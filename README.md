@@ -14,7 +14,8 @@ Dentro de `projects/`, crea una carpeta con el nombre del artefacto en **kebab-c
 ```
 projects/
 └── onboarding-digital/     ← así se nombra
-    ├── index.html          ← archivo principal (obligatorio)
+    ├── v1/                 ← primera versión (obligatorio)
+    │   └── index.html      ← archivo principal
     └── meta.json           ← metadata del artefacto (obligatorio)
 ```
 
@@ -27,16 +28,17 @@ Ejemplos: `onboarding-digital`, `simulador-flujo-caja`, `menu-hub-mobile`
 
 ```json
 {
-  "title": "Nombre legible del prototipo",
-  "description": "Qué hace y para qué sirve",
+  "name": "Nombre legible del prototipo",
   "author": "Tu nombre",
-  "date": "2026-06-01",
-  "status": "draft",
-  "tags": ["onboarding", "mobile"]
+  "project": "Nombre del proyecto o iniciativa",
+  "description": "Qué resuelve este prototipo",
+  "status": "en revisión",
+  "created_at": "2026-06-01",
+  "updated_at": "2026-06-01"
 }
 ```
 
-Valores posibles para `status`: `draft`, `review`, `approved`
+Valores posibles para `status`: `en revisión`, `en iteración`, `aprobado`, `handoff`
 
 ---
 
