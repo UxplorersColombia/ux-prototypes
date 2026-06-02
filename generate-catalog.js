@@ -15,6 +15,7 @@ const STATUS_CONFIG = {
   'en iteracion': { color: '#0369a1', bg: '#ebf4ff' }, // info
   'aprobado':     { color: '#007c26', bg: '#f6fcf2' }, // primary-d03 sobre primary-l05
   'handoff':      { color: '#29806d', bg: '#edfefa' }, // fiduciaria teal
+  'archivado':    { color: '#888888', bg: '#f0f0f0' }, // neutral gris
 };
 
 function normalize(s) {
@@ -37,7 +38,6 @@ function getProjects() {
         console.warn('  WARNING: meta.json invalido en ' + e.name + ': ' + err.message);
         return null;
       }
-      if (normalize(meta.status || '') === 'archivado') return null;
       var versions = fs.readdirSync(dir, { withFileTypes: true })
         .filter(function(d) { return d.isDirectory() && /^v\d+$/.test(d.name); })
         .map(function(d) { return d.name; })
