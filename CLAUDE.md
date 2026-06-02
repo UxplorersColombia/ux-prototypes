@@ -27,7 +27,7 @@ Pregunta **uno a uno** si no los tienes. No hagas todas las preguntas juntas.
 | Descripción breve | "Flujo de vinculación para usuarios nuevos" |
 | Status | por defecto: **en revisión** |
 
-**Status válidos:** `en revisión` · `en iteración` · `aprobado` · `handoff`
+**Status válidos:** `en revisión` · `en iteración` · `aprobado` · `handoff` · `archivado` (oculta del catálogo)
 
 ---
 
