@@ -100,7 +100,7 @@ Siempre `v1`, `v2`, `v3`... Nunca:
 | `en iteración` | Incorporando cambios tras la revisión |
 | `aprobado` | Listo para handoff o referencia |
 | `handoff` | Entregado a desarrollo |
-| `archivado` | Oculto del catálogo (el proyecto se preserva en git) |
+| `archivado` | Proyecto inactivo — visible en el catálogo con badge gris, filtrable |
 
 ### Mensaje de commit
 
