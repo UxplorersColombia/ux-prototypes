@@ -37,6 +37,7 @@ function getProjects() {
         console.warn('  WARNING: meta.json invalido en ' + e.name + ': ' + err.message);
         return null;
       }
+      if (normalize(meta.status || '') === 'archivado') return null;
       var versions = fs.readdirSync(dir, { withFileTypes: true })
         .filter(function(d) { return d.isDirectory() && /^v\d+$/.test(d.name); })
         .map(function(d) { return d.name; })
