@@ -94,10 +94,11 @@ function buildHTML(projects) {
   authors.sort();
   statuses.sort();
 
-  var authorOpts = authors.map(function(a)  { return '<option value="' + esc(a) + '">' + esc(a) + '</option>'; }).join('');
-  var statusOpts = statuses.map(function(s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join('');
-  var total      = projects.length;
-  var totalLabel = total + ' prototipo' + (total !== 1 ? 's' : '');
+  var STATUS_ORDER = ['en revisión', 'en iteración', 'aprobado', 'handoff', 'archivado'];
+  var authorOpts = authors.map(function(a) { return '<option value="' + esc(a) + '">' + esc(a) + '</option>'; }).join('');
+  var statusOpts = STATUS_ORDER.map(function(s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join('');
+  var activeCount = projects.filter(function(p) { return (p.meta.status || '') !== 'archivado'; }).length;
+  var totalLabel  = activeCount + ' prototipo' + (activeCount !== 1 ? 's' : '');
   var cards      = buildCards(projects);
 
   // ── Design tokens Skandia ──────────────────────────────────────────────────
@@ -167,11 +168,17 @@ function buildHTML(projects) {
     'function applyFilters(){',
     '  var a=document.getElementById("fa").value,s=document.getElementById("fs").value;',
     '  var cards=document.querySelectorAll(".card"),v=0;',
-    '  cards.forEach(function(c){var ok=(!a||c.dataset.author===a)&&(!s||c.dataset.status===s);c.classList.toggle("hidden",!ok);if(ok)v++;});',
+    '  cards.forEach(function(c){',
+    '    var isArchived=c.dataset.status==="archivado";',
+    '    var statusMatch=s?c.dataset.status===s:!isArchived;',
+    '    var ok=(!a||c.dataset.author===a)&&statusMatch;',
+    '    c.classList.toggle("hidden",!ok);if(ok)v++;',
+    '  });',
     '  document.getElementById("rcount").textContent=a||s?v+" resultado"+(v!==1?"s":""):"";',
     '  document.getElementById("total-count").textContent=v+" prototipo"+(v!==1?"s":"");',
     '}',
     'function clearFilters(){document.getElementById("fa").value="";document.getElementById("fs").value="";applyFilters();}',
+    'document.addEventListener("DOMContentLoaded",applyFilters);',
   ].join('\n');
 
   return '<!DOCTYPE html>\n' +
