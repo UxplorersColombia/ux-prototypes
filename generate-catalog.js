@@ -255,11 +255,12 @@ main{padding:var(--sp-xl) 90px;display:grid;grid-template-columns:repeat(auto-fi
 .badge-archivado::before{background:var(--grey-l05)}
 @keyframes badgePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.78)}}
 
-/* ── CARD META (DS grid, Montserrat labels) ── */
-.card-meta{display:grid;grid-template-columns:max-content 1fr;gap:3px var(--sp-m);font-size:.8rem}
+/* ── CARD META ── */
+.card-meta{display:flex;flex-direction:column;gap:5px;font-size:.8rem}
+.meta-row{display:flex;align-items:baseline;gap:var(--sp-s);flex-wrap:wrap}
 /* Fix #2 + #8: --text-subtle | 12px mínimo */
-.meta-key{font-family:"Montserrat",sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-subtle)}
-.meta-val{color:var(--text-med)}
+.meta-key{font-family:"Montserrat",sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-subtle);flex-shrink:0}
+.meta-val{color:var(--text-med);flex:1;min-width:0}
 .card-desc{font-size:.875rem;color:var(--text-med);line-height:1.6;flex:1}
 .card-divider{height:1px;background:var(--border);margin:2px 0}
 
