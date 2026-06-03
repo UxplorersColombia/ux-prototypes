@@ -77,8 +77,8 @@ const ARROW_SVG = '<svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org
 
 function buildCards(projects) {
   if (!projects.length) {
-    return `<div class="empty">
-      <div class="empty-icon">◻</div>
+    return `<div class="empty" role="status">
+      <span class="empty-icon" aria-hidden="true">◻</span>
       <h3>Sin prototipos</h3>
       <p>Agrega tu primer proyecto en <code>projects/</code>.</p>
     </div>`;
@@ -88,20 +88,24 @@ function buildCards(projects) {
     const badgeClass = STATUS_BADGE[key] || 'badge-archivado';
     const status     = esc(p.meta.status || 'sin estado');
     const initStr    = esc(initials(p.meta.author));
+    const cardId     = `card-title-${i}`;
+    // Fix #3: aria-label descriptivo en cada ver-link
+    const projectName = esc(p.meta.name || p.slug);
     const links = p.versions.length
       ? p.versions.map(v =>
-          `<a href="../projects/${esc(p.slug)}/${v}/" class="ver-link" target="_blank" rel="noopener">${v}${ARROW_SVG}</a>`
+          `<a href="../projects/${esc(p.slug)}/${v}/" class="ver-link" target="_blank" rel="noopener" aria-label="Abrir ${projectName} versión ${v}">${v}${ARROW_SVG}</a>`
         ).join('')
       : '<span class="no-ver">Sin versiones aún</span>';
-    // stagger delay capped at 8 cards
-    const delay = Math.min(i, 8) * 0.05;
-    return `<article class="card" data-author="${esc(p.meta.author)}" data-status="${esc(p.meta.status)}" style="animation-delay:${delay}s">
+    // Fix #9: sin decimales flotantes en animation-delay
+    const delay = (Math.min(i, 8) * 0.05).toFixed(2);
+    // Fix #4: article con aria-labelledby | Fix #5: avatar aria-hidden (autor ya está en meta)
+    return `<article class="card" data-author="${esc(p.meta.author)}" data-status="${esc(p.meta.status)}" style="animation-delay:${delay}s" aria-labelledby="${cardId}">
   <div class="card-header">
     <div class="card-title-block">
       <span class="badge ${badgeClass}">${status}</span>
-      <h2>${esc(p.meta.name || p.slug)}</h2>
+      <h2 id="${cardId}">${esc(p.meta.name || p.slug)}</h2>
     </div>
-    <div class="author-avatar" aria-label="${esc(p.meta.author)}">${initStr}</div>
+    <div class="author-avatar" aria-hidden="true">${initStr}</div>
   </div>
   <div class="card-meta">
     <div class="meta-row"><span class="meta-key">Autor</span><span class="meta-val">${esc(p.meta.author || '–')}</span></div>
@@ -138,7 +142,7 @@ function buildHTML(projects) {
   --primary-l04:#caf9cb;--primary-l05:#f6fcf2;
   --comp-00:#8fe000;--comp-d01:#7dc400;
   --fidu-d04:#29806d;--fidu-d05:#1d594c;--fidu-l05:#edfefa;--fidu-l04:#ccfdf2;
-  --grey-00:#404040;--grey-l03:#666666;--grey-l05:#a5a5a5;
+  --grey-00:#404040;--grey-l03:#666666;--grey-l05:#a5a5a5;--grey-accessible:#767676;
   --neutral-00:#ffffff;--neutral-l02:#f7f7f7;--neutral-l04:#dddddd;--neutral-l05:#c5c5c5;
   /* Feedback */
   --warn-light:#fff3e0;--warn-dark:#ffae08;
@@ -151,6 +155,8 @@ function buildHTML(projects) {
   --text-dark:var(--grey-00);
   --text-med:var(--grey-l03);
   --text-light:var(--grey-l05);
+  /* Fix #2: #767676 = 4.54:1 sobre blanco — mínimo WCAG AA */
+  --text-subtle:var(--grey-accessible);
   --border:var(--neutral-l04);
   --border-med:var(--neutral-l05);
   --brand:var(--primary-00);
@@ -176,29 +182,38 @@ html{scroll-behavior:smooth}
 body{font-family:"Open Sans",system-ui,sans-serif;background:var(--bg);color:var(--text-dark);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 
+/* ── SKIP LINK (Fix #10: WCAG 2.4.1) ── */
+.skip-link{position:absolute;top:-100%;left:var(--sp-m);background:var(--grey-00);color:#fff;padding:.5rem 1rem;border-radius:0 0 var(--bordes-s) var(--bordes-s);font-size:.875rem;font-weight:600;font-family:"Open Sans",sans-serif;text-decoration:none;z-index:9999;transition:top .15s}
+.skip-link:focus{top:0}
+
 /* ── HEADER (gradiente canónico Skandia) ── */
 header{background:var(--gradient-brand);color:#fff;padding:var(--sp-2xl) 90px;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-l);flex-wrap:wrap;position:relative;overflow:hidden}
 header::after{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
 .header-brand{display:flex;align-items:center;gap:var(--sp-s);position:relative;z-index:1}
 .header-logo{width:44px;height:44px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);border-radius:var(--bordes-s);display:flex;align-items:center;justify-content:center;font-family:"Montserrat",sans-serif;font-weight:700;font-size:.9rem;flex-shrink:0;backdrop-filter:blur(4px)}
-.header-titles h1{font-family:"Montserrat",sans-serif;font-size:1.5rem;font-weight:700;line-height:1.2;letter-spacing:-.01em}
-.header-titles p{font-size:.8rem;opacity:.85;margin-top:2px;font-weight:400}
+/* Fix #1: text-shadow compensa la luminosidad del extremo lime del gradiente */
+.header-titles h1{font-family:"Montserrat",sans-serif;font-size:1.5rem;font-weight:700;line-height:1.2;letter-spacing:-.01em;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.header-titles p{font-size:.875rem;opacity:.9;margin-top:2px;font-weight:400;text-shadow:0 1px 2px rgba(0,0,0,.25)}
 .header-stat{position:relative;z-index:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:var(--bordes-xl);padding:.5rem 1.25rem;display:flex;align-items:baseline;gap:.4rem;backdrop-filter:blur(4px);transition:background .2s}
 .header-stat:hover{background:rgba(255,255,255,.22)}
 .stat-num{font-family:"Montserrat",sans-serif;font-size:1.5rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
-.stat-label{font-family:"Open Sans",sans-serif;font-size:.75rem;font-weight:500;opacity:.85;text-transform:uppercase;letter-spacing:.08em}
+/* Fix #1: text-shadow en stat también (sobre gradiente lime) */
+.stat-label{font-family:"Open Sans",sans-serif;font-size:.75rem;font-weight:500;opacity:.9;text-transform:uppercase;letter-spacing:.08em;text-shadow:0 1px 2px rgba(0,0,0,.2)}
 
 /* ── TOOLBAR (sticky, DS light surface) ── */
 .toolbar{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.95);backdrop-filter:blur(12px) saturate(1.8);-webkit-backdrop-filter:blur(12px) saturate(1.8);border-bottom:1px solid var(--border);padding:.875rem 90px;display:flex;gap:var(--sp-l);align-items:center;flex-wrap:wrap;box-shadow:var(--shadow-sm)}
 .filter-group{display:flex;align-items:center;gap:.5rem}
-.filter-label{font-family:"Montserrat",sans-serif;font-size:.68rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
+/* Fix #2 + #8: --text-subtle 4.54:1 sobre blanco | 12px mínimo */
+.filter-label{font-family:"Montserrat",sans-serif;font-size:.75rem;font-weight:700;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
 .select-wrap{position:relative}
 .select-wrap::after{content:"";position:absolute;right:.75rem;top:50%;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--text-light);transform:translateY(-30%);pointer-events:none}
 select{appearance:none;-webkit-appearance:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--bordes-s);padding:.5rem 2.25rem .5rem .875rem;font-size:.875rem;font-family:"Open Sans",sans-serif;cursor:pointer;color:var(--text-dark);transition:border-color .15s var(--ease-std),box-shadow .15s var(--ease-std);min-width:148px}
 select:hover{border-color:var(--border-med)}
-select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,199,61,.15)}
+/* Fix #6: opacidad .35 → ratio Non-text Contrast 3:1 (WCAG 1.4.11) */
+select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,199,61,.35)}
 .toolbar-end{margin-left:auto;display:flex;align-items:center;gap:var(--sp-m)}
-.result-count{font-size:.8rem;color:var(--text-light);font-variant-numeric:tabular-nums}
+/* Fix #2: --text-subtle pasa WCAG AA */
+.result-count{font-size:.8rem;color:var(--text-subtle);font-variant-numeric:tabular-nums}
 .clear-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--bordes-xl);padding:.4rem 1.1rem;font-size:.8rem;cursor:pointer;color:var(--text-med);font-family:"Open Sans",sans-serif;font-weight:600;transition:all .15s var(--ease-std)}
 .clear-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
 
@@ -220,7 +235,8 @@ main{padding:var(--sp-xl) 90px;display:grid;grid-template-columns:repeat(auto-fi
 .card:hover .author-avatar{transform:scale(1.08)}
 
 /* ── STATUS BADGES (DS semantic feedback tokens) ── */
-.badge{display:inline-flex;align-items:center;gap:.35rem;font-family:"Montserrat",sans-serif;font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.25rem .7rem;border-radius:var(--bordes-xl);width:fit-content}
+/* Fix #8: mínimo 12px (0.75rem) — legibilidad para baja visión */
+.badge{display:inline-flex;align-items:center;gap:.35rem;font-family:"Montserrat",sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.2rem .65rem;border-radius:var(--bordes-xl);width:fit-content}
 .badge::before{content:"";width:5px;height:5px;border-radius:50%;flex-shrink:0}
 /* Warning → en revisión */
 .badge-revision{color:#b45309;background:var(--warn-light);border:1px solid rgba(255,174,8,.3)}
@@ -241,7 +257,8 @@ main{padding:var(--sp-xl) 90px;display:grid;grid-template-columns:repeat(auto-fi
 
 /* ── CARD META (DS grid, Montserrat labels) ── */
 .card-meta{display:grid;grid-template-columns:max-content 1fr;gap:3px var(--sp-m);font-size:.8rem}
-.meta-key{font-family:"Montserrat",sans-serif;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light)}
+/* Fix #2 + #8: --text-subtle | 12px mínimo */
+.meta-key{font-family:"Montserrat",sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-subtle)}
 .meta-val{color:var(--text-med)}
 .card-desc{font-size:.875rem;color:var(--text-med);line-height:1.6;flex:1}
 .card-divider{height:1px;background:var(--border);margin:2px 0}
@@ -254,7 +271,8 @@ main{padding:var(--sp-xl) 90px;display:grid;grid-template-columns:repeat(auto-fi
 .ver-link:hover{background:var(--brand-hover);transform:translateY(-1px);box-shadow:var(--shadow-brand)}
 .ver-link:active{transform:translateY(0);box-shadow:none}
 .ver-link svg{width:10px;height:10px;opacity:.9;flex-shrink:0}
-.no-ver{font-size:.8rem;color:var(--text-light);font-style:italic}
+/* Fix #2 */
+.no-ver{font-size:.8rem;color:var(--text-subtle);font-style:italic}
 
 /* ── EMPTY STATE ── */
 .empty{grid-column:1/-1;text-align:center;padding:5rem 2rem;color:var(--text-light);animation:cardEnter .4s var(--ease-out)}
@@ -264,7 +282,8 @@ main{padding:var(--sp-xl) 90px;display:grid;grid-template-columns:repeat(auto-fi
 .empty code{background:var(--bg);border-radius:var(--bordes-s);padding:.15rem .4rem}
 
 /* ── FOOTER ── */
-footer{text-align:center;padding:var(--sp-xl);font-size:.78rem;color:var(--text-light);border-top:1px solid var(--border);margin-top:var(--sp-xs)}
+/* Fix #2 */
+footer{text-align:center;padding:var(--sp-xl);font-size:.78rem;color:var(--text-subtle);border-top:1px solid var(--border);margin-top:var(--sp-xs)}
 footer a{color:var(--brand);transition:color .15s}
 footer a:hover{color:var(--brand-hover)}
 
@@ -351,6 +370,9 @@ function applyFilters(){
   var countEl=document.getElementById('total-count');
   var prev=parseInt(countEl.textContent)||0;
   if(prev!==v)animateCount(countEl,prev,v,300);
+  /* Fix aria-label del stat dinámicamente */
+  var statWrap=document.querySelector('.header-stat');
+  if(statWrap)statWrap.setAttribute('aria-label',v+' prototipo'+(v!==1?'s':'')+' activo'+(v!==1?'s':''));
   document.getElementById('rcount').textContent=(a||s)?v+' resultado'+(v!==1?'s':''):'';
 }
 
@@ -396,6 +418,9 @@ document.addEventListener('DOMContentLoaded',function(){
 </head>
 <body>
 
+<!-- Fix #10: skip link WCAG 2.4.1 -->
+<a class="skip-link" href="#grid">Saltar al contenido</a>
+
 <header>
   <div class="header-brand">
     <div class="header-logo" aria-hidden="true">UX</div>
@@ -429,7 +454,8 @@ document.addEventListener('DOMContentLoaded',function(){
   </div>
   <div class="toolbar-end">
     <span class="result-count" id="rcount" aria-live="polite"></span>
-    <button class="clear-btn" onclick="clearFilters()">Limpiar filtros</button>
+    <!-- Fix #7: type="button" explícito -->
+    <button class="clear-btn" type="button" onclick="clearFilters()">Limpiar filtros</button>
   </div>
 </div>
 
