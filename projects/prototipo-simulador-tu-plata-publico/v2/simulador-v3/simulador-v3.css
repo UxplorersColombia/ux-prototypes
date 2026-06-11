@@ -280,12 +280,150 @@
 ═══════════════════════════════════════════════════════════════════ */
 #s-ctas { max-width: 600px; align-self: center; width: 100%; }
 
+/* ════════════════════════════════════════════════════════════════════
+   CANAL CLIENTE · PANTALLA CTAs — layout dos columnas
+   Mismo patrón que s-entrada y s-ingresos
+═══════════════════════════════════════════════════════════════════ */
+
+.ctas-col--left { display: none; }
+.ctas-col--right { width: 100%; }
+
+/* Canal cliente desktop: grid dos columnas, anula max-width de #s-ctas */
+body[data-channel="cliente"] #s-ctas.screen--active {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  min-height: calc(100vh - 80px);
+  max-width: none !important;
+  align-self: stretch !important;
+  width: 100%;
+}
+
+/* Romper restricciones de page-shell y frame */
+body[data-channel="cliente"] .page-shell:has(#s-ctas.screen--active) {
+  padding: 0;
+}
+body[data-channel="cliente"] .frame:has(#s-ctas.screen--active),
+body[data-channel="cliente"] .page-shell:has(#s-ctas.screen--active) > .breadcrumb {
+  max-width: none;
+  margin: 0;
+}
+
+/* Ocultar frame-breadcrumb: vive en la columna izquierda */
+body[data-channel="cliente"] .frame:has(#s-ctas.screen--active) .frame-breadcrumb {
+  display: none;
+}
+
+/* Panel izquierdo */
+body[data-channel="cliente"] .ctas-col--left {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0;
+  background: #EDFEFA;
+  padding: 32px 48px 48px;
+}
+body[data-channel="cliente"] .ctas-col--left .breadcrumb {
+  align-self: flex-start;
+  font-size: 12px;
+  margin: 0;
+  padding: 0;
+}
+body[data-channel="cliente"] .ctas-col--left .ctas-illus {
+  margin-top: auto;
+  margin-bottom: 28px;
+  align-self: center;
+  flex-shrink: 0;
+}
+body[data-channel="cliente"] .ctas-col--left .ctas__head-left {
+  margin-top: 0;
+  margin-bottom: auto;
+}
+
+/* Ilustración */
+.ctas-illus { width: 240px; height: 240px; }
+.ctas-illus__img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Título y subtítulo del panel izquierdo */
+.ctas__head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ctas__title-left {
+  font-family: var(--title);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2.4vw, 2.25rem);
+  color: var(--texts-dark);
+  line-height: 1.2;
+  text-align: center;
+}
+.ctas__sub-left {
+  font-size: 15px;
+  color: var(--texts-medium);
+  line-height: 1.55;
+  text-align: center;
+}
+
+/* Panel derecho */
+body[data-channel="cliente"] .ctas-col--right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px 48px;
+  background: var(--neutral-00);
+  overflow-y: auto;
+}
+
+/* Tablet (≤ 860px): columnas apiladas */
+@media (max-width: 860px) {
+  body[data-channel="cliente"] #s-ctas.screen--active {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  body[data-channel="cliente"] .ctas-col--left {
+    padding: 24px 20px 20px;
+    gap: 20px;
+    justify-content: flex-start;
+    min-height: 180px;
+  }
+  .ctas-illus { width: 140px; height: 140px; }
+  body[data-channel="cliente"] .ctas-col--right {
+    padding: 24px 20px;
+    gap: 16px;
+  }
+}
+
+/* Mobile (≤ 768px): colapsa igual que paso de tus datos */
+@media (max-width: 768px) {
+  body[data-channel="cliente"] #s-ctas.screen--active {
+    display: flex;
+    flex-direction: column;
+  }
+  body[data-channel="cliente"] .ctas-col--left { display: none !important; }
+  body[data-channel="cliente"] .ctas-col--right {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 16px;
+  }
+  body[data-channel="cliente"] .page-shell:has(#s-ctas.screen--active) {
+    padding: 20px 16px 48px;
+  }
+  body[data-channel="cliente"] .frame:has(#s-ctas.screen--active),
+  body[data-channel="cliente"] .page-shell:has(#s-ctas.screen--active) > .breadcrumb {
+    max-width: none;
+    margin: 0;
+  }
+}
+
 .ctas-hero {
   display: flex;
   gap: 16px;
   align-items: center;
 }
 .ctas-hero .semaforo { flex-shrink: 0; }
+.ctas-hero { margin-bottom: 32px; }
 .ctas-hero__title {
   font-family: var(--title);
   font-weight: 700;
@@ -371,6 +509,16 @@
 }
 .hint--prominent .hint__icon { color: #d97706; }
 .hint--prominent .hint__text { color: #78350f; font-weight: 600; }
+
+/* ════════════════════════════════════════════════════════════════════
+   CANAL CLIENTE · Ancho expandido en Distribución y Diagnóstico
+   El .frame tiene max-width: 1024px por defecto. Aquí lo sustituimos
+   por 90vw para que el contenido aproveche el espacio disponible.
+═══════════════════════════════════════════════════════════════════ */
+body[data-channel="cliente"] .frame:has(#s-distribucion.screen--active),
+body[data-channel="cliente"] .frame:has(#s-diagnostico.screen--active) {
+  max-width: 95%;
+}
 
 /* ════════════════════════════════════════════════════════════════════
    BARRA DE DISTRIBUCIÓN STICKY (pantalla 2)
@@ -1149,6 +1297,146 @@ body[data-channel="publico"] .entrada-benefits {
 }
 
 /* ════════════════════════════════════════════════════════════════════
+   CANAL CLIENTE · PASO INGRESOS — layout dos columnas
+   Misma estructura que s-entrada: panel verde izquierdo + form derecho
+═══════════════════════════════════════════════════════════════════ */
+
+/* Columna izquierda oculta por defecto; derecha como bloque normal */
+.ingresos-col--left { display: none; }
+.ingresos-col--right { width: 100%; }
+
+/* Canal cliente desktop: activar grid de dos columnas */
+body[data-channel="cliente"] #s-ingresos.screen--active {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  height: calc(100vh - 80px);
+  max-width: none !important;
+  align-self: stretch !important;
+  width: 100%;
+}
+
+/* Romper restricciones de page-shell y frame */
+body[data-channel="cliente"] .page-shell:has(#s-ingresos.screen--active) {
+  padding: 0;
+}
+body[data-channel="cliente"] .frame:has(#s-ingresos.screen--active),
+body[data-channel="cliente"] .page-shell:has(#s-ingresos.screen--active) > .breadcrumb {
+  max-width: none;
+  margin: 0;
+}
+
+/* Ocultar frame-breadcrumb: el breadcrumb vive en la columna izquierda */
+body[data-channel="cliente"] .frame:has(#s-ingresos.screen--active) .frame-breadcrumb {
+  display: none;
+}
+
+/* Panel izquierdo */
+body[data-channel="cliente"] .ingresos-col--left {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0;
+  background: #EDFEFA;
+  padding: 32px 48px 48px;
+  overflow: hidden;
+}
+body[data-channel="cliente"] .ingresos-col--left .breadcrumb {
+  align-self: flex-start;
+  font-size: 12px;
+  margin: 0;
+  padding: 0;
+}
+body[data-channel="cliente"] .ingresos-col--left .ingresos-illus {
+  margin-top: auto;
+  margin-bottom: 28px;
+  align-self: center;
+  flex-shrink: 0;
+}
+body[data-channel="cliente"] .ingresos-col--left .ingresos__head {
+  margin-top: 0;
+  margin-bottom: auto;
+}
+
+/* Ilustración */
+.ingresos-illus { width: 240px; height: 240px; }
+.ingresos-illus__img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Título y subtítulo del panel izquierdo */
+.ingresos__head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ingresos__title {
+  font-family: var(--title);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2.4vw, 2.25rem);
+  color: var(--texts-dark);
+  line-height: 1.2;
+  text-align: center;
+}
+.ingresos__sub {
+  font-size: 15px;
+  color: var(--texts-medium);
+  line-height: 1.55;
+  text-align: center;
+}
+
+/* Panel derecho */
+body[data-channel="cliente"] .ingresos-col--right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px 48px;
+  background: var(--neutral-00);
+  overflow-y: auto;
+}
+
+/* Tablet (≤ 860px): columnas apiladas */
+@media (max-width: 860px) {
+  body[data-channel="cliente"] #s-ingresos.screen--active {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: auto;
+  }
+  body[data-channel="cliente"] .ingresos-col--left {
+    padding: 24px 20px 20px;
+    gap: 20px;
+    justify-content: flex-start;
+    min-height: 180px;
+  }
+  .ingresos-illus { width: 140px; height: 140px; }
+  body[data-channel="cliente"] .ingresos-col--right {
+    padding: 24px 20px;
+    gap: 16px;
+  }
+}
+
+/* Mobile (≤ 768px): colapsa igual que paso de tus datos */
+@media (max-width: 768px) {
+  body[data-channel="cliente"] #s-ingresos.screen--active {
+    display: flex;
+    flex-direction: column;
+  }
+  body[data-channel="cliente"] .ingresos-col--left { display: none !important; }
+  body[data-channel="cliente"] .ingresos-col--right {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 16px;
+  }
+  body[data-channel="cliente"] .page-shell:has(#s-ingresos.screen--active) {
+    padding: 20px 16px 48px;
+  }
+  body[data-channel="cliente"] .frame:has(#s-ingresos.screen--active),
+  body[data-channel="cliente"] .page-shell:has(#s-ingresos.screen--active) > .breadcrumb {
+    max-width: none;
+    margin: 0;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
    CANAL CLIENTE · PÁGINA INICIAL — layout dos bloques
    Alineada con el diseño del portal-clientes (ref. skandia-sim-trib)
 ═══════════════════════════════════════════════════════════════════ */
@@ -1673,8 +1961,85 @@ body[data-channel="publico"] .entrada-col--right { display: contents; }
 .modal--confirm .modal__title { text-align: center; }
 .modal--confirm .modal__desc  { text-align: center; margin-top: -10px; max-width: 320px; }
 
+/* Botones del modal: altura confortable en mobile. flex-shrink:0 evita que column-flex
+   colapse la altura cuando btn--grow tiene flex-basis:0% en el eje principal. */
+.modal__actions .btn {
+  min-height: 56px;
+  height: 56px;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 479px) {
-  .modal { padding: 24px 20px 20px; gap: 18px; }
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal {
+    padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+    gap: 20px;
+    max-width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--r-card) var(--r-card) 0 0;
+    animation: modalSlideUp 280ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
   .modal__actions { flex-direction: column-reverse; }
   .modal__actions .btn { width: 100%; }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   CANAL PÚBLICO · s-ingresos — card centrado (restaura el aspecto
+   que tenía antes del layout dos columnas del canal cliente)
+═══════════════════════════════════════════════════════════════════ */
+body[data-channel="publico"] #s-ingresos.screen--active {
+  max-width: min(560px, calc(100vw - 48px));
+  align-self: center;
+  width: 100%;
+}
+body[data-channel="publico"] .ingresos-col--right {
+  background: var(--neutral-00);
+  border: 1px solid var(--neutral-l03);
+  border-radius: var(--r-card);
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 540px) {
+  body[data-channel="publico"] #s-ingresos.screen--active {
+    max-width: calc(100vw - 32px);
+  }
+  body[data-channel="publico"] .ingresos-col--right {
+    padding: 20px 16px;
+    gap: 16px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   CANAL PÚBLICO · s-ctas — card con fondo mint; nav links quedan
+   fuera del card (son hermanos de #ctas-content en .ctas-col--right)
+═══════════════════════════════════════════════════════════════════ */
+body[data-channel="publico"] .ctas-col--right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+body[data-channel="publico"] #ctas-content {
+  background: #EDFEFA;
+  border: 1px solid var(--primary-l04);
+  border-radius: var(--r-card);
+  padding: 24px 20px;
+}
+
+@media (max-width: 540px) {
+  body[data-channel="publico"] #ctas-content {
+    padding: 20px 16px;
+  }
 }
