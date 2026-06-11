@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lógica de cálculos — Simulador de Flujo de Caja · Skandia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & base ─────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --green-500: #00c73d;
+      --green-600: #03a835;
+      --green-50:  #f6fcf2;
+      --green-100: #caf9cb;
+      --yellow-400: #ffae08;
+      --yellow-50:  #fffbf0;
+      --red-500:    #e03430;
+      --red-50:     #fef2f2;
+      --blue-500:   #0099de;
+      --blue-50:    #f0f9ff;
+
+      --surface-0:   #ffffff;
+      --surface-50:  #f8f9fa;
+      --surface-100: #f1f3f5;
+      --surface-200: #e2e2e2;
+      --surface-300: #dee2e6;
+      --surface-400: #ced4da;
+      --surface-600: #868e96;
+      --surface-700: #495057;
+      --surface-800: #404040;
+      --surface-900: #212529;
+
+      --text-primary:   #404040;
+      --text-secondary: #666666;
+      --text-muted:     #868e96;
+      --border:         #dddddd;
+
+      --font-body:  'Open Sans', system-ui, sans-serif;
+      --font-head:  'Montserrat', system-ui, sans-serif;
+      --font-mono:  'JetBrains Mono', 'Courier New', monospace;
+
+      --radius-sm:  4px;
+      --radius-md:  8px;
+      --radius-lg:  12px;
+      --radius-xl:  16px;
+
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--surface-50);
+      line-height: 1.6;
+      padding: 40px 20px 80px;
+    }
+
+    /* ─── Layout ────────────────────────────────────────────── */
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .doc-header {
+      background: var(--surface-800);
+      border-radius: var(--radius-xl);
+      padding: 40px 48px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-header::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: var(--green-500);
+    }
+
+    .doc-header::after {
+      content: '';
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(0,199,61,0.06);
+      pointer-events: none;
+    }
+
+    .header-eyebrow {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-500);
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-family: var(--font-head);
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 28px;
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      padding: 4px 12px;
+    }
+
+    .meta-chip .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-500);
+    }
+
+    /* ─── TOC ───────────────────────────────────────────────── */
+    .toc {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+    }
+
+    .toc-title {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 32px;
+    }
+
+    .toc-list li a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.15s;
+    }
+
+    .toc-list li a:hover { color: var(--green-600); }
+
+    .toc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-500);
+      min-width: 18px;
+    }
+
+    /* ─── Section ───────────────────────────────────────────── */
+    .section {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--surface-100);
+    }
+
+    .section-number {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-500);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      min-width: 32px;
+      text-align: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .section-title-wrap {}
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ─── Subsection ────────────────────────────────────────── */
+    .subsection {
+      margin-bottom: 28px;
+    }
+
+    .subsection:last-child { margin-bottom: 0; }
+
+    .subsection-title {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .subsection-title::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 14px;
+      background: var(--green-500);
+      border-radius: 2px;
+    }
+
+    /* ─── Tables ────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead tr {
+      background: var(--surface-50);
+      border-bottom: 2px solid var(--border);
+    }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--surface-100);
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody tr:hover { background: var(--surface-50); }
+
+    td {
+      padding: 10px 14px;
+      color: var(--text-primary);
+      vertical-align: top;
+    }
+
+    td strong { font-weight: 700; }
+
+    td code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--surface-100);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--surface-800);
+    }
+
+    /* ─── Code blocks ───────────────────────────────────────── */
+    .formula-block {
+      background: #1e1e2e;
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    .formula-block pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+      color: #cdd6f4;
+      white-space: pre;
+    }
+
+    .formula-block .keyword { color: #89b4fa; }
+    .formula-block .operator { color: #89dceb; }
+    .formula-block .string { color: #a6e3a1; }
+    .formula-block .comment { color: #6c7086; font-style: italic; }
+    .formula-block .number { color: #fab387; }
+    .formula-block .variable { color: #cba6f7; }
+    .formula-block .function { color: #89dceb; }
+
+    /* ─── Profile badges ────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    .badge-green {
+      color: #006420;
+      background: #dcfce7;
+    }
+
+    .badge-yellow {
+      color: #854d0e;
+      background: #fef9c3;
+    }
+
+    .badge-red {
+      color: #991b1b;
+      background: #fee2e2;
+    }
+
+    .badge-blue {
+      color: #1e3a5f;
+      background: #dbeafe;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .badge-green .badge-dot   { background: var(--green-500); }
+    .badge-yellow .badge-dot  { background: var(--yellow-400); }
+    .badge-red .badge-dot     { background: var(--red-500); }
+    .badge-blue .badge-dot    { background: var(--blue-500); }
+
+    /* ─── Profile cards ─────────────────────────────────────── */
+    .profile-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .profile-card {
+      border-radius: var(--radius-md);
+      padding: 18px 16px;
+      border: 1.5px solid;
+    }
+
+    .profile-card.green {
+      background: var(--green-50);
+      border-color: #b3edc4;
+    }
+
+    .profile-card.yellow {
+      background: var(--yellow-50);
+      border-color: #fde68a;
+    }
+
+    .profile-card.red {
+      background: var(--red-50);
+      border-color: #fecaca;
+    }
+
+    .profile-label {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .profile-card.green .profile-label   { color: var(--green-600); }
+    .profile-card.yellow .profile-label  { color: #b45309; }
+    .profile-card.red .profile-label     { color: #b91c1c; }
+
+    .profile-name {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .profile-card.green .profile-name   { color: #15803d; }
+    .profile-card.yellow .profile-name  { color: #92400e; }
+    .profile-card.red .profile-name     { color: #991b1b; }
+
+    .profile-rule {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ─── Callout / Note ────────────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      margin: 12px 0;
+      font-size: 13px;
+      line-height: 1.55;
+      border: 1px solid;
+    }
+
+    .callout-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .callout-body { flex: 1; color: var(--text-secondary); }
+    .callout-body strong { color: var(--text-primary); font-weight: 700; }
+
+    .callout.info {
+      background: var(--blue-50);
+      border-color: #bae6fd;
+    }
+
+    .callout.warning {
+      background: var(--yellow-50);
+      border-color: #fde68a;
+    }
+
+    .callout.success {
+      background: var(--green-50);
+      border-color: #b3edc4;
+    }
+
+    .callout.neutral {
+      background: var(--surface-50);
+      border-color: var(--border);
+    }
+
+    /* ─── Example blocks ────────────────────────────────────── */
+    .example-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .example-card {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .example-head {
+      padding: 10px 14px;
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .example-head.green  { background: #dcfce7; color: #15803d; }
+    .example-head.yellow { background: #fef9c3; color: #92400e; }
+    .example-head.red    { background: #fee2e2; color: #991b1b; }
+
+    .example-body {
+      padding: 14px;
+      background: var(--surface-0);
+    }
+
+    .example-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--surface-100);
+    }
+
+    .example-row:last-child { border-bottom: none; }
+
+    .example-label { color: var(--text-secondary); }
+
+    .example-value {
+      font-weight: 600;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-primary);
+    }
+
+    .example-result {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+    }
+
+    .example-result.green  { background: #dcfce7; }
+    .example-result.yellow { background: #fef9c3; }
+    .example-result.red    { background: #fee2e2; }
+
+    .result-margin {
+      font-family: var(--font-head);
+      font-size: 20px;
+      font-weight: 700;
+      display: block;
+    }
+
+    .result-margin.green  { color: #15803d; }
+    .result-margin.yellow { color: #92400e; }
+    .result-margin.red    { color: #991b1b; }
+
+    .result-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ─── Alert rows ────────────────────────────────────────── */
+    .alert-group { margin-bottom: 20px; }
+
+    .alert-group-title {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .alert-row {
+      display: grid;
+      grid-template-columns: 220px 1fr auto;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .alert-condition {
+      padding: 12px 14px;
+      background: var(--surface-50);
+      border-right: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--surface-700);
+      align-self: stretch;
+    }
+
+    .alert-text {
+      padding: 12px 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .alert-text em {
+      font-style: normal;
+      color: var(--text-secondary);
+    }
+
+    .alert-ref {
+      padding: 12px 14px;
+      background: var(--surface-50);
+      border-left: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 160px;
+      line-height: 1.4;
+    }
+
+    /* ─── Variable table ────────────────────────────────────── */
+    .var-type {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .var-type.array { background: #f3e8ff; color: #7e22ce; }
+    .var-type.string { background: #fef9c3; color: #854d0e; }
+    .var-type.object { background: #dcfce7; color: #15803d; }
+
+    /* ─── Edge case table ───────────────────────────────────── */
+    .edge-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    /* ─── Rule 50/30/20 visual ──────────────────────────────── */
+    .rule-visual {
+      display: flex;
+      gap: 0;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      height: 48px;
+      margin: 16px 0;
+    }
+
+    .rule-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .rule-segment.v50 { flex: 50; background: #e03430; }
+    .rule-segment.v30 { flex: 30; background: var(--yellow-400); }
+    .rule-segment.v20 { flex: 20; background: var(--green-500); }
+
+    .rule-legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ─── Projection cards ──────────────────────────────────── */
+    .projection-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .proj-card {
+      background: var(--surface-50);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    .proj-horizon {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .proj-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .proj-formula {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--green-600);
+      background: var(--green-50);
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+
+    /* ─── Footer ────────────────────────────────────────────── */
+    .doc-footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-logo {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .footer-meta {
+      font-size: 12px;
+      color: var(--surface-400);
+    }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      body { padding: 20px 12px 60px; }
+      .doc-header { padding: 28px 24px; }
+      .section { padding: 24px 20px; }
+      .profile-cards { grid-template-columns: 1fr; }
+      .example-grid { grid-template-columns: 1fr; }
+      .projection-cards { grid-template-columns: 1fr; }
+      .toc-list { grid-template-columns: 1fr; }
+      .alert-row { grid-template-columns: 1fr; }
+      .alert-condition { border-right: none; border-bottom: 1px solid var(--border); }
+      .alert-ref { border-left: none; border-top: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ────────────────────────────────────────────── -->
+  <header class="doc-header">
+    <div class="header-eyebrow">Documento técnico · Simulador de Flujo de Caja</div>
+    <h1 class="header-title">Lógica de cálculos — revisión de stakeholders</h1>
+    <p class="header-subtitle">Descripción completa del modelo de clasificación, fórmulas, umbrales y variables de estado del simulador v3.</p>
+    <div class="header-meta">
+      <span class="meta-chip"><span class="dot"></span>Versión simulador-v3</span>
+      <span class="meta-chip"><span class="dot"></span>Actualizado: 10 jun 2026</span>
+      <span class="meta-chip"><span class="dot"></span>Equipo UXplorers · Skandia</span>
+    </div>
+  </header>
+
+  <!-- ── TOC ───────────────────────────────────────────────── -->
+  <nav class="toc">
+    <div class="toc-title">Contenido</div>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="toc-num">01</span> Resumen del modelo</a></li>
+      <li><a href="#s2"><span class="toc-num">02</span> Fórmulas exactas</a></li>
+      <li><a href="#s3"><span class="toc-num">03</span> Ejemplo numérico</a></li>
+      <li><a href="#s4"><span class="toc-num">04</span> Umbrales de alertas</a></li>
+      <li><a href="#s5"><span class="toc-num">05</span> Regla 50/30/20</a></li>
+      <li><a href="#s6"><span class="toc-num">06</span> Variables de estado</a></li>
+      <li><a href="#s7"><span class="toc-num">07</span> Tratamiento de periodicidades</a></li>
+      <li><a href="#s8"><span class="toc-num">08</span> Subcategorías opcionales</a></li>
+      <li><a href="#s9"><span class="toc-num">09</span> Casos límite</a></li>
+      <li><a href="#s10"><span class="toc-num">10</span> Proyecciones</a></li>
+    </ul>
+  </nav>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 01 · Resumen del modelo                                  -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Resumen del modelo</h2>
+        <p class="section-desc">Clasificación de salud financiera mensual en tres perfiles.</p>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.7;">
+      El simulador clasifica la salud financiera mensual del usuario en tres perfiles: <strong>Saludable</strong>, <strong>Ajustado</strong> y <strong>En riesgo</strong>. La clasificación se basa en una sola variable: el <strong>margen disponible mensual</strong>, expresado como porcentaje del ingreso total.
+    </p>
+
+    <div class="profile-cards">
+      <div class="profile-card green">
+        <div class="profile-label">Perfil</div>
+        <div class="profile-name">Saludable</div>
+        <div class="profile-rule">Margen &ge; 20% del ingreso mensual</div>
+      </div>
+      <div class="profile-card yellow">
+        <div class="profile-label">Perfil</div>
+        <div class="profile-name">Ajustado</div>
+        <div class="profile-rule">0% &le; Margen &lt; 20% del ingreso mensual</div>
+      </div>
+      <div class="profile-card red">
+        <div class="profile-label">Perfil</div>
+        <div class="profile-name">En riesgo</div>
+        <div class="profile-rule">Margen &lt; 0% — los gastos superan los ingresos</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 02 · Fórmulas exactas                                    -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Fórmulas exactas</h2>
+        <p class="section-desc">Definición matemática de cada cálculo del simulador.</p>
+      </div>
+    </div>
+
+    <!-- 2.1 Ingreso mensual total -->
+    <div class="subsection">
+      <h3 class="subsection-title">2.1 Ingreso mensual total</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">El usuario ingresa una o varias fuentes de ingreso con periodicidad. Todas se normalizan a mensual:</p>
+      <div class="formula-block">
+        <pre><span class="comment">// Ingreso mensual total</span>
+<span class="variable">ingresoMensual</span> = <span class="function">Σ</span> (<span class="variable">monto_fuente</span> <span class="operator">×</span> <span class="variable">factor_periodicidad</span>)</pre>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Periodicidad</th>
+              <th>Factor de conversión a mensual</th>
+              <th>Razonamiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Quincenal</td>
+              <td><code>× 2</code></td>
+              <td style="color:var(--text-secondary);">Dos quincenas = un mes</td>
+            </tr>
+            <tr>
+              <td>Mensual</td>
+              <td><code>× 1</code></td>
+              <td style="color:var(--text-secondary);">Sin conversión</td>
+            </tr>
+            <tr>
+              <td>Bimestral</td>
+              <td><code>× 0.5</code></td>
+              <td style="color:var(--text-secondary);">Un bimestre = dos meses</td>
+            </tr>
+            <tr>
+              <td>Semestral</td>
+              <td><code>× 1/6 ≈ 0.1667</code></td>
+              <td style="color:var(--text-secondary);">Un semestre = seis meses</td>
+            </tr>
+            <tr>
+              <td>Anual</td>
+              <td><code>× 1/12 ≈ 0.0833</code></td>
+              <td style="color:var(--text-secondary);">Un año = doce meses</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2.2 Porcentaje de cada categoría -->
+    <div class="subsection">
+      <h3 class="subsection-title">2.2 Porcentaje de cada categoría</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Los sliders representan porcentaje del ingreso mensual. El monto en pesos se calcula así:</p>
+      <div class="formula-block">
+        <pre><span class="comment">// Monto en pesos de cada categoría</span>
+<span class="variable">montoCOP</span> = (<span class="variable">porcentaje</span> <span class="operator">/</span> <span class="number">100</span>) <span class="operator">×</span> <span class="variable">ingresoMensual</span>
+
+<span class="comment">// Gastos personalizados "Otros": COP → % para el cálculo</span>
+<span class="variable">otros_pct</span> = (<span class="variable">totalOtrosCOP</span> <span class="operator">/</span> <span class="variable">ingresoMensual</span>) <span class="operator">×</span> <span class="number">100</span></pre>
+      </div>
+
+      <div class="callout info" style="margin-top:14px;">
+        <span class="callout-icon">ℹ</span>
+        <div class="callout-body">
+          Los sliders permiten hasta el <strong>300% del ingreso</strong> para reflejar situaciones reales donde los gastos superan ampliamente los ingresos (personas con créditos o deudas altas).
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px;">
+        <table>
+          <thead>
+            <tr><th>Categoría</th><th>Variable de estado</th><th>Tipo de entrada</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Gastos vitales</td><td><code>state.vitales</code></td><td>Slider (% del ingreso)</td></tr>
+            <tr><td>Deudas y compromisos</td><td><code>state.deudas</code></td><td>Slider (% del ingreso)</td></tr>
+            <tr><td>Gustos y ocio</td><td><code>state.gustos</code></td><td>Slider (% del ingreso)</td></tr>
+            <tr><td>Gastos cotidianos</td><td><code>state.cotidianos</code></td><td>Slider (% del ingreso)</td></tr>
+            <tr><td>Futuro / Ahorro</td><td><code>state.futuro</code></td><td>Slider (% del ingreso)</td></tr>
+            <tr><td>Otros (personalizados)</td><td><code>state.otros[]</code></td><td>Monto en COP → convertido a %</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2.3 Margen disponible -->
+    <div class="subsection">
+      <h3 class="subsection-title">2.3 Margen disponible</h3>
+      <div class="formula-block">
+        <pre><span class="comment">// Margen en porcentaje</span>
+<span class="variable">margen_pct</span> = <span class="number">100</span> <span class="operator">-</span> <span class="variable">vitales</span> <span class="operator">-</span> <span class="variable">deudas</span> <span class="operator">-</span> <span class="variable">gustos</span> <span class="operator">-</span> <span class="variable">cotidianos</span> <span class="operator">-</span> <span class="variable">futuro</span> <span class="operator">-</span> <span class="variable">otros_pct</span>
+
+<span class="comment">// Margen en pesos colombianos</span>
+<span class="variable">margen_cop</span> = (<span class="variable">margen_pct</span> <span class="operator">/</span> <span class="number">100</span>) <span class="operator">×</span> <span class="variable">ingresoMensual</span></pre>
+      </div>
+
+      <div class="callout warning" style="margin-top:14px;">
+        <span class="callout-icon">⚠</span>
+        <div class="callout-body">
+          El margen <strong>excluye el ahorro programado (Futuro)</strong>: es lo que sobra después de todos los gastos <em>y</em> del ahorro. El tooltip en la pantalla de diagnóstico aclara esto con la etiqueta <em>"Disponible del ingreso"</em>.
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.4 Clasificación del perfil -->
+    <div class="subsection">
+      <h3 class="subsection-title">2.4 Clasificación del perfil</h3>
+      <div class="formula-block">
+        <pre><span class="keyword">function</span> <span class="function">calcularPerfil</span>(<span class="variable">margen_pct</span>) {
+  <span class="keyword">if</span> (<span class="variable">margen_pct</span> <span class="operator">&lt;</span>  <span class="number">0</span>)  <span class="keyword">return</span> <span class="string">'riesgo'</span>    <span class="comment">// gastos &gt; ingresos</span>
+  <span class="keyword">if</span> (<span class="variable">margen_pct</span> <span class="operator">&gt;=</span> <span class="number">20</span>) <span class="keyword">return</span> <span class="string">'saludable'</span>  <span class="comment">// margen holgado</span>
+  <span class="keyword">return</span> <span class="string">'ajustado'</span>                          <span class="comment">// margen estrecho pero positivo</span>
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 03 · Ejemplo numérico                                    -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Ejemplo numérico</h2>
+        <p class="section-desc">Tres escenarios con el mismo ingreso base para ilustrar cada perfil.</p>
+      </div>
+    </div>
+
+    <div class="callout neutral" style="margin-bottom:16px;">
+      <span class="callout-icon">📌</span>
+      <div class="callout-body">Ingreso base en los tres ejemplos: <strong>$5.000.000 / mes</strong></div>
+    </div>
+
+    <div class="example-grid">
+      <!-- Saludable -->
+      <div class="example-card">
+        <div class="example-head green">Perfil Saludable</div>
+        <div class="example-body">
+          <div class="example-row"><span class="example-label">Gastos vitales</span><span class="example-value">35%</span></div>
+          <div class="example-row"><span class="example-label">Deudas</span><span class="example-value">15%</span></div>
+          <div class="example-row"><span class="example-label">Gustos</span><span class="example-value">10%</span></div>
+          <div class="example-row"><span class="example-label">Cotidianos</span><span class="example-value">8%</span></div>
+          <div class="example-row"><span class="example-label">Futuro</span><span class="example-value">12%</span></div>
+          <div class="example-row"><span class="example-label">Otros</span><span class="example-value">0%</span></div>
+          <div class="example-result green">
+            <span class="result-margin green">Margen 20%</span>
+            <div class="result-label">$1.000.000 · margen ≥ 20% → Saludable ✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ajustado -->
+      <div class="example-card">
+        <div class="example-head yellow">Perfil Ajustado</div>
+        <div class="example-body">
+          <div class="example-row"><span class="example-label">Gastos vitales</span><span class="example-value">45%</span></div>
+          <div class="example-row"><span class="example-label">Deudas</span><span class="example-value">25%</span></div>
+          <div class="example-row"><span class="example-label">Gustos</span><span class="example-value">10%</span></div>
+          <div class="example-row"><span class="example-label">Cotidianos</span><span class="example-value">8%</span></div>
+          <div class="example-row"><span class="example-label">Futuro</span><span class="example-value">12%</span></div>
+          <div class="example-row"><span class="example-label">Otros</span><span class="example-value">0%</span></div>
+          <div class="example-result yellow">
+            <span class="result-margin yellow">Margen 0%</span>
+            <div class="result-label">$0 · 0% ≤ margen &lt; 20% → Ajustado ✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- En riesgo -->
+      <div class="example-card">
+        <div class="example-head red">Perfil En riesgo</div>
+        <div class="example-body">
+          <div class="example-row"><span class="example-label">Gastos vitales</span><span class="example-value">50%</span></div>
+          <div class="example-row"><span class="example-label">Deudas</span><span class="example-value">40%</span></div>
+          <div class="example-row"><span class="example-label">Gustos</span><span class="example-value">15%</span></div>
+          <div class="example-row"><span class="example-label">Cotidianos</span><span class="example-value">8%</span></div>
+          <div class="example-row"><span class="example-label">Futuro</span><span class="example-value">5%</span></div>
+          <div class="example-row"><span class="example-label">Otros</span><span class="example-value">0%</span></div>
+          <div class="example-result red">
+            <span class="result-margin red">Margen −18%</span>
+            <div class="result-label">−$900.000 · margen &lt; 0% → En riesgo ✓</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 04 · Umbrales de alertas                                 -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Umbrales de alertas</h2>
+        <p class="section-desc">Las alertas en la pantalla de diagnóstico se activan según perfil y valores de cada categoría.</p>
+      </div>
+    </div>
+
+    <!-- Saludable -->
+    <div class="alert-group">
+      <div class="alert-group-title"><span class="badge badge-green"><span class="badge-dot"></span>Saludable</span></div>
+
+      <div class="alert-row">
+        <div class="alert-condition">ahorro &lt; 10%</div>
+        <div class="alert-text">"Tu tasa de ahorro es del X%. El mínimo que suele funcionar bien es el 10% del ingreso."</div>
+        <div class="alert-ref">Regla general de finanzas personales: ahorro mínimo del 10% mensual</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">ahorro ≥ 10%</div>
+        <div class="alert-text">"Tu tasa de ahorro es del X%. Estás por encima del mínimo recomendado."</div>
+        <div class="alert-ref">Refuerzo positivo</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">deudas ≤ 30%</div>
+        <div class="alert-text">"Tus deudas representan el X% de tus ingresos. Estás dentro de un rango manejable."</div>
+        <div class="alert-ref">Límite de endeudamiento responsable: máx. 30% del ingreso (Banco de la República)</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">Siempre</div>
+        <div class="alert-text">"Tu margen está por encima del 20% — tienes un buen respaldo ante imprevistos."</div>
+        <div class="alert-ref">Fondo de emergencia: margen &gt; 20% se considera holgado</div>
+      </div>
+    </div>
+
+    <!-- Ajustado -->
+    <div class="alert-group">
+      <div class="alert-group-title"><span class="badge badge-yellow"><span class="badge-dot"></span>Ajustado</span></div>
+
+      <div class="alert-row">
+        <div class="alert-condition">Siempre</div>
+        <div class="alert-text">"Tu margen libre es del X%. Ante un imprevisto, ese espacio puede reducirse rápidamente."</div>
+        <div class="alert-ref">—</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">gustos + cotidianos &gt; 20%</div>
+        <div class="alert-text">"Tus gustos y gastos cotidianos representan el X% de tus ingresos. Puede haber espacio para reducirlos y ampliar tu margen."</div>
+        <div class="alert-ref">Regla 50/30/20: máximo 30% en gustos y ocio</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">ahorro &lt; 10%</div>
+        <div class="alert-text">"Tu tasa de ahorro es del X%. Fortalecer ese porcentaje puede darte más tranquilidad."</div>
+        <div class="alert-ref">Mínimo 10% mensual recomendado</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">ahorro ≥ 10%</div>
+        <div class="alert-text">"Fortalecer tu fondo de emergencia puede darte más tranquilidad ante lo inesperado."</div>
+        <div class="alert-ref">Fondo de emergencia de 3–6 meses de gastos</div>
+      </div>
+    </div>
+
+    <!-- En riesgo -->
+    <div class="alert-group">
+      <div class="alert-group-title"><span class="badge badge-red"><span class="badge-dot"></span>En riesgo</span></div>
+
+      <div class="alert-row">
+        <div class="alert-condition">Siempre</div>
+        <div class="alert-text">"Tus gastos superan tus ingresos en $X este mes."</div>
+        <div class="alert-ref">—</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">deudas &gt; 30%</div>
+        <div class="alert-text">"Tus deudas representan el X% de tus ingresos."</div>
+        <div class="alert-ref">Umbral de sobreendeudamiento: &gt;30% del ingreso (DANE, reguladores financieros)</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">vitales &gt; 50%</div>
+        <div class="alert-text">"Tus gastos vitales toman el X% de lo que entra."</div>
+        <div class="alert-ref">Regla 50/30/20: vitales no deben superar el 50% del ingreso</div>
+      </div>
+
+      <div class="alert-row">
+        <div class="alert-condition">vitales ≤ 50%</div>
+        <div class="alert-text">"Tus gastos vitales y deudas juntos toman el X% de lo que entra."</div>
+        <div class="alert-ref">Referencia combinada vitales + deudas</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 05 · Regla 50/30/20                                      -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Regla 50/30/20</h2>
+        <p class="section-desc">Marco de referencia orientativo para los diagnósticos y alertas.</p>
+      </div>
+    </div>
+
+    <div class="rule-visual">
+      <div class="rule-segment v50">50%</div>
+      <div class="rule-segment v30">30%</div>
+      <div class="rule-segment v20">20%</div>
+    </div>
+
+    <div class="rule-legend">
+      <div class="legend-item"><span class="legend-dot" style="background:#e03430"></span>Gastos esenciales / vitales — hasta el 50%</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--yellow-400)"></span>Gustos / ocio — hasta el 30%</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--green-500)"></span>Ahorro / futuro — al menos el 20%</div>
+    </div>
+
+    <div class="callout info" style="margin-top:20px;">
+      <span class="callout-icon">ℹ</span>
+      <div class="callout-body">
+        Esta regla es <strong>orientativa, no normativa</strong>. El simulador no obliga al usuario a seguirla; simplemente la usa como referencia para contextualizar los diagnósticos y alertas.
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 06 · Variables de estado                                 -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s6">
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Variables de entrada y estado</h2>
+        <p class="section-desc">Objeto <code>state</code> que concentra toda la información del simulador.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>state.salario</code></td>
+            <td><span class="var-type">Número (COP)</span></td>
+            <td>Ingreso mensual total calculado desde las fuentes</td>
+          </tr>
+          <tr>
+            <td><code>state.fuentes</code></td>
+            <td><span class="var-type array">Array</span></td>
+            <td>Lista de fuentes de ingreso: <code>{id, monto, periodicidad}</code></td>
+          </tr>
+          <tr>
+            <td><code>state.vitales</code></td>
+            <td><span class="var-type">Número (%)</span></td>
+            <td>% del ingreso destinado a gastos vitales</td>
+          </tr>
+          <tr>
+            <td><code>state.deudas</code></td>
+            <td><span class="var-type">Número (%)</span></td>
+            <td>% del ingreso destinado a deudas y compromisos</td>
+          </tr>
+          <tr>
+            <td><code>state.gustos</code></td>
+            <td><span class="var-type">Número (%)</span></td>
+            <td>% del ingreso en gustos y ocio</td>
+          </tr>
+          <tr>
+            <td><code>state.cotidianos</code></td>
+            <td><span class="var-type">Número (%)</span></td>
+            <td>% del ingreso en gastos cotidianos pequeños</td>
+          </tr>
+          <tr>
+            <td><code>state.futuro</code></td>
+            <td><span class="var-type">Número (%)</span></td>
+            <td>% del ingreso destinado al ahorro / inversión</td>
+          </tr>
+          <tr>
+            <td><code>state.otros</code></td>
+            <td><span class="var-type array">Array</span></td>
+            <td>Gastos personalizados: <code>{id, nombre, montoMensual (COP)}</code></td>
+          </tr>
+          <tr>
+            <td><code>state.vitalesDetalle</code></td>
+            <td><span class="var-type array">Array</span></td>
+            <td>Subcategorías de Vitales: <code>{key, label, monto (COP/mes)}</code></td>
+          </tr>
+          <tr>
+            <td><code>state.deudasDetalle</code></td>
+            <td><span class="var-type array">Array</span></td>
+            <td>Subcategorías de Deudas: <code>{key, label, monto (COP/mes)}</code></td>
+          </tr>
+          <tr>
+            <td><code>state.periodicidades</code></td>
+            <td><span class="var-type object">Objeto</span></td>
+            <td>Periodicidad seleccionada por categoría</td>
+          </tr>
+          <tr>
+            <td><code>state.lead</code></td>
+            <td><span class="var-type object">Objeto</span></td>
+            <td>Datos del formulario público: nombre, email, teléfono</td>
+          </tr>
+          <tr>
+            <td><code>state.channel</code></td>
+            <td><span class="var-type string">String</span></td>
+            <td><code>'publico'</code> o <code>'cliente'</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 07 · Tratamiento de periodicidades                       -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s7">
+    <div class="section-header">
+      <span class="section-number">07</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Tratamiento de periodicidades</h2>
+        <p class="section-desc">Normalización de montos no mensuales antes de cualquier cálculo.</p>
+      </div>
+    </div>
+
+    <div class="formula-block">
+      <pre><span class="comment">// Normalización a mensual</span>
+<span class="variable">montoMensual</span> = <span class="variable">montoIngresado</span> <span class="operator">×</span> <span class="variable">PERIODICIDAD_FACTOR</span>[<span class="variable">periodicidad</span>]</pre>
+    </div>
+
+    <div class="table-wrap" style="margin-top:16px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Periodicidad</th>
+            <th>Factor</th>
+            <th>Ejemplo de validación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Quincenal</td>
+            <td><code>× 2</code></td>
+            <td style="color:var(--text-secondary);">Arriendo $750.000/quincenal → $750.000 × 2 = <strong>$1.500.000/mes</strong> ✓</td>
+          </tr>
+          <tr>
+            <td>Mensual</td>
+            <td><code>× 1</code></td>
+            <td style="color:var(--text-secondary);">Sin conversión</td>
+          </tr>
+          <tr>
+            <td>Bimestral</td>
+            <td><code>× 0.5</code></td>
+            <td style="color:var(--text-secondary);">Bono $2.000.000/bimestral → $2.000.000 × 0.5 = <strong>$1.000.000/mes</strong></td>
+          </tr>
+          <tr>
+            <td>Semestral</td>
+            <td><code>× 1/6</code></td>
+            <td style="color:var(--text-secondary);">Prima $3.000.000/semestral → $3.000.000 × 0.1667 ≈ <strong>$500.000/mes</strong></td>
+          </tr>
+          <tr>
+            <td>Anual</td>
+            <td><code>× 1/12</code></td>
+            <td style="color:var(--text-secondary);">Cesantías $6.000.000/año → $6.000.000 × 0.0833 = <strong>$500.000/mes</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 08 · Subcategorías opcionales                            -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s8">
+    <div class="section-header">
+      <span class="section-number">08</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Subcategorías opcionales</h2>
+        <p class="section-desc">Desglose granular de Vitales y Deudas.</p>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.7;">El usuario puede desglosar cada rubro en subcategorías. Cuando lo hace, la suma de las subcategorías <strong>reemplaza</strong> el valor del slider principal en el cálculo.</p>
+
+    <div class="formula-block">
+      <pre><span class="keyword">if</span> (<span class="variable">state.vitalesDetalle</span>.length <span class="operator">&gt;</span> <span class="number">0</span>) {
+  <span class="comment">// Las subcategorías siempre se ingresan en COP mensual</span>
+  <span class="variable">montoVitales</span> = <span class="function">Σ</span> (<span class="variable">detalle.monto</span>) <span class="comment">// ∀ detalle ∈ vitalesDetalle</span>
+  <span class="variable">state.vitales</span> = <span class="function">Math.round</span>(<span class="variable">montoVitales</span> <span class="operator">/</span> <span class="variable">salario</span> <span class="operator">×</span> <span class="number">100</span>)
+}</pre>
+    </div>
+
+    <div class="callout success" style="margin-top:14px;">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">
+        Las subcategorías siempre se ingresan en <strong>COP mensual</strong>. El slider refleja el nuevo porcentaje calculado y puede superar el valor previo si las subcategorías suman más.
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 09 · Casos límite                                        -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s9">
+    <div class="section-header">
+      <span class="section-number">09</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Casos límite</h2>
+        <p class="section-desc">Comportamiento definido ante entradas extremas o incompletas.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Caso</th>
+            <th>Comportamiento esperado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Salario = 0</strong></td>
+            <td>Los porcentajes no se calculan. Los displays muestran <code>—</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>Margen muy negativo (&lt; −100%)</strong></td>
+            <td><code>calcularPerfil()</code> retorna <code>'riesgo'</code>. No hay límite inferior para el margen.</td>
+          </tr>
+          <tr>
+            <td><strong>Subcategorías &gt; slider original</strong></td>
+            <td>El slider se actualiza automáticamente al nuevo porcentaje (puede superar el valor anterior).</td>
+          </tr>
+          <tr>
+            <td><strong>Gastos totales &gt; 300% del ingreso</strong></td>
+            <td>El slider se topa en 300%. Los montos en COP pueden seguir siendo más altos si el usuario los ingresa manualmente.</td>
+          </tr>
+          <tr>
+            <td><strong>Una fuente de ingreso en cero</strong></td>
+            <td>Se ignora en el cálculo del total.</td>
+          </tr>
+          <tr>
+            <td><strong>Sin fuentes de ingreso registradas</strong></td>
+            <td>El botón "Continuar" en la pantalla de ingresos permanece deshabilitado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 10 · Proyecciones                                        -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s10">
+    <div class="section-header">
+      <span class="section-number">10</span>
+      <div class="section-title-wrap">
+        <h2 class="section-title">Proyecciones</h2>
+        <p class="section-desc">Pantalla de diagnóstico — solo para perfiles Saludable y Ajustado cuando <code>state.futuro &gt; 0</code>.</p>
+      </div>
+    </div>
+
+    <div class="projection-cards">
+      <div class="proj-card">
+        <div class="proj-horizon">1 año</div>
+        <div class="proj-name">Fondo de inversión</div>
+        <div class="proj-formula">futuroPesos × 12</div>
+      </div>
+      <div class="proj-card">
+        <div class="proj-horizon">6 meses</div>
+        <div class="proj-name">Fondo de emergencia</div>
+        <div class="proj-formula">futuroPesos × 6</div>
+      </div>
+      <div class="proj-card">
+        <div class="proj-horizon">2 años</div>
+        <div class="proj-name">Meta de proyecto / viaje</div>
+        <div class="proj-formula">futuroPesos × 24</div>
+      </div>
+    </div>
+
+    <div class="callout warning" style="margin-top:16px;">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-body">
+        Las proyecciones son <strong>lineales y no incluyen rendimientos ni inflación</strong>. Son ilustrativas del hábito de ahorro, no proyecciones financieras. Esta limitación debe quedar clara en el texto de interfaz.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────────── -->
+  <footer class="doc-footer">
+    <div class="footer-logo">Skandia Colombia</div>
+    <div class="footer-meta">Equipo UX Research · #UXplorers · Documento para revisión interna de stakeholders · Jun 2026</div>
+  </footer>
+
+</div>
+</body>
+</html>
