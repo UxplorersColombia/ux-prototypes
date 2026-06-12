@@ -1,11 +1,3 @@
-<!--
-  Versión Markdown del informe interactivo publicado en:
-  https://uxplorerscolombia.github.io/ux-prototypes/projects/resumen-investigaciones-universales-mfund/v1/
-  Pensada para consulta rápida y para alimentar herramientas de inteligencia artificial
-  (asistentes, agentes, NotebookLM, etc.) como contexto del proyecto Nueva Norma de Asesoría.
-  Equipo UX Research Skandia (#UXplorers) · Junio 2026
--->
-
 # Resumen de investigaciones: Universales / Pensión Voluntaria MFUND
 
 **Equipo UX Research (#UXplorers) · Junio 2026**
@@ -36,7 +28,7 @@ Marketing definirá en las próximas semanas la **narrativa, el naming y los con
 
 5. **El concepto de hub/marketplace ya fue validado en su dirección general.** El testeo del NewHub mostró recepción positiva (diseño, confianza en la marca, portafolios personalizables) y el rediseño de gestión de portafolios con filtros y porcentajes fue percibido como una mejora clara. Las advertencias: demasiada información por página, nombres de productos confusos y necesidad de explicaciones más básicas para quien apenas empieza.
 
-6. **Los datos de la base (Databricks) confirman dónde está la oportunidad.** Universales penetra solo el 9.14% de la base total (39,265 clientes), concentrado en Bogotá (58%) y en el segmento Finanzas Personales (53%). El mejor prospecto natural es el cliente que ya invierte: la penetración de Universales en clientes de inversión (15.3%) es 2.4 veces la de clientes de pensión voluntaria (6.5%). Y aunque el 99.6% tiene acceso al portal, solo el 21% usa la app — la relación sigue siendo intermediada, lo que coincide con el peso del asesor que muestra la cualitativa.
+6. **Los datos de la base (Databricks) confirman dónde está la oportunidad.** Universales penetra solo el 9.14% de la base total (39,265 clientes), concentrado en Bogotá (58%). La distribución por segmentos omnicanal muestra que Capital Investor concentra el 43.92% de los clientes con Universales, Family Guardian el 31.37% y Wealth Builder el 24.47%; Financial Explorer y Stability Seeker son marginales (<0.25% combinados) en la base actual. La mayor tasa de penetración de Universales dentro de su segmento la tiene Family Guardian (31.31%), seguida de Wealth Builder (30.31%) y Capital Investor (25.98%). El mejor prospecto natural es el cliente que ya invierte: la penetración de Universales en clientes de inversión (15.3%) es 2.4 veces la de clientes de pensión voluntaria (6.5%). Y aunque el 99.6% tiene acceso al portal, solo el 21% usa la app — la relación sigue siendo intermediada, lo que coincide con el peso del asesor que muestra la cualitativa.
 
 ---
 
@@ -73,6 +65,7 @@ Marketing definirá en las próximas semanas la **narrativa, el naming y los con
 |---|---|---|
 | **Base de Conocimiento: Productos Universales** | Penetración, perfil demográfico, segmentación, geografía, canales, cross-sell, actividad digital y saldos de los 39,265 clientes con Universales | [PDF](base-conocimiento-productos-universales.pdf) |
 | **Relación de clientes PV / Inversión con Universales** | Tenencia cruzada de Universales en clientes de Pensión Voluntaria e Inversión, por segmento, perfil y regional | [PDF](relacion-clientes-pv-inversion-universales.pdf) |
+| **Relación entre Segmentos de Omnicanalidad y Productos Universales** | Penetración, perfil demográfico, tenencia de productos, actividad digital, saldos y distribución geográfica de los clientes con Universales clasificados por segmento omnicanal (Capital Investor, Family Guardian, Wealth Builder) | [PDF](relacion-entre-segmentos-omnicanalidad.pdf) |
 
 ---
 
@@ -152,19 +145,20 @@ Del rediseño de **gestión de portafolios** (el antecedente más cercano al mar
 - **39,265 clientes con Universales = 9.14% de la base total** (429,552). Producto dominante: Línea Seguros (29,356), luego Colectivo (10,563) y Capital Seguro (1,088).
 - **Crecimiento reciente:** 2025 fue el mejor año de ingreso de clientes (4,684 nuevos, 11.9% de la base), seguido de 2024 (3,915) y 2023 (3,207) — la oferta digital actual sí está atrayendo.
 - **Perfil:** edad promedio 48.4 años (el rango más representativo es 35–44 con 34.9%), 44% casados, antigüedad promedio 6.4 años, género equilibrado. Tipología transaccional: 45.7% son clientes **nuevos** y 26% **inversionistas**.
-- **Segmentos tradicionales:** Finanzas Personales concentra el 53% de los clientes (pero con el menor saldo promedio, $36.9M), Privilegio 26.5%, Joven Pro 12.4%. Elite Wealth tiene solo el 2.1% de los clientes pero el mayor saldo promedio ($520.4M).
-- **Segmentos omnicanal:** Capital Investor 43.9%, Family Guardian 31.4%, Wealth Builder 24.5%.
+- **Segmentos omnicanal — distribución de clientes con Universales:** Capital Investor concentra 16,350 clientes (43.92%), Family Guardian 11,678 (31.37%) y Wealth Builder 9,108 (24.47%). Financial Explorer y Stability Seeker son prácticamente ausentes en la base actual de Universales (<0.25% combinados). La mayor tasa de penetración de Universales dentro de cada segmento la tiene Family Guardian (31.31%), seguida de Wealth Builder (30.31%) y Capital Investor (25.98%).
+- **Perfil demográfico por segmento:** Capital Investor es el más maduro y establecido (45 años promedio, 8.4 años de antigüedad, perfil mixto entre casados y solteros). Family Guardian es el segmento más familiar (48.4 años, 85.77% casados). Wealth Builder es el más joven (41 años, 73.99% solteros, mayor presencia femenina: 55.4%).
+- **Sofisticación financiera y cross-sell por segmento:** Capital Investor lidera en tenencia de productos de inversión (98.54%), oportunidades de cross-sell (82.09%, 2.36 líneas promedio) y saldo promedio en Universales ($209.8M). Es el único segmento con acceso a Capital Seguro (100% de esos 1,086 clientes). Family Guardian muestra menor sofisticación financiera (26.54% con inversión, 32.11% cross-sell) pero saldo promedio alto en Colectivo ($149.9M), consistente con pólizas familiares. Wealth Builder tiene el mayor potencial de crecimiento: perfil joven, penetración moderada de productos (20-26%) y 34.34% con oportunidades de cross-sell.
 - **Concentración geográfica y de canal:** Bogotá 58.5% de la base; el canal Agencias gestiona el 58% y Seguros el 31%.
 
 **Actividad digital — la paradoja que confirma a la cualitativa:**
-- El **99.6% tiene registro de acceso al portal**, pero solo el **20.9% usa la app móvil** y el 4.1% está activo en Invested. El cliente de universales es alcanzable digitalmente, pero hoy su relación con el producto es mayormente intermediada — el mismo patrón del hallazgo 4.5 (asesor cierra casi todo).
+- El ~100% tiene registro de acceso al portal en los tres segmentos. El uso de app móvil varía significativamente: Capital Investor lidera (28.48%), seguido de Wealth Builder (17.7%) y Family Guardian (15.93%). La actividad en Invested también está concentrada en Capital Investor (8.27%), muy por encima de Family Guardian (1.46%) y Wealth Builder (0.77%). El promedio global de 20.9% app y 4.1% Invested refleja la mezcla de estos tres perfiles. El cliente de universales es alcanzable digitalmente, pero hoy su relación con el producto es mayormente intermediada — el mismo patrón del hallazgo 4.5 (asesor cierra casi todo).
 
 **Tenencia cruzada y oportunidad de crecimiento** ([Relación de clientes PV/Inversión con Universales](relacion-clientes-pv-inversion-universales.pdf)):
 - **El cliente que ya invierte es el mejor prospecto de Universales:** penetración del 15.3% en clientes de inversión vs. 6.5% en clientes de pensión voluntaria — **2.4 veces mayor afinidad**. Coincide con la cualitativa: el encuadre "inversión" conecta y el encuadre "pensión" filtra.
 - **La tenencia combinada es la excepción:** 33.5% de los clientes tiene solo Pensión Voluntaria y 21.2% solo Inversión; apenas 1.9% tiene los tres tipos de producto. Hay mucho espacio para la narrativa de diversificación del hub.
-- **Los segmentos premium ya combinan productos:** Elite Wealth lidera la penetración de Inversión + Universales (27.9%), Elite 19.5%, Privilegio 11.2%; Finanzas Personales apenas 2.8% — la masa está sin activar.
-- **Cross-sell identificado:** el 52.4% de clientes con Universales tiene oportunidades de venta cruzada (1.76 líneas promedio por cliente); el 54.4% ya tiene productos de inversión.
-- **Perfiles de la combinación:** Inversión + Universales promedia 47.2 años; Pensión + Universales es más joven (42.1 años). La regional Centro concentra más del 70% de la tenencia cruzada.
+- **La sofisticación financiera varía radicalmente entre segmentos:** Capital Investor muestra el mayor nivel de tenencia cruzada — 98.54% con productos de inversión y 82.09% con oportunidades activas de cross-sell (promedio 2.36 líneas). Family Guardian y Wealth Builder tienen penetración de inversión de apenas 26.54% y 21.27% respectivamente, con solo 32-34% de oportunidades de cross-sell (1.36 líneas). Esto ubica a Family Guardian y Wealth Builder como los segmentos de mayor potencial de activación dentro de la base actual de Universales. Nota: los segmentos tradicionales se distribuyen de forma transversal en los segmentos omnicanal — Finanzas Personales, por ejemplo, representa el 61.75% de Family Guardian y el 63.9% de Wealth Builder, por lo que no existe un mapeo 1:1 entre ambas segmentaciones.
+- **Cross-sell identificado:** el 52.4% de clientes con Universales tiene oportunidades de venta cruzada (1.76 líneas promedio global); el 54.4% ya tiene productos de inversión. El desglose por segmento revela oportunidades muy diferenciadas: Capital Investor tiene el mayor potencial en productos sofisticados y PAC (82.09% con cross-sell, 17.62% ya con PAC); Family Guardian puede migrar de protección hacia inversión (solo 26.54% tiene inversión); Wealth Builder requiere construir el portafolio desde productos básicos (20–26% de penetración en cada categoría).
+- **Perfiles de la combinación y distribución geográfica:** Inversión + Universales promedia 47.2 años; Pensión + Universales es más joven (42.1 años). En la distribución por canal, Capital Investor opera principalmente por Agencias (80.18%) y se concentra en Centro (67.72%). Family Guardian se divide casi en partes iguales entre Seguros (45.15%) y Centro (44.42%), y Wealth Builder tiene distribución similar entre ambos canales. El promedio global de más del 70% de tenencia cruzada en la regional Centro refleja el peso de Capital Investor en ese canal.
 
 ---
 
@@ -177,7 +171,7 @@ Del rediseño de **gestión de portafolios** (el antecedente más cercano al mar
 5. **Menos es más en el hub.** El NewHub validó la dirección pero advirtió sobrecarga: priorizar la información esencial, acordeones/filtros para profundizar, explicaciones progresivas para no expertos, simuladores visibles y testimoniales.
 6. **Cuidar el SEO al reescribir.** "Ideas de inversión" es de las páginas mejor posicionadas; cualquier cambio de textos debe coordinarse con el informe de keywords de Growth (Mateo), como se acordó en el kickoff.
 7. **No mezclar historias de productos en un mismo momento del flujo** (aprendizaje de asesores en FPOB y de la primera norma de asesoría): una historia por decisión, aunque el hub las contenga todas.
-8. **Priorizar audiencias con los datos de la base.** El cliente actual de inversión es el prospecto más afín a la nueva oferta (2.4x la penetración vs. clientes de pensión voluntaria): el cross-sell desde inversión debería ser la primera campaña, alineado con la idea del kickoff de que el hub viva en el portal con data precargada. La masa por activar está en Finanzas Personales (53% de los clientes de universales, pero 2.8% de penetración combinada) — justo el perfil del cliente nuevo digital. Y la base tiene acceso al portal (99.6%) pero no usa la app (21%): las campañas del relanzamiento son también una palanca de migración digital.
+8. **Priorizar audiencias con los datos de la base.** El cliente actual de inversión es el prospecto más afín a la nueva oferta (2.4x la penetración vs. clientes de pensión voluntaria): el cross-sell desde inversión debería ser la primera campaña, alineado con la idea del kickoff de que el hub viva en el portal con data precargada. La masa por activar no es un segmento externo: está dentro de la base actual de Family Guardian y Wealth Builder, que combinan el 55.84% de los clientes con Universales pero muestran baja sofisticación financiera (26-27% con inversión) y bajo cross-sell (1.36 líneas promedio). Financial Explorer y Stability Seeker son prácticamente ausentes en Universales hoy (<0.25%); si el proyecto apunta a captar ese perfil, es un terreno nuevo, no de reactivación. Y la base tiene acceso al portal (~100%) pero adopción de app desigual (28% Capital Investor, 15-18% los otros dos): las campañas del relanzamiento son también una palanca de migración digital diferenciada por segmento.
 
 ---
 
@@ -190,7 +184,7 @@ Del rediseño de **gestión de portafolios** (el antecedente más cercano al mar
 | **Servicio de solo ejecución en fiduciaria** | Solo existe la referencia del multifondos; no hay evidencia de cómo lo entiende el cliente de fiduciaria en vinculación inicial |
 | **Narrativa de "mezclas" vs. Invested** | El riesgo de canibalización/confusión se discutió en el kickoff; no hay testeo que valide si el cliente distingue mezclas sugeridas de recomendación profesional |
 | **Flujo actual de universales (excusas → mezcla → vinculación)** | El testeo del rediseño de universales quedó como archivo; no hay highlights consultables sobre la narrativa de "excusas" específicamente |
-| **Cliente nuevo 100% digital (Financial Explorer)** | La evidencia actual viene mayoritariamente de clientes existentes y asesores; el journey de atracción sin asesor está poco estudiado |
+| **Cliente nuevo sin historial en Universales (Financial Explorer / Wealth Builder joven)** | Cuantitativamente, Financial Explorer es marginal en la base actual (<0.25%). Si la nueva norma apunta a captar ese perfil por canal digital sin asesor, es un segmento prácticamente nuevo para Universales: el journey de atracción, mensajes de entrada y el perfilamiento simplificado están sin estudiar |
 
 ---
 
@@ -203,4 +197,4 @@ Del rediseño de **gestión de portafolios** (el antecedente más cercano al mar
 
 ---
 
-*Documento elaborado por el equipo UX a partir del repositorio de investigación en Dovetail (workspace UXplorers) y de análisis cuantitativos de la base de clientes en Databricks (PDFs adjuntos en esta misma carpeta). Todos los hallazgos son trazables a su fuente mediante los enlaces incluidos. Junio 2026.*
+*Documento elaborado por el equipo UX a partir del repositorio de investigación en Dovetail (workspace UXplorers) y de análisis cuantitativos de la base de clientes en Databricks (carpeta `investigación/conocimiento/`). Todos los hallazgos son trazables a su fuente mediante los enlaces incluidos. Junio 2026.*
