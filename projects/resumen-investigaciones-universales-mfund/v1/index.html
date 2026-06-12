@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resumen de investigaciones — Universales / Pensión Voluntaria MFUND · Skandia UX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & tokens (Skandia DS) ───────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* Primitivos Skandia */
+      --green-500: #00c73d;
+      --green-600: #03a835;
+      --green-700: #009a2f;
+      --green-50:  #f6fcf2;
+      --green-100: #caf9cb;
+      --lime-500:  #8fe000;
+      --yellow-400: #ffae08;
+      --yellow-50:  #fff3e0;
+      --red-500:    #e03430;
+      --red-50:     #fff5f4;
+      --blue-500:   #0099de;
+      --blue-50:    #ebf4ff;
+
+      --surface-0:   #ffffff;
+      --surface-50:  #fafafa;
+      --surface-100: #f7f7f7;
+      --surface-200: #e9e9e9;
+      --surface-300: #dddddd;
+      --surface-400: #c5c5c5;
+      --surface-600: #878787;
+      --surface-700: #565656;
+      --surface-800: #404040;
+      --surface-900: #232323;
+
+      --text-primary:   #404040;
+      --text-secondary: #666666;
+      --text-muted:     #878787;
+      --border:         #dddddd;
+
+      --font-body:  'Open Sans', system-ui, sans-serif;
+      --font-head:  'Montserrat', system-ui, sans-serif;
+
+      --radius-sm:  4px;
+      --radius-md:  8px;
+      --radius-lg:  12px;
+      --radius-xl:  16px;
+      --radius-pill: 100px;
+
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+      --gradient-brand: linear-gradient(135deg, #00c73d, #8fe000);
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--surface-50);
+      line-height: 1.6;
+      padding: 0 20px 80px;
+    }
+
+    .page { max-width: 880px; margin: 0 auto; }
+
+    mark {
+      background: var(--green-100);
+      color: inherit;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    /* ─── Barra de progreso de lectura ──────────────────────── */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--gradient-brand);
+      z-index: 60;
+      transition: width 0.1s linear;
+    }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .doc-header {
+      background: var(--surface-900);
+      border-radius: var(--radius-xl);
+      padding: 40px 48px;
+      margin: 40px 0 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-header::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: var(--gradient-brand);
+    }
+
+    .doc-header::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(0,199,61,0.07);
+      pointer-events: none;
+    }
+
+    .header-eyebrow {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-500);
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-family: var(--font-head);
+      font-size: 27px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      max-width: 640px;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 28px;
+      max-width: 560px;
+    }
+
+    .header-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.72);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-pill);
+      padding: 4px 12px;
+    }
+
+    .meta-chip .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-500);
+    }
+
+    /* ─── Toolbar sticky: búsqueda + controles ──────────────── */
+    .toolbar {
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-wrap {
+      flex: 1 1 240px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      width: 14px; height: 14px;
+      stroke: var(--text-muted);
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--surface-100);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-pill);
+      padding: 8px 36px 8px 34px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    #searchInput:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(0,199,61,0.15);
+      background: var(--surface-0);
+    }
+
+    #searchClear {
+      position: absolute;
+      right: 8px;
+      border: none;
+      background: var(--surface-300);
+      color: var(--surface-700);
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+    }
+
+    .search-count {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .toolbar-btn {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-pill);
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .toolbar-btn:hover { background: var(--green-100); }
+    .toolbar-btn:active { transform: scale(0.97); }
+
+    /* ─── TOC ───────────────────────────────────────────────── */
+    .toc {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+    }
+
+    .toc-title {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 32px;
+    }
+
+    .toc-list li a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.15s;
+      border-radius: var(--radius-sm);
+    }
+
+    .toc-list li a:hover, .toc-list li a.active { color: var(--green-600); font-weight: 600; }
+
+    .toc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-500);
+      min-width: 18px;
+    }
+
+    /* ─── Section ───────────────────────────────────────────── */
+    .section {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      scroll-margin-top: 80px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--surface-100);
+    }
+
+    .section-number {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-500);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      min-width: 32px;
+      text-align: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .section p + p { margin-top: 10px; }
+
+    /* ─── Callout (cómo leer) ───────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      background: var(--blue-50);
+      border: 1px solid #cfe7f8;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    .callout .icon { flex-shrink: 0; font-size: 15px; }
+
+    .callout-warn { background: var(--yellow-50); border-color: #ffe2b0; }
+
+    /* ─── Cards de cambios normativos ───────────────────────── */
+    .norm-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .norm-card {
+      border: 1px solid var(--surface-200);
+      border-top: 3px solid var(--green-500);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: var(--surface-0);
+    }
+
+    .norm-card h4 {
+      font-family: var(--font-head);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .norm-card p { font-size: 12.5px; color: var(--text-secondary); }
+
+    /* ─── Acordeones (hallazgos) ────────────────────────────── */
+    details.acc {
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      background: var(--surface-0);
+      overflow: hidden;
+      transition: box-shadow 0.15s;
+    }
+
+    details.acc[open] { box-shadow: var(--shadow-sm); border-color: var(--green-100); }
+
+    details.acc summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    details.acc summary::-webkit-details-marker { display: none; }
+    details.acc summary:hover { background: var(--green-50); }
+
+    .acc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--surface-0);
+      background: var(--green-500);
+      border-radius: var(--radius-sm);
+      padding: 3px 7px;
+      flex-shrink: 0;
+    }
+
+    .acc-num--theme { background: var(--surface-800); }
+
+    .acc-title {
+      font-family: var(--font-head);
+      font-size: 13.5px;
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .acc-chevron {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      stroke: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    details.acc[open] .acc-chevron { transform: rotate(180deg); }
+
+    .acc-body {
+      padding: 4px 18px 18px 18px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      border-top: 1px dashed var(--surface-200);
+    }
+
+    .acc-body > *:first-child { margin-top: 12px; }
+    .acc-body p + p, .acc-body p + ul, .acc-body ul + p, .acc-body ul + h5, .acc-body p + h5 { margin-top: 10px; }
+
+    .acc-body ul { padding-left: 20px; }
+    .acc-body li { margin-bottom: 6px; }
+    .acc-body li::marker { color: var(--green-500); }
+
+    .acc-body h5 {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .acc-body h5::before {
+      content: '';
+      display: block;
+      width: 3px; height: 13px;
+      background: var(--green-500);
+      border-radius: 2px;
+    }
+
+    .acc-body strong { color: var(--text-primary); }
+
+    /* ─── Citas de usuarios ─────────────────────────────────── */
+    blockquote {
+      border-left: 3px solid var(--green-500);
+      background: var(--green-50);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 10px 16px;
+      margin: 10px 0;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    blockquote .src {
+      display: block;
+      font-style: normal;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ─── Tablas ────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    thead tr { background: var(--surface-100); border-bottom: 2px solid var(--border); }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    tbody tr { border-bottom: 1px solid var(--surface-100); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-50); }
+
+    td { padding: 10px 14px; vertical-align: top; }
+    td strong { font-weight: 700; }
+
+    .link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-pill);
+      padding: 2px 10px;
+      text-decoration: none;
+      white-space: nowrap;
+      margin: 1px 2px 1px 0;
+      transition: background 0.15s;
+    }
+
+    .link-pill:hover { background: var(--green-100); }
+
+    .link-pill--pdf { color: #8a5800; background: var(--yellow-50); border-color: #ffe2b0; }
+    .link-pill--pdf:hover { background: #ffe9c4; }
+
+    /* ─── Filtros del inventario ────────────────────────────── */
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 4px 0 4px;
+    }
+
+    .chip {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: var(--text-secondary);
+      background: var(--surface-100);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip:hover { border-color: var(--green-500); color: var(--green-700); }
+
+    .chip.active {
+      color: #ffffff;
+      background: var(--surface-800);
+      border-color: var(--surface-800);
+    }
+
+    /* ─── Stats Databricks ──────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 14px 0 6px;
+    }
+
+    .stat-card {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .stat-value {
+      font-family: var(--font-head);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green-600);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* ─── Tarjetas de implicaciones ─────────────────────────── */
+    .imp-list { list-style: none; counter-reset: imp; }
+
+    .imp-list li {
+      counter-increment: imp;
+      display: flex;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      background: var(--surface-0);
+    }
+
+    .imp-list li::before {
+      content: counter(imp, decimal-leading-zero);
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green-500);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .imp-list li strong { color: var(--text-primary); }
+
+    /* ─── Footer & back-to-top ──────────────────────────────── */
+    .doc-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 24px 0 0;
+    }
+
+    #backTop {
+      position: fixed;
+      right: 24px; bottom: 24px;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface-800);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.15s;
+      z-index: 55;
+    }
+
+    #backTop.visible { opacity: 1; pointer-events: auto; }
+    #backTop:hover { transform: translateY(-2px); background: var(--green-600); }
+
+    .no-results {
+      display: none;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 12px;
+      border: 1px dashed var(--surface-300);
+      border-radius: var(--radius-md);
+      margin-top: 10px;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      .doc-header { padding: 28px 24px; }
+      .section { padding: 24px 20px; }
+      .toc-list { grid-template-columns: 1fr; }
+      .norm-cards { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media print {
+      .toolbar, #backTop, .progress-bar { display: none; }
+      details.acc { border: none; }
+      details.acc summary { padding-left: 0; }
+      body { background: #fff; padding: 0; }
+      .section { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="page">
+
+    <!-- ═══ Header ═══ -->
+    <header class="doc-header">
+      <div class="header-eyebrow">UX Research · #UXplorers · Nueva Norma de Asesoría</div>
+      <h1 class="header-title">Resumen de investigaciones: Universales / Pensión Voluntaria MFUND</h1>
+      <p class="header-subtitle">Lo que el usuario, la fuerza comercial y los datos de la base ya nos dijeron, consolidado para las definiciones de naming, narrativa y experiencia de la nueva oferta.</p>
+      <div class="header-meta">
+        <span class="meta-chip"><span class="dot"></span>Junio 2026</span>
+        <span class="meta-chip"><span class="dot"></span>Cualitativa: Dovetail (13 fuentes)</span>
+        <span class="meta-chip"><span class="dot"></span>Cuantitativa: Databricks (2 análisis)</span>
+        <span class="meta-chip"><span class="dot"></span>Plazo regulatorio: 2 de octubre</span>
+      </div>
+    </header>
+
+    <!-- ═══ Toolbar ═══ -->
+    <div class="toolbar" role="search">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar en el informe… (ej: naming, tributario, asesor, app)" aria-label="Buscar en el informe">
+        <button id="searchClear" aria-label="Limpiar búsqueda">✕</button>
+      </div>
+      <span class="search-count" id="searchCount"></span>
+      <button class="toolbar-btn" id="expandAll">Expandir todo</button>
+      <button class="toolbar-btn" id="collapseAll">Contraer todo</button>
+    </div>
+
+    <!-- ═══ TOC ═══ -->
+    <nav class="toc" aria-label="Tabla de contenido">
+      <div class="toc-title">Contenido</div>
+      <ul class="toc-list">
+        <li><a href="#s1"><span class="toc-num">01</span>Propósito y contexto</a></li>
+        <li><a href="#s2"><span class="toc-num">02</span>Resumen ejecutivo — 6 hallazgos clave</a></li>
+        <li><a href="#s3"><span class="toc-num">03</span>Inventario de investigaciones</a></li>
+        <li><a href="#s4"><span class="toc-num">04</span>Hallazgos por tema</a></li>
+        <li><a href="#s5"><span class="toc-num">05</span>Implicaciones para naming y narrativa</a></li>
+        <li><a href="#s6"><span class="toc-num">06</span>Vacíos de investigación</a></li>
+        <li><a href="#s7"><span class="toc-num">07</span>Próximos pasos</a></li>
+      </ul>
+    </nav>
+
+    <!-- ═══ 01 Contexto ═══ -->
+    <section class="section" id="s1">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <div>
+          <h2 class="section-title">Propósito y contexto</h2>
+          <p class="section-desc">Por qué existe este informe y qué cambia con la norma</p>
+        </div>
+      </div>
+      <p>Este informe responde al compromiso del kickoff de la Nueva Norma de Asesoría: <em>"compartir el repositorio de investigación sobre universales, vinculación y Multifund con marketing y producto"</em>. Consolida la evidencia <strong>cualitativa</strong> (repositorio Dovetail) y <strong>cuantitativa</strong> (análisis de la base de clientes en Databricks) para que las definiciones de la nueva oferta partan de evidencia y no de cero.</p>
+      <p>El <strong>Decreto 1239 de 2024</strong> y la <strong>Circular Externa 014 de 2025</strong> (plazo de cumplimiento: <strong>2 de octubre</strong>) traen tres cambios con impacto directo en la experiencia digital:</p>
+      <div class="norm-cards">
+        <div class="norm-card">
+          <h4>Universales → Simples masivos</h4>
+          <p>La categoría cambia de nombre y ahora exige <strong>perfilamiento obligatorio</strong> (simplificado). El flujo digital actual debe rediseñarse por completo.</p>
+        </div>
+        <div class="norm-card">
+          <h4>Solo ejecución</h4>
+          <p>El cliente puede optar por <strong>no recibir recomendación profesional</strong> y elegir directamente sus portafolios. Debe llevarse a la vinculación digital de fiduciaria.</p>
+        </div>
+        <div class="norm-card">
+          <h4>Portafolios simples en digital</h4>
+          <p>Se habilitan <strong>12+ portafolios simples</strong> en la experiencia digital sin recomendación profesional (con perfilamiento completo). La oferta crece de 5 mezclas a un catálogo de 17+.</p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="icon">💡</span>
+        <span><strong>Cómo leer este informe:</strong> la sección 02 es el resumen ejecutivo (si solo lees algo, lee eso). La 03 lista las fuentes con sus enlaces. La 04 desarrolla los hallazgos por tema — usa el buscador o los acordeones para navegar el volumen. Las secciones 05 y 06 traducen la evidencia en implicaciones y vacíos por cubrir en el testeo de julio.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 02 Resumen ejecutivo ═══ -->
+    <section class="section" id="s2">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <div>
+          <h2 class="section-title">Resumen ejecutivo — 6 hallazgos clave</h2>
+          <p class="section-desc">Haz clic en cada hallazgo para ver el detalle</p>
+        </div>
+      </div>
+
+      <details class="acc" open>
+        <summary><span class="acc-num">H1</span><span class="acc-title">Los nombres actuales no comunican — y a veces ahuyentan</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>"Universales" no significa nada para el usuario, "Pensión Voluntaria" hace que clientes interesados en invertir descarten el producto (<em>"eso es para pensión"</em>) y "Skandia MFUND" no lo conoce nadie. El cambio de nombre que obliga la norma es una oportunidad, pero <strong>"simples masivos" es lenguaje normativo, no lenguaje de cliente</strong>: el naming debe construirse desde el beneficio.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">H2</span><span class="acc-title">El gancho que sí funciona es el beneficio práctico y tangible</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El beneficio tributario es el motivador #1 (especialmente en jóvenes), la rentabilidad es el dato que todos miran, y frases tipo <em>"paga menos declaración de renta"</em> abren la puerta donde el nombre técnico la cierra. Los mensajes que conectan con objetivos personales y usan lenguaje sin jerga fueron los más persuasivos en los testeos.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">H3</span><span class="acc-title">La fricción no está en el diseño, está en la carga cognitiva del proceso</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>La vinculación digital se percibe bien diseñada y más corta que un formato tradicional, pero el onboarding se siente largo y abrumador por exceso de información, tecnicismos sin explicar (P.E.P., cuenta contingente, "unidades") y falta de señales de progreso que motiven a terminar.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">H4</span><span class="acc-title">El asesor sigue siendo el verdadero canal de cierre</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Solo entre el 2% y el 10% de los clientes opera de forma autónoma; la gran mayoría de vinculaciones y cambios de portafolio pasan por un asesor. Los usuarios prefieren <strong>lo digital para operar y la asesoría para decidir</strong>. Cualquier narrativa nueva debe funcionar en dos audiencias a la vez: el cliente final y el asesor que la cuenta.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">H5</span><span class="acc-title">El concepto de hub/marketplace ya fue validado en su dirección general</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El testeo del NewHub mostró recepción positiva (diseño, confianza en la marca, portafolios personalizables) y el rediseño de gestión de portafolios con filtros y porcentajes fue percibido como una mejora clara. Las advertencias: demasiada información por página, nombres de productos confusos y necesidad de explicaciones más básicas para quien apenas empieza.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">H6</span><span class="acc-title">Los datos de la base (Databricks) confirman dónde está la oportunidad</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Universales penetra solo el <strong>9.14%</strong> de la base total (39,265 clientes), concentrado en Bogotá (58%) y en el segmento Finanzas Personales (53%). El mejor prospecto natural es el cliente que ya invierte: la penetración de Universales en clientes de inversión (<strong>15.3%</strong>) es <strong>2.4 veces</strong> la de clientes de pensión voluntaria (6.5%). Y aunque el 99.6% tiene acceso al portal, solo el 21% usa la app — la relación sigue siendo intermediada, lo que coincide con el peso del asesor que muestra la cualitativa.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ═══ 03 Inventario ═══ -->
+    <section class="section" id="s3">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <div>
+          <h2 class="section-title">Inventario de investigaciones</h2>
+          <p class="section-desc">Filtra por tipo de fuente · todos los enlaces abren la fuente original</p>
+        </div>
+      </div>
+
+      <div class="filter-chips" id="invFilters">
+        <button class="chip active" data-filter="all">Todas (15)</button>
+        <button class="chip" data-filter="nucleo">Núcleo universales/MFUND (6)</button>
+        <button class="chip" data-filter="adyacente">Adyacentes (7)</button>
+        <button class="chip" data-filter="datos">Cuantitativas Databricks (2)</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="invTable">
+          <thead>
+            <tr><th>Investigación</th><th>Qué aporta</th><th>Fuente</th></tr>
+          </thead>
+          <tbody>
+            <tr data-cat="nucleo"><td><strong>Hallazgos MFUND</strong><br><small>Síntesis · oct-nov 2025</small></td><td>11 insights que consolidan toda la investigación MFUND: percepción de asesores y clientes, objeciones, motivaciones/frenos, fricciones, lenguaje persuasivo</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/ORNjc7il0bDHRe1E90NK9" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="nucleo"><td><strong>Testeo Rediseño Universales</strong><br><small>2025</small></td><td>Testeo del flujo rediseñado de universales (archivo de hallazgos)</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/77xRqcym9hWiZFkqH8YLNe" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="nucleo"><td><strong>Vinculación Digital MFUND con FP's</strong></td><td>La vinculación digital vista por asesores (PPT en Dovetail)</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/6F5y6ORjVkMowr2CNdOexk" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="nucleo"><td><strong>Investigación MFUND C+S</strong><br><small>jun 2022</small></td><td>Experiencia de clientes con el producto Capital + Seguro</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/4QDJL2RLSy6n2iQfOPYgG0" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="nucleo"><td><strong>Herramientas comerciales MFUND</strong></td><td>Herramientas que usan los asesores para vender MFUND</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/7qtGDVRxS9HDlSbLkfaVmG" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="nucleo"><td><strong>Testeo extractos MFUND</strong></td><td>Testeo de extractos del producto</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/97fP02nJZg5KQ5voW3zdz" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="adyacente"><td><strong>NewHub</strong><br><small>ago-sep 2025</small></td><td>Testeo de la nueva landing/hub de inversiones: primera impresión, expectativas, apertura de productos, banner, sugerencias</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/2NKgnlW4t6NmaMbPE3Uwhi" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="adyacente"><td><strong>Gestión de portafolios FPs</strong><br><small>may 2025</small></td><td>Cómo asesoran y operan los FP's; lenguaje técnico, acompañamiento</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/4b0z0J63opBRh5IGEqxQkD" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="adyacente"><td><strong>Gestión de portafolios Clientes</strong><br><small>may 2025</small></td><td>Testeo del rediseño de gestión de portafolios (antecedente directo del marketplace)</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/6OWRh4inAw2DGC1Q6WoSxn" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="adyacente"><td><strong>Pruebas FPOB Fps</strong><br><small>sep-oct 2025</small></td><td>Narrativa de asesores y cross-sell hacia pensión voluntaria</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/1kla7MYZvYLj9hqwVs7Mef" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="adyacente"><td><strong>Monitor FPs</strong><br><small>sep-oct 2025</small></td><td>Herramientas de rentabilidad/riesgo que piden los asesores para vender</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/hR3ESaPCFTAgBswTzvoyH" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="adyacente"><td><strong>Invested Chat</strong><br><small>ene 2026</small></td><td>Conversaciones de clientes Invested (diferenciación de oferta)</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/1f4den59gt5gdkNP1mbEqa" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="adyacente"><td><strong>¿Por qué nos eligen nuestros clientes?</strong><br><small>jul 2025</small></td><td>Motivadores de elección de Skandia</td><td><a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/2i5Wd5CsFqwoA5NasHHTjW" target="_blank" rel="noopener">Dovetail ↗</a></td></tr>
+            <tr data-cat="datos"><td><strong>Base de Conocimiento: Productos Universales</strong><br><small>Databricks</small></td><td>Penetración, perfil demográfico, segmentación, geografía, canales, cross-sell, actividad digital y saldos de los 39,265 clientes con Universales</td><td><a class="link-pill link-pill--pdf" href="assets/base-conocimiento-productos-universales.pdf" target="_blank" rel="noopener">Ver PDF ↗</a></td></tr>
+            <tr data-cat="datos"><td><strong>Relación de clientes PV / Inversión con Universales</strong><br><small>Databricks</small></td><td>Tenencia cruzada de Universales en clientes de Pensión Voluntaria e Inversión, por segmento, perfil y regional</td><td><a class="link-pill link-pill--pdf" href="assets/relacion-clientes-pv-inversion-universales.pdf" target="_blank" rel="noopener">Ver PDF ↗</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="icon">📄</span>
+        <span><strong>Nota:</strong> los hallazgos de 2022 (MFUND C+S, MFUND-FPs, herramientas comerciales) y el Testeo Rediseño Universales viven como archivos PPT/PDF dentro de Dovetail; su contenido está recogido de forma sintetizada en los insights del proyecto <strong>Hallazgos MFUND</strong>. Para el detalle original, abrir el archivo en Dovetail.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 04 Hallazgos por tema ═══ -->
+    <section class="section" id="s4">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <div>
+          <h2 class="section-title">Hallazgos por tema</h2>
+          <p class="section-desc">Siete temas con citas textuales de usuarios y asesores · expande los que te interesen</p>
+        </div>
+      </div>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">4.1</span><span class="acc-title">Percepción del producto y naming — el mayor reto es de lenguaje</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>"Universales" no se entiende</h5>
+          <blockquote>"Los universales no se dan idea, digamos el término no sé si es muy propio de Skandia más que algo general."<span class="src">Cliente · Testeo NewHub</span></blockquote>
+          <p>El mismo testeo señaló <strong>"nombres confusos de los productos"</strong> como una de las oportunidades de mejora del hub.</p>
+          <h5>"Pensión Voluntaria" sesga hacia el retiro y genera rechazo inmediato</h5>
+          <blockquote>"La persona dice: Ah, es que pensión voluntaria no me interesa porque eso es para pensión. No saben que se trata de inversión también, que puede usarlo para la meta que tú quieras."<span class="src">Asesor · Hallazgos MFUND</span></blockquote>
+          <h5>"Skandia MFUND" no existe en la mente del cliente; el beneficio sí</h5>
+          <blockquote>"Nadie sabe qué es Skandia MFUND, pero si te dicen 'paga menos declaración de renta', luego te dicen que lo puedes hacer a través del fondo de pensión voluntaria MFUND."<span class="src">Hallazgos MFUND vigentes</span></blockquote>
+          <h5>La terminología técnica es una barrera transversal</h5>
+          <ul>
+            <li>"Cuenta contingente / sin contingente", "P.E.P.", "unidades", "Liquidez Colombia", "Acciones Col" — términos que el cliente no comprende.</li>
+            <li>Hasta la palabra "strategies" en los portafolios se cuestiona como innecesaria.</li>
+          </ul>
+          <blockquote>"A la gente no le gusta sentirse estúpida, pero ¿qué es P.E.P.?, no todos lo saben."<span class="src">Asesor · Hallazgos MFUND</span></blockquote>
+          <p><strong>Lo que significa para el proyecto:</strong> la norma nos obliga a renombrar, y la evidencia dice que el nombre nuevo no debe describir la categoría regulatoria ("simples masivos") sino el beneficio y el uso. Es la oportunidad de corregir tres problemas de naming a la vez.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">4.2</span><span class="acc-title">Motivaciones y frenos para invertir</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Motivadores (en orden de fuerza en la evidencia)</h5>
+          <ul>
+            <li><strong>Beneficio tributario</strong> — el argumento que más llama la atención y con el que los asesores abren la conversación; especialmente potente en jóvenes que no conectan con el discurso de "cierre de brecha pensional".</li>
+            <li><strong>Rentabilidad</strong> — "sigue siendo un dato atractivo independientemente del perfil del usuario"; en el contexto actual de volatilidad, las voluntarias son "el producto TOP" según los asesores.</li>
+            <li><strong>Flexibilidad</strong> — aportes variables, metas propias, ajustes por etapa de vida.</li>
+            <li><strong>Complemento a la pensión obligatoria</strong> y combinación ahorro + seguro (C+S) para perfiles de protección.</li>
+          </ul>
+          <h5>Frenos</h5>
+          <ul>
+            <li><strong>Rentabilidad percibida baja o fluctuante destruye la relación</strong> — usuarios con esa experiencia están decididos a retirar.</li>
+            <li><strong>Desconocimiento de las condiciones del producto:</strong> la mitad de los usuarios de MFUND C+S reportó experiencia negativa, atribuida a no entender qué compró y a la falta de asesoría posterior.</li>
+            <li><strong>Comparación con el mercado:</strong> algunos usuarios perciben alternativas más atractivas que MFUND.</li>
+            <li><strong>Fricciones operativas que cortan la constancia:</strong> sin integración con neobancos (Nequi, Nubank…) para débito automático; resistencia de algunos perfiles a las apps.</li>
+          </ul>
+          <blockquote>"Nosotros pusimos 120 y creo que ahora tenemos 117 después de 2 años y no va para ninguna parte."<span class="src">Cliente MFUND C+S · Hallazgos MFUND</span></blockquote>
+          <h5>Perfil del cliente MFUND</h5>
+          <p>No tiene demografía específica; comparte conocimiento básico de ahorro, busca rentabilidad, "superó la etapa de gastar todo el sueldo". Subgrupos: 40-50 años pensando en hijos y retiro, pensionados, y personas preocupadas por transferencia de patrimonio. Para el cliente nuevo digital que persigue este proyecto (perfil Financial Explorer), el mensaje de entrada validado es <strong>inversión sencilla + beneficio práctico, no "pensión"</strong>.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">4.3</span><span class="acc-title">Fricciones en la vinculación y onboarding digital</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p><strong>El diseño actual de la vinculación se percibe bien:</strong></p>
+          <blockquote>"Lo veo fácil, muy bonita la presentación... no es tan extensa, porque a veces los clientes ven ese formato de afiliación y dicen ¡uy, qué es esto!"<span class="src">Asesor · Hallazgos MFUND</span></blockquote>
+          <ul>
+            <li><strong>Pero el proceso en conjunto se siente largo y abrumador</strong>, con demasiada información de una sola vez; faltan explicaciones para inversionistas primerizos.</li>
+            <li><strong>Riesgo de abandono por falta de señales de avance y motivación.</strong></li>
+            <li><strong>Los tecnicismos dentro del flujo crean cuellos de botella</strong> (P.E.P. es el ejemplo recurrente); la identificación del asesor en el flujo aún no garantiza la asignación correcta del cliente.</li>
+            <li><strong>Contexto del kickoff que la investigación confirma:</strong> la vinculación actual es un proceso digitalizado, no una vinculación digital nativa; el 84% de las vinculaciones ya entra por canal digital, pero el cierre casi siempre ocurre con acompañamiento del asesor.</li>
+          </ul>
+          <blockquote>"Uno desde el principio debería darles como ánimo (estamos ya casi cerca, vamos muy bien, primer paso tus objetivos, vamos 2, te faltan 3), si no, lo sientes muy eterno."<span class="src">Asesor · Hallazgos MFUND</span></blockquote>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">4.4</span><span class="acc-title">Lenguaje y mensajes que funcionan</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Del testeo de mensajes en la experiencia MFUND:</p>
+          <ul>
+            <li><strong>Lenguaje directo, sin jerga técnica</strong> — facilita la comprensión de conceptos financieros.</li>
+            <li><strong>Beneficios prácticos y tangibles primero</strong> — el "para qué" antes que el "qué es".</li>
+            <li><strong>Flexibilidad y personalización como promesa</strong> — los planes que se adaptan "a tu meta" resultaron atractivos.</li>
+            <li><strong>Conexión emocional con objetivos y situaciones personales</strong> — los mensajes que parten de la vida del usuario persuaden más que los que parten del producto.</li>
+            <li><strong>Apoyo visual (íconos, gráficos)</strong> — hace digerible la información financiera.</li>
+          </ul>
+          <h5>Complemento del NewHub — lo que los usuarios pidieron</h5>
+          <ul>
+            <li>Explicaciones más básicas para no expertos e información <strong>filtrable según intereses</strong>.</li>
+            <li><strong>Simuladores visibles</strong> y productos organizados por <strong>categorías con descripciones breves</strong>.</li>
+            <li>Testimoniales y sección de preguntas frecuentes.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">4.5</span><span class="acc-title">El rol del asesor y sus herramientas — la otra audiencia de la narrativa</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <ul>
+            <li><strong>Solo entre el 2% y el 10% de los clientes opera de forma autónoma</strong>; el resto requiere asistencia directa del FP por videollamada o reunión.</li>
+            <li><strong>Las decisiones de inversión nacen casi siempre de una conversación con el asesor</strong>, no de iniciativa propia del cliente.</li>
+            <li><strong>El usuario quiere lo digital para operar y la asesoría para decidir:</strong> en el NewHub, los usuarios ven la página como preparación para una asesoría posterior; inversiones pequeñas las harían 100% en línea, las grandes con asesor.</li>
+            <li><strong>Los asesores venden con simuladores y datos de rentabilidad;</strong> valoran el Monitor (TIR por cliente) y piden materiales actualizados (videos, instructivos) y enterarse de los lanzamientos antes que el cliente.</li>
+            <li>En cross-sell deciden entre MFUND y CREA según perfil, y advierten <strong>no mezclar narrativas de productos en un mismo momento</strong> porque el cliente se confunde.</li>
+          </ul>
+          <blockquote>"Utilizo mucho los simuladores, me parece fundamental trabajar en proyecciones basado en históricos de rentabilidades."<span class="src">Asesor · Necesidades asesores en MFUND</span></blockquote>
+          <blockquote>"Nosotros somos muy técnicos y puede que nosotros entendamos, pero los clientes no."<span class="src">Asesor · Necesidades asesores en MFUND</span></blockquote>
+          <p>También se detectó <strong>desconocimiento del producto en parte de la fuerza comercial</strong>, que se traduce en clientes mal informados.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">4.6</span><span class="acc-title">Aprendizajes para el hub / marketplace de inversiones</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Del testeo del NewHub (la versión más reciente de la landing de inversiones)</h5>
+          <ul>
+            <li><strong>Primera impresión positiva:</strong> informativa, dinámica, buena identidad de marca, CTAs claros — pero <strong>cargada de información</strong> y "demasiado extensa".</li>
+            <li><strong>La trayectoria de Skandia genera confianza</strong>; el contenido de portafolios personalizables fue bien recibido.</li>
+            <li><strong>Lo que el usuario espera encontrar:</strong> qué es Skandia, productos explicados "en términos coloquiales", cómo empezar a invertir si no soy cliente, FAQs/chatbot y canales de servicio visibles.</li>
+            <li><strong>En banners gana lo simple:</strong> el banner propuesto (más limpio, menos imágenes) le ganó al actual.</li>
+          </ul>
+          <h5>Del rediseño de gestión de portafolios (antecedente del marketplace con filtros)</h5>
+          <ul>
+            <li><strong>La interfaz tipo catálogo con filtros fue una mejora clara:</strong> filtros por características, porcentajes en lugar de montos, diferenciación explícita entre "gestión por Skandia" y "gestión por el usuario", confirmación descargable.</li>
+            <li><strong>Confusiones a vigilar:</strong> claridad de botones/automatizaciones, búsqueda de portafolios específicos, mensajes sobre cuándo aplica la nueva distribución.</li>
+            <li><strong>Diferenciación con Invested:</strong> parte de los clientes llegó a Invested precisamente porque gestionar portafolios por su cuenta era trabajo. La oferta de mezclas debe contar con claridad qué es autogestión sencilla y qué es delegación con gestión activa.</li>
+            <li>Para la conversación comercial, los FP's pidieron <strong>gráficos de riesgo/retorno</strong> y clasificación de portafolios por perfil de riesgo.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">4.7</span><span class="acc-title">Quién es el cliente de universales hoy — datos de la base (Databricks)</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value">9.14%</div><div class="stat-label">Penetración en la base total — 39,265 de 429,552 clientes</div></div>
+            <div class="stat-card"><div class="stat-value">2.4×</div><div class="stat-label">Mayor afinidad en clientes de inversión (15.3%) vs. pensión voluntaria (6.5%)</div></div>
+            <div class="stat-card"><div class="stat-value">99.6%</div><div class="stat-label">Tiene acceso al portal… pero solo 20.9% usa la app móvil</div></div>
+            <div class="stat-card"><div class="stat-value">58.5%</div><div class="stat-label">De los clientes está en Bogotá; canal Agencias gestiona el 58%</div></div>
+          </div>
+          <h5>Tamaño y composición</h5>
+          <ul>
+            <li>Producto dominante: <strong>Línea Seguros</strong> (29,356 clientes), luego Colectivo (10,563) y Capital Seguro (1,088).</li>
+            <li><strong>Crecimiento reciente:</strong> 2025 fue el mejor año de ingreso de clientes (4,684 nuevos, 11.9% de la base) — la oferta digital actual sí está atrayendo.</li>
+            <li><strong>Perfil:</strong> edad promedio 48.4 años (rango más representativo: 35–44 con 34.9%), 44% casados, antigüedad promedio 6.4 años. El 45.7% son clientes <strong>nuevos</strong> y el 26% <strong>inversionistas</strong> (tipología transaccional).</li>
+            <li><strong>Segmentos tradicionales:</strong> Finanzas Personales concentra el 53% de los clientes (con el menor saldo promedio, $36.9M), Privilegio 26.5%, Joven Pro 12.4%. Elite Wealth tiene solo el 2.1% de los clientes pero el mayor saldo promedio ($520.4M).</li>
+            <li><strong>Segmentos omnicanal:</strong> Capital Investor 43.9%, Family Guardian 31.4%, Wealth Builder 24.5%.</li>
+          </ul>
+          <h5>Tenencia cruzada y oportunidad de crecimiento</h5>
+          <ul>
+            <li><strong>El cliente que ya invierte es el mejor prospecto de Universales</strong> (15.3% vs. 6.5% de penetración) — coincide con la cualitativa: el encuadre "inversión" conecta y el encuadre "pensión" filtra.</li>
+            <li><strong>La tenencia combinada es la excepción:</strong> 33.5% tiene solo Pensión Voluntaria y 21.2% solo Inversión; apenas 1.9% tiene los tres tipos de producto. Hay mucho espacio para la narrativa de diversificación del hub.</li>
+            <li><strong>Los segmentos premium ya combinan productos:</strong> Elite Wealth lidera la penetración de Inversión + Universales (27.9%), Elite 19.5%, Privilegio 11.2%; Finanzas Personales apenas 2.8% — la masa está sin activar.</li>
+            <li><strong>Cross-sell identificado:</strong> el 52.4% de clientes con Universales tiene oportunidades de venta cruzada (1.76 líneas promedio); el 54.4% ya tiene productos de inversión.</li>
+            <li><strong>Perfiles de la combinación:</strong> Inversión + Universales promedia 47.2 años; Pensión + Universales es más joven (42.1 años). La regional Centro concentra más del 70% de la tenencia cruzada.</li>
+          </ul>
+          <p>📄 Fuentes completas: <a class="link-pill link-pill--pdf" href="assets/base-conocimiento-productos-universales.pdf" target="_blank" rel="noopener">Base de Conocimiento: Productos Universales ↗</a> <a class="link-pill link-pill--pdf" href="assets/relacion-clientes-pv-inversion-universales.pdf" target="_blank" rel="noopener">Relación clientes PV/Inversión con Universales ↗</a></p>
+        </div>
+      </details>
+
+      <div class="no-results" id="noResults4">Ningún hallazgo coincide con la búsqueda.</div>
+    </section>
+
+    <!-- ═══ 05 Implicaciones ═══ -->
+    <section class="section" id="s5">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <div>
+          <h2 class="section-title">Implicaciones para naming, narrativa y contenidos</h2>
+          <p class="section-desc">Ocho decisiones que la evidencia respalda</p>
+        </div>
+      </div>
+      <ol class="imp-list">
+        <li><span><strong>Naming desde el beneficio, no desde la norma.</strong> Evitar trasladar "simples masivos" al cliente. La evidencia favorece nombres que comuniquen uso y beneficio con el término técnico en segundo plano. Validar el naming candidato en el testeo de julio.</span></li>
+        <li><span><strong>Narrativa de inversión flexible, no de pensión.</strong> El encuadre "pensión" filtra a los jóvenes y a quien invierte por metas. La historia de diversificación del kickoff (por región, divisa, tipo de activo) conecta con lo que el usuario pidió: categorías claras y filtrables.</span></li>
+        <li><span><strong>Liderar con beneficio tributario + rentabilidad, con honestidad sobre el riesgo.</strong> Son los dos ganchos más fuertes; pero la rentabilidad prometida y no entendida es la causa #1 de experiencias negativas y retiros. Acompañar siempre con expectativas claras — también nos protege frente a la línea delgada con "recomendación profesional".</span></li>
+        <li><span><strong>Doble audiencia: cliente y asesor.</strong> Producir la narrativa en dos alturas: la versión cliente (sin jerga, emocional, por objetivos) y el toolkit del asesor (argumentarios, simuladores, riesgo/retorno). Los asesores piden enterarse de los lanzamientos antes que el cliente.</span></li>
+        <li><span><strong>Menos es más en el hub.</strong> El NewHub validó la dirección pero advirtió sobrecarga: priorizar la información esencial, acordeones/filtros para profundizar, explicaciones progresivas, simuladores visibles y testimoniales.</span></li>
+        <li><span><strong>Cuidar el SEO al reescribir.</strong> "Ideas de inversión" es de las páginas mejor posicionadas; cualquier cambio de textos debe coordinarse con el informe de keywords de Growth, como se acordó en el kickoff.</span></li>
+        <li><span><strong>No mezclar historias de productos en un mismo momento del flujo</strong> (aprendizaje de asesores en FPOB y de la primera norma de asesoría): una historia por decisión, aunque el hub las contenga todas.</span></li>
+        <li><span><strong>Priorizar audiencias con los datos de la base.</strong> El cliente actual de inversión es el prospecto más afín (2.4× la penetración): el cross-sell desde inversión debería ser la primera campaña, alineado con la idea de que el hub viva en el portal con data precargada. La masa por activar está en Finanzas Personales — justo el perfil del cliente nuevo digital. Y las campañas del relanzamiento son también una palanca de migración a la app.</span></li>
+      </ol>
+    </section>
+
+    <!-- ═══ 06 Vacíos ═══ -->
+    <section class="section" id="s6">
+      <div class="section-header">
+        <div class="section-number">06</div>
+        <div>
+          <h2 class="section-title">Vacíos de investigación</h2>
+          <p class="section-desc">Lo que UX debe cubrir en la fase de testeo — julio</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Vacío</th><th>Por qué importa</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Comprensión del nuevo naming y de la clasificación</strong> (simples masivos / simples / complejos)</td><td>No existe investigación sobre cómo el cliente entiende la nueva categorización; "universales" ya demostró que el nombre puede fallar</td></tr>
+            <tr><td><strong>Perfilamiento obligatorio en el flujo</strong></td><td>Nadie ha testeado el perfilamiento simplificado vs. completo dentro de la experiencia digital; es la principal fricción nueva que agrega la norma</td></tr>
+            <tr><td><strong>Servicio de solo ejecución en fiduciaria</strong></td><td>Solo existe la referencia del multifondos; no hay evidencia de cómo lo entiende el cliente de fiduciaria en vinculación inicial</td></tr>
+            <tr><td><strong>Narrativa de "mezclas" vs. Invested</strong></td><td>El riesgo de canibalización/confusión se discutió en el kickoff; no hay testeo que valide si el cliente distingue mezclas sugeridas de recomendación profesional</td></tr>
+            <tr><td><strong>Flujo actual de universales</strong> (excusas → mezcla → vinculación)</td><td>El testeo del rediseño de universales quedó como archivo; no hay highlights consultables sobre la narrativa de "excusas" específicamente</td></tr>
+            <tr><td><strong>Cliente nuevo 100% digital (Financial Explorer)</strong></td><td>La evidencia actual viene mayoritariamente de clientes existentes y asesores; el journey de atracción sin asesor está poco estudiado</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ 07 Próximos pasos ═══ -->
+    <section class="section" id="s7">
+      <div class="section-header">
+        <div class="section-number">07</div>
+        <div>
+          <h2 class="section-title">Próximos pasos sugeridos</h2>
+          <p class="section-desc">Cómo activar este informe en el plan del kickoff</p>
+        </div>
+      </div>
+      <ol class="imp-list">
+        <li><span><strong>Sesión de desempaque</strong> con marketing y producto para recorrer este informe con las fuentes a la mano.</span></li>
+        <li><span>Marketing usa los temas <strong>4.1, 4.4 y la sección 05</strong> como insumo directo para las definiciones de naming y narrativa (semanas 1-2 del plan).</span></li>
+        <li><span>UX prepara el <strong>brief de investigación del testeo</strong> de comprensión y usabilidad de los nuevos flujos (meta: 10–15 de julio), priorizando los vacíos de la sección 06.</span></li>
+        <li><span>Cruzar este resumen con el <strong>informe de SEO/keywords de Growth</strong> cuando llegue, para que naming y posicionamiento se definan juntos.</span></li>
+      </ol>
+    </section>
+
+    <footer class="doc-footer">
+      Elaborado por el equipo UX (#UXplorers) a partir del repositorio de investigación en Dovetail y análisis de la base de clientes en Databricks.<br>
+      Todos los hallazgos son trazables a su fuente mediante los enlaces incluidos · Junio 2026
+    </footer>
+  </div>
+
+  <button id="backTop" aria-label="Volver arriba">↑</button>
+
+  <script>
+    // ── Barra de progreso de lectura ──
+    const progressBar = document.getElementById('progressBar');
+    const backTop = document.getElementById('backTop');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+      progressBar.style.width = pct + '%';
+      backTop.classList.toggle('visible', h.scrollTop > 600);
+    }, { passive: true });
+
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ── Expandir / contraer todo ──
+    const allAccs = [...document.querySelectorAll('details.acc')];
+    document.getElementById('expandAll').addEventListener('click', () => allAccs.forEach(d => d.open = true));
+    document.getElementById('collapseAll').addEventListener('click', () => allAccs.forEach(d => d.open = false));
+
+    // ── Filtros del inventario ──
+    const invRows = [...document.querySelectorAll('#invTable tbody tr')];
+    document.getElementById('invFilters').addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      document.querySelectorAll('#invFilters .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const f = chip.dataset.filter;
+      invRows.forEach(r => r.style.display = (f === 'all' || r.dataset.cat === f) ? '' : 'none');
+    });
+
+    // ── Búsqueda global ──
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    const searchCount = document.getElementById('searchCount');
+    const noResults4 = document.getElementById('noResults4');
+    const searchScopes = allAccs.concat(invRows); // acordeones + filas de inventario
+
+    function clearHighlights(root) {
+      root.querySelectorAll('mark').forEach(m => {
+        m.replaceWith(document.createTextNode(m.textContent));
+      });
+      root.normalize?.();
+    }
+
+    function highlight(root, term) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: n => n.parentElement.closest('script,style,summary svg') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+      });
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      const re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      nodes.forEach(node => {
+        if (!re.test(node.textContent)) return;
+        const frag = document.createDocumentFragment();
+        node.textContent.split(re).forEach((part, i) => {
+          if (i % 2 === 1) {
+            const mark = document.createElement('mark');
+            mark.textContent = part;
+            frag.appendChild(mark);
+          } else if (part) {
+            frag.appendChild(document.createTextNode(part));
+          }
+        });
+        node.replaceWith(frag);
+      });
+    }
+
+    let searchTimer;
+    function runSearch() {
+      const term = searchInput.value.trim().toLowerCase();
+      searchClear.style.display = term ? 'block' : 'none';
+
+      // limpiar estado previo
+      searchScopes.forEach(el => { clearHighlights(el); el.style.display = ''; });
+      allAccs.forEach(d => d.classList.remove('search-open'));
+
+      if (term.length < 2) {
+        searchCount.textContent = '';
+        noResults4.style.display = 'none';
+        // restaurar filtro activo del inventario
+        document.querySelector('#invFilters .chip.active')?.click?.();
+        return;
+      }
+
+      let hits = 0;
+      // acordeones: mostrar y abrir los que coinciden, ocultar el resto
+      allAccs.forEach(d => {
+        const match = d.textContent.toLowerCase().includes(term);
+        d.style.display = match ? '' : 'none';
+        if (match) { d.open = true; highlight(d, term); hits++; }
+      });
+      // filas de inventario
+      invRows.forEach(r => {
+        const match = r.textContent.toLowerCase().includes(term);
+        r.style.display = match ? '' : 'none';
+        if (match) { highlight(r, term); hits++; }
+      });
+
+      const visible4 = allAccs.filter(d => d.closest('#s4') && d.style.display !== 'none').length;
+      noResults4.style.display = visible4 === 0 ? 'block' : 'none';
+      searchCount.textContent = hits + ' resultado' + (hits === 1 ? '' : 's');
+    }
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(runSearch, 180);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      runSearch();
+      searchInput.focus();
+    });
+
+    // ── TOC activo según scroll ──
+    const tocLinks = [...document.querySelectorAll('.toc-list a')];
+    const sections = tocLinks.map(a => document.querySelector(a.getAttribute('href')));
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => s && obs.observe(s));
+  </script>
+</body>
+</html>
