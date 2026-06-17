@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invest-ed · Evolución Notificación de Rebalanceo</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:       #00c73d;
+  --green-dark:  #007c26;
+  --green-d02:   #009a2f;
+  --green-light: #f6fcf2;
+  --green-l04:   #caf9cb;
+  --grey-dark:   #404040;
+  --grey-mid:    #666666;
+  --grey-light:  #f6f6f6;
+  --grey-stroke: #dddddd;
+  --white:       #ffffff;
+  --blue:        #0099de;
+  --red:         #e03430;
+  --font-title:  'Montserrat', sans-serif;
+  --font-body:   'Open Sans', sans-serif;
+  --space-1: 8px; --space-2: 16px; --space-3: 24px;
+  --space-4: 32px; --space-5: 40px; --space-6: 48px;
+  --radius: 10px;
+  --max: 860px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--grey-dark);
+  background: var(--grey-light);
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--green); border-radius: 2px; }
+
+/* —— NAV —— */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white);
+  border-bottom: 1px solid var(--grey-stroke);
+  padding: 0 var(--space-6);
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-logo { font-family: var(--font-title); font-weight: 700; font-size: 16px; color: var(--green-dark); }
+.nav-sep { width: 1px; height: 18px; background: var(--grey-stroke); }
+.nav-title { font-size: 13px; color: var(--grey-mid); }
+.nav-links { display: flex; gap: var(--space-3); }
+.nav-links a { font-size: 12px; color: var(--grey-mid); text-decoration: none; font-weight: 500; transition: color .2s; }
+.nav-links a:hover, .nav-links a.active { color: var(--green-dark); }
+
+/* —— HERO —— */
+.hero {
+  background: var(--white);
+  border-bottom: 1px solid var(--grey-stroke);
+  padding: var(--space-6) var(--space-6) var(--space-5);
+}
+.hero-inner { max-width: var(--max); margin: 0 auto; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green-light); border: 1px solid var(--green-l04);
+  border-radius: 20px; padding: 4px 14px;
+  font-size: 11px; font-weight: 700; font-family: var(--font-title);
+  color: var(--green-dark); text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: var(--space-3);
+}
+.hero-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.hero h1 {
+  font-family: var(--font-title); font-size: 32px; font-weight: 700;
+  color: var(--grey-dark); line-height: 1.2; margin-bottom: var(--space-2);
+}
+.hero h1 span { color: var(--green-dark); }
+.hero-meta {
+  font-size: 13px; color: var(--grey-mid);
+  display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;
+}
+.hero-meta span { display: flex; align-items: center; gap: 6px; }
+.hero-meta-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--grey-stroke); }
+
+/* —— LAYOUT —— */
+.page { max-width: var(--max); margin: 0 auto; padding: var(--space-5) var(--space-6); }
+
+/* —— SECCIONES —— */
+.section { margin-bottom: var(--space-6); }
+.section-eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: var(--space-2);
+}
+.eyebrow-line { width: 24px; height: 2px; background: var(--green); flex-shrink: 0; }
+.eyebrow-text {
+  font-size: 11px; font-weight: 700; font-family: var(--font-title);
+  text-transform: uppercase; letter-spacing: 1.2px; color: var(--green-dark);
+}
+.section h2 {
+  font-family: var(--font-title); font-size: 22px; font-weight: 700;
+  color: var(--grey-dark); margin-bottom: var(--space-3); line-height: 1.3;
+}
+.section h3 {
+  font-family: var(--font-title); font-size: 16px; font-weight: 700;
+  color: var(--green-dark); margin: var(--space-4) 0 var(--space-2);
+}
+.section p { margin-bottom: var(--space-2); color: var(--grey-dark); }
+
+/* —— CARDS —— */
+.card {
+  background: var(--white); border: 1px solid var(--grey-stroke);
+  border-radius: var(--radius); padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.card-green {
+  background: var(--green-light); border: 1px solid var(--green-l04);
+  border-radius: var(--radius); padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.card-accent {
+  border-left: 4px solid var(--green);
+  background: var(--green-light);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.card-red {
+  border-left: 4px solid var(--red);
+  background: #fff5f4;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.quote {
+  font-size: 15px; font-style: italic; color: var(--grey-dark);
+  line-height: 1.7; margin-bottom: var(--space-2);
+}
+.quote-source {
+  font-size: 12px; color: var(--grey-mid); font-weight: 600;
+  font-family: var(--font-title); text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* —— TABLA —— */
+table { width: 100%; border-collapse: collapse; margin-bottom: var(--space-3); font-size: 14px; }
+thead tr { background: var(--green-dark); }
+thead th { color: var(--white); font-family: var(--font-title); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; padding: 10px 16px; text-align: left; }
+tbody tr:nth-child(even) { background: var(--grey-light); }
+tbody tr:nth-child(odd)  { background: var(--white); }
+tbody tr { border-bottom: 1px solid var(--grey-stroke); }
+tbody td { padding: 12px 16px; color: var(--grey-dark); line-height: 1.5; vertical-align: top; }
+tbody td:first-child { font-weight: 700; font-family: var(--font-title); font-size: 13px; color: var(--grey-dark); white-space: nowrap; }
+
+/* —— CHECK / CROSS LISTS —— */
+.check-list, .cross-list { list-style: none; padding: 0; margin-bottom: var(--space-3); }
+.check-list li, .cross-list li { padding: 8px 0 8px 28px; position: relative; border-bottom: 1px solid var(--grey-stroke); font-size: 14px; }
+.check-list li:last-child, .cross-list li:last-child { border-bottom: none; }
+.check-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+.cross-list li::before { content: '✗'; position: absolute; left: 0; color: var(--red); font-weight: 700; }
+
+/* —— GRID DECISIONES —— */
+.decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-3); }
+.decision-card { background: var(--white); border: 1px solid var(--grey-stroke); border-radius: var(--radius); overflow: hidden; }
+.decision-card-header { background: var(--grey-light); padding: 10px 16px; border-bottom: 1px solid var(--grey-stroke); }
+.decision-label { font-size: 10px; font-weight: 700; font-family: var(--font-title); text-transform: uppercase; letter-spacing: 1px; }
+.decision-label.old { color: var(--red); }
+.decision-label.new { color: var(--green-dark); }
+.decision-card-body { padding: 14px 16px; font-size: 14px; line-height: 1.6; color: var(--grey-dark); }
+
+/* —— BLOQUES ESTRUCTURA —— */
+.bloques-grid { display: grid; grid-template-columns: 1fr; gap: 2px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--grey-stroke); margin-bottom: var(--space-3); }
+.bloque-row { display: grid; grid-template-columns: 48px 180px 1fr; background: var(--white); }
+.bloque-row:nth-child(even) { background: var(--grey-light); }
+.bloque-num { background: var(--green-dark); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-weight: 700; font-size: 16px; }
+.bloque-name { padding: 14px 16px; font-family: var(--font-title); font-weight: 700; font-size: 13px; color: var(--grey-dark); display: flex; align-items: center; border-right: 1px solid var(--grey-stroke); }
+.bloque-desc { padding: 14px 16px; font-size: 13px; color: var(--grey-mid); display: flex; align-items: center; line-height: 1.5; }
+
+/* —— COPY BLOCK —— */
+.copy-block { margin-bottom: var(--space-4); }
+.copy-label { font-size: 10px; font-weight: 700; font-family: var(--font-title); text-transform: uppercase; letter-spacing: 1.2px; color: var(--green-dark); margin-bottom: 6px; }
+.copy-text {
+  background: var(--white); border: 1px solid var(--grey-stroke);
+  border-left: 3px solid var(--green);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: 14px; color: var(--grey-dark); line-height: 1.7;
+}
+
+/* —— PENDIENTES —— */
+.pendiente-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--grey-stroke); font-size: 14px; }
+.pendiente-item:last-child { border-bottom: none; }
+.pendiente-num { width: 24px; height: 24px; border-radius: 50%; background: var(--grey-light); border: 1px solid var(--grey-stroke); display: flex; align-items: center; justify-content: center; font-family: var(--font-title); font-weight: 700; font-size: 11px; color: var(--grey-mid); flex-shrink: 0; margin-top: 2px; }
+
+/* —— FOOTER —— */
+footer {
+  background: var(--grey-dark); color: rgba(255,255,255,0.5);
+  text-align: center; padding: var(--space-4);
+  font-size: 12px; font-family: var(--font-title);
+}
+footer strong { color: var(--green); }
+
+/* —— REVEAL —— */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .45s ease, transform .45s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+@media (max-width: 680px) {
+  nav { padding: 0 var(--space-3); }
+  .nav-links { display: none; }
+  .page { padding: var(--space-4) var(--space-3); }
+  .hero { padding: var(--space-4) var(--space-3); }
+  .hero h1 { font-size: 24px; }
+  .decision-grid { grid-template-columns: 1fr; }
+  .bloque-row { grid-template-columns: 40px 1fr; }
+  .bloque-name { border-right: none; border-bottom: 1px solid var(--grey-stroke); }
+  .bloque-desc { grid-column: 1 / -1; padding-top: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <span class="nav-logo">Skandia · Invest-ed</span>
+    <div class="nav-sep"></div>
+    <span class="nav-title">Evolución notificación de rebalanceo</span>
+  </div>
+  <div class="nav-links">
+    <a href="#contexto">Contexto</a>
+    <a href="#problema">Problema</a>
+    <a href="#diagnostico">Diagnóstico</a>
+    <a href="#decisiones">Decisiones</a>
+    <a href="#estructura">Estructura</a>
+    <a href="#copy">Copy</a>
+    <a href="#pendientes">Pendientes</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><div class="hero-dot"></div>Quick Win · UXplorers</div>
+    <h1>Evolución de la <span>notificación</span><br>de rebalanceo</h1>
+    <div class="hero-meta">
+      <span>Invest-ed 3.0</span>
+      <div class="hero-meta-dot"></div>
+      <span>Canal: Email HTML</span>
+      <div class="hero-meta-dot"></div>
+      <span>Prioridad: Ambos (mobile + desktop)</span>
+      <div class="hero-meta-dot"></div>
+      <span>Mayo 2026</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- 1. CONTEXTO -->
+  <section class="section reveal" id="contexto">
+    <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">01 · Contexto</span></div>
+    <h2>¿Por qué esta iniciativa?</h2>
+    <p>Esta iniciativa hace parte de los esfuerzos por evolucionar Invest-ed 3.0, y surge directamente de los hallazgos del taller de co-creación con stakeholders. Es un <strong>quick win</strong>: una mejora que puede implementarse de forma independiente, antes de que estén disponibles los espacios de alineación con Mercadeo e Inversiones.</p>
+    <p>El alcance de esta iteración es el <strong>correo HTML de notificación de rebalanceo</strong> — el mensaje que hoy reciben los clientes cuando se realiza un ajuste automático en su portafolio Invest-ed dentro del Fondo Voluntario de Pensión Skandia Multifund.</p>
+  </section>
+
+  <!-- 2. PROBLEMA -->
+  <section class="section reveal" id="problema">
+    <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">02 · Problema documentado</span></div>
+    <h2>El correo actual genera confusión</h2>
+    <p>Los clientes interpretan la notificación de rebalanceo como un <strong>retiro no autorizado</strong>, lo que deriva en llamadas a los Financial Planners y, en algunos casos, en retiros efectivos del producto. Este problema fue identificado y documentado en el Hallazgo 03 del taller de co-creación:</p>
+
+    <div class="card-accent reveal">
+      <div class="eyebrow-text" style="margin-bottom:10px;">Hallazgo 03 · Impacto alto · Comunicación reactiva en volatilidad</div>
+      <p class="quote">"Cuando hacen un rebalanceo, le llega un correo al cliente y el cliente siempre me llama a decirme que me están sacando plata. Hay un problema en esa comunicación."</p>
+      <div class="quote-source">— Financial Planner · Sesión de co-creación</div>
+    </div>
+
+    <p>La solución no es solo mejorar el correo: es <strong>cambiar el orden narrativo</strong> y contextualizar con información de mercado. Referentes como Betterment y Moneyfarm producen comunicaciones proactivas de volatilidad para suavizar el impacto emocional antes de que el cliente pregunte.</p>
+  </section>
+
+  <!-- 3. DIAGNÓSTICO -->
+  <section class="section reveal" id="diagnostico">
+    <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">03 · Diagnóstico del correo actual</span></div>
+    <h2>Lo que funciona y lo que hay que cambiar</h2>
+    <p>Se analizó la notificación vigente identificando fortalezas a conservar y problemas a resolver.</p>
+
+    <h3>✓ Lo que funciona</h3>
+    <div class="card">
+      <ul class="check-list">
+        <li><strong>Gráficos de distribución (tortas):</strong> permiten entender de un vistazo qué cambió y en qué proporción. Útiles y honestos.</li>
+        <li><strong>Recordatorio del perfil de riesgo:</strong> conecta el movimiento con el contexto del cliente. Está en el lugar conceptualmente correcto.</li>
+        <li><strong>Footer con canales de contacto:</strong> da respaldo institucional y reduce la ansiedad post-lectura. Debe sobrevivir cualquier iteración.</li>
+        <li><strong>Número de contrato como referencia:</strong> genera confianza y personaliza el mensaje. Le dice al cliente "esto es tuyo, esto es real".</li>
+      </ul>
+    </div>
+
+    <h3>✗ Lo que hay que trabajar</h3>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <table>
+        <thead>
+          <tr><th style="width:30%">Problema</th><th>Descripción</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Orden narrativo invertido</td><td>El correo anuncia el rebalanceo antes de explicar por qué. El cliente se alarma antes de entender. Contexto primero, movimiento después.</td></tr>
+          <tr><td>Saludo genérico</td><td>"Hola Nombre1182381" expone el campo de base de datos. El cliente no siente que el mensaje es para él.</td></tr>
+          <tr><td>Justificación llega tarde</td><td>Los tres puntos de contexto aparecen al final, después de los gráficos. Para un perfil Cauto, ese orden genera alarma antes que certeza.</td></tr>
+          <tr><td>Lenguaje técnico en leyendas</td><td>"FVP_SK_Diversificado_Global" y "FVP Especial CAT" son nombres internos que no le dicen nada al cliente.</td></tr>
+          <tr><td>Gráficas en jerarquía vertical</td><td>Primero una torta, luego la otra. No permiten comparar de un vistazo. Deben ir lado a lado.</td></tr>
+          <tr><td>Distribución nueva sin significado</td><td>Los gráficos muestran el qué, pero no por qué le debería importar al cliente.</td></tr>
+          <tr><td>CTA de video desaprovechado</td><td>"Conoce tu rebalanceo" aparece casi oculto y sin contexto de valor.</td></tr>
+          <tr><td>Perfil como etiqueta vacía</td><td>Decirle al cliente que su mezcla es "Cauta" sin explicar qué significa no genera tranquilidad.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4. DECISIONES -->
+  <section class="section reveal" id="decisiones">
+    <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">04 · Decisiones de diseño</span></div>
+    <h2>Qué cambiamos y por qué</h2>
+
+    <h3>Decisión 1 — Título del correo</h3>
+    <div class="decision-grid reveal">
+      <div class="decision-card">
+        <div class="decision-card-header"><div class="decision-label old">✗ Descartado</div></div>
+        <div class="decision-card-body">"Tu dinero está bien. Te explicamos por qué lo movimos."</div>
+      </div>
+      <div class="decision-card">
+        <div class="decision-card-header"><div class="decision-label new">✓ Aprobado</div></div>
+        <div class="decision-card-body">"Hubo un ajuste en tu portafolio — esto es lo que pasó"</div>
+      </div>
+    </div>
+    <div class="card-accent" style="margin-bottom: var(--space-4);">
+      <strong>Razón:</strong> El título anterior hace una promesa sobre el estado del portafolio que el mercado puede desmentir. En escenarios donde el cliente puede estar en tendencia a la baja, decirle "tu dinero está bien" puede ser malinterpretado. El nuevo título da certeza sobre la acción (fue una decisión, no un error), sin prometer nada sobre el resultado.
+    </div>
+
+    <h3>Decisión 2 — Bloque de tranquilidad inicial</h3>
+    <div class="decision-grid reveal">
+      <div class="decision-card">
+        <div class="decision-card-header"><div class="decision-label old">✗ Descartado</div></div>
+        <div class="decision-card-body">"Tu inversión en Invest-ed está activa y bajo nuestro cuidado."</div>
+      </div>
+      <div class="decision-card">
+        <div class="decision-card-header"><div class="decision-label new">✓ Aprobado</div></div>
+        <div class="decision-card-body">"Lo que ves en tu cuenta no es un error ni un retiro. Es una decisión que tomamos junto a nuestros expertos de inversión — y queremos que la entiendas completa."</div>
+      </div>
+    </div>
+    <div class="card-accent" style="margin-bottom: var(--space-4);">
+      <strong>Razón:</strong> La certeza se da sobre quién tomó la decisión y por qué, no sobre cómo le está yendo al portafolio. Esto es honesto en cualquier escenario de mercado.
+    </div>
+
+    <h3>Decisión 3 — Bloque del perfil de riesgo</h3>
+    <div class="decision-grid reveal">
+      <div class="decision-card">
+        <div class="decision-card-header"><div class="decision-label old">✗ Descartado</div></div>
+        <div class="decision-card-body">Pill simple: "Tu mezcla es Cauta" — solo una etiqueta sin explicación.</div>
+      </div>
+      <div class="decision-card">
+        <div class="decision-card-header"><div class="decision-label new">✓ Aprobado</div></div>
+        <div class="decision-card-body">Bloque expandido con: (1) explicación de qué significa Cauto, (2) prioridad y horizonte, (3) conexión directa con el rebalanceo realizado.</div>
+      </div>
+    </div>
+    <div class="card-accent" style="margin-bottom: var(--space-4);">
+      <strong>Razón:</strong> El perfil como etiqueta no tranquiliza. El cliente necesita entender qué implica ese perfil en términos de cómo se cuida su capital, y por qué el movimiento es coherente con lo que él mismo eligió.
+    </div>
+
+    <h3>Decisión 4 — Posición y tamaño de los gráficos</h3>
+    <div class="decision-grid reveal">
+      <div class="decision-card">
+        <div class="decision-card-header"><div class="decision-label old">✗ Descartado</div></div>
+        <div class="decision-card-body">Tortas apiladas verticalmente, a tamaño completo — primero la anterior, luego la nueva.</div>
+      </div>
+      <div class="decision-card">
+        <div class="decision-card-header"><div class="decision-label new">✓ Aprobado</div></div>
+        <div class="decision-card-body">Tortas en paralelo (lado a lado), reducidas en tamaño, dentro de la sección "Qué cambió en tu contrato".</div>
+      </div>
+    </div>
+    <div class="card-accent">
+      <strong>Razón:</strong> La comparación visual es el valor de los gráficos. Si van separados, el cliente no puede comparar. La reducción de tamaño evita que dominen la jerarquía del correo.
+    </div>
+  </section>
+
+  <!-- 5. ESTRUCTURA -->
+  <section class="section reveal" id="estructura">
+    <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">05 · Estructura del correo</span></div>
+    <h2>6 bloques en orden narrativo</h2>
+    <p>La versión final sigue una narrativa ordenada desde la emoción hacia el dato — el cliente se tranquiliza antes de recibir información:</p>
+
+    <div class="bloques-grid reveal">
+      <div class="bloque-row">
+        <div class="bloque-num">1</div>
+        <div class="bloque-name">Lo que necesitas saber</div>
+        <div class="bloque-desc">Aclara que no es un error ni un retiro. Certeza sobre la acción, no sobre el resultado.</div>
+      </div>
+      <div class="bloque-row">
+        <div class="bloque-num">2</div>
+        <div class="bloque-name">Por qué actuamos ahora</div>
+        <div class="bloque-desc">Contexto de mercado antes del movimiento. El cliente entiende el por qué antes de ver el qué.</div>
+      </div>
+      <div class="bloque-row">
+        <div class="bloque-num">3</div>
+        <div class="bloque-name">Qué cambió en tu contrato</div>
+        <div class="bloque-desc">Gráficas en paralelo + descripción en lenguaje simple de los movimientos realizados.</div>
+      </div>
+      <div class="bloque-row">
+        <div class="bloque-num">4</div>
+        <div class="bloque-name">Tu perfil es Cauto</div>
+        <div class="bloque-desc">Explicación de qué implica ese perfil + conexión directa con el rebalanceo.</div>
+      </div>
+      <div class="bloque-row">
+        <div class="bloque-num">5</div>
+        <div class="bloque-name">Rentabilidad histórica</div>
+        <div class="bloque-desc">Dato de rendimiento enmarcado como confirmación de la estrategia, no como promesa.</div>
+      </div>
+      <div class="bloque-row">
+        <div class="bloque-num">6</div>
+        <div class="bloque-name">CTA + cierre humano</div>
+        <div class="bloque-desc">Video de rebalanceo + canales de contacto disponibles.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. COPY -->
+  <section class="section reveal" id="copy">
+    <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">06 · Copy aprobado</span></div>
+    <h2>Texto definitivo por bloque</h2>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Asunto del correo</div>
+      <div class="copy-text">Hicimos un ajuste en tu inversión — y queremos contarte por qué</div>
+    </div>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Saludo</div>
+      <div class="copy-text">Hola, [Nombre] —</div>
+    </div>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Título principal</div>
+      <div class="copy-text" style="font-family: var(--font-title); font-weight: 700; font-size: 17px; color: var(--grey-dark);">Hubo un ajuste en tu portafolio — <span style="color:var(--green-dark);">esto es lo que pasó</span></div>
+    </div>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Bloque 1 — Lo que necesitas saber</div>
+      <div class="copy-text">Lo que ves en tu cuenta no es un error ni un retiro. Es una decisión que tomamos junto a nuestros expertos de inversión — y queremos que la entiendas completa.</div>
+    </div>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Bloque 2 — Por qué actuamos ahora</div>
+      <div class="copy-text">El mercado de renta fija en Colombia está viviendo un momento inusual: las tasas de corto plazo están por encima de las de largo plazo, algo que no había pasado antes. Al mismo tiempo, el mercado accionario —tanto en tecnología global como en Colombia— mostró correcciones que abren oportunidades para quienes pueden aprovecharlas con criterio. Nuestros expertos analizaron esta situación y decidieron actuar.</div>
+    </div>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Bloque 3 — Qué cambió en tu contrato</div>
+      <div class="copy-text">El 9 de abril ajustamos la distribución de tu contrato N° [número]. <em>[Gráficas de distribución anterior y nueva en paralelo]</em><br><br>Redujimos exposición en bonos de largo plazo y redistribuimos hacia posiciones de mediano plazo con mejor relación riesgo-retorno, además de incrementar levemente la exposición en acciones de tecnología y Colombia.</div>
+    </div>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Bloque 4 — Tu perfil es Cauto</div>
+      <div class="copy-text">
+        <strong>Tu mezcla de inversión es Cauta.</strong><br><br>
+        Esto significa que priorizamos la estabilidad de tu capital sobre la búsqueda de rentabilidades altas. Tu portafolio está construido para moverse lo menos posible ante la volatilidad del mercado — con inversiones de horizonte corto y bajo riesgo.<br><br>
+        <strong>Prioridad:</strong> Preservar tu capital &nbsp;·&nbsp; <strong>Horizonte:</strong> Corto plazo · baja volatilidad<br><br>
+        Cada ajuste que hacemos respeta este perfil. El rebalanceo del 9 de abril mantuvo esa lógica: menos riesgo donde el mercado lo aumentó, mejor posición donde el mercado abrió oportunidad con prudencia.
+      </div>
+    </div>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Bloque 5 — Rentabilidad histórica</div>
+      <div class="copy-text">
+        <span style="font-size:22px; font-weight:700; font-family:var(--font-title); color:var(--green-dark);">8.12% E.A. neto</span><br>
+        Rentabilidad a un año · al 9 de abril de 2026<br><br>
+        Este resultado refleja el trabajo constante de gestión activa que hacemos sobre tu portafolio.<br>
+        <em style="font-size:12px; color:var(--grey-mid);">*Las rentabilidades históricas no garantizan resultados futuros.</em>
+      </div>
+    </div>
+
+    <div class="copy-block reveal">
+      <div class="copy-label">Bloque 6 — CTA + cierre</div>
+      <div class="copy-text">¿Quieres entender mejor este movimiento? Te dejamos un video corto con el contexto completo.<br><br><strong>[Ver mi rebalanceo]</strong><br><br>Y si prefieres hablar con alguien, estamos disponibles por WhatsApp SAMI, chat o teléfono.</div>
+    </div>
+  </section>
+
+  <!-- 7. PENDIENTES -->
+  <section class="section reveal" id="pendientes">
+    <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">07 · Pendientes</span></div>
+    <h2>Para siguientes iteraciones</h2>
+    <p>Estos elementos quedan fuera del alcance de este quick win y serán abordados en los espacios de alineación con Mercadeo e Inversiones:</p>
+
+    <div class="card" style="padding: var(--space-3);">
+      <div class="pendiente-item">
+        <div class="pendiente-num">1</div>
+        <div><strong>Nombres de fondos en las leyendas.</strong> Hoy aparecen como códigos internos (FVP Especial CAT...). Requiere decisión de Inversiones sobre renombramiento para el cliente.</div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">2</div>
+        <div><strong>Tono del header.</strong> El tag "Rebalanceo de portafolio" puede ajustarse según la estrategia de comunicación que defina Mercadeo.</div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">3</div>
+        <div><strong>Adaptación por perfil.</strong> El bloque de perfil de riesgo debe tener variantes para mezclas Observadora y Arriesgada.</div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">4</div>
+        <div><strong>Validación con Financial Planners.</strong> Antes del lanzamiento, el correo debe ser revisado por el equipo comercial para garantizar alineación con el discurso que usan con clientes.</div>
+      </div>
+      <div class="pendiente-item">
+        <div class="pendiente-num">5</div>
+        <div><strong>Prueba de renderizado mobile.</strong> Aunque el formato es responsive, se recomienda prueba en los clientes de correo más usados por los clientes Skandia.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <strong>UXplorers</strong> · Equipo de Producto · Skandia · Mayo 2026
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+const sections = document.querySelectorAll('section[id]');
+const links = document.querySelectorAll('.nav-links a');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(a => a.classList.remove('active'));
+      const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { threshold: 0.4 });
+sections.forEach(s => io.observe(s));
+</script>
+</body>
+</html>
