@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva App Skandia · MVP Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-green-n00: #00C73D;
+            --color-green-d01: #03A835;
+            --color-green-d02: #009A2F;
+            --color-green-l05: #F6FCF2;
+            --color-grey-n00: #404040;
+            --color-grey-l03: #666666;
+            --color-grey-l05: #A5A5A5;
+            --color-white: #FFFFFF;
+            --color-bg-dark: #1a2a1a;
+            --color-border: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --transition: opacity 0.3s ease;
+            --color-conservative: #00C73D;
+            --color-moderate: #FF9F2D;
+            --color-aggressive: #E53E3E;
+            --color-conservative-bg: #F6FCF2;
+            --color-moderate-bg: #FFF5E9;
+            --color-aggressive-bg: #FFF5F5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--color-grey-n00);
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 390px;
+            height: 100vh;
+            max-height: 844px;
+            background-color: var(--color-white);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+            opacity: 0;
+            transition: var(--transition);
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Typography */
+        h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+        h2 { font-size: 20px; font-weight: 600; line-height: 1.3; margin-bottom: 8px; }
+        p { font-size: 14px; color: var(--color-grey-l03); line-height: 1.5; }
+        .bold { font-weight: 700; }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s, opacity 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            outline: none;
+        }
+        .btn:focus { box-shadow: 0 0 0 3px rgba(0, 199, 61, 0.3); }
+
+        .btn-primary {
+            background-color: var(--color-green-n00);
+            color: var(--color-white);
+        }
+        .btn-primary:hover { background-color: var(--color-green-d01); }
+        .btn-primary:active { background-color: var(--color-green-d02); }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--color-green-n00);
+            border: 1.5px solid var(--color-green-n00);
+        }
+
+        .btn-outline-white {
+            background-color: transparent;
+            color: var(--color-white);
+            border: 1.5px solid var(--color-white);
+        }
+
+        .btn-tertiary {
+            background-color: transparent;
+            color: var(--color-grey-l03);
+            font-size: 14px;
+            text-decoration: underline;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Inputs */
+        .input-group { margin-bottom: 20px; width: 100%; }
+        .input-label { font-size: 12px; font-weight: 600; margin-bottom: 8px; display: block; color: var(--color-grey-l03); }
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+        }
+        .input-field:focus { border-color: var(--color-green-n00); box-shadow: 0 0 0 2px rgba(0, 199, 61, 0.1); }
+
+        /* Navigation Helpers */
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 16px;
+            margin-left: -8px;
+        }
+
+        /* Specific Components */
+        .logo-container { display: flex; align-items: center; gap: 8px; margin-bottom: 40px; }
+        .logo-triangle {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 18px solid var(--color-green-n00);
+        }
+        .logo-text { font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
+
+        .progress-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .progress-segment {
+            flex: 1;
+            height: 4px;
+            background-color: var(--color-border);
+            border-radius: 2px;
+        }
+        .progress-segment.active { background-color: var(--color-green-n00); }
+
+        .pill-tag {
+            background-color: var(--color-green-l05);
+            color: var(--color-green-n00);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            border: 1px solid var(--color-green-n00);
+        }
+
+        .card-option {
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .card-option.selected {
+            border-color: var(--color-green-n00);
+            background-color: var(--color-green-l05);
+        }
+
+        /* Screen Specifics */
+        #screen-welcome { background-color: var(--color-bg-dark); color: var(--color-white); justify-content: space-between; }
+        #screen-emotional-slide { background-color: var(--color-bg-dark); color: var(--color-white); justify-content: flex-end; }
+
+        .badge-emotional {
+            background-color: var(--color-green-n00);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .floating-next {
+            position: absolute;
+            bottom: 40px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--color-green-n00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .pulse-circle {
+            width: 80px;
+            height: 80px;
+            background-color: var(--color-green-n00);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 199, 61, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(0, 199, 61, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 199, 61, 0); }
+        }
+
+        .confetti-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-green-n00);
+            border-radius: 50%;
+            animation: fall 3s linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(400px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Home Layout */
+        .home-header {
+            position: sticky;
+            top: 0;
+            background: var(--color-white);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .avatar-initials {
+            width: 40px;
+            height: 40px;
+            background-color: var(--color-green-l05);
+            color: var(--color-green-n00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .home-nav-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--color-white);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 8px 24px 8px;
+            border-top: 1px solid var(--color-border);
+            z-index: 20;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--color-grey-l03);
+            cursor: pointer;
+        }
+        .nav-item.active { color: var(--color-green-n00); }
+
+        .nav-plus {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #00C73D 0%, #7ED321 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 400;
+            margin-top: -36px;
+            box-shadow: 0 8px 16px rgba(0, 199, 61, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .nav-plus:active { transform: scale(0.9); }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--color-grey-l05);
+            transition: stroke 0.2s;
+        }
+        .nav-item.active svg {
+            stroke: var(--color-green-n00);
+            fill: rgba(0, 199, 61, 0.1);
+        }
+        .nav-item span { font-size: 11px; font-weight: 500; }
+
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .home-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+            cursor: pointer;
+        }
+        .home-card:active { border-color: var(--color-green-n00); }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 30;
+            display: none;
+            justify-content: flex-end;
+            flex-direction: column;
+        }
+
+        .overlay-content {
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 12px 24px 32px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .overlay-handle {
+            width: 40px;
+            height: 4px;
+            background-color: #e0e0e0;
+            border-radius: 2px;
+            margin: 0 auto 24px auto;
+        }
+
+        .overlay-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--color-grey-n00);
+        }
+        .overlay-item:last-of-type { border-bottom: none; }
+
+        .overlay-item-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-circle {
+            width: 44px;
+            height: 44px;
+            background-color: var(--color-green-l05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .icon-circle svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--color-green-n00);
+        }
+
+        .modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 40;
+            display: none;
+            text-align: center;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--color-grey-l03);
+        }
+        .checklist-item.valid { color: var(--color-green-n00); }
+        .checklist-item.valid .check-circle { background-color: var(--color-green-n00); border-color: var(--color-green-n00); }
+        .check-circle {
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid var(--color-grey-l05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+
+        .promo-banner {
+            width: 100%;
+            height: 120px;
+            border-radius: 20px;
+            background-color: var(--color-green-n00);
+            background-image: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 60%), url('https://images.unsplash.com/photo-1611974714024-4607a0a748aa?auto=format&fit=crop&q=80&w=400');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px rgba(0, 199, 61, 0.2);
+        }
+
+        .promo-small {
+            color: var(--color-white);
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .promo-title {
+            color: var(--color-white);
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+        .promo-title span {
+            color: #ffffff;
+            text-decoration: underline;
+            text-decoration-color: rgba(255,255,255,0.4);
+        }
+        .promo-subtitle {
+            color: var(--color-white);
+            font-size: 11px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        #timer { font-weight: 700; color: var(--color-green-n00); }
+
+        /* Explore Screen */
+        .search-container {
+            background: #F5F5F5;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: var(--color-grey-n00);
+            width: 100%;
+            outline: none;
+        }
+        .tabs-container {
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            margin: 0 -24px 20px -24px;
+            padding: 0 24px;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .tabs-container::-webkit-scrollbar { display: none; }
+        .tab-item {
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-grey-l03);
+            white-space: nowrap;
+            cursor: pointer;
+            position: relative;
+        }
+        .tab-item.active { color: var(--color-green-n00); }
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--color-green-n00);
+        }
+
+        .explore-banner {
+            background-color: var(--color-green-l05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .explore-banner p { font-size: 13px; font-weight: 600; color: var(--color-grey-n00); line-height: 1.4; }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 80px;
+        }
+        .product-card {
+            background: white;
+            border: 1px solid #E8E8E8;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+        .product-card .pill {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 100px;
+            width: fit-content;
+            text-transform: uppercase;
+        }
+        .pill-conservative { background: var(--color-conservative-bg); color: var(--color-conservative); }
+        .pill-moderate { background: var(--color-moderate-bg); color: var(--color-moderate); }
+        .pill-aggressive { background: var(--color-aggressive-bg); color: var(--color-aggressive); }
+        .product-card .name { font-size: 14px; font-weight: 700; color: var(--color-grey-n00); line-height: 1.2; }
+        .product-card .return { font-size: 12px; font-weight: 600; color: var(--color-green-n00); }
+        .product-card .min-amount { font-size: 10px; color: var(--color-grey-l05); }
+
+        .section-header {
+            grid-column: span 2;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-grey-l05);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 16px 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--color-border);
+        }
+
+        /* Product Detail */
+        .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .product-illustration {
+            width: 100%;
+            height: 180px;
+            background-color: var(--color-green-l05);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 48px;
+        }
+        .detail-section { margin-bottom: 24px; }
+        .detail-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--color-grey-n00); }
+        .detail-section p { font-size: 14px; color: var(--color-grey-l03); line-height: 1.6; }
+        .detail-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            background: #F9F9F9;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-item { display: flex; flex-direction: column; gap: 4px; }
+        .stat-label { font-size: 10px; color: var(--color-grey-l05); font-weight: 600; text-transform: uppercase; }
+        .stat-value { font-size: 13px; font-weight: 700; color: var(--color-grey-n00); }
+        .stat-value.green { color: var(--color-green-n00); }
+
+        .banner-card {
+            min-width: 280px;
+            padding: 16px;
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .banner-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--color-green-n00);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 0 16px 0 16px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+
+    <!-- SCREEN 1: welcome -->
+    <div id="screen-welcome" class="screen active">
+        <div>
+            <div class="logo-container">
+                <div class="logo-triangle"></div>
+                <div class="logo-text" style="color: white;">skandia</div>
+            </div>
+            <h1 style="margin-top: 40px; color: white;">Te empoderamos para que vivas</h1>
+            <h1 class="bold" style="color: white;">La vida de tus sueños</h1>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+            <button class="btn btn-primary" onclick="navigateTo('screen-emotional-slide')">Quiero ser cliente</button>
+            <button class="btn btn-outline-white" onclick="navigateTo('screen-login')">Ya soy cliente</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: emotional-slide -->
+    <div id="screen-emotional-slide" class="screen">
+        <div style="margin-bottom: 120px;">
+            <h2 style="color: white; font-size: 24px;">El dinero es profundamente <span style="text-decoration: line-through; opacity: 0.6;">racional</span></h2>
+            <div class="badge-emotional">EMOCIONAL</div>
+            <p style="color: white; margin-top: 16px; opacity: 0.8;">Lo que pasa adentro, se refleja en tu billetera.</p>
+        </div>
+        <div class="floating-next" onclick="navigateTo('screen-mood-test-1')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: mood-test-1 -->
+    <div id="screen-mood-test-1" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="width: 100px;"></div>
+            <div class="pill-tag">¿Dudas?</div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-segment active"></div>
+            <div class="progress-segment"></div>
+            <div class="progress-segment"></div>
+        </div>
+        <h2 class="bold">¿Cómo te llevas con tu dinero?</h2>
+        <p style="margin-bottom: 24px;">Si tu dinero fuera una persona…</p>
+
+        <div class="card-option" onclick="selectOption(this, 'test1')">Lo verías a menudo</div>
+        <div class="card-option" onclick="selectOption(this, 'test1')">Te volvería loco/a</div>
+        <div class="card-option" onclick="selectOption(this, 'test1')">Le tendrías miedo</div>
+        <div class="card-option" onclick="selectOption(this, 'test1')">Te daría tranquilidad</div>
+
+        <div style="margin-top: auto;">
+            <button id="btn-test1" class="btn btn-primary" disabled onclick="navigateTo('screen-mood-test-2')">Continuar</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 4: mood-test-2 -->
+    <div id="screen-mood-test-2" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="width: 100px;"></div>
+            <div class="pill-tag">¿Dudas?</div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-segment active"></div>
+            <div class="progress-segment active"></div>
+            <div class="progress-segment"></div>
+        </div>
+        <h2 class="bold">¿Qué haces cuando te pagan?</h2>
+        <p style="margin-bottom: 24px;">Tu comportamiento financiero habitual es…</p>
+
+        <div class="card-option" onclick="selectOption(this, 'test2')">Lo divides y lo organizas</div>
+        <div class="card-option" onclick="selectOption(this, 'test2')">Te das un capricho (o varios)</div>
+        <div class="card-option" onclick="selectOption(this, 'test2')">Lo inviertes todo</div>
+        <div class="card-option" onclick="selectOption(this, 'test2')">Ni te das cuenta qué desapareció</div>
+
+        <div style="margin-top: auto;">
+            <button id="btn-test2" class="btn btn-primary" disabled onclick="navigateTo('screen-mood-test-3')">Continuar</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: mood-test-3 -->
+    <div id="screen-mood-test-3" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="width: 100px;"></div>
+            <div class="pill-tag">¿Dudas?</div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-segment active"></div>
+            <div class="progress-segment active"></div>
+            <div class="progress-segment active"></div>
+        </div>
+        <h2 class="bold">Tu frase financiera de vida es…</h2>
+        <p style="margin-bottom: 24px;">Esa que resume tu filosofía…</p>
+
+        <div class="card-option" onclick="selectOption(this, 'test3')">Más vale prevenir que lamentar</div>
+        <div class="card-option" onclick="selectOption(this, 'test3')">Disfrutar el presente a toda costa</div>
+        <div class="card-option" onclick="selectOption(this, 'test3')">Lo importante es vivir, pero con un plan</div>
+        <div class="card-option" onclick="selectOption(this, 'test3')">Quiero estar tranquilo/a, sin Excel</div>
+
+        <div style="margin-top: auto;">
+            <button id="btn-test3" class="btn btn-primary" disabled onclick="navigateTo('screen-analyzing')">Continuar</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 6: analyzing -->
+    <div id="screen-analyzing" class="screen" style="justify-content: center; align-items: center; text-align: center;">
+        <div class="pulse-circle"></div>
+        <h2 class="bold" style="margin-top: 32px;">Analizando tus respuestas…</h2>
+        <p>Tu historia con el dinero dice más de lo que crees.</p>
+    </div>
+
+    <!-- SCREEN 7: mood-result -->
+    <div id="screen-mood-result" class="screen" style="justify-content: center; align-items: center; text-align: center;">
+        <div style="border: 1.5px solid var(--color-green-n00); border-radius: 16px; padding: 40px 24px; width: 100%;">
+            <div class="pill-tag" style="margin-bottom: 24px;">Mood: En construcción</div>
+            <div style="font-size: 64px; margin-bottom: 24px;">🏗️</div>
+            <h2 class="bold">¡Este es tu mood financiero!</h2>
+            <p>Estás construyendo una relación más consciente con tu dinero.</p>
+        </div>
+        <div style="width: 100%; margin-top: 32px; display: flex; flex-direction: column; gap: 12px;">
+            <button class="btn btn-primary" onclick="navigateTo('screen-needs-summary')">Continuar</button>
+            <button class="btn btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                Compartir
+            </button>
+        </div>
+    </div>
+
+    <!-- SCREEN 8: needs-summary -->
+    <div id="screen-needs-summary" class="screen">
+        <h2 class="bold">Tu relación con el dinero se basa en…</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px;">
+            <div class="pill-tag">Impulsividad</div>
+            <div class="pill-tag">Control</div>
+            <div class="pill-tag">Inseguridad financiera</div>
+        </div>
+
+        <h2 class="bold" style="font-size: 18px;">Así que, tu necesitas:</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+            <div class="home-card" style="grid-column: span 1;">
+                <div class="bold" style="font-size: 14px; margin-bottom: 4px;">Decisiones conscientes</div>
+                <p style="font-size: 11px;">Para tu impulsividad con las decisiones de dinero</p>
+            </div>
+            <div class="home-card" style="grid-column: span 1;">
+                <div class="bold" style="font-size: 14px; margin-bottom: 4px;">Empezar sin riesgos</div>
+                <p style="font-size: 11px;">Para el estrés que te genera el dinero</p>
+            </div>
+            <div class="home-card" style="grid-column: span 2;">
+                <div class="bold" style="font-size: 14px; margin-bottom: 4px;">Aprender a tomar el control</div>
+                <p style="font-size: 11px;">Para que el dinero no decida por ti</p>
+            </div>
+        </div>
+
+        <div style="margin-top: auto;">
+            <button class="btn btn-primary" onclick="navigateTo('screen-sami-tip')">Quiero empezar</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 9: sami-tip -->
+    <div id="screen-sami-tip" class="screen">
+        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 32px;">
+            <div style="background: var(--color-green-l05); padding: 8px; border-radius: 12px;">
+                <svg width="32" height="32" viewBox="0 0 40 40">
+                    <path d="M20 5 L35 30 L5 30 Z" fill="var(--color-green-n00)"/>
+                    <circle cx="16" cy="22" r="2" fill="white"/>
+                    <circle cx="24" cy="22" r="2" fill="white"/>
+                </svg>
+            </div>
+            <div style="background: var(--color-green-l05); padding: 12px; border-radius: 0 16px 16px 16px; flex: 1;">
+                <p style="color: var(--color-grey-n00); font-weight: 500;">Con esta ruta, estarás preparado para lo inesperado.</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="font-size: 48px;">🗺️</div>
+            <h2 class="bold">Tu ruta personalizada</h2>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="color: var(--color-green-n00); font-weight: bold;">✓</div>
+                <p style="color: var(--color-grey-n00);">Construir un fondo de imprevistos</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="color: var(--color-green-n00); font-weight: bold;">✓</div>
+                <p style="color: var(--color-grey-n00);">Hacer que tu dinero empiece a trabajar</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="color: var(--color-green-n00); font-weight: bold;">✓</div>
+                <p style="color: var(--color-grey-n00);">Aprender con contenidos educativos</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="color: var(--color-green-n00); font-weight: bold;">✓</div>
+                <p style="color: var(--color-grey-n00);">Crear hábitos constantes</p>
+            </div>
+        </div>
+
+        <div style="margin-top: auto;">
+            <button class="btn btn-primary" onclick="navigateTo('screen-create-account-gate')">¡Sigamos!</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 10: create-account-gate -->
+    <div id="screen-create-account-gate" class="screen" style="justify-content: center; align-items: center; text-align: center;">
+        <div id="confetti-container"></div>
+        <div style="margin-bottom: 24px;">
+            <svg width="64" height="64" viewBox="0 0 40 40">
+                <path d="M20 5 L35 30 L5 30 Z" fill="var(--color-green-n00)"/>
+                <circle cx="16" cy="22" r="2" fill="white"/>
+                <circle cx="24" cy="22" r="2" fill="white"/>
+            </svg>
+        </div>
+        <h2 class="bold">¡Genial! Ya conoces tu mood financiero.</h2>
+        <p>Ahora, crea tu cuenta y descubre una ruta pensada solo para ti.</p>
+
+        <div style="width: 100%; margin-top: 40px;">
+            <button class="btn btn-primary" onclick="navigateTo('screen-register-phone')">Crear cuenta</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 11: register-phone -->
+    <div id="screen-register-phone" class="screen">
+        <div class="back-btn" onclick="navigateTo('screen-create-account-gate')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </div>
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 64px; height: 64px; border: 2px solid var(--color-green-n00); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.28-2.28a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </div>
+            <h2 class="bold">Ingresa tu número de celular</h2>
+            <p>Estaremos enviando un código a tu número</p>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+            <div style="background: #f5f5f5; padding: 14px; border-radius: 8px; font-weight: 600; color: var(--color-grey-l03);">+57</div>
+            <input type="tel" id="phone-input" class="input-field" placeholder="Ingresa el número" maxlength="10" oninput="validatePhone()">
+        </div>
+
+        <div style="margin-top: auto;">
+            <button id="btn-phone" class="btn btn-primary" disabled onclick="startVerification()">Recibir código</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 12: register-verify -->
+    <div id="screen-register-verify" class="screen">
+        <div class="back-btn" onclick="navigateTo('screen-register-phone')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </div>
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 64px; height: 64px; border: 2px solid var(--color-green-n00); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h2 class="bold">Validación de seguridad</h2>
+            <p>Ingresa el código enviado a tu celular</p>
+        </div>
+
+        <input type="text" id="verify-input" class="input-field" style="text-align: center; letter-spacing: 12px; font-size: 24px; font-weight: 700;" placeholder="00000" maxlength="5" oninput="validateVerify()">
+
+        <div style="text-align: center; margin-top: 24px;">
+            <p id="timer">09:32</p>
+        </div>
+
+        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px;">
+            <button id="btn-verify" class="btn btn-primary" disabled onclick="navigateTo('screen-register-password')">Verificar</button>
+            <button class="btn btn-secondary">Reenviar código</button>
+            <button class="btn btn-tertiary">¿No has recibido el código?</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 13: register-password -->
+    <div id="screen-register-password" class="screen">
+        <div class="back-btn" onclick="navigateTo('screen-register-verify')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </div>
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 64px; height: 64px; border: 2px solid var(--color-green-n00); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h2 class="bold">Crea tu contraseña</h2>
+            <p>Fácil de recordar pero secreta</p>
+        </div>
+
+        <div class="input-group" style="position: relative;">
+            <input type="password" id="pass-input" class="input-field" placeholder="Tu contraseña" oninput="validatePassword()">
+            <div style="position: absolute; right: 14px; top: 14px; cursor: pointer;" onclick="togglePassword()">
+                <svg id="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-grey-l03)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </div>
+        </div>
+
+        <div id="password-checklist">
+            <div class="checklist-item" id="check-len"><div class="check-circle">✓</div> Al menos 8 caracteres</div>
+            <div class="checklist-item" id="check-upper"><div class="check-circle">✓</div> Una letra mayúscula (A-Z)</div>
+            <div class="checklist-item" id="check-num"><div class="check-circle">✓</div> Un número (0-9)</div>
+            <div class="checklist-item" id="check-sym"><div class="check-circle">✓</div> Un símbolo (ej. !@#$)</div>
+        </div>
+
+        <div style="margin-top: auto;">
+            <button id="btn-pass" class="btn btn-primary" disabled onclick="navigateTo('screen-register-info')">Continuar</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 14: register-info -->
+    <div id="screen-register-info" class="screen">
+        <div class="back-btn" onclick="navigateTo('screen-register-password')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </div>
+        <h2 class="bold">¡Ya casi terminamos! ✌</h2>
+        <p style="margin-bottom: 24px;">Completa estos datos personales:</p>
+
+        <div class="input-group">
+            <label class="input-label">Nombre</label>
+            <input type="text" id="info-name" class="input-field" placeholder="Escribe tu nombre" oninput="validateInfo()">
+        </div>
+        <div class="input-group">
+            <label class="input-label">Apellido</label>
+            <input type="text" id="info-last" class="input-field" placeholder="Escribe tu apellido" oninput="validateInfo()">
+        </div>
+        <div class="input-group">
+            <label class="input-label">Correo electrónico</label>
+            <input type="email" id="info-email" class="input-field" placeholder="ejemplo@correo.com" oninput="validateInfo()">
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: flex-start; margin-top: 8px;">
+            <input type="checkbox" id="info-check" style="width: 20px; height: 20px; accent-color: var(--color-green-n00);" onchange="validateInfo()">
+            <p style="font-size: 12px;">He leído y acepto la <span style="color: var(--color-green-n00); font-weight: 600;">Política de tratamiento de datos personales</span></p>
+        </div>
+
+        <div style="margin-top: auto;">
+            <button id="btn-info" class="btn btn-primary" disabled onclick="navigateTo('screen-welcome-complete')">Finalizar registro</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 15: welcome-complete -->
+    <div id="screen-welcome-complete" class="screen" style="justify-content: center; align-items: center; text-align: center;">
+        <div class="pulse-circle">
+            <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <svg width="40" height="40" viewBox="0 0 40 40">
+                    <path d="M20 5 L35 30 L5 30 Z" fill="white"/>
+                    <circle cx="16" cy="22" r="2" fill="var(--color-green-n00)"/>
+                    <circle cx="24" cy="22" r="2" fill="var(--color-green-n00)"/>
+                </svg>
+            </div>
+        </div>
+        <h1 class="bold" style="margin-top: 40px;">¡Todo está listo! 🎉</h1>
+        <p>Tu relación con el dinero tendrá una dirección. Es momento de descubrir tu ruta personalizada.</p>
+
+        <div style="width: 100%; margin-top: 40px;">
+            <button class="btn btn-primary" onclick="navigateTo('screen-home')">Descubrir mi ruta</button>
+        </div>
+    </div>
+
+    <!-- SCREEN LOGIN: login -->
+    <div id="screen-login" class="screen">
+        <div style="text-align: center; margin-top: 40px; margin-bottom: 40px;">
+            <div class="logo-container" style="justify-content: center;">
+                <div class="logo-triangle"></div>
+                <div class="logo-text">skandia</div>
+            </div>
+            <h2 class="bold">Bienvenido de nuevo</h2>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Usuario o correo</label>
+            <input type="text" class="input-field" placeholder="Ingresa tu usuario">
+        </div>
+        <div class="input-group" style="position: relative;">
+            <label class="input-label">Contraseña</label>
+            <input type="password" id="login-pass" class="input-field" placeholder="Tu contraseña">
+            <div style="position: absolute; right: 14px; top: 38px; cursor: pointer;" onclick="toggleLoginPassword()">
+                <svg id="login-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-grey-l03)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="navigateTo('screen-home')">Ingresar</button>
+
+        <div style="text-align: center; margin-top: 24px; display: flex; flex-direction: column; gap: 16px;">
+            <button class="btn btn-tertiary">¿Olvidaste tu contraseña?</button>
+            <button class="btn btn-tertiary" onclick="navigateTo('screen-welcome')">Volver</button>
+        </div>
+    </div>
+
+    <!-- SCREEN HOME: home -->
+    <div id="screen-home" class="screen" style="padding: 0; background-color: #fcfcfc; overflow: hidden;">
+        <div class="home-header">
+            <div class="avatar-initials">HP</div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <div style="position: relative; cursor: pointer; display: flex; align-items: center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-grey-n00)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <div style="position: absolute; top: 0; right: 0; width: 9px; height: 9px; background-color: var(--color-green-n00); border-radius: 50%; border: 2px solid var(--color-white);"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; padding: 24px;">
+            <h2 class="bold" style="margin-bottom: 24px;">Hola, Hermann</h2>
+
+            <!-- Banners -->
+            <div style="display: flex; gap: 12px; overflow-x: auto; margin: 0 -24px 24px -24px; padding: 0 24px; scrollbar-width: none; -ms-overflow-style: none;">
+                <div class="banner-card" style="background-color: var(--color-green-l05);">
+                    <div class="banner-badge">Interés</div>
+                    <div class="bold" style="font-size: 14px; color: var(--color-grey-n00); margin-top: 8px;">Oportunidades de inversión</div>
+                    <p style="font-size: 12px; color: var(--color-grey-l03); margin-right: 24px;">¡Solo hoy! 20% de descuento en fondos de inversión.</p>
+                    <div style="position: absolute; right: 16px; bottom: 16px; color: var(--color-grey-l03);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
+                </div>
+                <div class="banner-card" style="background-color: #FFF5E9;">
+                    <div class="banner-badge" style="background-color: #FF9F2D;">Nuevo</div>
+                    <div class="bold" style="font-size: 14px; color: var(--color-grey-n00); margin-top: 8px;">Cartera Pro</div>
+                    <p style="font-size: 12px; color: var(--color-grey-l03); margin-right: 24px;">Nueva opción de inversión con rendimientos destacados.</p>
+                    <div style="position: absolute; right: 16px; bottom: 16px; color: var(--color-grey-l03);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Saldo Total -->
+            <div style="background-color: var(--color-white); border: 1px solid var(--color-border); padding: 20px; border-radius: 12px; margin-bottom: 32px; box-shadow: var(--shadow);">
+                <div style="font-size: 12px; color: var(--color-grey-l03); margin-bottom: 4px;">Saldo total</div>
+                <div class="bold" style="font-size: 24px; color: var(--color-green-n00);">$ 0,00</div>
+                <div style="font-size: 11px; color: var(--color-grey-l05); margin-top: 8px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                    Ver detalle de mis productos
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </div>
+
+            <!-- Tus Productos -->
+            <h2 class="bold" style="font-size: 18px; margin-bottom: 8px;">Tus productos</h2>
+            <div style="text-align: center; padding: 24px 0; margin-bottom: 16px;">
+                <div style="font-size: 40px; opacity: 0.3;">🏦</div>
+                <p style="margin-top: 8px; color: var(--color-grey-l03);">Aquí verás tus productos cuando los abras.</p>
+            </div>
+
+            <!-- Explora Skandia -->
+            <h2 class="bold" style="font-size: 18px; margin-bottom: 12px;">Explora Skandia</h2>
+
+            <div style="background-color: var(--color-green-l05); border: 1px solid rgba(0, 199, 61, 0.15); border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; cursor: pointer;" onclick="alert('Próximamente: Sugerencias personalizadas para tu ruta financiera')">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="background: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-shrink: 0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .5 2.2 1.5 3.1.7.7 1.3 1.5 1.5 2.4"></path>
+                            <path d="M9 18h6"></path>
+                            <path d="M10 22h4"></path>
+                        </svg>
+                    </div>
+                    <span style="font-size: 13px; font-weight: 600; color: var(--color-grey-n00);">Ver sugerencias de tu ruta financiera</span>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-grey-l05)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <div style="display: flex; gap: 16px; overflow-x: auto; margin: 12px -24px 24px -24px; padding: 4px 24px; scrollbar-width: none; -ms-overflow-style: none;">
+                <div class="home-card" style="width: 150px; min-height: 150px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;" onclick="navigateToExplore('Pensiones')">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #eef4ff; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2c-.1-.7-1.2-2-3-2c-1.8 0-3 1.3-3 2c0 .7 1.2 2 3 2c1.8 0 2.9-1.3 3-2c.2.6 1.5 2 3 2s3-1.3 3-2c0-.7-1.2-2-3-2z"/><path d="M7 19c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H7z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div class="bold" style="font-size: 13px; line-height: 1.2;">Pensiones y cesantías</div>
+                    <p style="font-size: 10px; margin-top: 4px;">Protege tu futuro</p>
+                </div>
+                <div class="home-card" style="width: 150px; min-height: 150px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;" onclick="navigateToExplore('Voluntarias')">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #f0fdf4; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    </div>
+                    <div class="bold" style="font-size: 13px; line-height: 1.2;">Ahorro voluntario</div>
+                    <p style="font-size: 10px; margin-top: 4px;">Haz crecer tu dinero</p>
+                </div>
+                <div class="home-card" style="width: 150px; min-height: 150px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;" onclick="navigateToExplore('Seguros')">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #f0fdfa; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div class="bold" style="font-size: 13px; line-height: 1.2;">Seguros</div>
+                    <p style="font-size: 10px; margin-top: 4px;">Cuídate y cuida a los tuyos</p>
+                </div>
+                <div class="home-card" style="width: 150px; min-height: 150px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;" onclick="navigateToExplore('Voluntarias')">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #fff7ed; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    </div>
+                    <div class="bold" style="font-size: 13px; line-height: 1.2;">Créditos</div>
+                    <p style="font-size: 10px; margin-top: 4px;">Financia tus metas</p>
+                </div>
+            </div>
+
+            <!-- Promo INVEST-ED -->
+            <div class="promo-banner">
+                <p class="promo-small">Skandia INVEST-ED</p>
+                <h2 class="promo-title">INVIERTE EN <span>AUTOMÁTICO</span></h2>
+                <p class="promo-subtitle">Deja que nuestros expertos guíen tus metas.</p>
+            </div>
+
+            <div class="home-card" style="display: flex; align-items: center; gap: 12px; background-color: white; border: 1px solid var(--color-border); margin-bottom: 24px; padding: 12px;">
+                <div style="position: relative; width: 68px; height: 44px; flex-shrink: 0;">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
+                         style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; position: absolute; left: 0; top: 0; z-index: 2; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                         referrerpolicy="no-referrer">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #f6fcf2; border: 2px solid white; position: absolute; right: 0; top: 0; z-index: 1; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="width: 24px; height: 18px; background: #1a1a1a; border-radius: 12px 12px 6px 6px; position: relative; display: flex; align-items: center; justify-content: space-around; padding: 0 4px; border: 1px solid #333;">
+                            <div style="width: 5px; height: 5px; background: #00C73D; border-radius: 50%; box-shadow: 0 0 4px #00C73D;"></div>
+                            <div style="width: 5px; height: 5px; background: #00C73D; border-radius: 50%; box-shadow: 0 0 4px #00C73D;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <p style="color: var(--color-grey-n00); font-weight: 600; font-size: 12px; line-height: 1.2;">¿Tienes dudas? Agenda una cita con tu asesor</p>
+                    <button class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px; margin-top: 6px;">Agendar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-nav-bottom" style="position: relative; border-top: 1px solid var(--color-border);">
+            <div class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="navigateToExplore('Descubre')">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <span>Explorar</span>
+            </div>
+            <div class="nav-plus" onclick="togglePlusOverlay()">+</div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Actividad</span>
+            </div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <path d="M12 7v4M8 16h.01M16 16h.01"></path>
+                </svg>
+                <span>Sami</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay acciones rápidas -->
+    <div id="plus-overlay" class="overlay" onclick="togglePlusOverlay()">
+        <div class="overlay-content" onclick="event.stopPropagation()">
+            <div class="overlay-handle"></div>
+            <h2 class="bold" style="margin-bottom: 16px;">Acciones rápidas</h2>
+
+            <div class="overlay-item">
+                <div class="overlay-item-left">
+                    <div class="icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></div>
+                    <span style="font-size: 16px; font-weight: 600;">Aportes</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <div class="overlay-item">
+                <div class="overlay-item-left">
+                    <div class="icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="7" x2="7" y2="17"></line><polyline points="17 17 7 17 7 7"></polyline></svg></div>
+                    <span style="font-size: 16px; font-weight: 600;">Retiros</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <div class="overlay-item">
+                <div class="overlay-item-left">
+                    <div class="icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+                    <span style="font-size: 16px; font-weight: 600;">Extractos y certificados</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <div class="overlay-item">
+                <div class="overlay-item-left">
+                    <div class="icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg></div>
+                    <span style="font-size: 16px; font-weight: 600;">Trasladar entre contratos</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <div class="overlay-item">
+                <div class="overlay-item-left">
+                    <div class="icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg></div>
+                    <span style="font-size: 16px; font-weight: 600;">Gestionar portafolio</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-n00)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+
+            <button class="btn btn-tertiary" style="margin-top: 16px;" onclick="togglePlusOverlay()">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="product-modal" class="modal">
+        <h2 id="modal-title" class="bold">Producto</h2>
+        <p style="margin: 16px 0;">Próximamente podrás explorar este producto desde aquí.</p>
+        <button class="btn btn-primary" onclick="hideProductModal()">Entendido</button>
+    </div>
+
+    <!-- SCREEN EXPLORE -->
+    <div id="screen-explore" class="screen" style="padding: 0; background-color: #fcfcfc;">
+        <div style="padding: 24px 24px 0 24px;">
+            <h1 class="bold" style="font-size: 24px; margin-bottom: 16px;">Explorar</h1>
+
+            <div class="search-container">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-grey-l05)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="search-input" placeholder="¿Qué quieres hacer con tu plata?">
+            </div>
+
+            <div class="tabs-container" id="explore-tabs">
+                <div class="tab-item active" onclick="switchExploreTab('Descubre')">Descubre</div>
+                <div class="tab-item" onclick="switchExploreTab('Voluntarias')">Voluntarias</div>
+                <div class="tab-item" onclick="switchExploreTab('Pensiones')">Pensiones</div>
+                <div class="tab-item" onclick="switchExploreTab('Seguros')">Seguros</div>
+            </div>
+        </div>
+
+        <div id="explore-content" style="flex: 1; overflow-y: auto; padding: 0 24px 100px 24px;"></div>
+
+        <div class="home-nav-bottom">
+            <div class="nav-item" onclick="navigateTo('screen-home')">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>Home</span>
+            </div>
+            <div class="nav-item active" onclick="navigateToExplore('Descubre')">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                <span>Explorar</span>
+            </div>
+            <div class="nav-plus" onclick="togglePlusOverlay()">+</div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span>Actividad</span>
+            </div>
+            <div class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4M8 16h.01M16 16h.01"></path></svg>
+                <span>Sami</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN PRODUCT DETAIL -->
+    <div id="screen-product-detail" class="screen" style="padding: 0; background-color: #fcfcfc;">
+        <div style="padding: 24px 24px 0 24px; position: sticky; top: 0; background: white; z-index: 10; border-bottom: 1px solid var(--color-border);">
+            <div class="detail-header">
+                <div class="back-btn" style="margin-bottom: 0;" onclick="navigateTo('screen-explore')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </div>
+                <h2 id="detail-product-name" class="bold" style="margin-bottom: 0; font-size: 18px;">Nombre del Producto</h2>
+            </div>
+        </div>
+
+        <div id="detail-content" style="flex: 1; overflow-y: auto; padding: 24px;"></div>
+
+        <div style="padding: 16px 24px 32px 24px; background: white; border-top: 1px solid var(--color-border); display: flex; flex-direction: column; gap: 12px;">
+            <button class="btn btn-secondary">Hablar con un asesor</button>
+            <button class="btn btn-primary">Invertir</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let currentScreen = 'screen-welcome';
+    let timerInterval;
+    let userMood = 'En construcción';
+    let currentExploreTab = 'Descubre';
+
+    const moodProductPriority = {
+        'En construcción': ['FIC Efectivo', 'Pensión Voluntaria Conservadora', 'Renta Fija Plazo Fijo'],
+        'Impulsivo': ['Renta Fija Plazo Fijo', 'FIC Multiplazo', 'FIC Efectivo'],
+        'Controlador': ['FIC Multiplazo', 'FIC S&P 500', 'Pensión a la Medida'],
+        'Tranquilo': ['FIC Efectivo', 'Pensión Voluntaria Conservadora', 'FIC Monetario']
+    };
+
+    const moodBannerText = {
+        'En construcción': 'Con base en tu perfil, estos productos te ayudan a empezar',
+        'Impulsivo': 'Un plazo fijo puede ayudarte a construir el hábito de ahorrar',
+        'Controlador': 'Aquí las opciones con mayor rentabilidad para tu perfil',
+        'Tranquilo': 'Productos simples para que tu plata trabaje sola'
+    };
+
+    const productCatalog = [
+        { id: 'fic-efectivo', name: 'FIC Efectivo', category: 'Voluntarias', subCategory: 'Fondos de Inversión', section: 'Liquidez y corto plazo', profile: 'Conservador', return: '10.5% E.A.', minAmount: 'Desde $50.000', icon: '💰', description: 'Ideal para quienes buscan disponibilidad inmediata de su dinero con un riesgo bajo.', who: 'Personas que quieren tener su fondo de emergencia a la mano.', how: 'Tu dinero se invierte en activos de corto plazo con alta liquidez.', withdrawal: 'Puedes retirar tu dinero en cualquier día hábil.' },
+        { id: 'fic-monetario', name: 'FIC Monetario', category: 'Voluntarias', subCategory: 'Fondos de Inversión', section: 'Liquidez y corto plazo', profile: 'Conservador', return: '10.2% E.A.', minAmount: 'Desde $100.000', icon: '💵', description: 'Un fondo diseñado para preservar el capital mientras genera rendimientos competitivos.', who: 'Ahorradores que buscan una alternativa a la cuenta de ahorros tradicional.', how: 'Inversión en títulos de deuda de alta calidad crediticia.', withdrawal: 'Disponibilidad en 24 horas hábiles.' },
+        { id: 'renta-fija-plazo-fijo', name: 'Renta Fija Plazo Fijo', category: 'Voluntarias', subCategory: 'Fondos de Inversión', section: 'Plazo fijo', profile: 'Conservador', return: '11.8% E.A.', minAmount: 'Desde $1.000.000', icon: '📅', description: 'Asegura una tasa de rentabilidad fija por un tiempo determinado.', who: 'Quienes tienen una meta clara a un plazo específico y no quieren sorpresas.', how: 'Se pacta una tasa y un plazo desde el inicio de la inversión.', withdrawal: 'Al finalizar el plazo pactado (3, 6 o 12 meses).' },
+        { id: 'fic-multiplazo', name: 'FIC Multiplazo', category: 'Voluntarias', subCategory: 'Fondos de Inversión', section: 'Mediano plazo', profile: 'Moderado', return: '12.4% E.A.', minAmount: 'Desde $200.000', icon: '📈', description: 'Busca un equilibrio entre rentabilidad y riesgo en un horizonte de mediano plazo.', who: 'Inversionistas que pueden dejar su dinero quieto por al menos 6 meses.', how: 'Diversificación en bonos y títulos de deuda pública y privada.', withdrawal: 'Retiros parciales o totales después del periodo de permanencia sugerido.' },
+        { id: 'fic-sp500', name: 'FIC S&P 500', category: 'Voluntarias', subCategory: 'Fondos de Inversión', section: 'Mercados internacionales', profile: 'Agresivo', return: '14.2% E.A.', minAmount: 'Desde $500.000', icon: '🇺🇸', description: 'Invierte en las 500 empresas más grandes de Estados Unidos.', who: 'Personas que buscan diversificar en dólares y mercados globales.', how: 'Sigue el comportamiento del índice bursátil S&P 500.', withdrawal: 'Sujeto a las condiciones del mercado internacional (T+3).' },
+        { id: 'pension-voluntaria-conservadora', name: 'Pensión Voluntaria Conservadora', category: 'Voluntarias', subCategory: 'Pensión Voluntaria', profile: 'Conservador', return: '9.8% E.A.', minAmount: 'Desde $100.000', icon: '🛡️', description: 'Ahorro con beneficios tributarios enfocado en la estabilidad de largo plazo.', who: 'Quienes quieren asegurar su jubilación con un riesgo mínimo.', how: 'Portafolio diversificado en activos de renta fija nacional.', withdrawal: 'Cumpliendo requisitos de ley para beneficios tributarios o retiro con retención.', isPension: true },
+        { id: 'pension-a-la-medida', name: 'Pensión a la Medida', category: 'Voluntarias', subCategory: 'Pensión Voluntaria', profile: 'Moderado', return: '11.5% E.A.', minAmount: 'Desde $200.000', icon: '🎯', description: 'Un plan flexible que se ajusta a tus objetivos de retiro y capacidad de ahorro.', who: 'Profesionales independientes o empleados que buscan optimizar su futuro.', how: 'Combinación de fondos según tu perfil de riesgo y edad.', withdrawal: 'Flexible según el plan contratado.', isPension: true },
+        { id: 'fic-inmobiliario', name: 'FIC Inmobiliario', category: 'Voluntarias', subCategory: 'Fondos de Inversión', section: 'Inmobiliario y alternativos', profile: 'Moderado', return: '9.2% E.A.', minAmount: 'Desde $5.000.000', icon: '🏢', description: 'Invierte en proyectos inmobiliarios comerciales y residenciales de alto potencial.', who: 'Inversionistas que buscan diversificar en activos reales.', how: 'Participación en rentas y valorización de inmuebles.', withdrawal: 'Semestral o según liquidez del fondo.' },
+        { id: 'fic-acciones-colombia', name: 'FIC Acciones Colombia', category: 'Voluntarias', subCategory: 'Fondos de Inversión', section: 'Mediano plazo', profile: 'Agresivo', return: '13.8% E.A.', minAmount: 'Desde $200.000', icon: '🇨🇴', description: 'Invierte en las empresas más importantes de la Bolsa de Valores de Colombia.', who: 'Personas que creen en el crecimiento de la economía local.', how: 'Selección activa de acciones con alto potencial de dividendos.', withdrawal: 'Disponibilidad en 3 días hábiles.' }
+    ];
+
+    function navigateTo(screenId) {
+        if (screenId === 'screen-mood-result') {
+            const selectedOptions = document.querySelectorAll('.card-option.selected');
+            const lastSelection = selectedOptions[selectedOptions.length - 1]?.innerText;
+            if (lastSelection?.includes('prevenir')) userMood = 'Tranquilo';
+            else if (lastSelection?.includes('disfrutar')) userMood = 'Impulsivo';
+            else if (lastSelection?.includes('plan')) userMood = 'Controlador';
+            else userMood = 'En construcción';
+
+            document.querySelector('#screen-mood-result .pill-tag').innerText = `Mood: ${userMood}`;
+            const emojiMap = { 'En construcción': '🏗️', 'Impulsivo': '⚡', 'Controlador': '⚖️', 'Tranquilo': '🧘' };
+            document.querySelector('#screen-mood-result div[style*="font-size: 64px"]').innerText = emojiMap[userMood];
+        }
+
+        if (screenId === 'screen-explore') renderExploreProducts();
+
+        const currentEl = document.getElementById(currentScreen);
+        currentEl.classList.remove('active');
+
+        setTimeout(() => {
+            currentEl.style.display = 'none';
+            const nextScreen = document.getElementById(screenId);
+            nextScreen.style.display = 'flex';
+            setTimeout(() => { nextScreen.classList.add('active'); }, 50);
+        }, 300);
+
+        currentScreen = screenId;
+
+        if (screenId === 'screen-analyzing') {
+            setTimeout(() => { navigateTo('screen-mood-result'); }, 2500);
+        }
+        if (screenId === 'screen-create-account-gate') createConfetti();
+    }
+
+    function navigateToExplore(tab) {
+        navigateTo('screen-explore');
+        setTimeout(() => { switchExploreTab(tab); }, 350);
+    }
+
+    function switchExploreTab(tabName) {
+        currentExploreTab = tabName;
+        const tabs = document.querySelectorAll('#explore-tabs .tab-item');
+        tabs.forEach(tab => {
+            if (tab.innerText === tabName) tab.classList.add('active');
+            else tab.classList.remove('active');
+        });
+        renderExploreProducts();
+    }
+
+    function renderExploreProducts() {
+        const container = document.getElementById('explore-content');
+        container.innerHTML = '';
+
+        if (currentExploreTab === 'Descubre') {
+            const banner = document.createElement('div');
+            banner.className = 'explore-banner';
+            banner.innerHTML = `<div style="font-size: 24px;">✨</div><p>${moodBannerText[userMood]}</p>`;
+            container.appendChild(banner);
+
+            const grid = document.createElement('div');
+            grid.className = 'product-grid';
+            const priorities = moodProductPriority[userMood];
+            priorities.forEach(name => {
+                const product = productCatalog.find(p => p.name === name);
+                if (product) grid.appendChild(createProductCard(product));
+            });
+
+            const verTodos = document.createElement('div');
+            verTodos.className = 'product-card';
+            verTodos.style.justifyContent = 'center';
+            verTodos.style.alignItems = 'center';
+            verTodos.onclick = () => switchExploreTab('Voluntarias');
+            verTodos.innerHTML = `<div style="font-size: 24px; margin-bottom: 8px;">📦</div><div class="bold" style="color: var(--color-green-n00); font-size: 14px; text-align: center;">Ver todos los productos →</div>`;
+            grid.appendChild(verTodos);
+            container.appendChild(grid);
+
+        } else if (currentExploreTab === 'Voluntarias') {
+            const content = document.createElement('div');
+            content.style.cssText = 'display:flex; flex-direction:column; gap:16px; margin-top:16px;';
+
+            const pensionSection = document.createElement('div');
+            pensionSection.innerHTML = `
+                <div class="section-header" style="margin-bottom:12px;">Pensión Voluntaria</div>
+                <div class="home-card" style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="font-size:24px;">🎯</div>
+                    <div class="bold" style="font-size:16px;">Pensión Voluntaria</div>
+                    <p style="font-size:13px;">Ahorro extra con beneficios tributarios para alcanzar tus metas de retiro más rápido y optimizar tus impuestos.</p>
+                    <button class="btn btn-secondary" style="width:auto; align-self:flex-start; padding:8px 16px; font-size:12px; margin-top:8px;" onclick="showProductDetail('pension-a-la-medida')">Ver más</button>
+                </div>
+            `;
+            content.appendChild(pensionSection);
+
+            const ficSection = document.createElement('div');
+            ficSection.style.marginTop = '8px';
+            ficSection.innerHTML = `<div class="section-header" style="margin-bottom:12px;">Fondos de Inversión (FIC)</div>`;
+
+            const grid = document.createElement('div');
+            grid.className = 'product-grid';
+
+            const sections = ['Liquidez y corto plazo', 'Plazo fijo', 'Mediano plazo', 'Mercados internacionales', 'Inmobiliario y alternativos'];
+            sections.forEach(section => {
+                const sectionProducts = productCatalog.filter(p => p.subCategory === 'Fondos de Inversión' && p.section === section);
+                if (sectionProducts.length > 0) {
+                    const subHeader = document.createElement('div');
+                    subHeader.style.cssText = 'grid-column:span 2; font-size:12px; font-weight:600; color:var(--color-grey-l03); margin-top:8px;';
+                    subHeader.innerText = section;
+                    grid.appendChild(subHeader);
+                    sectionProducts.forEach(product => grid.appendChild(createProductCard(product)));
+                }
+            });
+
+            ficSection.appendChild(grid);
+            content.appendChild(ficSection);
+            container.appendChild(content);
+
+        } else if (currentExploreTab === 'Pensiones') {
+            const content = document.createElement('div');
+            content.style.cssText = 'display:flex; flex-direction:column; gap:16px; margin-top:16px;';
+
+            [{ title: 'Pensión Obligatoria', desc: 'El ahorro mensual que realizas por ley para asegurar tu vejez, invalidez o sobrevivencia.', icon: '💼' },
+             { title: 'Cesantías', desc: 'Tu seguro de desempleo y un aliado para compra de vivienda o educación.', icon: '🏠' }].forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'home-card';
+                card.style.cssText = 'display:flex; flex-direction:column; gap:8px;';
+                card.innerHTML = `<div style="font-size:24px;">${p.icon}</div><div class="bold" style="font-size:16px;">${p.title}</div><p style="font-size:13px;">${p.desc}</p><button class="btn btn-secondary" style="width:auto; align-self:flex-start; padding:8px 16px; font-size:12px; margin-top:8px;" onclick="alert('Conectando con un asesor para ${p.title}...')">Hablar con un asesor</button>`;
+                content.appendChild(card);
+            });
+            container.appendChild(content);
+
+        } else if (currentExploreTab === 'Seguros') {
+            const content = document.createElement('div');
+            content.style.marginTop = '16px';
+            const card = document.createElement('div');
+            card.className = 'home-card';
+            card.style.cssText = 'display:flex; flex-direction:column; gap:8px;';
+            card.innerHTML = `<div style="font-size:24px;">🛡️</div><div class="bold" style="font-size:16px;">Seguro Crea Patrimonio</div><p style="font-size:13px;">Protege lo que más quieres con un seguro que se adapta a tus necesidades y presupuesto.</p><button class="btn btn-secondary" style="width:auto; align-self:flex-start; padding:8px 16px; font-size:12px; margin-top:8px;" onclick="alert('Conectando con un asesor para Seguros...')">Hablar con un asesor</button>`;
+            content.appendChild(card);
+            container.appendChild(content);
+        }
+    }
+
+    function createProductCard(product) {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.onclick = () => showProductDetail(product.id);
+        const profileClass = product.profile === 'Conservador' ? 'pill-conservative' : product.profile === 'Moderado' ? 'pill-moderate' : 'pill-aggressive';
+        card.innerHTML = `<div class="pill ${profileClass}">${product.profile}</div><div class="name">${product.name}</div><div class="return">${product.return}</div><div class="min-amount">${product.minAmount}</div>`;
+        return card;
+    }
+
+    function showProductDetail(productId) {
+        const product = productCatalog.find(p => p.id === productId);
+        if (!product) return;
+
+        document.getElementById('detail-product-name').innerText = product.name;
+
+        const content = document.getElementById('detail-content');
+        content.innerHTML = `
+            <div class="product-illustration">${product.icon}</div>
+            <h2 class="bold" style="font-size:22px; margin-bottom:12px;">${product.name}</h2>
+            <p style="margin-bottom:24px;">${product.description}</p>
+            <div class="detail-stats">
+                <div class="stat-item"><div class="stat-label">Rentabilidad</div><div class="stat-value green">${product.return}</div></div>
+                <div class="stat-item"><div class="stat-label">Perfil</div><div class="stat-value">${product.profile}</div></div>
+                <div class="stat-item"><div class="stat-label">Desde</div><div class="stat-value">${product.minAmount.replace('Desde ', '')}</div></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:24px; color:var(--color-green-n00); font-size:14px; cursor:pointer;" onclick="alert('Abriendo ficha técnica del producto...')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span class="bold">Ver ficha técnica (PDF)</span>
+            </div>
+            <div class="detail-section"><h3>¿Para quién es este producto?</h3><p>${product.who}</p></div>
+            <div class="detail-section"><h3>¿Cómo funciona?</h3><p>${product.how}</p></div>
+            <div class="detail-section"><h3>¿Cuándo puedo sacar mi plata?</h3><p>${product.withdrawal}</p></div>
+            <p style="font-size:10px; color:var(--color-grey-l05); margin-top:40px;">* La rentabilidad es histórica y no garantiza resultados futuros. Skandia no garantiza una tasa de retorno fija para este tipo de productos de inversión.</p>
+        `;
+
+        const detailScreen = document.getElementById('screen-product-detail');
+        const primaryBtn = detailScreen.querySelector('.btn-primary');
+        const secondaryBtn = detailScreen.querySelector('.btn-secondary');
+        primaryBtn.innerText = product.isPension ? 'Iniciar apertura' : 'Invertir';
+        primaryBtn.setAttribute('onclick', "alert('Iniciando proceso...')");
+        secondaryBtn.innerText = 'Hablar con un asesor';
+        secondaryBtn.setAttribute('onclick', "alert('Conectando con un asesor...')");
+
+        navigateTo('screen-product-detail');
+    }
+
+    function selectOption(element, testId) {
+        const options = element.parentElement.querySelectorAll('.card-option');
+        options.forEach(opt => opt.classList.remove('selected'));
+        element.classList.add('selected');
+        document.getElementById('btn-' + testId).disabled = false;
+    }
+
+    function createConfetti() {
+        const container = document.getElementById('confetti-container');
+        container.innerHTML = '';
+        for (let i = 0; i < 15; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'confetti-dot';
+            dot.style.left = Math.random() * 100 + '%';
+            dot.style.top = '-20px';
+            dot.style.animationDelay = Math.random() * 2 + 's';
+            dot.style.backgroundColor = i % 2 === 0 ? '#00C73D' : '#03A835';
+            container.appendChild(dot);
+        }
+    }
+
+    function validatePhone() {
+        const input = document.getElementById('phone-input');
+        document.getElementById('btn-phone').disabled = input.value.length !== 10;
+    }
+
+    function startVerification() {
+        navigateTo('screen-register-verify');
+        let timeLeft = 572;
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').innerText = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+            if (timeLeft <= 0) clearInterval(timerInterval);
+        }, 1000);
+    }
+
+    function validateVerify() {
+        const input = document.getElementById('verify-input');
+        document.getElementById('btn-verify').disabled = input.value.length !== 5;
+    }
+
+    function togglePassword() {
+        const input = document.getElementById('pass-input');
+        const icon = document.getElementById('eye-icon');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        icon.style.stroke = input.type === 'text' ? 'var(--color-green-n00)' : 'var(--color-grey-l03)';
+    }
+
+    function validatePassword() {
+        const val = document.getElementById('pass-input').value;
+        const hasLen = val.length >= 8;
+        const hasUpper = /[A-Z]/.test(val);
+        const hasNum = /[0-9]/.test(val);
+        const hasSym = /[!@#$%^&*(),.?":{}|<>]/.test(val);
+        updateCheck('check-len', hasLen);
+        updateCheck('check-upper', hasUpper);
+        updateCheck('check-num', hasNum);
+        updateCheck('check-sym', hasSym);
+        document.getElementById('btn-pass').disabled = !(hasLen && hasUpper && hasNum && hasSym);
+    }
+
+    function updateCheck(id, isValid) {
+        const el = document.getElementById(id);
+        if (isValid) el.classList.add('valid');
+        else el.classList.remove('valid');
+    }
+
+    function validateInfo() {
+        const name = document.getElementById('info-name').value;
+        const last = document.getElementById('info-last').value;
+        const email = document.getElementById('info-email').value;
+        const check = document.getElementById('info-check').checked;
+        document.getElementById('btn-info').disabled = !(name && last && email && check);
+    }
+
+    function toggleLoginPassword() {
+        const input = document.getElementById('login-pass');
+        const icon = document.getElementById('login-eye');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        icon.style.stroke = input.type === 'text' ? 'var(--color-green-n00)' : 'var(--color-grey-l03)';
+    }
+
+    function togglePlusOverlay() {
+        const overlay = document.getElementById('plus-overlay');
+        overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function hideProductModal() {
+        document.getElementById('product-modal').style.display = 'none';
+    }
+
+    window.onload = () => {
+        document.querySelectorAll('.screen').forEach(s => {
+            if (s.id !== 'screen-welcome') s.style.display = 'none';
+        });
+    };
+</script>
+
+</body>
+</html>
