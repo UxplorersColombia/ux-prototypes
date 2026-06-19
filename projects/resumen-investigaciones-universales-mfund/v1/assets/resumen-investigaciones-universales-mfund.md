@@ -16,7 +16,7 @@ Marketing definirá en las próximas semanas la **narrativa, el naming y los con
 
 ---
 
-## 2. Resumen ejecutivo — 6 hallazgos clave
+## 2. Resumen ejecutivo — 7 hallazgos clave
 
 1. **Los nombres actuales no comunican — y a veces ahuyentan.** "Universales" no significa nada para el usuario, "Pensión Voluntaria" hace que clientes interesados en invertir descarten el producto ("eso es para pensión") y "Skandia MFUND" no lo conoce nadie. El cambio de nombre que obliga la norma es una oportunidad, pero "simples masivos" es lenguaje normativo, no lenguaje de cliente: el naming debe construirse desde el beneficio.
 
@@ -29,6 +29,8 @@ Marketing definirá en las próximas semanas la **narrativa, el naming y los con
 5. **El concepto de hub/marketplace ya fue validado en su dirección general.** El testeo del NewHub mostró recepción positiva (diseño, confianza en la marca, portafolios personalizables) y el rediseño de gestión de portafolios con filtros y porcentajes fue percibido como una mejora clara. Las advertencias: demasiada información por página, nombres de productos confusos y necesidad de explicaciones más básicas para quien apenas empieza.
 
 6. **Los datos de la base (Databricks) confirman dónde está la oportunidad.** Universales penetra solo el 9.14% de la base total (39,265 clientes), concentrado en Bogotá (58%). La distribución por segmentos omnicanal muestra que Capital Investor concentra el 43.92% de los clientes con Universales, Family Guardian el 31.37% y Wealth Builder el 24.47%; Financial Explorer y Stability Seeker son marginales (<0.25% combinados) en la base actual. La mayor tasa de penetración de Universales dentro de su segmento la tiene Family Guardian (31.31%), seguida de Wealth Builder (30.31%) y Capital Investor (25.98%). El mejor prospecto natural es el cliente que ya invierte: la penetración de Universales en clientes de inversión (15.3%) es 2.4 veces la de clientes de pensión voluntaria (6.5%). Y aunque el 99.6% tiene acceso al portal, solo el 21% usa la app — la relación sigue siendo intermediada, lo que coincide con el peso del asesor que muestra la cualitativa.
+
+7. **Las métricas en vivo confirman el diagnóstico y cuantifican su tamaño.** La vinculación al Fondo Voluntario MFUND tiene 92% de satisfacción y 90% de facilidad percibida (785 respuestas, ene–jun 2026), pero el 95% pasó por un asesor — el canal humano sigue siendo el cierre real. El portal donde vivirá el hub muestra un NPS sólido (~75, 8.170 respuestas) y 91% de éxito de tarea, homogéneo entre segmentos; su mayor fricción es la falta de autonomía para gestionar portafolios cuando el cliente quiere — exactamente la palanca que habilita la norma con el "servicio de solo ejecución".
 
 ---
 
@@ -66,6 +68,15 @@ Marketing definirá en las próximas semanas la **narrativa, el naming y los con
 | **Base de Conocimiento: Productos Universales** | Penetración, perfil demográfico, segmentación, geografía, canales, cross-sell, actividad digital y saldos de los 39,265 clientes con Universales | [PDF](base-conocimiento-productos-universales.pdf) |
 | **Relación de clientes PV / Inversión con Universales** | Tenencia cruzada de Universales en clientes de Pensión Voluntaria e Inversión, por segmento, perfil y regional | [PDF](relacion-clientes-pv-inversion-universales.pdf) |
 | **Relación entre Segmentos de Omnicanalidad y Productos Universales** | Penetración, perfil demográfico, tenencia de productos, actividad digital, saldos y distribución geográfica de los clientes con Universales clasificados por segmento omnicanal (Capital Investor, Family Guardian, Wealth Builder) | [PDF](relacion-entre-segmentos-omnicanalidad.pdf) |
+
+### Métricas continuas: Voz del Cliente (VoC)
+
+> **Nota de alcance:** estos archivos miden la experiencia con el Fondo Voluntario de Pensión Multifund (producto Pensión Voluntaria/universales) y con el portal transaccional donde vivirá el hub. No están segmentados por "universales" como criterio explícito, pero son la evidencia cuantitativa más fresca sobre el onboarding del producto y el canal donde se desplegará la oferta renovada.
+
+| Fuente | Qué contiene |
+|---|---|
+| **Vinculación MFUND 2026** | Satisfacción del onboarding al Fondo Voluntario (785 respuestas, ene–jun 2026): NPS de vinculación, facilidad, rol del asesor, fricciones y mejoras |
+| **Medición Portal Cliente 2026** | NPS y usabilidad del portal transaccional (8.170 respuestas): promotores/detractores, éxito de tarea, transacciones más frecuentes, segmento y fricciones en gestión de portafolio |
 
 ---
 
@@ -105,6 +116,8 @@ Marketing definirá en las próximas semanas la **narrativa, el naming y los con
 - **Los tecnicismos dentro del flujo crean cuellos de botella** (P.E.P. es el ejemplo recurrente) y la identificación del asesor en el flujo aún no garantiza la asignación correcta del cliente.
 - **Contexto del kickoff que la investigación confirma:** la vinculación actual es un proceso digitalizado, no una vinculación digital nativa; el 84% de las vinculaciones ya entra por el canal digital, pero el cierre casi siempre ocurre con acompañamiento del asesor.
 
+**Confirmación cuantitativa (Vinculación MFUND 2026 — 785 respuestas):** el 90% percibe el proceso como fácil o muy fácil y el 92% declara satisfacción top-2; sin embargo, en las respuestas abiertas de mejora (320 no triviales) los tres temas más frecuentes son: acompañamiento/comunicación del asesor (31 menciones), demoras y lentitud (19) y fallas de plataforma/app (16). La necesidad de pedagogía para clientes nuevos aparece en verbatims directos: *"Para quienes son nuevos en estos temas falta más pedagogía, más didáctica, que nos desmenucen la información para aprender y tener más conciencia a la hora de tomar decisiones"*. El formulario extenso suma 4 menciones explícitas (*"Demasiadas preguntas y con información que no conseguí tan fácil"*). Y emerge por primera vez en datos cuantitativos la demanda de autonomía: *"Sí, que se me permita abrir un fondo de inversión sin la necesidad de contactar con el asesor"* — la misma brecha que abre la norma con el servicio de solo ejecución.
+
 ### 4.4 Lenguaje y mensajes que funcionan
 
 Del testeo de mensajes en la experiencia MFUND ([Mensajes y lenguaje persuasivo](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/107rCnJhsl7euuXBt02l0h)):
@@ -118,7 +131,7 @@ Del testeo de mensajes en la experiencia MFUND ([Mensajes y lenguaje persuasivo]
 
 ### 4.5 El rol del asesor y sus herramientas (la otra audiencia de la narrativa)
 
-- **Solo entre el 2% y el 10% de los clientes opera de forma autónoma**; el resto requiere asistencia directa del FP por videollamada o reunión ([Acompañamiento comercial](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/2b7qrnB1vcd6gZgy2Qq52c)).
+- **Solo entre el 2% y el 10% de los clientes opera de forma autónoma**; el resto requiere asistencia directa del FP por videollamada o reunión ([Acompañamiento comercial](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/2b7qrnB1vcd6gZgy2Qq52c)). **Dato cuantitativo que confirma el rango:** en la encuesta de Vinculación MFUND 2026 (785 respuestas), el 95% de los clientes vinculados declaró haber recibido asesoría y acompañamiento de su asesor comercial (682 Sí / 35 No), y el canal de vinculación se divide 54% Digital / 46% Física — la presencia del asesor es transversal a ambos canales.
 - **Las decisiones de inversión nacen casi siempre de una conversación con el asesor**, no de iniciativa propia del cliente ([Asesoría previa a la gestión](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/6JM08b6UyQ3EQnrs8ry0rQ), [Necesidades asesores en MFUND](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/7cLluaAIfQbtRI5yFMGDVp)).
 - **El usuario quiere lo digital para operar y la asesoría para decidir:** en el NewHub, los usuarios ven la página como preparación para una asesoría posterior; inversiones pequeñas las harían 100% en línea, las grandes con asesor ([Apertura de productos](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/4JdQL8LLc6m4fF7yzrCNr2)).
 - **Los asesores venden con simuladores y datos de rentabilidad:** *"Utilizo mucho los simuladores, me parece fundamental trabajar en proyecciones basado en históricos de rentabilidades"*; valoran el Monitor (TIR por cliente) y piden materiales actualizados (videos, instructivos) y enterarse de los lanzamientos antes que el cliente ([Necesidades asesores en MFUND](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/7cLluaAIfQbtRI5yFMGDVp)).
@@ -132,6 +145,8 @@ Del testeo del **NewHub** (la versión más reciente de la landing de inversione
 - **La trayectoria de Skandia genera confianza** y el contenido de portafolios personalizables fue bien recibido ([Elementos positivos](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/1HBoAThcBuHC3VQry08Zgq)).
 - **Lo que el usuario espera encontrar:** qué es Skandia, productos explicados "en términos coloquiales", cómo empezar a invertir si no soy cliente, FAQs/chatbot y canales de servicio visibles ([Expectativas](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/3wh8MBGE7ToQK73Bc95FJZ)).
 - **En banners gana lo simple:** el banner propuesto (más limpio, menos imágenes, más fresco) le ganó al actual ([Banner principal](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/3aXqHdlQ1LQEY8qpH5hz0x)).
+
+**Métricas del portal donde vivirá el hub (Medición Portal Cliente 2026 — 8.170 respuestas):** NPS del portal transaccional ≈ 75 (82.5% promotores, 7.5% detractores), homogéneo entre segmentos (Finanzas Personales 73.8 / Privilegio 75.8 / Elite 75.6). El 91% de los usuarios logra lo que fue a hacer; el 86% lo percibe fácil o muy fácil. La transacción "Gestioné mi portafolio" figura entre las más frecuentes (709 menciones directas + combinaciones), y los temas de portafolio (172), inversión (185) y rentabilidad (156) dominan el texto libre. La fricción más relevante para el proyecto es la **falta de autonomía en horario:** *"No es posible modificar portafolios cuando decido hacerlo, solo cuando ustedes están disponibles"*; y la **opacidad de desempeño:** *"No es claro dónde puedo consultar cada portafolio y ver su desempeño"*, *"Falta hacer más entendible los informes de rentabilidad de cada portafolio"*. Estas dos fricciones son las que el relanzamiento debe resolver.
 
 Del rediseño de **gestión de portafolios** (el antecedente más cercano al marketplace con filtros del kickoff):
 - **La interfaz tipo catálogo con filtros fue una mejora clara:** filtros por características del portafolio, porcentajes en lugar de montos, diferenciación explícita entre "gestión por Skandia" y "gestión por el usuario", confirmación descargable ([Recepción positiva](https://uxplorers-skandiacol-xfdn.dovetail.com/docs/7skUaaFEYBeeeOI2CyAINh)).
@@ -160,31 +175,105 @@ Del rediseño de **gestión de portafolios** (el antecedente más cercano al mar
 - **Cross-sell identificado:** el 52.4% de clientes con Universales tiene oportunidades de venta cruzada (1.76 líneas promedio global); el 54.4% ya tiene productos de inversión. El desglose por segmento revela oportunidades muy diferenciadas: Capital Investor tiene el mayor potencial en productos sofisticados y PAC (82.09% con cross-sell, 17.62% ya con PAC); Family Guardian puede migrar de protección hacia inversión (solo 26.54% tiene inversión); Wealth Builder requiere construir el portafolio desde productos básicos (20–26% de penetración en cada categoría).
 - **Perfiles de la combinación y distribución geográfica:** Inversión + Universales promedia 47.2 años; Pensión + Universales es más joven (42.1 años). En la distribución por canal, Capital Investor opera principalmente por Agencias (80.18%) y se concentra en Centro (67.72%). Family Guardian se divide casi en partes iguales entre Seguros (45.15%) y Centro (44.42%), y Wealth Builder tiene distribución similar entre ambos canales. El promedio global de más del 70% de tenencia cruzada en la regional Centro refleja el peso de Capital Investor en ese canal.
 
+### 4.8 Métricas de experiencia en vivo (VoC continua)
+
+> Esta sección consolida los datos de los dos archivos de medición continua incorporados en junio 2026. No reemplazan la investigación cualitativa ni los análisis de Databricks — los complementan con evidencia a escala real y en tiempo presente.
+
+#### Vinculación MFUND 2026 — encuesta de onboarding del Fondo Voluntario (785 respuestas, ene–jun 2026)
+
+**Satisfacción y facilidad:**
+- **92% satisfacción top-2:** 593 "Muy satisfecho" (75.5%) + 129 "4" (16.4%); insatisfechos 5%, neutros 3%.
+- **90% facilidad:** 428 "Muy Fácil" (54.5%) + 205 "Fácil" (26.1%); con fricción 9.3% (ni fácil/ni difícil + difícil + muy difícil).
+
+**Rol del asesor:**
+- **95% recibió asesoría** (682 Sí vs 35 No de quienes respondieron): confirma cuantitativamente que el asesor es el canal de cierre real.
+- **Canal:** 54% Digital (424) / 46% Física (360) / 1 Email — el canal digital domina la entrada pero el asesor opera en ambos canales.
+- **Segmento tradicional reportado:** Finanzas Personales 428 (55%), Privilegio 69 (9%), Elite 21 (3%); 274 sin dato de segmento.
+
+**Fricciones (campo abierto "¿qué haríamos diferente?" — 320 respuestas no triviales):**
+
+| Tema | Menciones |
+|---|---|
+| Acompañamiento / comunicación del asesor | 31 |
+| Demoras / lentitud del proceso | 19 |
+| Fallas de plataforma / app / registro fotográfico | 16 |
+| Terminología / pedagogía para clientes nuevos | 15 |
+| Documentos / requisitos adicionales | 6 |
+| Formulario extenso / demasiadas preguntas | 4 |
+| Autonomía: abrir sin necesidad de asesor | 1 (pero es el único gap nuevo que abre la norma) |
+
+**Verbatims representativos:**
+- *"Para quienes son nuevos en estos temas falta más pedagogía, más didáctica, que nos desmenucen la información para aprender y tener más conciencia a la hora de tomar decisiones"*
+- *"Demasiadas preguntas y con información que no conseguí tan fácil"*
+- *"Sí, que se me permita abrir un fondo de inversión sin la necesidad de contactar con el asesor"* — voz de cliente que respalda el servicio de solo ejecución de la norma
+
+**Lo que significa para el proyecto:** la satisfacción de onboarding es alta, pero las fricciones se han concentrado en pedagogía (clientes nuevos que no entienden el producto), lentitud percibida y fallas técnicas puntuales. El servicio de solo ejecución no solo es una obligación regulatoria: hay un cliente que ya lo está pidiendo.
+
+---
+
+#### Medición Portal Cliente 2026 — NPS del portal transaccional (8.170 respuestas)
+
+**Resultado global:**
+- **NPS ≈ 75:** 6.737 promotores (82.5%) / 820 pasivos (10%) / 613 detractores (7.5%).
+- **91% logra su tarea** (7.303 Sí / 690 No / 177 sin dato).
+- **86% facilidad:** 4.079 "Muy Fácil" + 2.233 "Fácil"; fricción 12% (ni fácil/ni difícil + difícil + muy difícil).
+
+**NPS por segmento tradicional (homogéneo):**
+
+| Segmento | n | NPS |
+|---|---|---|
+| Finanzas Personales | 3.764 | 73.8 |
+| Privilegio | 2.511 | 75.8 |
+| Elite | 1.399 | 75.6 |
+
+**Transacciones más frecuentes en el portal:**
+
+| Transacción | Respuestas |
+|---|---|
+| Consulté mis saldos | 1.551 |
+| Solicité un retiro | 1.057 |
+| Realicé un aporte | 796 |
+| Gestioné mi portafolio | 709 (+ combinaciones) |
+| Consulté mi información | 411 |
+| Actualicé mis datos | 394 |
+| Descargué documentos / certificados | 250 |
+
+**Fricciones críticas para el hub/marketplace:**
+- **Autonomía restringida:** *"No es posible modificar portafolios cuando decido hacerlo, solo cuando ustedes están disponibles"*
+- **Opacidad de desempeño:** *"No es claro dónde puedo consultar cada portafolio y ver su desempeño"* / *"Falta hacer más entendible los informes de rentabilidad de cada portafolio"*
+- **Granularidad de autogestión:** *"en la gestión autónoma de los recursos en el multifund se pudiera mantener la actual distribución y solo cambiar un par de portafolios y el resto mantenerlos"*
+
+**Lo que significa para el proyecto:** el portal ya es una base sólida — NPS 75 es un buen punto de partida para el relanzamiento. Pero el cliente que gestiona inversiones choca contra dos muros: no puede actuar cuando quiere (horario/disponibilidad) y no entiende cómo le está yendo por portafolio. Resolver estas dos fricciones es el núcleo de la propuesta de valor del hub, y el servicio de solo ejecución de la norma es la habilitación regulatoria para hacerlo.
+
 ---
 
 ## 5. Implicaciones para marketing (naming, narrativa, contenidos)
 
 1. **Naming desde el beneficio, no desde la norma.** Evitar trasladar "simples masivos" al cliente. La evidencia favorece nombres que comuniquen uso y beneficio ("invierte para tu meta", "paga menos renta") con el término técnico en segundo plano. Validar el naming candidato en el testeo de julio.
-2. **Narrativa de inversión flexible, no de pensión.** El encuadre "pensión" filtra a los jóvenes y a quien invierte por metas. La historia de diversificación del kickoff (por región, divisa, tipo de activo) conecta bien con lo que el usuario pidió: categorías claras y filtrables.
-3. **Liderar con beneficio tributario + rentabilidad, con honestidad sobre el riesgo.** Son los dos ganchos más fuertes; pero la rentabilidad prometida y no entendida es la causa #1 de experiencias negativas y retiros. Acompañar siempre con expectativas claras (plazo, fluctuación) — también nos protege frente a la línea delgada con "recomendación profesional".
-4. **Doble audiencia: cliente y asesor.** Producir la narrativa en dos alturas: la versión cliente (sin jerga, emocional, por objetivos) y el toolkit del asesor (argumentarios, simuladores, riesgo/retorno). Los asesores piden enterarse de los lanzamientos antes que el cliente.
-5. **Menos es más en el hub.** El NewHub validó la dirección pero advirtió sobrecarga: priorizar la información esencial, acordeones/filtros para profundizar, explicaciones progresivas para no expertos, simuladores visibles y testimoniales.
-6. **Cuidar el SEO al reescribir.** "Ideas de inversión" es de las páginas mejor posicionadas; cualquier cambio de textos debe coordinarse con el informe de keywords de Growth (Mateo), como se acordó en el kickoff.
-7. **No mezclar historias de productos en un mismo momento del flujo** (aprendizaje de asesores en FPOB y de la primera norma de asesoría): una historia por decisión, aunque el hub las contenga todas.
-8. **Priorizar audiencias con los datos de la base.** El cliente actual de inversión es el prospecto más afín a la nueva oferta (2.4x la penetración vs. clientes de pensión voluntaria): el cross-sell desde inversión debería ser la primera campaña, alineado con la idea del kickoff de que el hub viva en el portal con data precargada. La masa por activar no es un segmento externo: está dentro de la base actual de Family Guardian y Wealth Builder, que combinan el 55.84% de los clientes con Universales pero muestran baja sofisticación financiera (26-27% con inversión) y bajo cross-sell (1.36 líneas promedio). Financial Explorer y Stability Seeker son prácticamente ausentes en Universales hoy (<0.25%); si el proyecto apunta a captar ese perfil, es un terreno nuevo, no de reactivación. Y la base tiene acceso al portal (~100%) pero adopción de app desigual (28% Capital Investor, 15-18% los otros dos): las campañas del relanzamiento son también una palanca de migración digital diferenciada por segmento.
+2. **El portal es una base sólida; el relanzamiento parte de terreno ganado.** NPS ≈ 75 y 91% de éxito de tarea son indicadores de que el portal ya funciona. La narrativa del relanzamiento puede comunicar "mejora de lo que ya tienes" en vez de ruptura — lo que reduce fricción de adopción y aprovecha la confianza acumulada. La autonomía de gestión de portafolios en tiempo real (hoy la fricción #1) y la transparencia de desempeño por portafolio son las dos promesas concretas que el hub debe entregar.
+3. **Narrativa de inversión flexible, no de pensión.** El encuadre "pensión" filtra a los jóvenes y a quien invierte por metas. La historia de diversificación del kickoff (por región, divisa, tipo de activo) conecta bien con lo que el usuario pidió: categorías claras y filtrables.
+4. **Liderar con beneficio tributario + rentabilidad, con honestidad sobre el riesgo.** Son los dos ganchos más fuertes; pero la rentabilidad prometida y no entendida es la causa #1 de experiencias negativas y retiros. Acompañar siempre con expectativas claras (plazo, fluctuación) — también nos protege frente a la línea delgada con "recomendación profesional".
+5. **Doble audiencia: cliente y asesor.** Producir la narrativa en dos alturas: la versión cliente (sin jerga, emocional, por objetivos) y el toolkit del asesor (argumentarios, simuladores, riesgo/retorno). Los asesores piden enterarse de los lanzamientos antes que el cliente.
+6. **Menos es más en el hub.** El NewHub validó la dirección pero advirtió sobrecarga: priorizar la información esencial, acordeones/filtros para profundizar, explicaciones progresivas para no expertos, simuladores visibles y testimoniales.
+7. **Cuidar el SEO al reescribir.** "Ideas de inversión" es de las páginas mejor posicionadas; cualquier cambio de textos debe coordinarse con el informe de keywords de Growth (Mateo), como se acordó en el kickoff.
+8. **No mezclar historias de productos en un mismo momento del flujo** (aprendizaje de asesores en FPOB y de la primera norma de asesoría): una historia por decisión, aunque el hub las contenga todas.
+9. **Priorizar audiencias con los datos de la base.** El cliente actual de inversión es el prospecto más afín a la nueva oferta (2.4x la penetración vs. clientes de pensión voluntaria): el cross-sell desde inversión debería ser la primera campaña, alineado con la idea del kickoff de que el hub viva en el portal con data precargada. La masa por activar no es un segmento externo: está dentro de la base actual de Family Guardian y Wealth Builder, que combinan el 55.84% de los clientes con Universales pero muestran baja sofisticación financiera (26-27% con inversión) y bajo cross-sell (1.36 líneas promedio). Financial Explorer y Stability Seeker son prácticamente ausentes en Universales hoy (<0.25%); si el proyecto apunta a captar ese perfil, es un terreno nuevo, no de reactivación. Y la base tiene acceso al portal (~100%) pero adopción de app desigual (28% Capital Investor, 15-18% los otros dos): las campañas del relanzamiento son también una palanca de migración digital diferenciada por segmento.
 
 ---
 
 ## 6. Vacíos de investigación (lo que UX debe cubrir en la fase de testeo — julio)
 
+> **Actualización junio 2026:** la incorporación de los archivos de métricas VoC (sección 3 y 4.8) cubre el vacío de "cuántos clientes están satisfechos con el onboarding" y "cómo está el NPS del portal". Estos vacíos quedan resueltos con datos a escala. Los vacíos que siguen abiertos son los que las métricas continuas no pueden responder porque requieren testeo de flujos nuevos.
+
 | Vacío | Por qué importa |
 |---|---|
 | **Comprensión del nuevo naming y de la clasificación** (simples masivos / simples / complejos) | No existe investigación sobre cómo el cliente entiende la nueva categorización; "universales" ya demostró que el nombre puede fallar |
 | **Perfilamiento obligatorio en el flujo** | Nadie ha testeado el perfilamiento simplificado vs. completo dentro de la experiencia digital; es la principal fricción nueva que agrega la norma |
-| **Servicio de solo ejecución en fiduciaria** | Solo existe la referencia del multifondos; no hay evidencia de cómo lo entiende el cliente de fiduciaria en vinculación inicial |
+| **Servicio de solo ejecución en fiduciaria** | Solo existe la referencia del multifondos; no hay evidencia de cómo lo entiende el cliente de fiduciaria en vinculación inicial. La VoC ya muestra que un cliente lo está pidiendo explícitamente, pero no cómo lo comprende |
 | **Narrativa de "mezclas" vs. Invested** | El riesgo de canibalización/confusión se discutió en el kickoff; no hay testeo que valide si el cliente distingue mezclas sugeridas de recomendación profesional |
 | **Flujo actual de universales (excusas → mezcla → vinculación)** | El testeo del rediseño de universales quedó como archivo; no hay highlights consultables sobre la narrativa de "excusas" específicamente |
 | **Cliente nuevo sin historial en Universales (Financial Explorer / Wealth Builder joven)** | Cuantitativamente, Financial Explorer es marginal en la base actual (<0.25%). Si la nueva norma apunta a captar ese perfil por canal digital sin asesor, es un segmento prácticamente nuevo para Universales: el journey de atracción, mensajes de entrada y el perfilamiento simplificado están sin estudiar |
+| **Autonomía de gestión de portafolios y transparencia de desempeño** | La VoC del portal identifica estas como las dos fricciones #1; falta testear qué diseño de interfaz las resuelve y cómo debe presentarse el rendimiento por portafolio para que sea comprensible sin asesor |
 
 ---
 
@@ -197,4 +286,4 @@ Del rediseño de **gestión de portafolios** (el antecedente más cercano al mar
 
 ---
 
-*Documento elaborado por el equipo UX a partir del repositorio de investigación en Dovetail (workspace UXplorers) y de análisis cuantitativos de la base de clientes en Databricks (carpeta `investigación/conocimiento/`). Todos los hallazgos son trazables a su fuente mediante los enlaces incluidos. Junio 2026.*
+*Documento elaborado por el equipo UX a partir del repositorio de investigación en Dovetail (workspace UXplorers), análisis cuantitativos de la base de clientes en Databricks (carpeta `investigación/conocimiento/`) y métricas continuas de Voz del Cliente (Vinculación MFUND 2026 — 785 respuestas; Medición Portal Cliente 2026 — 8.170 respuestas). Todos los hallazgos son trazables a su fuente mediante los enlaces incluidos. Actualizado junio 2026.*
