@@ -5,13 +5,19 @@
 // ─── Límites ──────────────────────────────────────────────────────────
 const MAX_FUENTES = 5;
 const MAX_OTROS   = 5;
+const MAX_VALOR   = 999_999_999;
 
 // ─── Defaults ─────────────────────────────────────────────────────────
 window.SIM_DEFAULTS = {
   channel: 'cliente',
   perfilDemo: 'auto',
   clientName: 'Usuario',
-  salarioPrecargado: 4500000
+  salarioPrecargado: 4500000,
+  asesor: {
+    nombre:  'Skandia Colombia',
+    correo:  'asesoria@skandia.com.co',
+    celular: '+57 601 658 0000'
+  }
 };
 
 // ─── Estado ───────────────────────────────────────────────────────────
@@ -22,6 +28,7 @@ const state = {
   salarioPrecargado: window.SIM_DEFAULTS.salarioPrecargado,
   salario: 0,
   fuentes: [],
+  lead: { nombre: '', email: '', telefono: '', indicativo: '+57', esCliente: false, capturado: false },
   vitales:    30,
   deudas:     20,
   gustos:     15,
@@ -29,6 +36,9 @@ const state = {
   futuro:     10,
   periodicidades: { vitales: 'mensual', deudas: 'mensual', gustos: 'mensual', cotidianos: 'mensual', futuro: 'mensual' },
   otros: [],
+  vitalesDetalle: [],  // [{key, label, monto}] — montos en COP mensual
+  deudasDetalle:  [],
+  _detalleOpen: { vitales: false, deudas: false },
   _nextFuenteId: 1,
   _nextOtroId:   1,
   _carouselIdx:  0,
@@ -49,9 +59,9 @@ const CATEGORIAS = [
   {
     key: 'deudas',
     title: 'Deudas',
-    sublabel: 'Lo que le debes al banco o a un crédito',
+    sublabel: 'Lo que pagas cada mes por compromisos adquiridos',
     examples: '',
-    tooltip: 'Cuota mínima de tarjetas de crédito, créditos de consumo, libranzas. Si tienes varios, suma todas las cuotas mensuales.',
+    tooltip: 'Cuotas de tarjetas, créditos, pagos a familiares o amigos, compras a plazos. Si tienes varios compromisos, suma todo lo que sale cada mes.',
     color: 'var(--c-deudas)'
   },
   {
@@ -75,10 +85,27 @@ const CATEGORIAS = [
     title: 'Futuro',
     sublabel: 'Lo que guardas para ti',
     examples: '',
-    tooltip: 'Ahorro programado, fondos de inversión, fondo de emergencia. Incluye lo que ya tienes en Skandia y lo que ahorras por fuera. Plata que separas cada mes y no tocas — es tuyo.',
+    tooltip: 'Ahorro programado, fondos de inversión, fondo de emergencia. Incluye lo que ya tienes en Skandia y lo que ahorras por fuera. Dinero que reservas cada mes para ti.',
     color: 'var(--c-futuro)'
   }
 ];
+
+// ─── Subcategorías sugeridas (Vitales y Deudas) ───────────────────────
+const SUBCATEGORIAS = {
+  vitales: [
+    { key: 'vivienda',   label: 'Vivienda',            hint: 'Arriendo, cuota hipotecaria, administración' },
+    { key: 'servicios',  label: 'Servicios públicos',   hint: 'Agua, luz, gas, internet, teléfono fijo' },
+    { key: 'transporte', label: 'Transporte',           hint: 'Bus, metro, gasolina, peajes' },
+    { key: 'mercado',    label: 'Mercado y alimentos',  hint: 'Compras de supermercado y plaza de mercado' },
+  ],
+  deudas: [
+    { key: 'tarjeta',   label: 'Tarjeta de crédito',   hint: 'Cuota mensual o pago mínimo' },
+    { key: 'consumo',   label: 'Crédito de consumo',    hint: 'Libre inversión, libranza, cuotas' },
+    { key: 'hipoteca',  label: 'Crédito hipotecario',   hint: 'Cuota del préstamo de vivienda' },
+    { key: 'vehiculo',  label: 'Crédito de vehículo',   hint: 'Cuota mensual del carro o moto' },
+    { key: 'informal',  label: 'Otra deuda',            hint: 'Pagos a familiares, amigos o deudas informales' },
+  ]
+};
 
 // ─── Periodicidad ─────────────────────────────────────────────────────
 const PERIODICIDAD_FACTOR = {
@@ -125,6 +152,7 @@ function ir(id) {
   if (window._navHistory[window._navHistory.length - 1] !== id) {
     window._navHistory.push(id);
   }
+  document.body.dataset.screen = id;
   const current = document.querySelector('.screen--active');
   if (current && current.id !== id) {
     current.classList.add('screen--leaving');
@@ -144,6 +172,7 @@ function _showScreen(id) {
   if (!target) return;
   target.classList.add('screen--active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 's-entrada')      _syncLeadButtonState();
   if (id === 's-distribucion') updateDistribucion();
   if (id === 's-diagnostico')  renderDiagnostico();
   if (id === 's-ctas')         renderPantallaCTAs();
@@ -160,32 +189,180 @@ function irAtras() {
 }
 window.irAtras = irAtras;
 
+// ─── Lead capture (canal público) ────────────────────────────────────
+const NOMBRE_RE = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'\-]{2,60}$/;
+
+function _isValidEmail(v) {
+  return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v);
+}
+
+function _validateNombre(v) {
+  if (!v) return 'Este campo es obligatorio';
+  if (v.length < 2) return 'Ingresa al menos 2 caracteres';
+  if (v.length > 60) return 'Máximo 60 caracteres';
+  if (!NOMBRE_RE.test(v)) return 'Solo se permiten letras, espacios y guiones';
+  return '';
+}
+
+function _validateEmail(v) {
+  if (!v) return 'Este campo es obligatorio';
+  if (!_isValidEmail(v)) return 'Correo inválido. Ej: nombre@dominio.com';
+  return '';
+}
+
+function _validateTelefono(v) {
+  const digits = v.replace(/\D/g, '');
+  if (!digits) return 'Este campo es obligatorio';
+  if (digits.length !== 10) return 'Ingresa los 10 dígitos de tu número';
+  return '';
+}
+
+function _setFieldError(fieldId, msg) {
+  const input = document.getElementById(fieldId);
+  const errEl = document.getElementById(fieldId + '-error');
+  if (!input || !errEl) return;
+  if (msg) {
+    input.classList.add('field__input--error');
+    errEl.textContent = msg;
+    errEl.hidden = false;
+  } else {
+    input.classList.remove('field__input--error');
+    errEl.textContent = '';
+    errEl.hidden = true;
+  }
+}
+
+function _clearFieldError(fieldId) {
+  _setFieldError(fieldId, '');
+}
+
+function validateLead() {
+  const nombre  = (document.getElementById('lead-nombre')?.value  || '').trim();
+  const email   = (document.getElementById('lead-email')?.value   || '').trim();
+  const tel     = (document.getElementById('lead-telefono')?.value || '').trim();
+  const consent = document.getElementById('lead-consent-check')?.checked;
+  return !_validateNombre(nombre) && !_validateEmail(email) && !_validateTelefono(tel) && !!consent;
+}
+
+function onLeadBlur(fieldId) {
+  const input = document.getElementById(fieldId);
+  const v = (input?.value || '').trim();
+  if (fieldId === 'lead-nombre')   _setFieldError(fieldId, _validateNombre(v));
+  if (fieldId === 'lead-email')    _setFieldError(fieldId, _validateEmail(v));
+  if (fieldId === 'lead-telefono') _setFieldError(fieldId, _validateTelefono(v));
+}
+window.onLeadBlur = onLeadBlur;
+
+function _syncLeadButtonState() {
+  if (state.channel !== 'publico') return;
+  const ok  = validateLead();
+  const btn = document.getElementById('btn-comenzar');
+  const hlp = document.getElementById('lead-form-helper');
+  if (btn) btn.disabled = !ok;
+  if (hlp) hlp.hidden   = ok;
+}
+
+function onLeadInput(fieldId) {
+  if (fieldId) _clearFieldError(fieldId);
+  _syncLeadButtonState();
+}
+window.onLeadInput = onLeadInput;
+
+function comenzar() {
+  if (state.channel === 'publico') {
+    if (!validateLead()) return;
+    state.lead = {
+      nombre:     document.getElementById('lead-nombre').value.trim(),
+      email:      document.getElementById('lead-email').value.trim(),
+      telefono:   document.getElementById('lead-telefono').value.trim(),
+      indicativo: document.getElementById('lead-indicativo').value,
+      esCliente:  document.getElementById('lead-es-cliente').checked,
+      capturado:  true
+    };
+  }
+  ir('s-ingresos');
+}
+window.comenzar = comenzar;
+
 // ─── Tooltips ─────────────────────────────────────────────────────────
+function repositionTip(box) {
+  box.style.transform = '';
+  const rect   = box.getBoundingClientRect();
+  const vw     = window.innerWidth;
+  const MARGIN = 12;
+  let shift = 0;
+  if (rect.right > vw - MARGIN)  shift = -(rect.right - (vw - MARGIN));
+  if (rect.left + shift < MARGIN) shift = MARGIN - rect.left;
+  if (shift !== 0) box.style.transform = `translateX(${shift}px)`;
+}
+
+function _getTipBox(btn) {
+  const id = btn.getAttribute('data-tip-for') || btn.nextElementSibling?.id;
+  return id ? document.getElementById(id) : btn.nextElementSibling;
+}
+
+// Registra hover en todos los .tip-trigger del documento
+function initTooltips() {
+  document.querySelectorAll('.tip-trigger').forEach(btn => {
+    if (btn._tipHoverBound) return; // evitar doble bind al re-render
+    btn._tipHoverBound = true;
+    btn.addEventListener('mouseenter', () => {
+      const box = _getTipBox(btn);
+      if (!box) return;
+      document.querySelectorAll('.tip-pop.visible').forEach(b => { b.classList.remove('visible'); b.style.transform = ''; });
+      box.classList.add('visible');
+      repositionTip(box);
+    });
+    btn.addEventListener('mouseleave', (e) => {
+      const box = _getTipBox(btn);
+      if (!box) return;
+      // Mantener abierto si el puntero se mueve hacia el propio tooltip
+      const related = e.relatedTarget;
+      if (related && box.contains(related)) return;
+      box.classList.remove('visible');
+      box.style.transform = '';
+    });
+  });
+}
+
 function toggleTip(btn) {
   const id  = btn.getAttribute('data-tip-for') || btn.nextElementSibling?.id;
   const box = id ? document.getElementById(id) : btn.nextElementSibling;
   if (!box) return;
   const isOpen = box.classList.contains('visible');
-  document.querySelectorAll('.tip-pop.visible').forEach(b => b.classList.remove('visible'));
-  if (!isOpen) box.classList.add('visible');
+  document.querySelectorAll('.tip-pop.visible').forEach(b => {
+    b.classList.remove('visible');
+    b.style.transform = '';
+  });
+  if (!isOpen) {
+    box.classList.add('visible');
+    repositionTip(box);
+  }
 }
 window.toggleTip = toggleTip;
 
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.tip-trigger') && !e.target.closest('.tip-pop')) {
-    document.querySelectorAll('.tip-pop.visible').forEach(b => b.classList.remove('visible'));
+    document.querySelectorAll('.tip-pop.visible').forEach(b => {
+      b.classList.remove('visible');
+      b.style.transform = '';
+    });
   }
 });
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    document.querySelectorAll('.tip-pop.visible').forEach(b => b.classList.remove('visible'));
+    document.querySelectorAll('.tip-pop.visible').forEach(b => {
+      b.classList.remove('visible');
+      b.style.transform = '';
+    });
   }
 });
 
 // ─── Lucide refresh ──────────────────────────────────────────────────
 function refreshIcons() {
   if (window.lucide && lucide.createIcons) lucide.createIcons();
+  initTooltips();
 }
 
 // ─── Canal ───────────────────────────────────────────────────────────
@@ -208,6 +385,7 @@ function setCanal(canal) {
   }
   recalcularSalario();
   buildFuentes();
+  _syncLeadButtonState();
   refreshIcons();
 }
 window.setCanal = setCanal;
@@ -241,11 +419,13 @@ function buildFuentes() {
         <div class="field">
           <div class="field__label-row">
             <label class="field__label">${labelTxt}</label>
-            <button type="button" class="tip-trigger" aria-label="Ver ayuda"
-                    data-tip-for="tip-fuente-${f.id}" onclick="toggleTip(this)">
-              <i data-lucide="help-circle"></i>
-            </button>
-            <span class="tip-pop" role="tooltip" id="tip-fuente-${f.id}">${tipTxt}</span>
+            <span class="tip-wrap">
+              <button type="button" class="tip-trigger" aria-label="Ver ayuda"
+                      data-tip-for="tip-fuente-${f.id}" onclick="toggleTip(this)">
+                <i data-lucide="help-circle"></i>
+              </button>
+              <span class="tip-pop" role="tooltip" id="tip-fuente-${f.id}">${tipTxt}</span>
+            </span>
           </div>
           ${sublabelHtml}
           <div class="fuente-input-row">
@@ -258,9 +438,12 @@ function buildFuentes() {
                 class="field__input fuente-monto"
                 value="${montoFmt}"
                 autocomplete="off"
+                maxlength="13"
                 aria-required="${isMain ? 'true' : 'false'}"
                 oninput="onFuenteInput('${f.id}', this)"
+                onblur="onFuenteBlur('${f.id}', this)"
               >
+              <span class="fuente-input-error field__error" hidden></span>
             </div>
             <select
               class="periodo-select periodo-select--fuente"
@@ -299,8 +482,11 @@ function _updateAgregarFuenteBtn() {
 }
 
 function onFuenteInput(id, input) {
-  const num = parseInt(input.value.replace(/\D/g, ''), 10) || 0;
+  let num = parseInt(input.value.replace(/\D/g, ''), 10) || 0;
+  if (num > MAX_VALOR) num = MAX_VALOR;
   input.value = num > 0 ? num.toLocaleString('es-CO') : '';
+  const errEl = input.closest('.fuente-input-wrap')?.querySelector('.fuente-input-error');
+  if (errEl) { errEl.textContent = ''; errEl.hidden = true; }
   const f = state.fuentes.find(f => f.id === id);
   if (f) f.monto = num;
   recalcularSalario();
@@ -308,6 +494,20 @@ function onFuenteInput(id, input) {
   updateTotalIngresos();
 }
 window.onFuenteInput = onFuenteInput;
+
+function onFuenteBlur(id, input) {
+  const num = parseInt(input.value.replace(/\D/g, ''), 10) || 0;
+  const errEl = input.closest('.fuente-input-wrap')?.querySelector('.fuente-input-error');
+  if (!errEl) return;
+  if (num === 0) {
+    errEl.textContent = 'Ingresa un valor mayor a cero';
+    errEl.hidden = false;
+  } else {
+    errEl.textContent = '';
+    errEl.hidden = true;
+  }
+}
+window.onFuenteBlur = onFuenteBlur;
 
 function onFuentePeriodicidad(id, periodicidad) {
   const f = state.fuentes.find(f => f.id === id);
@@ -389,7 +589,7 @@ function buildSliders() {
     const suffix       = PERIODICIDAD_LABELS[periodicidad] || 'al mes';
     const examplesHtml = cat.examples
       ? `<p class="slider-row__examples">${cat.examples}</p>` : '';
-    const pctStr       = (Math.min(state[cat.key], 80) / 80 * 100).toFixed(1);
+    const pctStr       = (Math.min(state[cat.key], 300) / 300 * 100).toFixed(1);
 
     return `
       <div class="slider-row" data-key="${cat.key}" style="--c:${cat.color}; --p:${pctStr}%">
@@ -397,11 +597,13 @@ function buildSliders() {
           <div class="slider-row__meta">
             <div class="slider-row__label-wrap">
               <span class="slider-row__label">${cat.title}</span>
-              <button type="button" class="tip-trigger" aria-label="Ver explicación de ${cat.title}"
-                      data-tip-for="tip-${cat.key}" onclick="toggleTip(this)">
-                <i data-lucide="help-circle"></i>
-              </button>
-              <span class="tip-pop" role="tooltip" id="tip-${cat.key}">${cat.tooltip}</span>
+              <span class="tip-wrap">
+                <button type="button" class="tip-trigger" aria-label="Ver explicación de ${cat.title}"
+                        data-tip-for="tip-${cat.key}" onclick="toggleTip(this)">
+                  <i data-lucide="help-circle"></i>
+                </button>
+                <span class="tip-pop" role="tooltip" id="tip-${cat.key}">${cat.tooltip}</span>
+              </span>
             </div>
             <p class="slider-row__sublabel">${cat.sublabel}</p>
             ${examplesHtml}
@@ -416,8 +618,8 @@ function buildSliders() {
           type="range"
           class="slider"
           id="sl-${cat.key}"
-          min="0" max="80"
-          value="${Math.min(state[cat.key], 80)}"
+          min="0" max="300"
+          value="${Math.min(state[cat.key], 300)}"
           step="1"
           oninput="onSlider('${cat.key}', this.value)"
           aria-label="${cat.title}"
@@ -450,6 +652,17 @@ function buildSliders() {
             ).join('')}
           </select>
         </div>
+
+        ${SUBCATEGORIAS[cat.key] ? `
+        <button type="button" class="detalle-toggle" id="detalle-btn-${cat.key}"
+                aria-expanded="${state._detalleOpen[cat.key] ? 'true' : 'false'}"
+                aria-controls="detalle-${cat.key}"
+                onclick="toggleDetalle('${cat.key}')">
+          <i data-lucide="${state._detalleOpen[cat.key] ? 'chevron-up' : 'list-plus'}"></i>
+          ${state._detalleOpen[cat.key] ? 'Ocultar detalle' : 'Desglosar por tipo (opcional)'}
+        </button>
+        <div class="detalle-panel" id="detalle-${cat.key}" ${state._detalleOpen[cat.key] ? '' : 'hidden'}></div>
+        ` : ''}
       </div>
     `;
   }).join('');
@@ -467,12 +680,12 @@ function onAmountInput(key, input) {
   input.value = num > 0 ? num.toLocaleString('es-CO') : '';
   if (state.salario > 0) {
     const monthly = normalizarAMensual(num, state.periodicidades[key]);
-    state[key] = Math.min(100, Math.round(monthly / state.salario * 100));
+    state[key] = Math.min(300, Math.round(monthly / state.salario * 100));
   } else {
     state[key] = 0;
   }
   const sl = document.getElementById('sl-' + key);
-  if (sl) sl.value = Math.min(state[key], 80);
+  if (sl) sl.value = Math.min(state[key], 300);
   updateDistribucion();
 }
 window.onAmountInput = onAmountInput;
@@ -493,7 +706,7 @@ function _syncAmtFromPct(key) {
     inputEl.value = amount > 0 ? amount.toLocaleString('es-CO') : '';
   }
   const sl = document.getElementById('sl-' + key);
-  if (sl) sl.style.setProperty('--p', (Math.min(state[key], 80) / 80 * 100).toFixed(1) + '%');
+  if (sl) sl.style.setProperty('--p', (Math.min(state[key], 300) / 300 * 100).toFixed(1) + '%');
 }
 
 // ─── Gastos personalizados (A2) ───────────────────────────────────────
@@ -509,6 +722,122 @@ function toggleCustomForm() {
   refreshIcons();
 }
 window.toggleCustomForm = toggleCustomForm;
+
+// ─── Subcategorías opcionales (Vitales / Deudas) ──────────────────────
+function toggleDetalle(key) {
+  state._detalleOpen[key] = !state._detalleOpen[key];
+  const panel = document.getElementById('detalle-' + key);
+  const btn   = document.getElementById('detalle-btn-' + key);
+  if (!panel) return;
+  panel.hidden = !state._detalleOpen[key];
+  if (btn) btn.setAttribute('aria-expanded', String(state._detalleOpen[key]));
+  if (state._detalleOpen[key]) buildDetallePanel(key);
+  refreshIcons();
+}
+window.toggleDetalle = toggleDetalle;
+
+function _getDetalle(key) {
+  return key === 'vitales' ? state.vitalesDetalle : state.deudasDetalle;
+}
+
+function _syncDetalleToParent(key) {
+  const detalle = _getDetalle(key);
+  if (detalle.length === 0) return;
+  const total = detalle.reduce((s, d) => s + (d.monto || 0), 0);
+  if (state.salario > 0) {
+    state[key] = Math.min(300, Math.round(total / state.salario * 100));
+  }
+  const sl = document.getElementById('sl-' + key);
+  if (sl) sl.value = Math.min(state[key], 300);
+  _syncAmtFromPct(key);
+  updateDistribucion();
+}
+
+function buildDetallePanel(key) {
+  const panel    = document.getElementById('detalle-' + key);
+  if (!panel) return;
+  const detalle  = _getDetalle(key);
+  const sugs     = SUBCATEGORIAS[key] || [];
+  const activeKeys = new Set(detalle.map(d => d.key));
+
+  const chips = sugs.filter(s => !activeKeys.has(s.key)).map(s =>
+    `<button type="button" class="detalle-chip" title="${s.hint}"
+             onclick="addDetalleItem('${key}','${s.key}','${s.label}')">
+      <i data-lucide="plus"></i> ${s.label}
+    </button>`
+  ).join('');
+
+  const items = detalle.map(d => {
+    const val = d.monto > 0 ? d.monto.toLocaleString('es-CO') : '';
+    return `
+      <div class="detalle-item" id="detalle-item-${key}-${d.key}">
+        <span class="detalle-item__label">${d.label}</span>
+        <div class="detalle-item__input-wrap">
+          <span class="amount-input__prefix">$</span>
+          <input type="text" inputmode="numeric" class="amount-input__field detalle-item__input"
+                 value="${val}" placeholder="0"
+                 oninput="onDetalleInput('${key}','${d.key}',this)"
+                 aria-label="Monto de ${d.label}">
+          <span class="amount-input__suffix">al mes</span>
+        </div>
+        <button type="button" class="detalle-item__remove" aria-label="Quitar ${d.label}"
+                onclick="removeDetalleItem('${key}','${d.key}')">
+          <i data-lucide="x"></i>
+        </button>
+      </div>`;
+  }).join('');
+
+  const totalDetalle = detalle.reduce((s, d) => s + (d.monto || 0), 0);
+  const totalStr     = totalDetalle > 0 ? formatCOP(totalDetalle) + '/mes' : '';
+
+  panel.innerHTML = `
+    <div class="detalle-panel__inner">
+      ${items}
+      ${totalStr ? `<p class="detalle-panel__total">Total desglosado: <strong>${totalStr}</strong></p>` : ''}
+      ${chips ? `<div class="detalle-panel__chips">${chips}</div>` : ''}
+    </div>`;
+  refreshIcons();
+}
+
+function addDetalleItem(key, subkey, label) {
+  const detalle = _getDetalle(key);
+  if (detalle.find(d => d.key === subkey)) return;
+  detalle.push({ key: subkey, label, monto: 0 });
+  buildDetallePanel(key);
+}
+window.addDetalleItem = addDetalleItem;
+
+function onDetalleInput(key, subkey, input) {
+  const num = parseInt(input.value.replace(/\D/g, ''), 10) || 0;
+  input.value = num > 0 ? num.toLocaleString('es-CO') : '';
+  const detalle = _getDetalle(key);
+  const item    = detalle.find(d => d.key === subkey);
+  if (item) item.monto = num;
+  _syncDetalleToParent(key);
+  const panel = document.getElementById('detalle-' + key);
+  const totalDetalle = detalle.reduce((s, d) => s + (d.monto || 0), 0);
+  const totalEl = panel?.querySelector('.detalle-panel__total');
+  if (totalEl) {
+    totalEl.innerHTML = `Total desglosado: <strong>${formatCOP(totalDetalle)}/mes</strong>`;
+  } else if (totalDetalle > 0 && panel) {
+    const inner = panel.querySelector('.detalle-panel__inner');
+    if (inner) {
+      const p = document.createElement('p');
+      p.className = 'detalle-panel__total';
+      p.innerHTML = `Total desglosado: <strong>${formatCOP(totalDetalle)}/mes</strong>`;
+      inner.insertBefore(p, inner.querySelector('.detalle-panel__chips') || null);
+    }
+  }
+}
+window.onDetalleInput = onDetalleInput;
+
+function removeDetalleItem(key, subkey) {
+  if (key === 'vitales') state.vitalesDetalle = state.vitalesDetalle.filter(d => d.key !== subkey);
+  else state.deudasDetalle = state.deudasDetalle.filter(d => d.key !== subkey);
+  _syncDetalleToParent(key);
+  buildDetallePanel(key);
+}
+window.removeDetalleItem = removeDetalleItem;
 
 function onCustomMontoInput(input) {
   const num = parseInt(input.value.replace(/\D/g, ''), 10) || 0;
@@ -713,7 +1042,7 @@ function renderDiagnostico() {
 
   const bodyInline = document.getElementById('diag-body-inline');
   bodyInline.innerHTML = (perfil === 'riesgo')
-    ? `<p class="diag-body-note">Eso no significa que estés en una situación sin salida — este es un buen momento para entender qué está pasando con tu plata y tomar acción antes de que el desbalance se acumule.</p>`
+    ? `<p class="diag-body-note">Esto no significa que estés sin opciones. Es un buen momento para entender qué está pasando con tus finanzas y tomar decisiones antes de que el desequilibrio crezca.</p>`
     : '';
 
   // Alertas + chips de referencia (V5)
@@ -752,7 +1081,7 @@ function renderDiagnostico() {
   ctasEl.innerHTML = `
     <div class="ctas">
       <div class="ctas__head">
-        <h3 class="ctas__title">¿Listo para dar el siguiente paso?</h3>
+        <h3 class="ctas__title">¿Quieres dar el siguiente paso?</h3>
         <p class="ctas__sub">${perfil === 'riesgo'
           ? 'Entender tu situación es el primer paso. Veamos qué puedes hacer ahora.'
           : 'Con tu diagnóstico listo, puedes convertir ese margen en algo que trabaje por ti.'}</p>
@@ -798,12 +1127,12 @@ function generarAlertas(perfil, margenPct, margenPesos) {
 
   } else if (perfil === 'ajustado') {
     a.push({
-      text: `Tu margen libre es del <strong>${margenPct}%</strong>. Con un imprevisto, ese espacio puede achicarse rápido.`,
+      text: `Tu margen libre es del <strong>${margenPct}%</strong>. Ante un imprevisto, ese espacio puede reducirse rápidamente.`,
       ref: null
     });
     if (state.gustos + state.cotidianos > 20) {
       a.push({
-        text: `Tus gustos y gastos cotidianos representan el <strong>${state.gustos + state.cotidianos}%</strong> de tus ingresos. Ahí puede haber espacio para liberar algo.`,
+        text: `Tus gustos y gastos cotidianos representan el <strong>${state.gustos + state.cotidianos}%</strong> de tus ingresos. Puede haber espacio para reducirlos y ampliar tu margen.`,
         ref: null
       });
     }
@@ -819,11 +1148,11 @@ function generarAlertas(perfil, margenPct, margenPesos) {
   } else { // riesgo
     if (ing > 0) {
       a.push({
-        text: `Tus egresos superan tus ingresos en <strong>${formatCOP(Math.abs(margenPesos))}</strong> este mes.`,
+        text: `Tus gastos superan tus ingresos en <strong>${formatCOP(Math.abs(margenPesos))}</strong> este mes.`,
         ref: null
       });
     } else {
-      a.push({ text: 'Tus egresos superan tus ingresos este mes.', ref: null });
+      a.push({ text: 'Tus gastos superan tus ingresos este mes.', ref: null });
     }
     if (deuda > 30) {
       a.push({
@@ -850,9 +1179,9 @@ function generarAlertas(perfil, margenPct, margenPesos) {
 function renderCarousel(futuroPesos) {
   state._futuroPesos   = futuroPesos;
   const items = [
-    { icon: 'sprout', title: 'Tu primer fondo de inversión', hor: '1 año',   monto: futuroPesos * 12, desc: 'Tu plata trabajando para ti en fondos Skandia.', rec: true },
-    { icon: 'shield', title: 'Tu fondo de emergencia',       hor: '6 meses', monto: futuroPesos * 6,  desc: 'Un colchón para imprevistos sin endeudarte.', rec: false },
-    { icon: 'plane',  title: 'Tu meta de viaje o proyecto',  hor: '2 años',  monto: futuroPesos * 24, desc: 'Ahorra para ese sueño que tienes en mente.', rec: false }
+    { icon: 'shield', title: 'Tu fondo de emergencia',       hor: '6 meses', meses: 6,  monto: futuroPesos * 6,  desc: 'Un colchón para imprevistos sin endeudarte.', rec: true },
+    { icon: 'sprout', title: 'Tu primer fondo de inversión', hor: '1 año',   meses: 12, monto: futuroPesos * 12, desc: 'Tu dinero trabajando para ti en fondos Skandia.', rec: false },
+    { icon: 'plane',  title: 'Tu meta de viaje o proyecto',  hor: '2 años',  meses: 24, monto: futuroPesos * 24, desc: 'Ahorra para ese sueño que tienes en mente.', rec: false }
   ];
   state._carouselItems = items;
   const idx     = state._carouselIdx || 0;
@@ -873,6 +1202,11 @@ function renderCarousel(futuroPesos) {
           ${it.rec ? '<span class="proyeccion__badge">Recomendado</span>' : ''}
         </div>
         <p class="proyeccion__desc">${it.desc}</p>
+        <button type="button" class="btn btn--ghost btn--small proyeccion__ver-proy"
+                onclick="abrirModalProyeccion(${futuroPesos}, ${it.meses})">
+          <i data-lucide="trending-up"></i> Ver proyección de crecimiento
+        </button>
+        <p class="proyeccion__disclaimer-card">*Este es el ahorro que podrías acumular. Con Skandia, tienes la posibilidad de hacerlo crecer con los rendimientos del portafolio.</p>
       </div>
     </div>
   `).join('');
@@ -904,33 +1238,128 @@ function goCarousel(idx) {
 }
 window.goCarousel = goCarousel;
 
+// ─── Modal proyección de ahorro ────────────────────────────────────────
+const TASA_EA = 0.0718;
+let _chartInstance = null;
+
+function abrirModalProyeccion(futuroPesos, meses) {
+  const modal = document.getElementById('modal-proyeccion');
+  if (!modal) return;
+  document.getElementById('modal-proyeccion-sub').textContent =
+    `Ahorrando ${formatCOP(futuroPesos)} al mes en el Portafolio Liquidez Colombia`;
+  modal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  renderGraficaProyeccion(futuroPesos, meses);
+  refreshIcons();
+}
+window.abrirModalProyeccion = abrirModalProyeccion;
+
+function cerrarModalProyeccion() {
+  const modal = document.getElementById('modal-proyeccion');
+  if (modal) modal.hidden = true;
+  document.body.style.overflow = '';
+  if (_chartInstance) { _chartInstance.destroy(); _chartInstance = null; }
+}
+window.cerrarModalProyeccion = cerrarModalProyeccion;
+
+function renderGraficaProyeccion(futuroPesos, meses) {
+  const r = Math.pow(1 + TASA_EA, 1 / 12) - 1;
+  const labels = Array.from({ length: meses + 1 }, (_, m) => `Mes ${m}`);
+  const conSkandia  = labels.map((_, m) => m === 0 ? 0 : Math.round(futuroPesos * ((Math.pow(1 + r, m) - 1) / r)));
+  const sinInvertir = labels.map((_, m) => futuroPesos * m);
+
+  const canvas = document.getElementById('chart-proyeccion');
+  if (!canvas) return;
+  if (_chartInstance) { _chartInstance.destroy(); _chartInstance = null; }
+
+  const style = getComputedStyle(document.documentElement);
+  const c01 = style.getPropertyValue('--charts-c01').trim() || '#a1dd70';
+  const c02 = style.getPropertyValue('--charts-c02').trim() || '#a4d7e1';
+
+  _chartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Con Skandia',
+          data: conSkandia,
+          borderColor: c01,
+          backgroundColor: c01 + '22',
+          tension: 0.3,
+          pointRadius: 4,
+          fill: false
+        },
+        {
+          label: 'Sin invertir',
+          data: sinInvertir,
+          borderColor: c02,
+          backgroundColor: c02 + '22',
+          tension: 0.3,
+          pointRadius: 4,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${formatCOP(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        y: {
+          ticks: { callback: v => formatCOP(v) },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 //  PANTALLA 4 — CTAs DE AVANCE (R2)
 //  2 CTAs personalizados por perfil + botones de reset secundarios
 // ═══════════════════════════════════════════════════════════════════════
 const CTA_COPY = {
   saludable: {
-    primario:    'Habla con un Financial Planner',
-    notaPrimario:'Un Financial Planner puede ayudarte a hacer crecer tu ahorro, sin compromiso.',
-    secundario:  'Aprende a hacer crecer tu ahorro',
+    primario:       'Habla con un Financial Planner',
+    notaPrimario:   'Un Financial Planner puede ayudarte a hacer crecer tu ahorro, sin compromiso.',
+    secundario:     'Aprende a hacer crecer tu ahorro',
     notaSecundario: 'Contenido práctico de Skandia para potenciar tu margen.',
     intro: 'Tu flujo está saludable. Es el momento ideal para que tu ahorro trabaje más por ti.'
   },
   ajustado: {
-    primario:    'Habla con un Financial Planner',
-    notaPrimario:'Hay espacio para mejorar. Un Financial Planner puede mostrarte cómo.',
-    secundario:  'Aprende a mejorar tu presupuesto',
+    primario:       'Habla con un Financial Planner',
+    notaPrimario:   'Hay espacio para mejorar. Un Financial Planner puede mostrarte cómo.',
+    secundario:     'Aprende a mejorar tu presupuesto',
     notaSecundario: 'Guías y videos de Skandia para optimizar tu distribución de gastos.',
     intro: 'Tu margen es estrecho, pero hay acciones concretas que puedes tomar hoy.'
   },
   riesgo: {
-    primario:    'Habla con un asesor',
-    notaPrimario:'No estás solo. Un asesor puede acompañarte con pasos concretos.',
-    secundario:  'Aprende a estabilizar tus finanzas',
-    notaSecundario: 'Recursos de Skandia para estabilizar tu flujo paso a paso.',
-    intro: 'Tus gastos superan tus ingresos. Hay pasos que puedes tomar ahora mismo.'
+    // Sin CTA de asesor — solo contenido educativo y PDF
+    secundario:     'Aprende a estabilizar tus finanzas',
+    notaSecundario: 'Recursos de Skandia para estabilizar tu flujo, paso a paso.',
+    intro: 'Tus gastos superan tus ingresos. Estos recursos pueden ayudarte a tomar el control.'
   }
 };
+
+function _buildPDFcta() {
+  return `
+    <button type="button" class="cta-card cta-card--pdf" onclick="enviarPDF()">
+      <div class="cta-card__icon"><i data-lucide="file-text"></i></div>
+      <div class="cta-card__body">
+        <p class="cta-card__title">Recibir diagnóstico en PDF</p>
+        <p class="cta-card__note">Recibirás el resumen completo en tu correo.</p>
+      </div>
+      <span class="cta-card__arrow"><i data-lucide="send"></i></span>
+    </button>`;
+}
 
 function renderPantallaCTAs() {
   const perfil = calcularPerfil();
@@ -938,6 +1367,18 @@ function renderPantallaCTAs() {
   const p      = PERFILES[perfil];
   const el     = document.getElementById('ctas-content');
   if (!el) return;
+
+  const ctaAsesor = (perfil !== 'riesgo') ? `
+      <div class="cta-card cta-card--primary">
+        <div class="cta-card__icon"><i data-lucide="headphones"></i></div>
+        <div class="cta-card__body">
+          <p class="cta-card__title">${copy.primario}</p>
+          <p class="cta-card__note">${copy.notaPrimario}</p>
+        </div>
+        <button type="button" class="btn btn--primary btn--small" onclick="abrirModalAsesor()">
+          Hablar <i data-lucide="arrow-right"></i>
+        </button>
+      </div>` : '';
 
   el.innerHTML = `
     <div class="ctas-hero">
@@ -953,16 +1394,7 @@ function renderPantallaCTAs() {
     </div>
 
     <div class="ctas-actions">
-      <div class="cta-card cta-card--primary">
-        <div class="cta-card__icon"><i data-lucide="headphones"></i></div>
-        <div class="cta-card__body">
-          <p class="cta-card__title">${copy.primario}</p>
-          <p class="cta-card__note">${copy.notaPrimario}</p>
-        </div>
-        <button type="button" class="btn btn--primary btn--small">
-          Agendar <i data-lucide="arrow-right"></i>
-        </button>
-      </div>
+      ${ctaAsesor}
 
       <a href="https://channel.skandia.com.co/" target="_blank" rel="noopener"
          class="cta-card cta-card--secondary"
@@ -974,14 +1406,60 @@ function renderPantallaCTAs() {
         </div>
         <span class="cta-card__arrow"><i data-lucide="external-link"></i></span>
       </a>
+
+      ${_buildPDFcta()}
     </div>
   `;
   refreshIcons();
 }
 
+// ─── Toast de confirmación ────────────────────────────────────────────
+function mostrarToast(msg) {
+  const existing = document.querySelector('.sim-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'sim-toast';
+  toast.setAttribute('role', 'status');
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('sim-toast--visible'));
+  setTimeout(() => {
+    toast.classList.remove('sim-toast--visible');
+    setTimeout(() => toast.remove(), 400);
+  }, 4000);
+}
+
+function enviarPDF() {
+  const channel = state.channel;
+  let msg;
+  if (channel === 'publico' && state.lead?.email) {
+    msg = `Tu diagnóstico fue enviado a ${state.lead.email}`;
+  } else {
+    msg = 'Tu diagnóstico fue enviado a tu correo registrado en Skandia';
+  }
+  mostrarToast(msg);
+}
+window.enviarPDF = enviarPDF;
+
 // ─── Reiniciar ────────────────────────────────────────────────────────
 function reiniciar() {
-  if (!window.confirm('¿Seguro que quieres volver a empezar? Se borrarán todos los datos ingresados.')) return;
+  const overlay = document.getElementById('modal-reinicio');
+  if (overlay) {
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+}
+window.reiniciar = reiniciar;
+
+function cerrarModalReinicio() {
+  const overlay = document.getElementById('modal-reinicio');
+  if (overlay) overlay.hidden = true;
+  document.body.style.overflow = '';
+}
+window.cerrarModalReinicio = cerrarModalReinicio;
+
+function confirmarReinicio() {
+  cerrarModalReinicio();
   state.vitales    = 30;
   state.deudas     = 20;
   state.gustos     = 15;
@@ -989,12 +1467,31 @@ function reiniciar() {
   state.futuro     = 10;
   state.periodicidades = { vitales: 'mensual', deudas: 'mensual', gustos: 'mensual', cotidianos: 'mensual', futuro: 'mensual' };
   state.otros = [];
+  state.vitalesDetalle = [];
+  state.deudasDetalle  = [];
+  state._detalleOpen   = { vitales: false, deudas: false };
+  state._nextFuenteId  = 1;
+  state._nextOtroId    = 1;
+  state._carouselIdx   = 0;
+  state._futuroPesos   = 0;
+  // Limpiar formulario de lead en DOM
+  const nombre  = document.getElementById('lead-nombre');
+  const email   = document.getElementById('lead-email');
+  const tel     = document.getElementById('lead-telefono');
+  const consent = document.getElementById('lead-consent-check');
+  if (nombre)  nombre.value  = '';
+  if (email)   email.value   = '';
+  if (tel)     tel.value     = '';
+  if (consent) consent.checked = false;
+  // Limpiar errores visibles
+  document.querySelectorAll('.field__error').forEach(el => { el.textContent = ''; el.hidden = true; });
+  document.querySelectorAll('.field__input--error').forEach(el => el.classList.remove('field__input--error'));
   setCanal(state.channel);
   buildSliders();
   updateDistribucion();
   ir('s-entrada');
 }
-window.reiniciar = reiniciar;
+window.confirmarReinicio = confirmarReinicio;
 
 // ─── Touch swipe carousel ─────────────────────────────────────────────
 (function () {
@@ -1010,10 +1507,207 @@ window.reiniciar = reiniciar;
   }, { passive: true });
 })();
 
+// ─── Modal Financial Planner ──────────────────────────────────────────
+function abrirModalAsesor() {
+  const overlay = document.getElementById('modal-asesor');
+  if (!overlay) return;
+
+  if (state.channel === 'publico') {
+    const l = state.lead;
+    overlay.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-fp-title">
+        <h2 class="modal__title" id="modal-fp-title">¿Necesitas ayuda?</h2>
+        <p class="modal__desc">Déjanos tus datos y un asesor de Skandia se comunicará contigo para ayudarte.</p>
+
+        <div class="modal__form">
+          <div class="field">
+            <div class="field__label-row">
+              <label class="field__label" for="mf-nombre">Nombre completo <span class="modal__req">*</span></label>
+            </div>
+            <div class="field__input-wrap">
+              <input type="text" id="mf-nombre" class="field__input" placeholder="Tu nombre"
+                     value="${(l.nombre || '').replace(/"/g, '&quot;')}" autocomplete="name">
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field__label-row">
+              <label class="field__label" for="mf-email">Correo electrónico <span class="modal__req">*</span></label>
+            </div>
+            <div class="field__input-wrap">
+              <input type="email" id="mf-email" class="field__input" placeholder="tu@correo.com"
+                     value="${(l.email || '').replace(/"/g, '&quot;')}" autocomplete="email">
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field__label-row">
+              <label class="field__label" for="mf-tel">
+                Teléfono <span class="modal__label--opt">(opcional)</span>
+              </label>
+            </div>
+            <div class="modal__phone-row">
+              <select id="mf-indicativo" class="modal__indicativo" aria-label="Indicativo del país">
+                <option value="+57"${(l.indicativo||'+57')==='+57'?' selected':''}>🇨🇴 +57</option>
+                <option value="+1"${l.indicativo==='+1'?' selected':''}>🇺🇸 +1</option>
+                <option value="+34"${l.indicativo==='+34'?' selected':''}>🇪🇸 +34</option>
+                <option value="+52"${l.indicativo==='+52'?' selected':''}>🇲🇽 +52</option>
+                <option value="+54"${l.indicativo==='+54'?' selected':''}>🇦🇷 +54</option>
+              </select>
+              <div class="field__input-wrap" style="flex:1">
+                <input type="tel" id="mf-tel" class="field__input" placeholder="300 123 4567"
+                       value="${(l.telefono || '').replace(/"/g, '&quot;')}" inputmode="numeric" autocomplete="tel">
+              </div>
+            </div>
+          </div>
+
+          <div class="hint">
+            <span class="hint__icon"><i data-lucide="info"></i></span>
+            <p class="hint__text">Al enviar tus datos, un asesor de Skandia se pondrá en contacto contigo para brindarte orientación personalizada.</p>
+          </div>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" class="btn btn--secondary btn--grow" onclick="cerrarModalAsesor()">Cancelar</button>
+          <button type="button" class="btn btn--primary btn--grow" onclick="enviarModalAsesor()">
+            <i data-lucide="send"></i> Enviar datos
+          </button>
+        </div>
+      </div>`;
+
+  } else {
+    const a = (window.SIM_DEFAULTS && window.SIM_DEFAULTS.asesor) || {
+      nombre: 'Skandia Colombia', correo: 'asesoria@skandia.com.co', celular: '+57 601 658 0000'
+    };
+    overlay.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-fp-title">
+        <h2 class="modal__title" id="modal-fp-title">Contacta a tu asesor</h2>
+        <p class="modal__desc">Estos son los datos de contacto de tu asesor para que puedas comunicarte directamente:</p>
+
+        <div class="modal__asesor-card">
+          <div class="modal__asesor-row">
+            <span class="modal__asesor-icon"><i data-lucide="user"></i></span>
+            <div>
+              <p class="modal__asesor-label">Nombre</p>
+              <p class="modal__asesor-value">${a.nombre}</p>
+            </div>
+          </div>
+          <div class="modal__asesor-row">
+            <span class="modal__asesor-icon"><i data-lucide="mail"></i></span>
+            <div>
+              <p class="modal__asesor-label">Correo</p>
+              <p class="modal__asesor-value">${a.correo}</p>
+            </div>
+          </div>
+          <div class="modal__asesor-row">
+            <span class="modal__asesor-icon"><i data-lucide="phone"></i></span>
+            <div>
+              <p class="modal__asesor-label">Celular</p>
+              <p class="modal__asesor-value">${a.celular}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">
+          <span class="hint__icon"><i data-lucide="info"></i></span>
+          <p class="hint__text">Al aceptar, también le comunicaremos a tu asesor tu necesidad de contacto para que puedan asistirte de manera oportuna.</p>
+        </div>
+
+        <div class="modal__actions">
+          <button type="button" class="btn btn--secondary btn--grow" onclick="cerrarModalAsesor()">Cancelar</button>
+          <button type="button" class="btn btn--primary btn--grow" onclick="confirmarAsesor()">
+            <i data-lucide="check"></i> Aceptar
+          </button>
+        </div>
+      </div>`;
+  }
+
+  overlay.hidden = false;
+  document.body.style.overflow = 'hidden';
+  refreshIcons();
+}
+
+function cerrarModalAsesor() {
+  const overlay = document.getElementById('modal-asesor');
+  if (overlay) overlay.hidden = true;
+  document.body.style.overflow = '';
+}
+
+function enviarModalAsesor() {
+  const nombre = document.getElementById('mf-nombre')?.value.trim();
+  const email  = document.getElementById('mf-email')?.value.trim();
+  if (!nombre || !email) {
+    mostrarToast('Por favor completa los campos requeridos.');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    mostrarToast('Ingresa un correo electrónico válido.');
+    return;
+  }
+  cerrarModalAsesor();
+  _mostrarConfirmacion('publico');
+}
+
+function confirmarAsesor() {
+  cerrarModalAsesor();
+  _mostrarConfirmacion('cliente');
+}
+
+function _mostrarConfirmacion(origen) {
+  const overlay = document.getElementById('modal-confirmacion');
+  if (!overlay) return;
+  const msg = origen === 'cliente'
+    ? 'Le hemos comunicado a tu asesor tu necesidad de contacto. Pronto se pondrá en comunicación contigo.'
+    : 'Hemos recibido tu información. Un asesor de Skandia se pondrá en contacto contigo pronto.';
+
+  overlay.innerHTML = `
+    <div class="modal modal--confirm" role="dialog" aria-modal="true" aria-labelledby="modal-conf-title">
+      <div class="modal__success-icon"><i data-lucide="check"></i></div>
+      <h2 class="modal__title" id="modal-conf-title">¡Datos enviados!</h2>
+      <p class="modal__desc">${msg}</p>
+      <button type="button" class="btn btn--primary btn--full" onclick="cerrarModalConfirmacion()">Cerrar</button>
+    </div>`;
+
+  overlay.hidden = false;
+  document.body.style.overflow = 'hidden';
+  refreshIcons();
+}
+
+function cerrarModalConfirmacion() {
+  const overlay = document.getElementById('modal-confirmacion');
+  if (overlay) overlay.hidden = true;
+  document.body.style.overflow = '';
+}
+
+// Cierra cualquier modal al hacer click en el backdrop
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal-overlay')) {
+    cerrarModalAsesor();
+    cerrarModalConfirmacion();
+  }
+});
+
+// Cierra con Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    cerrarModalAsesor();
+    cerrarModalConfirmacion();
+    cerrarModalReinicio();
+    cerrarModalProyeccion();
+  }
+});
+
+window.abrirModalAsesor        = abrirModalAsesor;
+window.cerrarModalAsesor       = cerrarModalAsesor;
+window.enviarModalAsesor       = enviarModalAsesor;
+window.confirmarAsesor         = confirmarAsesor;
+window.cerrarModalConfirmacion = cerrarModalConfirmacion;
+
 // ─── Init ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   const canal = new URLSearchParams(window.location.search).get('canal');
   if (canal === 'publico' || canal === 'cliente') state.channel = canal;
+  document.body.dataset.screen = 's-entrada';
   buildSliders();
   setCanal(state.channel);
   updateDistribucion();
