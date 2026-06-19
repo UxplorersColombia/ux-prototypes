@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rentabilidades Skandia</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --sk-green:   #00c73d;
+  --sk-green-d: #007c26;
+  --sk-green-l: #f0faf3;
+  --sk-grey:    #404040;
+  --sk-grey2:   #666666;
+  --sk-grey3:   #a5a5a5;
+  --sk-bg:      #f4f6f8;
+  --sk-white:   #ffffff;
+  --sk-border:  #e0e0e0;
+  --sk-blue:    #0099de;
+  --sk-warn:    #ffae08;
+  --sk-red:     #e03430;
+  --sk-up:      #00c73d;
+  --sk-dn:      #e03430;
+  --sidebar-w:  220px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--sk-bg); color: var(--sk-grey); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* —— TOPBAR —— */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 56px; background: var(--sk-grey);
+  display: flex; align-items: center; padding: 0 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  gap: 20px;
+}
+.tb-logo { display: flex; align-items: center; gap: 10px; }
+.tb-logo-box {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--sk-green); display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 15px; color: #000;
+}
+.tb-name { font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.02em; }
+.tb-divider { width: 1px; height: 22px; background: rgba(255,255,255,0.15); }
+.tb-title { font-size: 13px; color: rgba(255,255,255,0.65); }
+.tb-spacer { flex: 1; }
+.tb-btn {
+  font-size: 12px; font-weight: 600; padding: 7px 16px;
+  border-radius: 20px; border: none; cursor: pointer;
+  background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8);
+  transition: background 0.15s;
+}
+.tb-btn:hover { background: rgba(255,255,255,0.2); }
+.tb-btn.primary { background: var(--sk-green); color: #000; }
+.tb-date { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 8px; }
+
+/* —— LAYOUT —— */
+.layout { display: flex; padding-top: 56px; min-height: 100vh; }
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--sk-white);
+  border-right: 1px solid var(--sk-border);
+  position: fixed; top: 56px; bottom: 0; left: 0;
+  overflow-y: auto; padding: 20px 0;
+}
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 24px; }
+
+/* —— SIDEBAR NAV —— */
+.nav-section { padding: 0 12px 8px; }
+.nav-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--sk-grey3);
+  padding: 0 8px; margin-bottom: 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px;
+  cursor: pointer; font-size: 13px; font-weight: 500;
+  color: var(--sk-grey2); transition: all 0.15s;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--sk-bg); color: var(--sk-grey); }
+.nav-item.active { background: var(--sk-green-l); color: var(--sk-green-d); font-weight: 700; }
+.nav-ico { font-size: 15px; width: 20px; text-align: center; }
+.nav-divider { height: 1px; background: var(--sk-border); margin: 10px 12px; }
+
+/* —— CONTENT HEADER —— */
+.content-header { margin-bottom: 20px; }
+.content-title { font-size: 22px; font-weight: 800; color: var(--sk-grey); margin-bottom: 4px; }
+.content-sub { font-size: 13px; color: var(--sk-grey3); }
+
+/* —— TABS —— */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--sk-border); padding-bottom: 0; }
+.tab {
+  font-size: 13px; font-weight: 600; padding: 10px 18px;
+  border: none; background: none; cursor: pointer;
+  color: var(--sk-grey3); border-bottom: 2px solid transparent;
+  margin-bottom: -2px; transition: all 0.15s;
+}
+.tab:hover { color: var(--sk-grey); }
+.tab.active { color: var(--sk-green-d); border-bottom-color: var(--sk-green); }
+
+/* —— SECTION —— */
+.section { display: none; }
+.section.active { display: block; }
+
+/* —— KPI ROW —— */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+.kpi-card {
+  background: var(--sk-white); border-radius: 10px;
+  border: 1px solid var(--sk-border);
+  padding: 16px 18px;
+}
+.kpi-label { font-size: 11px; color: var(--sk-grey3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.kpi-val { font-size: 24px; font-weight: 800; color: var(--sk-grey); line-height: 1; }
+.kpi-sub { font-size: 11px; color: var(--sk-grey3); margin-top: 4px; }
+.kpi-trend { font-size: 12px; font-weight: 700; margin-top: 4px; }
+.up { color: var(--sk-up); }
+.dn { color: var(--sk-dn); }
+
+/* —— TABLE —— */
+.table-card {
+  background: var(--sk-white); border-radius: 10px;
+  border: 1px solid var(--sk-border); overflow: hidden;
+  margin-bottom: 20px;
+}
+.table-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--sk-border);
+}
+.table-title { font-size: 14px; font-weight: 700; }
+.table-actions { display: flex; gap: 8px; }
+.action-btn {
+  font-size: 11px; font-weight: 600; padding: 5px 12px;
+  border-radius: 14px; border: 1px solid var(--sk-border);
+  cursor: pointer; background: var(--sk-white); color: var(--sk-grey2);
+  transition: all 0.15s;
+}
+.action-btn:hover { border-color: var(--sk-green); color: var(--sk-green-d); }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--sk-grey3);
+  padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--sk-border);
+  background: #fafafa;
+}
+th.num, td.num { text-align: right; }
+tbody tr { border-bottom: 1px solid var(--sk-border); transition: background 0.1s; cursor: pointer; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f7fbf8; }
+tbody tr.selected { background: var(--sk-green-l); }
+td { padding: 11px 16px; font-size: 13px; }
+.fund-name { font-weight: 600; color: var(--sk-grey); }
+.fund-type { font-size: 11px; color: var(--sk-grey3); margin-top: 2px; }
+.risk-badge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+}
+.risk-c { background: #dcfce7; color: #166534; }
+.risk-m { background: #fef9c3; color: #854d0e; }
+.risk-a { background: #fee2e2; color: #991b1b; }
+.risk-ma { background: #f3e8ff; color: #581c87; }
+.return-up { color: var(--sk-up); font-weight: 700; }
+.return-dn { color: var(--sk-dn); font-weight: 700; }
+.sparkline-cell { width: 80px; }
+canvas.spark { width: 80px !important; height: 32px !important; }
+.compare-btn {
+  font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 10px;
+  border: 1px solid var(--sk-border);
+  cursor: pointer; background: var(--sk-white); color: var(--sk-grey2);
+  white-space: nowrap;
+}
+.compare-btn.added { background: var(--sk-green-l); border-color: var(--sk-green); color: var(--sk-green-d); }
+
+/* —— DETAIL PANEL —— */
+.detail-panel {
+  background: var(--sk-white); border-radius: 10px;
+  border: 1px solid var(--sk-border); margin-bottom: 20px;
+  overflow: hidden;
+}
+.detail-panel-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--sk-border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.detail-panel-title { font-size: 16px; font-weight: 800; }
+.detail-panel-close {
+  font-size: 20px; font-weight: 400; color: var(--sk-grey3);
+  cursor: pointer; border: none; background: none; line-height: 1;
+}
+.detail-panel-body { padding: 20px; }
+.detail-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+.detail-stats { display: flex; flex-direction: column; gap: 10px; }
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sk-border); }
+.stat-row:last-child { border-bottom: none; }
+.stat-label { font-size: 12px; color: var(--sk-grey2); }
+.stat-val { font-size: 14px; font-weight: 700; }
+.detail-chart-wrap { position: relative; height: 200px; }
+
+/* —— COMPARE PANEL —— */
+.compare-panel {
+  background: var(--sk-white); border-radius: 10px;
+  border: 2px solid var(--sk-green);
+  margin-bottom: 20px; overflow: hidden;
+}
+.compare-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--sk-border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.compare-title { font-size: 14px; font-weight: 700; color: var(--sk-green-d); }
+.compare-clear {
+  font-size: 12px; font-weight: 600; color: var(--sk-grey3);
+  cursor: pointer; border: none; background: none;
+}
+.compare-body { padding: 16px 20px; }
+.compare-chart-wrap { position: relative; height: 180px; margin-bottom: 16px; }
+.compare-table table { width: 100%; }
+.compare-table td { padding: 8px 12px; font-size: 12px; border-bottom: 1px solid var(--sk-border); }
+.compare-table thead th { font-size: 10px; }
+.fund-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+/* —— SIMULATOR —— */
+.sim-card {
+  background: var(--sk-white); border-radius: 10px;
+  border: 1px solid var(--sk-border); margin-bottom: 20px;
+}
+.sim-header { padding: 14px 20px; border-bottom: 1px solid var(--sk-border); }
+.sim-body { padding: 20px; }
+.sim-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; }
+.sim-inputs { display: flex; flex-direction: column; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sk-grey3); }
+.form-input, .form-select {
+  padding: 9px 12px; border: 1px solid var(--sk-border);
+  border-radius: 8px; font-size: 13px; color: var(--sk-grey);
+  background: var(--sk-white); outline: none; width: 100%;
+}
+.form-input:focus, .form-select:focus { border-color: var(--sk-green); }
+.run-btn {
+  padding: 11px; border-radius: 8px; border: none;
+  background: var(--sk-green); color: #000; font-weight: 700;
+  font-size: 13px; cursor: pointer; transition: background 0.15s;
+}
+.run-btn:hover { background: #00b836; }
+.sim-result {
+  display: none; margin-top: 12px;
+  background: var(--sk-green-l); border-radius: 8px;
+  padding: 14px; text-align: center;
+}
+.sim-result.visible { display: block; }
+.sim-result-label { font-size: 11px; color: var(--sk-grey2); margin-bottom: 4px; }
+.sim-result-val { font-size: 28px; font-weight: 800; color: var(--sk-green-d); }
+.sim-result-sub { font-size: 12px; color: var(--sk-grey3); margin-top: 4px; }
+.sim-chart-wrap { position: relative; height: 220px; }
+
+/* —— PERFIL SECTION —— */
+.perfil-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+.perfil-card {
+  background: var(--sk-white); border-radius: 10px;
+  border: 1px solid var(--sk-border); padding: 18px;
+  cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.perfil-card:hover { border-color: var(--sk-green); box-shadow: 0 0 0 2px rgba(0,199,61,0.12); }
+.perfil-card.active { border-color: var(--sk-green); background: var(--sk-green-l); }
+.perfil-icon { font-size: 28px; margin-bottom: 8px; }
+.perfil-name { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+.perfil-desc { font-size: 12px; color: var(--sk-grey2); line-height: 1.5; }
+.perfil-return { font-size: 22px; font-weight: 800; color: var(--sk-green-d); margin-top: 10px; }
+.perfil-return-label { font-size: 11px; color: var(--sk-grey3); }
+
+/* —— ENTITY TABS —— */
+.entity-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.entity-tab {
+  font-size: 12px; font-weight: 600; padding: 7px 16px;
+  border-radius: 20px; border: 1px solid var(--sk-border);
+  cursor: pointer; background: var(--sk-white); color: var(--sk-grey2);
+  transition: all 0.15s;
+}
+.entity-tab:hover { border-color: var(--sk-green); color: var(--sk-green-d); }
+.entity-tab.active { background: var(--sk-green); color: #000; border-color: var(--sk-green); font-weight: 700; }
+
+/* —— PLACEHOLDER —— */
+.placeholder { text-align: center; padding: 40px 20px; color: var(--sk-grey3); font-size: 14px; }
+
+/* —— RESPONSIVE —— */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .detail-grid, .sim-grid, .perfil-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-logo">
+    <div class="tb-logo-box">S</div>
+    <span class="tb-name">Skandia</span>
+  </div>
+  <div class="tb-divider"></div>
+  <span class="tb-title">Portal de Rentabilidades</span>
+  <div class="tb-spacer"></div>
+  <button class="tb-btn">Descargar fichas técnicas</button>
+  <button class="tb-btn primary">Mi portafolio</button>
+  <span class="tb-date">Cierre: 16 jun 2026</span>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">Explorar</div>
+      <button class="nav-item active" onclick="nav('entidad')">
+        <span class="nav-ico">🏛</span> Por entidad
+      </button>
+      <button class="nav-item" onclick="nav('perfil')">
+        <span class="nav-ico">🎯</span> Por perfil
+      </button>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">
+      <div class="nav-label">Herramientas</div>
+      <button class="nav-item" onclick="nav('simulador')">
+        <span class="nav-ico">🧮</span> Simulador
+      </button>
+      <button class="nav-item" onclick="nav('comparador')">
+        <span class="nav-ico">⚖️</span> Comparador
+      </button>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">
+      <div class="nav-label">Recursos</div>
+      <button class="nav-item">
+        <span class="nav-ico">📄</span> Fichas técnicas
+      </button>
+      <button class="nav-item">
+        <span class="nav-ico">❓</span> Glosario
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ——————————— POR ENTIDAD ——————————— -->
+    <div id="sec-entidad" class="section active">
+      <div class="content-header">
+        <div class="content-title">Rentabilidades por entidad</div>
+        <div class="content-sub">Portafolios activos · Cierre 16 de junio de 2026</div>
+      </div>
+
+      <div class="entity-tabs" id="entityTabs">
+        <button class="entity-tab active" onclick="selectEntity('pensiones', this)">Pensiones Voluntarias</button>
+        <button class="entity-tab" onclick="selectEntity('fiduciaria', this)">Fiduciaria</button>
+        <button class="entity-tab" onclick="selectEntity('seguros', this)">Seguros</button>
+        <button class="entity-tab" onclick="selectEntity('valores', this)">Valores</button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-row" id="kpiRow">
+        <div class="kpi-card"><div class="kpi-label">Fondos activos</div><div class="kpi-val" id="k-fondos">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Mejor rent. 1 año</div><div class="kpi-val up" id="k-best">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Promedio rent. 1 año</div><div class="kpi-val" id="k-avg">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Peor rent. 1 año</div><div class="kpi-val" id="k-worst">—</div></div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-card" id="fundsTableCard">
+        <div class="table-header">
+          <span class="table-title" id="tableTitle">Fondos</span>
+          <div class="table-actions">
+            <button class="action-btn" onclick="openComparador()">⚖️ Comparar selección</button>
+            <button class="action-btn" onclick="">📤 Exportar</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Fondo</th>
+              <th>Tipo</th>
+              <th>Riesgo</th>
+              <th class="num">Día</th>
+              <th class="num">30 días</th>
+              <th class="num">6 meses</th>
+              <th class="num">1 año</th>
+              <th class="sparkline-cell">Tendencia</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="fundsBody"></tbody>
+        </table>
+      </div>
+
+      <!-- DETAIL PANEL -->
+      <div class="detail-panel" id="detailPanel" style="display:none;">
+        <div class="detail-panel-header">
+          <span class="detail-panel-title" id="detailTitle">—</span>
+          <button class="detail-panel-close" onclick="closeDetail()">×</button>
+        </div>
+        <div class="detail-panel-body">
+          <div class="detail-grid">
+            <div class="detail-stats" id="detailStats"></div>
+            <div>
+              <div class="form-label" style="margin-bottom:8px;">Rentabilidad histórica</div>
+              <div class="detail-chart-wrap"><canvas id="detailChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPARE PANEL -->
+      <div class="compare-panel" id="comparePanel" style="display:none;">
+        <div class="compare-header">
+          <span class="compare-title">⚖️ Comparando fondos (<span id="cmpCount">0</span>/3)</span>
+          <button class="compare-clear" onclick="clearCompare()">Limpiar comparador</button>
+        </div>
+        <div class="compare-body">
+          <div class="compare-chart-wrap"><canvas id="cmpChart"></canvas></div>
+          <div class="compare-table" id="compareTable"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ——————————— POR PERFIL ——————————— -->
+    <div id="sec-perfil" class="section">
+      <div class="content-header">
+        <div class="content-title">Rentabilidades por perfil de riesgo</div>
+        <div class="content-sub">Selecciona tu perfil para ver los fondos recomendados</div>
+      </div>
+      <div class="perfil-grid" id="perfilGrid"></div>
+      <div id="perfilFunds"></div>
+    </div>
+
+    <!-- ——————————— SIMULADOR ——————————— -->
+    <div id="sec-simulador" class="section">
+      <div class="content-header">
+        <div class="content-title">Simulador de inversión</div>
+        <div class="content-sub">Proyecta el crecimiento de tu inversión con aportes periódicos</div>
+      </div>
+      <div class="sim-card">
+        <div class="sim-header"><span class="table-title">Configura tu simulación</span></div>
+        <div class="sim-body">
+          <div class="sim-grid">
+            <div class="sim-inputs">
+              <div class="form-group">
+                <div class="form-label">Aporte inicial</div>
+                <input class="form-input" id="simAporte" type="number" min="0" step="100000" value="5000000" placeholder="Ej: 5.000.000">
+              </div>
+              <div class="form-group">
+                <div class="form-label">Aporte mensual</div>
+                <input class="form-input" id="simMensual" type="number" min="0" step="50000" value="500000" placeholder="Ej: 500.000">
+              </div>
+              <div class="form-group">
+                <div class="form-label">Plazo (años)</div>
+                <input class="form-input" id="simPlazo" type="number" min="1" max="30" value="5">
+              </div>
+              <div class="form-group">
+                <div class="form-label">Fondo</div>
+                <select class="form-select" id="simFondo"></select>
+              </div>
+              <button class="run-btn" onclick="runSimulator()">Calcular proyección</button>
+              <div class="sim-result" id="simResult">
+                <div class="sim-result-label">Valor proyectado</div>
+                <div class="sim-result-val" id="simResultVal">—</div>
+                <div class="sim-result-sub" id="simResultSub">—</div>
+              </div>
+            </div>
+            <div class="sim-chart-wrap"><canvas id="simChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ——————————— COMPARADOR ——————————— -->
+    <div id="sec-comparador" class="section">
+      <div class="content-header">
+        <div class="content-title">Comparador de fondos</div>
+        <div class="content-sub">Selecciona hasta 3 fondos desde la tabla de entidad y compáralos aquí</div>
+      </div>
+      <div class="placeholder" id="cmpPlaceholder">Ve a "Por entidad" y usa el botón <strong>Comparar</strong> en cada fondo para añadirlos.</div>
+      <div id="cmpSecContent" style="display:none;">
+        <div class="compare-panel" style="border:1px solid var(--sk-border);">
+          <div class="compare-header">
+            <span class="compare-title">Comparativo de rentabilidades</span>
+            <button class="compare-clear" onclick="clearCompare(); nav('comparador')">Limpiar</button>
+          </div>
+          <div class="compare-body">
+            <div class="compare-chart-wrap"><canvas id="cmpChartSec"></canvas></div>
+            <div class="compare-table" id="cmpTableSec"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ===== DATA ===== */
+const FUNDS = {
+  pensiones: [
+    { id:'pv1', name:'Skandia Acciones Colombia', desc:'Inversión en acciones locales de alta capitalización', type:'Renta Variable', risk:'alto',
+      val:1842.32, r1:0.04, r30:1.12, r180:6.8, r365:14.2, trend:[11,9,13,15,12,14,14.2] },
+    { id:'pv2', name:'Skandia Conservador', desc:'Portafolio de renta fija y activos líquidos', type:'Renta Fija', risk:'conservador',
+      val:1210.88, r1:0.02, r30:0.62, r180:3.4, r365:7.8, trend:[7,7.2,7.5,7.8,7.7,7.9,7.8] },
+    { id:'pv3', name:'Skandia Moderado', desc:'Mezcla equilibrada de renta fija y variable', type:'Balanceado', risk:'moderado',
+      val:1520.14, r1:0.03, r30:0.88, r180:5.1, r365:10.5, trend:[9,9.5,10,10.3,10.1,10.4,10.5] },
+    { id:'pv4', name:'Skandia Dólar', desc:'Exposición a activos denominados en USD', type:'Divisa', risk:'moderado-alto',
+      val:2150.72, r1:0.05, r30:1.44, r180:8.2, r365:18.6, trend:[12,14,16,18,17,18,18.6] },
+    { id:'pv5', name:'Skandia Global Diversificado', desc:'Acciones y bonos de mercados desarrollados y emergentes', type:'Global', risk:'alto',
+      val:1980.44, r1:0.06, r30:1.32, r180:7.4, r365:16.3, trend:[10,12,14,15,16,16,16.3] },
+  ],
+  fiduciaria: [
+    { id:'fi1', name:'Skandia FIC Efectivo', desc:'Fondo de inversión colectiva a la vista', type:'Liquidez', risk:'conservador',
+      val:1058.22, r1:0.01, r30:0.48, r180:2.8, r365:5.9, trend:[5.5,5.6,5.7,5.8,5.9,5.9,5.9] },
+    { id:'fi2', name:'Skandia FIC Renta', desc:'Portafolio de deuda corporativa y TES', type:'Renta Fija', risk:'conservador',
+      val:1320.56, r1:0.02, r30:0.74, r180:4.2, r365:8.6, trend:[7,7.5,8,8.3,8.5,8.6,8.6] },
+    { id:'fi3', name:'Skandia FIC Crecimiento', desc:'Mixto con sesgo a renta variable local', type:'Balanceado', risk:'moderado',
+      val:1660.18, r1:0.04, r30:1.1, r180:6.0, r365:12.4, trend:[9,10,11,12,12.1,12.3,12.4] },
+    { id:'fi4', name:'Skandia FIC Internacional', desc:'Exposición a mercados globales', type:'Global', risk:'alto',
+      val:2020.90, r1:0.05, r30:1.38, r180:7.8, r365:15.8, trend:[11,12,13,15,15.5,15.7,15.8] },
+  ],
+  seguros: [
+    { id:'sg1', name:'Skandia Vida Ahorro Conservador', desc:'Producto de vida con componente de ahorro conservador', type:'Seguros Ahorro', risk:'conservador',
+      val:1180.44, r1:0.02, r30:0.56, r180:3.2, r365:6.8, trend:[6,6.2,6.4,6.6,6.7,6.8,6.8] },
+    { id:'sg2', name:'Skandia Vida Ahorro Crecimiento', desc:'Producto de vida con componente de ahorro moderado', type:'Seguros Ahorro', risk:'moderado',
+      val:1440.32, r1:0.03, r30:0.92, r180:5.4, r365:11.2, trend:[8,9,10,10.5,11,11.2,11.2] },
+  ],
+  valores: [
+    { id:'vl1', name:'Skandia Acciones Globales', desc:'Portafolio de acciones internacionales de alta liquidez', type:'Renta Variable', risk:'alto',
+      val:2440.18, r1:0.07, r30:1.68, r180:9.2, r365:21.4, trend:[14,16,18,20,21,21.2,21.4] },
+    { id:'vl2', name:'Skandia Bonos Emergentes', desc:'Deuda soberana y corporativa de mercados emergentes', type:'Renta Fija', risk:'moderado',
+      val:1380.62, r1:0.03, r30:0.86, r180:4.8, r365:9.8, trend:[8,8.5,9,9.5,9.7,9.8,9.8] },
+    { id:'vl3', name:'Skandia Multi-Activo', desc:'Estrategia de retorno absoluto con baja correlación', type:'Multi-Activo', risk:'moderado-alto',
+      val:1820.44, r1:0.04, r30:1.22, r180:6.6, r365:13.8, trend:[10,11,12,13,13.5,13.7,13.8] },
+  ],
+};
+
+const PERFIL_INFO = [
+  { key:'conservador', name:'Conservador', icon:'🛡️', desc:'Prioriza preservar el capital con volatilidad mínima. Fondos de renta fija y liquidez.', avgR365:7.5 },
+  { key:'moderado', name:'Moderado', icon:'⚖️', desc:'Equilibra rentabilidad y riesgo con una mezcla diversificada de activos.', avgR365:11.2 },
+  { key:'alto', name:'Dinámico', icon:'🚀', desc:'Maximiza el potencial de crecimiento aceptando mayor volatilidad.', avgR365:16.5 },
+];
+
+const RISK_LABELS = { conservador:'Conservador', moderado:'Moderado', 'moderado-alto':'Mod. Alto', alto:'Dinámico' };
+const RISK_CLS = { conservador:'risk-c', moderado:'risk-m', 'moderado-alto':'risk-ma', alto:'risk-a' };
+const CMP_COLORS = ['#00c73d','#0099de','#ff6b2b'];
+
+let currentEntity = 'pensiones';
+let selectedFund = null;
+let compareFunds = [];
+let detailChartInst = null;
+let simChartInst = null;
+let cmpChartInst = null;
+let cmpChartSecInst = null;
+
+/* ===== NAV ===== */
+function nav(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) n.classList.add('active');
+  });
+  if (id === 'simulador') buildSimulator();
+  if (id === 'comparador') refreshCmpSec();
+  if (id === 'perfil') buildPerfil();
+}
+
+/* ===== ENTITY ===== */
+function selectEntity(ent, btn) {
+  currentEntity = ent;
+  document.querySelectorAll('.entity-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  selectedFund = null;
+  document.getElementById('detailPanel').style.display = 'none';
+  renderFundsTable();
+}
+
+function renderFundsTable() {
+  const funds = FUNDS[currentEntity] || [];
+  const r365s = funds.map(f => f.r365);
+  const best = Math.max(...r365s), worst = Math.min(...r365s);
+  const avg = r365s.reduce((a,b)=>a+b,0)/r365s.length;
+  document.getElementById('k-fondos').textContent = funds.length;
+  document.getElementById('k-best').textContent = best.toFixed(1) + '%';
+  document.getElementById('k-avg').textContent = avg.toFixed(1) + '%';
+  document.getElementById('k-worst').textContent = worst.toFixed(1) + '%';
+  document.getElementById('tableTitle').textContent = 'Fondos – ' + ({ pensiones:'Pensiones Voluntarias', fiduciaria:'Fiduciaria', seguros:'Seguros', valores:'Valores' }[currentEntity]);
+
+  const tbody = document.getElementById('fundsBody');
+  tbody.innerHTML = '';
+  funds.forEach(f => {
+    const inCmp = compareFunds.find(c => c.id === f.id);
+    const tr = document.createElement('tr');
+    if (selectedFund && selectedFund.id === f.id) tr.classList.add('selected');
+    tr.innerHTML = `
+      <td><div class="fund-name">${f.name}</div><div class="fund-type">${f.desc}</div></td>
+      <td><span class="fund-type">${f.type}</span></td>
+      <td><span class="risk-badge ${RISK_CLS[f.risk]}">${RISK_LABELS[f.risk]}</span></td>
+      <td class="num ${f.r1>=0?'return-up':'return-dn'}">${f.r1>=0?'+':''}${f.r1.toFixed(2)}%</td>
+      <td class="num ${f.r30>=0?'return-up':'return-dn'}">${f.r30>=0?'+':''}${f.r30.toFixed(2)}%</td>
+      <td class="num ${f.r180>=0?'return-up':'return-dn'}">${f.r180>=0?'+':''}${f.r180.toFixed(1)}%</td>
+      <td class="num ${f.r365>=0?'return-up':'return-dn'}">${f.r365>=0?'+':''}${f.r365.toFixed(1)}%</td>
+      <td class="sparkline-cell"><canvas class="spark" id="sp-${f.id}"></canvas></td>
+      <td><button class="compare-btn ${inCmp?'added':''}" onclick="event.stopPropagation();toggleCompare('${f.id}')">${inCmp?'✓ Comparando':'+ Comparar'}</button></td>
+    `;
+    tr.onclick = () => selectFund(f);
+    tbody.appendChild(tr);
+    drawSpark(f);
+  });
+  refreshComparePanel();
+}
+
+function drawSpark(f) {
+  setTimeout(() => {
+    const canvas = document.getElementById('sp-' + f.id);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const color = f.trend[f.trend.length-1] >= f.trend[0] ? '#00c73d' : '#e03430';
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels: f.trend.map((_,i)=>i), datasets: [{ data: f.trend, borderColor: color, borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.4 }] },
+      options: { plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}}, animation:false, responsive:false }
+    });
+  }, 0);
+}
+
+/* ===== FUND DETAIL ===== */
+function selectFund(f) {
+  selectedFund = f;
+  document.getElementById('detailPanel').style.display = 'block';
+  document.getElementById('detailTitle').textContent = f.name;
+  const stats = document.getElementById('detailStats');
+  stats.innerHTML = `
+    <div class="stat-row"><span class="stat-label">Valor cuota</span><span class="stat-val">$${f.val.toLocaleString('es-CO',{minimumFractionDigits:2})}</span></div>
+    <div class="stat-row"><span class="stat-label">Rentabilidad día</span><span class="stat-val ${f.r1>=0?'up':'dn'}">${f.r1>=0?'+':''}${f.r1.toFixed(2)}%</span></div>
+    <div class="stat-row"><span class="stat-label">Rentabilidad 30 días</span><span class="stat-val ${f.r30>=0?'up':'dn'}">${f.r30>=0?'+':''}${f.r30.toFixed(2)}%</span></div>
+    <div class="stat-row"><span class="stat-label">Rentabilidad 6 meses</span><span class="stat-val ${f.r180>=0?'up':'dn'}">${f.r180>=0?'+':''}${f.r180.toFixed(1)}%</span></div>
+    <div class="stat-row"><span class="stat-label">Rentabilidad 1 año</span><span class="stat-val ${f.r365>=0?'up':'dn'}">${f.r365>=0?'+':''}${f.r365.toFixed(1)}%</span></div>
+    <div class="stat-row"><span class="stat-label">Tipo</span><span class="stat-val">${f.type}</span></div>
+    <div class="stat-row"><span class="stat-label">Perfil</span><span class="stat-val">${RISK_LABELS[f.risk]}</span></div>
+  `;
+  if (detailChartInst) detailChartInst.destroy();
+  const ctx = document.getElementById('detailChart').getContext('2d');
+  detailChartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6','Actual'],
+      datasets: [{ label: f.name, data: f.trend, borderColor:'#00c73d', backgroundColor:'rgba(0,199,61,0.08)', borderWidth:2, pointRadius:3, pointBackgroundColor:'#00c73d', fill:true, tension:0.4 }]
+    },
+    options: { plugins:{legend:{display:false}}, scales:{ y:{ ticks:{ callback:v=>v+'%', font:{size:11} }, grid:{color:'#f0f0f0'} }, x:{ ticks:{font:{size:11}} } }, responsive:true, maintainAspectRatio:false }
+  });
+  renderFundsTable();
+}
+
+function closeDetail() {
+  selectedFund = null;
+  document.getElementById('detailPanel').style.display = 'none';
+  renderFundsTable();
+}
+
+/* ===== COMPARE ===== */
+function toggleCompare(fundId) {
+  const allFunds = Object.values(FUNDS).flat();
+  const f = allFunds.find(x => x.id === fundId);
+  if (!f) return;
+  const idx = compareFunds.findIndex(c => c.id === fundId);
+  if (idx >= 0) { compareFunds.splice(idx, 1); }
+  else if (compareFunds.length < 3) { compareFunds.push(f); }
+  renderFundsTable();
+  refreshComparePanel();
+}
+
+function clearCompare() {
+  compareFunds = [];
+  renderFundsTable();
+  refreshComparePanel();
+  refreshCmpSec();
+}
+
+function openComparador() { nav('comparador'); }
+
+function refreshComparePanel() {
+  const panel = document.getElementById('comparePanel');
+  document.getElementById('cmpCount').textContent = compareFunds.length;
+  if (compareFunds.length < 2) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  drawCmpChart('cmpChart', cmpChartInst, i => { cmpChartInst = i; });
+  renderCmpTable(document.getElementById('compareTable'));
+}
+
+function refreshCmpSec() {
+  const ph = document.getElementById('cmpPlaceholder');
+  const content = document.getElementById('cmpSecContent');
+  if (compareFunds.length < 2) { ph.style.display = 'block'; content.style.display = 'none'; return; }
+  ph.style.display = 'none'; content.style.display = 'block';
+  drawCmpChart('cmpChartSec', cmpChartSecInst, i => { cmpChartSecInst = i; });
+  renderCmpTable(document.getElementById('cmpTableSec'));
+}
+
+function drawCmpChart(canvasId, prevInst, setInst) {
+  if (prevInst) prevInst.destroy();
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  const inst = new Chart(ctx.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6','Actual'],
+      datasets: compareFunds.map((f, i) => ({
+        label: f.name,
+        data: f.trend,
+        borderColor: CMP_COLORS[i],
+        backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 3, tension: 0.4,
+        pointBackgroundColor: CMP_COLORS[i]
+      }))
+    },
+    options: { plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}, scales:{ y:{ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'#f0f0f0'}}, x:{ticks:{font:{size:11}}} }, responsive:true, maintainAspectRatio:false }
+  });
+  setInst(inst);
+}
+
+function renderCmpTable(container) {
+  const cols = ['Día','30 días','6 meses','1 año'];
+  const getVals = f => [f.r1, f.r30, f.r180, f.r365];
+  let html = '<table><thead><tr><th>Fondo</th>';
+  cols.forEach(c => html += `<th class="num">${c}</th>`);
+  html += '</tr></thead><tbody>';
+  compareFunds.forEach((f, i) => {
+    const vals = getVals(f);
+    html += `<tr><td><span class="fund-dot" style="background:${CMP_COLORS[i]}"></span><strong>${f.name}</strong></td>`;
+    vals.forEach(v => html += `<td class="num ${v>=0?'return-up':'return-dn'}">${v>=0?'+':''}${v.toFixed(2)}%</td>`);
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+/* ===== PERFIL ===== */
+function buildPerfil() {
+  const grid = document.getElementById('perfilGrid');
+  grid.innerHTML = '';
+  PERFIL_INFO.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'perfil-card';
+    card.innerHTML = `
+      <div class="perfil-icon">${p.icon}</div>
+      <div class="perfil-name">${p.name}</div>
+      <div class="perfil-desc">${p.desc}</div>
+      <div class="perfil-return">${p.avgR365.toFixed(1)}%</div>
+      <div class="perfil-return-label">Rent. promedio 1 año</div>
+    `;
+    card.onclick = () => showPerfilFunds(p, card);
+    grid.appendChild(card);
+  });
+}
+
+function showPerfilFunds(p, card) {
+  document.querySelectorAll('.perfil-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  const allFunds = Object.values(FUNDS).flat().filter(f => {
+    if (p.key === 'conservador') return f.risk === 'conservador';
+    if (p.key === 'moderado') return f.risk === 'moderado' || f.risk === 'moderado-alto';
+    return f.risk === 'alto';
+  });
+  const container = document.getElementById('perfilFunds');
+  if (!allFunds.length) { container.innerHTML = '<div class="placeholder">No hay fondos para este perfil.</div>'; return; }
+  let html = '<div class="table-card"><div class="table-header"><span class="table-title">Fondos para perfil ' + p.name + '</span></div><table><thead><tr><th>Fondo</th><th>Entidad</th><th class="num">30 días</th><th class="num">6 meses</th><th class="num">1 año</th></tr></thead><tbody>';
+  allFunds.forEach(f => {
+    const ent = Object.entries(FUNDS).find(([,arr])=>arr.find(x=>x.id===f.id))?.[0]||'';
+    const entLabel = { pensiones:'Pensiones', fiduciaria:'Fiduciaria', seguros:'Seguros', valores:'Valores' }[ent]||'';
+    html += `<tr><td><div class="fund-name">${f.name}</div><div class="fund-type">${f.type}</div></td><td><span class="fund-type">${entLabel}</span></td><td class="num ${f.r30>=0?'return-up':'return-dn'}">${f.r30>=0?'+':''}${f.r30.toFixed(2)}%</td><td class="num ${f.r180>=0?'return-up':'return-dn'}">${f.r180>=0?'+':''}${f.r180.toFixed(1)}%</td><td class="num ${f.r365>=0?'return-up':'return-dn'}">${f.r365>=0?'+':''}${f.r365.toFixed(1)}%</td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+/* ===== SIMULATOR ===== */
+function buildSimulator() {
+  const sel = document.getElementById('simFondo');
+  if (sel.options.length > 0) return;
+  const allFunds = Object.values(FUNDS).flat();
+  allFunds.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.id; opt.textContent = f.name;
+    sel.appendChild(opt);
+  });
+}
+
+function runSimulator() {
+  const aporte = parseFloat(document.getElementById('simAporte').value) || 0;
+  const mensual = parseFloat(document.getElementById('simMensual').value) || 0;
+  const plazo = parseInt(document.getElementById('simPlazo').value) || 5;
+  const fondoId = document.getElementById('simFondo').value;
+  const fondo = Object.values(FUNDS).flat().find(f => f.id === fondoId);
+  if (!fondo) return;
+  const tasa = fondo.r365 / 100;
+  const tasaMensual = Math.pow(1 + tasa, 1/12) - 1;
+  const meses = plazo * 12;
+  const labels = [], valores = [], aportes = [];
+  let total = aporte;
+  let totalAportado = aporte;
+  for (let m = 1; m <= meses; m++) {
+    total = total * (1 + tasaMensual) + mensual;
+    totalAportado += mensual;
+    if (m % 12 === 0 || m === meses) {
+      labels.push('Año ' + Math.ceil(m/12));
+      valores.push(Math.round(total));
+      aportes.push(Math.round(totalAportado));
+    }
+  }
+  const resultado = document.getElementById('simResult');
+  document.getElementById('simResultVal').textContent = '$' + total.toLocaleString('es-CO', {minimumFractionDigits:0, maximumFractionDigits:0});
+  document.getElementById('simResultSub').textContent = 'Ganancia: $' + (total - totalAportado).toLocaleString('es-CO', {maximumFractionDigits:0}) + ' · Tasa anual: ' + fondo.r365.toFixed(1) + '%';
+  resultado.classList.add('visible');
+  if (simChartInst) simChartInst.destroy();
+  const ctx = document.getElementById('simChart').getContext('2d');
+  simChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Valor proyectado', data: valores, backgroundColor: 'rgba(0,199,61,0.8)', borderRadius: 4 },
+        { label: 'Total aportado', data: aportes, backgroundColor: 'rgba(0,153,222,0.5)', borderRadius: 4 }
+      ]
+    },
+    options: {
+      plugins:{ legend:{position:'bottom',labels:{font:{size:11}}} },
+      scales:{ y:{ ticks:{ callback:v=>'$'+(v/1000000).toFixed(1)+'M', font:{size:11} }, grid:{color:'#f0f0f0'} }, x:{ticks:{font:{size:11}}} },
+      responsive:true, maintainAspectRatio:false
+    }
+  });
+}
+
+/* ===== INIT ===== */
+renderFundsTable();
+</script>
+</body>
+</html>
