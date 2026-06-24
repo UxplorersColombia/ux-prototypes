@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="ext-resource-dependency" content="assets/Waze-de-Planes-Skandia.pdf" data-resource-id="wazePdf">
+<meta name="ext-resource-dependency" content="assets/ABC-de-PACs.docx" data-resource-id="abcDoc">
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e7e5df; }
+  @keyframes wz-spin { to { transform: rotate(360deg); } }
+  @keyframes wz-ping { 0% { transform: scale(.6); opacity: .6; } 80%,100% { transform: scale(2.4); opacity: 0; } }
+  @keyframes wz-up { from { transform: translateY(26px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes wz-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes wz-pop { 0% { transform: scale(.85); opacity:0;} 60%{transform:scale(1.04);} 100%{transform:scale(1);opacity:1;} }
+  @keyframes wz-sheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .wz-scroll::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+</helmet>
+
+<template id="__bundler_thumbnail" data-bg-color="#00c73d">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#00c73d"/>
+    <path d="M600 250 L540 360 L660 470 L560 600" fill="none" stroke="#ffffff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="600" cy="250" r="26" fill="#ffffff"/>
+    <circle cx="560" cy="600" r="46" fill="#ffffff"/>
+    <path d="M560 580 L578 614 L560 606 L542 614 Z" fill="#00c73d"/>
+  </svg>
+</template>
+
+<div style="min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 10px; font-family: var(--body); overflow: hidden; background: #e7e5df;">
+<div style="transform: scale({{ fitScale }}); transform-origin: top center; flex: none;">
+<div style="width:402px; height:874px; flex:none; border-radius:48px; overflow:hidden; position:relative; background:#F2F2F7; box-shadow:0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.12); font-family:-apple-system, system-ui, sans-serif;">
+  <div style="position:absolute; top:11px; left:50%; transform:translateX(-50%); width:126px; height:37px; border-radius:24px; background:#000; z-index:50;"></div>
+  <div style="position:absolute; top:0; left:0; right:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:21px 32px 0;">
+    <span style="font-family:-apple-system,system-ui; font-weight:600; font-size:17px; color:#000;">9:41</span>
+    <div style="display:flex; align-items:center; gap:7px;">
+      <svg width="19" height="12" viewBox="0 0 19 12" fill="#000"><rect x="0" y="7.5" width="3.2" height="4.5" rx="0.7"/><rect x="4.8" y="5" width="3.2" height="7" rx="0.7"/><rect x="9.6" y="2.5" width="3.2" height="9.5" rx="0.7"/><rect x="14.4" y="0" width="3.2" height="12" rx="0.7"/></svg>
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#000"><path d="M8.5 3.2C10.8 3.2 12.9 4.1 14.4 5.6L15.5 4.5C13.7 2.7 11.2 1.5 8.5 1.5C5.8 1.5 3.3 2.7 1.5 4.5L2.6 5.6C4.1 4.1 6.2 3.2 8.5 3.2Z"/><path d="M8.5 6.8C9.9 6.8 11.1 7.3 12 8.2L13.1 7.1C11.8 5.9 10.2 5.1 8.5 5.1C6.8 5.1 5.2 5.9 3.9 7.1L5 8.2C5.9 7.3 7.1 6.8 8.5 6.8Z"/><circle cx="8.5" cy="10.5" r="1.5"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke="#000" stroke-opacity="0.35" fill="none"/><rect x="2" y="2" width="20" height="9" rx="2" fill="#000"/><path d="M25 4.5V8.5C25.8 8.2 26.5 7.2 26.5 6.5C26.5 5.8 25.8 4.8 25 4.5Z" fill="#000" fill-opacity="0.4"/></svg>
+    </div>
+  </div>
+
+<div style="position: absolute; inset: 0; font-family: var(--body); color: var(--texts-dark); overflow: hidden;">
+
+  <!-- ============ GLOBAL MENU BUTTON ============ -->
+  <button onClick="{{ openMenu }}" aria-label="Menú" style="position:absolute; top:52px; right:14px; z-index:8; width:46px; height:46px; border-radius:50%; border:none; background:rgba(255,255,255,.92); box-shadow:var(--shadow-md); display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(6px);">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+
+  <!-- ============ START ============ -->
+  <sc-if value="{{ isStart }}" hint-placeholder-val="{{ true }}">
+  <div style="position:absolute; inset:0; display:flex; flex-direction:column;">
+    <div style="position:absolute; inset:0;">
+      <svg viewBox="0 0 360 700" preserveAspectRatio="xMidYMid slice" style="width:100%; height:100%; display:block;">
+        <defs><linearGradient id="rgPrev" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#00c73d"/><stop offset="1" stop-color="#8fe000"/></linearGradient></defs>
+        <rect x="0" y="0" width="360" height="700" fill="{{ m_bg }}"/>
+        <g fill="{{ m_block }}">
+          <rect x="14" y="40" width="120" height="96" rx="9"/><rect x="150" y="20" width="100" height="120" rx="9"/><rect x="266" y="48" width="90" height="80" rx="9"/>
+          <rect x="20" y="170" width="96" height="120" rx="9"/><rect x="200" y="180" width="150" height="90" rx="9"/>
+          <rect x="14" y="320" width="110" height="120" rx="9"/><rect x="244" y="310" width="112" height="130" rx="9"/>
+          <rect x="30" y="480" width="120" height="120" rx="9"/><rect x="210" y="470" width="140" height="120" rx="9"/>
+        </g>
+        <g stroke="{{ m_grid }}" stroke-width="13" stroke-linecap="round">
+          <line x1="-10" y1="156" x2="370" y2="156"/><line x1="-10" y1="304" x2="370" y2="304"/><line x1="-10" y1="456" x2="370" y2="456"/>
+          <line x1="142" y1="-10" x2="142" y2="710"/>
+        </g>
+        <polyline points="180,640 120,520 220,400 130,280 210,150 168,40" fill="none" stroke="{{ m_casing }}" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="180,640 120,520 220,400 130,280 210,150 168,40" fill="none" stroke="url(#rgPrev)" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="168" cy="40" r="8" fill="#fff" stroke="{{ m_markerCol }}" stroke-width="4"/>
+        <g transform="translate(180 640)"><circle r="15" fill="{{ m_markerCol }}"/><circle r="15" fill="none" stroke="#fff" stroke-width="3.5"/><path d="M0 -7 L7 7 L0 3 L-7 7 Z" fill="#fff"/></g>
+      </svg>
+      <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 55%, rgba(255,255,255,.0) 100%);"></div>
+    </div>
+
+    <div style="position:relative; padding:58px 18px 0; display:flex; align-items:center; gap:9px;">
+      <div style="width:34px; height:34px; border-radius:10px; background:#fff; box-shadow:var(--shadow-sm); display:flex; align-items:center; justify-content:center;">
+        <img src="assets/isotipo-simple-verde.svg" alt="Skandia" style="width:21px; height:21px;"/>
+      </div>
+      <div>
+        <div style="font-family:var(--title); font-weight:700; font-size:17px; line-height:1; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.35);">Waze de Planes</div>
+        <div style="font-size:11px; color:rgba(255,255,255,.92); text-shadow:0 1px 3px rgba(0,0,0,.35);">Planes Institucionales · Skandia</div>
+      </div>
+    </div>
+
+    <div style="position:relative; z-index:2; margin-top:auto; background:#fff; border-radius:26px 26px 0 0; padding:24px 20px 34px; box-shadow:0 -10px 30px rgba(0,0,0,.12);">
+      <div style="width:38px; height:5px; border-radius:3px; background:var(--neutral-l04); margin:0 auto 18px;"></div>
+      <h2 style="font-family:var(--title); font-size:23px; line-height:1.15; margin:0;">¿A dónde vamos hoy?</h2>
+      <p style="font-size:13.5px; color:var(--texts-medium); margin:8px 0 18px; line-height:1.5;">La ruta más clara para crear un plan institucional: del primer contacto al primer aporte, sin perderte en el camino.</p>
+      <div onClick="{{ start }}" style="display:flex; align-items:center; gap:12px; background:var(--neutral-l02); border:1px solid var(--stroke-grey-light); border-radius:14px; padding:14px 16px; cursor:pointer; margin-bottom:14px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#878787" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>
+        <span style="font-size:14px; color:var(--texts-light);">Buscar destino — tu tipo de plan</span>
+      </div>
+      <button onClick="{{ start }}" style="width:100%; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:16px; padding:15px; border-radius:100px; display:flex; align-items:center; justify-content:center; gap:9px; box-shadow:0 6px 16px rgba(0,199,61,.32);" style-hover="background:var(--button-brand-hover);">
+        Iniciar ruta
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <div onClick="{{ openConsulta }}" style="margin-top:14px; display:flex; align-items:center; gap:12px; background:#fff; border:1.5px solid var(--stroke-grey-light); border-radius:14px; padding:12px 14px; cursor:pointer;" style-hover="border-color:var(--stroke-brand); box-shadow:var(--shadow-sm);">
+        <div style="width:34px; height:34px; flex:none; border-radius:10px; background:var(--background-brand-light); display:flex; align-items:center; justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9v.01M9 13v.01M9 17v.01"/></svg>
+        </div>
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:13px; color:var(--texts-dark);">¿La empresa ya tiene PAC?</div>
+          <div style="font-size:11px; color:var(--texts-medium);">Consúltalo por NIT en segundos</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div onClick="{{ openMenu }}" style="margin-top:14px; display:flex; align-items:center; gap:12px; background:var(--background-brand-light); border:1px solid var(--primary-l04); border-radius:14px; padding:12px 14px; cursor:pointer;">
+        <div style="width:34px; height:34px; flex:none; border-radius:10px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>
+        </div>
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:13px; color:var(--primary-d03);">Opciones del viaje</div>
+          <div style="font-size:11px; color:var(--primary-d02);">Diccionario · Mapa offline · Recursos · Ayuda</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#03a835" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+      </div>
+      <div style="text-align:center; margin-top:12px; font-size:11px; color:var(--texts-light);">14 paradas · 2 rutas posibles</div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ CHECK ============ -->
+  <sc-if value="{{ isCheck }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; background:#fff; display:flex; flex-direction:column; padding:58px 20px 34px;">
+    <button onClick="{{ back }}" style="align-self:flex-start; border:none; background:none; cursor:pointer; padding:0; margin-bottom:18px; display:flex; align-items:center; gap:6px; color:var(--texts-medium); font-size:13px; font-family:var(--body);">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Atrás
+    </button>
+    <div style="display:inline-flex; align-self:flex-start; align-items:center; gap:7px; background:var(--background-brand-light); color:var(--texts-brand); font-weight:700; font-size:11px; padding:6px 12px; border-radius:100px; margin-bottom:18px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg> Punto de partida
+    </div>
+    <h2 style="font-family:var(--title); font-size:24px; line-height:1.18;">¿La empresa ya tiene<br>un plan activo?</h2>
+
+    <div style="display:flex; gap:11px; background:var(--neutral-l02); border-radius:16px; padding:15px; margin:18px 0 8px;">
+      <div style="width:40px; height:40px; flex:none; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 013 3v1a7 7 0 014 6v3l1.5 3h-17L9 15v-3a7 7 0 014-6V5a3 3 0 01-1-2"/><path d="M9 19a3 3 0 006 0"/></svg>
+      </div>
+      <p style="font-size:13.5px; line-height:1.5; color:var(--texts-dark); margin:0;">Antes de arrancar, confirma el punto de partida. Revisa el <strong>informe de DALI</strong> o pregúntale a tu <strong>Director Comercial</strong>.</p>
+    </div>
+
+    <button onClick="{{ openConsulta }}" style="margin-top:13px; width:100%; cursor:pointer; background:var(--background-brand-light); color:var(--primary-d03); border:1.5px solid var(--primary-l04); font-family:var(--title); font-weight:700; font-size:13.5px; padding:13px; border-radius:14px; display:flex; align-items:center; justify-content:center; gap:9px;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#03a835" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      Consultar por NIT si ya tiene plan
+    </button>
+
+    <div style="margin-top:auto; display:flex; flex-direction:column; gap:12px;">
+      <button onClick="{{ sayNo }}" style="width:100%; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:15.5px; padding:16px; border-radius:100px; text-align:left; display:flex; align-items:center; justify-content:space-between; box-shadow:0 6px 16px rgba(0,199,61,.28);">
+        <span>No tiene plan · arranca el viaje</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <button onClick="{{ sayYes }}" style="width:100%; cursor:pointer; background:#fff; color:var(--texts-dark); border:1.5px solid var(--stroke-grey-light); font-family:var(--title); font-weight:700; font-size:15.5px; padding:16px; border-radius:100px; text-align:left;">Ya tiene plan activo</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ BLOCKED (desvío) ============ -->
+  <sc-if value="{{ isBlocked }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; background:#fff; display:flex; flex-direction:column; padding:58px 20px 34px;">
+    <button onClick="{{ back }}" style="align-self:flex-start; border:none; background:none; cursor:pointer; padding:0; margin-bottom:24px; display:flex; align-items:center; gap:6px; color:var(--texts-medium); font-size:13px; font-family:var(--body);">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Atrás
+    </button>
+    <div style="width:74px; height:74px; border-radius:50%; background:var(--feedback-warning-light); display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ffae08" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.3 1.7 18a2 2 0 0 0 1.7 3h17.2a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/></svg>
+    </div>
+    <div style="font-weight:700; font-size:11px; color:var(--feedback-warning-dark); letter-spacing:.3px; margin-bottom:8px;">Vía con peaje especial</div>
+    <h2 style="font-family:var(--title); font-size:23px; line-height:1.18;">Lo atiende solo el FP que lo abrió</h2>
+    <p style="font-size:14px; line-height:1.55; color:var(--texts-medium); margin-top:12px;">Si la empresa ya tiene un plan, solo el Financial Planner que lo abrió puede atenderlo. Para vincular un nuevo partícipe, <strong style="color:var(--texts-dark);">coordina primero con ese FP y obtén su autorización</strong> para crear el nuevo contrato.</p>
+    <button onClick="{{ back }}" style="margin-top:auto; width:100%; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:16px; padding:15px; border-radius:100px;">Volver a empezar</button>
+  </div>
+  </sc-if>
+
+  <!-- ============ DESTINOS ============ -->
+  <sc-if value="{{ isDestinos }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; background:var(--neutral-l02); display:flex; flex-direction:column; padding:58px 0 0;">
+    <div style="padding:0 20px;">
+      <button onClick="{{ back }}" style="border:none; background:none; cursor:pointer; padding:0; margin-bottom:16px; display:flex; align-items:center; gap:6px; color:var(--texts-medium); font-size:13px; font-family:var(--body);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Atrás
+      </button>
+      <h2 style="font-family:var(--title); font-size:24px; line-height:1.15;">Elige tu destino</h2>
+      <p style="font-size:13px; color:var(--texts-medium); margin:7px 0 18px; line-height:1.5;">Según el diagnóstico de la reunión, elige uno de los tres planes de Skandia. El destino define tu ruta.</p>
+    </div>
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:0 20px 28px; display:flex; flex-direction:column; gap:13px;">
+
+      <div onClick="{{ pickBonif }}" style="cursor:pointer; background:#fff; border:1.5px solid var(--stroke-grey-light); border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-sm);" style-hover="border-color:var(--stroke-brand); box-shadow:var(--shadow-md);">
+        <div style="display:flex; align-items:center; gap:13px;">
+          <div style="width:46px; height:46px; flex:none; border-radius:13px; background:var(--background-brand-light); display:flex; align-items:center; justify-content:center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-family:var(--title); font-weight:700; font-size:16px;">Plan de Bonificaciones</div>
+            <div style="font-size:12.5px; color:var(--texts-medium); margin-top:2px;">Aportes Condicionados (AC)</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <p style="font-size:12.5px; color:var(--texts-dark); line-height:1.45; margin:0;">Aportes del patrocinador a favor del partícipe, sujetos a condiciones.</p>
+        <div style="display:inline-flex; align-self:flex-start; align-items:center; gap:6px; background:var(--feedback-success-light); color:var(--primary-d02); font-weight:700; font-size:11px; padding:5px 11px; border-radius:100px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#03a835" stroke-width="2.6"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg> Ruta rápida posible
+        </div>
+      </div>
+
+      <div onClick="{{ pickMutuo }}" style="cursor:pointer; background:#fff; border:1.5px solid var(--stroke-grey-light); border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-sm);" style-hover="border-color:var(--stroke-brand); box-shadow:var(--shadow-md);">
+        <div style="display:flex; align-items:center; gap:13px;">
+          <div style="width:46px; height:46px; flex:none; border-radius:13px; background:var(--background-brand-light); display:flex; align-items:center; justify-content:center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 1 0-8 0M3 21v-2a4 4 0 0 1 4-4h2M21 21v-2a4 4 0 0 0-4-4h-2"/><path d="m17 11 2 2 4-4M3 13l2-2"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-family:var(--title); font-weight:700; font-size:16px;">Plan de Ahorro Mutuo</div>
+            <div style="font-size:12.5px; color:var(--texts-medium); margin-top:2px;">Aporte compartido (AM)</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <p style="font-size:12.5px; color:var(--texts-dark); line-height:1.45; margin:0;">Ahorro conjunto: por cada peso que aporta el partícipe, la empresa aporta otro tanto.</p>
+        <div style="display:inline-flex; align-self:flex-start; align-items:center; gap:6px; background:var(--feedback-warning-light); color:#b97c00; font-weight:700; font-size:11px; padding:5px 11px; border-radius:100px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b97c00" stroke-width="2.4" stroke-linecap="round"><path d="M3 12h7l2-4 3 8 2-4h4"/></svg> Ruta legal · 6 paradas
+        </div>
+      </div>
+
+      <div onClick="{{ pickFlex }}" style="cursor:pointer; background:#fff; border:1.5px solid var(--stroke-grey-light); border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-sm);" style-hover="border-color:var(--stroke-brand); box-shadow:var(--shadow-md);">
+        <div style="display:flex; align-items:center; gap:13px;">
+          <div style="width:46px; height:46px; flex:none; border-radius:13px; background:var(--background-brand-light); display:flex; align-items:center; justify-content:center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 6v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6M9 11h6M9 15h4"/><path d="M9 6V4h6v2"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-family:var(--title); font-weight:700; font-size:16px;">Beneficios Flexibles</div>
+            <div style="font-size:12.5px; color:var(--texts-medium); margin-top:2px;">BeneFlex</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <p style="font-size:12.5px; color:var(--texts-dark); line-height:1.45; margin:0;">Reorganiza la remuneración del empleado en subcuentas con destinos definidos.</p>
+        <div style="display:inline-flex; align-self:flex-start; align-items:center; gap:6px; background:var(--feedback-warning-light); color:#b97c00; font-weight:700; font-size:11px; padding:5px 11px; border-radius:100px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#b97c00" stroke-width="2.4" stroke-linecap="round"><path d="M3 12h7l2-4 3 8 2-4h4"/></svg> Ruta legal · 6 paradas
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ BIFURCACIÓN ============ -->
+  <sc-if value="{{ isBif }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; background:#fff; display:flex; flex-direction:column; padding:58px 0 0;">
+    <div style="padding:0 20px;">
+      <button onClick="{{ back }}" style="border:none; background:none; cursor:pointer; padding:0; margin-bottom:16px; display:flex; align-items:center; gap:6px; color:var(--texts-medium); font-size:13px; font-family:var(--body);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Atrás
+      </button>
+      <div style="display:inline-flex; align-items:center; gap:7px; background:var(--neutral-l02); color:var(--texts-medium); font-weight:700; font-size:11px; padding:6px 12px; border-radius:100px; margin-bottom:14px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3M12 15v6"/></svg> La bifurcación
+      </div>
+      <h2 style="font-family:var(--title); font-size:22px; line-height:1.18;">¿La carta mantiene las condiciones estándar, sin cambios?</h2>
+      <p style="font-size:12.5px; color:var(--texts-medium); margin:9px 0 4px; line-height:1.5;">Si la carta conserva estas condiciones, tomas la <strong style="color:var(--primary-d02);">ruta rápida</strong>. Una sola decisión define tu camino.</p>
+    </div>
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:14px 20px 20px;">
+      <div style="background:var(--neutral-l02); border-radius:16px; padding:14px 16px; display:grid; grid-template-columns:1fr; gap:9px;">
+        <sc-for list="{{ standardConds }}" as="cond" hint-placeholder-count="8">
+          <div style="display:flex; align-items:flex-start; gap:9px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:2px;"><path d="M20 6 9 17l-5-5"/></svg>
+            <span style="font-size:12.5px; line-height:1.4; color:var(--texts-dark);">{{ cond }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:14px 20px 30px; border-top:1px solid var(--neutral-l03); display:flex; flex-direction:column; gap:11px; background:#fff;">
+      <button onClick="{{ bifYes }}" style="width:100%; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:15px; padding:15px; border-radius:100px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 6px 16px rgba(0,199,61,.28);">
+        <span>Sí, sin cambios · ruta rápida</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
+      </button>
+      <button onClick="{{ bifNo }}" style="width:100%; cursor:pointer; background:#fff; color:var(--texts-dark); border:1.5px solid var(--stroke-grey-light); font-family:var(--title); font-weight:700; font-size:15px; padding:15px; border-radius:100px;">No, la carta cambia · ruta legal</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ CALCULANDO ============ -->
+  <sc-if value="{{ isCalc }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; background:var(--background-black); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;">
+    <div style="position:relative; width:96px; height:96px; display:flex; align-items:center; justify-content:center; margin-bottom:28px;">
+      <div style="position:absolute; inset:0; border-radius:50%; border:3px solid rgba(0,199,61,.25);"></div>
+      <div style="position:absolute; inset:0; border-radius:50%; border:3px solid transparent; border-top-color:var(--primary-00); animation:wz-spin 1s linear infinite;"></div>
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.7-6-10a6 6 0 0 1 12 0c0 4.3-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>
+    </div>
+    <div style="font-family:var(--title); font-weight:700; font-size:19px; color:#fff;">Calculando la mejor ruta…</div>
+    <div style="font-size:13px; color:rgba(255,255,255,.7); margin-top:8px;">{{ planLabel }}</div>
+    <div style="display:inline-flex; align-items:center; gap:7px; margin-top:16px; background:rgba(255,255,255,.1); color:#fff; font-weight:700; font-size:12px; padding:7px 14px; border-radius:100px;">{{ routeLabel }}</div>
+  </div>
+  </sc-if>
+
+  <!-- ============ NAVEGANDO ============ -->
+  <sc-if value="{{ isNav }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; display:flex; flex-direction:column; background:#fff;">
+    <!-- MAP -->
+    <div style="position:relative; height:50%; overflow:hidden;">
+      <svg viewBox="0 0 360 360" preserveAspectRatio="xMidYMid slice" style="width:100%; height:100%; display:block;">
+        <defs><linearGradient id="rg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#00c73d"/><stop offset="1" stop-color="#8fe000"/></linearGradient></defs>
+        <rect x="0" y="0" width="360" height="360" fill="{{ m_bg }}"/>
+        <g fill="{{ m_block }}">
+          <rect x="10" y="14" width="120" height="80" rx="9"/><rect x="148" y="8" width="96" height="96" rx="9"/><rect x="262" y="20" width="92" height="74" rx="9"/>
+          <rect x="14" y="124" width="92" height="96" rx="9"/><rect x="206" y="132" width="148" height="80" rx="9"/>
+          <rect x="10" y="252" width="108" height="100" rx="9"/><rect x="240" y="246" width="116" height="108" rx="9"/>
+        </g>
+        <g stroke="{{ m_grid }}" stroke-width="12" stroke-linecap="round">
+          <line x1="-10" y1="112" x2="370" y2="112"/><line x1="-10" y1="236" x2="370" y2="236"/><line x1="138" y1="-10" x2="138" y2="370"/>
+        </g>
+        <polyline points="{{ routePts }}" fill="none" stroke="{{ m_casing }}" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="{{ routePts }}" fill="none" stroke="{{ m_route }}" stroke-width="7.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <g transform="translate({{ finish.x }} {{ finish.y }})"><rect x="-9" y="-22" width="3" height="26" rx="1" fill="{{ m_text }}"/><path d="M-6 -22 h16 v11 h-16 z" fill="{{ m_markerCol }}"/></g>
+        <sc-for list="{{ nodes }}" as="nd" hint-placeholder-count="7">
+          <circle cx="{{ nd.x }}" cy="{{ nd.y }}" r="5.5" fill="{{ nd.fill }}" stroke="{{ m_markerCol }}" stroke-width="3"/>
+        </sc-for>
+        <g transform="translate({{ marker.x }} {{ marker.y }})">
+          <circle r="22" fill="{{ m_markerCol }}" opacity="0.18" style="animation:wz-ping 2s ease-out infinite;"/>
+          <circle r="14" fill="{{ m_markerCol }}"/>
+          <circle r="14" fill="none" stroke="#fff" stroke-width="3.5"/>
+          <path d="M0 -7 L7 7 L0 3 L-7 7 Z" fill="#fff"/>
+        </g>
+      </svg>
+      <div style="position:absolute; left:0; right:0; bottom:0; height:54px; background:linear-gradient(180deg, transparent, rgba(255,255,255,.0));"></div>
+      <!-- progress overlay top -->
+      <div style="position:absolute; top:108px; left:16px; display:inline-flex; align-items:center; gap:7px; background:rgba(255,255,255,.94); border-radius:100px; padding:7px 13px; box-shadow:var(--shadow-md); backdrop-filter:blur(6px);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.7-6-10a6 6 0 0 1 12 0c0 4.3-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>
+        <span style="font-size:12px; font-weight:700; color:var(--texts-dark);">{{ stepLabel }}</span>
+      </div>
+    </div>
+
+    <!-- DIRECTION CARD -->
+    <div style="flex:1; background:#fff; border-radius:26px 26px 0 0; margin-top:-22px; position:relative; z-index:2; box-shadow:0 -10px 28px rgba(0,0,0,.12); display:flex; flex-direction:column; padding:18px 20px 28px; overflow:hidden;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+        <div style="width:56px; height:56px; flex:none; border-radius:16px; background:var(--estilos-degrade); display:flex; align-items:center; justify-content:center; box-shadow:0 6px 14px rgba(0,199,61,.28);">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ cur.iconPath }}"/></svg>
+        </div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:12px; font-weight:700; color:var(--primary-d02); margin-bottom:3px;">{{ cur.maneuver }}</div>
+          <div style="font-family:var(--title); font-weight:700; font-size:18px; line-height:1.15;">{{ cur.titulo }}</div>
+        </div>
+        <sc-if value="{{ curHasBadge }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none; font-size:9.5px; font-weight:700; padding:5px 9px; border-radius:7px; text-align:center; line-height:1.2; max-width:78px; background:{{ cur.badgeBg }}; color:{{ cur.badgeColor }};">{{ cur.badge }}</div>
+        </sc-if>
+      </div>
+
+      <div class="wz-scroll" style="flex:1; overflow-y:auto;">
+        <p style="font-size:13.5px; line-height:1.55; color:var(--texts-dark); margin:0 0 12px;">{{ cur.desc }}</p>
+
+        <sc-if value="{{ curHasList }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:9px; margin-bottom:12px;">
+            <sc-for list="{{ cur.list }}" as="li" hint-placeholder-count="3">
+              <div style="display:flex; align-items:flex-start; gap:10px;">
+                <div style="width:21px; height:21px; flex:none; border-radius:50%; background:var(--background-brand-light); color:var(--primary-d02); font-weight:700; font-size:11px; display:flex; align-items:center; justify-content:center;">{{ li.n }}</div>
+                <span style="font-size:12.8px; line-height:1.45; color:var(--texts-dark); padding-top:1px;">{{ li.t }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ curHasWarn }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; gap:9px; background:var(--feedback-warning-light); border-radius:12px; padding:11px 13px; margin-bottom:6px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ffae08" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:1px;"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.3 1.7 18a2 2 0 0 0 1.7 3h17.2a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/></svg>
+            <span style="font-size:12px; line-height:1.45; color:#8a6500;">{{ cur.warn }}</span>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- progress dots -->
+      <div style="display:flex; align-items:center; gap:5px; margin:14px 0 13px;">
+        <sc-for list="{{ progress }}" as="d" hint-placeholder-count="7">
+          <div style="height:5px; border-radius:3px; flex:none; transition:all .3s ease; width:{{ d.w }}; background:{{ d.bg }};"></div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex; gap:11px;">
+        <button onClick="{{ back }}" style="flex:none; width:52px; cursor:pointer; background:var(--neutral-l02); border:none; border-radius:100px; display:flex; align-items:center; justify-content:center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button onClick="{{ next }}" style="flex:1; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:16px; padding:15px; border-radius:100px; display:flex; align-items:center; justify-content:center; gap:9px; box-shadow:0 6px 16px rgba(0,199,61,.28);">
+          {{ nextLabel }}
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ LLEGADA ============ -->
+  <sc-if value="{{ isLlegada }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; display:flex; flex-direction:column; background:var(--neutral-l02);">
+    <div style="background:var(--estilos-degrade); padding:64px 20px 34px; text-align:center; position:relative; overflow:hidden;">
+      <div style="width:78px; height:78px; border-radius:50%; background:rgba(255,255,255,.95); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; box-shadow:0 8px 20px rgba(0,0,0,.18);">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div style="font-family:var(--title); font-weight:700; font-size:13px; color:rgba(255,255,255,.92); letter-spacing:.5px;">¡Llegaste a tu destino!</div>
+      <h2 style="font-family:var(--title); font-size:25px; color:#fff; margin-top:6px;">El plan está aportando</h2>
+      <div style="display:inline-flex; align-items:center; gap:7px; margin-top:13px; background:rgba(255,255,255,.22); color:#fff; font-weight:700; font-size:12.5px; padding:8px 15px; border-radius:100px;">{{ planLabel }}</div>
+    </div>
+
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:20px 20px 28px;">
+      <p style="font-size:13px; color:var(--texts-medium); line-height:1.5; margin:0 0 16px;">La empresa aporta a través de las cuentas recaudadoras e informa a Skandia por una de estas dos vías:</p>
+
+      <div style="background:#fff; border-radius:16px; padding:16px; display:flex; gap:13px; margin-bottom:12px; box-shadow:var(--shadow-sm);">
+        <div style="width:42px; height:42px; flex:none; border-radius:12px; background:var(--background-brand-light); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+        </div>
+        <div><div style="font-family:var(--title); font-weight:700; font-size:14.5px;">Con una planilla</div><p style="font-size:12.5px; color:var(--texts-medium); margin:3px 0 0; line-height:1.45;">Reporta a Skandia el detalle de los aportes en una planilla.</p></div>
+      </div>
+
+      <div style="background:#fff; border-radius:16px; padding:16px; display:flex; gap:13px; margin-bottom:20px; box-shadow:var(--shadow-sm);">
+        <div style="width:42px; height:42px; flex:none; border-radius:12px; background:var(--background-brand-light); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5M8 14h8"/></svg>
+        </div>
+        <div><div style="font-family:var(--title); font-weight:700; font-size:14.5px;">Vía miplanilla operador</div><p style="font-size:12.5px; color:var(--texts-medium); margin:3px 0 0; line-height:1.45;">O canaliza el reporte a través del operador miplanilla.</p></div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:11px;">
+        <button onClick="{{ goDict }}" style="width:100%; cursor:pointer; background:#fff; color:var(--texts-dark); border:1.5px solid var(--stroke-grey-light); font-family:var(--title); font-weight:700; font-size:14.5px; padding:14px; border-radius:100px; display:flex; align-items:center; justify-content:center; gap:9px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Abrir el diccionario ABC
+        </button>
+        <button onClick="{{ restart }}" style="width:100%; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:15px; padding:15px; border-radius:100px;">Nuevo viaje</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ PANELS SCRIM ============ -->
+  <sc-if value="{{ anyPanel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePanel }}" style="position:absolute; inset:0; background:rgba(0,0,0,.4); z-index:30;"></div>
+  </sc-if>
+
+  <!-- ============ MENU DRAWER ============ -->
+  <sc-if value="{{ panelMenu }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; left:0; right:0; bottom:0; z-index:31; max-height:90%; background:#fff; border-radius:26px 26px 0 0; box-shadow:0 -12px 32px rgba(0,0,0,.22); display:flex; flex-direction:column; overflow:hidden;">
+    <div style="padding:10px 0 4px; display:flex; justify-content:center; background:#fff;"><div style="width:42px; height:5px; border-radius:3px; background:var(--neutral-l04);"></div></div>
+    <div style="background:var(--estilos-degrade); padding:16px 20px; color:#fff;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-family:var(--title); font-weight:700; font-size:17px;">Opciones del viaje</div>
+          <div style="font-size:11.5px; opacity:.9;">Waze de Planes · Skandia</div>
+        </div>
+        <button onClick="{{ closePanel }}" style="border:none; background:rgba(255,255,255,.22); width:34px; height:34px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:18px 16px 36px;">
+      <div style="font-size:10.5px; font-weight:700; color:var(--texts-light); padding:0 6px 8px; letter-spacing:.4px;">Estilo del mapa</div>
+      <div style="display:flex; gap:7px; background:var(--neutral-l02); border-radius:12px; padding:5px; margin-bottom:20px;">
+        <button onClick="{{ setMapDia }}" style="flex:1; border:none; cursor:pointer; padding:9px 0; border-radius:9px; font-size:12px; font-weight:700; font-family:var(--body); background:{{ tabDia }}; color:{{ tabDiaC }};">Día</button>
+        <button onClick="{{ setMapNoche }}" style="flex:1; border:none; cursor:pointer; padding:9px 0; border-radius:9px; font-size:12px; font-weight:700; font-family:var(--body); background:{{ tabNoche }}; color:{{ tabNocheC }};">Noche</button>
+        <button onClick="{{ setMapEsq }}" style="flex:1; border:none; cursor:pointer; padding:9px 0; border-radius:9px; font-size:12px; font-weight:700; font-family:var(--body); background:{{ tabEsq }}; color:{{ tabEsqC }};">Esquema</button>
+      </div>
+
+      <div style="font-size:10.5px; font-weight:700; color:var(--texts-light); padding:0 6px 8px; letter-spacing:.4px;">Tu copiloto</div>
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <div onClick="{{ openConsulta }}" style="cursor:pointer; display:flex; align-items:center; gap:13px; padding:13px 8px; border-radius:12px;" style-hover="background:var(--neutral-l02);">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9v.01M9 13v.01M9 17v.01"/></svg>
+          <div style="flex:1;"><div style="font-weight:700; font-size:14px;">Consultar empresa</div><div style="font-size:11.5px; color:var(--texts-medium);">¿Tiene PAC vigente? · por NIT</div></div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div onClick="{{ goDict }}" style="cursor:pointer; display:flex; align-items:center; gap:13px; padding:13px 8px; border-radius:12px;" style-hover="background:var(--neutral-l02);">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <div style="flex:1;"><div style="font-weight:700; font-size:14px;">Diccionario del viaje</div><div style="font-size:11.5px; color:var(--texts-medium);">El ABC de PACs · A-Z</div></div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div onClick="{{ goOffline }}" style="cursor:pointer; display:flex; align-items:center; gap:13px; padding:13px 8px; border-radius:12px;" style-hover="background:var(--neutral-l02);">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>
+          <div style="flex:1;"><div style="font-weight:700; font-size:14px;">Mapa offline (PDF)</div><div style="font-size:11.5px; color:var(--texts-medium);">Descarga la guía completa</div></div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div onClick="{{ goRecursos }}" style="cursor:pointer; display:flex; align-items:center; gap:13px; padding:13px 8px; border-radius:12px;" style-hover="background:var(--neutral-l02);">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          <div style="flex:1;"><div style="font-weight:700; font-size:14px;">Recursos y enlaces</div><div style="font-size:11.5px; color:var(--texts-medium);">Toolkit, DocuSign, Typeform</div></div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div onClick="{{ goHelp }}" style="cursor:pointer; display:flex; align-items:center; gap:13px; padding:13px 8px; border-radius:12px;" style-hover="background:var(--neutral-l02);">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg>
+          <div style="flex:1;"><div style="font-weight:700; font-size:14px;">Ayuda</div><div style="font-size:11.5px; color:var(--texts-medium);">Cómo funciona esta guía</div></div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ DICCIONARIO ============ -->
+  <sc-if value="{{ panelDict }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:32; background:#fff; display:flex; flex-direction:column;">
+    <div style="padding:56px 18px 14px; border-bottom:1px solid var(--neutral-l03);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+        <button onClick="{{ goMenu }}" style="border:none; background:var(--neutral-l02); width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:none;">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div><div style="font-family:var(--title); font-weight:700; font-size:18px; line-height:1;">Diccionario del viaje</div><div style="font-size:11.5px; color:var(--texts-medium); margin-top:3px;">ABC de PACs · {{ termCount }} conceptos</div></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; background:var(--neutral-l02); border-radius:12px; padding:11px 14px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#878787" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>
+        <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="Buscar un concepto…" style="flex:1; border:none; background:none; outline:none; font-family:var(--body); font-size:14px; color:var(--texts-dark);"/>
+      </div>
+    </div>
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:8px 18px 30px;">
+      <sc-if value="{{ dictEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center; padding:50px 20px; color:var(--texts-light);">
+          <div style="font-size:14px;">Aún no encontramos ese concepto.</div>
+          <div style="font-size:12.5px; margin-top:6px;">Prueba con otra palabra.</div>
+        </div>
+      </sc-if>
+      <sc-for list="{{ dictGroups }}" as="grp" hint-placeholder-count="6">
+        <div style="padding:16px 4px 8px;"><span style="font-family:var(--title); font-weight:700; font-size:22px; color:var(--primary-00);">{{ grp.letter }}</span></div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <sc-for list="{{ grp.items }}" as="it" hint-placeholder-count="3">
+            <div style="border:1px solid var(--neutral-l03); border-radius:13px; overflow:hidden; background:#fff;">
+              <div onClick="{{ it.toggle }}" style="cursor:pointer; padding:13px 15px; display:flex; align-items:center; gap:10px;">
+                <span style="flex:1; font-family:var(--title); font-weight:700; font-size:13.5px; line-height:1.25;">{{ it.term }}</span>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#878787" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; transition:transform .2s ease; transform:{{ it.chev }};"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+              <sc-if value="{{ it.open }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:0 15px 14px;">
+                  <p style="font-size:12.8px; line-height:1.55; color:var(--texts-dark); margin:0;">{{ it.def }}</p>
+                  <sc-if value="{{ it.hasSimple }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:10px; background:var(--background-brand-light); border-radius:10px; padding:10px 12px;">
+                      <div style="font-size:10px; font-weight:700; color:var(--primary-d02); margin-bottom:4px; letter-spacing:.3px;">En palabras simples</div>
+                      <p style="font-size:12.3px; line-height:1.5; color:var(--primary-d03); margin:0;">{{ it.simple }}</p>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ CONSULTA EMPRESA (PAC) ============ -->
+  <sc-if value="{{ panelConsulta }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:32; background:#fff; display:flex; flex-direction:column;">
+    <div style="padding:56px 18px 14px; border-bottom:1px solid var(--neutral-l03);">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button onClick="{{ closePanel }}" style="border:none; background:var(--neutral-l02); width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:none;">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div><div style="font-family:var(--title); font-weight:700; font-size:18px; line-height:1;">Consultar empresa</div><div style="font-size:11.5px; color:var(--texts-medium); margin-top:3px;">¿Tiene un PAC vigente en Skandia?</div></div>
+      </div>
+    </div>
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:18px 20px 30px;">
+
+      <div style="display:flex; align-items:center; gap:9px; background:var(--neutral-l02); border:1.5px solid var(--stroke-grey-light); border-radius:14px; padding:6px 7px 6px 14px; margin-bottom:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#878787" stroke-width="2" style="flex:none;"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>
+        <input value="{{ cNit }}" onInput="{{ onCNit }}" onKeyDown="{{ cKey }}" inputmode="numeric" placeholder="NIT sin dígito de verificación" style="flex:1; min-width:0; border:none; background:none; outline:none; font-family:var(--body); font-size:15px; color:var(--texts-dark);"/>
+        <button onClick="{{ doConsulta }}" disabled="{{ cBtnDisabled }}" style="flex:none; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:13.5px; padding:11px 16px; border-radius:100px;">Consultar</button>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:7px; padding:0 2px 4px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2.2" style="flex:none; margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+        <span style="font-size:11.5px; line-height:1.45; color:var(--texts-light);">Escribe solo los números del NIT, <strong>sin el dígito de verificación</strong> (el número después del guion).</span>
+      </div>
+
+      <sc-if value="{{ isCIdle }}" hint-placeholder-val="{{ true }}">
+        <div style="text-align:center; padding:42px 24px 10px;">
+          <div style="width:72px; height:72px; border-radius:50%; background:var(--neutral-l02); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#b5b5b5" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9v.01M9 13v.01M9 17v.01"/></svg>
+          </div>
+          <div style="font-size:13.5px; line-height:1.5; color:var(--texts-light);">Ingresa el NIT de la empresa para verificar si tiene un plan vigente.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCLoading }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center; padding:46px 24px;">
+          <div style="width:54px; height:54px; margin:0 auto 16px; position:relative;">
+            <div style="position:absolute; inset:0; border-radius:50%; border:3px solid var(--neutral-l03);"></div>
+            <div style="position:absolute; inset:0; border-radius:50%; border:3px solid transparent; border-top-color:var(--primary-00); animation:wz-spin 1s linear infinite;"></div>
+          </div>
+          <div style="font-size:13.5px; color:var(--texts-medium);">Buscando en la base…</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCFound }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; border:1.5px solid var(--stroke-success); border-radius:18px; overflow:hidden;">
+          <div style="background:var(--feedback-success-light); padding:18px; display:flex; gap:13px; align-items:flex-start;">
+            <div style="width:42px; height:42px; flex:none; border-radius:50%; background:var(--button-brand-default); display:flex; align-items:center; justify-content:center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:700; font-size:11px; color:var(--primary-d02); letter-spacing:.3px;">Plan vigente en Skandia</div>
+              <div style="font-family:var(--title); font-weight:700; font-size:17px; line-height:1.2; color:var(--texts-dark); margin-top:3px;">{{ cEmpresa }}</div>
+              <div style="font-size:11.5px; color:var(--primary-d02); margin-top:3px;">NIT {{ cNitEcho }}</div>
+            </div>
+          </div>
+          <div style="padding:4px 16px 12px; background:#fff;">
+            <sc-for list="{{ cFields }}" as="f" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--neutral-l02);">
+                <div style="width:34px; height:34px; flex:none; border-radius:10px; background:var(--background-brand-light); display:flex; align-items:center; justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ f.iconPath }}"/></svg>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:10.5px; font-weight:700; color:var(--texts-light); letter-spacing:.3px;">{{ f.label }}</div>
+                  <div style="font-size:14px; font-weight:700; color:var(--texts-dark); line-height:1.3;">{{ f.value }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <button onClick="{{ cReset }}" style="width:100%; margin-top:14px; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:15px; padding:14px; border-radius:100px;">Consultar otra empresa</button>
+      </sc-if>
+
+      <sc-if value="{{ isCNotFound }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; border:1.5px solid var(--stroke-grey-light); border-radius:18px; padding:22px; text-align:center; background:var(--neutral-l02);">
+          <div style="width:60px; height:60px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; box-shadow:var(--shadow-sm);">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#878787" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>
+          </div>
+          <div style="font-family:var(--title); font-weight:700; font-size:16.5px; line-height:1.25; color:var(--texts-dark);">Esta empresa no tiene plan vigente en Skandia</div>
+          <div style="font-size:12.5px; color:var(--texts-medium); margin-top:8px; line-height:1.5;">No encontramos un PAC asociado al NIT <strong>{{ cNitEcho }}</strong>. Verifica el número o confírmalo con tu Director Comercial.</div>
+        </div>
+        <button onClick="{{ cReset }}" style="width:100%; margin-top:14px; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:15px; padding:14px; border-radius:100px;">Consultar otra empresa</button>
+      </sc-if>
+
+      <sc-if value="{{ isCError }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; border:1.5px solid var(--stroke-error-dark); border-radius:18px; padding:20px; background:var(--feedback-error-light); display:flex; gap:12px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e03430" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div><div style="font-family:var(--title); font-weight:700; font-size:14.5px; color:var(--texts-error);">No pudimos consultar la base</div><p style="font-size:12.5px; color:#8a2a28; margin:5px 0 0; line-height:1.5;">Revisa tu conexión a internet e inténtalo de nuevo.</p></div>
+        </div>
+        <button onClick="{{ doConsulta }}" style="width:100%; margin-top:14px; border:none; cursor:pointer; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:15px; padding:14px; border-radius:100px;">Reintentar</button>
+      </sc-if>
+
+      <sc-if value="{{ cIsDemo }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:16px; display:flex; gap:9px; background:var(--feedback-warning-light); border-radius:12px; padding:11px 13px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b97c00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:1px;"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.3 1.7 18a2 2 0 0 0 1.7 3h17.2a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/></svg>
+          <span style="font-size:11.5px; line-height:1.45; color:#8a6500;">Estás viendo <strong>datos de demostración</strong>. Revisa el Sheet o tu conexión.</span>
+        </div>
+      </sc-if>
+
+      <a href="https://wa.me/573138891387?text=Hola%2C%20tengo%20una%20duda%20sobre%20PAC." target="_blank" rel="noopener" style="text-decoration:none; margin-top:18px; display:flex; align-items:center; gap:12px; background:var(--neutral-l02); border:1.5px solid var(--stroke-grey-light); border-radius:14px; padding:14px;" style-hover="border-color:var(--stroke-brand);">
+        <div style="width:40px; height:40px; flex:none; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38a9.86 9.86 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.15h-.01a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.69 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
+        </div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:var(--title); font-weight:700; font-size:14px; color:var(--texts-dark);">¿Persiste tu duda de PAC?</div>
+          <div style="font-size:11.5px; color:var(--texts-medium);">Escríbenos por WhatsApp</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c5c5c5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ MAPA OFFLINE ============ -->
+  <sc-if value="{{ panelOffline }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:32; background:#fff; display:flex; flex-direction:column;">
+    <div style="padding:56px 18px 14px; display:flex; align-items:center; gap:12px;">
+      <button onClick="{{ goMenu }}" style="border:none; background:var(--neutral-l02); width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:none;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div style="font-family:var(--title); font-weight:700; font-size:18px;">Mapa offline</div>
+    </div>
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:8px 20px 30px;">
+      <div style="background:var(--estilos-degrade); border-radius:18px; padding:24px; color:#fff; margin-bottom:18px;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>
+        <h3 style="font-family:var(--title); font-size:19px; color:#fff; margin:14px 0 8px;">¿Quieres el mapa offline?</h3>
+        <p style="font-size:13px; line-height:1.55; margin:0; opacity:.95;">Te lo entregamos como PDF. Es la guía completa <strong>“Waze de Planes”</strong> — 15 páginas con todo el recorrido para llevarla a donde vayas, sin conexión.</p>
+      </div>
+      <a href="{{ wazePdfUrl }}" download="Waze de Planes - Skandia.pdf" style="text-decoration:none; display:flex; align-items:center; gap:13px; background:#fff; border:1.5px solid var(--stroke-grey-light); border-radius:14px; padding:15px; margin-bottom:11px;" style-hover="border-color:var(--stroke-brand);">
+        <div style="width:42px; height:42px; flex:none; border-radius:11px; background:var(--feedback-error-light); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e03430" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        </div>
+        <div style="flex:1;"><div style="font-family:var(--title); font-weight:700; font-size:14px; color:var(--texts-dark);">Waze de Planes — guía</div><div style="font-size:11.5px; color:var(--texts-medium);">PDF · mapa offline</div></div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+      </a>
+      <a href="{{ abcUrl }}" download="ABC de PACs.docx" style="text-decoration:none; display:flex; align-items:center; gap:13px; background:#fff; border:1.5px solid var(--stroke-grey-light); border-radius:14px; padding:15px;" style-hover="border-color:var(--stroke-brand);">
+        <div style="width:42px; height:42px; flex:none; border-radius:11px; background:var(--background-info-light); display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0099de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div style="flex:1;"><div style="font-family:var(--title); font-weight:700; font-size:14px; color:var(--texts-dark);">ABC de PACs — glosario</div><div style="font-size:11.5px; color:var(--texts-medium);">Documento · definiciones</div></div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+      </a>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ RECURSOS ============ -->
+  <sc-if value="{{ panelRecursos }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:32; background:#fff; display:flex; flex-direction:column;">
+    <div style="padding:56px 18px 14px; display:flex; align-items:center; gap:12px;">
+      <button onClick="{{ goMenu }}" style="border:none; background:var(--neutral-l02); width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:none;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div style="font-family:var(--title); font-weight:700; font-size:18px;">Recursos para el viaje</div>
+    </div>
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:8px 20px 30px; display:flex; flex-direction:column; gap:12px;">
+      <p style="font-size:12.5px; color:var(--texts-medium); line-height:1.5; margin:0 0 4px;">Enlaces y herramientas para cada parada del recorrido.</p>
+      <div style="background:var(--neutral-l02); border-radius:14px; padding:15px;">
+        <div style="font-family:var(--title); font-weight:700; font-size:14px; margin-bottom:3px;">Toolkit PAC</div>
+        <div style="font-size:12px; color:var(--texts-link); word-break:break-all;">linktr.ee/ToolkitPACS2025</div>
+      </div>
+      <div style="background:var(--neutral-l02); border-radius:14px; padding:15px;">
+        <div style="font-family:var(--title); font-weight:700; font-size:14px; margin-bottom:3px;">Creación de plan</div>
+        <div style="font-size:12px; color:var(--texts-medium);">Vinculación digital · DocuSign</div>
+      </div>
+      <div style="background:var(--neutral-l02); border-radius:14px; padding:15px;">
+        <div style="font-family:var(--title); font-weight:700; font-size:14px; margin-bottom:3px;">Creación de partícipes</div>
+        <div style="font-size:12px; color:var(--texts-link); word-break:break-all;">form.typeform.com/to/M67Ne9TO</div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ AYUDA ============ -->
+  <sc-if value="{{ panelHelp }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute; inset:0; z-index:32; background:#fff; display:flex; flex-direction:column;">
+    <div style="padding:56px 18px 14px; display:flex; align-items:center; gap:12px;">
+      <button onClick="{{ goMenu }}" style="border:none; background:var(--neutral-l02); width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:none;">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div style="font-family:var(--title); font-weight:700; font-size:18px;">Ayuda</div>
+    </div>
+    <div class="wz-scroll" style="flex:1; overflow-y:auto; padding:8px 20px 30px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; gap:12px;">
+          <div style="width:34px; height:34px; flex:none; border-radius:10px; background:var(--background-brand-light); display:flex; align-items:center; justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.7-6-10a6 6 0 0 1 12 0c0 4.3-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg></div>
+          <div><div style="font-family:var(--title); font-weight:700; font-size:14px;">Di a dónde vas</div><p style="font-size:12.5px; color:var(--texts-medium); margin:3px 0 0; line-height:1.5;">Tu destino es el tipo de plan. Elígelo y el copiloto traza la ruta paso a paso.</p></div>
+        </div>
+        <div style="display:flex; gap:12px;">
+          <div style="width:34px; height:34px; flex:none; border-radius:10px; background:var(--feedback-warning-light); display:flex; align-items:center; justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffae08" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+          <div><div style="font-family:var(--title); font-weight:700; font-size:14px;">Las estaciones son tus documentos</div><p style="font-size:12.5px; color:var(--texts-medium); margin:3px 0 0; line-height:1.5;">Cada peaje de la ruta es un requisito o documento que debes tener listo para no detenerte.</p></div>
+        </div>
+        <div style="display:flex; gap:12px;">
+          <div style="width:34px; height:34px; flex:none; border-radius:10px; background:var(--background-info-light); display:flex; align-items:center; justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0099de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div><div style="font-family:var(--title); font-weight:700; font-size:14px;">Diccionario del viaje</div><p style="font-size:12.5px; color:var(--texts-medium); margin:3px 0 0; line-height:1.5;">¿Un término nuevo? Abre el ABC de PACs y busca su definición en lenguaje cotidiano.</p></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; background:var(--neutral-l02); border-radius:16px; padding:18px;">
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>
+          <div style="font-family:var(--title); font-weight:700; font-size:14.5px;">El mapa offline es el PDF</div>
+        </div>
+        <p style="font-size:12.5px; color:var(--texts-dark); line-height:1.55; margin:0 0 14px;">¿No tienes conexión o prefieres tenerlo a la mano? El mapa offline es el PDF de la guía “Waze de Planes”: descárgalo y úsalo para hacer tus planes donde estés.</p>
+        <a href="{{ wazePdfUrl }}" download="Waze de Planes - Skandia.pdf" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:9px; background:var(--button-brand-default); color:#fff; font-family:var(--title); font-weight:700; font-size:13.5px; padding:13px; border-radius:100px; margin-bottom:9px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Descargar mapa offline (PDF)
+        </a>
+        <a href="{{ abcUrl }}" download="ABC de PACs.docx" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:9px; background:#fff; color:var(--texts-dark); border:1.5px solid var(--stroke-grey-light); font-family:var(--title); font-weight:700; font-size:13.5px; padding:13px; border-radius:100px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Descargar ABC de PACs
+        </a>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+  <div style="position:absolute; bottom:0; left:0; right:0; z-index:60; height:34px; display:flex; justify-content:center; align-items:flex-end; padding-bottom:8px; pointer-events:none;">
+    <div style="width:139px; height:5px; border-radius:100px; background:rgba(0,0,0,0.25);"></div>
+  </div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 470, &quot;height&quot;: 940}, &quot;mapStyle&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;dia&quot;, &quot;noche&quot;, &quot;esquema&quot;], &quot;default&quot;: &quot;dia&quot;, &quot;tsType&quot;: &quot;string&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'start',     // start | check | blocked | destinos | bif | calc | nav | llegada
+    planKey: null,       // bonif | mutuo | flex
+    route: null,         // rapida | legal
+    step: 0,
+    panel: null,         // menu | dict | offline | recursos | help
+    activeTerm: null,
+    query: '',
+    mapStyle: null,      // dia | noche | esquema (null -> prop -> dia)
+    fitScale: 1,
+
+    // --- Consulta de empresas (PAC) ---
+    cNit: '',
+    cStatus: 'idle',     // idle | loading | found | notfound | error
+    cResult: null,
+    cMode: null,         // live | demo
+  };
+
+  componentDidMount() {
+    this._fit = () => {
+      const w = window.innerWidth, h = window.innerHeight;
+      const s = Math.min((w - 20) / 402, (h - 20) / 874, 1);
+      this.setState({ fitScale: Math.max(0.3, Math.round(s * 1000) / 1000) });
+    };
+    this._fit();
+    window.addEventListener('resize', this._fit);
+  }
+
+  componentWillUnmount() { clearTimeout(this._t); if (this._fit) window.removeEventListener('resize', this._fit); }
+
+  _goCalc(route) {
+    this.setState({ route, screen: 'calc', step: 0 });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ screen: 'nav' }), 1700);
+  }
+
+  _plans() {
+    return {
+      bonif: { label: 'Plan de Bonificaciones', forceLegal: false },
+      mutuo: { label: 'Plan de Ahorro Mutuo', forceLegal: true },
+      flex:  { label: 'Plan de Beneficios Flexibles', forceLegal: true },
+    };
+  }
+
+  _peajes() {
+    return [
+      { titulo: 'Cámara de comercio vigente', desc: 'El certificado del patrocinador debe tener una vigencia menor a 30 días.' },
+      { titulo: 'Dueños personas jurídicas', desc: 'Identifica a las personas naturales con más del 5% de participación en la compañía.' },
+      { titulo: 'Documento RUB', desc: 'Te orienta para identificar a los beneficiarios finales de la compañía.' },
+      { titulo: 'Antigüedad de la empresa', desc: 'Mínimo 6 meses. Entre 6 y 12 meses → cuestionario de conocimiento a profundidad.', warn: 'Empresas con menos de 6 meses constituidas no aplican para PAC. Es un requisito de entrada.' },
+    ];
+  }
+
+  _steps() {
+    const ICON_CHAT = 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z';
+    const ICON_DOC = 'M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 13h6M9 17h4';
+    const ICON_RIGHT = 'M6 19v-7a4 4 0 0 1 4-4h7M14 4l4 4-4 4';
+    const ICON_LEFT = 'M18 19v-7a4 4 0 0 0-4-4H7M11 4L7 8l4 4';
+    const ICON_FLAG = 'M4 21V4M4 4h13l-2.5 4L17 12H4';
+    const BADGE_PEAJE = { badge: 'Peaje · documento', badgeBg: 'var(--feedback-warning-light)', badgeColor: '#b97c00' };
+
+    const diag = {
+      iconPath: ICON_CHAT, maneuver: 'Continúa recto · 300 m',
+      titulo: 'Reunión de diagnóstico',
+      desc: 'Asistes a la reunión y construyes la ruta a partir de lo que escuchas.',
+      list: ['Escucha la necesidad de la empresa', 'Construye el diagnóstico', 'Ofrece la alternativa de plan'],
+    };
+    const peajes = this._peajes().map((p, i) => ({
+      iconPath: ICON_DOC,
+      maneuver: i === 0 ? 'Próximo peaje · 150 m' : 'Siguiente peaje',
+      titulo: p.titulo, desc: p.desc, warn: p.warn || null, ...BADGE_PEAJE,
+    }));
+    const creado = {
+      iconPath: ICON_FLAG, maneuver: 'Casi llegas · el sistema toma el control',
+      titulo: 'El plan está creado',
+      desc: 'Ambas rutas llegan aquí. Ahora se generan los contratos de los partícipes.',
+      list: ['Te notifican que el plan fue creado', 'Creas los contratos vía Typeform (el partícipe recibe correo para firma)', 'Los contratos quedan en el sistema al día siguiente'],
+    };
+
+    if (this.state.route === 'rapida') {
+      const rapida = {
+        iconPath: ICON_RIGHT, maneuver: 'Gira a la derecha · Vinculación Digital',
+        titulo: 'Vinculación Digital',
+        desc: 'En una experiencia tipo DocuSign, el patrocinador —con apoyo del Financial Planner— completa toda la documentación.',
+        list: ['El patrocinador abre la experiencia digital', 'El Financial Planner lo acompaña y guía', 'Se completa y firma la documentación'],
+        badge: 'Ruta rápida · sin peajes', badgeBg: 'var(--feedback-success-light)', badgeColor: '#03a835',
+      };
+      return [diag, ...peajes, rapida, creado];
+    }
+    const legal = {
+      iconPath: ICON_LEFT, maneuver: 'Toma el desvío · 6 paradas',
+      titulo: 'Ajustar y aprobar la carta',
+      desc: 'Cuando la carta cambia o el plan es Ahorro Mutuo o Beneficios Flexibles, sigues esta ruta de seis paradas.',
+      list: ['Enviar la carta modelo a la empresa', 'La empresa la ajusta a sus necesidades', 'Revisar los ajustes recibidos', 'Cargar en el site de Legal vía Director Comercial', 'Legal Skandia acepta las modificaciones', 'Enlistar documentos y presentar a Desarrollo Comercial'],
+      warn: 'No hagas firmar la carta antes del OK de Legal sobre los cambios: firmar antes de la aprobación genera reprocesos.',
+      badge: 'Ruta legal', badgeBg: 'var(--feedback-warning-light)', badgeColor: '#b97c00',
+    };
+    return [diag, ...peajes, legal, creado];
+  }
+
+  _terms() {
+    return [
+      { term: 'Aporte', l: 'A', def: 'Cada depósito de dinero que entra al plan. Puede hacerlo la empresa (aporte del patrocinador), el empleado (aporte del partícipe) o ambos. Cada tipo de aporte vive en una subcuenta separada con sus propias reglas.', simple: 'Piensa en el plan como una alcancía con varios compartimentos: lo que pone la empresa va en uno, lo que pones tú en otro, y cada uno tiene su propio candado.' },
+      { term: 'Aportes Condicionados (AC) / Plan de Bonificaciones', l: 'A', def: 'La empresa entrega una bonificación —bono por resultados, prima de retención, compensación de desvinculación— pero en lugar de pagarla en efectivo, la deposita en el plan sujeta a condiciones. Mientras la condición no se cumpla, el dinero no es ingreso del empleado y no paga impuestos en ese momento. Es el tipo de plan más numeroso del portafolio Skandia.' },
+      { term: 'Aportes Perseverancia', l: 'A', def: 'Subcuenta especial de los planes de Ahorro Mutuo: cuando un partícipe no cumple su condición de consolidación (por ejemplo, renuncia antes de tiempo), el aporte que la empresa hizo a su nombre se declara fallido y, en lugar de devolverse, se redistribuye cada seis meses entre los partícipes activos.', simple: 'Es el premio a quienes se quedan: la porción del que se fue se reparte entre los que perseveraron.' },
+      { term: 'Ahorro Mutuo (AM)', l: 'A', def: 'La empresa “acompaña” el ahorro del empleado: si el empleado aporta un porcentaje de su salario cada mes, la empresa aporta otro porcentaje a su nombre. Si el empleado deja de aportar, la empresa también. Es el equivalente colombiano del matching de los planes 401(k), típico de multinacionales.', simple: 'Por cada peso que ahorras, tu empresa pone otro tanto, con la condición de que sigas ahorrando y permanezcas un tiempo.' },
+      { term: 'AUM (Assets Under Management)', l: 'A', def: 'Activos bajo administración: el valor total del dinero invertido dentro del plan o del fondo en un momento dado, incluyendo aportes y rendimientos. Es la medida estándar del tamaño de un plan.' },
+      { term: 'Beneficiario', l: 'B', def: 'La persona que recibe los recursos del plan cuando el partícipe fallece. En las cartas de condiciones, el fallecimiento es una condición de consolidación: los aportes se consolidan y se entregan a quienes legalmente le sucedan, acreditando los documentos de ley ante Skandia.' },
+      { term: 'Beneficio tributario', l: 'B', def: 'El ahorro en impuestos que genera el plan, y la razón principal por la que las empresas lo implementan. Opera al entrar (el aporte no constituye salario ni, mientras esté condicionado, ingreso del empleado) y al salir (si el retiro cumple las condiciones del Artículo 126-1, sale con tratamiento favorable). El material Skandia proyecta una disminución cercana al 85% en la retención del mes del bono y del orden del 33% en el impuesto de renta del año.', simple: 'Recibir el bono en efectivo es como recibir el salario de todo un año en un solo mes: el sistema te cobra como si siempre ganaras eso. Pasarlo por el plan reparte y difiere ese golpe.' },
+      { term: 'Beneficios Flexibles (BeneFlex)', l: 'B', def: 'Reorganiza la forma en que el empleado recibe parte de su remuneración: en lugar de todo como salario en efectivo, una porción se canaliza al plan a través de subcuentas con destinos definidos (pensión, primas, cesantías). Requiere un estructurador y es típico de grandes empleadores con cientos o miles de empleados.' },
+      { term: 'Bonificación Voluntaria (BV)', l: 'B', def: 'Nombre con que se conoce en Skandia la familia de planes de Aportes Condicionados. Cubre bonos de ejecutivos, planes de socios (distribución de utilidades) y bonificaciones de enganche, retención o desvinculación.' },
+      { term: 'Carta de condiciones', l: 'C', def: 'El documento contractual que crea el plan. Es una carta que la empresa patrocinadora dirige a Skandia AFP – ACCAI S.A. donde quedan escritas todas las reglas: quién puede ser partícipe, cuánto se aporta, qué condiciones deben cumplirse y cuándo puede usarse el dinero.' },
+      { term: 'Condición de consolidación', l: 'C', def: 'El requisito que debe cumplirse para que el dinero aportado por la empresa pase a ser propiedad del partícipe: 10 años de permanencia, fallecimiento, invalidez, requisitos de pensión, compra de vivienda, desvinculación laboral o acuerdo anticipado entre las partes. Cada plan elige cuáles aplica.' },
+      { term: 'Condición fallida', l: 'C', def: 'Ocurre cuando la condición de consolidación se vuelve imposible de cumplir (por ejemplo, el empleado renuncia antes del tiempo pactado en Ahorro Mutuo). El aporte de la empresa nunca llega a ser del empleado: regresa al patrocinador o se redistribuye entre los partícipes activos.' },
+      { term: 'Consolidación', l: 'C', def: 'El momento en que el dinero condicionado se vuelve, jurídicamente, propiedad del partícipe. Es también el momento tributario relevante: al consolidar, Skandia practica la retención que corresponda según lo informado por el patrocinador. Puede ser total o parcial.', simple: 'Es el día en que el candado de la alcancía se abre y lo que había adentro pasa a tener tu nombre en la escritura.' },
+      { term: 'Crédito con garantía del plan', l: 'C', def: 'El partícipe puede solicitar un crédito de libre inversión usando como garantía el saldo de su plan, sin necesidad de consolidar ni retirar. Da liquidez inmediata sin perder los beneficios tributarios del dinero que permanece en el plan.', simple: 'En vez de romper la alcancía (y pagar impuestos por hacerlo), la dejas como prenda y el banco te presta sobre lo que hay adentro.' },
+      { term: 'Cuenta contingente', l: 'C', def: 'Un “bolsillo de control” interno en tu plan que registra el impuesto que te ahorraste provisionalmente al invertir. No es una deuda: es el registro del impuesto que el fondo te retendría únicamente si retiras el dinero incumpliendo los requisitos de ley.' },
+      { term: 'Cuenta individual', l: 'C', def: 'El registro a nombre de cada partícipe dentro del fondo, donde se abonan sus aportes, los de la empresa y los rendimientos de ambos. Aunque el plan es colectivo en su administración, cada persona tiene su propia cuenta con sus propias subcuentas.' },
+      { term: 'Disponibilidad (condiciones de)', l: 'D', def: 'Las reglas sobre cuándo el partícipe puede efectivamente usar o retirar recursos ya consolidados. Es la segunda llave: la consolidación responde “¿de quién es el dinero?”; la disponibilidad responde “¿cuándo puede tocarlo?”.', simple: 'La alcancía tiene dos candados: el primero pone el dinero a tu nombre; el segundo define cuándo puedes sacarlo. Solo con los dos abiertos el dinero llega a tu bolsillo.' },
+      { term: 'Entidad Patrocinadora / Patrocinador', l: 'E', def: 'La empresa que crea el plan y hace los aportes a favor de sus trabajadores, contratistas o miembros. Firma la carta de condiciones, decide quién entra, define las condiciones de consolidación y puede modificar o cesar los aportes. Sus aportes no constituyen salario.', simple: 'Es el “dueño del juego”: pone las reglas y buena parte del dinero, aunque el dinero, una vez consolidado, sea de los jugadores.' },
+      { term: 'Estructurador', l: 'E', def: 'Asesor especializado que diseña los planes de Beneficios Flexibles: define cómo se reorganiza la remuneración entre salario, subcuentas y beneficios, cuidando que el esquema sea sostenible jurídica y tributariamente.' },
+      { term: 'Fondo Voluntario de Pensión (FVP)', l: 'F', def: 'El vehículo de inversión donde vive el plan. En Skandia es el Fondo Voluntario de Pensión Skandia Multifund, administrado por Skandia AFP – ACCAI S.A. y vigilado por la Superintendencia Financiera. “Voluntario” lo distingue del sistema pensional obligatorio.' },
+      { term: 'FP (Financial Planner)', l: 'F', def: 'El asesor comercial de Skandia que acompaña al plan y a sus partícipes: ayuda a estructurarlo, recuerda los aportes, atiende las solicitudes de consolidación y asesora las decisiones de inversión. Cada plan tiene un FP asignado.' },
+      { term: 'Liberalidad (aporte de mera liberalidad)', l: 'L', def: 'Expresión jurídica que significa que el aporte de la empresa es un acto voluntario y gratuito: no es obligación laboral ni contraprestación por el trabajo. Por eso —en línea con el Artículo 128 del CST— no constituye salario ni entra en la liquidación de prestaciones.', simple: 'Es un regalo con condiciones, no parte del sueldo: la empresa lo da porque quiere, y por eso recibe un tratamiento distinto.' },
+      { term: 'PAC (Plan de Ahorro Corporativo)', l: 'P', def: 'Nombre genérico de la familia de planes que una empresa constituye en el fondo voluntario a favor de sus empleados, socios o miembros. Las cuatro modalidades: Bonificación Voluntaria, Ahorro Mutuo, Beneficios Flexibles y planes Colectivos.' },
+      { term: 'Partícipe', l: 'P', def: 'La persona natural a cuyo nombre están los recursos del plan: el empleado, contratista, socio o miembro de la entidad patrocinadora. Cumplidas las condiciones, se convierte en dueño del dinero, elige los portafolios y designa el destino de sus recursos.', simple: 'Si el patrocinador es quien siembra, el partícipe es quien cosecha — siempre que cumpla las condiciones del cultivo.' },
+      { term: 'Permanencia (10 años)', l: 'P', def: 'La condición de tiempo del Artículo 126-1: si un aporte permanece 10 años en el fondo voluntario (contados desde que se abona), puede retirarse conservando el beneficio tributario, sin necesidad de pensión ni vivienda. El conteo se conserva si los recursos se trasladan a otro fondo de similares características.' },
+      { term: 'Plan Colectivo', l: 'P', def: 'Modalidad sin patrocinador: un grupo con un vínculo común (una familia, un fondo de empleados, una asociación) constituye un plan para ahorrar e invertir conjuntamente. Es el vehículo típico del patrimonio familiar dentro del portafolio.' },
+      { term: 'Portafolio / Alternativa de inversión', l: 'P', def: 'La canasta de inversiones donde se coloca el dinero del plan. Los aportes entran inicialmente al portafolio Strategist Liquidez Colombia (bajo riesgo, alta liquidez) y el partícipe puede recomponer su inversión entre las alternativas del fondo según su perfil.' },
+      { term: 'Retención en la fuente', l: 'R', def: 'El cobro anticipado de impuestos al momento de un pago. Si el bono se paga en efectivo, la retención se practica de inmediato; si entra al plan, no hay retención al depositar — solo, si hay lugar, al consolidar, según el porcentaje que informe el patrocinador. Diferir la retención es una de las palancas centrales de la optimización tributaria.' },
+      { term: 'Subcuenta', l: 'S', def: 'Compartimento dentro de la cuenta individual del partícipe que agrupa aportes con un mismo origen y reglas. Por ejemplo, en Ahorro Mutuo: Aportes del Partícipe, de la Entidad Patrocinadora, Adicionales y Perseverancia. Cada subcuenta tiene su propia condición de consolidación.' },
+      { term: 'Traslado', l: 'T', def: 'El mecanismo para mover el plan —total o parcialmente— de un fondo voluntario a otro de similares características. Lo solicita el patrocinador, previo acuerdo con cada partícipe. El traslado bien hecho conserva la antigüedad de los aportes: el conteo de los 10 años no se reinicia.', simple: 'Es una mudanza, no una demolición: el plan cambia de edificio (de administradora) pero conserva su historia, condiciones y antigüedad.' },
+      { term: 'UVT (Unidad de Valor Tributario)', l: 'U', def: 'La unidad de medida que usa la DIAN para expresar cifras tributarias, actualizada cada año con la inflación. Los topes del Artículo 126-1 se expresan en UVT: los aportes voluntarios que no excedan el 30% del ingreso del año, sin superar 3.800 UVT anuales, no hacen parte de la base de retención y son renta exenta.' },
+    ];
+  }
+
+  _theme(s) {
+    const T = {
+      dia:    { bg: '#c6d4cc', block: '#e9efeb', grid: '#f1f6f3', route: 'url(#rg)', casing: '#ffffff', marker: '#00c73d', text: '#5a6b63' },
+      noche:  { bg: '#19202e', block: '#222b3c', grid: '#2c3650', route: '#5fed73', casing: '#10151f', marker: '#8fe000', text: '#cdd6e6' },
+      esquema:{ bg: '#f7faf8', block: '#eef3f0', grid: '#e2ebe6', route: 'url(#rg)', casing: '#ffffff', marker: '#00c73d', text: '#9aa3a0' },
+    };
+    return T[s] || T.dia;
+  }
+
+  // ========================================================================
+  //  CONSULTA DE EMPRESAS (PAC)  —  conectado a Google Sheets
+  // ========================================================================
+  _baseUrl() {
+    // Lee en vivo el Google Sheet (hoja gid=0) como CSV. El Sheet debe estar
+    // compartido como "Cualquier persona con el enlace · Lector".
+    return 'https://docs.google.com/spreadsheets/d/1mALSR8qxSuaF28EBy5BMUgTdO_6B5ZdvJBfS9gWf25U/gviz/tq?tqx=out:csv&gid=0';
+  }
+
+  _demoRows() {
+    return [
+      { nit: '900123456', empresa: 'Inversiones Andinas S.A.S.', programa: 'Plan de Bonificaciones', director: 'Camila Restrepo', agencia: 'Bogotá Norte', fp: 'Andrés Gómez' },
+    ];
+  }
+
+  _norm(v) { return String(v == null ? '' : v).replace(/\D/g, ''); }
+
+  _tc(str) {
+    const s = String(str == null ? '' : str).trim();
+    if (!s) return '';
+    if (s !== s.toUpperCase()) return s;
+    const lower = new Set(['de', 'del', 'la', 'las', 'los', 'y', 'e', 'en', 'el', 'o', 'a', 'para', 'con']);
+    const upper = new Set(['sas', 'sa', 'ltda', 'eu', 'sca', 'bic', 'esp', 'ips', 'eps', 'cia', 'srl', 'spa']);
+    return s.toLowerCase().split(/\s+/).map((w, i) => {
+      const bare = w.replace(/[.,()]/g, '');
+      if (upper.has(bare)) return w.toUpperCase();
+      if (i > 0 && lower.has(w)) return w;
+      return w.replace(/^([a-záéíóúñ])/, c => c.toUpperCase());
+    }).join(' ');
+  }
+
+  _parseCSV(text) {
+    text = String(text || '').replace(/^\uFEFF/, '');
+    const rows = []; let row = []; let field = ''; let q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else q = false; }
+        else field += c;
+      } else {
+        if (c === '"') q = true;
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+        else if (c === '\r') { /* ignora */ }
+        else field += c;
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    if (!rows.length) return [];
+    const norm = (h) => String(h || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const head = rows[0].map(norm);
+    const find = (preds) => head.findIndex(h => preds.some(p => h.includes(p)));
+    const iNit = find(['nit']);
+    const iEmp = find(['empresa', 'razon', 'nombre', 'compania']);
+    const iProg = find(['programa']);
+    const iDir = find(['director']);
+    const iAg = find(['agencia']);
+    let iFp = find(['financial', 'planner']);
+    if (iFp === -1) iFp = head.findIndex(h => h === 'fp');
+    const out = [];
+    for (let r = 1; r < rows.length; r++) {
+      const cols = rows[r];
+      if (!cols || cols.every(c => !String(c).trim())) continue;
+      const get = (idx) => (idx >= 0 && cols[idx] != null) ? String(cols[idx]).trim() : '';
+      const nit = get(iNit);
+      if (!nit) continue;
+      out.push({ nit: this._norm(nit) || nit, empresa: this._tc(get(iEmp)), programa: this._tc(get(iProg)), director: this._tc(get(iDir)), agencia: this._tc(get(iAg)), fp: this._tc(get(iFp)) });
+    }
+    return out;
+  }
+
+  async _loadBase() {
+    if (this._baseRows) return this._baseRows;
+    const url = this._baseUrl();
+    if (!url) { this._baseRows = this._demoRows(); this._baseMode = 'demo'; return this._baseRows; }
+    // Intenta el endpoint principal y, si falla, uno de respaldo; con reintentos.
+    const candidates = [url, url.replace('/gviz/tq?tqx=out:csv', '/export?format=csv')];
+    let lastErr = null;
+    for (const u of candidates) {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const res = await fetch(u, { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const rows = this._parseCSV(await res.text());
+          if (!rows.length) throw new Error('vacío');
+          this._baseRows = rows; this._baseMode = 'live';
+          return rows;
+        } catch (e) { lastErr = e; await new Promise(r => setTimeout(r, 400)); }
+      }
+    }
+    throw lastErr || new Error('fallo de red');
+  }
+
+  async _doConsulta() {
+    const input = this._norm(this.state.cNit);
+    if (!input) return;
+    this.setState({ cStatus: 'loading', cResult: null });
+    let rows;
+    try { rows = await this._loadBase(); }
+    catch (e) { this.setState({ cStatus: 'error' }); return; }
+    let match = null;
+    for (const r of rows) {
+      const b = this._norm(r.nit);
+      if (!b) continue;
+      if (b === input || b.slice(0, -1) === input || b === input.slice(0, -1)) { match = r; break; }
+    }
+    this.setState({ cStatus: match ? 'found' : 'notfound', cResult: match, cMode: this._baseMode });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const screen = s.screen;
+    const plans = this._plans();
+    const plan = plans[s.planKey] || { label: '' };
+    const steps = this._steps();
+    const stepIdx = Math.max(0, Math.min(s.step, steps.length - 1));
+    const cur0 = steps[stepIdx] || {};
+    const cur = {
+      iconPath: cur0.iconPath || '',
+      maneuver: cur0.maneuver || '',
+      titulo: cur0.titulo || '',
+      desc: cur0.desc || '',
+      list: cur0.list ? cur0.list.map((t, i) => ({ n: i + 1, t })) : null,
+      warn: cur0.warn || '',
+      badge: cur0.badge || '',
+      badgeBg: cur0.badgeBg || 'var(--neutral-l02)',
+      badgeColor: cur0.badgeColor || '#404040',
+    };
+
+    // map style
+    const mapStyle = s.mapStyle || this.props.mapStyle || 'dia';
+    const th = this._theme(mapStyle);
+
+    // nodes along an S-curve
+    const n = steps.length;
+    const nodes = steps.map((st, i) => {
+      const t = n > 1 ? i / (n - 1) : 0;
+      const y = Math.round(296 - t * 252);
+      const x = Math.round(180 + Math.sin(t * Math.PI * 1.7 + 0.35) * 84);
+      return { x, y, fill: i <= stepIdx ? th.marker : '#ffffff' };
+    });
+    const routePts = nodes.map(p => p.x + ',' + p.y).join(' ');
+    const marker = nodes[stepIdx] || { x: 180, y: 338 };
+    const finish = nodes[n - 1] || { x: 180, y: 40 };
+
+    const progress = steps.map((st, i) => ({
+      w: i === stepIdx ? '22px' : '7px',
+      bg: i < stepIdx ? th.marker : (i === stepIdx ? th.marker : 'var(--neutral-l03)'),
+    }));
+
+    // dictionary
+    const q = (s.query || '').trim().toLowerCase();
+    const all = this._terms();
+    const filtered = q ? all.filter(t => t.term.toLowerCase().includes(q) || t.def.toLowerCase().includes(q) || (t.simple || '').toLowerCase().includes(q)) : all;
+    const groups = [];
+    let g = null;
+    filtered.forEach(t => {
+      if (!g || g.letter !== t.l) { g = { letter: t.l, items: [] }; groups.push(g); }
+      const open = s.activeTerm === t.term;
+      g.items.push({
+        term: t.term, def: t.def, simple: t.simple || '', hasSimple: !!t.simple,
+        open, chev: open ? 'rotate(180deg)' : 'rotate(0deg)',
+        toggle: () => this.setState(st => ({ activeTerm: st.activeTerm === t.term ? null : t.term })),
+      });
+    });
+
+    const routeLabel = s.route === 'rapida' ? 'Ruta rápida · Vinculación Digital' : 'Ruta legal · 6 paradas';
+    const tab = (key) => mapStyle === key ? '#fff' : 'transparent';
+    const tabC = (key) => mapStyle === key ? 'var(--primary-d02)' : 'var(--texts-medium)';
+
+    // consulta
+    const cStatus = s.cStatus || 'idle';
+    const cr = s.cResult || {};
+    const cFields = [];
+    if (cr.programa) cFields.push({ label: 'Programa', value: cr.programa, iconPath: 'M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7M3 7l2-4h14l2 4M3 7h18M8 11h8' });
+    if (cr.director) cFields.push({ label: 'Director', value: cr.director, iconPath: 'M20 21v-2a4 4 0 0 0-3-3.87M4 21v-2a4 4 0 0 1 3-3.87M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' });
+    if (cr.agencia) cFields.push({ label: 'Agencia', value: cr.agencia, iconPath: 'M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9v.01M9 13v.01M9 17v.01' });
+    if (cr.fp) cFields.push({ label: 'Financial Planner', value: cr.fp, iconPath: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM16 11l2 2 4-4' });
+
+    return {
+      deviceDark: false, devW: 402, devH: 874, fitScale: s.fitScale || 1,
+      wazePdfUrl: ((typeof window !== 'undefined' && window.__resources) || {}).wazePdf || 'assets/Waze-de-Planes-Skandia.pdf',
+      abcUrl: ((typeof window !== 'undefined' && window.__resources) || {}).abcDoc || 'assets/ABC-de-PACs.docx',
+      isStart: screen === 'start', isCheck: screen === 'check', isBlocked: screen === 'blocked',
+      isDestinos: screen === 'destinos', isBif: screen === 'bif', isCalc: screen === 'calc',
+      isNav: screen === 'nav', isLlegada: screen === 'llegada',
+
+      // map theme
+      m_bg: th.bg, m_block: th.block, m_grid: th.grid, m_route: th.route,
+      m_casing: th.casing, m_markerCol: th.marker, m_text: th.text,
+      nodes, routePts, marker, finish,
+
+      // nav
+      cur, curHasList: !!cur.list, curHasWarn: !!cur.warn, curHasBadge: !!cur.badge,
+      progress, stepLabel: 'Parada ' + (stepIdx + 1) + ' de ' + n,
+      nextLabel: stepIdx >= n - 1 ? 'Finalizar viaje' : 'Siguiente',
+
+      planLabel: plan.label, routeLabel,
+      standardConds: [
+        'Consolidación por permanencia de 10 años del aporte',
+        'Compra de vivienda o pago de obligaciones hipotecarias',
+        'Cumplimiento de condiciones de pensión',
+        'Incapacidad total y permanente',
+        'Fallecimiento',
+        'Uso para cubrir la garantía de un crédito',
+        'Desvinculación de la empresa',
+        'Acuerdo entre patrocinador y partícipe',
+      ],
+
+      // dict
+      dictGroups: groups, query: s.query, dictEmpty: filtered.length === 0,
+      termCount: all.length,
+
+      // panels
+      panelMenu: s.panel === 'menu', panelDict: s.panel === 'dict',
+      panelOffline: s.panel === 'offline', panelRecursos: s.panel === 'recursos',
+      panelHelp: s.panel === 'help', anyPanel: !!s.panel,
+      panelConsulta: s.panel === 'consulta',
+
+      // consulta empresa
+      cNit: s.cNit,
+      isCIdle: cStatus === 'idle', isCLoading: cStatus === 'loading',
+      isCFound: cStatus === 'found', isCNotFound: cStatus === 'notfound', isCError: cStatus === 'error',
+      cEmpresa: cr.empresa || 'Empresa registrada',
+      cNitEcho: cr.nit || s.cNit,
+      cFields,
+      cBtnDisabled: !this._norm(s.cNit),
+      cIsDemo: s.cMode === 'demo',
+
+      // map style tabs
+      tabDia: tab('dia'), tabDiaC: tabC('dia'),
+      tabNoche: tab('noche'), tabNocheC: tabC('noche'),
+      tabEsq: tab('esquema'), tabEsqC: tabC('esquema'),
+
+      // handlers
+      start: () => this.setState({ screen: 'check' }),
+      sayNo: () => this.setState({ screen: 'destinos' }),
+      sayYes: () => this.setState({ screen: 'blocked' }),
+      pickBonif: () => this.setState({ planKey: 'bonif', screen: 'bif' }),
+      pickMutuo: () => { this.setState({ planKey: 'mutuo' }); this._goCalc('legal'); },
+      pickFlex: () => { this.setState({ planKey: 'flex' }); this._goCalc('legal'); },
+      bifYes: () => this._goCalc('rapida'),
+      bifNo: () => this._goCalc('legal'),
+      next: () => this.setState(st => {
+        const tot = this._steps().length;
+        if (st.step >= tot - 1) return { screen: 'llegada' };
+        return { step: st.step + 1 };
+      }),
+      back: () => this.setState(st => {
+        if (st.screen === 'nav') {
+          if (st.step > 0) return { step: st.step - 1 };
+          return { screen: st.planKey === 'bonif' ? 'bif' : 'destinos' };
+        }
+        if (st.screen === 'check') return { screen: 'start' };
+        if (st.screen === 'blocked') return { screen: 'check' };
+        if (st.screen === 'destinos') return { screen: 'check' };
+        if (st.screen === 'bif') return { screen: 'destinos' };
+        return { screen: 'start' };
+      }),
+      restart: () => this.setState({ screen: 'start', planKey: null, route: null, step: 0, panel: null }),
+
+      openMenu: () => this.setState({ panel: 'menu' }),
+      closePanel: () => this.setState({ panel: null }),
+      goMenu: () => this.setState({ panel: 'menu' }),
+      goDict: () => this.setState({ panel: 'dict' }),
+      goOffline: () => this.setState({ panel: 'offline' }),
+      goRecursos: () => this.setState({ panel: 'recursos' }),
+      goHelp: () => this.setState({ panel: 'help' }),
+      onQuery: (e) => this.setState({ query: e.target.value, activeTerm: null }),
+
+      // consulta empresa
+      openConsulta: () => this.setState({ panel: 'consulta', cStatus: 'idle', cNit: '', cResult: null }),
+      onCNit: (e) => this.setState({ cNit: (e.target.value || '').replace(/\D/g, '') }),
+      cKey: (e) => { if (e.key === 'Enter') this._doConsulta(); },
+      doConsulta: () => this._doConsulta(),
+      cReset: () => this.setState({ cStatus: 'idle', cNit: '', cResult: null }),
+
+      setMapDia: () => this.setState({ mapStyle: 'dia' }),
+      setMapNoche: () => this.setState({ mapStyle: 'noche' }),
+      setMapEsq: () => this.setState({ mapStyle: 'esquema' }),
+    };
+  }
+}
+</script>
+</body>
+</html>
