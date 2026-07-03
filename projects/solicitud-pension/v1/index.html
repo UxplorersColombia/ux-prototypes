@@ -138,11 +138,7 @@
 
         <!-- ---- STEP: CUENTA ---- -->
         <sc-if value="{{ isCuenta }}" hint-placeholder-val="{{ false }}">
-          <h2 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:18px;text-align:center;color:#363636;margin:0 0 6px;">{{ cuentaTitle }}</h2>
-          <sc-if value="{{ showSaldo }}" hint-placeholder-val="{{ false }}">
-            <div style="text-align:center;color:#666666;font-size:14px;margin-bottom:4px;">{{ cuentaSubtitle }}</div>
-            <div style="text-align:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:24px;color:#363636;margin-bottom:26px;">{{ saldo }}</div>
-          </sc-if>
+          <h2 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:18px;text-align:center;color:#363636;margin:0 0 26px;">{{ cuentaTitle }}</h2>
           <div style="background:#f7f7f7;border-radius:12px;padding:20px;box-shadow:0 0 4px 0 rgba(61, 75, 92, 0.15);">
             <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><path d="M14 3v4a1 1 0 0 0 1 1h4"></path><path d="M5 3h9l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path></svg>
@@ -175,9 +171,6 @@
         <sc-if value="{{ isExcedentes }}" hint-placeholder-val="{{ false }}">
           <h2 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:18px;text-align:center;color:#363636;margin:0 0 4px;">Información para retiro de Excedentes de Libre Disponibilidad</h2>
           <p style="text-align:center;color:#666666;font-size:13px;margin:0 0 22px;line-height:1.5;">Aplica solo cuando el afiliado cumple los requisitos establecidos en el artículo 85 de la Ley 100 de 1993.</p>
-          <!-- Saldo total en pensión obligatoria -->
-          <div style="text-align:center;color:#666666;font-size:14px;margin-bottom:4px;">Saldo total en pensión obligatoria (este saldo varía diariamente)</div>
-          <div style="text-align:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:24px;color:#363636;margin-bottom:26px;">{{ saldo }}</div>
           <!-- Datos para el giro -->
           <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:16px;">
             <div style="font-size:15px;font-weight:700;color:#404040;">Datos para el giro</div>
@@ -629,12 +622,6 @@
               <span style="font-size:14px;font-weight:700;color:#404040;">Prestación solicitada</span>
               <span style="font-size:14px;color:#666666;text-align:right;max-width:55%;">{{ tycPrestacion }}</span>
             </div>
-            <sc-if value="{{ tycShowSaldo }}" hint-placeholder-val="{{ true }}">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #e9e9e9;">
-                <span style="font-size:14px;font-weight:700;color:#404040;">Tu saldo es</span>
-                <span style="font-size:14px;color:#666666;">$508.897.000*</span>
-              </div>
-            </sc-if>
             <sc-if value="{{ tycShowDest }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #e9e9e9;">
                 <span style="font-size:14px;font-weight:700;color:#404040;">Destino</span>
@@ -662,7 +649,7 @@
               </sc-for>
             </sc-if>
           </div>
-          <p style="font-size:13px;color:#666666;line-height:1.55;margin:0 0 22px;">* El valor del retiro depende de los recursos disponibles en tu contrato y de la variación del valor de la unidad al momento del cierre. Al finalizar la transacción, autorizas a Skandia AFP - ACCAI S.A. a aplicar los descuentos correspondientes por impuestos y retenciones.</p>
+          <p style="font-size:13px;color:#666666;line-height:1.55;margin:0 0 22px;">El valor del retiro depende de los recursos disponibles en tu contrato y de la variación del valor de la unidad al momento del cierre. Al finalizar la transacción, autorizas a Skandia AFP - ACCAI S.A. a aplicar los descuentos correspondientes por impuestos y retenciones.</p>
           <!-- Aceptaciones con toggle -->
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div class="sk-toggle-card" style="background:#f0fdf4;border-radius:12px;padding:16px 18px;display:flex;gap:18px;align-items:center;box-shadow:0 0 4px 0 rgba(61,75,92,0.15);">
@@ -1304,7 +1291,6 @@ if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { 
     const cuentaTitle = s.type === 'devolucion' ? 'Cuenta bancaria para tu devolución de saldos'
       : s.type === 'subsidio' ? 'Cuenta bancaria para tu subsidio pensional'
       : 'Cuenta bancaria para tu mesada pensional';
-    const showSaldo = ['vejez', 'invalidez', 'devolucion'].includes(s.type);
 
     // datos fields
     const df = [
@@ -1934,7 +1920,7 @@ if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { 
       vejezSubtipos, tipoRows,
       onToggleVejez: () => this.setState({ vejezOpen: !s.vejezOpen }),
       // cuenta
-      cuentaTitle, cuentaSubtitle: 'Saldo total en pensión obligatoria (este saldo varía diariamente)', showSaldo, saldo: '$508.897.000',
+      cuentaTitle,
       showExcedentes: s.type === 'vejez', excedentes: s.excedentes,
       excedBd: s.excedentes ? '#00c73d' : '#c5c5c5', excedBg: s.excedentes ? '#00c73d' : '#fff',
       onExcedentes: () => this.set('excedentes', !s.excedentes),
@@ -2081,7 +2067,6 @@ if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { 
         const typeLabels = { vejez: 'Vejez normal / Pensión Vejez', devolucion: 'Devolución de saldos', invalidez: 'Pensión por invalidez', calificacion: 'Calificación PCL', subsidio: 'Subsidio de incapacidad temporal', excedentes: 'Excedentes de libre disponibilidad', gpm: 'Garantía de pensión mínima', familiar: 'Pensión familiar' };
         const f = this.flow();
         const tycHasExcedentes = f.includes('excedentes');
-        const tycShowSaldo = !['gpm', 'familiar'].includes(s.type);
         const tycShowDest = !['excedentes', 'gpm', 'familiar'].includes(s.type);
         const tycIsFisico = ['gpm', 'familiar'].includes(s.type);
         const tycShowBenef = f.includes('beneficiarios') || tycIsFisico;
