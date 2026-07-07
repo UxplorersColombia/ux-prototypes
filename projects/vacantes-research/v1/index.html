@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research: Mejora de vacantes — Skandia.co</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & base ─────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --green-500: #00c73d;
+      --green-600: #03a835;
+      --green-50:  #f6fcf2;
+      --green-100: #caf9cb;
+      --yellow-400: #ffae08;
+      --yellow-50:  #fffbf0;
+      --red-500:    #e03430;
+      --red-50:     #fef2f2;
+      --blue-500:   #0099de;
+      --blue-50:    #f0f9ff;
+
+      --surface-0:   #ffffff;
+      --surface-50:  #f8f9fa;
+      --surface-100: #f1f3f5;
+      --surface-200: #e2e2e2;
+      --surface-300: #dee2e6;
+      --surface-400: #ced4da;
+      --surface-600: #868e96;
+      --surface-700: #495057;
+      --surface-800: #404040;
+      --surface-900: #212529;
+
+      --text-primary:   #404040;
+      --text-secondary: #666666;
+      --text-muted:     #868e96;
+      --border:         #dddddd;
+
+      --font-body:  'Open Sans', system-ui, sans-serif;
+      --font-head:  'Montserrat', system-ui, sans-serif;
+      --font-mono:  'JetBrains Mono', 'Courier New', monospace;
+
+      --radius-sm:  4px;
+      --radius-md:  8px;
+      --radius-lg:  12px;
+      --radius-xl:  16px;
+
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--surface-50);
+      line-height: 1.6;
+      padding: 40px 20px 80px;
+    }
+
+    /* ─── Layout ────────────────────────────────────────────── */
+    .page { max-width: 900px; margin: 0 auto; }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .doc-header {
+      background: var(--surface-800);
+      border-radius: var(--radius-xl);
+      padding: 40px 48px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .doc-header::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--green-500);
+    }
+    .doc-header::after {
+      content: ''; position: absolute; right: -60px; top: -60px; width: 200px; height: 200px;
+      border-radius: 50%; background: rgba(0,199,61,0.06); pointer-events: none;
+    }
+    .header-eyebrow {
+      font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--green-500); margin-bottom: 12px;
+    }
+    .header-title { font-family: var(--font-head); font-size: 26px; font-weight: 700; color: #ffffff; line-height: 1.3; margin-bottom: 8px; }
+    .header-subtitle { font-size: 14px; color: rgba(255,255,255,0.55); margin-bottom: 28px; max-width: 62ch; }
+    .header-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+    .meta-chip {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px; padding: 4px 12px;
+    }
+    .meta-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-500); }
+    .meta-chip.gate { color: #baf7c9; background: rgba(0,199,61,0.14); border-color: rgba(0,199,61,0.35); }
+    .meta-chip.gate .dot { background: #baf7c9; }
+
+    /* ─── TOC ───────────────────────────────────────────────── */
+    .toc { background: var(--surface-0); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; margin-bottom: 32px; }
+    .toc-title { font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; }
+    .toc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 32px; }
+    .toc-list li a { text-decoration: none; color: var(--text-secondary); font-size: 13px; display: flex; align-items: center; gap: 8px; transition: color 0.15s; }
+    .toc-list li a:hover { color: var(--green-600); }
+    .toc-num { font-family: var(--font-head); font-size: 11px; font-weight: 700; color: var(--green-500); min-width: 18px; }
+
+    /* ─── Section ───────────────────────────────────────────── */
+    .section { background: var(--surface-0); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px 36px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+    .section-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--surface-100); }
+    .section-number { font-family: var(--font-head); font-size: 12px; font-weight: 700; color: var(--green-500); background: var(--green-50); border: 1px solid var(--green-100); border-radius: var(--radius-sm); padding: 4px 8px; min-width: 32px; text-align: center; margin-top: 2px; flex-shrink: 0; }
+    .section-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+    .section-desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+    /* ─── Subsection ────────────────────────────────────────── */
+    .subsection { margin-bottom: 28px; }
+    .subsection:last-child { margin-bottom: 0; }
+    .subsection-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .subsection-title::before { content: ''; display: block; width: 3px; height: 14px; background: var(--green-500); border-radius: 2px; }
+    .body-text { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+    .body-text:last-child { margin-bottom: 0; }
+    .body-text strong { color: var(--text-primary); font-weight: 700; }
+    ul.plain { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    ul.plain li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; padding-left: 16px; position: relative; }
+    ul.plain li::before { content: ''; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--green-500); }
+    ul.plain li strong { color: var(--text-primary); }
+
+    /* ─── Tables ────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: var(--surface-50); border-bottom: 2px solid var(--border); }
+    thead th { padding: 10px 14px; text-align: left; font-family: var(--font-head); font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+    tbody tr { border-bottom: 1px solid var(--surface-100); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-50); }
+    td { padding: 10px 14px; color: var(--text-primary); vertical-align: top; }
+    td strong { font-weight: 700; }
+    td code { font-family: var(--font-mono); font-size: 12px; background: var(--surface-100); padding: 2px 6px; border-radius: 3px; color: var(--surface-800); }
+
+    /* ─── Benchmark heatmap table ───────────────────────────── */
+    table.bench th, table.bench td { text-align: center; font-variant-numeric: tabular-nums; }
+    table.bench th:first-child, table.bench td:first-child { text-align: left; font-family: var(--font-head); font-weight: 700; color: var(--text-primary); }
+    table.bench td.score { font-family: var(--font-mono); font-weight: 500; }
+    .sc-badge { display: inline-flex; min-width: 26px; justify-content: center; padding: 3px 7px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+    .sc-red    { background: var(--red-50);    color: #b91c1c; }
+    .sc-yellow { background: var(--yellow-50); color: #92400e; }
+    .sc-green  { background: var(--green-50);  color: var(--green-600); }
+    .sc-na     { color: var(--text-muted); font-style: italic; font-size: 12px; }
+    td.avg .sc-badge { font-family: var(--font-head); font-weight: 800; font-size: 13px; padding: 4px 10px; }
+
+    /* ─── Badges / tags ─────────────────────────────────────── */
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 100px; }
+    .badge-green  { color: #006420; background: #dcfce7; }
+    .badge-yellow { color: #854d0e; background: #fef9c3; }
+    .badge-red    { color: #991b1b; background: #fee2e2; }
+    .badge-blue   { color: #1e3a5f; background: #dbeafe; }
+    .badge-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .badge-green .badge-dot  { background: var(--green-500); }
+    .badge-yellow .badge-dot { background: var(--yellow-400); }
+    .badge-red .badge-dot    { background: var(--red-500); }
+    .badge-blue .badge-dot   { background: var(--blue-500); }
+
+    .tag { display: inline-flex; align-items: center; font-size: 11.5px; font-weight: 600; color: var(--text-secondary); background: var(--surface-50); border: 1px solid var(--border); border-radius: 100px; padding: 3px 11px; }
+    .tag code { font-family: var(--font-mono); font-size: 11px; }
+
+    /* ─── Callout / Note ────────────────────────────────────── */
+    .callout { display: flex; gap: 12px; padding: 14px 16px; border-radius: var(--radius-md); margin: 12px 0; font-size: 13px; line-height: 1.55; border: 1px solid; }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { flex: 1; color: var(--text-secondary); }
+    .callout-body strong { color: var(--text-primary); font-weight: 700; }
+    .callout.info    { background: var(--blue-50);   border-color: #bae6fd; }
+    .callout.warning { background: var(--yellow-50); border-color: #fde68a; }
+    .callout.success { background: var(--green-50);  border-color: #b3edc4; }
+    .callout.danger  { background: var(--red-50);    border-color: #fecaca; }
+    .callout.neutral { background: var(--surface-50);border-color: var(--border); }
+
+    /* ─── Example / comparison cards ────────────────────────── */
+    .example-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+    .example-card { border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; }
+    .example-head { padding: 10px 14px; font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .example-head.green { background: #dcfce7; color: #15803d; }
+    .example-head.red   { background: #fee2e2; color: #991b1b; }
+    .example-body { padding: 16px; background: var(--surface-0); text-align: center; }
+    .result-margin { font-family: var(--font-head); font-size: 34px; font-weight: 800; display: block; line-height: 1; }
+    .result-margin.green { color: #15803d; }
+    .result-margin.red   { color: #991b1b; }
+    .result-label { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
+
+    /* ─── Evidence frame / gallery ──────────────────────────── */
+    .evidence-frame { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; background: var(--surface-0); box-shadow: var(--shadow-sm); }
+    .evidence-frame img { width: 100%; display: block; }
+    .evidence-frame figcaption { padding: 8px 12px; font-size: 11.5px; color: var(--text-muted); border-top: 1px solid var(--surface-100); }
+    .evidence-lead { display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: start; margin-bottom: 20px; }
+    .evidence-lead .evidence-frame { position: sticky; top: 20px; }
+    @media (max-width: 640px) { .evidence-lead { grid-template-columns: 1fr; } .evidence-lead .evidence-frame { position: static; } }
+    .evidence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
+    .evidence-grid a { display: block; text-decoration: none; }
+    .evidence-grid img { height: 108px; object-fit: cover; object-position: top; }
+
+    /* ─── Referente card ────────────────────────────────────── */
+    .ref-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .ref-head h4 { font-family: var(--font-head); font-size: 14.5px; font-weight: 700; color: var(--text-primary); margin-right: 4px; }
+
+    /* ─── O-I-I-O rows (opportunity map) ────────────────────── */
+    .oiio-row { display: grid; grid-template-columns: 140px 1fr; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 6px; font-size: 13px; }
+    .oiio-label { padding: 12px 14px; background: var(--surface-50); border-right: 1px solid var(--border); font-family: var(--font-head); font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); }
+    .oiio-text { padding: 12px 14px; color: var(--text-secondary); line-height: 1.55; }
+    @media (max-width: 560px) { .oiio-row { grid-template-columns: 1fr; } .oiio-label { border-right: none; border-bottom: 1px solid var(--border); } }
+
+    /* ─── Conclusions ───────────────────────────────────────── */
+    .concl-row { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--surface-100); align-items: flex-start; }
+    .concl-row:last-child { border-bottom: none; }
+    .concl-num { font-family: var(--font-head); font-size: 12px; font-weight: 700; color: var(--green-500); background: var(--green-50); border: 1px solid var(--green-100); border-radius: var(--radius-sm); padding: 4px 8px; min-width: 24px; text-align: center; flex-shrink: 0; }
+    .concl-row p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; }
+    .concl-row p strong { color: var(--text-primary); }
+
+    /* ─── Footer ────────────────────────────────────────────── */
+    .doc-footer { text-align: center; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .footer-logo { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+    .footer-meta { font-size: 12px; color: var(--surface-400); }
+    .footer-meta code { font-family: var(--font-mono); background: var(--surface-100); color: var(--text-secondary); padding: 1px 5px; border-radius: 3px; }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      body { padding: 20px 12px 60px; }
+      .doc-header { padding: 28px 24px; }
+      .section { padding: 24px 20px; }
+      .toc-list { grid-template-columns: 1fr; }
+      .example-grid { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .section, .doc-header { box-shadow: none; break-inside: avoid; }
+      .evidence-lead .evidence-frame { position: static; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ────────────────────────────────────────────── -->
+  <header class="doc-header">
+    <div class="header-eyebrow">Etapa 1 · Research — Identificar</div>
+    <h1 class="header-title">Mejora del proceso de recepción y administración de vacantes — Skandia.co</h1>
+    <p class="header-subtitle">Auditoría del estado actual, benchmark de 6 referentes y mapa de oportunidades que alimentan la propuesta de proceso de la Etapa 2.</p>
+    <div class="header-meta">
+      <span class="meta-chip"><span class="dot"></span>Proyecto: vacantes</span>
+      <span class="meta-chip"><span class="dot"></span>Research: 2 jul 2026</span>
+      <span class="meta-chip"><span class="dot"></span>Presentación Talento Humano: 9 jul 2026</span>
+      <span class="meta-chip gate"><span class="dot"></span>Gate 1 · Aprobado</span>
+    </div>
+  </header>
+
+  <!-- ── TOC ───────────────────────────────────────────────── -->
+  <nav class="toc">
+    <div class="toc-title">Contenido</div>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="toc-num">01</span> Brief de investigación</a></li>
+      <li><a href="#s2"><span class="toc-num">02</span> Auditoría del estado actual</a></li>
+      <li><a href="#s3"><span class="toc-num">03</span> Benchmark de portales de empleo</a></li>
+      <li><a href="#s4"><span class="toc-num">04</span> Mapa de oportunidades</a></li>
+      <li><a href="#s5"><span class="toc-num">05</span> Conclusiones ejecutivas</a></li>
+    </ul>
+  </nav>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 01 · Brief de investigación                              -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <div>
+        <h2 class="section-title">Brief de investigación</h2>
+        <p class="section-desc">Contexto estratégico, objetivos, alcance y supuestos del sprint.</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Contexto estratégico</h3>
+      <p class="body-text">Talento Humano identificó que la sección pública de vacantes de Skandia (<a href="https://www.skandia.co/nuestras-vacantes" target="_blank" rel="noopener" style="color:var(--blue-500)">skandia.co/nuestras-vacantes</a>) no cumple su función: es un formulario Typeform de 5 campos (nombre, teléfono, correo, área de interés, hoja de vida) sin ninguna estructura de gestión detrás. Las hojas de vida llegan a un correo, sin base de datos ni forma de filtrar, notificar al área correspondiente o dar seguimiento. No existe descripción de cargo, lo que genera aplicaciones desubicadas (ej. un economista no sabe si aplicar a inversiones, operaciones o finanzas) y aplicaciones duplicadas. Skandia no tiene presencia de empleos en LinkedIn porque su foco institucional histórico ha sido la captación de leads/clientes, no de colaboradores — este proyecto es también una oportunidad de cambiar esa conversación internamente.</p>
+      <div class="table-wrap" style="margin-top:14px;">
+        <table>
+          <tbody>
+            <tr><td style="width:170px;"><strong>Stakeholders</strong></td><td style="color:var(--text-secondary)">Talento Humano (dueños del reto), equipo UX/UXplorers (ejecutor), áreas contratantes (ventas, tecnología, servicio al cliente, operaciones), New Hub / administradores del sitio (Liferay).</td></tr>
+            <tr><td><strong>Impacto esperado</strong></td><td style="color:var(--text-secondary)">Reducir la fricción y el desorden operativo de la recepción de CVs, mejorar la experiencia del candidato, y dar a Talento Humano un proceso administrable sin inversión en plataforma externa.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Objetivo de investigación</h3>
+      <p class="body-text"><strong>Principal:</strong> identificar patrones de diseño y de proceso —en portales de empleo de referentes del sector financiero colombiano y de empleadores digitales aspiracionales— que permitan proponer un proceso sistémico de gestión de vacantes para Skandia, desde la publicación hasta el cierre de la posición.</p>
+      <p class="body-text"><strong>Secundarios:</strong> diagnosticar en detalle las brechas del estado actual · extraer del benchmark patrones aplicables sin plataforma externa · traducir los hallazgos en un mapa de oportunidades priorizado para la Etapa 2.</p>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Preguntas clave</h3>
+      <ul class="plain">
+        <li>¿Cómo organizan otras compañías sus vacantes para que un candidato se ubique sin conocer la estructura organizacional interna?</li>
+        <li>¿Qué información mínima necesita una ficha de vacante para dar contexto suficiente sin sobrecargar al candidato?</li>
+        <li>¿Qué patrones de flujo de aplicación reducen la fricción y evitan aplicaciones duplicadas o desubicadas?</li>
+        <li>¿Cómo comunican estas compañías su cultura/employer branding dentro del mismo flujo, sin desviar el foco comercial de Skandia hacia clientes?</li>
+        <li>¿Qué mecanismos de filtro (ciudad, área, tipo de contrato) son estándar y cuáles agregan valor diferencial?</li>
+      </ul>
+      <div class="callout info">
+        <span class="callout-icon">ℹ</span>
+        <div class="callout-body"><strong>Hipótesis inicial:</strong> un porcentaje relevante de la fricción actual no es de diseño visual sino de arquitectura de información y de falta de estructura de datos — la solución requiere tanto una reorganización de la experiencia del candidato como un proceso de back-office (captura estructurada, notificación, gestión) que hoy no existe.</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Tipo de proyecto, participantes y metodología</h3>
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            <tr><td style="width:170px;"><strong>Tipo (Playbook)</strong></td><td style="color:var(--text-secondary)"><strong style="color:var(--text-primary)">Identificar.</strong> No hay diseño previo que validar ni se busca explicar motivaciones profundas de comportamiento — el objetivo es detectar patrones y oportunidades del mercado vía benchmarking.</td></tr>
+            <tr><td><strong>Fuente primaria</strong></td><td style="color:var(--text-secondary)">Sitio público skandia.co/nuestras-vacantes (auditoría directa, sin usuarios).</td></tr>
+            <tr><td><strong>Comparables directos</strong></td><td style="color:var(--text-secondary)">Bancolombia, Davivienda, Sura, Protección (sector financiero colombiano).</td></tr>
+            <tr><td><strong>Aspiracionales</strong></td><td style="color:var(--text-secondary)">Mercado Libre, Nubank (UX de carreras reconocida).</td></tr>
+            <tr><td><strong>Metodología</strong></td><td style="color:var(--text-secondary)">Auditoría heurística del estado actual · benchmarking (selección de 6 referentes + 7 criterios, análisis individual, matriz comparativa) · insights en formato Observación → Interpretación → Implicación → Oportunidad.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="body-text" style="margin-top:12px;font-size:12.5px;">No se realizaron entrevistas con candidatos en este sprint — el playbook no lo exige para un proyecto tipo <em>Identificar</em> de alcance acotado; se recomienda como posible sprint futuro tipo <em>Validar</em> una vez exista un prototipo.</p>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Supuestos y riesgos</h3>
+      <ul class="plain">
+        <li><strong>Supuesto:</strong> la solución debe ser administrable internamente sin presupuesto para plataforma externa (ATS comercial), como se acordó en la sesión del 25-jun.</li>
+        <li><strong>Supuesto:</strong> el sitio sigue operando sobre Liferay (New Hub) — cualquier recomendación de arquitectura de información debe ser viable en esa plataforma o mediante un enlace a un sistema externo ligero.</li>
+        <li><strong>Riesgo:</strong> algunos referentes bancarios usan ATS corporativos robustos (Workday, SmartRecruiters) inalcanzables por presupuesto — se marcan como "aspiracionales de largo plazo" vs. "aplicables ahora".</li>
+        <li><strong>Riesgo:</strong> sin acceso a datos reales de aplicaciones (volumen, duplicados, tiempos), el diagnóstico cuantitativo se basa en lo reportado verbalmente por Talento Humano el 25-jun.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 02 · Auditoría del estado actual                         -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <div>
+        <h2 class="section-title">Auditoría del estado actual</h2>
+        <p class="section-desc">skandia.co/nuestras-vacantes — capturado 2-jul-2026.</p>
+      </div>
+    </div>
+
+    <div class="evidence-lead">
+      <figure class="evidence-frame">
+        <a href="evidencia/actual/vacantes-actual-01-hero-vacantes.png" target="_blank">
+          <img src="evidencia/actual/vacantes-actual-01-hero-vacantes.png" alt="Página actual de vacantes de Skandia.co, mostrando 4 tarjetas fijas sobre un hero institucional">
+        </a>
+        <figcaption>entregables/evidencia/actual/vacantes-actual-01-hero-vacantes.png</figcaption>
+      </figure>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:34px">#</th><th>Hallazgo</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1</strong></td><td>Hero institucional ("Construyamos ¡La mejor historia juntos!") + 4 tarjetas fijas: <em>Talento Diverso, Analista Jr. de Servicio al Cliente, Asesor Pensional, Financial Planner</em>. No hay listado dinámico ni más vacantes visibles.</td></tr>
+            <tr><td><strong>2</strong></td><td>Las 4 tarjetas —incluida "Talento Diverso"— apuntan al mismo formulario Typeform embebido. Solo cambian los parámetros UTM de tracking, no el contenido que ve el candidato.</td></tr>
+            <tr><td><strong>3</strong></td><td>Formulario genérico de 5 campos: nombre, teléfono, correo, área de interés, hoja de vida. Sin pregunta de experiencia ni descripción del cargo antes de aplicar.</td></tr>
+            <tr><td><strong>4</strong></td><td>Sin información del cargo: solo título y frase de misión, sin requisitos, beneficios ni contexto de vicepresidencia/equipo.</td></tr>
+            <tr><td><strong>5</strong></td><td>Sin filtros por ciudad, área o tipo de contrato — justo lo que pidió Talento Humano (ej. "vacantes en Cali").</td></tr>
+            <tr><td><strong>6</strong></td><td>Sin integración con LinkedIn: Skandia no tiene pestaña de empleos, solo presencia institucional genérica.</td></tr>
+            <tr><td><strong>7</strong></td><td>Sin persistencia de datos: las hojas de vida llegan a un correo; no hay base de datos, panel de gestión ni notificación automática al área.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <span class="callout-icon">⚑</span>
+      <div class="callout-body"><strong>Diagnóstico consolidado:</strong> el problema no es principalmente visual — es de <strong>arquitectura de información</strong> (categorización por cargo específico en vez de equipo/vicepresidencia), <strong>contenido</strong> (cero descripción de cargo) y <strong>proceso</strong> (cero estructura de datos detrás del formulario). La solución requiere un rediseño del frontend <em>y</em> un proceso de backoffice, no solo un ajuste estético.</div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 03 · Benchmark                                           -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <div>
+        <h2 class="section-title">Benchmark de portales de empleo</h2>
+        <p class="section-desc">6 referentes, 7 criterios, navegación en vivo hasta la ficha de vacante y el flujo de aplicación.</p>
+      </div>
+    </div>
+
+    <p class="body-text">Se analizaron 4 comparables directos del sector financiero colombiano (Bancolombia, Davivienda, Sura, Protección) y 2 aspiracionales por su UX de carreras (Mercado Libre, Nubank).</p>
+
+    <div class="example-grid" style="margin-bottom:24px;">
+      <div class="example-card">
+        <div class="example-head red">Skandia · actual</div>
+        <div class="example-body">
+          <span class="result-margin red">1.2 / 10</span>
+          <div class="result-label">promedio de los 7 criterios evaluados</div>
+        </div>
+      </div>
+      <div class="example-card">
+        <div class="example-head green">Mercado Libre · mejor referente</div>
+        <div class="example-body">
+          <span class="result-margin green">7.9 / 10</span>
+          <div class="result-label">promedio de los 7 criterios evaluados</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Matriz comparativa (0–10 por criterio)</h3>
+      <div class="table-wrap">
+        <table class="bench">
+          <thead>
+            <tr>
+              <th>Referente</th><th>Arquitectura</th><th>Ficha</th><th>Aplicación</th>
+              <th>Filtros</th><th>Employer<br>branding</th><th>Accesib.</th><th>LinkedIn</th><th>Promedio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Skandia (actual)</td>
+              <td class="score"><span class="sc-badge sc-red">1</span></td>
+              <td class="score"><span class="sc-badge sc-red">1</span></td>
+              <td class="score"><span class="sc-badge sc-red">3</span></td>
+              <td class="score"><span class="sc-badge sc-red">0</span></td>
+              <td class="score"><span class="sc-badge sc-red">2</span></td>
+              <td class="score"><span class="sc-na">N/D</span></td>
+              <td class="score"><span class="sc-badge sc-red">0</span></td>
+              <td class="avg"><span class="sc-badge sc-red">~1.2</span></td>
+            </tr>
+            <tr>
+              <td>Bancolombia</td>
+              <td class="score"><span class="sc-badge sc-yellow">7</span></td>
+              <td class="score"><span class="sc-badge sc-green">9</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">5*</span></td>
+              <td class="score"><span class="sc-badge sc-green">8</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">6</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">7</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">4</span></td>
+              <td class="avg"><span class="sc-badge sc-yellow">6.6</span></td>
+            </tr>
+            <tr>
+              <td>Davivienda</td>
+              <td class="score"><span class="sc-badge sc-yellow">4</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">7</span></td>
+              <td class="score"><span class="sc-badge sc-red">3</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">6</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">5</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">5</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">6</span></td>
+              <td class="avg"><span class="sc-badge sc-yellow">5.1</span></td>
+            </tr>
+            <tr>
+              <td>Sura (Seguros/AM)</td>
+              <td class="score"><span class="sc-badge sc-yellow">4</span></td>
+              <td class="score"><span class="sc-badge sc-green">8</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">5</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">6</span></td>
+              <td class="score"><span class="sc-badge sc-green">8</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">6</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">5</span></td>
+              <td class="avg"><span class="sc-badge sc-yellow">6.0</span></td>
+            </tr>
+            <tr>
+              <td>Protección</td>
+              <td class="score"><span class="sc-badge sc-yellow">4</span></td>
+              <td class="score"><span class="sc-badge sc-green">8</span></td>
+              <td class="score"><span class="sc-badge sc-red">3</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">7</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">6</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">5</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">6</span></td>
+              <td class="avg"><span class="sc-badge sc-yellow">5.6</span></td>
+            </tr>
+            <tr>
+              <td>Mercado Libre</td>
+              <td class="score"><span class="sc-badge sc-green">8</span></td>
+              <td class="score"><span class="sc-badge sc-green">9</span></td>
+              <td class="score"><span class="sc-badge sc-green">9</span></td>
+              <td class="score"><span class="sc-badge sc-green">8</span></td>
+              <td class="score"><span class="sc-badge sc-green">9</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">7</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">5</span></td>
+              <td class="avg"><span class="sc-badge sc-green">7.9</span></td>
+            </tr>
+            <tr>
+              <td>Nubank</td>
+              <td class="score"><span class="sc-badge sc-yellow">7</span></td>
+              <td class="score"><span class="sc-badge sc-green">9</span></td>
+              <td class="score"><span class="sc-badge sc-green">9</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">6</span></td>
+              <td class="score"><span class="sc-badge sc-green">8</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">7</span></td>
+              <td class="score"><span class="sc-badge sc-yellow">4</span></td>
+              <td class="avg"><span class="sc-badge sc-green">7.1</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="body-text" style="margin-top:10px;font-size:12px;">* Bancolombia: flujo funcional pero sobre plantilla Taleo genérica que diluye marca.</p>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Análisis individual por referente</h3>
+
+      <div style="margin-bottom:26px;">
+        <div class="ref-head"><h4>Bancolombia</h4><span class="tag">empleo.grupobancolombia.com</span><span class="tag">ATS: Oracle Taleo</span></div>
+        <p class="body-text">Ficha de vacante ejemplar: reto/perfil/beneficios con cifras concretas de compensación (14,12 salarios legales + hasta 47,37% variable, días de vacaciones). Filtros avanzados, alertas de vacantes por correo. Pero la identidad de marca fuerte del landing se diluye casi por completo al entrar a la plantilla genérica de Taleo.</p>
+        <div class="evidence-grid">
+          <a href="evidencia/bancolombia/01-landing.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/bancolombia/01-landing.png" alt="Landing de carreras Bancolombia"><figcaption>Landing</figcaption></figure></a>
+          <a href="evidencia/bancolombia/02-listado.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/bancolombia/02-listado.png" alt="Listado de vacantes Bancolombia"><figcaption>Listado</figcaption></figure></a>
+          <a href="evidencia/bancolombia/03-listado-categoria.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/bancolombia/03-listado-categoria.png" alt="Listado filtrado por categoría Bancolombia"><figcaption>Listado por categoría</figcaption></figure></a>
+          <a href="evidencia/bancolombia/04-ficha-vacante.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/bancolombia/04-ficha-vacante.png" alt="Ficha de vacante Bancolombia"><figcaption>Ficha de vacante</figcaption></figure></a>
+        </div>
+      </div>
+
+      <div style="margin-bottom:26px;">
+        <div class="ref-head"><h4>Davivienda</h4><span class="tag">trabajarendavivienda.com</span><span class="tag">ATS: Magneto365 (tercero)</span></div>
+        <p class="body-text">Landing de marca propia, pero externalizado 100% a Magneto365 (ATS compartido con múltiples empresas). Ficha con buen nivel de detalle pero tono inconsistente entre vacantes. El flujo de aplicación exige crear cuenta antes de ver el formulario — alta fricción.</p>
+        <div class="evidence-grid">
+          <a href="evidencia/davivienda/01-landing.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/davivienda/01-landing.png" alt="Landing de carreras Davivienda"><figcaption>Landing</figcaption></figure></a>
+          <a href="evidencia/davivienda/02-listado.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/davivienda/02-listado.png" alt="Listado de vacantes Davivienda"><figcaption>Listado</figcaption></figure></a>
+          <a href="evidencia/davivienda/03-ficha-vacante.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/davivienda/03-ficha-vacante.png" alt="Ficha de vacante Davivienda"><figcaption>Ficha de vacante</figcaption></figure></a>
+          <a href="evidencia/davivienda/04-flujo-aplicacion.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/davivienda/04-flujo-aplicacion.png" alt="Flujo de aplicación con registro obligatorio Davivienda"><figcaption>Flujo (registro obligatorio)</figcaption></figure></a>
+        </div>
+      </div>
+
+      <div style="margin-bottom:26px;">
+        <div class="ref-head"><h4>Sura (Seguros SURA / SURA AM)</h4><span class="tag">trabajaconnosotros.sura.com</span><span class="tag">Sin portal único</span></div>
+        <p class="body-text">Sin portal único: el visitante salta entre <code style="font-family:var(--font-mono);font-size:12px;background:var(--surface-100);padding:2px 6px;border-radius:3px;">trabajaconnosotros.sura.com</code> (abandonado, 0 resultados desde 2020), <code style="font-family:var(--font-mono);font-size:12px;background:var(--surface-100);padding:2px 6px;border-radius:3px;">empleos.sura-am.com</code> (búsqueda poco confiable) y finalmente Magneto para la marca Protección. Employer branding fuerte en el landing regional, pero fragmentado en la ejecución.</p>
+        <div class="evidence-grid">
+          <a href="evidencia/sura/01-landing-categorias.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/sura/01-landing-categorias.png" alt="Landing por categorías Sura"><figcaption>Landing por categorías</figcaption></figure></a>
+          <a href="evidencia/sura/02-listado-sistemas-tecnologia.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/sura/02-listado-sistemas-tecnologia.png" alt="Listado Sistemas y Tecnología Sura"><figcaption>Listado (Sistemas y Tec.)</figcaption></figure></a>
+          <a href="evidencia/sura/03-listado-colombia.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/sura/03-listado-colombia.png" alt="Listado Colombia Sura"><figcaption>Listado Colombia</figcaption></figure></a>
+          <a href="evidencia/sura/04-landing-sura-am.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/sura/04-landing-sura-am.png" alt="Landing Sura Asset Management"><figcaption>Landing Sura AM</figcaption></figure></a>
+          <a href="evidencia/sura/05-listado-colombia-sura-am.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/sura/05-listado-colombia-sura-am.png" alt="Listado Colombia vía Sura AM"><figcaption>Listado (Sura AM)</figcaption></figure></a>
+          <a href="evidencia/sura/06-landing-corporativo-sumate-sura.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/sura/06-landing-corporativo-sumate-sura.png" alt="Landing corporativo Súmate Sura"><figcaption>Landing "Súmate"</figcaption></figure></a>
+        </div>
+      </div>
+
+      <div style="margin-bottom:26px;">
+        <div class="ref-head"><h4>Protección</h4><span class="tag">empleos.sura-am.com/COLOMBIA-PROTECCION</span><span class="tag">ATS: Magneto365 (vía Sura AM)</span></div>
+        <p class="body-text">Mismo patrón que Sura: su microsite es solo employer branding en texto, sin buscador funcional; las vacantes reales y el flujo de aplicación viven enteramente en Magneto365. Gate de registro obligatorio antes de ver el formulario o adjuntar CV — <strong>la mayor fricción medida en todo el benchmark (3/10)</strong>.</p>
+        <div class="evidence-grid">
+          <a href="evidencia/proteccion/01-listado-sura-am-sin-resultados.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/proteccion/01-listado-sura-am-sin-resultados.png" alt="Listado sin resultados vía Sura AM"><figcaption>Listado sin resultados</figcaption></figure></a>
+          <a href="evidencia/proteccion/02-ficha-vacante.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/proteccion/02-ficha-vacante.png" alt="Ficha de vacante Protección"><figcaption>Ficha de vacante</figcaption></figure></a>
+          <a href="evidencia/proteccion/03-flujo-aplicacion.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/proteccion/03-flujo-aplicacion.png" alt="Flujo de aplicación con gate de registro Protección"><figcaption>Flujo (gate de registro)</figcaption></figure></a>
+          <a href="evidencia/sura/08-landing-magneto-proteccion.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/sura/08-landing-magneto-proteccion.png" alt="Landing Magneto para Protección"><figcaption>Landing en Magneto</figcaption></figure></a>
+          <a href="evidencia/sura/10-flujo-aplicacion-gate-registro.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/sura/10-flujo-aplicacion-gate-registro.png" alt="Gate de registro obligatorio antes de aplicar"><figcaption>Gate de registro obligatorio</figcaption></figure></a>
+        </div>
+      </div>
+
+      <div style="margin-bottom:26px;">
+        <div class="ref-head"><h4>Mercado Libre</h4><span class="badge badge-green"><span class="badge-dot"></span>Mejor puntuado</span><span class="tag">careers-meli.mercadolibre.com</span><span class="tag">ATS: Eightfold</span></div>
+        <p class="body-text">Salto de dominio transparente porque el diseño visual se mantiene coherente. El referente mejor puntuado: ficha con feature diferenciador de "perfil típico de contrataciones anteriores" (años de experiencia, skills, empresas previas), formulario de un solo submit sin crear cuenta, y employer branding con testimonios reales en video.</p>
+        <div class="evidence-grid">
+          <a href="evidencia/mercadolibre/01-landing.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/mercadolibre/01-landing.png" alt="Landing de carreras Mercado Libre"><figcaption>Landing</figcaption></figure></a>
+          <a href="evidencia/mercadolibre/02-listado.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/mercadolibre/02-listado.png" alt="Listado de vacantes Mercado Libre"><figcaption>Listado</figcaption></figure></a>
+          <a href="evidencia/mercadolibre/03-ficha-vacante.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/mercadolibre/03-ficha-vacante.png" alt="Ficha de vacante Mercado Libre"><figcaption>Ficha de vacante</figcaption></figure></a>
+          <a href="evidencia/mercadolibre/04-flujo-aplicacion.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/mercadolibre/04-flujo-aplicacion.png" alt="Flujo de aplicación de un solo submit Mercado Libre"><figcaption>Flujo (sin cuenta)</figcaption></figure></a>
+        </div>
+      </div>
+
+      <div>
+        <div class="ref-head"><h4>Nubank</h4><span class="tag">international.nubank.com.br/careers</span><span class="tag">ATS: Greenhouse</span></div>
+        <p class="body-text">Ficha y formulario en una sola página (sin wizard, sin cuenta), múltiples formas de adjuntar CV (archivo, Dropbox, Google Drive o texto manual), video de cultura embebido directamente en la ficha del cargo.</p>
+        <div class="evidence-grid">
+          <a href="evidencia/nubank/01-listado-greenhouse.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/nubank/01-listado-greenhouse.png" alt="Listado de vacantes Nubank en Greenhouse"><figcaption>Listado (Greenhouse)</figcaption></figure></a>
+          <a href="evidencia/nubank/02-ficha-vacante.png" target="_blank"><figure class="evidence-frame"><img src="evidencia/nubank/02-ficha-vacante.png" alt="Ficha de vacante Nubank con video de cultura"><figcaption>Ficha + video de cultura</figcaption></figure></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Patrones transversales</h3>
+      <ul class="plain">
+        <li><strong>Externalizar el ATS diluye la identidad de marca.</strong> Los comparables financieros colombianos externalizan (Taleo, SuccessFactors, Magneto365) y, al hacerlo, pierden identidad de marca en el momento crítico. Ningún competidor directo de Skandia construyó un portal 100% propio.</li>
+        <li><strong>El registro obligatorio antes de aplicar es el mayor punto de fricción</strong> en 3 de 4 comparables financieros (Davivienda, Protección, y parcialmente Sura vía Magneto). Los dos aspiracionales permiten aplicar sin crear cuenta, en un solo formulario.</li>
+        <li><strong>La ficha de vacante rica es un estándar de la industria</strong>, no una innovación: los 6 referentes —incluidos los peor puntuados en otros criterios— tienen descripción de cargo, requisitos y beneficios. Skandia hoy no tiene ninguno de estos elementos.</li>
+        <li><strong>La integración real con LinkedIn es débil en todos los referentes</strong> (4–6/10): ninguno ofrece "aplicar con LinkedIn" vía SSO. Es oportunidad de diferenciación, no urgencia.</li>
+        <li><strong>Los filtros básicos (ciudad, área/sector, tipo de contrato) están presentes</strong> incluso en los ATS de terceros más genéricos — es un piso mínimo ya estándar en el mercado.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 04 · Mapa de oportunidades                               -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <div>
+        <h2 class="section-title">Mapa de oportunidades</h2>
+        <p class="section-desc">6 insights en formato Observación → Interpretación → Implicación → Oportunidad.</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Insight 1 — Ficha de vacante inexistente</h3>
+      <div class="oiio-row"><div class="oiio-label">Observación</div><div class="oiio-text">Las 4 tarjetas de skandia.co/nuestras-vacantes muestran solo un título y una frase de misión; los 6 referentes del benchmark, sin excepción, presentan descripción de cargo, requisitos y beneficios.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Interpretación</div><div class="oiio-text">El candidato aplica sin saber a qué se está postulando, lo que explica las aplicaciones desubicadas que reportó Talento Humano.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Implicación</div><div class="oiio-text">Cualquier rediseño que no incluya una ficha de vacante estructurada seguirá produciendo el mismo problema de fondo, aunque se mejore la estética.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Oportunidad</div><div class="oiio-text">Definir una plantilla mínima de ficha de vacante (misión del rol, responsabilidades, requisitos, beneficios, vicepresidencia/equipo, ciudad) obligatoria para toda publicación.</div></div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Insight 2 — Una sola vacante "de mentira" repetida 4 veces</h3>
+      <div class="oiio-row"><div class="oiio-label">Observación</div><div class="oiio-text">Las 4 tarjetas de la página actual apuntan al mismo Typeform genérico, diferenciado solo por parámetros UTM de marketing.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Interpretación</div><div class="oiio-text">No existe hoy ningún mecanismo para publicar una vacante real y distinta — la página es una fachada visual sin backend de gestión.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Implicación</div><div class="oiio-text">El problema es sistémico, no cosmético: se necesita un proceso de publicación (quién crea la vacante, con qué campos, dónde vive) antes de pensar en el diseño de la tarjeta.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Oportunidad</div><div class="oiio-text">Insumo central para la Etapa 2: diseñar el flujo de publicación de RR.HH. como parte del blueprint, no solo la vista del candidato.</div></div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Insight 3 — El registro obligatorio antes de aplicar es el mayor antipatrón detectado</h3>
+      <div class="oiio-row"><div class="oiio-label">Observación</div><div class="oiio-text">Davivienda y Protección (vía Magneto) exigen crear cuenta antes de mostrar el formulario o permitir adjuntar CV; los referentes mejor puntuados (Nubank, Mercado Libre) no lo hacen.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Interpretación</div><div class="oiio-text">El registro obligatorio no es un estándar de la industria sino una fricción evitable que varios competidores directos de Skandia todavía arrastran.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Implicación</div><div class="oiio-text">Skandia tiene la oportunidad de diseñar un flujo de bajo esfuerzo (sin cuenta, un solo formulario) que supere a sus comparables directos sin gran inversión tecnológica.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Oportunidad</div><div class="oiio-text">El nuevo formulario debe permitir aplicar "como invitado", con carga de CV en múltiples formatos, replicando el patrón de Nubank/Mercado Libre.</div></div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Insight 4 — Externalizar el ATS diluye la marca empleadora</h3>
+      <div class="oiio-row"><div class="oiio-label">Observación</div><div class="oiio-text">En Bancolombia, Davivienda, Sura y Protección, el salto del sitio corporativo al ATS externo (Taleo/Magneto/SuccessFactors) es abrupto y pierde toda la narrativa de marca.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Interpretación</div><div class="oiio-text">Si Skandia decide en la Etapa 2 usar una herramienta externa ligera para el backend, debe evitar que el candidato perciba un salto de marca.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Implicación</div><div class="oiio-text">Cualquier solución técnica (incluso ad hoc) debe mantener la identidad visual de Skandia de principio a fin del flujo del candidato.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Oportunidad</div><div class="oiio-text">Si se requiere un componente externo, envolverlo en la experiencia visual propia de Skandia en vez de redirigir a un dominio ajeno.</div></div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Insight 5 — Filtro por ciudad y área: piso mínimo ya estándar, no una aspiración</h3>
+      <div class="oiio-row"><div class="oiio-label">Observación</div><div class="oiio-text">Todos los referentes, incluso los de peor arquitectura general (Sura, Protección), ofrecen filtros por ciudad, sector/área y tipo de contrato.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Interpretación</div><div class="oiio-text">La solicitud de Talento Humano de filtrar por ciudad (ej. "vacantes en Cali") no es una funcionalidad avanzada — es el estándar mínimo del mercado que Skandia hoy no cumple.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Implicación</div><div class="oiio-text">Este filtro debe considerarse un requisito base (must-have) de la propuesta de proceso, no una mejora opcional.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Oportunidad</div><div class="oiio-text">Estructurar el catálogo de vacantes desde el inicio con metadatos de ciudad y vicepresidencia/equipo, habilitando filtros simples sin tecnología compleja.</div></div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Insight 6 — LinkedIn: oportunidad de diferenciación, no urgencia de paridad</h3>
+      <div class="oiio-row"><div class="oiio-label">Observación</div><div class="oiio-text">Ningún referente del benchmark ofrece "aplicar con LinkedIn" real (SSO); todos se limitan a campos de texto o botones de compartir.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Interpretación</div><div class="oiio-text">Skandia no está en desventaja competitiva por no tener presencia de empleos en LinkedIn hoy — pero tampoco tiene que igualar mucho para destacar, ya que la barra del sector es baja.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Implicación</div><div class="oiio-text">Invertir esfuerzo en una integración LinkedIn robusta sería diferenciación real frente a todos los referentes, aunque no es lo más urgente frente a los gaps básicos.</div></div>
+      <div class="oiio-row"><div class="oiio-label">Oportunidad</div><div class="oiio-text">Priorizar esto como mejora de "segunda ola" en la propuesta de proceso, después de resolver ficha de vacante, filtros y backend de gestión.</div></div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- 05 · Conclusiones ejecutivas                             -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <div>
+        <h2 class="section-title">Conclusiones ejecutivas</h2>
+        <p class="section-desc">Lo que alimenta directamente la Etapa 2 — Propuesta de proceso.</p>
+      </div>
+    </div>
+
+    <div class="concl-row"><span class="concl-num">1</span><p><strong>El problema es de proceso y contenido, no solo de diseño visual.</strong> El benchmark confirma que ningún competidor directo resuelve esto solo con una tarjeta bonita — todos tienen, como mínimo, ficha de vacante estructurada y algún tipo de backend de gestión (propio o tercerizado).</p></div>
+    <div class="concl-row"><span class="concl-num">2</span><p><strong>Skandia puede superar a sus comparables directos sin replicar su complejidad técnica.</strong> Davivienda, Sura y Protección arrastran fricciones (registro obligatorio, pérdida de marca al saltar a un ATS externo) que Skandia puede evitar de entrada si diseña el flujo pensando en el candidato, tomando como referencia los patrones de Nubank y Mercado Libre.</p></div>
+    <div class="concl-row"><span class="concl-num">3</span><p><strong>Hay un piso mínimo no negociable:</strong> ficha de vacante con descripción real del cargo, filtro por ciudad/área, y un backend con estructura de datos (aunque sea simple) que notifique al área correspondiente. Sin esto, cualquier ajuste visual será cosmético.</p></div>
+    <div class="concl-row"><span class="concl-num">4</span><p><strong>La integración con LinkedIn puede esperar</strong> a una segunda fase — el benchmark muestra que ni los líderes del sector lo resuelven bien, así que no es donde está la brecha más urgente.</p></div>
+
+    <div class="callout success" style="margin-top:20px;">
+      <span class="callout-icon">→</span>
+      <div class="callout-body">Estos hallazgos alimentan directamente la <strong>Etapa 2 — Propuesta de proceso</strong> (<code style="font-family:var(--font-mono);font-size:12px;background:var(--surface-0);padding:1px 6px;border-radius:3px;">vacantes-propuesta.md</code>): el service blueprint end-to-end y la arquitectura de información del nuevo portal.</div>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────────── -->
+  <footer class="doc-footer">
+    <div class="footer-logo">Skandia Colombia</div>
+    <div class="footer-meta">Equipo UX Research · #UXplorers · Anexo visual — documento fuente sin modificar: <code>entregables/vacantes-research.md</code> · Gate 1 aprobado · Jul 2026</div>
+  </footer>
+
+</div>
+</body>
+</html>
