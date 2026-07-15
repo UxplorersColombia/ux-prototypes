@@ -41,6 +41,7 @@
     .sk-shell-head{ padding:0 16px !important; }
     .sk-shell-user span, .sk-shell-qa{ display:none !important; }
   }
+  @media (max-width:479px){ .sk-shell-brand{ display:none !important; } }
   .sk-btn-group-modal button{ height:40px !important; }
 </style>
 </helmet>
@@ -1106,30 +1107,6 @@
     </div>
   </sc-if>
 
-  <!-- ============ FISICO ALERT MODAL ============ -->
-  <sc-if value="{{ showFisicoAlert }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;inset:0;background:rgba(255,255,255,0.94);display:flex;align-items:center;justify-content:center;padding:24px;z-index:50;">
-      <div style="animation:skModalIn .25s ease-out;background:#fff;border:1px solid #e9e9e9;border-radius:18px;box-shadow:0 12px 32px -8px rgba(0,0,0,0.18);padding:34px 36px;max-width:540px;width:100%;">
-        <h2 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:21px;color:#363636;margin:0 0 8px;">{{ fisicoAlertTitle }}</h2>
-        <p style="font-size:13.5px;color:#404040;line-height:1.5;margin:0 0 20px;">Esta solicitud se diligencia en un formato físico. Para facilitar tu trámite, podrás descargar el formato, adjuntar toda la documentación y radicarlo en línea con tu autorización y validación de seguridad.</p>
-        <div style="margin:0 0 24px;">
-          <div style="font-size:13px;font-weight:700;color:#404040;margin-bottom:12px;">Así será tu proceso</div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <sc-for list="{{ fisicoSteps }}" as="p" hint-placeholder-count="4">
-              <div style="display:flex;gap:12px;align-items:center;">
-                <span style="width:26px;height:26px;border-radius:50%;background:#00c73d;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;">{{ p.n }}</span>
-                <span style="font-size:14px;color:#404040;">{{ p.label }}</span>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-        <div class="sk-btn-group sk-btn-group-modal" style="display:flex;gap:14px;">
-          <button onClick="{{ onFisicoBack }}" style="flex:1;height:54px;border-radius:100px;border:2px solid #00c73d;background:#fff;color:#00c73d;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Regresar</button>
-          <button onClick="{{ onFisicoReady }}" style="flex:1;height:54px;border-radius:100px;border:2px solid #00c73d;background:#00c73d;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Continuar</button>
-        </div>
-      </div>
-    </div>
-  </sc-if>
 
   <!-- ============ SUBSIDIO MODAL (prórroga / primera vez) ============ -->
   <sc-if value="{{ showSubsidioModal }}" hint-placeholder-val="{{ false }}">
@@ -1173,18 +1150,11 @@
           <h2 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:20px;color:#404040;margin:0 0 6px;">Documentación requerida</h2>
           <p style="font-size:13.5px;color:#404040;line-height:1.5;margin:0;">Los documentos varían según la solicitud y beneficiarios.</p>
         </div>
-        <!-- Selector tipo de solicitud -->
+        <!-- Tipo de solicitud (bloqueado según lo seleccionado) -->
         <div style="position:relative;">
-          <div onClick="{{ docModalTypeSelect.onToggle }}" style="width:100%;height:54px;box-sizing:border-box;padding:23px 38px 7px 14px;border:1.5px solid {{ docModalTypeSelect.border }};border-radius:8px;background:#fff;box-shadow:0 0 6px 0 rgba(61,75,92,0.15);font-family:'Open Sans',sans-serif;font-size:15px;color:#404040;cursor:pointer;display:flex;align-items:center;transition:border-color .15s;">{{ docModalTypeSelect.value }}</div>
+          <div style="width:100%;height:54px;box-sizing:border-box;padding:23px 40px 7px 14px;border:1.5px solid transparent;border-radius:8px;background:#f2f2f2;font-family:'Open Sans',sans-serif;font-size:15px;color:#878787;display:flex;align-items:center;">{{ docModalTypeSelect.value }}</div>
           <label style="position:absolute;left:14px;top:8px;font-size:12px;color:#878787;pointer-events:none;">Tipo de solicitud</label>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#878787" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:19px;pointer-events:none;transform:{{ docModalTypeSelect.chevron }};transition:transform .2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-          <sc-if value="{{ docModalTypeSelect.isOpen }}" hint-placeholder-val="{{ false }}">
-            <div class="sk-dd-scroll" style="position:absolute;left:0;right:0;top:60px;z-index:30;background:#fff;border-radius:8px;box-shadow:0 12px 32px -8px rgba(0,0,0,0.12),0 4px 8px -2px rgba(0,0,0,0.06);max-height:230px;overflow-y:auto;padding:4px 0;">
-              <sc-for list="{{ docModalTypeSelect.opts }}" as="o" hint-placeholder-count="8">
-                <div onClick="{{ o.onClick }}" style="padding:13px 16px;cursor:pointer;font-size:15px;color:#404040;background:{{ o.bg }};transition:background .12s;" style-hover="background:#f6fcf2;">{{ o.label }}</div>
-              </sc-for>
-            </div>
-          </sc-if>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a5a5a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:20px;pointer-events:none;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
         </div>
         <!-- Documentos del afiliado -->
         <div>
@@ -1206,7 +1176,7 @@
             <div style="font-size:15px;font-weight:700;color:#363636;margin-bottom:10px;">Documentos de beneficiarios</div>
             <div style="display:flex;flex-wrap:wrap;gap:8px;">
               <sc-for list="{{ docModalChips }}" as="c" hint-placeholder-count="5">
-                <div onClick="{{ c.onClick }}" style="padding:9px 16px;border:1.5px solid {{ c.bd }};border-radius:100px;background:{{ c.bg }};color:{{ c.fg }};font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 0 4px 0 rgba(61,75,92,0.15);transition:border-color .15s,background .15s;">{{ c.label }}</div>
+                <div onClick="{{ c.onClick }}" style="padding:9px 18px;border-radius:100px;border:none;background:{{ c.bg }};color:{{ c.fg }};font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 0 4px 0 rgba(61, 75, 92, 0.15);">{{ c.label }}</div>
               </sc-for>
             </div>
           </div>
@@ -1223,7 +1193,8 @@
           </div>
         </sc-if>
         <div class="sk-btn-group sk-btn-group-modal" style="display:flex;gap:12px;width:100%;">
-          <button onClick="{{ onCloseDocsModal }}" style="flex:1;height:54px;border-radius:100px;border:2px solid #00c73d;background:#00c73d;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Entendido</button>
+          <button onClick="{{ onCloseDocsModal }}" style="flex:1;height:54px;border-radius:100px;border:2px solid #00c73d;background:#fff;color:#00c73d;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Regresar</button>
+          <button onClick="{{ onDocsContinue }}" style="flex:1;height:54px;border-radius:100px;border:2px solid #00c73d;background:#00c73d;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Continuar</button>
         </div>
       </div>
     </div>
@@ -1338,7 +1309,6 @@ class Component extends DCLogic {
     else this.setState({ done: true });
   }
   nextFromFlow() {
-if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { this.setState({ showFisicoAlert: true }); return; }
     if (this.curKey() === 'tipo' && this.state.type === 'subsidio' && !this.state.subsidioModo) { this.setState({ showSubsidioModal: true }); return; }
     this.next();
   }
@@ -1348,7 +1318,12 @@ if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { 
   }
   jump(i) { if (this.state.type) this.setState({ stepIdx: i, done: false }); }
   reset() { this.setState({ type: null, subtipo: null, stepIdx: 0, done: false, vejezOpen: false, benefMode: null, showFisicoAlert: false, subsidioModo: '', showSubsidioModal: false, subsidioSel: '' }); }
-  pick(t, sub) { this.setState({ type: t, subtipo: sub || null, stepIdx: 0, done: false, benefMode: null, subsidioModo: '', subsidioSel: '' }); }
+  pick(t, sub) {
+    const base = { type: t, subtipo: sub || null, stepIdx: 0, done: false, benefMode: null, subsidioModo: '', subsidioSel: '', docModalTypeOpen: false };
+    // Subsidio: primero el modal de prórroga/primera vez. Los demás: modal de documentación.
+    if (t === 'subsidio') this.setState({ ...base, showSubsidioModal: true });
+    else this.setState({ ...base, showDocsModal: true, docModalType: t, docModalParentesco: 'conyuge' });
+  }
 
   sw(on, onClick) {
     return on
@@ -1412,7 +1387,7 @@ if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { 
     else if (t === 'subsidio') {
       if (o.subsidioModo === 'prorroga') {
         arr = [
-          { title: 'Original o fotocopia ampliada de la incapacidad emitida por la EPS, junto con la malla de incapacidades.' },
+          { title: 'Original de la incapacidad emitida por la EPS.' },
         ];
       } else {
         arr = [
@@ -2085,7 +2060,7 @@ if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { 
       showFisicoAlert: s.showFisicoAlert,
       showPfModal: s.showPfModal,
       onPfBack: () => this.setState({ showPfModal: false, pfDec: '' }),
-      onPfGpm: () => this.setState({ showPfModal: false, pfDec: '', type: 'gpm', stepIdx: 0, showFisicoAlert: true }),
+      onPfGpm: () => this.setState({ showPfModal: false, pfDec: '', type: 'gpm', subtipo: null, stepIdx: 0, done: false, benefMode: null, subsidioModo: '', subsidioSel: '', showDocsModal: true, docModalType: 'gpm', docModalParentesco: 'conyuge', docModalTypeOpen: false }),
       showConvModal: s.showConvModal,
       onConvBack: () => this.setState({ showConvModal: false, convAccede: '' }),
       onConvChange: () => this.setState({ showConvModal: false, convAccede: '', type: null, stepIdx: 0, done: false }),
@@ -2101,14 +2076,25 @@ if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { 
       subsidioContinueBg: s.subsidioSel ? '#00c73d' : '#c5c5c5',
       subsidioContinueCursor: s.subsidioSel ? 'pointer' : 'not-allowed',
       onSubsidioClose: () => this.setState({ showSubsidioModal: false, subsidioSel: '' }),
-      onSubsidioContinue: () => { if (!s.subsidioSel) return; this.setState({ showSubsidioModal: false, subsidioModo: s.subsidioSel }); this.next(); },
+      onSubsidioContinue: () => {
+        if (!s.subsidioSel) return;
+        if (s.subsidioSel === 'primera') {
+          // Primera vez: mostrar modal de documentación
+          this.setState({ showSubsidioModal: false, subsidioModo: 'primera', showDocsModal: true, docModalType: 'subsidio', docModalParentesco: 'conyuge', docModalTypeOpen: false });
+        } else {
+          // Prórroga: sin modal de documentación, avanza directo
+          this.setState({ showSubsidioModal: false, subsidioModo: 'prorroga' });
+          this.next();
+        }
+      },
       inFlow,
       // banner
-      showBanner: is('tipo') || is('adjuntos') || is('adjuntosBenef'),
+      showBanner: is('adjuntos') || is('adjuntosBenef'),
       bannerText: is('adjuntos') ? 'Recuerda: no podremos procesar tu solicitud si los documentos están incompletos, protegidos con contraseña o son inválidos.' : 'Durante el proceso te pediremos documentos tuyos y de tus beneficiarios.',
-      showDocsLink: is('tipo') || is('adjuntosBenef'),
+      showDocsLink: is('adjuntosBenef'),
       onOpenDocsModal: () => this.setState({ showDocsModal: true, docModalType: s.type || 'vejez', docModalParentesco: 'conyuge', docModalTypeOpen: false }),
       onCloseDocsModal: () => this.setState({ showDocsModal: false, docModalTypeOpen: false }),
+      onDocsContinue: () => { const onTipo = this.curKey() === 'tipo'; this.setState({ showDocsModal: false, docModalTypeOpen: false }); if (onTipo) this.nextFromFlow(); },
       showDocsModal: s.showDocsModal,
       docModalAfiliadoList: this.afiliadoDocDefs(s.docModalType, {}).map(d => d.title),
       docModalHasBenef: ['vejez','devolucion','invalidez','gpm','familiar'].includes(s.docModalType),
@@ -2125,7 +2111,7 @@ if (this.curKey() === 'tipo' && ['gpm','familiar'].includes(this.state.type)) { 
       })(),
       docModalChips: [['conyuge','Cónyuge'],['companero','Compañero(a) permanente'],['hijos','Hijos'],['padres','Padres'],['hermano','Hermano inválido']].map(([v,label]) => {
         const sel = s.docModalParentesco === v;
-        return { label, bd: sel ? '#00c73d' : '#c5c5c5', bg: sel ? '#f6fcf2' : '#fff', fg: sel ? '#009a2f' : '#666666', onClick: () => this.set('docModalParentesco', v) };
+        return { label, bd: sel ? '#00c73d' : '#c5c5c5', bg: sel ? '#00c73d' : '#fff', fg: sel ? '#fff' : '#666666', onClick: () => this.set('docModalParentesco', v) };
       }),
       docModalParentescoLabel: ({conyuge:'Cónyuge',companero:'Compañero(a) permanente',hijos:'Hijos',padres:'Padres',hermano:'Hermano inválido'})[s.docModalParentesco] || '',
       docModalList: this.benefDocsFor(s.docModalParentesco, s.docModalType, { hijoInvalido: true, hijoUnico: true }),
