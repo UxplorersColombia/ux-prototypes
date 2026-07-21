@@ -269,6 +269,12 @@ Este es un único caso, no una muestra, y conviene tratarlo como una hipótesis 
 - ✅ El equipo puede priorizar ajustes sin ambigüedad (16 recomendaciones priorizadas en la sección 8).
 - 🟡 El dato comparativo antes/después es usable, pero con la salvedad de muestra de la sección 2 (no se alcanzó el diseño 4-6 activos / 5-6 inactivos; se cerró con 4 activos + 1 inactivo de perfil no-hostil).
 
+---
+
+## 10. Anexos
+
+- **Informe completo de la prueba remota (Useberry):** resultados detallados por bloque de la prueba *InvestED 2.0 – Prueba de usabilidad por tareas* (53 respuestas · 30 completas), incluyendo respuestas abiertas y SEQ por tarea → [Ver informe en Useberry ↗](https://app.useberry.com/sharing-results/ttIkT0LkY4JbVT/?segmentID=30022375-da37-46d1-a394-a7ec64bf5498)
+- **Prototipo testeado:** versión navegable del nuevo Invested usada tanto en las 5 entrevistas como en la prueba remota → [shine-style-workbench.lovable.app ↗](https://shine-style-workbench.lovable.app)
 
 ---
 
