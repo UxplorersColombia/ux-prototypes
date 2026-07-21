@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invested 3.0 — Análisis final de investigación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  /*
+    Sistema de color: base de marca Skandia (verde #00c73d) reencuadrada
+    con neutrales propios — un papel cálido con matiz verde en vez de blanco
+    puro, y una tinta casi negra con la misma raíz cromática, para que el
+    verde de marca se sienta elegido dentro de una paleta y no pegado sobre gris de plantilla.
+    El deck se compromete deliberadamente a un solo tema (papel de informe
+    claro + cubiertas oscuras) en vez de seguir el tema del sistema operativo:
+    en un proyector, la consistencia entre laptop y pantalla importa más que
+    respetar el modo oscuro del presentador.
+  */
+  :root{
+    --paper:#fbfbf7; --paper-2:#f2f4ef; --paper-3:#e8ece5;
+    --line:#dde2d8; --line-strong:#c7cec0;
+    --ink:#161b17; --ink-soft:#4c564e; --ink-faint:#7c877e;
+    --ink-black:#0d100e; --ink-black-2:#182018;
+
+    --accent:#00c73d; --accent-600:#03a835; --accent-700:#009a2f; --accent-900:#005a1a;
+    --accent-tint:#e4f9e5; --accent-tint-strong:#caf9cb;
+
+    --warn:#ffae08; --warn-tint:#fdf1e0; --warn-ink:#8a5a06;
+    --danger:#e03430; --danger-deep:#a92622; --danger-tint:#fbebea;
+    --info:#0099de; --info-tint:#e7f4fb;
+
+    --radius-pill:100px; --radius-card:14px; --radius-sm:7px;
+    --head:'Montserrat',sans-serif; --body:'Open Sans',sans-serif; --mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace;
+
+    --ease:cubic-bezier(.22,.8,.32,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;background:var(--ink-black);overflow:hidden;}
+  body{font-family:var(--body);color:var(--ink);font-size:16px;}
+  .deck{position:relative;width:100vw;height:100vh;overflow:hidden;}
+
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;
+    padding:9vh 8vw 8vh;background:var(--paper);opacity:0;
+    transform:translateY(10px);
+    transition:opacity .32s var(--ease),transform .32s var(--ease);
+  }
+  .slide.active{display:flex;opacity:1;transform:translateY(0);}
+  @media (prefers-reduced-motion:reduce){
+    .slide{transition:opacity .01s linear;transform:none;}
+  }
+
+  /* papel de investigación: retícula muy tenue, como el fondo de una gráfica financiera */
+  .slide:not(.cover):not(.closing)::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:
+      linear-gradient(var(--paper-3) 1px,transparent 1px),
+      linear-gradient(90deg,var(--paper-3) 1px,transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.55),transparent 62%);
+            mask-image:linear-gradient(180deg,rgba(0,0,0,.55),transparent 62%);
+    opacity:.55;
+  }
+
+  .slide-inner{position:relative;max-width:1180px;width:100%;margin:0 auto;}
+
+  .eyebrow{
+    font-family:var(--head);font-weight:700;font-size:.76rem;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--accent-700);margin:0 0 1rem;
+  }
+  h1{font-family:var(--head);font-weight:800;font-size:2.7rem;line-height:1.12;margin:0 0 1rem;color:var(--ink);letter-spacing:-.01em;text-wrap:balance;}
+  h2{font-family:var(--head);font-weight:700;font-size:2.1rem;line-height:1.18;margin:0 0 1.15rem;color:var(--ink);letter-spacing:-.008em;text-wrap:balance;max-width:34ch;}
+  p{font-size:1.14rem;line-height:1.58;color:var(--ink-soft);margin:0 0 .8rem;max-width:64ch;}
+  ul{margin:0;padding:0;list-style:none;}
+  li{font-size:1.1rem;line-height:1.52;color:var(--ink);margin-bottom:.85rem;padding-left:1.55rem;position:relative;max-width:58ch;}
+  li::before{
+    content:"";position:absolute;left:0;top:.56rem;width:7px;height:7px;border-radius:50%;
+    background:var(--accent);
+  }
+
+  .grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center;}
+
+  .badge{
+    display:inline-flex;align-items:center;gap:.4rem;font-family:var(--head);font-weight:700;
+    font-size:.8rem;padding:.35rem .9rem;border-radius:var(--radius-pill);white-space:nowrap;letter-spacing:.01em;
+  }
+  .badge-confirmed{background:var(--accent-tint);color:var(--accent-700);}
+  .badge-partial{background:var(--warn-tint);color:var(--warn-ink);}
+  .badge-refuted{background:var(--danger-tint);color:var(--danger-deep);}
+  .badge-info{background:var(--info-tint);color:var(--info);}
+  .badge-neutral{background:var(--paper-2);color:var(--ink-soft);}
+
+  .card{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius-card);
+    padding:1.4rem 1.6rem;
+  }
+
+  .quote{
+    font-family:var(--body);font-style:italic;font-size:1.24rem;line-height:1.5;color:var(--ink);
+    background:var(--accent-tint);border-left:3px solid var(--accent);border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+    padding:1.1rem 1.4rem 1.1rem 1.65rem;margin:1.2rem 0 0;max-width:62ch;position:relative;
+  }
+  .quote::before{
+    content:"\201C";position:absolute;left:.35rem;top:.55rem;font-family:var(--head);font-style:normal;
+    font-size:1.6rem;font-weight:800;color:var(--accent-700);opacity:.55;line-height:1;
+  }
+  .quote cite{display:block;margin-top:.65rem;font-style:normal;font-weight:700;font-size:.82rem;letter-spacing:.02em;color:var(--accent-900);}
+
+  .stat-row{display:flex;gap:2.4rem;margin:1.5rem 0;flex-wrap:wrap;}
+  .stat{min-width:120px;}
+  .stat .num{
+    font-family:var(--mono);font-weight:700;font-size:2.5rem;color:var(--accent-600);line-height:1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+  }
+  .stat .label{font-size:.9rem;color:var(--ink-soft);margin-top:.4rem;max-width:20ch;}
+
+  table{width:100%;border-collapse:collapse;font-size:1rem;}
+  th{
+    font-family:var(--head);font-weight:700;text-align:left;font-size:.78rem;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-faint);border-bottom:2px solid var(--line-strong);padding:.65rem .8rem;
+  }
+  td{padding:.8rem .8rem;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  td strong{color:var(--ink);}
+
+  .pill-list{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.7rem;}
+  .pill{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius-pill);padding:.42rem 1.05rem;font-size:.92rem;
+    font-weight:600;color:var(--ink);
+  }
+
+  /* -- marco de informe: cabecera y pie fijos, comunes a todas las diapositivas de contenido -- */
+  .report-frame{position:fixed;inset:0;pointer-events:none;z-index:6;font-family:var(--head);}
+  .report-head, .report-foot{
+    position:absolute;left:8vw;right:8vw;display:flex;justify-content:space-between;align-items:baseline;
+    font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);
+  }
+  .report-head{top:3.2vh;border-bottom:1px solid var(--line);padding-bottom:1.1vh;}
+  .report-foot{bottom:3vh;font-family:var(--mono);text-transform:none;letter-spacing:.02em;font-size:.78rem;}
+  .report-foot .pagi{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink-soft);}
+  .report-foot .src{color:var(--ink-faint);}
+  body.on-cover .report-frame,body.on-closing .report-frame{opacity:0;}
+
+  .progress-track{position:fixed;bottom:0;left:0;height:3px;background:transparent;width:100%;z-index:5;}
+  .progress-bar{height:100%;background:var(--accent);transition:width .28s var(--ease);}
+  body.on-cover .progress-track,body.on-closing .progress-track{opacity:0;}
+
+  .verdict-badge{font-size:.78rem;padding:.32rem .78rem;}
+
+  .two-col-list{display:grid;grid-template-columns:1fr 1fr;gap:0 2.6rem;}
+
+  .section-tag{
+    display:inline-flex;align-items:center;gap:.45rem;font-family:var(--head);font-weight:700;font-size:.74rem;
+    color:var(--ink-black);background:var(--accent-tint-strong);padding:.3rem .75rem;border-radius:var(--radius-sm);
+    margin-bottom:1.1rem;letter-spacing:.01em;
+  }
+
+  /* -- portada y cierre: mismo mundo oscuro, un único gesto gráfico compartido -- */
+  .logo{position:absolute;top:2.4vh;right:8vw;height:24px;opacity:.85;}
+  .cover .logo,.closing .logo{position:static;height:32px;margin-bottom:2.4rem;}
+
+  .cover,.closing{background:radial-gradient(120% 140% at 12% 0%,var(--ink-black-2) 0%,var(--ink-black) 62%);}
+  .cover::before,.closing::before{content:none;}
+  .cover h1{color:#f6f8f5;font-size:3.5rem;max-width:900px;}
+  .cover p{color:#c3d3c6;}
+  .cover .eyebrow{color:var(--accent-tint-strong);}
+  .cover .meta{margin-top:2.5rem;display:flex;gap:.9rem;align-items:center;}
+  .cover .meta .badge{background:rgba(255,255,255,.08);color:var(--accent-tint-strong);border:1px solid rgba(255,255,255,.12);}
+
+  .growth-motif{position:absolute;right:6vw;bottom:8vh;width:min(38vw,520px);height:auto;opacity:.9;pointer-events:none;}
+  .growth-motif path{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+  .growth-motif .fill{stroke:none;fill:url(#growthFill);}
+  .growth-motif .grid-line{stroke:rgba(255,255,255,.09);stroke-width:1;}
+  .growth-motif circle{fill:var(--accent);}
+  .growth-path{stroke-dasharray:620;stroke-dashoffset:620;animation:draw 1.6s var(--ease) .3s forwards;}
+  @media (prefers-reduced-motion:reduce){.growth-path{animation:none;stroke-dashoffset:0;}}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+
+  .closing h2{color:#f6f8f5;}
+  .closing p{color:#c3d3c6;}
+
+  .report-link{
+    display:inline-flex;flex-direction:column;gap:.25rem;margin-top:1.6rem;padding:.85rem 1.3rem;
+    border:1px solid rgba(255,255,255,.16);border-radius:var(--radius-card);
+    background:rgba(255,255,255,.05);text-decoration:none;transition:background .18s var(--ease),border-color .18s var(--ease);
+  }
+  .report-link:hover,.report-link:focus-visible{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.3);}
+  .report-link span{
+    font-family:var(--head);font-weight:700;font-size:.95rem;color:var(--accent-tint-strong);
+    display:inline-flex;align-items:center;gap:.5rem;
+  }
+  .report-link span::after{content:"\2197";font-weight:700;}
+  .report-link code{font-family:var(--mono);font-size:.82rem;color:#9fb3a4;}
+
+  ::selection{background:var(--accent-tint-strong);color:var(--ink-black);}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<div class="report-frame" id="reportFrame">
+  <div class="report-head">
+    <span>Invested 3.0</span>
+    <span>Análisis final · UXplorers</span>
+  </div>
+  <div class="report-foot">
+    <span class="pagi" id="counter">01 / 14</span>
+    <span class="src">Julio 2026</span>
+  </div>
+</div>
+<div class="progress-track"><div class="progress-bar" id="progressBar" style="width:7.14%"></div></div>
+
+<div class="deck" id="deck">
+
+  <!-- 1. PORTADA -->
+  <section class="slide cover active">
+    <div class="slide-inner">
+      <svg class="logo" viewBox="0 0 280 48" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M62.0001 34.4076C52.8491 31.9373 52.7944 27.3199 52.8491 24.5232C52.9124 20.0347 58.3408 15.8726 64.7474 15.8726C70.8261 15.8726 77.2327 18.5376 77.2988 25.9545H68.7318C68.6685 23.6645 66.718 23.2866 65.2796 23.2866C63.3205 23.2866 62.0116 24.1969 62.0778 25.5766C62.1411 26.4869 62.9408 27.4001 64.7589 27.8667L69.9371 29.2321C77.3247 31.2359 78.2395 36.1281 78.2395 38.0775C78.2395 44.5182 71.4388 47.5726 65.0322 47.5726C58.8241 47.5726 52.3514 43.8656 52.2881 37.1013H60.7832C60.8494 38.8589 62.797 40.6137 65.294 40.6137C67.3078 40.5478 69.0338 39.6376 69.0338 38.0775C69.0338 36.775 68.2485 36.0737 66.0276 35.4754L62.0001 34.4076Z" fill="#F1F3F5"/><path d="M92.2609 46.8974H83.2422V0H92.2609V24.8442L99.519 16.5198H111.089L98.4086 29.9195L113.635 46.8974H102.459L92.2609 34.8632V46.8974Z" fill="#F1F3F5"/><path d="M137.144 43.4505C135.179 46.3789 130.608 47.481 128.255 47.481C120.459 47.481 112.691 41.4324 112.691 31.6768C112.691 21.9212 120.459 15.8726 128.252 15.8726C130.211 15.8726 134.788 16.5195 137.141 19.9059V16.5195H146.16V46.897H137.144V43.4505ZM129.756 38.899C133.496 38.899 137.144 36.2311 137.144 31.6768C137.144 27.1224 133.482 24.4545 129.756 24.4545C125.965 24.4545 122.107 27.3171 122.107 31.6768C122.107 36.0365 125.965 38.899 129.756 38.899Z" fill="#F1F3F5"/><path d="M163.611 46.897H154.518V16.5195H163.611V20.945C165.242 17.8878 168.838 15.8726 172.434 15.8726C179.295 15.8726 183.613 20.0977 183.613 28.7541V46.8999H174.52V30.7006C174.52 26.6673 172.296 24.652 169.227 24.652C166.022 24.652 163.605 26.2121 163.605 30.8294L163.611 46.897Z" fill="#F1F3F5"/><path d="M213.601 46.8972V43.1272C212.099 45.9239 208.437 47.547 204.645 47.547C196.8 47.547 189.873 41.3696 189.873 31.8029C189.873 22.0473 196.8 15.8698 204.645 15.8698C208.437 15.8698 212.099 17.4299 213.601 20.2267V-0.00878906H222.622V46.8972H213.601ZM206.345 24.3917C202.488 24.3917 199.283 27.2543 199.283 31.6139C199.283 36.1024 202.488 38.9621 206.345 38.9621C210.137 38.9621 213.405 35.9679 213.405 31.6139C213.405 27.0596 210.074 24.3917 206.345 24.3917Z" fill="#F1F3F5"/><path d="M235.49 -0.00878906C238.56 -0.00878906 241.045 2.28126 241.045 5.25833C241.045 8.23539 238.56 10.5913 235.49 10.5913C232.421 10.5913 229.8 8.24684 229.8 5.25833C229.8 2.26981 232.418 -0.00878906 235.49 -0.00878906ZM239.998 46.8857H230.979V16.5196H239.998V46.8857Z" fill="#F1F3F5"/><path d="M270.981 43.4505C269.019 46.3789 264.445 47.481 262.092 47.481C254.31 47.481 246.531 41.4324 246.531 31.6768C246.531 21.9212 254.299 15.8726 262.092 15.8726C264.051 15.8726 268.628 16.5195 270.981 19.9059V16.5195H280V46.897H270.981V43.4505ZM263.593 38.899C267.333 38.899 270.981 36.2311 270.981 31.6768C270.981 27.1224 267.319 24.4545 263.593 24.4545C259.802 24.4545 255.944 27.3171 255.944 31.6768C255.944 36.0365 259.802 38.899 263.593 38.899Z" fill="#F1F3F5"/><path d="M1.21062 15.8641L31.3276 45.8323C31.7828 46.2844 32.3624 46.5921 32.9933 46.7166C33.6242 46.8411 34.2779 46.7767 34.8721 46.5317C35.4662 46.2866 35.974 45.8719 36.3313 45.3398C36.6887 44.8077 36.8796 44.1822 36.8798 43.5422V15.0855C36.8791 13.827 36.3763 12.6202 35.482 11.7303C34.5876 10.8404 33.3749 10.3401 32.1101 10.3394H3.51204C2.8689 10.3396 2.24027 10.5295 1.70555 10.8851C1.17083 11.2407 0.754015 11.746 0.507748 12.3372C0.261481 12.9284 0.196813 13.5789 0.321913 14.2067C0.447013 14.8344 0.756269 15.4112 1.21062 15.8641Z" fill="#00C73D"/><path d="M2.04213 45.1511C6.40045 49.4908 13.8571 46.4193 13.8571 40.2848C13.8571 38.4582 13.1278 36.7063 11.8298 35.4147C10.5318 34.1231 8.77124 33.3975 6.93553 33.3975C0.767714 33.3975 -2.31907 40.8172 2.04501 45.154" fill="#00C73D"/></g></svg>
+      <div class="eyebrow">UXplorers · Investigación mixta Entender + Validar</div>
+      <h1>Invested 3.0<br>Análisis final de investigación</h1>
+      <p style="max-width:640px;">Cómo demostrar que Invested genera valor para el cliente más allá de las rentabilidades.</p>
+      <div class="meta">
+        <span class="badge">Cierre de campo</span>
+        <span class="badge">Julio 2026</span>
+      </div>
+    </div>
+    <svg class="growth-motif" viewBox="0 0 480 260" aria-hidden="true">
+      <defs>
+        <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00c73d" stop-opacity=".35"/>
+          <stop offset="100%" stop-color="#00c73d" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <line class="grid-line" x1="0" y1="60" x2="480" y2="60"/>
+      <line class="grid-line" x1="0" y1="130" x2="480" y2="130"/>
+      <line class="grid-line" x1="0" y1="200" x2="480" y2="200"/>
+      <path class="fill" d="M0,210 C70,200 100,175 150,160 C210,140 240,110 300,85 C360,60 400,45 480,15 L480,260 L0,260 Z"/>
+      <path class="growth-path" d="M0,210 C70,200 100,175 150,160 C210,140 240,110 300,85 C360,60 400,45 480,15"/>
+      <circle cx="480" cy="15" r="5"/>
+    </svg>
+  </section>
+
+  <!-- 2. PREGUNTA CENTRAL + ESTADO -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Contexto</div>
+      <h2>La pregunta que guió esta ronda</h2>
+      <div class="quote" style="margin-top:0;">
+        "¿De qué manera podemos demostrar que Invested genera valor para el cliente más allá de las rentabilidades?"
+      </div>
+      <div class="stat-row" style="margin-top:2rem;">
+        <div class="stat"><span class="badge badge-confirmed">✅ Cierre de campo</span></div>
+        <div class="stat"><span class="badge badge-partial">⚠️ Salvedad de muestra</span></div>
+      </div>
+      <p style="margin-top:1.2rem;max-width:760px;">Se completaron las 5 entrevistas y la prueba remota (53 respuestas · 30 completas). No se alcanzó la meta original de 9–12 entrevistas con 5–6 clientes inactivos: solo tenemos una voz inactiva, y la del <strong>desertor hostil</strong> (el que se fue disgustado) sigue sin entrevista directa esta ronda.</p>
+    </div>
+  </section>
+
+  <!-- 3. METODOLOGÍA -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Metodología</div>
+      <h2>Lo planeado frente a lo ejecutado</h2>
+      <table>
+        <thead><tr><th></th><th>Planeado (brief v3.0)</th><th>Ejecutado al cierre</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Entrevistas 1:1</strong><br>(Teams, 45 min)</td><td>9–12 (4–6 activos, 5–6 inactivos)</td><td><strong>5 realizadas:</strong> 4 activos + 1 inactivo</td></tr>
+          <tr><td><strong>Prueba remota</strong><br>(Useberry, sin moderador)</td><td>30–50 testers</td><td><strong>53 respuestas · 30 completas</strong> (57%) · 18 min 28 s promedio</td></tr>
+          <tr><td><strong>Prototipo</strong></td><td>—</td><td>shine-style-workbench.lovable.app</td></tr>
+          <tr><td><strong>Análisis</strong></td><td>Dovetail</td><td>Dovetail + informe Useberry + base de testers</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:1.4rem;">Fuentes previas en Dovetail: CX-SAC (2025), Gestión de portafolios con Financial Planners, Monitor para Financial Planners, Gestión de portafolios con clientes.</p>
+    </div>
+  </section>
+
+  <!-- 4. QUIÉNES PARTICIPARON -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Metodología</div>
+      <h2>Quiénes participaron</h2>
+      <div class="grid2">
+        <div>
+          <p style="font-weight:700;color:var(--ink);margin-bottom:.6rem;">5 entrevistas 1:1</p>
+          <ul>
+            <li>4 clientes activos (26–38 años, conocimiento financiero mixto)</li>
+            <li>1 cliente inactivo: Sebastián Piedrahita, gestiona su portafolio con un asesor humano</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="stat-row" style="margin:0;gap:1.6rem;">
+            <div class="stat"><div class="num">72%</div><div class="label">no había usado Invest-ED antes</div></div>
+          </div>
+          <div class="stat-row" style="margin:.8rem 0 0;gap:1.6rem;">
+            <div class="stat"><div class="num">100%</div><div class="label">cómodos con herramientas digitales</div></div>
+          </div>
+          <p style="margin-top:.8rem;font-size:.95rem;">Muestra remota: 26–61 años, edad central ≈ 37. La prueba remota lee sobre todo como experiencia de quien aún no usa el servicio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. HALLAZGO 1 -->
+  <section class="slide">
+    <div class="slide-inner">
+      <span class="section-tag">Hallazgo 1 · H1</span>
+      <h2>La activación funciona; la fricción ahora está en la información que falta</h2>
+      <div class="stat-row">
+        <div class="stat"><div class="num">91%</div><div class="label">completó la activación</div></div>
+        <div class="stat"><div class="num">81%</div><div class="label">la calificó "muy fácil"</div></div>
+      </div>
+      <p>No piden un flujo más simple: piden ver la <strong>rentabilidad esperada y una proyección</strong> antes de activar, simular desde la <strong>cuota mensual</strong> disponible, y ver la rentabilidad de lo que <strong>ellos específicamente</strong> han aportado.</p>
+      <div class="quote">"Puse 200 millones y no fue claro cuál es esa proyección." <cite>Tester — prueba remota</cite></div>
+    </div>
+  </section>
+
+  <!-- 6. HALLAZGO 2 -->
+  <section class="slide">
+    <div class="slide-inner">
+      <span class="section-tag">Hallazgo 2 · H4</span>
+      <h2>La comunicación proactiva en caídas es el hallazgo más sólido</h2>
+      <div class="stat-row">
+        <div class="stat"><div class="num">94%</div><div class="label">encontró fácil entender la notificación</div></div>
+        <div class="stat"><div class="num">5/5</div><div class="label">entrevistas: esperarían, no retirarían</div></div>
+      </div>
+      <p>La notificación de caída tranquiliza — "te hace sentir que no estás solo". El contrafactual ya ocurrió: en CX-SAC (2025), pérdidas sostenidas <strong>sin explicación</strong> fueron la causa central de deserción. Falta cerrar el ciclo: avisar cuándo y cómo se resolvió.</p>
+      <div class="quote">"Nuestro equipo ya está evaluando el rebalanceo… te hace sentir que no estás solo." <cite>Entrevista de cierre</cite></div>
+    </div>
+  </section>
+
+  <!-- 7. HALLAZGO 3 -->
+  <section class="slide">
+    <div class="slide-inner">
+      <span class="section-tag">Hallazgo 3 · H3</span>
+      <h2>La gamificación motiva, pero no sustituye la rentabilidad</h2>
+      <div class="stat-row">
+        <div class="stat"><div class="num">86%</div><div class="label">encuentra motivador el desbloqueo</div></div>
+        <div class="stat"><div class="num">88%</div><div class="label">valora ver logros y aprendizajes</div></div>
+      </div>
+      <p>Lo más valorado de "Logros" no son las insignias de actividad, sino el <strong>avance visual hacia la meta</strong> ("la barrita"). Los usuarios con más conocimiento lo dicen sin rodeos.</p>
+      <div class="quote">"A la hora del té, lo importante es que la plata esté moviéndose bien." <cite>Entrevista — cliente activo</cite></div>
+    </div>
+  </section>
+
+  <!-- 8. HALLAZGO 4 -->
+  <section class="slide">
+    <div class="slide-inner">
+      <span class="section-tag">Hallazgo 4 · H3 / H5</span>
+      <h2>El desbloqueo progresivo divide, y no por nivel de conocimiento</h2>
+      <p>Quienes empiezan lo reciben bien (modelo "Duolingo": genera confianza). Entre quienes ya invierten con criterio, la reacción varía — algunos lo ven como una restricción injustificada, otros lo encuentran motivador y justo.</p>
+      <div class="quote">"Si ya está la perfilación, las mezclas deberían estar disponibles desde el inicio." <cite>Tester con criterio propio</cite></div>
+      <p style="margin-top:1.2rem;">La variable que separa aceptación de rechazo no es solo cuánto sabe la persona: es si <strong>ya tiene un proceso de decisión propio</strong> (un criterio, un asesor) frente al cual el desbloqueo se sienta redundante o complementario.</p>
+    </div>
+  </section>
+
+  <!-- 9. HALLAZGO 5 -->
+  <section class="slide">
+    <div class="slide-inner">
+      <span class="section-tag">Hallazgo 5 · H5</span>
+      <h2>"Mezcla" no se entiende de forma espontánea</h2>
+      <div class="stat-row">
+        <div class="stat"><div class="num">90%</div><div class="label">calificó fácil entender su inversión, cuando el flujo lo explica bien</div></div>
+      </div>
+      <p>El nombre confunde ("no entiendo a qué se refiere con mezcla"), las siglas <strong>RV y RF</strong> no se descifran, y la perfilación no es visible en el flujo. Cuando el flujo conecta con claridad riesgo, plazo y meta, la comprensión ocurre sin fricción — el problema no es el concepto, es la explicación.</p>
+      <div class="pill-list">
+        <span class="pill">Lenguaje confuso</span>
+        <span class="pill">Perfilación invisible</span>
+        <span class="pill">Falta de agencia</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. HALLAZGO 6 -->
+  <section class="slide">
+    <div class="slide-inner">
+      <span class="section-tag">Hallazgo 6 · Fuera de hipótesis</span>
+      <h2>Dos tipos de cliente inactivo</h2>
+      <div class="grid2">
+        <div class="card" style="border-left:4px solid var(--danger);">
+          <p style="font-weight:700;color:var(--ink);margin-bottom:.4rem;">Desertor hostil (CX-SAC, 2025)</p>
+          <p style="margin:0;font-size:1rem;">Entra sin comprensión, sufre pérdidas sin explicación, sale en silencio y molesto.</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--accent);">
+          <p style="font-weight:700;color:var(--ink);margin-bottom:.4rem;">Desertor "amistoso" (Sebastián Piedrahita)</p>
+          <p style="margin:0;font-size:1rem;">Se queda con su asesor humano por preferencia, no por daño. Es reactivable.</p>
+        </div>
+      </div>
+      <p style="margin-top:1.4rem;">Palanca concreta de reactivación: mostrar la <strong>rentabilidad de sus propios aportes</strong> desde el inicio. Es un solo caso — trátese como hipótesis a validar, no como hallazgo cerrado.</p>
+    </div>
+  </section>
+
+  <!-- 11. VEREDICTOS DE CIERRE -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Síntesis</div>
+      <h2>Veredictos de cierre de las 5 hipótesis</h2>
+      <table>
+        <thead><tr><th>Hipótesis</th><th>Prioridad</th><th>Veredicto</th></tr></thead>
+        <tbody>
+          <tr><td>H1 · Rentabilidad frena activación</td><td>Crítica</td><td><span class="badge badge-confirmed verdict-badge">✅ Confirmada</span></td></tr>
+          <tr><td>H2 · Educación → permanencia</td><td>Crítica</td><td><span class="badge badge-partial verdict-badge">🟡 Parcial</span></td></tr>
+          <tr><td>H3 · Gamificación sustituye rentabilidad</td><td>Crítica</td><td><span class="badge badge-refuted verdict-badge">❌ Refutada</span> <span class="badge badge-confirmed verdict-badge">✅ Complemento</span></td></tr>
+          <tr><td>H4 · Comunicación proactiva reduce retiros</td><td>Alta</td><td><span class="badge badge-confirmed verdict-badge">✅ Confirmada</span></td></tr>
+          <tr><td>H5 · Diferenciación de mezclas → valor</td><td>Alta</td><td><span class="badge badge-partial verdict-badge">🟡 Parcial</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 12. RECOMENDACIONES TÁCTICAS -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Recomendaciones</div>
+      <h2>Ajustes tácticos antes del lanzamiento</h2>
+      <div class="two-col-list">
+        <ul>
+          <li><strong>Proyección de crecimiento</strong> en "Ver mi mezcla" + simulador meta–plazo–cuota editable</li>
+          <li><strong>Rentabilidad propia</strong> acumulada desde el primer aporte, separada del portafolio general</li>
+          <li><strong>Notificación de caída completa:</strong> magnitud, causa, plazo, cierre del ciclo, botón de asesor</li>
+        </ul>
+        <ul>
+          <li><strong>Renombrar "mezcla"</strong> y eliminar siglas RV/RF; perfilación visible en el flujo</li>
+          <li><strong>Rediseñar la entrada:</strong> un solo camino evidente hacia la activación (momento de quiebre #1)</li>
+          <li>Facilitar el acceso a "Logros y aprendizaje"</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. ESTRATÉGICAS + PRÓXIMOS PASOS -->
+  <section class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Recomendaciones</div>
+      <h2>Estratégicas y próximos pasos</h2>
+      <ul>
+        <li><strong>Desbloqueo progresivo con puerta de salida:</strong> quien completa perfilación puede acceder a cualquier mezcla, o hacerlo con su asesor</li>
+        <li><strong>Educación por niveles</strong>, anclada a eventos reales del contrato</li>
+        <li><strong>Política de comunicación por dosis</strong>, con canal configurable (WhatsApp y correo dominan)</li>
+      </ul>
+      <div class="quote" style="background:var(--warn-tint);border-left-color:var(--warn);">
+        ⚠️ Antes de decisiones de alto impacto o irreversibles: recomendamos un <strong>mini-sprint de 3–4 entrevistas</strong> con el desertor hostil, para validar H2 y H4 con evidencia directa.
+      </div>
+    </div>
+  </section>
+
+  <!-- 14. CIERRE -->
+  <section class="slide closing">
+    <div class="slide-inner">
+      <svg class="logo" style="position:static;height:28px;margin-bottom:2.2rem;" viewBox="0 0 280 48" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M62.0001 34.4076C52.8491 31.9373 52.7944 27.3199 52.8491 24.5232C52.9124 20.0347 58.3408 15.8726 64.7474 15.8726C70.8261 15.8726 77.2327 18.5376 77.2988 25.9545H68.7318C68.6685 23.6645 66.718 23.2866 65.2796 23.2866C63.3205 23.2866 62.0116 24.1969 62.0778 25.5766C62.1411 26.4869 62.9408 27.4001 64.7589 27.8667L69.9371 29.2321C77.3247 31.2359 78.2395 36.1281 78.2395 38.0775C78.2395 44.5182 71.4388 47.5726 65.0322 47.5726C58.8241 47.5726 52.3514 43.8656 52.2881 37.1013H60.7832C60.8494 38.8589 62.797 40.6137 65.294 40.6137C67.3078 40.5478 69.0338 39.6376 69.0338 38.0775C69.0338 36.775 68.2485 36.0737 66.0276 35.4754L62.0001 34.4076Z" fill="#404040"/><path d="M92.2609 46.8974H83.2422V0H92.2609V24.8442L99.519 16.5198H111.089L98.4086 29.9195L113.635 46.8974H102.459L92.2609 34.8632V46.8974Z" fill="#404040"/><path d="M137.144 43.4505C135.179 46.3789 130.608 47.481 128.255 47.481C120.459 47.481 112.691 41.4324 112.691 31.6768C112.691 21.9212 120.459 15.8726 128.252 15.8726C130.211 15.8726 134.788 16.5195 137.141 19.9059V16.5195H146.16V46.897H137.144V43.4505ZM129.756 38.899C133.496 38.899 137.144 36.2311 137.144 31.6768C137.144 27.1224 133.482 24.4545 129.756 24.4545C125.965 24.4545 122.107 27.3171 122.107 31.6768C122.107 36.0365 125.965 38.899 129.756 38.899Z" fill="#404040"/><path d="M163.611 46.897H154.518V16.5195H163.611V20.945C165.242 17.8878 168.838 15.8726 172.434 15.8726C179.295 15.8726 183.613 20.0977 183.613 28.7541V46.8999H174.52V30.7006C174.52 26.6673 172.296 24.652 169.227 24.652C166.022 24.652 163.605 26.2121 163.605 30.8294L163.611 46.897Z" fill="#404040"/><path d="M213.601 46.8972V43.1272C212.099 45.9239 208.437 47.547 204.645 47.547C196.8 47.547 189.873 41.3696 189.873 31.8029C189.873 22.0473 196.8 15.8698 204.645 15.8698C208.437 15.8698 212.099 17.4299 213.601 20.2267V-0.00878906H222.622V46.8972H213.601ZM206.345 24.3917C202.488 24.3917 199.283 27.2543 199.283 31.6139C199.283 36.1024 202.488 38.9621 206.345 38.9621C210.137 38.9621 213.405 35.9679 213.405 31.6139C213.405 27.0596 210.074 24.3917 206.345 24.3917Z" fill="#404040"/><path d="M235.49 -0.00878906C238.56 -0.00878906 241.045 2.28126 241.045 5.25833C241.045 8.23539 238.56 10.5913 235.49 10.5913C232.421 10.5913 229.8 8.24684 229.8 5.25833C229.8 2.26981 232.418 -0.00878906 235.49 -0.00878906ZM239.998 46.8857H230.979V16.5196H239.998V46.8857Z" fill="#404040"/><path d="M270.981 43.4505C269.019 46.3789 264.445 47.481 262.092 47.481C254.31 47.481 246.531 41.4324 246.531 31.6768C246.531 21.9212 254.299 15.8726 262.092 15.8726C264.051 15.8726 268.628 16.5195 270.981 19.9059V16.5195H280V46.897H270.981V43.4505ZM263.593 38.899C267.333 38.899 270.981 36.2311 270.981 31.6768C270.981 27.1224 267.319 24.4545 263.593 24.4545C259.802 24.4545 255.944 27.3171 255.944 31.6768C255.944 36.0365 259.802 38.899 263.593 38.899Z" fill="#404040"/><path d="M1.21062 15.8641L31.3276 45.8323C31.7828 46.2844 32.3624 46.5921 32.9933 46.7166C33.6242 46.8411 34.2779 46.7767 34.8721 46.5317C35.4662 46.2866 35.974 45.8719 36.3313 45.3398C36.6887 44.8077 36.8796 44.1822 36.8798 43.5422V15.0855C36.8791 13.827 36.3763 12.6202 35.482 11.7303C34.5876 10.8404 33.3749 10.3401 32.1101 10.3394H3.51204C2.8689 10.3396 2.24027 10.5295 1.70555 10.8851C1.17083 11.2407 0.754015 11.746 0.507748 12.3372C0.261481 12.9284 0.196813 13.5789 0.321913 14.2067C0.447013 14.8344 0.756269 15.4112 1.21062 15.8641Z" fill="#00C73D"/><path d="M2.04213 45.1511C6.40045 49.4908 13.8571 46.4193 13.8571 40.2848C13.8571 38.4582 13.1278 36.7063 11.8298 35.4147C10.5318 34.1231 8.77124 33.3975 6.93553 33.3975C0.767714 33.3975 -2.31907 40.8172 2.04501 45.154" fill="#00C73D"/></g></svg>
+      <h2 style="font-size:2.6rem;">El valor de Invested existe. Falta hacerlo visible.</h2>
+      <p style="font-size:1.25rem;max-width:760px;">Proyección personalizada, comunicación proactiva en caídas y un lenguaje claro son las tres palancas de mayor impacto por menor esfuerzo.</p>
+      <p style="margin-top:2rem;font-weight:700;color:var(--accent-tint-strong);">Gracias — preguntas y discusión</p>
+      <a class="report-link" href="https://uxplorerscolombia.github.io/ux-prototypes/projects/invested-3-0-analisis-final/v1/" target="_blank" rel="noopener">
+        <span>Informe completo</span>
+        <code>uxplorerscolombia.github.io/ux-prototypes/.../invested-3-0-analisis-final/v1</code>
+      </a>
+    </div>
+    <svg class="growth-motif" viewBox="0 0 480 260" aria-hidden="true">
+      <line class="grid-line" x1="0" y1="60" x2="480" y2="60"/>
+      <line class="grid-line" x1="0" y1="130" x2="480" y2="130"/>
+      <line class="grid-line" x1="0" y1="200" x2="480" y2="200"/>
+      <path class="fill" d="M0,210 C70,200 100,175 150,160 C210,140 240,110 300,85 C360,60 400,45 480,15 L480,260 L0,260 Z"/>
+      <path class="growth-path" d="M0,210 C70,200 100,175 150,160 C210,140 240,110 300,85 C360,60 400,45 480,15"/>
+      <circle cx="480" cy="15" r="5"/>
+    </svg>
+  </section>
+
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  const counter = document.getElementById('counter');
+  const progressBar = document.getElementById('progressBar');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function render(){
+    slides.forEach((s,i)=> s.classList.toggle('active', i===current));
+    counter.textContent = pad(current+1) + ' / ' + pad(total);
+    progressBar.style.width = ((current+1)/total*100) + '%';
+    const active = slides[current];
+    document.body.classList.toggle('on-cover', active.classList.contains('cover'));
+    document.body.classList.toggle('on-closing', active.classList.contains('closing'));
+  }
+
+  function next(){ if(current < total-1){ current++; render(); } }
+  function prev(){ if(current > 0){ current--; render(); } }
+
+  window.addEventListener('keydown', (e)=>{
+    if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); next(); }
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+    else if(e.key === 'Home'){ current = 0; render(); }
+    else if(e.key === 'End'){ current = total-1; render(); }
+  });
+
+  document.addEventListener('click', (e)=>{
+    if(e.target.closest('a')){ return; }
+    if(e.clientX > window.innerWidth/2){ next(); } else { prev(); }
+  });
+
+  render();
+</script>
+</body>
+</html>
