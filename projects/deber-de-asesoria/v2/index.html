@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.294.0/dist/umd/lucide.min.js"></script>
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  function make(node){
+    var tag=node[0], attrs=node[1]||{}, kids=node[2]||[];
+    var el=document.createElementNS(NS, tag);
+    for(var k in attrs){ el.setAttribute(k, attrs[k]); }
+    (kids||[]).forEach(function(c){ el.appendChild(make(c)); });
+    return el;
+  }
+  function draw(el){
+    var L=window.lucide; if(!L||!L.icons) return false;
+    var root=el.shadowRoot||el.attachShadow({mode:'open'});
+    var name=el.getAttribute('name')||'circle';
+    var size=el.getAttribute('size')||'20';
+    var pascal=name.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join('');
+    var node=L.icons[pascal]||L.icons['Circle'];
+    var svg;
+    if(node && typeof node[0]==='string' && node[0]==='svg'){ svg=make(node); }
+    else {
+      svg=document.createElementNS(NS,'svg'); svg.setAttribute('viewBox','0 0 24 24');
+      var arr=(node && typeof node[0]==='string') ? [node] : (node||[]);
+      arr.forEach(function(c){ svg.appendChild(make(c)); });
+    }
+    svg.setAttribute('width',size); svg.setAttribute('height',size);
+    svg.setAttribute('fill','none'); svg.setAttribute('stroke','currentColor');
+    svg.setAttribute('stroke-width','2'); svg.setAttribute('stroke-linecap','round'); svg.setAttribute('stroke-linejoin','round');
+    svg.style.display='block';
+    root.textContent=''; root.appendChild(svg);
+    el.style.display='inline-flex'; el.style.alignItems='center'; el.style.justifyContent='center'; el.style.flex='none';
+    return true;
+  }
+  if(!customElements.get('sk-icon')){
+    customElements.define('sk-icon', class extends HTMLElement{
+      static get observedAttributes(){return['name','size'];}
+      connectedCallback(){ if(!draw(this)) window.addEventListener('sk-lucide-ready', function(){ draw(this); }.bind(this), {once:true}); }
+      attributeChangedCallback(){ if(this.shadowRoot||window.lucide) draw(this); }
+    });
+  }
+  window.dispatchEvent(new Event('sk-lucide-ready'));
+})();
+</script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Open Sans',system-ui,sans-serif;color:#404040}
+  a{color:#1d594c;text-decoration:none;font-weight:600}
+  a:hover{color:#153f36;text-decoration:underline}
+  @keyframes skfade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .skpop{animation:skfade .28s ease}
+  .sk-scroll::-webkit-scrollbar{width:8px;height:8px}
+  .sk-scroll::-webkit-scrollbar-thumb{background:#d4d4d4;border-radius:8px}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:radial-gradient(120% 80% at 50% -10%,#edfefa 0%,#eef1f3 46%,#e7ebee 100%);display:flex;flex-direction:column">
+
+  <!-- ══ Barra de revisión ══ -->
+  <div style="background:#0f2d33;color:#cfe8e2;padding:9px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:0;z-index:400;box-shadow:0 2px 8px rgba(0,0,0,.14)">
+    <span style="display:inline-flex;align-items:center;gap:8px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;color:#fff"><sk-icon name="building-2" size="16" style="color:#4fb69d"></sk-icon>Prototipo · Soluciones para tu empresa (Fiduciaria)</span>
+    <select onChange="{{ jumpTo }}" value="" style="background:#173e45;color:#cfe8e2;border:1px solid #2a5a53;border-radius:100px;padding:6px 12px;font-family:'Open Sans';font-size:12px;font-weight:600;cursor:pointer">
+      <option value="">Ir a pantalla…</option>
+      <option value="pj01">PJ-01 Empresa</option>
+      <option value="pj02">PJ-02 Selección FIC</option>
+      <option value="pj03">PJ-03 Perfilamiento</option>
+      <option value="pj04">PJ-04 Vinculación</option>
+      <option value="pj05">PJ-05 Confirmación</option>
+    </select>
+    <a href="Deber de Asesoria.dc.html" style="margin-left:auto;color:#8fe0cd;font-size:12.5px;font-weight:700;display:inline-flex;gap:6px;align-items:center"><sk-icon name="arrow-left" size="14"></sk-icon>Volver al flujo de persona natural</a>
+  </div>
+
+  <!-- ══ Escenario ══ -->
+  <div style="flex:1;display:flex;justify-content:center;align-items:flex-start;padding:22px 16px 40px">
+    <div style="width:100%;max-width:412px;background:#fff;border-radius:30px;overflow:hidden;box-shadow:0 26px 60px -20px rgba(15,45,51,.35),0 8px 22px -12px rgba(0,0,0,.2);border:1px solid #e3e7ea;display:flex;flex-direction:column;min-height:788px;position:relative">
+
+      <!-- App bar -->
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #eef0f1;background:#fff;position:sticky;top:0;z-index:50">
+        <button hidden="{{ backHidden }}" onClick="{{ goBack }}" aria-label="Volver" style="border:none;background:transparent;color:#404040;cursor:pointer;padding:4px;border-radius:9px;display:inline-flex" style-hover="background:#f2f4f5"><sk-icon name="arrow-left" size="20"></sk-icon></button>
+        <img src="assets/brand/logo-color.svg" alt="Skandia" style="height:24px;width:auto;display:block">
+        <span style="margin-left:auto;background:#edfefa;color:#1d594c;border:1px solid #bcdcd6;border-radius:5px;padding:3px 9px;font-size:11px;font-weight:700">Fiduciaria</span>
+      </div>
+
+      <!-- Main -->
+      <div ref="{{ mainRef }}" class="sk-scroll" style="flex:1;overflow-y:auto;padding:22px 18px 10px">
+
+        <!-- ═══ PJ-01 · EMPRESA ═══ -->
+        <section hidden="{{ h.pj01 }}" class="skpop">
+          <div style="background:#29806d;color:#fff;border-radius:16px;padding:16px 18px;margin-bottom:14px"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px">Soluciones para tu empresa</div><div style="font-size:12.5px;color:#cfe8e2;margin-top:2px">Skandia Fiduciaria S.A.</div></div>
+          <p style="font-size:14.5px;line-height:1.5;color:#404040;margin:0 0 16px">Administre los recursos de su empresa con el respaldo de una fiduciaria — de forma clara, digital y a su ritmo.</p>
+          <button onClick="{{ pjFicEfectivo }}" style="width:100%;text-align:left;background:#fff;border:1px solid #bcdcd6;border-radius:14px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start;margin-bottom:11px" style-hover="border-color:#29806d;box-shadow:0 8px 22px -10px rgba(41,128,109,.28)"><span style="flex:none;width:42px;height:42px;border-radius:11px;background:#29806d;color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="banknote" size="20"></sk-icon></span><span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#1d594c">Liquidez para la operación</span><span style="display:block;font-size:13px;color:#666;line-height:1.45;margin-top:2px">FIC Efectivo — recursos disponibles para el día a día de la empresa.</span></span></button>
+          <button onClick="{{ pjFicMonetario }}" style="width:100%;text-align:left;background:#fff;border:1px solid #bcdcd6;border-radius:14px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start" style-hover="border-color:#29806d;box-shadow:0 8px 22px -10px rgba(41,128,109,.28)"><span style="flex:none;width:42px;height:42px;border-radius:11px;background:#29806d;color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="piggy-bank" size="20"></sk-icon></span><span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#1d594c">Excedentes de tesorería</span><span style="display:block;font-size:13px;color:#666;line-height:1.45;margin-top:2px">FIC Monetario — excedentes trabajando mientras no se usan.</span></span></button>
+          <div style="display:flex;gap:10px;background:#edfefa;border-left:4px solid #29806d;border-radius:8px;padding:12px 14px;margin-top:14px;font-size:13px;line-height:1.4;color:#1d594c"><sk-icon name="info" size="17" style="color:#29806d;flex:none;margin-top:1px"></sk-icon><span>Contenido informativo, no constituye una recomendación profesional.</span></div>
+        </section>
+
+        <!-- ═══ PJ-02 · SELECCIÓN FIC ═══ -->
+        <section hidden="{{ h.pj02 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 6px">Seleccione el fondo</h1>
+          <p style="font-size:12.5px;color:#888;margin:0 0 14px">Cada fondo requiere su propia solicitud. Si la empresa ya tiene una vinculación, precargamos sus datos.</p>
+          <button onClick="{{ goPj03 }}" style="width:100%;text-align:left;background:#fff;border:1px solid #bcdcd6;border-radius:14px;padding:16px;cursor:pointer;margin-bottom:11px" style-hover="border-color:#29806d"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#1d594c">FIC Efectivo</div><div style="font-size:13px;color:#666;margin-top:2px">Disponibilidad inmediata para la operación.</div></div><span style="flex:none;background:#f5f5f5;border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:700;color:#404040;white-space:nowrap">Desde $1.000.000</span></div><span onClick="{{ ficaToast }}" style="display:inline-block;margin-top:8px;color:#1d594c;font-weight:600;font-size:13px;text-decoration:underline">Ver ficha y reglamento</span></button>
+          <button onClick="{{ goPj03 }}" style="width:100%;text-align:left;background:#fff;border:1px solid #bcdcd6;border-radius:14px;padding:16px;cursor:pointer" style-hover="border-color:#29806d"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#1d594c">FIC Monetario</div><div style="font-size:13px;color:#666;margin-top:2px">Excedentes de corto plazo con baja exposición.</div></div><span style="flex:none;background:#f5f5f5;border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:700;color:#404040;white-space:nowrap">Desde $1.000.000</span></div><span onClick="{{ ficaToast }}" style="display:inline-block;margin-top:8px;color:#1d594c;font-weight:600;font-size:13px;text-decoration:underline">Ver ficha y reglamento</span></button>
+        </section>
+
+        <!-- ═══ PJ-03 · PERFILAMIENTO EMPRESA ═══ -->
+        <section hidden="{{ h.pj03 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 8px">Conozcamos la empresa</h1>
+          <p style="font-size:14px;line-height:1.5;color:#404040;margin:0 0 12px">Estas preguntas permiten confirmar que el fondo se ajusta al manejo de los recursos de la empresa. El resultado queda documentado.</p>
+          <div style="background:#f7f7f7;border-radius:14px;padding:14px;font-size:13px;color:#666;line-height:1.5">Perfilamiento de persona jurídica: siempre por preguntas (sin variante de tarjetas). Mismo patrón que el flujo natural, con lenguaje operativo: origen de los recursos, horizonte de la tesorería, tolerancia a variaciones, políticas internas de inversión.</div>
+          <button onClick="{{ pjPerfilComplete }}" style="width:100%;margin-top:16px;border:none;border-radius:4px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#29806d" style-hover="background:#1d594c">Completar perfilamiento (simulado)</button>
+        </section>
+
+        <!-- ═══ PJ-04 · VINCULACIÓN EMPRESA ═══ -->
+        <section hidden="{{ h.pj04 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 14px">Solicitud de vinculación</h1>
+          <div style="display:flex;gap:6px;margin-bottom:16px">
+            <div style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#404040"><div style="height:6px;border-radius:4px;background:#29806d;margin-bottom:6px"></div>Empresa</div>
+            <div style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#1d594c"><div style="height:6px;border-radius:4px;background:#29806d;margin-bottom:6px"></div>Representante</div>
+            <div style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#9aa0a3"><div style="height:6px;border-radius:4px;background:#dcdfe1;margin-bottom:6px"></div>Documentos</div>
+            <div style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#9aa0a3"><div style="height:6px;border-radius:4px;background:#dcdfe1;margin-bottom:6px"></div>Aceptación</div>
+          </div>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:14px;padding:14px;margin-bottom:10px"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">Empresa XYZ S.A.S.</div><div style="font-size:12.5px;color:#666;margin:2px 0 6px">NIT 900.123.456-7 · Titular de la vinculación</div><span style="background:#ecfdf3;color:#087a34;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">Completado</span></div>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:14px;padding:14px;margin-bottom:10px"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">Representante legal</div><div style="font-size:12.5px;color:#666;margin:2px 0 6px">Validación de identidad del representante legal.</div><span style="background:#fff3e0;color:#7a5300;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">En validación</span></div>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:14px;padding:14px;margin-bottom:10px"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">Documentos</div><div style="font-size:12.5px;color:#666;margin:2px 0 6px">Adjunte los documentos del representante legal y de beneficiarios finales.</div><span style="background:#f5f5f5;color:#555;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">En proceso</span></div>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:14px;padding:14px"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">Reglamento del fondo</div><div style="font-size:12.5px;color:#666;margin:2px 0 0">Aceptación expresa por cada fondo — nunca preseleccionada.</div><label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.4;margin-top:10px;cursor:pointer"><input type="checkbox" checked="{{ pjreg }}" onChange="{{ togglePjReg }}" style="width:19px;height:19px;accent-color:#29806d;flex:none;margin-top:1px"><span>Leí y acepto el reglamento del fondo.</span></label></div>
+          <button disabled="{{ pjBtnDisabled }}" onClick="{{ pjConfirm }}" style="width:100%;margin-top:14px;border:none;border-radius:4px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ pjBtnBg }}">Confirmar solicitud</button>
+        </section>
+
+        <!-- ═══ PJ-05 · CONFIRMACIÓN ═══ -->
+        <section hidden="{{ h.pj05 }}" class="skpop">
+          <div style="width:60px;height:60px;border-radius:50%;background:#edfefa;border:2px solid #29806d;color:#29806d;display:flex;align-items:center;justify-content:center;margin:6px auto 14px"><sk-icon name="check" size="30"></sk-icon></div>
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;text-align:center;color:#232323;margin:0 0 12px">Solicitud completada</h1>
+          <p style="font-size:14.5px;line-height:1.5;color:#404040;text-align:center;margin:0 0 16px">El contrato quedó asociado a Empresa XYZ S.A.S. Puede consultar el estado en su portal.</p>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323;margin-bottom:6px">Resumen de la solicitud</div><div style="font-size:13px;color:#666;line-height:1.5">FIC Efectivo · Perfil: Tesorería conservadora · Reglamento aceptado el 17-jul-2026 · Canal: web pública</div><button onClick="{{ ficaToast }}" style="width:100%;margin-top:12px;background:transparent;color:#1d594c;border:1.5px solid #29806d;border-radius:4px;padding:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:Montserrat,sans-serif">Descargar resumen</button></div>
+          <a href="Deber de Asesoria.dc.html" style="display:block;text-align:center;width:100%;margin-top:14px;border:none;border-radius:4px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#29806d" style-hover="background:#1d594c">Volver al flujo de persona natural</a>
+        </section>
+
+        <!-- Footer regulatorio -->
+        <div style="border-top:1px solid #eef0f1;margin:18px -18px 0;padding:14px 18px 20px;font-size:11.5px;line-height:1.5;color:#888">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#404040"><sk-icon name="shield-check" size="14" style="color:#666"></sk-icon>Vigilado Superintendencia Financiera de Colombia</div>
+          <div style="margin-top:3px">Fondos de Inversión Colectiva: administrados por Skandia Fiduciaria S.A.</div>
+          <div style="opacity:.85;margin-top:5px">Contenido informativo — no constituye recomendación profesional. Decreto 1239 de 2024 · CE 014 de 2025.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div hidden="{{ toastHidden }}" style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#22282c;color:#fff;padding:11px 20px;border-radius:100px;font-size:13.5px;font-weight:500;z-index:600;max-width:88%;text-align:center;box-shadow:0 12px 32px -8px rgba(0,0,0,.4);display:flex;gap:8px;align-items:center"><sk-icon name="check-circle-2" size="16" style="color:#4fb69d"></sk-icon>{{ toast }}</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.mainRef = React.createRef();
+    this._toastT = null;
+    this.SCREENS = ['pj01','pj02','pj03','pj04','pj05'];
+    this.state = { screen:'pj01', prev:[], pjreg:false, toast:'' };
+  }
+  componentDidUpdate(){ if(this._lastScreen!==this.state.screen){ this._lastScreen=this.state.screen; if(this.mainRef.current) this.mainRef.current.scrollTop=0; } }
+  trz = (ev,data)=>{ try{ console.log('[Trz]',ev,data||{}); }catch(e){} };
+  go = (id)=> this.setState(s=>({screen:id, prev:[...s.prev, s.screen]}), ()=>this.trz('view_'+id));
+  goBack = ()=> this.setState(s=>{ const prev=[...s.prev]; const p=prev.pop()||'pj01'; return {screen:p, prev}; });
+  jumpTo = (e)=>{ const v=e.target.value; if(v) this.go(v); };
+  pjFic = (fic)=>()=>{ this.trz('da_pj_fic_selected',{fic}); this.go('pj02'); };
+  goPj03 = ()=> this.go('pj03');
+  pjPerfilComplete = ()=>{ this.trz('da_pj_perfilamiento_completed',{resultado:'Tesorería conservadora'}); this.go('pj04'); };
+  togglePjReg = (e)=> this.setState({pjreg:e.target.checked});
+  pjConfirm = ()=>{ this.trz('da_pj_reglamento_aceptado',{fic:'FIC Efectivo'}); this.trz('da_pj_journey_completed'); this.go('pj05'); };
+  showToast = (m)=>{ this.setState({toast:m}); clearTimeout(this._toastT); this._toastT=setTimeout(()=>this.setState({toast:''}),3400); };
+  ficaToast = ()=> this.showToast('Ficha y reglamento del fondo — sk-dialog');
+
+  renderVals(){
+    const s=this.state;
+    const h={}; this.SCREENS.forEach(id=>h[id]=s.screen!==id);
+    return {
+      mainRef:this.mainRef, h, backHidden:s.prev.length===0, goBack:this.goBack, jumpTo:this.jumpTo,
+      pjFicEfectivo:this.pjFic('FIC Efectivo'), pjFicMonetario:this.pjFic('FIC Monetario'),
+      goPj03:this.goPj03, pjPerfilComplete:this.pjPerfilComplete,
+      togglePjReg:this.togglePjReg, pjreg:s.pjreg, pjBtnDisabled:!s.pjreg, pjBtnBg:s.pjreg?'#29806d':'#e9e9e9',
+      pjConfirm:this.pjConfirm, ficaToast:this.ficaToast,
+      toastHidden:!s.toast, toast:s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

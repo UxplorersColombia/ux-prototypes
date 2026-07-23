@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Open+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.294.0/dist/umd/lucide.min.js"></script>
+<script src="./image-slot.js"></script>
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  function make(node){
+    var tag=node[0], attrs=node[1]||{}, kids=node[2]||[];
+    var el=document.createElementNS(NS, tag);
+    for(var k in attrs){ el.setAttribute(k, attrs[k]); }
+    (kids||[]).forEach(function(c){ el.appendChild(make(c)); });
+    return el;
+  }
+  function draw(el){
+    var L=window.lucide; if(!L||!L.icons) return false;
+    var root=el.shadowRoot||el.attachShadow({mode:'open'});
+    var name=el.getAttribute('name')||'circle';
+    var size=el.getAttribute('size')||'20';
+    var pascal=name.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join('');
+    var node=L.icons[pascal]||L.icons['Circle'];
+    var svg;
+    if(node && typeof node[0]==='string' && node[0]==='svg'){ svg=make(node); }
+    else {
+      svg=document.createElementNS(NS,'svg'); svg.setAttribute('viewBox','0 0 24 24');
+      var arr=(node && typeof node[0]==='string') ? [node] : (node||[]);
+      arr.forEach(function(c){ svg.appendChild(make(c)); });
+    }
+    svg.setAttribute('width',size); svg.setAttribute('height',size);
+    svg.setAttribute('fill','none'); svg.setAttribute('stroke','currentColor');
+    svg.setAttribute('stroke-width','2'); svg.setAttribute('stroke-linecap','round'); svg.setAttribute('stroke-linejoin','round');
+    svg.style.display='block';
+    root.textContent=''; root.appendChild(svg);
+    el.style.display='inline-flex'; el.style.alignItems='center'; el.style.justifyContent='center'; el.style.flex='none';
+    return true;
+  }
+  if(!customElements.get('sk-icon')){
+    customElements.define('sk-icon', class extends HTMLElement{
+      static get observedAttributes(){return['name','size'];}
+      connectedCallback(){ if(!draw(this)) window.addEventListener('sk-lucide-ready', function(){ draw(this); }.bind(this), {once:true}); }
+      attributeChangedCallback(){ if(this.shadowRoot||window.lucide) draw(this); }
+    });
+  }
+  window.dispatchEvent(new Event('sk-lucide-ready'));
+})();
+</script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Open Sans',system-ui,sans-serif;color:#404040}
+  a{color:#009a2f;text-decoration:none;font-weight:600}
+  a:hover{color:#03a835;text-decoration:underline}
+  details>summary{list-style:none;cursor:pointer}
+  details>summary::-webkit-details-marker{display:none}
+  .chev{transition:transform .18s ease}
+  details[open] .chev{transform:rotate(180deg)}
+  .tip{border-bottom:1px dotted #00c73d;cursor:help;position:relative}
+  .tip:hover::after{content:attr(data-tip);position:absolute;left:0;top:1.5em;background:#22282c;color:#fff;font-size:12px;font-weight:400;line-height:1.35;padding:9px 11px;border-radius:8px;width:230px;z-index:90;box-shadow:0 8px 24px -6px rgba(0,0,0,.35)}
+  @keyframes skfade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes skspin{to{transform:rotate(360deg)}}
+  @keyframes skslide{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+  .skpop{animation:skfade .28s ease}
+  .sk-scroll::-webkit-scrollbar{width:8px;height:8px}
+  .sk-scroll::-webkit-scrollbar-thumb{background:#d4d4d4;border-radius:8px}
+  section[hidden]{display:none!important}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:radial-gradient(120% 80% at 50% -10%,#eafaef 0%,#eef1f3 46%,#e7ebee 100%);display:flex;flex-direction:column">
+
+  <!-- ══ Barra de revisión (herramienta, no es UI del producto) ══ -->
+  <div style="background:#12333a;color:#dfeef0;padding:9px 16px;display:{{ demoBarDisp }};flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:0;z-index:400;box-shadow:0 2px 8px rgba(0,0,0,.14)">
+    <span style="display:inline-flex;align-items:center;gap:8px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;color:#fff"><sk-icon name="flask-conical" size="16" style="color:#8fe000"></sk-icon>Prototipo · Deber de Asesoría F1</span>
+    <button onClick="{{ demoA }}" style="background:#1d4a53;color:#eafaef;border:1px solid #2e5f69;border-radius:100px;padding:6px 13px;font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;gap:6px;align-items:center" style-hover="background:#256069;color:#fff"><sk-icon name="play" size="12"></sk-icon>Demo A · tarjetas</button>
+    <button onClick="{{ demoB }}" style="background:#1d4a53;color:#eafaef;border:1px solid #2e5f69;border-radius:100px;padding:6px 13px;font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;gap:6px;align-items:center" style-hover="background:#256069;color:#fff"><sk-icon name="play" size="12"></sk-icon>Demo B · preguntas + desviación</button>
+    <select onChange="{{ jumpTo }}" value="{{ jumpVal }}" style="background:#1d4a53;color:#eafaef;border:1px solid #2e5f69;border-radius:100px;padding:6px 12px;font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;cursor:pointer">
+      <option value="">Ir a pantalla…</option>
+      <option value="wf00">WF-00 New hub</option>
+      <option value="wf01">WF-01 Site educativo</option>
+      <option value="wf02">WF-02 One page</option>
+      <option value="wf03">WF-03 Rutas de necesidad</option>
+      <option value="wf03b">WF-03b Control / delegar</option>
+      <option value="wf04">WF-04 Catálogo</option>
+      <option value="wf05">WF-05 Simulador</option>
+      <option value="wf06">WF-06 Tu selección</option>
+      <option value="wf07">WF-07 Perfilamiento apertura</option>
+      <option value="wf07a">WF-07a Tarjetas</option>
+      <option value="wf07trans">WF-07b Transición</option>
+      <option value="wf07b">WF-07b Preguntas</option>
+      <option value="wf08">WF-08 Resultado de perfil</option>
+      <option value="wf08b">WF-08b Resultado de perfil · opción B</option>
+      <option value="wf10">WF-10 Vinculación</option>
+      <option value="wf10fic">WF-10 Encadenamiento FIC</option>
+      <option value="wf11">WF-11 Primer aporte</option>
+      <option value="wf12">WF-12 Confirmación</option>
+      <option value="f301">WF-F3-01 Bifurcación</option>
+      <option value="f303">WF-F3-03 Recomendación</option>
+    </select>
+    <button onClick="{{ openM09 }}" style="background:transparent;color:#dfeef0;border:1px solid #2e5f69;border-radius:100px;padding:6px 12px;font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;cursor:pointer" style-hover="background:#1d4a53">WF-09 desviación</button>
+    <button onClick="{{ toggleTrz }}" style="background:transparent;color:#8fe000;border:1px solid #3c6a2e;border-radius:100px;padding:6px 12px;font-family:Montserrat,sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;gap:6px;align-items:center;margin-left:auto" style-hover="background:#1d4a53"><sk-icon name="activity" size="13"></sk-icon>Eventos [Trz]</button>
+    <div style="display:flex;background:#0e2b31;border:1px solid #2e5f69;border-radius:100px;padding:3px">
+      <button onClick="{{ setViewMobile }}" style="border:none;border-radius:100px;padding:6px 12px;font-family:Montserrat,sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;gap:6px;align-items:center;{{ viewToggleSty.mobile }}"><sk-icon name="smartphone" size="13"></sk-icon>Móvil</button>
+      <button onClick="{{ setViewDesktop }}" style="border:none;border-radius:100px;padding:6px 12px;font-family:Montserrat,sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;gap:6px;align-items:center;{{ viewToggleSty.desktop }}"><sk-icon name="monitor" size="13"></sk-icon>Escritorio</button>
+    </div>
+  </div>
+
+  <!-- ══ Escenario ══ -->
+  <div style="flex:1;display:flex;flex-direction:{{ escenarioDir }};justify-content:center;align-items:{{ escenarioAlign }};gap:24px;padding:32px 24px 40px;max-width:1120px;margin:0 auto;width:100%">
+    <div style="display:{{ sidebarDisp }};flex-direction:column;gap:16px;width:260px;flex:none;position:sticky;top:32px">
+      <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="flex:none;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="{{ sbRutaIcon }}" size="17"></sk-icon></span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:13.5px;color:#232323;line-height:1.3">{{ sbRutaLabel }}</span></div>
+        <sc-for list="{{ sbSteps }}" as="st" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0"><span style="flex:none;width:9px;height:9px;border-radius:50%;background:{{ st.dot }}"></span><span style="font-size:13px;color:{{ st.col }};font-weight:{{ st.weight }}">{{ st.label }}</span></div>
+        </sc-for>
+      </div>
+      <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;font-size:11.5px;line-height:1.5;color:#888">
+        <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#404040;margin-bottom:5px"><sk-icon name="shield-check" size="14" style="color:#666"></sk-icon>Vigilado SFC</div>
+        <sc-for list="{{ sbEntidades }}" as="e" hint-placeholder-count="2"><div style="margin-top:3px">{{ e }}</div></sc-for>
+      </div>
+    </div>
+    <div style="width:100%;max-width:{{ cardWidth }};background:#fff;border-radius:{{ cardRadius }};overflow:hidden;box-shadow:0 26px 60px -20px rgba(18,51,58,.4),0 8px 22px -12px rgba(0,0,0,.2);border:1px solid #e3e7ea;display:flex;flex-direction:column;min-height:788px;position:relative">
+
+      <!-- App bar -->
+      <div style="display:{{ appbarDisp }};align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #eef0f1;background:#fff;position:sticky;top:0;z-index:50">
+        <button onClick="{{ goBack }}" aria-label="Volver" style="border:none;background:transparent;color:#404040;cursor:pointer;padding:4px;border-radius:9px;display:{{ backDisp }};align-items:center;justify-content:center" style-hover="background:#f2f4f5"><sk-icon name="arrow-left" size="20"></sk-icon></button>
+        <img src="assets/brand/logo-color.svg" alt="Skandia" style="height:24px;width:auto;display:block">
+        <div style="margin-left:auto;display:{{ chipDisp }};align-items:center;gap:6px;background:#f6fcf2;border:1px solid #caf9cb;color:#0a7a2f;border-radius:100px;padding:5px 12px;font-size:12px;font-weight:700;max-width:52%;overflow:hidden">
+          <sk-icon name="target" size="12"></sk-icon><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ metaText }}</span>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div ref="{{ mainRef }}" class="sk-scroll" style="flex:1;overflow-y:auto;padding:22px 18px 10px;display:flex;flex-direction:column">
+
+        <!-- ═══ WF-00 · NEW HUB ═══ -->
+        <section hidden="{{ h.wf00 }}" class="skpop">
+
+          <!-- Landing escritorio (replica del sitio Skandia) -->
+          <div style="display:{{ hubDesktopDisp }};margin:-22px -18px 0">
+            <div style="background:#2b2b2b;color:#cfcfcf;display:flex;align-items:center;gap:20px;padding:9px 22px;font-size:12px;font-weight:600">
+              <span style="color:#fff">Personas</span><span>Empresas</span><span>Distribuidores</span>
+              <span style="margin-left:auto;display:flex;gap:18px;align-items:center"><span>Rentabilidades</span><span>Acciones rápidas</span><span>Atención al cliente</span><span>Canales</span><sk-icon name="search" size="15" style="color:#8fe000"></sk-icon></span>
+            </div>
+            <div style="background:#fff;display:flex;align-items:center;gap:20px;padding:16px 22px;border-bottom:1px solid #eef0f1">
+              <img src="assets/brand/logo-color.svg" alt="Skandia" style="height:26px;width:auto;display:block">
+              <span style="margin-left:12px;display:flex;gap:22px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#404040"><span style="display:inline-flex;align-items:center;gap:4px">Hoy quiero <sk-icon name="chevron-down" size="14"></sk-icon></span><span style="display:inline-flex;align-items:center;gap:4px">Somos Skandia <sk-icon name="chevron-down" size="14"></sk-icon></span><span style="display:inline-flex;align-items:center;gap:4px">Skandia digital <sk-icon name="chevron-down" size="14"></sk-icon></span></span>
+              <button style="margin-left:auto;background:#00c73d;color:#fff;border:none;border-radius:100px;padding:11px 22px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#03a835">Inicia sesión</button>
+            </div>
+            <div style="padding:30px 24px 34px;text-align:center">
+              <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:30px;line-height:1.25;color:#00c73d;margin:0 0 12px">Tener el poder es…<br>Elegir una solución a tu medida</h1>
+              <p style="font-size:16px;color:#6b6b6b;margin:0 0 26px">Inversiones, seguros y pensiones en Colombia: descubre nuestros productos destacados.</p>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:760px;margin:0 auto">
+                <button onClick="{{ pickMeta }}" style="position:relative;height:340px;border:none;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;background:#000" style-hover="box-shadow:0 12px 28px -10px rgba(0,0,0,.4)">
+                  <image-slot id="hub-card-1" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1548025991-cb332f419f05?w=600&amp;h=900&amp;fit=crop&amp;crop=faces&amp;auto=format&amp;q=70" credit="Photo by Seyi Ariyo on Unsplash" credit-href="https://unsplash.com/@oh_gosh" placeholder="Foto: persona invirtiendo"></image-slot>
+                  <span style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 22%,rgba(0,0,0,0) 60%);pointer-events:none"></span>
+                  <span style="position:absolute;left:14px;right:14px;bottom:16px;text-align:left;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.25;pointer-events:none">Tengo una meta con fecha<span style="display:block;font-family:'Open Sans',sans-serif;font-weight:400;font-size:11.5px;color:#e4e9e6;margin-top:4px;line-height:1.4">Un viaje, una moto, un posgrado. Sabes cuánto necesitas y para cuándo.</span></span>
+                </button>
+                <button onClick="{{ pickLiquidez }}" style="position:relative;height:340px;border:none;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;background:#000" style-hover="box-shadow:0 12px 28px -10px rgba(0,0,0,.4)">
+                  <image-slot id="hub-card-2" shape="rect" fit="cover" src="https://plus.unsplash.com/premium_photo-1661609510179-95f220c600fb?w=600&amp;h=900&amp;fit=crop&amp;crop=faces&amp;auto=format&amp;q=70" credit="Photo by Getty Images on Unsplash" credit-href="https://unsplash.com/@gettyimages" placeholder="Foto: pareja revisando"></image-slot>
+                  <span style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 22%,rgba(0,0,0,0) 60%);pointer-events:none"></span>
+                  <span style="position:absolute;left:14px;right:14px;bottom:16px;text-align:left;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.25;pointer-events:none">Quiero tenerlo a la mano<span style="display:block;font-family:'Open Sans',sans-serif;font-weight:400;font-size:11.5px;color:#e4e9e6;margin-top:4px;line-height:1.4">Disponible cuando lo necesites, creciendo mientras tanto.</span></span>
+                </button>
+                <button onClick="{{ pickCrecer }}" style="position:relative;height:340px;border:none;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;background:#000" style-hover="box-shadow:0 12px 28px -10px rgba(0,0,0,.4)">
+                  <image-slot id="hub-card-3" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1517401220137-9462c929bf9f?w=600&amp;h=900&amp;fit=crop&amp;crop=faces&amp;auto=format&amp;q=70" credit="Photo by Sincerely Media on Unsplash" credit-href="https://unsplash.com/@sincerelymedia" placeholder="Foto: persona con documentos"></image-slot>
+                  <span style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 22%,rgba(0,0,0,0) 60%);pointer-events:none"></span>
+                  <span style="position:absolute;left:14px;right:14px;bottom:16px;text-align:left;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.25;pointer-events:none">Quiero que crezca a futuro<span style="display:block;font-family:'Open Sans',sans-serif;font-weight:400;font-size:11.5px;color:#e4e9e6;margin-top:4px;line-height:1.4">No tienes afán. Quieres que el tiempo juegue a tu favor.</span></span>
+                </button>
+                <button onClick="{{ goEdu }}" style="position:relative;height:340px;border:none;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;background:#1c1c1c" style-hover="box-shadow:0 12px 28px -10px rgba(0,0,0,.4)">
+                  <image-slot id="hub-card-4" shape="rect" fit="cover" src="https://images.unsplash.com/photo-1758873267202-44c33e64f084?w=600&amp;h=900&amp;fit=crop&amp;crop=faces&amp;auto=format&amp;q=70" credit="Photo by Vitaly Gariev on Unsplash" credit-href="https://unsplash.com/@silverkblack" placeholder="Foto: asesor con cliente"></image-slot>
+                  <span style="position:absolute;inset:0;background:linear-gradient(to top,rgba(15,20,18,.9) 46%,rgba(15,20,18,.35) 100%);pointer-events:none"></span>
+                  <span style="position:absolute;left:16px;right:16px;bottom:16px;text-align:left;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.25;pointer-events:none">Aún no lo sé — muéstrame cómo funciona<span style="display:block;font-family:'Open Sans',sans-serif;font-weight:400;font-size:11.5px;color:#dfe6e2;margin-top:4px;line-height:1.4">Invertir, explicado fácil. Empieza por entender, sin compromiso.</span></span>
+                </button>
+              </div>
+              <button onClick="{{ goOnepage }}" style="margin-top:26px;background:#00c73d;color:#fff;border:none;border-radius:100px;padding:14px 32px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer" style-hover="background:#03a835">Conoce todos los productos</button>
+            </div>
+          </div>
+
+          <!-- Hub móvil -->
+          <div style="display:{{ hubMobileDisp }}">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:26px;line-height:1.2;color:#232323;margin:0 0 10px">¿Qué quieres lograr con tu dinero?</h1>
+          <p style="font-size:15px;line-height:1.5;color:#666;margin:0 0 20px">Cuéntanos qué quieres lograr y te mostramos cómo empezar — tú decides hasta dónde quieres que te acompañemos.</p>
+
+          <div style="{{ catGridSty }}">
+            <button onClick="{{ pickMeta }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.04);margin-bottom:12px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)">
+              <span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="calendar-check" size="21"></sk-icon></span>
+              <span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:2px">Tengo una meta con fecha</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; font-family: Open Sans">Un viaje, una moto, un posgrado. Sabes cuánto necesitas y para cuándo.</span></span>
+            </button>
+            <button onClick="{{ pickLiquidez }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.04);margin-bottom:12px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)">
+              <span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="wallet" size="21"></sk-icon></span>
+              <span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:2px">Quiero tenerlo a la mano</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; font-family: Open Sans">Disponible cuando lo necesites, creciendo mientras tanto.</span></span>
+            </button>
+            <button onClick="{{ pickCrecer }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.04);margin-bottom:12px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)">
+              <span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="trending-up" size="21"></sk-icon></span>
+              <span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:2px">Quiero que crezca a futuro</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; font-family: Open Sans">No tienes afán. Quieres que el tiempo juegue a tu favor.</span></span>
+            </button>
+            <button onClick="{{ goEdu }}" style="text-align:left;background:#f7f7f7;border:1px solid transparent;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start;margin-bottom:12px" style-hover="background:#eef6ee;border-color:#caf9cb">
+              <span style="flex:none;width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid #e3e7ea;color:#00c73d;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="compass" size="21"></sk-icon></span>
+              <span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:2px">Aún no lo sé — muéstrame cómo funciona</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; font-family: Open Sans">Invertir, explicado fácil. Empieza por entender, sin compromiso.</span></span>
+            </button>
+                      </div>
+
+          <button onClick="{{ asesoriaHub }}" style="width:100%;margin-top:16px;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:12px 24px;font-family:Montserrat,sans-serif;font-weight:600;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px" style-hover="background:#caf9cb"><sk-icon name="headset" size="17"></sk-icon>Prefiero hablar con un asesor</button>
+          <div style="text-align:center;margin-top:14px"><a onClick="{{ goOnepage }}" style="cursor: pointer; font-size: 14px; font-family: Montserrat">Ver todas las opciones en un solo lugar</a></div>
+          </div>
+        </section>
+
+        <!-- ═══ WF-01 · SITE EDUCATIVO ═══ -->
+        <section hidden="{{ h.wf01 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:23px;line-height:1.22;color:#232323;margin:0 0 6px">Invertir, explicado como debe ser: fácil</h1>
+          <p style="font-size:13px;color:#888;margin:0 0 18px">Máximo un concepto nuevo a la vez. Sin letra pequeña escondida.</p>
+
+          <sc-for list="{{ eduModulos }}" as="m" hint-placeholder-count="4">
+            <details onToggle="{{ m.onToggle }}" style="border:1px solid #e3e7ea;border-radius:15px;padding:15px 16px;margin-bottom:11px;background:#fff">
+              <summary style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15.5px;color:#232323">{{ m.title }}<span class="chev" style="color:#00c73d;display:inline-flex;flex:none"><sk-icon name="chevron-down" size="20"></sk-icon></span></summary>
+              <div style="margin-top:12px;display:flex;flex-direction:column;gap:9px">
+                <sc-for list="{{ m.rows }}" as="r" hint-placeholder-count="4">
+                  <div style="font-size:14px;line-height:1.5;color:#404040"><span style="display:inline-block;font-size:11px;font-weight:700;color:#0a7a2f;background:#f6fcf2;border-radius:5px;padding:1px 7px;margin-right:7px">{{ r.tag }}</span>{{ r.text }}</div>
+                </sc-for>
+              </div>
+            </details>
+          </sc-for>
+
+          <div style="background:linear-gradient(135deg,#00c73d,#8fe000);border-radius:18px;padding:20px;text-align:center;color:#fff;margin-top:16px">
+            <p style="font-family:Montserrat,sans-serif;font-weight:700;font-size:17px;margin:0 0 4px">¿Quieres ver qué lograría tu dinero?</p>
+            <p style="font-size:13px;opacity:.92;margin:0 0 14px">Simúlalo — sin registrarte.</p>
+            <button onClick="{{ eduSim }}" style="background:#fff;color:#03a835;border:none;border-radius:100px;padding:12px 26px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;display:inline-flex;gap:8px;align-items:center" style-hover="background:#f2fff5"><sk-icon name="calculator" size="16"></sk-icon>Simular mi dinero</button>
+          </div>
+          <button onClick="{{ goRutas }}" style="width:100%;background:transparent;color:#0a7a2f;border:none;padding:12px;font-family:Montserrat,sans-serif;font-weight:600;font-size:15px;text-decoration:underline;cursor:pointer;margin-top:8px">Elegir mi ruta</button>
+
+          <div style="display:flex;gap:10px;background:#ebf4ff;border-left:4px solid #0099de;border-radius:8px;padding:12px 14px;margin-top:8px;font-size:13.5px;line-height:1.4;color:#404040"><sk-icon name="info" size="18" style="color:#0099de;flex:none;margin-top:1px"></sk-icon><span>Este contenido es informativo: te ayuda a entender tus opciones, pero no es una recomendación profesional. La decisión siempre es tuya.</span></div>
+          <details onToggle="{{ legalWf01 }}" style="background:#f7f7f7;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:12.5px;color:#666;line-height:1.5">
+            <summary style="font-weight:700;color:#404040;font-size:13px">Ver detalle legal</summary>
+            <div style="margin-top:7px">Los datos e información aquí contenidos no deben interpretarse como una asesoría, recomendación o sugerencia por parte de Skandia para la toma de decisiones de inversión. El cliente asume la responsabilidad por sus decisiones de inversión, en el marco del Decreto 1239 de 2024 y la Circular Externa 014 de 2025. <em>[Texto final: Legal — Andrés Londoño]</em></div>
+          </details>
+        </section>
+
+        <!-- ═══ WF-02 · ONE PAGE ═══ -->
+        <section hidden="{{ h.wf02 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:22px;line-height:1.22;color:#232323;margin:0 0 6px">Todas las formas de poner tu dinero a trabajar, en un solo lugar</h1>
+          <p style="font-size:13px;color:#888;margin:0 0 16px">Organizado por lo que quieres lograr — nunca por tipo de producto. Cada ficha tiene su detalle técnico a un clic.</p>
+          <sc-for list="{{ onepageSecs }}" as="sec" hint-placeholder-count="3">
+            <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin:18px 0 8px">{{ sec.title }}</h2>
+            <div style="{{ catGridSty }}">
+            <sc-for list="{{ sec.items }}" as="it" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #e3e7ea;border-radius:14px;padding:15px;margin-bottom:10px">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                  <div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">{{ it.name }}</div><div style="font-size:13px;color:#666;line-height:1.45;margin-top:2px">{{ it.pq }}</div></div>
+                  <span style="flex:none;background:#f5f5f5;border-radius:100px;padding:3px 11px;font-size:12px;font-weight:700;color:#404040">Desde {{ it.desde }}</span>
+                </div>
+                <div style="text-align:center;margin-top:8px"><a onClick="{{ it.onMas }}" style="cursor:pointer;font-size:13.5px">Ver ficha técnica</a></div>
+              </div>
+            </sc-for>
+            </div>
+          </sc-for>
+          <div style="background:#f7f7f7;border-radius:14px;padding:14px;font-size:13px;color:#666">Muy pronto: más portafolios para más metas.</div>
+          <div style="display:flex;gap:10px;background:#ebf4ff;border-left:4px solid #0099de;border-radius:8px;padding:12px 14px;margin-top:12px;font-size:13.5px;line-height:1.4;color:#404040"><sk-icon name="info" size="18" style="color:#0099de;flex:none;margin-top:1px"></sk-icon><span>Contenido informativo, no es una recomendación profesional. La decisión siempre es tuya.</span></div>
+        </section>
+
+        <!-- ═══ WF-03 · RUTAS DE NECESIDAD ═══ -->
+        <section hidden="{{ h.wf03 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:25px;line-height:1.2;color:#232323;margin:0 0 16px">Empecemos por ti: ¿para qué es este dinero?</h1>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <button onClick="{{ rutaMeta }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="calendar-check" size="21"></sk-icon></span><span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323">Tengo una meta con fecha</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; margin-top: 2px; font-family: Open Sans">Un viaje, una moto, un posgrado. Sabes cuánto necesitas y para cuándo.</span></span></button>
+            <button onClick="{{ rutaLiq }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="wallet" size="21"></sk-icon></span><span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323">Quiero tenerlo a la mano</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; margin-top: 2px; font-family: Open Sans">Disponible cuando lo necesites, creciendo mientras tanto.</span></span></button>
+            <button onClick="{{ rutaCrecer }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="trending-up" size="21"></sk-icon></span><span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323">Quiero que crezca a futuro</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; margin-top: 2px; font-family: Open Sans">No tienes afán. Quieres que el tiempo juegue a tu favor.</span></span></button>
+          </div>
+          <p style="text-align:center;font-size:13px;color:#888;margin:16px 0 6px">Elegir una ruta no te compromete: puedes explorar y cambiar de idea.</p>
+          <button onClick="{{ asesoriaHere }}" style="width: 100%; background: transparent; color: #0a7a2f; border: none; padding: 10px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">¿No estás seguro? Un asesor puede ayudarte a decidir.</button>
+        </section>
+
+        <!-- ═══ WF-03b · CONTROL vs DELEGAR ═══ -->
+        <section hidden="{{ h.wf03b }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:22px;color:#232323;margin:0 0 4px">¿Cómo prefieres manejarlo?</h1>
+          <p style="font-size:13px;color:#888;margin:0 0 16px">Las dos formas son igual de válidas. Elige la que va contigo.</p>
+          <div style="display:grid;gap:12px">
+            <button onClick="{{ modoControl }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:18px;cursor:pointer;min-height:132px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px"><sk-icon name="sliders-horizontal" size="21"></sk-icon></span><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323">Yo quiero tener el control</div><div style="font-size: 13px; color: #666; line-height: 1.45; margin-top: 3px; font-family: Open Sans">Tú eliges en qué <span class="tip" data-tip="Portafolio: el conjunto de inversiones donde está tu dinero.">portafolios</span> está tu dinero y los ajustas cuando quieras.</div></button>
+            <button onClick="{{ modoDelegar }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:18px;cursor:pointer;min-height:132px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px"><sk-icon name="users" size="21"></sk-icon></span><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323">Prefiero delegar en expertos</div><div style="font-size: 13px; color: #666; line-height: 1.45; margin-top: 3px; font-family: Open Sans">Un equipo profesional lo gestiona por ti. Tú solo sigues el avance.</div><div style="margin-top:10px"><span style="background: #f5f5f5; border-radius: 5px; padding: 3px 9px; font-size: 11px; font-weight: 700; color: #555; font-family: Open Sans">Invested · Mezcla Cauta</span></div></button>
+          </div>
+          <p style="font-size:13px;color:#888;margin-top:16px">Esta opción de expertos se combina únicamente con las de meta con fecha.</p>
+        </section>
+
+        <!-- ═══ WF-04 · CATÁLOGO ═══ -->
+        <section hidden="{{ h.wf04 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 6px">{{ catTitle }}</h1>
+          <p style="font-size:12.5px;color:#888;margin:0 0 14px">En orden alfabético. Ninguna opción está por encima de otra: la que se ajusta a ti depende de ti.</p>
+
+          <sc-if value="{{ catGrouped }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ catGroups }}" as="grp" hint-placeholder-count="2">
+              <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin:14px 0 2px">{{ grp.title }}</h2>
+              <p style="font-size:12.5px;color:#888;margin:0 0 10px">{{ grp.desc }}</p>
+              <div style="{{ catGridSty }}">
+              <sc-for list="{{ grp.items }}" as="it" hint-placeholder-count="2">
+                <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;margin-bottom:12px">
+                  <div style="display:flex;gap:10px;align-items:flex-start">
+                    <span style="flex:none;width:34px;height:34px;border-radius:10px;background:{{ it.riskBg }};color:{{ it.riskFg }};display:inline-flex;align-items:center;justify-content:center;margin-top:1px"><sk-icon name="{{ it.icon }}" size="17"></sk-icon></span>
+                    <div style="flex:1">
+                      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">{{ it.name }}</div><span style="flex:none;background:#f5f5f5;border-radius:100px;padding:3px 11px;font-size:12px;font-weight:700;color:#404040;white-space:nowrap">Desde {{ it.desde }}</span></div>
+                      <div style="font-size:13.5px;color:#404040;line-height:1.4;margin-top:3px;font-weight:600">{{ it.paraQuien }}</div>
+                      <div style="font-size:12.5px;color:#888;line-height:1.4;margin-top:2px">{{ it.pq }}</div>
+                      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><span style="background:{{ it.riskBg }};color:{{ it.riskFg }};border-radius:100px;padding:3px 11px;font-size:11.5px;font-weight:700">{{ it.riesgoLabel }}</span><span style="background:#f5f5f5;border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:600;color:#666">{{ it.vehTag }}</span></div>
+                      <div style="font-size:13px;color:#404040;margin-top:8px">{{ it.dato }}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:12px">
+                    <button onClick="{{ it.onSim }}" style="flex:1;border:none;border-radius:100px;padding:10px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">{{ it.simLabel }}</button>
+                    <button onClick="{{ it.onAdd }}" style="flex:none;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:Montserrat,sans-serif" style-hover="background:#caf9cb">{{ it.addLabel }}</button>
+                  </div>
+                  <div style="text-align:center;margin-top:8px"><a onClick="{{ it.onMas }}" style="cursor:pointer;font-size:13px">Ver más</a></div>
+                </div>
+              </sc-for>
+              </div>
+            </sc-for>
+          </sc-if>
+
+          <sc-if value="{{ catFlat }}" hint-placeholder-val="{{ true }}">
+            <div style="{{ catGridSty }}">
+            <sc-for list="{{ catItems }}" as="it" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;margin-bottom:12px">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <span style="flex:none;width:34px;height:34px;border-radius:10px;background:{{ it.riskBg }};color:{{ it.riskFg }};display:inline-flex;align-items:center;justify-content:center;margin-top:1px"><sk-icon name="{{ it.icon }}" size="17"></sk-icon></span>
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">{{ it.name }}</div><span style="flex:none;background:#f5f5f5;border-radius:100px;padding:3px 11px;font-size:12px;font-weight:700;color:#404040;white-space:nowrap">Desde {{ it.desde }}</span></div>
+                    <div style="font-size:13.5px;color:#404040;line-height:1.4;margin-top:3px;font-weight:600">{{ it.paraQuien }}</div>
+                    <div style="font-size:12.5px;color:#888;line-height:1.4;margin-top:2px">{{ it.pq }}</div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><span style="background:{{ it.riskBg }};color:{{ it.riskFg }};border-radius:100px;padding:3px 11px;font-size:11.5px;font-weight:700">{{ it.riesgoLabel }}</span><span style="background:#f5f5f5;border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:600;color:#666">{{ it.vehTag }}</span></div>
+                    <div style="font-size:13px;color:#404040;margin-top:8px">{{ it.dato }}</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:12px">
+                  <button onClick="{{ it.onSim }}" style="flex:1;border:none;border-radius:100px;padding:10px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">{{ it.simLabel }}</button>
+                  <button onClick="{{ it.onAdd }}" style="flex:none;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:Montserrat,sans-serif" style-hover="background:#caf9cb">{{ it.addLabel }}</button>
+                </div>
+                <div style="text-align:center;margin-top:8px"><a onClick="{{ it.onMas }}" style="cursor:pointer;font-size:13px">Ver más</a></div>
+              </div>
+            </sc-for>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;gap:10px;background:#ebf4ff;border-left:4px solid #0099de;border-radius:8px;padding:12px 14px;margin-top:6px;font-size:13px;line-height:1.4;color:#404040"><sk-icon name="info" size="17" style="color:#0099de;flex:none;margin-top:1px"></sk-icon><span>Contenido informativo, no es una recomendación profesional. La decisión siempre es tuya.</span></div>
+        </section>
+
+<!-- ═══ WF-05 · SIMULADOR ═══ -->
+        <section hidden="{{ h.wf05 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:20px;color:#03a835;text-align:center;margin:0 0 14px">{{ simTitle }}</h1>
+          <div style="background:#eafae0;border-radius:20px;padding:16px;display:{{ simGridDisplay }};grid-template-columns:{{ simGridCols }};gap:16px">
+
+            <div>
+              <p style="font-size:13px;color:#4d7358;margin:0 0 14px">Sin registrarte. Solo dos datos y ves qué lograría.</p>
+              <label style="display:block;font-size:13px;font-weight:700;color:#2c4a33;margin-bottom:6px">Monto recurrente mensual</label>
+              <p style="font-size:12px;color:#4d7358;margin:0 0 6px">*Te recomendamos invertir el 10% mensual de tus ingresos.</p>
+              <div style="position:relative;margin-bottom:14px"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#888;font-weight:600">$</span><input ref="{{ simMontoRef }}" inputmode="numeric" defaultValue="500.000" onInput="{{ fmtInput }}" style="width:100%;border:1px solid #b7dcae;border-radius:8px;padding:12px 14px 12px 28px;font-size:16px;font-family:inherit;color:#404040;background:#fff" style-focus="border-color:#00c73d;outline:2px solid #caf9cb"></div>
+              <label style="display:block;font-size:13px;font-weight:700;color:#2c4a33;margin-bottom:6px">¿Por cuánto tiempo?</label>
+              <div style="display:flex;gap:8px;margin-bottom:18px">
+                <button onClick="{{ plazo6 }}" style="flex:1;border-radius:100px;padding:10px 6px;font-family:Montserrat,sans-serif;font-size:14px;font-weight:600;cursor:pointer;{{ plazo.sb6 }}">6 meses</button>
+                <button onClick="{{ plazo12 }}" style="flex:1;border-radius:100px;padding:10px 6px;font-family:Montserrat,sans-serif;font-size:14px;font-weight:600;cursor:pointer;{{ plazo.sb12 }}">12 meses</button>
+                <button onClick="{{ plazo24 }}" style="flex:1;border-radius:100px;padding:10px 6px;font-family:Montserrat,sans-serif;font-size:14px;font-weight:600;cursor:pointer;{{ plazo.sb24 }}">24 meses</button>
+              </div>
+            </div>
+
+            <div style="background:#fff;border-radius:16px;padding:16px">
+              <div style="text-align:center;font-size:13px;color:#404040;margin-bottom:12px">Con una rentabilidad E.A. de <span style="font-family:Montserrat,sans-serif;font-weight:700;color:#03a835">{{ simRatePct }}%</span></div>
+              <sc-if value="{{ simHasResult }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+                  <div><div style="font-size:10.5px;color:#9aa0a3;font-weight:600">Podría ser tu dinero</div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px;color:#03a835">{{ simResult.valSim }}</div></div>
+                  <div style="text-align:right"><div style="font-size:10.5px;color:#c9a06a;font-weight:600">Debajo del colchón</div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#c97a00">{{ simResult.valCol }}</div></div>
+                </div>
+              </sc-if>
+              <svg viewBox="0 0 300 130" style="width:100%;display:block;overflow:visible">
+                <sc-for list="{{ simResult.grid }}" as="g" hint-placeholder-count="3"><line x1="8" y1="{{ g.y }}" x2="292" y2="{{ g.y }}" stroke="#f0f2f3" stroke-width="1"></line></sc-for>
+                <polygon points="{{ simResult.chartArea }}" fill="#e4f7d8"></polygon>
+                <polyline points="{{ simResult.chartColPts }}" fill="none" stroke="#ffae08" stroke-width="2.5" stroke-dasharray="5 4"></polyline>
+                <polyline points="{{ simResult.chartSimPts }}" fill="none" stroke="#00c73d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                <circle cx="{{ simResult.dotStartX }}" cy="{{ simResult.dotStartY }}" r="4" fill="#fff" stroke="#0a7a2f" stroke-width="2.5"></circle>
+                <circle cx="{{ simResult.dotColX }}" cy="{{ simResult.dotColY }}" r="4.5" fill="#fff" stroke="#ffae08" stroke-width="2.5"></circle>
+                <circle cx="{{ simResult.dotSimX }}" cy="{{ simResult.dotSimY }}" r="5" fill="#00c73d" stroke="#fff" stroke-width="2"></circle>
+              </svg>
+              <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#9aa0a3;font-weight:600;margin-top:-4px;padding:0 4px"><span>Hoy</span><span>{{ simResult.plazoLabel }}</span></div>
+              <div style="display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:11px;color:#404040;flex-wrap:wrap">
+                <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#00c73d;flex:none"></span>Podría ser tu dinero</span>
+                <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:#ffae08;flex:none"></span>Debajo del colchón</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="display:{{ simShow }};margin-top:14px">
+            <p style="font-size:12.5px;color:#666;text-align:center;margin:0 0 10px">{{ simResult.resumen }}</p>
+            <div style="display:flex;gap:10px;background:#fff3e0;border-left:4px solid #ffae08;border-radius:8px;padding:11px 13px;font-size:12.5px;line-height:1.4;color:#7a5300"><sk-icon name="alert-triangle" size="16" style="color:#c97a00;flex:none;margin-top:1px"></sk-icon><span>Los resultados simulados no garantizan rendimientos futuros. La rentabilidad objetivo es estimada y neta de comisiones.</span></div>
+            <button onClick="{{ simToCart }}" style="width:100%;margin-top:12px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Agregar a mi selección</button>
+            <button onClick="{{ goWf04 }}" style="width: 100%; background: transparent; color: #0a7a2f; border: none; padding: 10px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">Probar otra opción</button>
+          </div>
+        </section>
+
+        <!-- ═══ WF-06 · TU SELECCIÓN ═══ -->
+        <section hidden="{{ h.wf06 }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:22px;color:#232323;margin:0 0 4px">Tu selección</h1>
+          <p style="font-size:13px;color:#888;margin:0 0 14px">{{ cartMeta }}</p>
+          <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#f7f7f7;border-radius:16px;padding:22px;text-align:center"><p style="font-size:15px;color:#404040;margin:0 0 12px">Aún no has agregado opciones.</p><button onClick="{{ goRutas }}" style="background: transparent; color: #0a7a2f; border: 1.5px solid #00c73d; border-radius: 100px; padding: 10px 20px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: Montserrat">Explorar rutas</button></div>
+          </sc-if>
+          <sc-if value="{{ cartNotEmpty }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;border-radius:100px;overflow:hidden;height:9px;margin-bottom:16px">
+              <sc-for list="{{ distBar }}" as="d" hint-placeholder-count="2"><div style="width:{{ d.widthPct }};background:{{ d.color }}"></div></sc-for>
+            </div>
+          </sc-if>
+          <div style="{{ catGridSty }}">
+          <sc-for list="{{ cartItems }}" as="c" hint-placeholder-count="2">
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;margin-bottom:12px;position:relative">
+              <button onClick="{{ c.onRemove }}" style="position:absolute;top:12px;right:14px;border:none;background:transparent;color:#c0392b;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:underline">Quitar</button>
+              <div style="display:flex;align-items:center;gap:8px;padding-right:52px"><span style="width:8px;height:8px;border-radius:50%;background:{{ c.color }};flex:none"></span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">{{ c.name }}</span></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><span style="background:#f6fcf2;border:1px solid #caf9cb;color:#0a7a2f;border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:600">{{ c.meta }}</span><span style="background:#f5f5f5;border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:600;color:#666">{{ c.tag }}</span></div>
+              <div style="margin-top:12px"><span style="font-size:13px;font-weight:700;color:#404040">Monto a invertir</span>
+                <div style="position:relative;margin-top:6px"><span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#888;font-weight:600;font-size:14px">$</span><input inputmode="numeric" value="{{ c.montoDisplay }}" onInput="{{ c.onMonto }}" style="width:100%;border:1px solid #dcdfe1;border-radius:9px;padding:10px 12px 10px 26px;font-size:15px;font-family:inherit;color:#404040" style-focus="border-color:#00c73d;outline:2px solid #caf9cb"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:12px"><span style="font-size:13px;font-weight:700;color:#404040;flex:none">Distribución</span><input type="range" min="0" max="100" value="{{ c.pct }}" onInput="{{ c.onPct }}" style="flex:1;accent-color:{{ c.color }};cursor:pointer"><span style="font-size:13px;font-weight:700;color:#0a7a2f;width:38px;text-align:right">{{ c.pctLabel }}</span></div>
+            </div>
+          </sc-for>
+          </div>
+          <sc-if value="{{ cartNotEmpty }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#f2fbea;border-radius:16px;padding:16px;margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;color:#404040;font-weight:600">Total a invertir</span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:19px;color:#232323">{{ cartTotalFmt }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px"><span style="font-size:13px;color:#404040;font-weight:600">Podrías ganar en 1 año</span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#03a835">+{{ cartGainFmt }}</span></div>
+              <p style="font-size:11.5px;color:#7a9482;margin:8px 0 0">Estimado con una rentabilidad promedio ponderada de {{ cartRatePct }}% E.A. No garantiza resultados futuros.</p>
+            </div>
+          </sc-if>
+          <sc-for list="{{ cartAlerts }}" as="a" hint-placeholder-count="1">
+            <div style="display:flex;gap:10px;border-radius:8px;padding:12px 14px;margin-bottom:10px;font-size:13px;line-height:1.4;color:#404040;background:{{ a.bg }};border-left:4px solid {{ a.bar }}"><sk-icon name="{{ a.ic }}" size="17" style="color:{{ a.fg }};flex:none;margin-top:1px"></sk-icon><span>{{ a.text }}</span></div>
+          </sc-for>
+          <sc-if value="{{ cartNotEmpty }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#f7f7f7;border-radius:14px;padding:15px;margin-top:4px;font-size:14px;line-height:1.5;color:#404040">Antes del último paso, queremos conocerte — así confirmamos que esta mezcla se ajusta a ti.</div>
+            <button disabled="{{ cartNextDisabled }}" onClick="{{ toPerfilamiento }}" style="width:100%;margin-top:12px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ cartNextBg }}">Continuar</button>
+            <button onClick="{{ goWf04 }}" style="width: 100%; background: transparent; color: #0a7a2f; border: none; padding: 10px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">Seguir explorando</button>
+            <button onClick="{{ guardarHere }}" style="width: 100%; background: transparent; color: #0a7a2f; border: none; padding: 8px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">Guardar y continuar después</button>
+          </sc-if>
+        </section>
+
+        <!-- ═══ WF-07 · PERFILAMIENTO APERTURA ═══ -->
+        <section hidden="{{ h.wf07 }}" class="skpop" style="flex:1;display:flex;flex-direction:column">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:24px;line-height:1.25;color:#232323;margin:0 0 16px">Queremos conocerte antes de dar el siguiente paso</h1>
+          <p style="font-size:15px;line-height:1.5;color:#404040;margin:0 0 20px">Tus respuestas nos permiten confirmar que lo que elegiste se ajusta a ti. Es la forma responsable de invertir — y tu perfil queda guardado para la próxima vez.</p>
+          <div style="background:#f7f7f7;border-radius:14px;padding:16px;font-size:13.5px;color:#404040;display:flex;gap:9px;align-items:center"><sk-icon name="clock" size="17" style="color:#00c73d"></sk-icon>{{ durText }}</div>
+          <details onToggle="{{ legalWf01 }}" style="background:#f7f7f7;border-radius:10px;padding:14px 16px;margin-top:20px;font-size:12.5px;color:#666;line-height:1.5">
+            <summary style="font-weight:700;color:#404040;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px">Este paso hace parte de la normativa que protege a quienes invierten en Colombia<span class="chev" style="color:#00c73d;flex:none"><sk-icon name="chevron-down" size="16"></sk-icon></span></summary>
+            <div style="margin-top:9px">Decreto 1239 de 2024 y Circular Externa 014 de 2025: antes de vincularte evaluamos que tus elecciones se ajusten a tu perfil. El análisis queda documentado y disponible para ti. <em>[Texto final: Legal]</em></div>
+          </details>
+          <div style="flex:1"></div>
+          <button onClick="{{ startPerfilamiento }}" style="width:100%;margin-top:24px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Empezar</button>
+        </section>
+
+        <!-- ═══ WF-07a · TARJETAS ═══ -->
+        <section hidden="{{ h.wf07a }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 6px">¡Selecciona tu perfil de inversionista!</h1>
+          <p style="font-size:13.5px;line-height:1.5;color:#666;margin:0 0 16px">Tu perfil te permitirá invertir según tus objetivos, tiempos y tolerancia al riesgo. Elige el que te describa mejor. <b style="color:#404040">Puedes actualizarlo cuando quieras.</b></p>
+          <sc-for list="{{ tarjetas }}" as="t" hint-placeholder-count="3">
+            <div style="border-radius:16px;padding:20px 18px;margin-bottom:14px;text-align:center;{{ t.sty }}">
+              <div style="text-align:right;margin-bottom:4px"><a onClick="{{ t.pick }}" style="cursor:pointer;font-size:12.5px;font-weight:700">Ver más</a></div>
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px;color:#232323">{{ t.name }}</div>
+              <div style="font-size:13.5px;font-weight:600;color:#404040;margin-top:2px">{{ t.subt }}</div>
+              <p style="font-size:13px;line-height:1.5;color:#666;margin:10px 0 14px">{{ t.desc }}</p>
+              <button onClick="{{ t.select }}" style="width:100%;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:11px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="background:#caf9cb">Seleccionar</button>
+            </div>
+          </sc-for>
+          <div style="background:#f7f7f7;border-radius:16px;padding:16px">
+            <div style="display:flex;gap:14px;align-items:center">
+              <span style="flex:none;width:48px;height:48px;border-radius:50%;background:#f6fcf2;color:#00c73d;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="search-check" size="24"></sk-icon></span>
+              <div style="flex:1"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323;margin-bottom:3px">¿Aún no tienes claro cuál es tu perfil?</div><p style="font-size:12.5px;line-height:1.4;color:#666;margin:0">Responde un cuestionario corto y <b style="color:#0a7a2f">desbloquea 6 opciones adicionales de portafolio</b>.</p></div>
+            </div>
+            <button onClick="{{ goTransB }}" style="width:100%;margin-top:12px;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="background:#caf9cb">Realizar cuestionario</button>
+          </div>
+        </section>
+
+        <!-- ═══ WF-07b transición ═══ -->
+        <section hidden="{{ h.wf07trans }}" class="skpop">
+          <div style="width:54px;height:54px;border-radius:50%;background:#ebf4ff;color:#0099de;display:flex;align-items:center;justify-content:center;margin:6px auto 14px"><sk-icon name="sparkles" size="26"></sk-icon></div>
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;line-height:1.25;color:#232323;text-align:center;margin:0 0 10px">Por el tipo de opciones que elegiste, necesitamos conocerte un poco mejor</h1>
+          <p style="font-size:15px;line-height:1.5;color:#404040;text-align:center;margin:0 0 18px">Son unas preguntas más — te toman unos minutos y hacen tu perfil más preciso.</p>
+          <button onClick="{{ goTransB }}" style="width:100%;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+          <button onClick="{{ goBackCart }}" style="width:100%;background:transparent;color:#0a7a2f;border:none;padding:10px;font-weight:600;font-size:14px;text-decoration:underline;cursor:pointer">Revisar mi selección</button>
+        </section>
+
+        <!-- ═══ WF-07b preguntas ═══ -->
+        <section hidden="{{ h.wf07b }}" class="skpop">
+          <div style="height:8px;background:#eef0f1;border-radius:100px;overflow:hidden;margin-bottom:10px"><div style="height:100%;background:#00c73d;border-radius:100px;transition:width .3s;width:{{ q.progress }}"></div></div>
+          <p style="font-size:12.5px;color:#888;margin:0 0 14px">{{ q.count }}</p>
+          <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px;color:#232323;margin:0 0 6px">{{ q.question }}</h2>
+          <sc-if value="{{ q.hasTip }}" hint-placeholder-val="{{ false }}"><p style="font-size:12.5px;color:#888;margin:0 0 10px">{{ q.tip }}</p></sc-if>
+          <sc-for list="{{ q.options }}" as="o" hint-placeholder-count="3">
+            <button onClick="{{ o.pick }}" style="width:100%;text-align:left;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:9px;font-size:14.5px;line-height:1.4;color:#404040;{{ o.sty }}">{{ o.text }}</button>
+          </sc-for>
+          <button onClick="{{ nextQ }}" style="width:100%;margin-top:6px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">{{ q.nextLabel }}</button>
+          <button onClick="{{ prevQ }}" style="width:100%;display:{{ q.backDisp }};background:transparent;color:#0a7a2f;border:none;padding:10px;font-weight:600;font-size:14px;text-decoration:underline;cursor:pointer">Atrás</button>
+          <p style="text-align:center;font-size:12px;color:#aaa;margin-top:6px">Respuestas de ejemplo precargadas para la demo — cámbialas si quieres.</p>
+        </section>
+
+        <!-- ═══ WF-08 resultado ═══ -->
+        <section hidden="{{ h.wf08 }}" class="skpop" style="flex:1;display:flex;flex-direction:column">
+          <div style="background:linear-gradient(135deg,#00c73d,#8fe000);border-radius:18px;padding:22px 18px 8px;text-align:center;color:#fff;overflow:hidden">
+            <p style="font-size:13px;opacity:.92;margin:0 0 6px">Tu perfil</p>
+            <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:30px;margin:0 0 12px">{{ perfil.name }}</h1>
+            <span style="background:rgba(255,255,255,.22);border-radius:100px;padding:5px 16px;font-size:12px;font-weight:700">{{ perfil.varLabel }}</span>
+            <img ref="{{ perfilImgRef }}" src="assets/perfil-montana-2.png" alt="" style="display:block;width:100%;max-width:320px;margin:14px auto -4px">
+          </div>
+          <p style="font-size:15px;line-height:1.5;color:#404040;margin:26px 0 24px">{{ perfil.trad }}</p>
+          <div style="height:10px;background:#eef0f1;border-radius:100px;overflow:hidden;margin-bottom:8px"><div style="height:100%;background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px;width:{{ perfil.meter }}"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#888"><span>Más estable</span><span>Más altibajos</span></div>
+          <div style="flex:1"></div>
+          <p style="font-size:13px;color:#666;margin:24px 0 10px">¿No te identificas? <a onClick="{{ revisarPerfil }}" style="cursor:pointer">Puedes revisar tus respuestas.</a></p>
+          <button onClick="{{ perfilContinue }}" style="width:100%;margin-top:6px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+        </section>
+
+        <!-- ═══ WF-08b · RESULTADO DE PERFIL · OPCIÓN B ═══ -->
+        <section hidden="{{ h.wf08b }}" class="skpop" style="flex:1;display:flex;flex-direction:column;text-align:center">
+          <img ref="{{ perfilBImgRef }}" src="assets/perfil-montana-2.png" alt="" style="display:block;width:100%;max-width:280px;margin:8px auto 6px">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:26px;line-height:1.25;color:#232323;margin:10px 0 12px">Eres {{ perfilB.name }}</h1>
+          <p style="font-size:15px;line-height:1.55;color:#404040;margin:0 0 22px;text-align:left">{{ perfilB.trad }}</p>
+          <sc-for list="{{ perfilB.bullets }}" as="b" hint-placeholder-count="3">
+            <div style="display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:16px">
+              <span style="flex:none;width:28px;height:28px;color:#00c73d;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="{{ b.icon }}" size="20"></sk-icon></span>
+              <span style="font-size:14px;line-height:1.5;color:#404040;padding-top:2px">{{ b.text }}</span>
+            </div>
+          </sc-for>
+          <div style="flex:1"></div>
+          <button onClick="{{ perfilContinue }}" style="width:100%;margin-top:6px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+          <p style="font-size:11.5px;color:#aaa;margin-top:10px">Al continuar, confirmas que este perfil refleja tu situación actual.</p>
+        </section>
+
+        <!-- ═══ WF-09 confirmación desviación ═══ -->
+        <section hidden="{{ h.wf09confirm }}" class="skpop">
+          <div style="width:56px;height:56px;border-radius:50%;background:#fff3e0;border:2px solid #ffae08;color:#c97a00;display:flex;align-items:center;justify-content:center;margin:6px auto 14px"><sk-icon name="check" size="28"></sk-icon></div>
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;text-align:center;color:#232323;margin:0 0 10px">Tu decisión quedó registrada</h1>
+          <p style="font-size:15px;line-height:1.5;color:#404040;text-align:center;margin:0 0 16px">Registramos que decidiste continuar con una mezcla por encima de tu perfil. Este registro respalda tu decisión y podrás consultarlo cuando quieras.</p>
+          <div style="background:#f7f7f7;border-radius:14px;padding:14px;font-size:12.5px;line-height:1.5;color:#666">{{ desvRegistro }}</div>
+          <button onClick="{{ goWf10 }}" style="width:100%;margin-top:16px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+        </section>
+
+        <!-- ═══ WF-10 vinculación ═══ -->
+        <section hidden="{{ h.wf10 }}" class="skpop">
+          <a onClick="{{ v10Back }}" style="display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:14px"><sk-icon name="arrow-left" size="16"></sk-icon>Atrás</a>
+
+          <!-- Intro: iniciar proceso -->
+          <div style="display:{{ v10Disp.intro }}">
+            <div style="background:#f7f7f7;border-radius:14px;padding:18px;margin-bottom:16px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:4px">{{ v10Banner }}</div>
+              <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">{{ v10Sub }}</p>
+              <div style="font-size:12px;font-weight:700;color:#232323;margin-bottom:6px">{{ v10Pct }}</div>
+              <div style="display:flex;align-items:center;gap:8px"><sk-icon name="check-circle-2" size="18" style="color:#00c73d;flex:none"></sk-icon><div style="flex:1;height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:{{ v10Pct }};background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;margin-bottom:16px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Validación de identidad</div>
+              <p style="font-size:12.5px;color:#888;margin:2px 0 14px">2/2 campos completados</p>
+              <div style="background:#fbfbfb;border:1px solid #eef0f1;border-radius:12px;padding:14px">
+                <p style="text-align:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:14.5px;color:#232323;margin:0 0 12px;line-height:1.35">Recomendaciones claves<br>antes de iniciar</p>
+                <div style="display:flex;gap:12px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid #eef0f1;margin-bottom:12px">
+                  <span style="flex:none;width:34px;height:34px;border-radius:50%;background:#232323;color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="credit-card" size="16"></sk-icon></span>
+                  <div><div style="font-weight:700;font-size:13.5px;color:#232323">Ten a la mano tu documento de identidad</div><p style="font-size:12.5px;color:#666;line-height:1.4;margin:2px 0 0">Necesitaremos una foto de este. Asegúrate de que esté en buen estado, sin reflejos, y totalmente legible al momento de tomar la foto.</p></div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                  <span style="flex:none;width:34px;height:34px;border-radius:50%;background:#232323;color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="scan-face" size="16"></sk-icon></span>
+                  <div><div style="font-weight:700;font-size:13.5px;color:#232323">Prepárate para una selfie</div><p style="font-size:12.5px;color:#666;line-height:1.4;margin:2px 0 0">Revisa que la cámara de tu dispositivo está funcionando correctamente y colócate en un lugar con buena iluminación.</p></div>
+                </div>
+                <div style="display:flex;gap:10px;background:#f0f0f0;border-radius:10px;padding:11px 12px;margin-top:14px"><sk-icon name="alert-circle" size="16" style="color:#404040;flex:none;margin-top:1px"></sk-icon><div><div style="font-weight:700;font-size:12.5px;color:#232323">No cierres la ventana de tu navegador</div><p style="font-size:12px;color:#666;line-height:1.4;margin:2px 0 0">Una vez inicies tu validación si cierras la ventana de tu navegador perderás tu avance.</p></div></div>
+              </div>
+            </div>
+            <button onClick="{{ startProceso }}" style="width:100%;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">{{ bioBtnLabel }}</button>
+            <p style="font-size:13px;color:#0a7a2f;font-weight:600;margin-top:10px;text-align:center">{{ bioStatus }}</p>
+          </div>
+
+          <!-- Overview: checklist de secciones -->
+          <div style="display:{{ v10Disp.overview }}">
+            <div style="background:#f7f7f7;border-radius:14px;padding:18px;margin-bottom:16px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:4px">{{ v10Banner }}</div>
+              <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">{{ v10Sub }}</p>
+              <div style="font-size:12px;font-weight:700;color:#232323;text-align:right;margin-bottom:6px">{{ v10Pct }}</div>
+              <div style="display:flex;align-items:center;gap:8px"><sk-icon name="check-circle-2" size="18" style="color:#00c73d;flex:none"></sk-icon><div style="flex:1;height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:{{ v10Pct }};background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div><sk-icon name="check-circle-2" size="18" style="color:{{ allDoneColor }};flex:none"></sk-icon></div>
+            </div>
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Información personal y laboral</div>
+              <p style="font-size:12.5px;color:#888;margin:2px 0 14px">{{ v10SecDoneCount }}/4 campos completados</p>
+              <sc-for list="{{ v10Sections }}" as="sec" hint-placeholder-count="4">
+                <button onClick="{{ sec.open }}" style="width:100%;text-align:left;background:#fff;border:1px solid #eef0f1;border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px" style-hover="border-color:#00c73d">
+                  <span style="flex:none;width:34px;height:34px;border-radius:50%;background:#f5f5f5;color:#404040;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="{{ sec.icon }}" size="16"></sk-icon></span>
+                  <span style="flex:1"><span style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;color:#232323"><sk-icon name="{{ sec.statusIcon }}" size="14" style="color:{{ sec.statusColor }}"></sk-icon>{{ sec.label }}</span><span style="display:block;font-size:12px;color:#888;margin-top:2px">{{ sec.countText }}</span></span>
+                  <sk-icon name="chevron-right" size="18" style="color:#9aa0a3;flex:none"></sk-icon>
+                </button>
+              </sc-for>
+              <label style="display:flex;justify-content:space-between;align-items:center;background:#f7f7f7;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:13px;color:#404040;cursor:pointer">¿Recibiste asesoría comercial?<input type="checkbox" checked="{{ asesoriaComercial }}" onChange="{{ toggleAsesoria }}" style="width:19px;height:19px;accent-color:#00c73d"></label>
+            </div>
+            <button disabled="{{ v10FinalDisabled }}" onClick="{{ goDocs }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ v10FinalBg }}">Continuar</button>
+            <button onClick="{{ guardarHere }}" style="width:100%;background:transparent;color:#0a7a2f;border:none;padding:10px;font-weight:600;font-size:14px;text-decoration:underline;cursor:pointer;font-family:Montserrat,sans-serif">Guardar y continuar después</button>
+          </div>
+
+          <!-- Datos personales -->
+          <div style="display:{{ v10Disp.personal }}">
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="width:34px;height:34px;border-radius:50%;background:#f5f5f5;color:#404040;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="user" size="16"></sk-icon></span><div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Datos personales</div><div style="font-size:12px;color:#888">0/11 campos completados</div></div></div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>País de nacimiento</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>Departamento de nacimiento</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>Ciudad de nacimiento</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>País de residencia</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>Departamento de residencia</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>Ciudad de residencia</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>¿Cuál es tu estado civil?</option></select>
+                <input placeholder="Personas a cargo" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <label style="display:flex;justify-content:space-between;align-items:center;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">¿Presentas alguna condición de discapacidad?<input type="checkbox" style="width:19px;height:19px;accent-color:#00c73d"></label>
+              </div>
+              <button onClick="{{ completeSectionPersonal }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+            </div>
+          </div>
+
+          <!-- Información laboral -->
+          <div style="display:{{ v10Disp.laboral }}">
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="width:34px;height:34px;border-radius:50%;background:#f5f5f5;color:#404040;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="briefcase" size="16"></sk-icon></span><div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Información laboral</div><div style="font-size:12px;color:#888">0/17 campos completados</div></div></div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <input placeholder="Profesión" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>¿Qué tipo de trabajador eres?</option></select>
+                <input placeholder="Cargo" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <input placeholder="Fecha de vinculación" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <input placeholder="Empresa donde trabajas" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>Tipo de empresa</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>Tipo documento empleador</option></select>
+                <input placeholder="Número de documento" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <input placeholder="Dirección de la empresa" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>País origen de la empresa</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>Departamento origen de la empresa</option></select>
+                <select style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;color:#888;font-family:inherit"><option>Ciudad origen de la empresa</option></select>
+                <input placeholder="Teléfono de la empresa" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <input placeholder="Correo de la empresa" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <input placeholder="Ingreso mensual (COP)" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <input placeholder="Ingreso base cotización" style="width:100%;border:1px solid #dcdfe1;border-radius:8px;padding:11px 12px;font-size:14px;font-family:inherit;color:#404040">
+                <label style="display:flex;justify-content:space-between;align-items:center;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">¿Cuenta con un salario integral?<input type="checkbox" style="width:19px;height:19px;accent-color:#00c73d"></label>
+              </div>
+              <button onClick="{{ completeSectionLaboral }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+            </div>
+          </div>
+
+          <!-- Persona expuesta públicamente -->
+          <div style="display:{{ v10Disp.pep }}">
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="width:34px;height:34px;border-radius:50%;background:#f5f5f5;color:#404040;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="landmark" size="16"></sk-icon></span><div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Persona expuesta públicamente</div><div style="font-size:12px;color:#888">3/3 campos completados</div></div></div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">Por mi cargo o actividad <b>administro recursos públicos</b><input type="checkbox" checked="{{ pepFlags.a }}" onChange="{{ togglePepA }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none"></label>
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">Soy una persona expuesta públicamente<input type="checkbox" checked="{{ pepFlags.b }}" onChange="{{ togglePepB }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none"></label>
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">Tengo relación con una persona expuesta públicamente<input type="checkbox" checked="{{ pepFlags.c }}" onChange="{{ togglePepC }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none"></label>
+              </div>
+              <button onClick="{{ completeSectionPep }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+            </div>
+          </div>
+
+          <!-- Cumplimiento fiscal internacional -->
+          <div style="display:{{ v10Disp.fiscal }}">
+            <div style="background:#f7f7f7;border-radius:14px;padding:16px;margin-bottom:14px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323;margin-bottom:4px">{{ v10Banner }}</div>
+              <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 10px">{{ v10Sub }}</p>
+              <div style="font-size:12px;font-weight:700;color:#232323;text-align:right;margin-bottom:6px">{{ v10Pct }}</div>
+              <div style="height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:{{ v10Pct }};background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span style="width:34px;height:34px;border-radius:50%;background:#f5f5f5;color:#404040;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="scale" size="16"></sk-icon></span><div><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Cumplimiento fiscal internacional</div><div style="font-size:12px;color:#888">3/3 campos completados</div></div></div>
+              <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">Para cumplir con las normas establecidas por la DIAN, te solicitamos confirmar tu situación tributaria respondiendo las siguientes preguntas:</p>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">¿Tienes domicilio fiscal en Colombia?<input type="checkbox" checked="{{ fiscalFlags.a }}" onChange="{{ toggleFiscalA }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none"></label>
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">¿Declaras impuesto sobre renta y/o complementarios en Colombia?<input type="checkbox" checked="{{ fiscalFlags.b }}" onChange="{{ toggleFiscalB }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none"></label>
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">¿Haces operaciones en moneda extranjera?<input type="checkbox" checked="{{ fiscalFlags.c }}" onChange="{{ toggleFiscalC }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none"></label>
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">¿Tienes obligaciones tributarias por ciudadanía o residencia fiscal en Estados Unidos?<input type="checkbox" checked="{{ fiscalFlags.d }}" onChange="{{ toggleFiscalD }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none"></label>
+                <label style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f7f7f7;border-radius:10px;padding:12px 14px;font-size:13px;color:#404040;cursor:pointer">¿Tienes obligaciones tributarias por residencia fiscal en otro país distinto a Colombia y EE. UU.?<input type="checkbox" checked="{{ fiscalFlags.e }}" onChange="{{ toggleFiscalE }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none"></label>
+              </div>
+              <button onClick="{{ completeSectionFiscal }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Finalizar</button>
+            </div>
+          </div>
+
+          <!-- Documentación -->
+          <div style="display:{{ v10Disp.docs }}">
+            <div style="background:#f7f7f7;border-radius:14px;padding:18px;margin-bottom:16px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:4px">¡Gran decisión!</div>
+              <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">En solo dos pasos te vincularás a tu complemento.</p>
+              <div style="font-size:12px;font-weight:700;color:#232323;margin-bottom:6px">85%</div>
+              <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:85%;background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div><sk-icon name="check-circle-2" size="18" style="color:#00c73d;flex:none"></sk-icon></div>
+            </div>
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Documentación</div>
+              <p style="font-size:12.5px;color:#888;margin:2px 0 14px">{{ docCountText }}</p>
+              <p style="font-weight:700;font-size:13.5px;color:#232323;margin:0 0 10px">Adjunta uno de estos documentos según tu ocupación</p>
+              <select style="width:100%;border:1px solid #dcdfe1;border-radius:10px;padding:12px;font-size:14px;color:#232323;font-family:inherit;margin-bottom:12px"><option>{{ docType }}</option></select>
+              <div style="border:1.5px dashed #c5c5c5;border-radius:12px;padding:24px 16px;text-align:center">
+                <sk-icon name="upload" size="26" style="color:#9aa0a3"></sk-icon>
+                <p style="font-weight:700;font-size:14px;color:#232323;margin:10px 0 2px">Arrastra y suelta archivos aquí.</p>
+                <p style="font-size:12.5px;color:#9aa0a3;margin:0 0 14px">Formato: PDF / Image / Scan</p>
+                <button onClick="{{ selectDoc }}" style="width:100%;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:11px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;cursor:pointer" style-hover="background:#caf9cb">Selecciona archivo</button>
+                <p style="font-size:12px;color:#9aa0a3;margin-top:10px">Tamaño Max: 5MB</p>
+              </div>
+            </div>
+            <button disabled="{{ docContinueDisabled }}" onClick="{{ finalizarTraslado }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ docBtnBg }}">Continuar</button>
+            <p style="text-align:center;margin-top:12px"><a style="cursor:pointer;font-size:13.5px;font-weight:700">¿Quieres realizar este aporte por descuento por nómina?</a></p>
+          </div>
+        </section>
+
+        <!-- ═══ WF-10-FIC encadenamiento ═══ -->
+        <section hidden="{{ h.wf10fic }}" class="skpop">
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:20px;line-height:1.25;color:#232323;margin:0 0 8px">Ya casi: falta tu solicitud del fondo {{ ficName }}</h1>
+          <p style="font-size:14px;line-height:1.5;color:#404040;margin:0 0 12px">Cada fondo requiere su propia solicitud. Tus datos ya están precargados — solo confirma.</p>
+          <div style="background:#f7f7f7;border-radius:14px;padding:14px;font-size:12.5px;color:#666;line-height:1.5">Nombre: Laura Gómez Rincón · CC 1.023.456.789 · 310 245 6789<br><span style="display:inline-block;margin-top:6px;background:#ecfdf3;color:#087a34;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700">Datos precargados</span></div>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;margin-top:12px">
+            <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323;margin-bottom:8px">Reglamento del fondo</div>
+            <div class="sk-scroll" style="max-height:120px;overflow:auto;border:1px solid #e3e7ea;border-radius:10px;padding:11px;font-size:12px;color:#666;line-height:1.5">Reglamento del Fondo de Inversión Colectiva administrado por Skandia Fiduciaria S.A. — documento simulado para el prototipo. Contiene: política de inversión, plazos de redención, comisiones de administración, derechos y obligaciones del inversionista, procedimiento de vinculación y retiro, y órganos de administración y control. El texto real lo entrega el reglamento vigente aprobado ante la Superintendencia Financiera de Colombia. Desplázate para leerlo completo antes de aceptar. [Fin del documento simulado]</div>
+            <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.4;margin-top:12px;cursor:pointer"><input type="checkbox" checked="{{ ficcheck }}" onChange="{{ toggleFicCheck }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none;margin-top:1px"><span>Leí y acepto el reglamento de este fondo.</span></label>
+          </div>
+          <button disabled="{{ ficBtnDisabled }}" onClick="{{ ficConfirm }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ ficBtnBg }}">Confirmar solicitud del fondo</button>
+        </section>
+
+        <!-- ═══ WF-11 primer aporte ═══ -->
+        <section hidden="{{ h.wf11 }}" class="skpop">
+
+          <!-- Pantalla 1: contrato creado -->
+          <div style="display:{{ v11Disp.contrato }}">
+            <a onClick="{{ goBack }}" style="display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:14px"><sk-icon name="arrow-left" size="16"></sk-icon>Atrás</a>
+            <div style="background:#f7f7f7;border-radius:14px;padding:18px;margin-bottom:16px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:4px">¡Último paso!</div>
+              <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">Ya tienes creado tu contrato, solo nos queda realizar tu primer aporte.</p>
+              <div style="font-size:12px;font-weight:700;color:#232323;margin-bottom:6px">85%</div>
+              <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:85%;background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div><sk-icon name="check-circle-2" size="18" style="color:#00c73d;flex:none"></sk-icon></div>
+            </div>
+            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Realiza tu primer aporte</div>
+              <p style="font-size:12.5px;color:#888;margin:2px 0 16px">0/1 campos completados</p>
+              <p style="text-align:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:17px;line-height:1.35;color:#232323;margin:0 0 16px">Laura, con tu primer aporte empieza el camino a tus objetivos</p>
+              <div style="background:#fbfbfb;border:1px solid #eef0f1;border-radius:12px;padding:16px 16px 18px;position:relative">
+                <span style="position:absolute;top:0;left:0;background:#ffae08;color:#fff;border-radius:8px 0 8px 0;padding:5px 12px;font-size:12px;font-weight:700">{{ contratoVeh }}</span>
+                <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-top:16px">
+                  <p style="font-size:13.5px;line-height:1.5;color:#404040;margin:0">Tu contrato creado para los Universales de Skandia Inversiones.</p>
+                  <div style="flex:none;background:#ebf4ff;border-radius:10px;padding:9px 12px;text-align:center"><div style="font-size:11px;color:#666">Contrato</div><div style="font-weight:700;font-size:13px;color:#232323">#100006077905</div></div>
+                </div>
+                <p style="font-size:12.5px;line-height:1.55;color:#666;text-align:center;margin:18px 0 0">A tu correo enviaremos el resumen de tu proceso de vinculación. En caso de requerir el apoyo de un asesor certificado contáctanos a través de nuestro<br><b style="color:#404040">PBX 658 4000 y línea nacional 01 8000 517 526</b></p>
+              </div>
+            </div>
+            <button onClick="{{ goResumenAporte }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Realizar aporte por PSE</button>
+            <p style="text-align:center;margin-top:12px"><a onClick="{{ goNominaAporte }}" style="cursor:pointer;font-size:13.5px;font-weight:700">¿Quieres realizar este aporte por descuento por nómina?</a></p>
+          </div>
+
+          <!-- Pantalla 2: resumen de la selección (solo lectura) -->
+          <div style="display:{{ v11Disp.resumen }}">
+            <a onClick="{{ goBack }}" style="display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:14px"><sk-icon name="arrow-left" size="16"></sk-icon>Atrás</a>
+            <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 4px">Tu selección</h1>
+            <p style="font-size:13px;color:#888;margin:0 0 16px">Este es tu contrato — la distribución que elegiste ya quedó definida.</p>
+            <sc-for list="{{ resumenCartItems }}" as="c" hint-placeholder-count="2">
+              <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;margin-bottom:12px">
+                <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:{{ c.color }};flex:none"></span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">{{ c.name }}</span></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><span style="background:#f6fcf2;border:1px solid #caf9cb;color:#0a7a2f;border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:600">{{ c.meta }}</span><span style="background:#f5f5f5;border-radius:100px;padding:3px 10px;font-size:11.5px;font-weight:600;color:#666">{{ c.tag }}</span></div>
+                <div style="margin-top:12px"><span style="font-size:13px;font-weight:700;color:#404040">Monto a invertir</span>
+                  <div style="position:relative;margin-top:6px"><span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#888;font-weight:600;font-size:14px">$</span><div style="width:100%;border:1px solid #eef0f1;background:#fbfbfb;border-radius:9px;padding:10px 12px 10px 26px;font-size:15px;color:#404040">{{ c.montoDisplay }}</div></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:12px"><span style="font-size:13px;font-weight:700;color:#404040;flex:none">Distribución</span><div style="flex:1;height:6px;border-radius:100px;background:#e3e7ea;position:relative"><div style="position:absolute;left:0;top:0;height:100%;border-radius:100px;background:{{ c.color }};width:{{ c.pctLabel }}"></div></div><span style="font-size:13px;font-weight:700;color:#0a7a2f;width:38px;text-align:right">{{ c.pctLabel }}</span></div>
+              </div>
+            </sc-for>
+            <div style="background:#f2fbea;border-radius:16px;padding:16px;margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;color:#404040;font-weight:600">Total a invertir</span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:19px;color:#232323">{{ resumenTotalFmt }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px"><span style="font-size:13px;color:#404040;font-weight:600">Podrías ganar en 1 año</span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#03a835">+{{ resumenGainFmt }}</span></div>
+              <p style="font-size:11.5px;color:#7a9482;margin:8px 0 0">Estimado con una rentabilidad promedio ponderada de {{ resumenRatePct }}% E.A. No garantiza resultados futuros.</p>
+            </div>
+            <button onClick="{{ goMontoAporte }}" style="width:100%;margin-top:6px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Confirmar aporte</button>
+          </div>
+
+          <!-- Pantalla 3: monto y medio de pago -->
+          <div style="display:{{ v11Disp.monto }}">
+          <a onClick="{{ backToResumen }}" style="display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:14px"><sk-icon name="arrow-left" size="16"></sk-icon>Atrás</a>
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 6px">Haz tu primer aporte</h1>
+          <p style="font-size:14px;line-height:1.5;color:#404040;margin:0 0 14px">{{ wf11meta }}</p>
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:6px">¿Con cuánto empiezas?</label>
+          <div style="position:relative;margin-bottom:4px"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#888;font-weight:600">$</span><input ref="{{ aporteRef }}" inputmode="numeric" defaultValue="500.000" onInput="{{ fmtInput }}" style="width:100%;border:1px solid #c5c5c5;border-radius:8px;padding:12px 14px 12px 28px;font-size:16px;font-family:inherit;color:#404040" style-focus="border-color:#00c73d;outline:2px solid #caf9cb"></div>
+          <div style="font-size:11.5px;color:#888;margin-bottom:14px">Precargamos el monto que simulaste. Puedes cambiarlo.</div>
+          <label style="display:block;font-size:13px;font-weight:700;margin-bottom:6px">¿Cómo quieres aportar?</label>
+          <button onClick="{{ medioPse }}" style="width:100%;text-align:left;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:9px;font-family:'Open Sans',sans-serif;font-size:14px;line-height:1.4;color:#404040;{{ medioSty.pse }}"><b>PSE</b> — desde tu cuenta bancaria, en línea.</button>
+          <button onClick="{{ medioDebito }}" style="width:100%;text-align:left;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:9px;font-family:'Open Sans',sans-serif;font-size:14px;line-height:1.4;color:#404040;{{ medioSty.debito }}"><b>Débito automático</b> — tu aporte se repite cada mes, tú no haces nada.</button>
+          <button onClick="{{ medioNomina }}" style="width:100%;text-align:left;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:9px;font-family:'Open Sans',sans-serif;font-size:14px;line-height:1.4;color:#404040;{{ medioSty.nomina }}"><b>Descuento de nómina</b> — directo de tu salario, si tu empresa tiene convenio.</button>
+          <button onClick="{{ medioDespues }}" style="width:100%;text-align:left;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:9px;font-family:'Open Sans',sans-serif;font-size:14px;line-height:1.4;color:#404040;{{ medioSty.despues }}"><b>Aportar después</b> — tu cuenta queda lista y aportas cuando quieras.</button>
+          <div style="display:{{ debitoDisp }}">
+            <div style="display:flex;gap:10px;background:#ebf4ff;border-left:4px solid #0099de;border-radius:8px;padding:12px 14px;margin:8px 0;font-size:13px;line-height:1.4;color:#404040"><sk-icon name="info" size="17" style="color:#0099de;flex:none;margin-top:1px"></sk-icon><span>Puedes cancelar el débito automático cuando quieras, sin costo. Aquí te contamos cómo, qué comisiones aplican y en qué plazos se procesa tu dinero.</span></div>
+            <details style="background:#f7f7f7;border-radius:10px;padding:11px 14px;font-size:12.5px;color:#666;line-height:1.5"><summary style="font-weight:700;color:#404040;font-size:13px">Ver condiciones del débito automático</summary><div style="margin-top:7px"><b>Revocación:</b> solicita la cancelación por la app, el portal o la línea de servicio; efectiva en máximo [X] días hábiles.<br><b>Comisiones:</b> monto y condiciones según el reglamento del producto — se muestran antes de confirmar.<br><b>Liquidación:</b> tu aporte se refleja en la inversión en [X] horas/días hábiles desde el débito. <em>[Textos y plazos finales: Legal + Operaciones]</em></div></details>
+          </div>
+          <div style="display:{{ pagoDisp }};gap:10px;background:#fff3e0;border-left:4px solid #ffae08;border-radius:8px;padding:12px 14px;margin:8px 0;font-size:13px;line-height:1.4;color:#7a5300"><sk-icon name="alert-triangle" size="17" style="color:#c97a00;flex:none;margin-top:1px"></sk-icon><span>No pudimos procesar tu aporte. Tu dinero no se movió. Puedes intentar de nuevo o usar otro medio de pago.</span></div>
+          <button disabled="{{ wf11NextDisabled }}" onClick="{{ confirmAporte }}" style="width:100%;margin-top:8px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ wf11NextBg }}">{{ wf11NextLabel }}</button>
+          <button onClick="{{ guardarHere }}" style="width: 100%; background: transparent; color: #0a7a2f; border: none; padding: 10px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">Guardar y continuar después</button>
+          <p style="text-align:center;font-size:12px;color:#aaa;margin-top:4px">Cuando confirmes: “Tu aporte se está validando — suele tomar hasta [X] horas hábiles.”</p>
+          </div>
+        </section>
+
+        <!-- ═══ WF-12 confirmación ═══ -->
+        <section hidden="{{ h.wf12 }}" class="skpop">
+          <div style="width:64px;height:64px;border-radius:50%;background:#f6fcf2;border:2px solid #00c73d;color:#00c73d;display:flex;align-items:center;justify-content:center;margin:6px auto 14px"><sk-icon name="check" size="32"></sk-icon></div>
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:22px;line-height:1.25;text-align:center;color:#232323;margin:0 0 16px">{{ wf12Title }}</h1>
+          <div style="background:linear-gradient(135deg,#00c73d,#8fe000);border-radius:16px;padding:18px;color:#fff;margin-bottom:12px">
+            <div style="font-size:12.5px;opacity:.9">Total de tu compra</div>
+            <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:26px;margin:2px 0 10px">{{ cierreTotalFmt }}</div>
+            <div style="display:flex;border-radius:100px;overflow:hidden;height:8px;margin-bottom:10px">
+              <sc-for list="{{ cierreDistBar }}" as="d" hint-placeholder-count="2"><div style="width:{{ d.widthPct }};background:rgba(255,255,255,{{ d.opacity }})"></div></sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600"><span>Podrías ganar en 1 año</span><span>+{{ cierreGainFmt }}</span></div>
+          </div>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
+            <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323;margin-bottom:10px">Tu resumen de decisiones</div>
+            <sc-for list="{{ resumen }}" as="r" hint-placeholder-count="5"><div style="display:flex;gap:10px;font-size:13px;line-height:1.45;margin-bottom:6px"><span style="flex:none;width:104px;color:#888;font-weight:600">{{ r.k }}</span><span style="color:#404040">{{ r.v }}</span></div></sc-for>
+            <div style="height:1px;background:#eef0f1;margin:12px 0"></div>
+            <p style="font-size:12.5px;color:#666;margin:0 0 10px">Este es tu resumen. Guárdalo — es el respaldo de tus decisiones.</p>
+            <button onClick="{{ descargarResumen }}" style="width: 100%; background: transparent; color: #0a7a2f; border: 1.5px solid #00c73d; border-radius: 100px; padding: 10px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; font-family: Montserrat" style-hover="background:#caf9cb"><sk-icon name="download" size="16"></sk-icon>Descargar mi resumen</button>
+          </div>
+          <div style="background:#f7f7f7;border-radius:14px;padding:15px;margin-top:12px"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323;margin-bottom:4px">¿Qué sigue?</div><p style="font-size:13px;color:#666;line-height:1.5;margin:0">Verás tu inversión en la app de Skandia. Te contamos cómo va, sin tecnicismos.</p></div>
+          <button onClick="{{ resetAll }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Ir a mi inversión</button>
+        </section>
+
+        <!-- ═══ WF-F3-01 · BIFURCACIÓN ═══ -->
+        <section hidden="{{ h.f301 }}" class="skpop">
+          <div style="display:inline-block;background:repeating-linear-gradient(45deg,#f2f2f2,#f2f2f2 8px,#e8e8e8 8px,#e8e8e8 16px);border:1px dashed #b3b3b3;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;color:#666;margin-bottom:14px">Fase 3 · ene-2027 — especificación (wireframe). La arquitectura y los eventos se construyen desde F1.</div>
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 6px">Elige cómo quieres tomar esta decisión</h1>
+          <p style="font-size:14px;line-height:1.5;color:#404040;margin:0 0 16px">Para este tipo de portafolios tienes dos caminos. Los dos son válidos — elige el que va contigo.</p>
+          <div style="display:grid;gap:12px">
+            <button onClick="{{ caminoRecomendacion }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:18px;cursor:pointer;min-height:120px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px"><sk-icon name="user-check" size="20"></sk-icon></span><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15.5px;color:#232323">Con recomendación profesional</div><div style="font-size:13px;color:#666;line-height:1.45;margin-top:3px">Con base en tu perfil, te presentamos una recomendación hecha por expertos. Tú decides si la sigues.</div></button>
+            <button onClick="{{ caminoSolo }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:18px;cursor:pointer;min-height:120px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px"><sk-icon name="compass" size="20"></sk-icon></span><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15.5px;color:#232323">Por tu cuenta</div><div style="font-size:13px;color:#666;line-height:1.45;margin-top:3px">Tú tomas la decisión sin recomendación de Skandia. Elegir este camino es tu derecho; te contamos qué implica.</div></button>
+          </div>
+          <p style="font-size:12.5px;color:#888;margin-top:16px">Tu elección queda registrada como respaldo de tu decisión.</p>
+        </section>
+
+        <!-- ═══ WF-F3-03 · RECOMENDACIÓN ═══ -->
+        <section hidden="{{ h.f303 }}" class="skpop">
+          <div style="display:inline-block;background:repeating-linear-gradient(45deg,#f2f2f2,#f2f2f2 8px,#e8e8e8 8px,#e8e8e8 16px);border:1px dashed #b3b3b3;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;color:#666;margin-bottom:14px">Fase 3 · ene-2027 — especificación (wireframe)</div>
+          <span style="display:inline-block;background:#ebf4ff;color:#0b5f8a;border:1px solid #9cc4ec;border-radius:5px;padding:3px 10px;font-size:11.5px;font-weight:700;margin-bottom:12px">Esto es una recomendación profesional</span>
+          <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 14px">Nuestra recomendación para ti</h1>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;font-size:13px;line-height:1.6;color:#404040"><b>Modalidad:</b> asesoría no independiente.<br><b>Quién la suministra:</b> [Nombre], asesor certificado, vinculado a Skandia.<br><b>Por qué te la damos:</b> síntesis de los argumentos que la fundamentan, con base en tu perfil [Perfil] y tu meta [Meta].<br><b>Aceptación previa:</b> aceptaste recibir recomendaciones el [fecha] (medio verificable).</div>
+          <div style="display:grid;gap:12px;margin-top:12px">
+            <button onClick="{{ recoAceptar }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:14px;padding:16px;cursor:pointer" style-hover="border-color:#00c73d"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Aceptar la recomendación</div><div style="font-size:13px;color:#666;margin-top:2px">Continúas con la mezcla recomendada.</div></button>
+            <button onClick="{{ recoRechazar }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:14px;padding:16px;cursor:pointer" style-hover="border-color:#00c73d"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">No seguirla</div><div style="font-size:13px;color:#666;margin-top:2px">Decides distinto. Tu decisión también queda respaldada.</div></button>
+          </div>
+          <p style="font-size:12.5px;color:#888;margin-top:16px">Estados únicos y consistentes en todo el ecosistema: aceptada · rechazada · vigente · vencida.</p>
+        </section>
+
+        <!-- MORE_SCREENS -->
+
+        <!-- Footer regulatorio permanente -->
+        <div style="border-top:1px solid #eef0f1;margin:18px -18px 0;padding:14px 18px 20px;font-size:11.5px;line-height:1.5;color:#888">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#404040"><sk-icon name="shield-check" size="14" style="color:#666"></sk-icon>Vigilado Superintendencia Financiera de Colombia</div>
+          <sc-for list="{{ footerEntidades }}" as="e" hint-placeholder-count="2"><div style="margin-top:3px">{{ e }}</div></sc-for>
+          <div style="opacity:.85;margin-top:5px">Contenido informativo — no constituye recomendación profesional. Decreto 1239 de 2024 · CE 014 de 2025.</div>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:16px;right:16px;bottom:16px;display:{{ floatingCartDisp }};align-items:center;justify-content:space-between;gap:10px;background:#12333a;color:#fff;border-radius:100px;padding:8px 8px 8px 16px;box-shadow:0 14px 32px -10px rgba(0,0,0,.35);z-index:45">
+        <span style="display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700"><sk-icon name="shopping-cart" size="16" style="color:#8fe000"></sk-icon>{{ floatingCartCount }} · {{ floatingCartTotal }}</span>
+        <button onClick="{{ goWf06 }}" style="background:#00c73d;color:#fff;border:none;border-radius:100px;padding:9px 16px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#03a835">Ver selección</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODALES ══ -->
+<div onClick="{{ backdropM01 }}" style="position:fixed;inset:0;background:rgba(18,25,28,.55);z-index:500;display:{{ disp.m01 }};align-items:{{ modalAlign }};justify-content:center;padding:0">
+  <div class="skpop" style="background:#fff;border-radius:{{ modalRadius }};max-width:{{ modalWidth }};width:100%;padding:24px 20px 26px;max-height:88vh;overflow:auto;animation:skslide .3s ease">
+    <div style="width:38px;height:4px;border-radius:100px;background:#e0e0e0;margin:0 auto 14px"></div>
+    <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:19px;color:#232323;margin:0 0 8px">Hablemos — sin costo y sin compromiso</h2>
+    <p style="font-size:14px;line-height:1.5;color:#555;margin:0 0 6px">Déjanos tu número y <b>tu asesora Carolina Pérez</b> te contacta. Tu avance queda guardado: retomas donde ibas.</p>
+    <p style="font-size:12px;color:#999;margin:0 0 14px">(Si no tienes asesor asignado, te contacta un asesor de Skandia.)</p>
+    <label style="display:block;font-size:13px;font-weight:700;margin-bottom:5px">Tu celular</label>
+    <input ref="{{ leadcelRef }}" defaultValue="310 245 6789" inputmode="tel" style="width:100%;border:1px solid #c5c5c5;border-radius:8px;padding:12px 14px;font-size:16px;font-family:inherit;color:#404040" style-focus="border-color:#00c73d;outline:2px solid #caf9cb">
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.4;margin:14px 0;cursor:pointer"><input type="checkbox" checked="{{ leadhabeas }}" onChange="{{ toggleLeadHabeas }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none;margin-top:1px"><span>Autorizo el tratamiento de mis datos para que un asesor me contacte.</span></label>
+    <button disabled="{{ leadDisabled }}" onClick="{{ sendLead }}" style="width:100%;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ leadBtnBg }}">Que me contacten</button>
+    <button onClick="{{ closeM01 }}" style="width:100%;background:transparent;color:#0a7a2f;border:none;padding:11px;font-weight:600;font-size:14px;text-decoration:underline;cursor:pointer;margin-top:4px">Seguir por mi cuenta</button>
+  </div>
+</div>
+
+<div onClick="{{ backdropM02 }}" style="position:fixed;inset:0;background:rgba(18,25,28,.55);z-index:500;display:{{ disp.m02 }};align-items:{{ modalAlign }};justify-content:center">
+  <div class="skpop" style="background:#fff;border-radius:{{ modalRadius }};max-width:{{ modalWidth }};width:100%;padding:24px 20px 26px;max-height:88vh;overflow:auto;animation:skslide .3s ease">
+    <div style="width:38px;height:4px;border-radius:100px;background:#e0e0e0;margin:0 auto 14px"></div>
+    <div style="display:inline-flex;align-items:center;gap:9px;margin-bottom:8px"><span style="width:38px;height:38px;border-radius:11px;background:#f6fcf2;color:#00c73d;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="bookmark-check" size="20"></sk-icon></span><h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:19px;color:#232323;margin:0">Tu avance queda guardado</h2></div>
+    <p style="font-size:14px;line-height:1.5;color:#555;margin:0 0 12px">Puedes retomar cuando quieras desde el link que te enviamos a tu celular.</p>
+    <div style="background:#f7f7f7;border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:#888;margin-bottom:8px">Simulación del rescate (outbound WhatsApp, en nombre de tu asesora):</div>
+      <div style="background:#e7f9ec;border-radius:14px 14px 14px 3px;padding:11px 13px;font-size:13.5px;line-height:1.45;color:#1c3a26">Hola, Laura 👋 Soy Carolina Pérez, tu asesora en Skandia. Vi que empezaste a explorar opciones para <b>{{ metaOr }}</b>. Si quieres, lo terminamos juntas — o retómalo tú aquí 👉 <u>skandia.co/retomar</u></div>
+    </div>
+    <button onClick="{{ closeM02 }}" style="width: 100%; margin-top: 16px; background: transparent; color: #0a7a2f; border: 1.5px solid #00c73d; border-radius: 100px; padding: 12px; font-weight: 600; font-size: 15px; cursor: pointer; font-family: Montserrat" style-hover="background:#caf9cb">Seguir ahora</button>
+  </div>
+</div>
+
+<div style="position:fixed;inset:0;background:rgba(18,25,28,.6);z-index:500;display:{{ disp.m09 }};align-items:{{ modalAlign }};justify-content:center">
+  <div class="skpop" style="background:#fff;border-radius:{{ modalRadius }};max-width:{{ modalWidth }};width:100%;padding:24px 20px 26px;max-height:88vh;overflow:auto;animation:skslide .3s ease">
+    <div style="width:44px;height:44px;border-radius:12px;background:#fff3e0;color:#c97a00;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px"><sk-icon name="alert-triangle" size="23"></sk-icon></div>
+    <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:19px;color:#232323;margin:0 0 10px">Antes de continuar, mira esto</h2>
+    <p style="font-size:15px;line-height:1.5;color:#404040;margin:0 0 8px;font-weight:700">{{ desvMsg }}</p>
+    <p style="font-size:14px;line-height:1.5;color:#555;margin:0 0 18px">Puede subir y bajar más de lo que indicaste sentirte cómodo. Puedes ajustarla o continuar así — la decisión es tuya y quedará registrada.</p>
+    <button onClick="{{ desvAjustar }}" style="width:100%;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d;margin-bottom:9px" style-hover="background:#03a835">Ajustar mi selección</button>
+    <button onClick="{{ desvContinuar }}" style="width:100%;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:12px;font-weight:600;font-size:15px;cursor:pointer" style-hover="background:#caf9cb">Continuar con esta mezcla</button>
+  </div>
+</div>
+
+<div style="position:fixed;inset:0;background:rgba(18,25,28,.6);z-index:500;display:{{ disp.mf302 }};align-items:{{ modalAlign }};justify-content:center">
+  <div class="skpop" style="background:#fff;border-radius:{{ modalRadius }};max-width:{{ modalWidth }};width:100%;padding:22px 20px 26px;max-height:90vh;overflow:auto;animation:skslide .3s ease">
+    <div style="display:inline-block;background:repeating-linear-gradient(45deg,#f2f2f2,#f2f2f2 8px,#e8e8e8 8px,#e8e8e8 16px);border:1px dashed #b3b3b3;border-radius:8px;padding:5px 11px;font-size:11px;font-weight:700;color:#666;margin-bottom:12px">Fase 3 · especificación</div>
+    <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:19px;color:#232323;margin:0 0 12px">Vas a invertir por tu cuenta</h2>
+    <div ref="{{ f302Ref }}" onScroll="{{ f302Scroll }}" class="sk-scroll" style="max-height:150px;overflow:auto;border:1px solid #e3e7ea;border-radius:11px;padding:13px;font-size:13.5px;line-height:1.5;color:#404040">Esto significa que Skandia no evaluará si este portafolio es conveniente para tu perfil, y la decisión y sus resultados son tuyos. Esta modalidad se llama “solo ejecución” y está prevista en la normativa colombiana.<br><br>Al continuar, Skandia no tiene la obligación de suministrar una recomendación profesional ni de realizar un análisis de conveniencia para esta inversión. Tu elección se registra en medio verificable, a tu iniciativa, y queda disponible para tu consulta. <em>[Texto final: Legal — art. 41 D.1239/2024; subnum. 7.1.f CE 014/2025]</em><br><br>Desplázate hasta el final para habilitar la confirmación.</div>
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.4;margin:14px 0;cursor:pointer;opacity:{{ f302Op }}"><input type="checkbox" disabled="{{ f302CheckDisabled }}" checked="{{ f302check }}" onChange="{{ toggleF302 }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none;margin-top:1px"><span>Entiendo qué significa invertir por mi cuenta y decido continuar.</span></label>
+    <button disabled="{{ f302BtnDisabled }}" onClick="{{ f302Confirm }}" style="width:100%;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ f302BtnBg }};margin-bottom:9px">Continuar por mi cuenta</button>
+    <button onClick="{{ closeMf302 }}" style="width:100%;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:12px;font-weight:600;font-size:15px;cursor:pointer" style-hover="background:#caf9cb">Prefiero ver la recomendación</button>
+  </div>
+</div>
+
+<div onClick="{{ backdropCapa3 }}" style="position:fixed;inset:0;background:rgba(18,25,28,.55);z-index:500;display:{{ disp.mcapa3 }};align-items:{{ modalAlign }};justify-content:center">
+  <div class="skpop" style="background:#fff;border-radius:{{ modalRadius }};max-width:{{ modalWidth }};width:100%;padding:24px 20px 26px;max-height:88vh;overflow:auto;animation:skslide .3s ease">
+    <div style="width:38px;height:4px;border-radius:100px;background:#e0e0e0;margin:0 auto 14px"></div>
+    <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px;color:#232323;margin:0 0 12px">{{ capa3Name }}</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <sc-for list="{{ capa3Badges }}" as="bd" hint-placeholder-count="4">
+        <span style="display:inline-flex;align-items:center;gap:6px;background:#f6fcf2;border:1px solid #caf9cb;color:#0a7a2f;border-radius:100px;padding:5px 12px;font-size:12.5px;font-weight:600"><sk-icon name="{{ bd.icon }}" size="14"></sk-icon>{{ bd.label }}</span>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ capa3Rows }}" as="r" hint-placeholder-count="6">
+        <div style="display:flex;gap:10px;font-size:13.5px;line-height:1.45"><span style="flex:none;width:150px;color:#888;font-weight:600">{{ r.k }}</span><span style="color:#404040">{{ r.v }}</span></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:10px;background:#fff3e0;border-left:4px solid #ffae08;border-radius:8px;padding:12px 14px;margin-top:14px;font-size:13px;line-height:1.4;color:#7a5300"><sk-icon name="alert-triangle" size="17" style="color:#c97a00;flex:none;margin-top:1px"></sk-icon><span>Rentabilidades históricas: no garantizan resultados futuros. Obligaciones de medio y no de resultado.</span></div>
+    <button onClick="{{ capa3Descargar }}" style="width:100%;margin-top:16px;border:none;border-radius:100px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d;display:inline-flex;gap:8px;align-items:center;justify-content:center" style-hover="background:#03a835"><sk-icon name="download" size="16"></sk-icon>Descargar ficha técnica</button>
+    <button onClick="{{ closeCapa3 }}" style="width: 100%; margin-top: 9px; background: transparent; color: #0a7a2f; border: 1.5px solid #00c73d; border-radius: 100px; padding: 12px; font-weight: 600; font-size: 15px; cursor: pointer; font-family: Montserrat" style-hover="background:#caf9cb">Cerrar</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#22282c;color:#fff;padding:11px 20px;border-radius:100px;font-size:13.5px;font-weight:500;z-index:600;max-width:88%;text-align:center;box-shadow:0 12px 32px -8px rgba(0,0,0,.4);display:{{ disp.toast }};gap:8px;align-items:center"><sk-icon name="check-circle-2" size="16" style="color:#8fe000"></sk-icon>{{ toast }}</div>
+
+<!-- Panel de eventos [Trz] -->
+<div class="sk-scroll" style="display:{{ disp.trz }};position:fixed;right:14px;top:60px;width:340px;max-height:74vh;overflow:auto;background:#0e161a;color:#9fe8b8;font-family:'Open Sans',sans-serif;font-size:11.5px;padding:14px;border-radius:14px;z-index:700;line-height:1.4;box-shadow:0 20px 50px -12px rgba(0,0,0,.55);border:1px solid #1e2c33">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#fff;font-weight:700;font-family:Montserrat,sans-serif">Registro [Trz] · AMV/SFC</span><button onClick="{{ toggleTrz }}" style="background:transparent;border:none;color:#7fae8f;cursor:pointer;display:inline-flex"><sk-icon name="x" size="16"></sk-icon></button></div>
+  <div style="color:#5f7d68;margin-bottom:8px">Cada decisión regulatoria queda disponible de inmediato.</div>
+  <sc-for list="{{ trzLog }}" as="ev" hint-placeholder-count="3">
+    <div style="padding:6px 0;border-top:1px solid #1a262c"><span style="color:#5f7d68">{{ ev.t }}</span> <span style="color:#fff;font-weight:700">{{ ev.ev }}</span> <span style="color:#7fae8f">{{ ev.data }}</span></div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900},&quot;showDemoBar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Prototipo&quot;,&quot;label&quot;:&quot;Mostrar barra de revisión&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;wf00&quot;,&quot;options&quot;:[&quot;wf00&quot;,&quot;wf01&quot;,&quot;wf02&quot;,&quot;wf03&quot;,&quot;wf04&quot;,&quot;wf06&quot;,&quot;wf07&quot;,&quot;wf08&quot;,&quot;wf10&quot;,&quot;wf11&quot;,&quot;wf12&quot;,&quot;pj01&quot;,&quot;f301&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototipo&quot;,&quot;label&quot;:&quot;Pantalla inicial&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.mainRef = React.createRef();
+    this.simMontoRef = React.createRef();
+    this.aporteRef = React.createRef();
+    this.leadcelRef = React.createRef();
+    this.f302Ref = React.createRef();
+    this.perfilImgRef = React.createRef();
+    this.perfilBImgRef = React.createRef();
+    this._lastPerfilImg = null;
+    this._toastT = null;
+
+    this.METAS = {meta:'Tu meta con fecha', liquidez:'Tenerlo a la mano', crecer:'Crecer a futuro'};
+    this.SCREENS = ['wf00','wf01','wf02','wf03','wf03b','wf04','wf05','wf06','wf07','wf07a','wf07trans','wf07b','wf08','wf08b','wf09confirm','wf10','wf10fic','wf11','wf12','f301','f303'];
+    this.ENT = {
+      accai:'Multifund y Fondo Voluntario de Pensiones: administrados por Skandia AFP–ACCAI S.A.',
+      fidu:'Fondos de Inversión Colectiva: administrados por Skandia Fiduciaria S.A.'
+    };
+    this.RISKLABEL = {1:'Prudente',2:'Observador/a',3:'Arriesgado'};
+    this.PALETTE = ['#00c73d','#0a7a2f','#8fe000','#03a835','#4fd873','#79e39a'];
+    this.CAT = {
+      cat12:{n:'Recaudador CAT 12 meses',v:'FVP',ent:'accai',clase:'simple_masivo',riesgo:1,ruta:'meta',pq:'Para tu meta con fecha: llegas en 12 meses.',dato:'Rentabilidad objetivo 9,1% E.A.*',desde:'$50.000',tasa:.091,fase:1,isCat:true,clasif:'Renta Fija',region:'Colombia',valorFondo:'96.800'},
+      cat6:{n:'Recaudador CAT 6 meses',v:'FVP',ent:'accai',clase:'simple_masivo',riesgo:1,ruta:'meta',pq:'Para metas más cercanas: 6 meses.',dato:'Rentabilidad objetivo 8,6% E.A.*',desde:'$50.000',tasa:.086,fase:1,isCat:true,clasif:'Renta Fija',region:'Colombia',valorFondo:'71.300'},
+      ficcat:{n:'FIC CATs',v:'FIC',ent:'fidu',clase:'simple_masivo',riesgo:1,ruta:'meta',pq:'Meta con fecha, administrada por la Fiduciaria.',dato:'Rentabilidad objetivo por plazo*',desde:'$100.000',tasa:.085,fase:1,s2:true,isCat:true,clasif:'Renta Fija',region:'Colombia',valorFondo:'54.900'},
+      vista:{n:'Vista',v:'FVP',ent:'accai',clase:'simple_masivo',riesgo:1,ruta:'liquidez',pq:'Disponible cuando lo necesites.',dato:'Disponibilidad inmediata',desde:'$50.000',tasa:.07,fase:1,clasif:'Renta Fija',region:'Colombia',valorFondo:'182.400'},
+      liqcol:{n:'Strategist Liquidez Colombia',v:'FVP',ent:'accai',clase:'simple_masivo',riesgo:1,ruta:'liquidez',pq:'Tu dinero a la mano, creciendo mientras tanto.',dato:'Disponibilidad inmediata',desde:'$50.000',tasa:.075,fase:1,clasif:'Renta Fija',region:'Colombia',valorFondo:'204.100'},
+      ficefe:{n:'FIC Efectivo',v:'FIC',ent:'fidu',clase:'simple_masivo',riesgo:1,ruta:'liquidez',pq:'Tu fondo para imprevistos, siempre disponible.',dato:'Disponibilidad inmediata',desde:'$100.000',tasa:.072,fase:1,clasif:'Renta Fija',region:'Colombia',valorFondo:'138.600'},
+      ficmon:{n:'FIC Monetario',v:'FIC',ent:'fidu',clase:'simple_masivo',riesgo:1,ruta:'liquidez',pq:'Corto plazo con baja exposición a altibajos.',dato:'Baja exposición',desde:'$100.000',tasa:.074,fase:1,clasif:'Renta Fija',region:'Colombia',valorFondo:'99.700'},
+      pro:{n:'Skandia PRO',v:'FVP',ent:'accai',clase:'simple_masivo',riesgo:2,ruta:'crecer',pq:'Crecer a futuro, con el tiempo a tu favor.',dato:'Mediano y largo plazo',desde:'$50.000',tasa:.10,fase:1,grupo:'esencial',clasif:'Inversiones alternativas',region:'Colombia',valorFondo:'267.500'},
+      invested:{n:'Invested · Mezcla Cauta',v:'FVP',ent:'accai',clase:'simple_masivo',riesgo:1,ruta:'crecer',pq:'Expertos lo gestionan por ti. Tú sigues el avance.',dato:'Gestión delegada',desde:'$200.000',tasa:.088,fase:1,soloCats:true,grupo:'esencial',clasif:'Inversiones alternativas',region:'Colombia',valorFondo:'118.900'},
+      demoF2:{n:'Strategist Acciones Colombia',v:'FVP',ent:'accai',clase:'simple',riesgo:3,ruta:'crecer',pq:'Crecimiento con altibajos fuertes en el camino.',dato:'Renta variable',desde:'$50.000',tasa:.13,fase:1,grupo:'crecer',clasif:'Renta Variable',region:'Colombia',valorFondo:'143.200'},
+      accGlobal:{n:'Strategist Acciones Global',v:'FVP',ent:'accai',clase:'simple',riesgo:3,ruta:'crecer',pq:'Renta variable global diversificada.',dato:'Renta variable',desde:'$50.000',tasa:.135,fase:1,grupo:'crecer',clasif:'Renta Variable',region:'Global',valorFondo:'89.600'},
+      liqUSA:{n:'Strategist Liquidez USA',v:'FVP',ent:'accai',clase:'simple',riesgo:3,ruta:'crecer',pq:'Liquidez en dólares para diversificar.',dato:'Exposición en USD',desde:'$50.000',tasa:.06,fase:1,grupo:'crecer',clasif:'Renta Fija',region:'USA',valorFondo:'76.100'},
+      rentaFijaG:{n:'Strategist Renta Fija Global',v:'FVP',ent:'accai',clase:'simple',riesgo:2,ruta:'crecer',pq:'Renta fija internacional diversificada.',dato:'Renta fija internacional',desde:'$50.000',tasa:.085,fase:1,grupo:'crecer',clasif:'Renta Fija',region:'Global',valorFondo:'64.300'},
+      bonosCoPlus:{n:'Bonos Colombia Plus',v:'FVP',ent:'accai',clase:'simple',riesgo:2,ruta:'crecer',pq:'Bonos locales con búsqueda de valor.',dato:'Renta fija local',desde:'$50.000',tasa:.095,fase:1,grupo:'crecer',clasif:'Renta Fija',region:'Colombia',valorFondo:'58.700'},
+      ficMultiplazo:{n:'FIC Multiplazo',v:'FIC',ent:'fidu',clase:'simple',riesgo:2,ruta:'crecer',pq:'Distintos plazos, gestión moderada.',dato:'Multiplazo',desde:'$100.000',tasa:.09,fase:1,grupo:'crecer',clasif:'Inversiones alternativas',region:'Colombia',valorFondo:'47.200'}
+    };
+    this.QS = [
+      {q:'¿Has invertido antes?',o:['Nunca — este sería mi comienzo','Alguna vez (un CDT, un fondo)','Con frecuencia: conozco cómo funciona'],tip:null},
+      {q:'Si tu inversión baja 10% en un mes, ¿qué harías?',o:['Retiraría mi dinero: no quiero verlo bajar','Esperaría a ver cómo evoluciona','Aprovecharía para invertir un poco más'],tip:'Los altibajos son subidas y bajadas del valor en el camino — no son pérdida definitiva.'},
+      {q:'¿Cuándo crees que necesitarás este dinero?',o:['En menos de 1 año','Entre 1 y 3 años','En más de 3 años'],tip:null},
+      {q:'¿Qué parte de tus ahorros representa este dinero?',o:['Casi todos mis ahorros','Cerca de la mitad','Una parte pequeña'],tip:null}
+    ];
+    this.PERFILES = {
+      1:{n:'Prudente',trad:'te sientes más cómodo cuando tu dinero está estable, aunque crezca menos',m:'18%'},
+      2:{n:'Observador/a',trad:'aceptas algunos altibajos en el camino si tu dinero puede crecer más',m:'50%'},
+      3:{n:'Arriesgado',trad:'buscas el mayor crecimiento posible y entiendes que habrá subidas y bajadas fuertes',m:'85%'}
+    };
+    this.state = this.freshState();
+    if(props && props.startScreen) this.state.screen = props.startScreen;
+  }
+
+  freshState(){
+    return {
+      viewMode:'mobile',
+      screen:'wf00', prev:[], ruta:null, meta:null, cart:[], variante:null, upgraded:false,
+      perfil:null, perfilNivel:0, perfilVariante:null, desviado:false,
+      simProducto:'cat12', simPlazo:24, simResult:null, simTitle:'Simula tu dinero',
+      medio:null, ficPend:[], ficName:'',
+      trz:[], trzOpen:false, modals:{}, toast:'',
+      qIdx:0, qAns:[0,0,0,0], tarjetaSel:0,
+      vstep:1, bioStatus:'', bioError:false, bioRunning:false,
+      v10:'intro', doneBio:false, donePersonal:false, doneLaboral:false, donePep:false, doneFiscal:false, asesoriaComercial:false,
+      docType:'Certificado laboral', docSelected:false,
+      v11:'contrato',
+      pepFlags:{a:false,b:false,c:false}, fiscalFlags:{a:false,b:false,c:false,d:false,e:false},
+      vhabeas:false, leadhabeas:false, ficcheck:false, pjreg:false, f302check:false, f302read:false,
+      debitoOpen:false, pagoError:false,
+      capa3:{name:'',rows:[]}, vresumen:[], resumen:[], resumenText:'', desvMsg:'', desvRegistro:'', cierreTotals:null
+    };
+  }
+
+  componentDidMount(){ this.trz('da_hub_view',{utm:'demo',canal_origen:'new-hub'}); }
+  componentDidUpdate(){
+    if(this._lastScreen!==this.state.screen){ this._lastScreen=this.state.screen; if(this.mainRef.current) this.mainRef.current.scrollTop=0; }
+    const img=this.state.perfilNivel?'assets/perfil-montana-'+this.state.perfilNivel+'.png':'assets/perfil-montana-2.png';
+    if(this._lastPerfilImg!==img){
+      this._lastPerfilImg=img;
+      if(this.perfilImgRef.current) this.perfilImgRef.current.src=img;
+      if(this.perfilBImgRef.current) this.perfilBImgRef.current.src=img;
+    }
+  }
+
+  /* ── Trazabilidad ── */
+  trz = (ev,data)=>{
+    const t=new Date().toISOString().slice(11,19);
+    this.setState(s=>({trz:[{t,ev,data:JSON.stringify(data||{})}, ...s.trz]}));
+    try{ console.log('[Trz]',ev,data||{}); }catch(e){}
+  };
+  toggleTrz = ()=> this.setState(s=>({trzOpen:!s.trzOpen}));
+  setViewMobile = ()=> this.setState({viewMode:'mobile'});
+  setViewDesktop = ()=> this.setState({viewMode:'desktop'});
+
+  /* ── Navegación ── */
+  go = (id)=>{
+    this.setState(s=>{
+      const prev = (s.screen!==id) ? [...s.prev, s.screen] : s.prev;
+      return {screen:id, prev};
+    }, ()=>{ this.trz('view_'+id); this.onEnter(id); });
+  };
+  onEnter = (id)=>{
+    if(id==='wf04') this.trz('da_catalogo_view',{ruta:this.state.ruta});
+    if(id==='wf06') this.enterCart();
+    if(id==='wf11') this.setState({v11:'contrato'});
+    if(id==='f301') this.trz('da_camino_shown',{composicion:this.state.cart.map(c=>c.id)});
+  };
+  goBack = ()=>{
+    this.setState(s=>{
+      const prev=[...s.prev]; const p=prev.pop()||'wf00';
+      return {screen:p, prev};
+    });
+  };
+  jumpTo = (e)=>{ const v=e.target.value; if(v){ this.go(v); } };
+  goEdu = ()=>{ this.trz('da_hub_edu_selected'); this.go('wf01'); };
+  goOnepage = ()=>{ this.go('wf02'); this.trz('da_onepage_view'); };
+  goRutas = ()=> this.go('wf03');
+
+  /* ── Rutas ── */
+  pickRuta = (r,origen)=>{
+    this.setState({ruta:r, meta:this.METAS[r]});
+    this.trz(origen==='wf00'?'da_hub_ruta_selected':'da_ruta_selected',{ruta:r});
+    if(r==='crecer') this.go('wf03b'); else this.go('wf04');
+  };
+  pickMeta = ()=> this.pickRuta('meta','wf00');
+  pickLiquidez = ()=> this.pickRuta('liquidez','wf00');
+  pickCrecer = ()=> this.pickRuta('crecer','wf00');
+  pickModo = (modo)=>{
+    this.trz('da_modo_gestion_selected',{modo});
+    if(modo==='control') this.go('wf04');
+    else { this.addToCart('invested'); this.go('wf06'); }
+  };
+
+  /* ── Educación ── */
+  eduToggle = (modulo)=>(e)=>{ if(e.target.open) this.trz('da_edu_modulo_opened',{modulo}); };
+  eduSim = ()=>{ this.trz('da_edu_to_simulador'); this.openSim('cat12','wf01'); };
+  legalWf01 = (e)=>{ if(e.target.open) this.trz('da_legal_expand',{pantalla:'WF-01'}); };
+
+  /* ── Catálogo / motor de carrito ── */
+  varianteFor = (cart)=> cart.some(c=>this.CAT[c.id].clase!=='simple_masivo') ? 'preguntas':'tarjetas';
+  maxRiesgo = ()=> this.state.cart.reduce((m,c)=>Math.max(m,this.CAT[c.id].riesgo),0);
+  rebalance = (cart)=>{ const n=cart.length; if(!n) return cart; const base=Math.floor(100/n); return cart.map((c,i)=>({...c,pct:i===0?100-base*(n-1):base})); };
+  parseMoney = (str)=> Number(String(str).replace(/\D/g,''))||0;
+
+  addToCart = (id, montoSim)=>{
+    this.setState(s=>{
+      if(s.cart.some(c=>c.id===id)) return {};
+      const prevVar=this.varianteFor(s.cart);
+      const monto=montoSim||this.parseMoney(this.CAT[id].desde);
+      let cart=this.rebalance([...s.cart, {id,pct:0,montoSim:montoSim||null,monto}]);
+      const newVar=this.varianteFor(cart);
+      let upgraded=s.upgraded;
+      if(prevVar==='tarjetas' && newVar==='preguntas'){ upgraded=true; this.trz('da_perfilamiento_upgraded',{de:'tarjetas',a:'preguntas',trigger_producto:id}); }
+      return {cart, upgraded};
+    }, ()=>{ this.showToast(this.CAT[id].n+' agregada a tu selección'); });
+  };
+  addFromCatalog = (id)=>()=>{ this.addToCart(id); this.trz('da_producto_added',{producto:id,origen:'catalogo'}); };
+  removeFromCart = (id)=>()=>{ this.setState(s=>({cart:this.rebalance(s.cart.filter(c=>c.id!==id))}), ()=>this.trz('da_carrito_item_removed',{producto:id})); };
+  roundPcts = (cart,fixedId)=>{
+    const rounded=cart.map(c=>({...c,pct:Math.round(c.pct)}));
+    const diff=100-rounded.reduce((a,c)=>a+c.pct,0);
+    if(diff!==0){ const idx=rounded.findIndex(c=>c.id!==fixedId); const t=idx>=0?idx:0; rounded[t]={...rounded[t],pct:rounded[t].pct+diff}; }
+    return rounded;
+  };
+  adjustPct = (id)=>(e)=>{
+    const val=Math.max(0,Math.min(100,Number(e.target.value)||0));
+    this.setState(s=>{
+      const cart=s.cart;
+      if(cart.length<=1) return {cart:cart.map(c=>({...c,pct:100}))};
+      const others=cart.filter(c=>c.id!==id);
+      const othersSum=others.reduce((a,c)=>a+c.pct,0);
+      const remainder=100-val;
+      let next;
+      if(othersSum<=0){ const share=remainder/others.length; next=cart.map(c=>c.id===id?{...c,pct:val}:{...c,pct:share}); }
+      else { next=cart.map(c=>c.id===id?{...c,pct:val}:{...c,pct:remainder*(c.pct/othersSum)}); }
+      return {cart:this.roundPcts(next,id)};
+    });
+  };
+  setMonto = (id)=>(e)=>{ const val=this.parseMoney(e.target.value); this.setState(s=>({cart:s.cart.map(c=>c.id===id?{...c,monto:val}:c)})); };
+  cartTotals = ()=>{
+    const items=this.state.cart.map((c,i)=>{ const p=this.CAT[c.id]; const monto=c.monto??(c.montoSim||this.parseMoney(p.desde));
+      return {id:c.id,name:p.n,pct:c.pct,monto,tasa:p.tasa,color:this.PALETTE[i%this.PALETTE.length]}; });
+    const total=items.reduce((a,it)=>a+it.monto,0);
+    const rateAvg=total?items.reduce((a,it)=>a+it.monto*it.tasa,0)/total:0;
+    const future=total*(1+rateAvg);
+    return {items, total, rateAvg, future, gain:future-total};
+  };
+
+  capa3 = (id)=>()=>{
+    const p=this.CAT[id]; this.trz('da_ficha_capa3_opened',{producto:id});
+    const badges=(this._BADGES&&this._BADGES[id]||[]).map(([icon,label])=>({icon,label}));
+    const rows=[
+      {k:'Valor del fondo', v:'$ '+p.valorFondo+' millones COP'},
+      {k:'Rentabilidad', v:(p.tasa*100).toFixed(1).replace('.',',')+'% E.A. — objetivo, no garantizada'},
+      {k:'Región de inversión', v:p.region||'—'},
+      {k:'Nivel de riesgo', v:this.RISKLABEL[p.riesgo]},
+      {k:'Monto mínimo', v:p.desde}
+    ];
+    this.setState(s=>({capa3:{id, name:p.n+' — ficha técnica', rows, badges}, modals:{...s.modals, mcapa3:true}}));
+  };
+  capa3Descargar = ()=>{
+    const c=this.state.capa3; this.trz('da_ficha_capa3_descargada',{producto:c.id});
+    const txt='FICHA TÉCNICA — '+c.name+'\nSkandia (prototipo · 17-jul-2026)\n\n'+c.rows.map(r=>r.k+': '+r.v).join('\n')+'\n\nRentabilidades históricas: no garantizan resultados futuros.\nVigilado Superintendencia Financiera de Colombia.';
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'})); a.download='skandia-ficha-tecnica.txt'; a.click();
+  };
+
+  /* ── Simulador ── */
+  openSim = (id,from)=>{ this.setState({simProducto:id, simTitle:'Simula: '+this.CAT[id].n, simResult:null}); this.go('wf05'); setTimeout(()=>this.recompute(),60); };
+  setPlazo = (m)=>()=> this.setState({simPlazo:m}, ()=>this.recompute());
+  fmtInput = (e)=>{ const d=e.target.value.replace(/\D/g,''); e.target.value = d?Number(d).toLocaleString('es-CO'):''; this.recompute(); };
+  simMonto = ()=> this.simMontoRef.current ? (Number(this.simMontoRef.current.value.replace(/\D/g,''))||0) : 0;
+  fmt = (n)=> '$'+Math.round(n).toLocaleString('es-CO');
+  runSim = ()=> this.recompute();
+  recompute = ()=>{
+    const m=this.simMonto(); if(!m){ this.setState({simResult:null}); return; }
+    const p=this.CAT[this.state.simProducto], anios=this.state.simPlazo/12, fin=m*Math.pow(1+p.tasa,anios);
+    this.trz('da_sim_run',{producto:this.state.simProducto,monto:m,plazo:this.state.simPlazo});
+    const W=300,H=130,PL=8,PR=8,PT=12,PB=22,steps=6;
+    const pts=[]; for(let i=0;i<=steps;i++){ const t=(i/steps)*anios; pts.push(m*Math.pow(1+p.tasa,t)); }
+    const yMin=m*0.9, yMax=fin+(fin-m)*0.35+m*0.02;
+    const nx=(i)=>PL+(i/steps)*(W-PL-PR), ny=(v)=>H-PB-((v-yMin)/(yMax-yMin))*(H-PT-PB);
+    const chartSimPts=pts.map((v,i)=>nx(i)+','+ny(v)).join(' ');
+    const chartArea=nx(0)+','+(H-PB)+' '+pts.map((v,i)=>nx(i)+','+ny(v)).join(' ')+' '+nx(steps)+','+(H-PB);
+    const chartColPts=nx(0)+','+ny(m)+' '+nx(steps)+','+ny(m);
+    const grid=[0,.5,1].map(f=>({y:(PT)+(1-f)*(H-PT-PB)}));
+    this.setState({simResult:{
+      resumen:'En '+this.state.simPlazo+' meses, tu aporte de '+this.fmt(m)+' podría llegar a:',
+      valSim:this.fmt(fin), valCol:this.fmt(m), prodLabel:p.n+' (estimado)',
+      rentPct:(p.tasa*100).toFixed(1).replace('.',','), plazoLabel:this.state.simPlazo+' meses',
+      chartSimPts, chartArea, chartColPts, grid,
+      dotStartX:nx(0), dotStartY:ny(m), dotSimX:nx(steps), dotSimY:ny(fin), dotColX:nx(steps), dotColY:ny(m)
+    }});
+  };
+  simToCart = ()=>{ this.trz('da_sim_to_carrito',{producto:this.state.simProducto}); this.addToCart(this.state.simProducto, this.simMonto()); this.go('wf06'); };
+
+  /* ── Carrito ── */
+  enterCart = ()=>{
+    this.setState(s=>({variante:this.varianteFor(s.cart)}), ()=>{
+      this.trz('da_perfilamiento_variant_assigned',{variante:this.state.variante,composicion:this.state.cart.map(c=>c.id),regla_aplicada:this.state.variante==='tarjetas'?'100% simples masivos':'≥1 simple/complejo en la mezcla'});
+      this.trz('da_carrito_view',{composicion:this.state.cart.map(c=>c.id)});
+    });
+  };
+  toPerfilamiento = ()=>{ this.setState(s=>({variante:this.varianteFor(s.cart)})); this.trz('da_perfilamiento_start',{variante:this.varianteFor(this.state.cart)}); this.go('wf07'); };
+  startPerfilamiento = ()=>{
+    if(this.state.variante==='preguntas'){ if(this.state.upgraded){ this.go('wf07trans'); } else { this.setState({qIdx:0,qAns:[0,0,0,0]}); this.go('wf07b'); } }
+    else this.go('wf07a');
+  };
+
+  /* ── Perfilamiento ── */
+  pickTarjeta = (n)=>()=> this.setState({tarjetaSel:n});
+  selectTarjeta = (n)=>()=> this.setState({tarjetaSel:n}, this.completeTarjetas);
+  completeTarjetas = ()=>{ this.setPerfil(this.state.tarjetaSel,'tarjetas'); this.trz('da_perfilamiento_completed',{variante:'tarjetas',resultado:this.PERFILES[this.state.tarjetaSel].n,respuestas:[this.state.tarjetaSel]}); this.go('wf08b'); };
+  qPick = (i)=>()=> this.setState(s=>{ const a=[...s.qAns]; a[s.qIdx]=i; return {qAns:a}; });
+  nextQ = ()=>{
+    this.trz('da_perfilamiento_step',{n:this.state.qIdx+1,respuesta:this.state.qAns[this.state.qIdx]});
+    if(this.state.qIdx<this.QS.length-1){ this.setState(s=>({qIdx:s.qIdx+1})); }
+    else{ const score=this.state.qAns.reduce((s,a)=>s+a,0); const nivel=score<=3?1:score<=6?2:3; this.setPerfil(nivel,'preguntas'); this.trz('da_perfilamiento_completed',{variante:'preguntas',resultado:this.PERFILES[nivel].n}); this.go('wf08b'); }
+  };
+  prevQ = ()=> this.setState(s=>({qIdx:Math.max(0,s.qIdx-1)}));
+  setPerfil = (nivel,variante)=>{ this.setState({perfilNivel:nivel, perfil:this.PERFILES[nivel].n, perfilVariante:variante}); this.trz('da_perfil_asignado',{perfil:this.PERFILES[nivel].n,variante,vigencia:'12 meses (S8 por definir)'}); };
+  revisarPerfil = ()=>{ this.trz('da_perfil_revision_solicitada'); if(this.state.variante==='tarjetas') this.go('wf07a'); else { this.setState({qIdx:0}); this.go('wf07b'); } };
+  perfilContinue = ()=>{
+    if(this.maxRiesgo()>this.state.perfilNivel){
+      this.trz('da_desviacion_shown',{perfil:this.state.perfil,composicion:this.state.cart.map(c=>c.id),nivel_exceso:this.maxRiesgo()-this.state.perfilNivel});
+      this.setState(s=>({desvMsg:'La mezcla que armaste tiene más riesgo del que refleja tu perfil ('+s.perfil+').', modals:{...s.modals,m09:true}}));
+    } else this.go('wf10');
+  };
+  openM09 = ()=> this.setState(s=>({desvMsg:s.desvMsg||'La mezcla que armaste tiene más riesgo del que refleja tu perfil.', modals:{...s.modals,m09:true}}));
+  desvAjustar = ()=>{ this.trz('da_desviacion_decision',{decision:'ajustar'}); this.closeModal('m09'); this.go('wf06'); };
+  desvContinuar = ()=>{
+    this.trz('da_desviacion_decision',{decision:'continuar'}); this.closeModal('m09');
+    this.trz('da_cliente_desviado_registrado',{timestamp:new Date().toISOString(),canal:'web-publica',medio_verificable_id:'demo-0001'});
+    this.setState({desviado:true, desvRegistro:'Registro: continuar con mezcla por encima del perfil '+this.state.perfil+' · 17-jul-2026 · canal web · id demo-0001 — disponible de inmediato para reportería.'});
+    this.go('wf09confirm');
+  };
+
+  /* ── Vinculación ── */
+  toggleVhabeas = (e)=> this.setState({vhabeas:e.target.checked});
+  vStep = (n)=>{
+    this.trz('da_vinculacion_step',{paso:n});
+    if(n===3){
+      const fvps=this.state.cart.filter(c=>this.CAT[c.id].v==='FVP'), fics=this.state.cart.filter(c=>this.CAT[c.id].v==='FIC');
+      const r=[];
+      if(fvps.length) r.push('Una sola solicitud Multifund para: '+fvps.map(c=>this.CAT[c.id].n+' ('+c.pct+'%)').join(' · ')+'.');
+      if(fics.length) r.push('Luego confirmarás la solicitud de cada fondo: '+fics.map(c=>this.CAT[c.id].n).join(' · ')+' (datos precargados).');
+      this.setState({vresumen:r.length?r:['Tu selección']});
+    }
+    this.setState({vstep:n});
+  };
+  runBio = ()=>{
+    this.setState({bioError:false, bioRunning:true, bioStatus:'Verificando tu identidad…'});
+    this.trz('da_vinculacion_biometria_iniciada');
+    setTimeout(()=>{
+      this.setState({bioStatus:'Identidad verificada ✓'});
+      setTimeout(()=>{ this.setState({bioRunning:false, doneBio:true, v10:'overview'}); this.trz('da_vinculacion_biometria_completada'); }, 650);
+    }, 1400);
+  };
+  v10Go = (stage)=>()=> this.setState({v10:stage});
+  completeSection = (key)=>()=>{
+    this.setState({v10:'overview', ['done'+key]:true});
+    this.trz('da_vinculacion_seccion_completada',{seccion:key});
+  };
+  toggleAsesoria = (e)=> this.setState({asesoriaComercial:e.target.checked});
+  togglePep = (k)=>(e)=> this.setState(s=>({pepFlags:{...s.pepFlags,[k]:e.target.checked}}));
+  toggleFiscal = (k)=>(e)=> this.setState(s=>({fiscalFlags:{...s.fiscalFlags,[k]:e.target.checked}}));
+  goDocs = ()=>{ this.trz('da_vinculacion_secciones_completadas'); this.setState({v10:'docs'}); };
+  selectDoc = ()=>{ this.setState({docSelected:true}); this.trz('da_vinculacion_documento_adjuntado',{tipo:this.state.docType}); };
+  finalizarTraslado = ()=>{ this.trz('da_vinculacion_documentacion_completada'); this.vConfirm(); };
+  vConfirm = ()=>{
+    const fvps=this.state.cart.filter(c=>this.CAT[c.id].v==='FVP');
+    if(fvps.length) this.trz('da_vinculacion_completed',{vehiculo:'FVP',contratos:fvps.map(c=>c.id)});
+    this.setState({ficPend:this.state.cart.filter(c=>this.CAT[c.id].v==='FIC').map(c=>c.id)}, this.nextFic);
+  };
+  nextFic = ()=>{
+    if(this.state.ficPend.length){
+      const id=this.state.ficPend[0];
+      this.setState({ficName:this.CAT[id].n, ficcheck:false});
+      this.go('wf10fic');
+    } else this.go('wf11');
+  };
+  toggleFicCheck = (e)=> this.setState({ficcheck:e.target.checked});
+  ficConfirm = ()=>{
+    const id=this.state.ficPend[0];
+    this.trz('da_reglamento_aceptado',{fic:id,timestamp:new Date().toISOString()});
+    this.trz('da_vinculacion_completed',{vehiculo:'FIC',contratos:[id]});
+    this.showToast('Solicitud del fondo confirmada');
+    this.setState(s=>({ficPend:s.ficPend.slice(1)}), this.nextFic);
+  };
+
+  /* ── Aporte ── */
+  goResumenAporte = ()=>{ this.setState({medio:'pse'}); this.trz('da_aporte_resumen_view'); this.setState({v11:'resumen'}); };
+  goNominaAporte = ()=>{ this.setState({medio:'nomina'}); this.trz('da_aporte_resumen_view',{medio:'nomina'}); this.setState({v11:'resumen'}); };
+  pickMedio = (m)=>()=>{ this.setState({medio:m, debitoOpen:m==='debito'}); if(m==='debito') this.trz('da_debito_configurado',{condiciones_informadas:true}); };
+  hidePagoError = ()=> this.setState({pagoError:false});
+  confirmAporteDirecto = ()=>{
+    const m=Math.round(this.cartTotals().total);
+    this.trz('da_aporte_iniciado',{monto:m,medio:this.state.medio,origen:'resumen_directo'});
+    this.trz('da_aporte_confirmado',{monto:m});
+    this.buildResumen(m); this.go('wf12');
+  };
+  confirmAporte = ()=>{
+    const m=this.aporteRef.current?(Number(this.aporteRef.current.value.replace(/\D/g,''))||0):0;
+    this.trz('da_aporte_iniciado',{monto:m,medio:this.state.medio});
+    if(this.state.medio!=='despues') this.trz('da_aporte_confirmado',{monto:m});
+    this.buildResumen(m); this.go('wf12');
+  };
+  buildResumen = (monto)=>{
+    const s=this.state;
+    const medioLabel={pse:'PSE',debito:'débito automático',nomina:'nómina'}[s.medio]||s.medio;
+    const totals=this.cartTotals();
+    const rows=[
+      {k:'Tu meta', v:s.meta||'—'},
+      {k:'Total invertido', v:this.fmt(totals.total)},
+      {k:'Ganancia estimada (1 año)', v:'+'+this.fmt(totals.gain)+' ('+(totals.rateAvg*100).toFixed(1).replace('.',',')+'% E.A. prom.)'},
+      {k:'Qué elegiste', v:s.cart.map(c=>this.CAT[c.id].n+' ('+c.pct+'%)').join(' · ')},
+      {k:'Tu perfil', v:s.perfil+' ('+(s.perfilVariante==='tarjetas'?'simplificado':'completo')+')'},
+      {k:'Cómo decidiste', v:s.desviado?'continuaste con una mezcla por encima de tu perfil — registrada el 17-jul-2026':'por tu cuenta, dentro de tu perfil'},
+      {k:'Primer aporte', v:(s.medio==='despues'?'pendiente — cuando tú quieras':this.fmt(monto)+' vía '+medioLabel)},
+      {k:'Fecha', v:'17 de julio de 2026 · Canal: web pública'}
+    ];
+    this.setState({resumen:rows, resumenText:rows.map(r=>r.k+': '+r.v).join('\n'), cierreTotals:totals});
+    this.trz('da_journey_completed',{contratos:s.cart.map(c=>c.id),perfil:s.perfil,decisiones_regulatorias:s.desviado?['cliente_desviado']:[],canal_origen:'web-publica'});
+  };
+  descargarResumen = ()=>{
+    this.trz('da_resumen_descargado');
+    const txt='RESUMEN DE TUS DECISIONES — Skandia\n(prototipo · 17-jul-2026)\n\n'+this.state.resumenText+'\n\nEste resumen es el respaldo de tus decisiones.\nVigilado Superintendencia Financiera de Colombia.';
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'})); a.download='skandia-resumen-decisiones.txt'; a.click();
+  };
+
+  toggleVhabeas = (e)=> this.setState({vhabeas:e.target.checked});
+
+  /* ── F3 ── */
+  caminoRecomendacion = ()=>{ this.trz('da_camino_selected',{camino:'recomendacion'}); this.go('f303'); };
+  caminoSolo = ()=>{ this.trz('da_camino_selected',{camino:'solo_ejecucion'}); this.setState(s=>({f302read:false,f302check:false,modals:{...s.modals,mf302:true}})); this.trz('da_solo_ejecucion_advertencia_shown'); };
+  f302Scroll = (e)=>{ const el=e.target; if(el.scrollTop+el.clientHeight>=el.scrollHeight-8) this.setState({f302read:true}); };
+  toggleF302 = (e)=> this.setState({f302check:e.target.checked});
+  f302Confirm = ()=>{ this.trz('da_solo_ejecucion_confirmado',{medio_verificable:'demo',canal:'web'}); this.closeModal('mf302'); this.showToast('Registramos tu elección de invertir por tu cuenta el 17-jul-2026.'); };
+  recoDecision = (d)=>()=>{ this.trz('da_recomendacion_decision',{d}); this.showToast(d==='aceptada'?'Estado: aceptada — registro en medio verificable':'Estado: rechazada — mismo lenguaje en cada re-ingreso'); this.go('wf00'); };
+
+  /* ── Transversales ── */
+  openModal = (id)=> this.setState(s=>({modals:{...s.modals,[id]:true}}));
+  closeModal = (id)=> this.setState(s=>({modals:{...s.modals,[id]:false}}));
+  closeM01 = ()=> this.closeModal('m01');
+  closeM02 = ()=> this.closeModal('m02');
+  closeMf302 = ()=> this.closeModal('mf302');
+  closeCapa3 = ()=> this.closeModal('mcapa3');
+  backdropM01 = (e)=>{ if(e.target===e.currentTarget) this.closeModal('m01'); };
+  backdropM02 = (e)=>{ if(e.target===e.currentTarget) this.closeModal('m02'); };
+  backdropCapa3 = (e)=>{ if(e.target===e.currentTarget) this.closeModal('mcapa3'); };
+  toggleLeadHabeas = (e)=> this.setState({leadhabeas:e.target.checked});
+  asesoriaHere = ()=> this.openAsesoria(this.state.screen);
+  asesoriaHub = ()=> this.openAsesoria('WF-00');
+  openAsesoria = (p)=>{ this.trz('da_lead_asesoria_click',{pantalla:p}); this.openModal('m01'); };
+  sendLead = ()=>{ this.trz('da_lead_asesoria',{pantalla_origen:this.state.screen,meta:this.state.meta,composicion_carrito:this.state.cart.map(c=>c.id)}); this.closeModal('m01'); this.showToast('Listo — Carolina te contacta pronto. Tu avance quedó guardado.'); };
+  guardarHere = ()=> this.guardarRetomar(this.state.screen);
+  guardarRetomar = (p)=>{ this.trz('da_guardar_retomar',{pantalla:p}); this.trz('da_abandono',{paso:p}); this.trz('da_rescate_enviado',{canal:'whatsapp-demo',trigger_paso:p}); this.openModal('m02'); };
+  showToast = (m)=>{ this.setState({toast:m}); clearTimeout(this._toastT); this._toastT=setTimeout(()=>this.setState({toast:''}),3400); };
+
+  /* ── Demos ── */
+  resetAll = ()=>{ clearTimeout(this._toastT); this.setState(this.freshState(), ()=>this.trz('view_wf00')); };
+  demoA = ()=>{
+    const st=this.freshState();
+    st.ruta='meta'; st.meta=this.METAS.meta; st.variante='tarjetas';
+    st.cart=[{id:'cat12',pct:60,montoSim:500000},{id:'ficefe',pct:40,montoSim:null}];
+    st.screen='wf06';
+    this.setState(st, ()=>{ this.showToast('Demo A: CAT 12m + FIC Efectivo → tarjetas'); this.enterCart(); });
+  };
+  demoB = ()=>{
+    const st=this.freshState();
+    st.ruta='crecer'; st.meta=this.METAS.crecer;
+    st.cart=this.rebalance([{id:'cat12',pct:0,montoSim:500000},{id:'demoF2',pct:0,montoSim:null}]);
+    st.variante='preguntas'; st.upgraded=true; st.screen='wf06';
+    this.setState(st, ()=>{ this.trz('da_perfilamiento_upgraded',{de:'tarjetas',a:'preguntas',trigger_producto:'demoF2'}); this.showToast('Demo B: Strategist Acciones Colombia → preguntas + desviación'); this.enterCart(); });
+  };
+
+  renderVals(){
+    const s=this.state;
+    const h={}; this.SCREENS.forEach(id=>h[id]=s.screen!==id);
+    const mh={}; ['m01','m02','m09','mf302','mcapa3'].forEach(id=>mh[id]=!s.modals[id]);
+    const disp={}; ['m01','m02','m09','mf302','mcapa3'].forEach(id=>disp[id]=s.modals[id]?'flex':'none');
+    disp.toast=s.toast?'flex':'none'; disp.trz=s.trzOpen?'block':'none';
+
+    // footer entidades (S7)
+    let ents;
+    if(s.screen.startsWith('pj')) ents=['fidu'];
+    else if(s.cart.length) ents=[...new Set(s.cart.map(c=>this.CAT[c.id].ent))];
+    else ents=['accai','fidu'];
+    const footerEntidades = ents.map(e=>this.ENT[e]);
+
+    // educación
+    const eduModulos=[
+      {title:'¿Qué es invertir (de verdad)?', mod:'que-es-invertir', rows:[
+        {tag:'Concepto',text:'Invertir es poner tu dinero a trabajar para que crezca con el tiempo, en lugar de dejarlo quieto.'},
+        {tag:'Ejemplo',text:'Como cuando prestas tu bici y te la devuelven con mantenimiento hecho: tu dinero vuelve con algo más.'},
+        {tag:'Beneficio',text:'Tu plata deja de perder valor frente al costo de la vida.'},
+        {tag:'Qué sigue',text:'Elegir para qué es ese dinero — esa es la primera decisión, no el producto.'}]},
+      {title:'¿Y si necesito mi dinero de vuelta?', mod:'dinero-de-vuelta', rows:[
+        {tag:'Concepto',text:'Hay opciones donde tu dinero está disponible casi de inmediato y otras donde acompaña una meta con fecha.'},
+        {tag:'Ejemplo',text:'Es la diferencia entre el bolsillo del pantalón y la alcancía con propósito.'},
+        {tag:'Beneficio',text:'Tú eliges qué tan a la mano lo necesitas. Nada queda “atrapado” sin que lo sepas antes.'},
+        {tag:'Qué sigue',text:'Al elegir tu ruta te contamos exactamente cuándo puedes disponer de tu dinero.'}]},
+      {title:'¿Qué tanto puede subir y bajar?', mod:'subir-bajar', rows:[
+        {tag:'Concepto',text:'Algunas inversiones tienen altibajos: unos meses suben más, otros bajan.'},
+        {tag:'Ejemplo',text:'Como el clima del año: hay temporadas — lo que importa es el destino, no un aguacero.'},
+        {tag:'Beneficio',text:'Conocer qué tan tranquilo te sientes con los altibajos nos permite mostrarte opciones que se ajustan a ti.'},
+        {tag:'Qué sigue',text:'Antes de invertir te haremos unas preguntas cortas para conocerte. Eso te protege.'}]},
+      {title:'¿Cuánto necesito para empezar?', mod:'cuanto-necesito', rows:[
+        {tag:'Concepto',text:'Menos de lo que crees: hay opciones desde $50.000.'},
+        {tag:'Ejemplo',text:'Lo de un plan de fin de semana puede ser tu primer aporte.'},
+        {tag:'Beneficio',text:'Empezar pequeño te deja aprender con calma. Puedes aumentar cuando quieras.'},
+        {tag:'Qué sigue',text:'Simula qué lograría tu dinero — sin registrarte.'}]}
+    ].map(m=>({...m, onToggle:this.eduToggle(m.mod)}));
+
+    // one page
+    const secMap={'Tengo una meta con fecha':['cat12','cat6','ficcat'],'Quiero tenerlo a la mano':['vista','liqcol','ficefe','ficmon'],'Quiero que crezca a futuro':['pro','invested']};
+    const onepageSecs=Object.entries(secMap).map(([title,ids])=>({title, items:ids.map(id=>({name:this.CAT[id].n,pq:this.CAT[id].pq,desde:this.CAT[id].desde,onMas:this.capa3(id)}))}));
+
+    // ── catálogo ──
+    const catTitle={meta:'Opciones para tu meta con fecha',liquidez:'Opciones para tenerlo a la mano',crecer:'Opciones para crecer a futuro'}[s.ruta]||'Opciones';
+    const RISKPAL={1:{bg:'#f6fcf2',fg:'#0a7a2f',accent:'#00c73d'},2:{bg:'#fff6e6',fg:'#8a5a00',accent:'#ffae08'},3:{bg:'#fdeeeb',fg:'#b0331f',accent:'#e0533f'}};
+    const PARAQUIEN={1:'Para quien no quiere sorpresas con lo que ya ahorró.',2:'Para quien puede esperar y tolera algún vaivén.',3:'Para quien busca crecer y no le espanta un vaivén fuerte.'};
+    const PRODICON={cat12:'calendar-check',cat6:'calendar-check',ficcat:'calendar-check',vista:'wallet',liqcol:'wallet',ficefe:'wallet',ficmon:'piggy-bank',pro:'trending-up',invested:'users',demoF2:'line-chart',accGlobal:'globe',liqUSA:'dollar-sign',rentaFijaG:'landmark',bonosCoPlus:'landmark',ficMultiplazo:'layers'};
+    if(!this._BADGES) this._BADGES={
+      cat12:[['calendar-clock','Corto plazo'],['shield-check','Protección del capital'],['droplet','Liquidez media'],['landmark','TES']],
+      cat6:[['calendar-clock','Corto plazo'],['shield-check','Protección del capital'],['droplet','Alta liquidez'],['landmark','TES']],
+      ficcat:[['calendar-clock','Corto plazo'],['shield-check','Protección del capital'],['banknote','Deuda privada'],['landmark','TES']],
+      vista:[['droplet','Alta liquidez'],['shield-check','Protección del capital'],['circle-dollar-sign','En pesos colombianos'],['landmark','TES']],
+      liqcol:[['droplet','Alta liquidez'],['circle-dollar-sign','En pesos colombianos'],['landmark','TES'],['building-2','Bonos corporativos'],['file-text','Deuda privada']],
+      ficefe:[['droplet','Alta liquidez'],['shield-check','Protección del capital'],['landmark','TES'],['banknote','Deuda privada']],
+      ficmon:[['droplet','Liquidez media'],['scale','Balance'],['landmark','TES'],['building-2','Bonos corporativos']],
+      pro:[['scale','Balance'],['trending-up','Crecimiento moderado'],['globe','Diversificación'],['landmark','TES'],['globe-2','Bonos globales']],
+      invested:[['users','Gestión delegada'],['scale','Balance'],['globe','Diversificación'],['bar-chart-3','ETF']],
+      demoF2:[['trending-up','Crecimiento agresivo'],['globe','Diversificación'],['bar-chart-3','Acciones globales'],['zap','Alta volatilidad']],
+      accGlobal:[['globe','Diversificación'],['bar-chart-3','Acciones globales'],['trending-up','Crecimiento agresivo'],['zap','Alta volatilidad']],
+      liqUSA:[['droplet','Alta liquidez'],['circle-dollar-sign','En dólares'],['globe','Diversificación']],
+      rentaFijaG:[['globe','Diversificación'],['landmark','Renta fija internacional'],['scale','Balance']],
+      bonosCoPlus:[['landmark','TES'],['building-2','Bonos corporativos'],['scale','Balance']],
+      ficMultiplazo:[['calendar-clock','Multiplazo'],['scale','Balance'],['landmark','TES']]
+    };
+    const mkCard=([id,p])=>{ const pal=RISKPAL[p.riesgo]; return { id,name:p.n,pq:p.pq,paraQuien:PARAQUIEN[p.riesgo],dato:'Rentabilidad objetivo '+(p.tasa*100).toFixed(1).replace('.',',')+'% E.A.*',desde:p.desde,hasObj:true,
+        icon:PRODICON[id]||'circle',
+        riesgoLabel:this.RISKLABEL[p.riesgo], riskBg:pal.bg, riskFg:pal.fg, riskAccent:pal.accent,
+        vehTag:(p.v==='FVP'?('Mfund · FVP'+(p.isCat?' · CAT':'')):'Fiduciaria · FIC'), simLabel:'Simula con tu monto',
+        addLabel:s.cart.some(c=>c.id===id)?'Agregada':'Agregar', added:s.cart.some(c=>c.id===id),
+        onSim:()=>{ this.trz('da_sim_cta_click',{producto:id,origen:'card_catalogo'}); this.openSim(id,'wf04'); }, onAdd:this.addFromCatalog(id), onMas:this.capa3(id) }; };
+    const catEntries=Object.entries(this.CAT).filter(([id,p])=>p.ruta===s.ruta&&!p.soloCats).sort((a,b)=>a[1].n.localeCompare(b[1].n));
+    const catGrouped=(s.ruta==='crecer');
+    const catItems=catGrouped?[]:catEntries.map(mkCard);
+    const catGroups=catGrouped?[
+      {title:'Portafolios esenciales', desc:'Los pilares. Bases sólidas para casi cualquier estrategia.', items:catEntries.filter(([,p])=>p.grupo==='esencial').map(mkCard)},
+      {title:'Portafolios para crecer', desc:'Más exposición, más horizonte, más potencial de largo plazo.', items:catEntries.filter(([,p])=>p.grupo==='crecer').map(mkCard)}
+    ]:[];
+
+    // ── carrito ──
+    const cartTotalsData=this.cartTotals();
+    const cartItems=s.cart.map((c,ci)=>{ const p=this.CAT[c.id]; const it=cartTotalsData.items[ci]; return {
+      id:c.id,name:p.n,tag:(p.v==='FVP'?'Fondo Voluntario':'Fondo de Inversión Colectiva'),
+      meta:(s.meta||p.pq),pct:c.pct,pctLabel:c.pct+'%',montoDisplay:this.fmt(it.monto),color:it.color,
+      onRemove:this.removeFromCart(c.id), onPct:this.adjustPct(c.id), onMonto:this.setMonto(c.id) };});
+    const distBar=cartTotalsData.items.map(it=>({widthPct:it.pct+'%',color:it.color}));
+    const cartAlerts=[]; let block=false;
+    const hasInv=s.cart.some(c=>c.id==='invested');
+    const nonCat=s.cart.some(c=>!['invested','cat12','cat6','ficcat'].includes(c.id));
+    if(hasInv&&nonCat){ cartAlerts.push({sev:'info',text:'La opción de expertos (Invested Mezcla Cauta) se combina únicamente con las de meta con fecha. Quita una de las dos para continuar.'}); block=true; }
+    if(s.cart.some(c=>this.CAT[c.id].v==='FIC')) cartAlerts.push({sev:'info',text:'Cada fondo de inversión colectiva requiere su propia solicitud. Si ya tienes una vinculación, precargamos tus datos.'});
+    const AS={warn:['#fff3e0','#ffae08','alert-triangle','#7a5300'],info:['#ebf4ff','#0099de','info','#0b5f8a'],success:['#ecfdf3','#16d727','check-circle-2','#087a34']};
+    cartAlerts.forEach(a=>{const x=AS[a.sev];a.bg=x[0];a.bar=x[1];a.ic=x[2];a.fg=x[3];});
+    const cartEmpty=s.cart.length===0;
+
+    // ── perfilamiento ──
+    const durText=s.variante==='tarjetas'?'Te toma menos de un minuto: eliges la frase que más se parece a ti.':'Te toma unos minutos: unas preguntas cortas que hacen tu perfil más preciso.';
+    const cq=this.QS[s.qIdx];
+    const q={ count:'Pregunta '+(s.qIdx+1)+' de '+this.QS.length+' · tu avance queda guardado',
+      progress:(((s.qIdx+1)/this.QS.length*100))+'%', question:cq.q, tip:cq.tip, hasTip:!!cq.tip,
+      options:cq.o.map((o,i)=>({text:o,on:s.qAns[s.qIdx]===i,pick:this.qPick(i),sty:(s.qAns[s.qIdx]===i)?'border:2px solid #00c73d;background:#f6fcf2':'border:1px solid #e3e7ea;background:#fff'})),
+      nextLabel:s.qIdx===this.QS.length-1?'Ver mi perfil':'Siguiente', backDisp:s.qIdx>0?'block':'none' };
+    const radioSel=(on)=>on?'border:2px solid #00c73d;background:#f6fcf2':'border:1px solid #e3e7ea;background:#fff';
+    const TARCARD={
+      1:{subt:'Seguridad ante todo',desc:'Inviertes con cautela, priorizando estabilidad y liquidez. Aceptas bajos riesgos y buscas ingresos constantes.',pts:'0,22 20,14 40,26 60,14 80,22 100,16'},
+      2:{subt:'Equilibrio entre seguridad y crecimiento',desc:'Buscas equilibrio entre seguridad y rentabilidad. Tienes tolerancia moderada al riesgo y piensas a mediano/largo plazo.',pts:'0,26 15,8 30,30 45,4 60,28 75,8 90,24 100,14'},
+      3:{subt:'Máxima ganancia, máximo riesgo',desc:'Priorizas la rentabilidad sobre la estabilidad. Aceptas riesgos altos para maximizar ganancias a largo plazo.',pts:'0,30 10,4 20,34 32,2 44,32 56,2 68,32 80,4 90,28 100,10'}
+    };
+    const tarjetas=[1,2,3].map(n=>({n,on:s.tarjetaSel===n,pick:this.pickTarjeta(n),select:this.selectTarjeta(n),
+      name:this.PERFILES[n].n,subt:TARCARD[n].subt,desc:TARCARD[n].desc,pts:TARCARD[n].pts,sty:radioSel(s.tarjetaSel===n)}));
+    let perfil=null;
+    if(s.perfilNivel){ const P=this.PERFILES[s.perfilNivel]; perfil={name:s.perfil,varLabel:s.perfilVariante==='tarjetas'?'Perfilamiento simplificado':'Perfilamiento completo',trad:'Esto significa que '+P.trad+'. Lo usamos para confirmar que tus elecciones se ajustan a ti.',meter:P.m,img:'assets/perfil-montana-'+s.perfilNivel+'.png'}; }
+    const perfilB=perfil?{...perfil, bullets:[
+      {icon:'shield-check',text:'Válido por 12 meses — puedes actualizarlo cuando quieras.'},
+      {icon:'target',text:'Se usa para confirmar que tu selección se ajusta a ti.'},
+      {icon:'lock',text:'Queda guardado y disponible para tu consulta.'}
+    ]}:null;
+
+    // ── simulador ──
+    const selBtn=(on)=>on?'background:#00c73d;border:1px solid #00c73d;color:#fff':'background:#fff;border:1px solid #dcdfe1;color:#404040';
+    const plazo={sb6:selBtn(s.simPlazo===6),sb12:selBtn(s.simPlazo===12),sb24:selBtn(s.simPlazo===24)};
+
+    // ── vinculación ──
+    const vdot=(n)=>(s.vstep>=n)?'#00c73d':'#dcdfe1';
+    const vcol=(n)=>(s.vstep===n)?'#0a7a2f':(s.vstep>n?'#404040':'#9aa0a3');
+    const vsteps=[{label:'Tus datos',dot:vdot(1),col:vcol(1)},{label:'Verificación',dot:vdot(2),col:vcol(2)},{label:'Confirmación',dot:vdot(3),col:vcol(3)}];
+
+    // ── WF-10 nuevo: proceso de vinculación ──
+    const doneCount=[s.donePersonal,s.doneLaboral,s.donePep,s.doneFiscal].filter(Boolean).length;
+    const v10Pct=(s.doneBio?20:0)+doneCount*20;
+    const v10Banner=v10Pct===0?'¡Iniciemos tu proceso!':(v10Pct>=100?'¡Listo! Revisa y finaliza':v10Pct>=80?'¡Vas por buen camino!':'¡Ya casi terminamos esta parte!');
+    const v10Sub=v10Pct===0?'Completa o actualiza tu información para una mejor experiencia y comunicación personalizada.':(v10Pct>=100?'Todas las secciones están completas.':'Con esta información, te ayudaremos a construir una ruta pensada solo para ti.');
+    const secItem=(key,label,icon,done)=>({key,label,icon,done,
+      countText:done?'Completado':'0 campos completados',
+      statusIcon:done?'check-circle-2':'alert-triangle', statusColor:done?'#0a7a2f':'#c97a00',
+      open:this.v10Go(key)});
+    const v10Sections=[
+      secItem('personal','Datos personales','user',s.donePersonal),
+      secItem('laboral','Información laboral','briefcase',s.doneLaboral),
+      secItem('pep','Persona expuesta públicamente','landmark',s.donePep),
+      secItem('fiscal','Cumplimiento fiscal internacional','scale',s.doneFiscal)
+    ];
+    const allDone=doneCount===4;
+    const v10D=(k)=>(s.v10===k?'block':'none');
+    const docBtnBg=s.docSelected?'#00c73d':'#e9e9e9';
+    const medioSty={pse:radioSel(s.medio==='pse'),debito:radioSel(s.medio==='debito'),nomina:radioSel(s.medio==='nomina'),despues:radioSel(s.medio==='despues')};
+
+    // ── sidebar (desktop) ──
+    const PHASES=['Explorar','Perfilarte','Vincularte','Aportar','Listo'];
+    const phaseOf={wf00:0,wf01:0,wf02:0,wf03:0,wf03b:0,wf04:0,wf05:0,wf06:0,pj01:0,pj02:0,f301:0,f303:0,
+      wf07:1,wf07a:1,wf07trans:1,wf07b:1,wf08:1,wf08b:1,wf09confirm:1,pj03:1,
+      wf10:2,wf10fic:2,pj04:2,
+      wf11:3,
+      wf12:4,pj05:4};
+    const curPhase=phaseOf[s.screen]??0;
+    const sbSteps=PHASES.map((label,i)=>({label,active:i===curPhase,done:i<curPhase,
+      dot:i<curPhase?'#00c73d':(i===curPhase?'#00c73d':'#dcdfe1'),
+      col:i===curPhase?'#0a7a2f':(i<curPhase?'#404040':'#9aa0a3'),
+      weight:i===curPhase?'700':'600'}));
+    const rutaIconMap={meta:'calendar-check',liquidez:'wallet',crecer:'trending-up'};
+    const sbRutaIcon=rutaIconMap[s.ruta]||'compass';
+
+    return {
+      mainRef:this.mainRef, simMontoRef:this.simMontoRef, aporteRef:this.aporteRef, leadcelRef:this.leadcelRef, f302Ref:this.f302Ref,
+      perfilImgRef:this.perfilImgRef, perfilBImgRef:this.perfilBImgRef,
+      h, mh, disp,
+      demoBarDisp: (this.props.showDemoBar===false)?'none':'flex',
+      isDesktop: s.viewMode==='desktop',
+      hubDesktopDisp: (s.viewMode==='desktop'&&s.screen==='wf00')?'block':'none',
+      hubMobileDisp: (s.viewMode==='desktop'&&s.screen==='wf00')?'none':'block',
+      cardWidth: (s.viewMode==='desktop'&&s.screen==='wf00')?'900px':(s.viewMode==='desktop'?'720px':'412px'),
+      cardRadius: s.viewMode==='desktop'?'20px':'30px',
+      modalWidth: s.viewMode==='desktop'?'480px':'412px',
+      modalAlign: s.viewMode==='desktop'?'center':'flex-end',
+      modalRadius: s.viewMode==='desktop'?'20px':'22px 22px 0 0',
+      escenarioDir: s.viewMode==='desktop'?'row':'column',
+      escenarioAlign: s.viewMode==='desktop'?'flex-start':'center',
+      sidebarDisp: (s.viewMode==='desktop'&&s.screen!=='wf00')?'flex':'none',
+      appbarDisp: (s.viewMode==='desktop'&&s.screen==='wf00')?'none':'flex',
+      catGridSty: s.viewMode==='desktop'?'display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:start':'display:flex;flex-direction:column;gap:0',
+      viewToggleSty: {
+        mobile: s.viewMode==='mobile'?'background:#245a63;color:#fff':'background:transparent;color:#9fc3c8',
+        desktop: s.viewMode==='desktop'?'background:#245a63;color:#fff':'background:transparent;color:#9fc3c8'
+      },
+      setViewMobile:this.setViewMobile, setViewDesktop:this.setViewDesktop,
+      sbSteps:sbSteps, sbRutaIcon:sbRutaIcon, sbRutaLabel:(s.meta||'Aún explorando tus opciones'), sbEntidades:footerEntidades,
+      backDisp: s.prev.length? 'inline-flex':'none',
+      chipDisp: s.meta? 'inline-flex':'none',
+      metaText: s.meta?('Para: '+s.meta):'', metaOr: s.meta||'tu meta',
+      footerEntidades,
+      eduModulos, onepageSecs,
+      jumpVal:'',
+      trzHidden:!s.trzOpen, trzLog:s.trz,
+      toastHidden:!s.toast, toast:s.toast,
+      capa3Name:s.capa3.name, capa3Rows:s.capa3.rows, capa3Badges:s.capa3.badges||[],
+      desvMsg:s.desvMsg,
+      leadhabeas:s.leadhabeas, leadDisabled:!s.leadhabeas, leadBtnBg:s.leadhabeas?'#00c73d':'#e9e9e9',
+      f302check:s.f302check, f302CheckDisabled:!s.f302read, f302Op:s.f302read?1:.5,
+      f302BtnDisabled:!s.f302check, f302BtnBg:s.f302check?'#00c73d':'#e9e9e9',
+      // handlers
+      demoA:this.demoA, demoB:this.demoB, jumpTo:this.jumpTo, openM09:this.openM09, toggleTrz:this.toggleTrz,
+      goBack:this.goBack, pickMeta:this.pickMeta, pickLiquidez:this.pickLiquidez, pickCrecer:this.pickCrecer,
+      goEdu:this.goEdu, goOnepage:this.goOnepage, goRutas:this.goRutas,
+      asesoriaHub:this.asesoriaHub, asesoriaHere:this.asesoriaHere, guardarHere:this.guardarHere,
+      eduSim:this.eduSim, legalWf01:this.legalWf01,
+      closeM01:this.closeM01, closeM02:this.closeM02, closeMf302:this.closeMf302, closeCapa3:this.closeCapa3,
+      backdropM01:this.backdropM01, backdropM02:this.backdropM02, backdropCapa3:this.backdropCapa3,
+      toggleLeadHabeas:this.toggleLeadHabeas, sendLead:this.sendLead,
+      desvAjustar:this.desvAjustar, desvContinuar:this.desvContinuar,
+      f302Scroll:this.f302Scroll, toggleF302:this.toggleF302, f302Confirm:this.f302Confirm,
+
+      // catálogo
+      catTitle, catItems, catGrouped, catFlat:!catGrouped, catGroups, catCartLabel:'Ver tu selección ('+s.cart.length+')',
+      floatingCartDisp:(s.screen==='wf04'&&s.cart.length>0)?'flex':'none', floatingCartCount:s.cart.length+(s.cart.length===1?' seleccionado':' seleccionados'), floatingCartTotal:this.fmt(cartTotalsData.total),
+      // carrito
+      cartItems, cartAlerts, cartEmpty, cartMeta:(s.meta?('Para: '+s.meta+' — la meta viaja contigo hasta el final.'):''),
+      cartNextDisabled:(cartEmpty||block), cartNextBg:(cartEmpty||block)?'#e9e9e9':'#00c73d', cartNotEmpty:!cartEmpty,
+      distBar, cartTotalFmt:this.fmt(cartTotalsData.total), cartGainFmt:this.fmt(cartTotalsData.gain), cartRatePct:(cartTotalsData.rateAvg*100).toFixed(1).replace('.',','),
+      goWf04:()=>this.go('wf04'), goWf06:()=>this.go('wf06'),
+      // perfilamiento
+      durText, q, tarjetas, tarNextDisabled:(s.tarjetaSel===0), tarNextBg:(s.tarjetaSel===0)?'#e9e9e9':'#00c73d',
+      perfil:perfil||{name:this.PERFILES[2].n,varLabel:'Perfilamiento completo',trad:'Esto significa que '+this.PERFILES[2].trad+'.',meter:this.PERFILES[2].m,img:'assets/perfil-montana-2.png'},
+      perfilB:perfilB||{name:this.PERFILES[2].n,trad:'Esto significa que '+this.PERFILES[2].trad+'.',img:'assets/perfil-montana-2.png',bullets:[{icon:'shield-check',text:'Válido por 12 meses — puedes actualizarlo cuando quieras.'},{icon:'target',text:'Se usa para confirmar que tu selección se ajusta a ti.'},{icon:'lock',text:'Queda guardado y disponible para tu consulta.'}]},
+      perfilHasImg:!!(perfil&&perfil.img), desvRegistro:s.desvRegistro,
+      // simulador
+      simTitle:s.simTitle, plazo, simResult:s.simResult||{resumen:'',valCol:'',valSim:'',prodLabel:'',rentPct:'0,0',plazoLabel:'',chartSimPts:'',chartArea:'',chartColPts:'',grid:[],dotStartX:0,dotStartY:0,dotSimX:0,dotSimY:0,dotColX:0,dotColY:0}, simShow:s.simResult?'block':'none', simHasResult:!!s.simResult,
+      simRatePct:((this.CAT[s.simProducto]?.tasa||0)*100).toFixed(1).replace('.',','),
+      simGridDisplay:'grid', simGridCols:(s.viewMode==='desktop'?'1fr 1fr':'1fr'),
+      // vinculación
+      vsteps, vstepDisp1:(s.vstep===1?'block':'none'), vstepDisp2:(s.vstep===2?'block':'none'), vstepDisp3:(s.vstep===3?'block':'none'),
+      vnext1Disabled:!s.vhabeas, vnext1Bg:s.vhabeas?'#00c73d':'#e9e9e9', vhabeas:s.vhabeas,
+      bioStatus:s.bioStatus, bioBtnDisabled:s.bioRunning, bioErrDisp:s.bioError?'flex':'none',
+      vresumen:s.vresumen,
+      v10Disp:{intro:v10D('intro'),overview:v10D('overview'),personal:v10D('personal'),laboral:v10D('laboral'),pep:v10D('pep'),fiscal:v10D('fiscal'),docs:v10D('docs')},
+      docType:s.docType, docSelected:s.docSelected, docBtnBg, docContinueDisabled:!s.docSelected,
+      docCountText:s.docSelected?'1/1 campos completados':'0/1 campos completados',
+      goDocs:this.goDocs, selectDoc:this.selectDoc,
+      v10Pct:v10Pct+'%', v10Banner, v10Sub, v10Sections, allDone, allDoneColor:allDone?'#00c73d':'#dcdfe1', v10SecDoneCount:doneCount,
+      v10FinalBg:allDone?'#00c73d':'#e9e9e9', v10FinalDisabled:!allDone,
+      asesoriaComercial:s.asesoriaComercial, toggleAsesoria:this.toggleAsesoria,
+      v10Back:s.v10==='intro'?this.goBack:this.v10Go(s.v10==='docs'?'overview':'overview'),
+      v10GoOverview:this.v10Go('overview'),
+      completeSectionPersonal:this.completeSection('Personal'), completeSectionLaboral:this.completeSection('Laboral'), completeSectionPep:this.completeSection('Pep'), completeSectionFiscal:this.completeSection('Fiscal'),
+      finalizarTraslado:this.finalizarTraslado,
+      startProceso:this.runBio, bioBtnLabel:s.bioRunning?'Verificando…':'Iniciar proceso',
+      pepFlags:s.pepFlags, togglePepA:this.togglePep('a'), togglePepB:this.togglePep('b'), togglePepC:this.togglePep('c'),
+      fiscalFlags:s.fiscalFlags, toggleFiscalA:this.toggleFiscal('a'), toggleFiscalB:this.toggleFiscal('b'), toggleFiscalC:this.toggleFiscal('c'), toggleFiscalD:this.toggleFiscal('d'), toggleFiscalE:this.toggleFiscal('e'),
+      ficName:s.ficName, ficcheck:s.ficcheck, ficBtnDisabled:!s.ficcheck, ficBtnBg:s.ficcheck?'#00c73d':'#e9e9e9',
+      // aporte
+      wf11meta:(s.medio,'Este es el paso donde '+(s.meta?('“'+String(s.meta).toLowerCase()+'”'):'tu meta')+' empieza a moverse. Puedes empezar con $50.000.'),
+      v11Disp:{contrato:(s.v11==='contrato'?'block':'none'), resumen:(s.v11==='resumen'?'block':'none'), monto:(s.v11==='monto'?'block':'none')},
+      contratoVeh:(s.cart.length?this.CAT[s.cart[0].id].v:'FVP')==='FVP'?'Multifund':'Fiduciaria',
+      goResumenAporte:this.goResumenAporte, goNominaAporte:this.goNominaAporte,
+      resumenCartItems:cartItems.map(it=>({id:it.id,name:it.name,tag:it.tag,meta:it.meta,pctLabel:it.pctLabel,montoDisplay:it.montoDisplay,color:it.color})),
+      resumenTotalFmt:this.fmt(cartTotalsData.total), resumenGainFmt:this.fmt(cartTotalsData.gain), resumenRatePct:(cartTotalsData.rateAvg*100).toFixed(1).replace('.',','),
+      goMontoAporte:this.confirmAporteDirecto,
+      medioSty, debitoDisp:s.debitoOpen?'block':'none', pagoDisp:s.pagoError?'flex':'none',
+      wf11NextDisabled:!s.medio, wf11NextBg:s.medio?'#00c73d':'#e9e9e9', wf11NextLabel:s.medio==='despues'?'Dejar mi cuenta lista':'Confirmar aporte',
+      // cierre
+      wf12Title:s.medio==='despues'?'Listo. Tu cuenta quedó lista para tu meta.':'Listo. Tu dinero ya está trabajando en tu meta.',
+      resumen:s.resumen,
+      cierreTotalFmt:s.cierreTotals?this.fmt(s.cierreTotals.total):'$0',
+      cierreGainFmt:s.cierreTotals?this.fmt(s.cierreTotals.gain):'$0',
+      cierreDistBar:(s.cierreTotals?s.cierreTotals.items:[]).map((it,i)=>({widthPct:it.pct+'%',opacity:[1,.6,.4,.8,.5][i%5]})),
+      // capa3
+      capa3Name:s.capa3.name, capa3Rows:s.capa3.rows, capa3Badges:s.capa3.badges||[],
+      // handlers extra
+      goRutas:this.goRutas, modoControl:()=>this.pickModo('control'), modoDelegar:()=>this.pickModo('delegar'),
+      rutaMeta:()=>this.pickRuta('meta','wf03'), rutaLiq:()=>this.pickRuta('liquidez','wf03'), rutaCrecer:()=>this.pickRuta('crecer','wf03'),
+      plazo6:this.setPlazo(6), plazo12:this.setPlazo(12), plazo24:this.setPlazo(24),
+      fmtInput:this.fmtInput, runSim:this.runSim, simToCart:this.simToCart,
+      toPerfilamiento:this.toPerfilamiento, startPerfilamiento:this.startPerfilamiento,
+      completeTarjetas:this.completeTarjetas, nextQ:this.nextQ, prevQ:this.prevQ,
+      perfilContinue:this.perfilContinue, revisarPerfil:this.revisarPerfil,
+      goTransB:()=>this.go('wf07b'), goBackCart:()=>this.go('wf06'),
+      toggleVhabeas:this.toggleVhabeas, vStep2:()=>this.vStep(2), runBio:this.runBio, vConfirm:this.vConfirm,
+      toggleFicCheck:this.toggleFicCheck, ficConfirm:this.ficConfirm,
+      medioPse:this.pickMedio('pse'), medioDebito:this.pickMedio('debito'), medioNomina:this.pickMedio('nomina'), medioDespues:this.pickMedio('despues'),
+      backToResumen:()=>this.setState({v11:'resumen'}),
+      hidePagoError:this.hidePagoError, confirmAporte:this.confirmAporte, descargarResumen:this.descargarResumen,
+      resetAll:this.resetAll,
+      goWf10:()=>this.go('wf10'),
+      goWf00:()=>this.go('wf00'),
+      caminoRecomendacion:this.caminoRecomendacion, caminoSolo:this.caminoSolo,
+      recoAceptar:this.recoDecision('aceptada'), recoRechazar:this.recoDecision('rechazada'),
+      capa3Toast:()=>this.showToast('Ficha y reglamento del fondo — sk-dialog'), capa3Descargar:this.capa3Descargar
+    };
+  }
+}
+</script>
+</body>
+</html>
