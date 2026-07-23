@@ -1232,8 +1232,8 @@ class Component extends DCLogic {
     email: 'and****@correo.com', emailErr: false,
     ddOpen: null, ddCivil: 'Casado/a', ddLugar: 'Bogotá D.C.', ddTrabajador: 'Empleado', ddEps: 'Sura EPS', ddPais: 'Colombia', ddDepartamento: 'Cundinamarca', ddCiudadAfiliado: 'Bogotá D.C.', ddLugarQuery: '', ddCiudadAfiliQuery: '', epsOtro: '', epsOtroErr: false, epsOpen: false,
     ddRecibeTipo: 'Vejez', ddTramitaTipo: 'Vejez', ddRecibeInvalidezOrigen: '', ddTramitaInvalidezOrigen: '',
-    datosHijos: '2', datosDir: 'Calle 123 # 45-67', datosCelular: '300 *** **45', datosTelefono: '6012345678', datosTelefonoEmp: '',
-    datosHijosErr: false, datosDirErr: false, datosCelularErr: false, emailErrMsg: '',
+    datosHijos: '2', datosDir: 'Calle 123 # 45-67', datosCelular: '300 *** **45', datosTelefono: '6012345678', datosTelefonoEmp: '', datosEdad: '62', datosGenero: 'Masculino',
+    datosHijosErr: false, datosDirErr: false, ddLugarErr: false, datosCelularErr: false, emailErrMsg: '',
     benNombre: '', benNumDoc: '', benFechaNac: '', benEdad: '', benDir: '', benTelFijo: '', benCelular: '',
     benTipoDoc: '', benLugarNac: '', benParentesco: '', benGenero: '', benInvalidez: '', benLugarRes: '',
     benEmail: '', benEmailErr: false, benEmailErrMsg: '',
@@ -1522,10 +1522,12 @@ class Component extends DCLogic {
     const df = [
       ['Fecha de nacimiento', 'DD/MM/AAAA', true, false, false, '15/03/1959', false],
       ['Lugar de nacimiento', 'Ciudad, Departamento', true, false, false, 'Bogotá, Cundinamarca', false],
+      ['Edad', 'Ej. 62', true, false, false, '62', false],
+      ['Género', 'Selecciona', true, true, false, 'Masculino', false],
       ['¿Cuál es tu estado civil?', 'Selecciona', false, true, false, 'Casado/a', true],
       ['Número de hijos', 'Ej. 3', false, false, false, '2', true],
       ['Dirección de residencia', 'Ej. Calle 00 # 00-00', false, false, false, 'Calle 123 # 45-67', true],
-      ['Lugar de residencia', 'Ciudad, Departamento', false, true, false, 'Bogotá D.C.', true],
+      ['Lugar de residencia', 'Ej. Bogotá D.C.', false, false, false, 'Bogotá D.C.', true],
       ['Número celular', 'Ej. 300 333 4445', false, false, false, '300 *** **45', true],
       ['Teléfono fijo', 'Ej. 601 000 0000', false, false, false, '6012345678', false],
       ['País', 'Selecciona', false, true, false, 'Colombia', true],
@@ -1568,6 +1570,7 @@ class Component extends DCLogic {
       '¿Cuál es tu estado civil?': ['Soltero/a', 'Casado/a', 'Separado/a', 'Viudo/a', 'Unión Libre', 'Divorciado/a'],
       'Lugar de residencia': ciudadesCol,
       'Ocupación': ['Empleado', 'Independiente', 'Pensionado', 'Desempleado', 'Empresario/Socio', 'Rentista', 'Servidor Público'],
+      'Género': ['Masculino', 'Femenino', 'Otro'],
       'EPS': ['Sura EPS', 'EPS Sanitas', 'Nueva EPS', 'Salud Total', 'Compensar', 'Famisanar', 'Coosalud', 'Otra'],
       'País': paises,
       'Departamento': paisesMap[s.ddPais]?.departamentos || [],
@@ -1577,12 +1580,13 @@ class Component extends DCLogic {
     const inputStateKeys = {
       'Número de hijos':        { val: 'datosHijos',   err: 'datosHijosErr',   req: true },
       'Dirección de residencia':{ val: 'datosDir',     err: 'datosDirErr',     req: true },
+      'Lugar de residencia':    { val: 'ddLugar',      err: 'ddLugarErr',      req: true },
       'Número celular':         { val: 'datosCelular', err: 'datosCelularErr', req: true },
       'Correo electrónico':     { val: 'email',        err: 'emailErr',        req: true },
       'Teléfono fijo':          { val: 'datosTelefono', err: null,             req: false },
       'Teléfono de empresa':    { val: 'datosTelefonoEmp', err: null,          req: false },
     };
-    const customKeys = { '¿Cuál es tu estado civil?': 'ddCivil', 'Lugar de residencia': 'ddLugar', 'Ocupación': 'ddTrabajador', 'EPS': 'ddEps', 'País': 'ddPais', 'Departamento': 'ddDepartamento', 'Ciudad': 'ddCiudadAfiliado' };
+    const customKeys = { '¿Cuál es tu estado civil?': 'ddCivil', 'Ocupación': 'ddTrabajador', 'EPS': 'ddEps', 'País': 'ddPais', 'Departamento': 'ddDepartamento', 'Ciudad': 'ddCiudadAfiliado' };
     const datosFields = df.map(([label, ph, ro, select, full, val, required]) => {
       const isEmail = label === 'Correo electrónico';
       const numeric = numericLabels.includes(label);
@@ -1868,14 +1872,14 @@ class Component extends DCLogic {
     // Selector único de modalidad (reemplaza los acordeones)
     const modHasSel = typeof s.modalidad === 'number';
     const modSelect = {
-      value: modHasSel ? mods[s.modalidad][0] : 'Selecciona la modalidad de pensión',
+      value: modHasSel ? `${s.modalidad + 1}. ${mods[s.modalidad][0]}` : 'Selecciona la modalidad de pensión',
       color: modHasSel ? '#404040' : '#878787',
       isOpen: s.modSelectOpen,
       border: s.modSelectOpen ? '#00c73d' : 'transparent',
       chevron: s.modSelectOpen ? 'rotate(180deg)' : 'rotate(0deg)',
       onToggle: () => this.set('modSelectOpen', !s.modSelectOpen),
       opts: mods.map(([label, pago], i) => ({
-        label, responsible: 'Responsable del pago mesada: ' + pago,
+        label: `${i + 1}. ${label}`, responsible: 'Responsable del pago mesada: ' + pago,
         sel: s.modalidad === i, bg: s.modalidad === i ? '#f6fcf2' : '#fff',
         rb: s.modalidad === i ? '#00c73d' : '#c5c5c5',
         onClick: () => this.setState({ modalidad: i, modSelectOpen: false, modAccRetiro: false, modAccRenta: false }),
