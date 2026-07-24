@@ -677,9 +677,9 @@
           <div style="font-size:14.5px;color:#404040;line-height:1.55;margin-bottom:16px;">Declaro que Skandia me ha dado la información referente al bono y que:</div>
           <div style="display:flex;flex-direction:column;gap:16px;">
             <sc-for list="{{ noBonoOpts }}" as="o" hint-placeholder-count="2">
-              <div onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:14px;padding:18px 20px;border:1.5px solid {{ o.bd }};border-radius:12px;cursor:pointer;background:{{ o.bg }};box-shadow:0 0 4px 0 rgba(61, 75, 92, 0.15);transition:border-color .15s,background .15s;" style-hover="border-color:#00c73d;background:#f6fcf2;">
+              <div onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:14px;padding:18px 20px;border:1.5px solid {{ o.bd }};border-radius:12px;cursor:{{ o.disabled ? 'not-allowed' : 'pointer' }};background:{{ o.bg }};box-shadow:0 0 4px 0 rgba(61, 75, 92, 0.15);transition:border-color .15s,background .15s;opacity:{{ o.disabled ? '0.6' : '1' }};" style-hover="{{ o.disabled ? '' : 'border-color:#00c73d;background:#f6fcf2;' }}">
                 <span style="width:18px;height:18px;border-radius:50%;border:2px solid {{ o.rb }};display:flex;align-items:center;justify-content:center;flex:none;"><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#00c73d;"></span></sc-if></span>
-                <span style="flex:1;font-size:14px;font-weight:500;color:#404040;line-height:1.5;">{{ o.label }}</span>
+                <span style="flex:1;font-size:14px;font-weight:500;color:{{ o.labelColor }};line-height:1.5;">{{ o.label }}</span>
               </div>
             </sc-for>
           </div>
@@ -2270,7 +2270,20 @@ class Component extends DCLogic {
       noBonoOpts: [
         ['derecho', 'Tengo derecho a bono'],
         ['sinderecho', 'No tengo derecho a bono pensional, por cuanto no coticé por lo menos 150 semanas (3 años) al Régimen de Prima Media (Colpensiones) u otra Caja con anterioridad a la fecha de corte de la pagina del Ministerio de Hacienda.'],
-      ].map(([v, label]) => { const sel = s.noBonoOpc === v; return { label, sel, rb: sel ? '#00c73d' : '#c5c5c5', bd: sel ? '#00c73d' : 'transparent', bg: sel ? '#f6fcf2' : '#fff', onClick: () => this.set('noBonoOpc', v) }; }),
+      ].map(([v, label]) => {
+        const sel = s.noBonoOpc === v;
+        const isAnticipada = s.subtipo === 'anticipada_bono' || s.subtipo === 'anticipada_sinbono';
+        const isLocked = isAnticipada && ((s.subtipo === 'anticipada_bono' && v === 'sinderecho') || (s.subtipo === 'anticipada_sinbono' && v === 'derecho'));
+        return {
+          label, sel,
+          disabled: isLocked,
+          rb: isLocked ? '#c5c5c5' : (sel ? '#00c73d' : '#c5c5c5'),
+          bd: isLocked ? '#e9e9e9' : (sel ? '#00c73d' : 'transparent'),
+          bg: isLocked ? '#f7f7f7' : (sel ? '#f6fcf2' : '#fff'),
+          labelColor: isLocked ? '#a5a5a5' : '#404040',
+          onClick: isLocked ? () => {} : (() => this.set('noBonoOpc', v))
+        };
+      }),
       // tyc
       nextLabel: is('tyc') ? 'Solicitar código de seguridad' : 'Continuar',
       ...(() => {
