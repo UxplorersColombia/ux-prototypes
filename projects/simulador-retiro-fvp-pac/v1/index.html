@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta v1 — Simulador Retiro FVP/PAC | Skandia</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --sk-primary:#00c73d;
+    --sk-primary-hover:#03a835;
+    --sk-primary-pressed:#009a2f;
+    --sk-primary-tint:#caf9cb;
+    --sk-surface-0:#ffffff;
+    --sk-surface-800:#404040;
+    --sk-surface-900:#212529;
+    --sk-n1:#f7f7f7;
+    --sk-n2:#e9e9e9;
+    --sk-n3:#dddddd;
+    --sk-n4:#666666;
+    --sk-info-bg:#ebf4ff; --sk-info-border:#0099de;
+    --sk-warning-bg:#fff3e0; --sk-warning-border:#ffae08;
+    --sk-success-bg:#ecfdf3; --sk-success-border:#87f491;
+    --sk-error-bg:#fff5f4; --sk-error-border:#e03430;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Montserrat',Verdana,Arial,sans-serif;background:var(--sk-n1);color:var(--sk-surface-800);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
+
+  .header{display:flex;align-items:center;gap:10px;margin:24px 0 20px;}
+  .brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--sk-primary),var(--sk-primary-tint));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px;flex:none;}
+  .brand-name{font-weight:800;letter-spacing:0.3px;font-size:15px;}
+  .brand-sub{font-size:11px;color:var(--sk-n4);font-weight:600;}
+
+  h1{font-size:23px;font-weight:800;margin:0 0 4px;}
+  .subtitle{font-size:13.5px;color:var(--sk-n4);font-weight:500;max-width:680px;line-height:1.5;margin:0 0 22px;}
+
+  /* Stepper (fallback pattern: ui-stepper promovido, ver simuladores-credito-impulso-wireframes.md sección 1) */
+  .stepper{display:flex;gap:6px;margin-bottom:26px;}
+  .step-item{flex:1;display:flex;flex-direction:column;gap:6px;}
+  .step-bar{height:4px;border-radius:4px;background:var(--sk-n3);}
+  .step-item.done .step-bar, .step-item.active .step-bar{background:var(--sk-primary);}
+  .step-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--sk-n4);display:flex;align-items:center;gap:4px;}
+  .step-item.active .step-label{color:var(--sk-surface-800);}
+  .step-item.done .step-label{color:var(--sk-primary-pressed);}
+  .step-check{display:none;}
+  .step-item.done .step-check{display:inline;}
+
+  /* Cards */
+  .card{background:var(--sk-surface-0);border:1px solid var(--sk-n3);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 2px rgba(0,0,0,0.03);}
+  .card-title{font-size:14px;font-weight:800;margin-bottom:4px;}
+  .card-desc{font-size:12.5px;color:var(--sk-n4);margin-bottom:18px;font-weight:500;}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* sk-radio (fallback visual, mismo API real: name, value, selectedValue) */
+  .radio-card{
+    display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--sk-n3);border-radius:12px;
+    padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s, background .15s;
+  }
+  .radio-card:hover{border-color:var(--sk-primary);}
+  .radio-card.selected{border-color:var(--sk-primary);background:var(--sk-primary-tint);}
+  .radio-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--sk-n4);flex:none;margin-top:2px;position:relative;}
+  .radio-card.selected .radio-dot{border-color:var(--sk-primary);}
+  .radio-card.selected .radio-dot::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--sk-primary);}
+  .radio-title{font-weight:700;font-size:14px;}
+  .radio-sub{font-size:12.5px;color:var(--sk-n4);margin-top:2px;line-height:1.4;}
+  .support-note{font-size:11.5px;color:var(--sk-n4);margin-top:10px;font-style:italic;}
+
+  /* sk-input-number / sk-input-text / sk-select (fallback visual) */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
+  .field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px;}
+  .field .unit-input{position:relative;}
+  .field .unit-input input{padding-right:32px;}
+  .field .unit-input span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sk-n4);font-weight:600;}
+  input[type="text"], input[type="number"], select{
+    width:100%;border:1px solid var(--sk-n3);border-radius:8px;padding:9px 10px;
+    font-family:'Montserrat',sans-serif;font-size:13.5px;color:var(--sk-surface-800);
+    background:var(--sk-n1);transition:border-color .15s, background .15s;
+  }
+  input:focus, select:focus{outline:none;border-color:var(--sk-primary);background:#fff;}
+  .field .help{font-size:11px;color:var(--sk-n4);margin-top:5px;}
+  .split-note{font-size:11px;color:var(--sk-n4);margin-top:8px;font-weight:500;}
+  .split-note.warn{color:#B87500;font-weight:700;}
+
+  /* sk-button (skType primary/secondary/tertiary) */
+  .btn{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;border-radius:100px;padding:11px 22px;cursor:pointer;border:1.5px solid transparent;transition:background .15s,border-color .15s;}
+  .btn-primary{background:var(--sk-primary);color:#fff;}
+  .btn-primary:hover{background:var(--sk-primary-hover);}
+  .btn-primary:active{background:var(--sk-primary-pressed);}
+  .btn-primary:disabled{background:var(--sk-n3);color:var(--sk-n4);cursor:not-allowed;}
+  .btn-secondary{background:#fff;color:var(--sk-primary-pressed);border-color:var(--sk-primary);}
+  .btn-secondary:hover{background:var(--sk-primary-tint);}
+  .btn-tertiary{background:none;color:var(--sk-primary-pressed);padding:8px 10px;}
+  .btn-tertiary:hover{text-decoration:underline;}
+  .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;}
+  .btn-row.split{justify-content:space-between;}
+
+  /* sk-alert (4 tipos reales: warning/error/info/success — sin variante neutra, ver wireframes sección 1) */
+  .sk-alert{border-radius:12px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:500;margin-bottom:16px;}
+  .sk-alert .ico{font-size:16px;line-height:1.3;}
+  .sk-alert-info{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);color:#04527a;}
+  .sk-alert-warning{background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);color:#7a4c00;}
+  .sk-alert-success{background:var(--sk-success-bg);border:1px solid #3fae63;color:#1a5c33;}
+  .sk-alert-title{font-weight:800;margin-bottom:2px;}
+
+  /* Resultado banner (sk-alert info, neutro — nunca success/error, ver wireframes sección 1) */
+  .result-banner{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);border-radius:12px;padding:20px 22px;margin-bottom:6px;}
+  .result-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#04527a;opacity:0.8;margin-bottom:6px;}
+  .result-title{font-size:17px;font-weight:800;color:#04527a;line-height:1.4;}
+  .result-sub{font-size:12.5px;color:#04527a;opacity:0.85;margin-top:6px;font-weight:500;}
+
+  table.line-table{width:100%;border-collapse:collapse;margin-top:14px;}
+  .line-table td{padding:9px 4px;font-size:13px;border-bottom:1px solid var(--sk-n2);}
+  .line-table td.lbl{color:var(--sk-n4);font-weight:500;}
+  .line-table td.val{text-align:right;font-weight:700;color:var(--sk-surface-800);white-space:nowrap;}
+  .line-table tr.subtotal td{background:var(--sk-n1);font-weight:800;border-top:1.5px solid var(--sk-n3);}
+  .line-table tr.final td{background:var(--sk-primary-tint);font-weight:800;font-size:14px;color:var(--sk-primary-pressed);border-top:2px solid var(--sk-primary);}
+  .term-ico{cursor:pointer;color:var(--sk-info-border);font-weight:800;margin-left:4px;text-decoration:none;}
+
+  /* Ayuda inline (fallback <details>/<summary> — no existe sk-tooltip, ver wireframes sección 1) */
+  .help-block{margin-top:18px;}
+  .help-block summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--sk-surface-800);padding:4px 0;}
+  .help-block[open] summary{color:var(--sk-primary-pressed);}
+  .help-body{background:var(--sk-n1);border:1px solid var(--sk-n3);border-radius:10px;padding:14px 16px;margin-top:6px;font-size:12.5px;line-height:1.6;}
+  .help-body .row{margin-bottom:8px;}
+  .help-body .row b{color:var(--sk-surface-800);}
+  .help-condensed{font-size:12.5px;color:var(--sk-n4);margin-top:2px;line-height:1.5;}
+  .help-condensed .ver-ejemplo{color:var(--sk-primary-pressed);font-weight:700;cursor:pointer;}
+
+  .vigencia-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#7a4c00;background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:100px;padding:5px 12px;margin-bottom:16px;}
+
+  .disclaimer-block{margin-top:22px;}
+  .disclaimer-main{font-size:12.5px;color:var(--sk-surface-800);font-weight:600;line-height:1.6;margin-bottom:8px;}
+  .disclaimer-legal{font-size:10.5px;line-height:1.6;color:var(--sk-n4);font-weight:500;background:var(--sk-n1);border-radius:10px;padding:12px 14px;}
+
+  /* Capa cliente */
+  .cliente-shell{margin-top:32px;padding-top:26px;border-top:1px solid var(--sk-n3);}
+  .segment-toggle{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
+  .segment-btn{font-size:11.5px;font-weight:700;padding:8px 14px;border-radius:100px;border:1.5px solid var(--sk-n3);background:#fff;color:var(--sk-n4);cursor:pointer;}
+  .segment-btn.active{border-color:var(--sk-primary);color:var(--sk-primary-pressed);background:var(--sk-primary-tint);}
+
+  .acto-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--sk-primary-pressed);margin-bottom:4px;}
+  .acto-title{font-size:18px;font-weight:800;margin-bottom:10px;}
+  .acto-narrative{font-size:13.5px;line-height:1.6;color:var(--sk-surface-800);margin-bottom:6px;}
+  .acto-narrative.extra{display:none;}
+  .segment-acompanada .acto-narrative.extra{display:block;}
+  .acto-support{font-size:12px;color:var(--sk-n4);margin-top:10px;font-style:italic;}
+
+  @media (max-width:600px){
+    h1{font-size:19px;}
+    .card{padding:16px;}
+    .stepper{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="brand-mark">Sk</div>
+    <div>
+      <div class="brand-name">SKANDIA</div>
+      <div class="brand-sub">Crédito Impulso · Herramienta comercial</div>
+    </div>
+  </div>
+
+  <h1>Simulador de retiro FVP vs. consolidación PAC</h1>
+  <p class="subtitle">Compara cuánto le cuesta a tu cliente retirar del FVP o consolidar vía PAC sin cumplir los requisitos tributarios, frente a tomar un Crédito Impulso. Herramienta de uso del asesor — la capa para el cliente aparece al final del flujo.</p>
+
+  <!-- STEPPER (fallback ui-stepper promovido) -->
+  <div class="stepper" id="stepper"></div>
+
+  <!-- PASO 0: RAMIFICACIÓN -->
+  <div class="panel active" id="panel-0">
+    <div class="card">
+      <div class="card-title">¿De dónde sale la plata que vas a comparar?</div>
+      <div class="card-desc">Elige la situación de tu cliente para ver solo el escenario que le aplica — ya no se muestran los dos siempre juntos.</div>
+
+      <div class="radio-card" data-branch="fvp" onclick="selectBranch('fvp')">
+        <div class="radio-dot"></div>
+        <div>
+          <div class="radio-title">De un Fondo Voluntario de Pensiones (FVP)</div>
+          <div class="radio-sub">Tu cliente tiene ahorro voluntario en Multifund y está evaluando si retirarlo o tomar Crédito Impulso.</div>
+        </div>
+      </div>
+
+      <div class="radio-card" data-branch="pac" onclick="selectBranch('pac')">
+        <div class="radio-dot"></div>
+        <div>
+          <div class="radio-title">De un PAC (Plan de Ahorro Contractual)</div>
+          <div class="radio-sub">Tu cliente tiene un PAC vigente y está evaluando consolidarlo o tomar Crédito Impulso.</div>
+        </div>
+      </div>
+
+      <div class="support-note">Puedes cambiar de opción cuando quieras — no perderás los datos que ya ingresaste en el resto del simulador.</div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-continuar-0" disabled onclick="goToStep(1)">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 1: DATOS DEL CLIENTE -->
+  <div class="panel" id="panel-1">
+    <div class="vigencia-badge">⏱ Tasa Skandia y parámetros tributarios vigentes desde el 1 de enero de 2026</div>
+
+    <div class="card">
+      <div class="card-title">Datos del cliente</div>
+      <div class="card-desc">Información base del cliente y del monto a retirar o consolidar.</div>
+
+      <div class="grid" style="margin-bottom:16px;">
+        <div class="field">
+          <label>Valor a retirar o consolidar</label>
+          <input type="text" inputmode="numeric" class="money" id="valorRetiro" value="250.000.000">
+        </div>
+        <div class="field">
+          <label>Salario mensual</label>
+          <input type="text" inputmode="numeric" class="money" id="salarioMensual" value="25.000.000">
+        </div>
+        <div class="field">
+          <label>Tipo de salario</label>
+          <select id="tipoSalario">
+            <option value="Ordinario" selected>Ordinario</option>
+            <option value="Integral">Integral</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-bottom:6px;">
+        <div class="field">
+          <label>% Capital</label>
+          <div class="unit-input"><input type="number" id="pctCapital" value="70" step="1" min="0" max="100"><span>%</span></div>
+          <div class="help">Cuánto de esa plata ya era tuyo antes vs. cuánto es rendimiento — cambia cómo se calculan los impuestos. <a href="#help-contingente" class="term-ico" onclick="openHelp('help-contingente')">¿Por qué importa?</a></div>
+        </div>
+        <div class="field">
+          <label>% Rendimientos</label>
+          <div class="unit-input"><input type="number" id="pctRendimientos" value="30" step="1" min="0" max="100"><span>%</span></div>
+        </div>
+      </div>
+      <div class="split-note" id="splitNote">Capital: $175.000.000 · Rendimientos: $75.000.000</div>
+
+      <div class="grid" style="margin-top:18px;">
+        <div class="field"><label>Otros intereses (año)</label><input type="text" inputmode="numeric" class="money" id="otrosIntereses" value="10.000.000"></div>
+        <div class="field"><label>Arrendamientos (año)</label><input type="text" inputmode="numeric" class="money" id="arrendamientos" value="4.000.000"></div>
+        <div class="field"><label>Honorarios (año)</label><input type="text" inputmode="numeric" class="money" id="honorarios" value="5.000.000"></div>
+      </div>
+
+      <details class="help-block" id="help-contingente">
+        <summary>Así funciona: Cuenta contingente</summary>
+        <div class="help-body">
+          <div class="row"><b>Qué es:</b> Es la cuenta donde queda bloqueada la parte de tu FVP que respalda el crédito, mientras el crédito esté vigente.</div>
+          <div class="row"><b>Ejemplo:</b> Si tomas $10M de Crédito Impulso, esa cuenta guarda el respaldo — tu FVP sigue siendo tuyo, solo queda comprometido como garantía.</div>
+          <div class="row"><b>Por qué te sirve:</b> Te permite acceder al crédito sin retirar tu inversión ni perder su crecimiento.</div>
+          <div class="row"><b>Qué sigue:</b> Puedes ver cuánto queda bloqueado y cuánto sigue disponible en la sección de garantía.</div>
+        </div>
+      </details>
+
+      <div class="btn-row split">
+        <button class="btn btn-secondary" onclick="goToStep(0)">Atrás</button>
+        <button class="btn btn-primary" onclick="goToStep(2)">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 2: SUPUESTOS -->
+  <div class="panel" id="panel-2">
+    <div class="card">
+      <div class="card-title">Supuestos del crédito y la rentabilidad</div>
+      <div class="card-desc">Se aplican al escenario elegido.</div>
+      <div class="grid">
+        <div class="field"><label>% Rentabilidad cliente (FVP)</label><div class="unit-input"><input type="number" id="rentCliente" value="8" step="0.1"><span>%</span></div></div>
+        <div class="field"><label>Meses (rentabilidad dejada de percibir)</label><input type="number" id="mesesRent" value="12" step="1"></div>
+        <div class="field"><label>Tasa crédito Skandia (E.A.)</label><div class="unit-input"><input type="number" id="tasaSk" value="16.79" step="0.01"><span>%</span></div></div>
+        <div class="field"><label>Meses del préstamo</label><input type="number" id="mesesSk" value="12" step="1"></div>
+      </div>
+      <div class="btn-row split">
+        <button class="btn btn-secondary" onclick="goToStep(1)">Atrás</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">Ver comparación</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO 3: RESULTADO (CAPA ASESOR) -->
+  <div class="panel" id="panel-3">
+    <div class="result-banner">
+      <div class="result-tag">Resultado — capa asesor</div>
+      <div class="result-title" id="resultTitleAsesor">—</div>
+      <div class="result-sub">Revisa el detalle en la tabla de abajo antes de compartirlo con tu cliente.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="scenarioTitleAsesor">Detalle del escenario</div>
+      <table class="line-table" id="resultTable"></table>
+
+      <details class="help-block">
+        <summary>Así funciona: los términos de esta tabla</summary>
+        <div class="help-body">
+          <div class="row"><b>Ingreso gravado</b> — Es la parte de tu ingreso sobre la que se calculan impuestos, no todo tu ingreso se grava igual. Ej: de $5M, puede que solo $3M sean ingreso gravado si el resto tiene alguna exención. Te ayuda a entender por qué el impuesto no se calcula sobre el 100% de lo que recibes.</div>
+          <div class="row"><b>Retefuente (Retención en la fuente)</b> — Es un adelanto del impuesto de renta que se descuenta antes de que recibas el pago, no un impuesto adicional. Ej: si retiras $1.000.000 y tu Retefuente es del 10%, recibes $900.000 — los $100.000 ya quedaron abonados a tu declaración de renta.</div>
+          <div class="row"><b>UVT (Unidad de Valor Tributario)</b> — Es la unidad que usa la ley colombiana para calcular impuestos y cambia cada año. Verifica siempre la fecha de vigencia junto al valor de UVT que usa este simulador (badge de arriba).</div>
+          <div class="row"><b>SMLMV</b> — Es el salario mínimo que fija el gobierno cada año; varias fórmulas tributarias lo usan como referencia. Este simulador muestra el SMLMV vigente para el período indicado en el badge de arriba.</div>
+          <div class="row"><b>IBC (Ingreso Base de Cotización)</b> — Es el valor sobre el que se calculan tus aportes a salud y pensión, puede ser distinto de tu ingreso total.</div>
+        </div>
+      </details>
+
+      <div class="disclaimer-block">
+        <div class="disclaimer-main">Esta simulación es una guía para tu conversación con el cliente — no es la última palabra sobre su situación tributaria o crediticia.</div>
+        <div class="disclaimer-legal">Los cálculos se basan en los parámetros tributarios y la tasa vigentes en la fecha indicada arriba. Esta información es de carácter informativo y no constituye asesoría financiera, tributaria o legal.</div>
+      </div>
+
+      <div class="btn-row split">
+        <button class="btn btn-secondary" onclick="goToStep(2)">Atrás</button>
+        <button class="btn btn-primary" onclick="showClienteLayer()">Ver comparación con el cliente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPA CLIENTE -->
+  <div class="cliente-shell" id="clienteShell" style="display:none;">
+    <div class="segment-toggle">
+      <button class="segment-btn active" id="seg-directa" onclick="setSegment('directa')">Vista resumida</button>
+      <button class="segment-btn" id="seg-acompanada" onclick="setSegment('acompanada')">Vista con más detalle</button>
+    </div>
+
+    <div class="card" id="segmentWrap">
+      <div class="acto-tag">Acto 1</div>
+      <div class="acto-title">Así está tu situación hoy</div>
+      <div class="acto-narrative extra">Antes de comparar, veamos juntos cómo está tu situación hoy.</div>
+      <div class="acto-narrative" id="acto1Texto">—</div>
+      <div class="acto-narrative extra" id="acto1Extra">Esto es solo para que entiendas cómo estás hoy — no implica ningún cambio en tus productos actuales.</div>
+      <div class="acto-support">Estos son los mismos datos que ya conoces — solo los estamos organizando para comparar.</div>
+
+      <details class="help-block" id="helpUVTCliente">
+        <summary style="font-size:12px;">¿Qué es la UVT?</summary>
+        <div class="help-body" style="font-size:12px;">
+          Es la unidad que usa la ley para calcular impuestos, y cambia cada año.
+          <span class="help-condensed"><span class="ver-ejemplo" onclick="this.parentElement.nextElementSibling.style.display='block'">Ver ejemplo</span></span>
+          <div style="display:none;margin-top:6px;">En vez de decir "$52.374", la norma dice "1 UVT". Verifica siempre la fecha de vigencia junto al valor.</div>
+        </div>
+      </details>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goToActo2()">Ver cómo se compara con Crédito Impulso</button>
+      </div>
+    </div>
+
+    <div class="card" id="acto2Card" style="display:none;">
+      <div class="acto-tag">Acto 2</div>
+      <div class="acto-title">Así se compara con Crédito Impulso</div>
+      <div class="result-banner" style="margin-top:4px;">
+        <div class="result-title" id="resultTitleCliente" style="font-size:15px;">—</div>
+      </div>
+      <div class="acto-support">Tú decides qué hacer con esta diferencia — con tu asesor puedes revisar cada escenario con calma.</div>
+
+      <div class="disclaimer-block">
+        <div class="disclaimer-main">Esta comparación te ayuda a entender tu situación — la decisión final siempre es tuya, y puedes tomarte el tiempo que necesites.</div>
+        <div class="disclaimer-legal">Información con fines educativos, calculada con los valores vigentes en la fecha indicada. No es una recomendación ni un compromiso de Skandia.</div>
+      </div>
+
+      <div class="btn-row" style="align-items:center;">
+        <button class="btn btn-secondary" onclick="document.getElementById('acto2Card').style.display='none';document.getElementById('segmentWrap').style.display='block';">Atrás</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <button class="btn btn-primary" onclick="confirmarRevision()">Revisar el detalle con tu asesor</button>
+          <span id="confirmRevision" style="display:none;font-size:11.5px;color:var(--sk-n4);">Tu asesor puede retomar esta comparación contigo cuando quieras.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---------- Motor de cálculo (idéntico al prototipo original — no se tocó la lógica de negocio) ----------
+const UVT = 52374;
+const SMLMV = 1750905;
+const C6 = 0.04, C7 = 0.04;
+const C11 = 0.125, C12 = 0.16;
+const C23 = 0.4;
+const RENTA_EXENTA_CAP = 1340 * UVT;
+const G3 = 25;
+const H3 = G3 * SMLMV;
+const E13c = SMLMV, E14c = E13c * 25;
+
+const fmtCOP = n => isFinite(n) ? n.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}) : '—';
+const MONEY_IDS = ['valorRetiro','salarioMensual','otrosIntereses','arrendamientos','honorarios'];
+
+function digitsOnly(str){ return (str||'').replace(/[^\d]/g,''); }
+function formatThousands(digits){ if(!digits) return ''; return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function getMoneyVal(id){ return parseFloat(digitsOnly(document.getElementById(id).value)) || 0; }
+function setupMoneyInput(id){
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    const caretFromEnd = el.value.length - el.selectionStart;
+    const digits = digitsOnly(el.value);
+    el.value = formatThousands(digits);
+    const pos = Math.max(0, el.value.length - caretFromEnd);
+    el.setSelectionRange(pos, pos);
+    recalc();
+  });
+}
+
+function solidarityRate(v){
+  const table = [[0,0],[4,0.01],[16,0.012],[17,0.014],[18,0.016],[19,0.018],[20,0.02]];
+  let r = 0; for(const [th,rr] of table){ if(v>=th) r=rr; } return r;
+}
+function rentaUvtTable(x){
+  const b = [[1090,1700,0.19,0],[1700,4100,0.28,116],[4100,8670,0.33,788],[8670,18970,0.35,2296],[18970,31000,0.37,5901],[31000,Infinity,0.39,10352]];
+  for(const [lo,hi,rate,add] of b){ if(hi===Infinity){ if(x>=lo) return (x-lo)*rate+add; } else if(x>=lo && x<=hi) return (x-lo)*rate+add; }
+  return 0;
+}
+function retefuentePacTable(x){
+  const b = [[95,150,0.19,0],[150,360,0.28,10],[360,640,0.33,69],[640,945,0.35,162],[945,2300,0.37,268],[2300,Infinity,0.39,770]];
+  for(const [lo,hi,rate,add] of b){ if(hi===Infinity){ if(x>=lo) return (x-lo)*rate+add; } else if(x>=lo && x<=hi) return (x-lo)*rate+add; }
+  return 0;
+}
+function ibcCalc(ingreso, e13=E13c, e14=E14c){
+  if(ingreso < e13) return 0;
+  const d19 = ingreso*0.4;
+  if(d19 < e13) return e13;
+  if(d19 > e14) return e14;
+  return d19;
+}
+function calculoBaseSSCI(ingreso, baseSalMonthly, otrosAnual){
+  const D31 = ibcCalc(otrosAnual/12);
+  const D33 = baseSalMonthly + D31;
+  const D35 = E14c - D33;
+  const D22 = ibcCalc(ingreso);
+  const D36 = Math.min(D22, D35);
+  const D39 = D36 < 0 ? 0 : D36*(C11+C12+solidarityRate(D36/SMLMV));
+  return {D33, D39};
+}
+function baseSalario(salarioMensual, tipo){ return tipo==="Ordinario" ? salarioMensual : salarioMensual*0.7; }
+function calculosEngine(salarioMensual, tipo, honorarios, otrosInt, arrend, L5, D33monthly){
+  const E11 = tipo==="Ordinario" ? salarioMensual*13 : salarioMensual*12;
+  const E12 = honorarios;
+  const smlmvSal = salarioMensual/SMLMV;
+  const E8 = solidarityRate(smlmvSal);
+  const F8 = tipo==="Ordinario" ? H3*13 : H3*12;
+  let base = tipo==="Ordinario" ? (E11<F8?E11:F8) : (E11<F8?E11*0.7:F8);
+  const E13 = base*E8 + base*(C6+C7);
+  const M7 = smlmvSal>G3 ? 0 : (G3-smlmvSal);
+  const D18room = SMLMV*M7;
+  const E14 = (E12/12*0.4) < D18room ? E12*0.4*(E8+C11+C12) : D18room*(E8+C11+C12);
+  const E16 = L5+otrosInt+arrend;
+  const P7 = H3 - D33monthly;
+  const D19cap = P7<0 ? 0 : P7;
+  let E17;
+  if(E16 < SMLMV) E17 = 0;
+  else if(E16*0.4 < D19cap) E17 = E16*0.4*(E8+C11+C12);
+  else E17 = D19cap*(E8+C11+C12);
+  const F19 = E13+E14+E17;
+  const E26 = (E11+E12+E16)-F19;
+  const E27 = (E26*C23 < RENTA_EXENTA_CAP) ? E26*C23 : RENTA_EXENTA_CAP;
+  const E29 = E26-E27;
+  const E31 = E29/UVT;
+  const E32 = rentaUvtTable(E31)*UVT;
+  return {E11,E12,E13,E14,E16,E17,E26,E27,E29,E31,E32,E8,D19cap,D18room,M7};
+}
+function calculosE20(salarioMensual, tipo, otrosInt, arrend, L5, D33monthly, honorarios){
+  const ce = calculosEngine(salarioMensual, tipo, honorarios, otrosInt, arrend, L5, D33monthly);
+  const D19cap = ce.D19cap;
+  let E21;
+  if(L5<SMLMV && D19cap<SMLMV) E21 = 0;
+  else if(D19cap<L5) E21 = D19cap;
+  else E21 = L5;
+  const K21 = solidarityRate(E21/SMLMV);
+  let E20;
+  if(E21 < SMLMV) E20 = 0;
+  else if(E21===D19cap) E20 = D19cap*(K21+C11+C12);
+  else if(E21*0.4 > SMLMV) E20 = E21*0.4*(K21+C11+C12);
+  else E20 = SMLMV*(K21+C11+C12);
+  return {E20, ce};
+}
+function pacTax(D51, D52, salarioMensual, tipo, honorarios, otrosInt, arrend, D33fvp){
+  const {E20:E20full, ce:ceFull} = calculosE20(salarioMensual, tipo, otrosInt, arrend, D52, D33fvp, honorarios);
+  const {E13,E14,E11,E12,E16} = ceFull;
+  const D18 = D51+E11+E12+E16;
+  const D19 = E13+E14+E20full;
+  const D20 = D18-D19;
+  const D21 = Math.min(D20*0.4, RENTA_EXENTA_CAP);
+  const D22 = D20-D21;
+  const D23 = rentaUvtTable(D22/UVT)*UVT;
+  const L18 = D18-D51-D52;
+  const L19 = D19;
+  const L20 = L18-L19;
+  const L21 = Math.min(L20*0.4, RENTA_EXENTA_CAP);
+  const L22 = L20-L21;
+  const L23 = rentaUvtTable(L22/UVT)*UVT;
+  return {G66: D23-L23, D23, L23};
+}
+function fullScenario(valorRetiro, pctCapital, pctRend, salarioMensual, tipo, honorarios, otrosInt, arrend, rentPct, mesesRent, tasaSk, mesesSk){
+  const D51 = valorRetiro*pctCapital;
+  const D52 = valorRetiro*pctRend;
+  const baseSal = baseSalario(salarioMensual, tipo);
+  const otrosAnualFvp = otrosInt+arrend+honorarios;
+  const {D33:D33fvp, D39:D39fvp} = calculoBaseSSCI(D52, baseSal, otrosAnualFvp);
+  const {D33:D33pac, D39:D39pac} = calculoBaseSSCI(D51, baseSal, 0);
+  const calcFull = calculosEngine(salarioMensual, tipo, honorarios, otrosInt, arrend, D52, D33fvp);
+  const calcSin  = calculosEngine(salarioMensual, tipo, honorarios, otrosInt, arrend, 0, D33fvp);
+  const D66 = calcFull.E32 - calcSin.E32;
+  const D63 = D52, D64 = D39fvp, D65 = D63*0.07;
+  const D67 = Math.max(D65, D66) + D64;
+  const D71 = valorRetiro*(Math.pow(1+rentPct, mesesRent/12)-1);
+  const D73 = D67+D71;
+  const D78 = valorRetiro*(Math.pow(1+tasaSk, mesesSk/12)-1);
+  const D80 = D73-D78;
+  const {E11,E12,E13,E14,E16} = calcFull;
+  const L1 = E11+E12+otrosInt;
+  const L2 = E13+E14;
+  const L3 = L1-L2;
+  const K4 = L3*0.4;
+  const L5pac = Math.min(K4, RENTA_EXENTA_CAP);
+  const D3 = D51, D4 = D39pac;
+  const F5 = (D3-D4)*0.4;
+  const F6 = Math.min(F5, RENTA_EXENTA_CAP);
+  const D5 = L5pac===0 ? F6 : (F6-L5pac);
+  const D6 = D3-D4-D5;
+  const G10 = D6/UVT;
+  const F15 = retefuentePacTable(G10);
+  const G65 = F15*UVT;
+  const {G66} = pacTax(D51, D52, salarioMensual, tipo, honorarios, otrosInt, arrend, D33fvp);
+  const H65 = D52*0.07;
+  const K65 = G65+H65;
+  const K66 = G66;
+  const G67 = Math.max(K65,K66)+D39pac;
+  const H71 = valorRetiro*(Math.pow(1+rentPct, mesesRent/12)-1);
+  const H73 = G67+H71;
+  const H78 = valorRetiro*(Math.pow(1+tasaSk, mesesSk/12)-1);
+  const H80 = H73-H78;
+  return {
+    fvp: {ingreso:D63, ss:D64, rete:D65, impuesto:D66, a1:D67, a2:D71, total:D73, intereses:D78, ahorro:D80},
+    pac: {ingreso:D51, ss:D39pac, rete:G65+H65, impuesto:G66, a1:G67, a2:H71, total:H73, intereses:H78, ahorro:H80}
+  };
+}
+
+// ---------- UI / navegación ----------
+let branch = null;
+let currentStep = 0;
+const steps = ['Ramificación','Datos del cliente','Supuestos','Comparación'];
+
+function renderStepper(){
+  const el = document.getElementById('stepper');
+  el.innerHTML = steps.map((s,i) => `
+    <div class="step-item ${i<currentStep?'done':i===currentStep?'active':''}">
+      <div class="step-bar"></div>
+      <div class="step-label"><span class="step-check">✓</span>${s}</div>
+    </div>`).join('');
+}
+function goToStep(n){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+  currentStep = n;
+  renderStepper();
+  if(n===3) recalc();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function selectBranch(b){
+  branch = b;
+  document.querySelectorAll('.radio-card').forEach(c=>c.classList.toggle('selected', c.dataset.branch===b));
+  document.getElementById('btn-continuar-0').disabled = false;
+}
+function openHelp(id){ document.getElementById(id).open = true; }
+
+function setLabelRow(id, label, value){
+  return `<tr><td class="lbl">${label}</td><td class="val" id="${id}">${value}</td></tr>`;
+}
+
+function recalc(){
+  const valorRetiro = getMoneyVal('valorRetiro');
+  let pctCapital = parseFloat(document.getElementById('pctCapital').value); if(isNaN(pctCapital)) pctCapital=0;
+  let pctRend = parseFloat(document.getElementById('pctRendimientos').value); if(isNaN(pctRend)) pctRend=0;
+  const salarioMensual = getMoneyVal('salarioMensual');
+  const tipo = document.getElementById('tipoSalario').value;
+  const otrosInt = getMoneyVal('otrosIntereses');
+  const arrend = getMoneyVal('arrendamientos');
+  const honorarios = getMoneyVal('honorarios');
+  const rentPct = (parseFloat(document.getElementById('rentCliente').value)||0)/100;
+  const mesesRent = parseFloat(document.getElementById('mesesRent').value)||12;
+  const tasaSk = (parseFloat(document.getElementById('tasaSk').value)||0)/100;
+  const mesesSk = parseFloat(document.getElementById('mesesSk').value)||12;
+
+  const splitNote = document.getElementById('splitNote');
+  const sumPct = pctCapital+pctRend;
+  const capMonto = valorRetiro*(pctCapital/100);
+  const rendMonto = valorRetiro*(pctRend/100);
+  if(Math.abs(sumPct-100) > 0.01){
+    splitNote.className = 'split-note warn';
+    splitNote.textContent = `⚠ Capital + Rendimientos debe sumar 100% (actual: ${sumPct.toFixed(1)}%). Capital: ${fmtCOP(capMonto)} · Rendimientos: ${fmtCOP(rendMonto)}`;
+  } else {
+    splitNote.className = 'split-note';
+    splitNote.textContent = `Capital: ${fmtCOP(capMonto)} · Rendimientos: ${fmtCOP(rendMonto)}`;
+  }
+
+  const r = fullScenario(valorRetiro, pctCapital/100, pctRend/100, salarioMensual, tipo, honorarios, otrosInt, arrend, rentPct, mesesRent, tasaSk, mesesSk);
+  const s = branch==='pac' ? r.pac : r.fvp;
+  const contra = branch==='pac' ? 'consolidar tu PAC sin cumplir requisitos' : 'retirar de tu FVP';
+  const contraCorta = branch==='pac' ? 'consolidar el PAC' : 'retirar del FVP';
+
+  document.getElementById('scenarioTitleAsesor').textContent = branch==='pac'
+    ? 'Consolidación PAC sin cumplimiento de requisitos'
+    : 'Retiro FVP sin cumplimiento de requisitos';
+
+  const diff = Math.abs(s.ahorro);
+  const direccion = s.ahorro > 0 ? 'menos' : 'más';
+  const tituloAsesor = `Tomar Crédito Impulso cuesta ${fmtCOP(diff)} ${direccion} que ${contra}, en este escenario.`;
+  document.getElementById('resultTitleAsesor').textContent = tituloAsesor;
+  document.getElementById('resultTitleCliente').textContent = `Tomar Crédito Impulso cuesta ${fmtCOP(diff)} ${direccion} que ${contraCorta}.`;
+
+  document.getElementById('resultTable').innerHTML =
+    setLabelRow('r_ingreso', branch==='pac' ? 'Ingreso gravado (capital + rendimientos)' : 'Ingreso gravado', fmtCOP(s.ingreso)) +
+    setLabelRow('r_ss', 'Seguridad social', fmtCOP(s.ss)) +
+    setLabelRow('r_rete', 'Retefuente', fmtCOP(s.rete)) +
+    setLabelRow('r_impuesto', 'Impuesto renta', fmtCOP(s.impuesto)) +
+    `<tr class="subtotal"><td class="lbl">Impuesto + seguridad social</td><td class="val">${fmtCOP(s.a1)}</td></tr>` +
+    setLabelRow('r_a2', 'Rentabilidad dejada de percibir', fmtCOP(s.a2)) +
+    `<tr class="subtotal"><td class="lbl">Costo total de ${contraCorta}</td><td class="val">${fmtCOP(s.total)}</td></tr>` +
+    setLabelRow('r_intereses', 'Costo del Crédito Impulso (intereses)', fmtCOP(s.intereses)) +
+    `<tr class="final"><td class="lbl">Diferencia (Crédito Impulso vs. ${contraCorta})</td><td class="val">${fmtCOP(s.ahorro)}</td></tr>`;
+
+  document.getElementById('acto1Texto').textContent =
+    branch==='pac'
+      ? `Hoy tu PAC de ${fmtCOP(valorRetiro)} está sin consolidar. Si lo retiras sin cumplir los requisitos tributarios, el costo estimado es ${fmtCOP(s.total)} entre impuestos, seguridad social y rentabilidad dejada de percibir.`
+      : `Hoy tienes ${fmtCOP(valorRetiro)} en tu Fondo Voluntario. Si lo retiras sin cumplir los requisitos tributarios, el costo estimado es ${fmtCOP(s.total)} entre impuestos, seguridad social y rentabilidad dejada de percibir.`;
+}
+
+function showClienteLayer(){
+  document.getElementById('clienteShell').style.display = 'block';
+  document.getElementById('segmentWrap').style.display = 'block';
+  document.getElementById('acto2Card').style.display = 'none';
+  document.getElementById('clienteShell').scrollIntoView({behavior:'smooth'});
+}
+function goToActo2(){
+  document.getElementById('segmentWrap').style.display = 'none';
+  document.getElementById('acto2Card').style.display = 'block';
+}
+function confirmarRevision(){
+  document.getElementById('confirmRevision').style.display = 'block';
+}
+function setSegment(seg){
+  document.getElementById('seg-directa').classList.toggle('active', seg==='directa');
+  document.getElementById('seg-acompanada').classList.toggle('active', seg==='acompanada');
+  document.getElementById('segmentWrap').classList.toggle('segment-acompanada', seg==='acompanada');
+  document.getElementById('helpUVTCliente').open = (seg==='acompanada');
+}
+
+MONEY_IDS.forEach(setupMoneyInput);
+['pctCapital','pctRendimientos','tipoSalario','rentCliente','mesesRent','tasaSk','mesesSk'].forEach(id => document.getElementById(id).addEventListener('input', recalc));
+renderStepper();
+</script>
+</body>
+</html>
