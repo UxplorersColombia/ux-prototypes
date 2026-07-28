@@ -455,19 +455,45 @@
         <section hidden="{{ h.wf07 }}" class="skpop" style="flex:1;display:flex;flex-direction:column">
           <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:24px;line-height:1.25;color:#232323;margin:0 0 16px">Queremos conocerte antes de dar el siguiente paso</h1>
           <p style="font-size:15px;line-height:1.5;color:#404040;margin:0 0 20px">Tus respuestas nos permiten confirmar que lo que elegiste se ajusta a ti. Es la forma responsable de invertir — y tu perfil queda guardado para la próxima vez.</p>
-          <div style="background:#f7f7f7;border-radius:14px;padding:16px;font-size:13.5px;color:#404040;display:flex;gap:9px;align-items:center"><sk-icon name="clock" size="17" style="color:#00c73d"></sk-icon>{{ durText }}</div>
+          <div style="margin-top:20px;display:grid;gap:12px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+              <input value="{{ lead.nombre }}" onChange="{{ setNombre }}" placeholder="Tu nombre" style="width:100%;box-sizing:border-box;border:1px solid #dddddd;border-radius:8px;padding:13px 14px;font-family:'Open Sans',sans-serif;font-size:14px;color:#232323;outline:none;background:#fff" style-focus="border-color:#00c73d">
+              <input value="{{ lead.correo }}" onChange="{{ setCorreo }}" placeholder="Tu correo" style="width:100%;box-sizing:border-box;border:1px solid #dddddd;border-radius:8px;padding:13px 14px;font-family:'Open Sans',sans-serif;font-size:14px;color:#232323;outline:none;background:#fff" style-focus="border-color:#00c73d">
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;align-items:end">
+              <input value="{{ lead.cedula }}" onChange="{{ setCedula }}" placeholder="Tu número de cédula de ciudadanía" style="width:100%;box-sizing:border-box;border:1px solid #dddddd;border-radius:8px;padding:13px 14px;font-family:'Open Sans',sans-serif;font-size:14px;color:#232323;outline:none;background:#fff" style-focus="border-color:#00c73d">
+              <div style="display:flex;gap:10px;align-items:flex-end">
+                <div style="flex:none;width:96px">
+                  <label style="display:block;font-size:12px;color:#666;margin-bottom:4px;font-family:'Open Sans',sans-serif">País</label>
+                  <select value="{{ lead.pais }}" onChange="{{ setPais }}" style="width:100%;box-sizing:border-box;border:1px solid #dddddd;border-radius:8px;padding:13px 10px;font-family:'Open Sans',sans-serif;font-weight:700;font-size:14px;color:#00c73d;background:#fff;outline:none;cursor:pointer">
+                    <option value="+57">+57</option>
+                    <option value="+1">+1</option>
+                    <option value="+34">+34</option>
+                    <option value="+52">+52</option>
+                    <option value="+507">+507</option>
+                  </select>
+                </div>
+                <input value="{{ lead.cel }}" onChange="{{ setCel }}" placeholder="Tu número de celular" style="flex:1;min-width:0;box-sizing:border-box;border:1px solid #dddddd;border-radius:8px;padding:13px 14px;font-family:'Open Sans',sans-serif;font-size:14px;color:#232323;outline:none;background:#fff" style-focus="border-color:#00c73d">
+              </div>
+            </div>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-family:'Open Sans',sans-serif;font-size:13.5px;line-height:1.5;color:#404040;margin-top:2px">
+              <input type="checkbox" checked="{{ lead.ok }}" onChange="{{ toggleLeadOk }}" style="flex:none;width:17px;height:17px;margin-top:2px;accent-color:#00c73d;cursor:pointer">
+              <span>Acepto y autorizo la <a href="#" style="color:#0a7a2f;font-weight:700">Política de protección de datos</a> y el <a href="#" style="color:#0a7a2f;font-weight:700">Tratamiento de información personal</a>.</span>
+            </label>
+          </div>
           <details onToggle="{{ legalWf01 }}" style="background:#f7f7f7;border-radius:10px;padding:14px 16px;margin-top:20px;font-size:12.5px;color:#666;line-height:1.5">
             <summary style="font-weight:700;color:#404040;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px">Este paso hace parte de la normativa que protege a quienes invierten en Colombia<span class="chev" style="color:#00c73d;flex:none"><sk-icon name="chevron-down" size="16"></sk-icon></span></summary>
             <div style="margin-top:9px">Decreto 1239 de 2024 y Circular Externa 014 de 2025: antes de vincularte evaluamos que tus elecciones se ajusten a tu perfil. El análisis queda documentado y disponible para ti. <em>[Texto final: Legal]</em></div>
           </details>
           <div style="flex:1"></div>
-          <button onClick="{{ startPerfilamiento }}" style="width:100%;margin-top:24px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Empezar</button>
+          <button disabled="{{ leadInvalid }}" onClick="{{ startPerfilamiento }}" style="width:100%;margin-top:24px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:{{ leadBtnFg }};background:{{ leadBtnBg }}">Empezar</button>
         </section>
 
         <!-- ═══ WF-07a · TARJETAS ═══ -->
         <section hidden="{{ h.wf07a }}" class="skpop">
           <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 6px">¡Selecciona tu perfil de inversionista!</h1>
           <p style="font-size:13.5px;line-height:1.5;color:#666;margin:0 0 16px">Tu perfil te permitirá invertir según tus objetivos, tiempos y tolerancia al riesgo. Elige el que te describa mejor. <b style="color:#404040">Puedes actualizarlo cuando quieras.</b></p>
+          <div style="background:#f7f7f7;border-radius:14px;padding:16px;font-size:13.5px;color:#404040;display:flex;gap:9px;align-items:center;margin-bottom:16px"><sk-icon name="clock" size="17" style="color:#00c73d"></sk-icon>{{ durText }}</div>
           <sc-for list="{{ tarjetas }}" as="t" hint-placeholder-count="3">
             <div style="border-radius:16px;padding:20px 18px;margin-bottom:14px;text-align:center;{{ t.sty }}">
               
@@ -499,6 +525,7 @@
         <section hidden="{{ h.wf07b }}" class="skpop">
           <div style="height:8px;background:#eef0f1;border-radius:100px;overflow:hidden;margin-bottom:10px"><div style="height:100%;background:#00c73d;border-radius:100px;transition:width .3s;width:{{ q.progress }}"></div></div>
           <p style="font-size:12.5px;color:#888;margin:0 0 14px">{{ q.count }}</p>
+          <div style="background:#f7f7f7;border-radius:14px;padding:16px;font-size:13.5px;color:#404040;display:flex;gap:9px;align-items:center;margin-bottom:16px"><sk-icon name="clock" size="17" style="color:#00c73d"></sk-icon>{{ durText }}</div>
           <h2 style="font-family:'Open Sans',sans-serif;font-weight:700;font-size:18px;color:#232323;margin:0 0 6px">{{ q.question }}</h2>
           <sc-if value="{{ q.hasTip }}" hint-placeholder-val="{{ false }}"><p style="font-size:12.5px;color:#888;margin:0 0 10px">{{ q.tip }}</p></sc-if>
           <sc-for list="{{ q.options }}" as="o" hint-placeholder-count="3">
@@ -606,7 +633,6 @@
                   <sk-icon name="chevron-right" size="18" style="color:#9aa0a3;flex:none"></sk-icon>
                 </button>
               </sc-for>
-              <label style="display:flex;justify-content:space-between;align-items:center;background:#f7f7f7;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:13px;color:#404040;cursor:pointer">¿Recibiste asesoría comercial?<input type="checkbox" checked="{{ asesoriaComercial }}" onChange="{{ toggleAsesoria }}" style="width:19px;height:19px;accent-color:#00c73d"></label>
             </div>
             <button disabled="{{ v10FinalDisabled }}" onClick="{{ goDocs }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ v10FinalBg }}">Continuar</button>
             <button onClick="{{ guardarHere }}" style="width:100%;background:transparent;color:#0a7a2f;border:none;padding:10px;font-weight:600;font-size:14px;text-decoration:underline;cursor:pointer;font-family:Montserrat,sans-serif">Guardar y continuar después</button>
@@ -907,13 +933,13 @@
       <sc-for list="{{ asesorList }}" as="a" hint-placeholder-count="4">
         <button onClick="{{ a.onPick }}" style="display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:12px;padding:12px;cursor:pointer" style-hover="border-color:#00c73d;background:#f6fcf2">
           <span style="flex:none;width:36px;height:36px;border-radius:50%;background:#f2f4f3;color:#0a7a2f;display:inline-flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px">{{ a.ini }}</span>
-          <span style="flex:1"><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">{{ a.n }}</span><span style="display:block;font-size:12px;color:#888;margin-top:2px">{{ a.meta }}</span></span>
+          <span style="flex:1"><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">{{ a.n }}</span><span style="display: block; font-size: 12px; color: #888; margin-top: 2px; font-family: Open Sans">{{ a.meta }}</span></span>
           <sk-icon name="chevron-right" size="18" style="color:#9aa0a3;flex:none"></sk-icon>
         </button>
       </sc-for>
       <div style="display:{{ asesorEmptyDisp }};background:#f7f7f7;border-radius:12px;padding:16px;font-size:13px;color:#666;line-height:1.5">No encontramos asesores con ese dato. Revisa el nombre o el código.</div>
     </div>
-    <button onClick="{{ closeMasesor }}" style="width:100%;margin-top:14px;background:transparent;color:#0a7a2f;border:none;padding:10px;font-weight:700;font-size:14px;text-decoration:underline;cursor:pointer">Cancelar</button>
+    <button onClick="{{ closeMasesor }}" style="width: 100%; margin-top: 14px; background: transparent; color: #0a7a2f; border: none; padding: 10px; font-weight: 700; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">Cancelar</button>
   </div>
 </div>
 
@@ -1259,7 +1285,12 @@ class Component extends DCLogic {
     });
   };
   toPerfilamiento = ()=>{ this.setState(s=>({variante:this.varianteFor(s.cart)})); this.trz('da_perfilamiento_start',{variante:this.varianteFor(this.state.cart)}); this.go('wf07'); };
+  setLead = (k)=>(e)=>{ const v = e.target.value; this.setState(s=>({lead:Object.assign({nombre:'',correo:'',cedula:'',cel:'',pais:'+57',ok:false}, s.lead, {[k]:v})})); };
+  toggleLeadOk = ()=> this.setState(s=>{ const l = Object.assign({nombre:'',correo:'',cedula:'',cel:'',pais:'+57',ok:false}, s.lead); return {lead:Object.assign({}, l, {ok:!l.ok})}; });
+  leadData = ()=> Object.assign({nombre:'',correo:'',cedula:'',cel:'',pais:'+57',ok:false}, this.state.lead||{});
+  leadOk = ()=>{ const l=this.leadData(); return l.nombre.trim().length>1 && /\S+@\S+\.\S+/.test(l.correo) && l.cedula.trim().length>4 && l.cel.trim().length>6 && l.ok; };
   startPerfilamiento = ()=>{
+    if(!this.leadOk()) return;
     if(this.state.variante==='preguntas'){ if(this.state.upgraded){ this.go('wf07trans'); } else { this.setState({qIdx:0,qAns:[0,0,0,0]}); this.go('wf07b'); } }
     else this.go('wf07a');
   };
@@ -1748,6 +1779,10 @@ class Component extends DCLogic {
       plazo6:this.setPlazo(6), plazo12:this.setPlazo(12), plazo24:this.setPlazo(24),
       fmtInput:this.fmtInput, runSim:this.runSim, simToCart:this.simToCart,
       toPerfilamiento:this.toPerfilamiento, startPerfilamiento:this.startPerfilamiento,
+      lead:this.leadData(), setNombre:this.setLead('nombre'), setCorreo:this.setLead('correo'),
+      setCedula:this.setLead('cedula'), setCel:this.setLead('cel'), setPais:this.setLead('pais'),
+      toggleLeadOk:this.toggleLeadOk, leadInvalid:!this.leadOk(),
+      leadBtnBg:this.leadOk()?'#00c73d':'#e9e9e9', leadBtnFg:this.leadOk()?'#fff':'#666666',
       completeTarjetas:this.completeTarjetas, nextQ:this.nextQ, prevQ:this.prevQ,
       perfilContinue:this.perfilContinue, revisarPerfil:this.revisarPerfil,
       goTransB:()=>this.go('wf07b'), goBackCart:()=>this.go('wf06'),
