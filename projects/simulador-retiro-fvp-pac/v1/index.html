@@ -19,15 +19,33 @@
     --sk-n2:#e9e9e9;
     --sk-n3:#dddddd;
     --sk-n4:#666666;
-    --sk-info-bg:#ebf4ff; --sk-info-border:#0099de;
-    --sk-warning-bg:#fff3e0; --sk-warning-border:#ffae08;
+    --sk-info-bg:#ebf4ff; --sk-info-border:#0099de; --sk-info-ink:#04527a;
+    --sk-warning-bg:#fff3e0; --sk-warning-border:#ffae08; --sk-warning-ink:#7a4c00;
     --sk-success-bg:#ecfdf3; --sk-success-border:#87f491;
     --sk-error-bg:#fff5f4; --sk-error-border:#e03430;
+    --sk-success-icon:#00a34e;
     --radius:14px;
+    --sk-radius-sm:8px;
+    --sk-radius-md:12px;
+    --sk-radius-pill:100px;
+    --sk-space-xs:4px; --sk-space-sm:8px; --sk-space-md:16px; --sk-space-lg:24px; --sk-space-xl:32px;
+    --sk-ease:cubic-bezier(0.4,0,0.2,1);
+    --sk-focus-ring:0 0 0 3px var(--sk-primary-tint);
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Montserrat',Verdana,Arial,sans-serif;background:var(--sk-n1);color:var(--sk-surface-800);-webkit-font-smoothing:antialiased;}
   .wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
+
+  /* Foco visible consistente en todo elemento interactivo (teclado) */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+  summary:focus-visible, [tabindex]:focus-visible{
+    outline:2px solid var(--sk-primary-pressed); outline-offset:2px; border-radius:4px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+  @keyframes sk-panel-in{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .panel.active{ animation:sk-panel-in .25s var(--sk-ease); }
 
   .header{display:flex;align-items:center;gap:10px;margin:24px 0 20px;}
   .brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--sk-primary),var(--sk-primary-tint));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px;flex:none;}
@@ -38,9 +56,9 @@
   .subtitle{font-size:13.5px;color:var(--sk-n4);font-weight:500;max-width:680px;line-height:1.5;margin:0 0 22px;}
 
   /* Stepper (fallback pattern: ui-stepper promovido, ver simuladores-credito-impulso-wireframes.md sección 1) */
-  .stepper{display:flex;gap:6px;margin-bottom:26px;}
+  .stepper{display:flex;gap:6px;margin-bottom:var(--sk-space-lg);}
   .step-item{flex:1;display:flex;flex-direction:column;gap:6px;}
-  .step-bar{height:4px;border-radius:4px;background:var(--sk-n3);}
+  .step-bar{height:4px;border-radius:4px;background:var(--sk-n3);transition:background-color .2s var(--sk-ease);}
   .step-item.done .step-bar, .step-item.active .step-bar{background:var(--sk-primary);}
   .step-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--sk-n4);display:flex;align-items:center;gap:4px;}
   .step-item.active .step-label{color:var(--sk-surface-800);}
@@ -58,10 +76,11 @@
 
   /* sk-radio (fallback visual, mismo API real: name, value, selectedValue) */
   .radio-card{
-    display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--sk-n3);border-radius:12px;
-    padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s, background .15s;
+    display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--sk-n3);border-radius:var(--sk-radius-md);
+    padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s var(--sk-ease), background .15s var(--sk-ease);
   }
   .radio-card:hover{border-color:var(--sk-primary);}
+  .radio-card:focus-visible{outline:2px solid var(--sk-primary-pressed);outline-offset:2px;}
   .radio-card.selected{border-color:var(--sk-primary);background:var(--sk-primary-tint);}
   .radio-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--sk-n4);flex:none;margin-top:2px;position:relative;}
   .radio-card.selected .radio-dot{border-color:var(--sk-primary);}
@@ -77,14 +96,18 @@
   .field .unit-input input{padding-right:32px;}
   .field .unit-input span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sk-n4);font-weight:600;}
   input[type="text"], input[type="number"], select{
-    width:100%;border:1px solid var(--sk-n3);border-radius:8px;padding:9px 10px;
+    width:100%;border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);padding:9px 10px;
     font-family:'Montserrat',sans-serif;font-size:13.5px;color:var(--sk-surface-800);
-    background:var(--sk-n1);transition:border-color .15s, background .15s;
+    background:var(--sk-n1);transition:border-color .15s var(--sk-ease), background .15s var(--sk-ease), box-shadow .15s var(--sk-ease);
   }
-  input:focus, select:focus{outline:none;border-color:var(--sk-primary);background:#fff;}
-  .field .help{font-size:11px;color:var(--sk-n4);margin-top:5px;}
+  input:focus, select:focus{outline:none;border-color:var(--sk-primary);background:#fff;box-shadow:var(--sk-focus-ring);}
+  .field .help{font-size:11px;color:var(--sk-n4);margin-top:5px;line-height:1.5;}
   .split-note{font-size:11px;color:var(--sk-n4);margin-top:8px;font-weight:500;}
-  .split-note.warn{color:#B87500;font-weight:700;}
+  .split-note.warn{
+    display:flex;align-items:flex-start;gap:8px;color:var(--sk-warning-ink);font-weight:700;
+    background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:var(--sk-radius-sm);
+    padding:10px 12px;
+  }
 
   /* sk-button (skType primary/secondary/tertiary) */
   .btn{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;border-radius:100px;padding:11px 22px;cursor:pointer;border:1.5px solid transparent;transition:background .15s,border-color .15s;}
@@ -99,19 +122,19 @@
   .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;}
   .btn-row.split{justify-content:space-between;}
 
-  /* sk-alert (4 tipos reales: warning/error/info/success — sin variante neutra, ver wireframes sección 1) */
-  .sk-alert{border-radius:12px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:500;margin-bottom:16px;}
+  /* sk-alert (4 tipos reales: warning/error/info/success — radio 8px = valor real del componente) */
+  .sk-alert{border-radius:var(--sk-radius-sm);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:500;margin-bottom:16px;backdrop-filter:blur(4px);}
   .sk-alert .ico{font-size:16px;line-height:1.3;}
-  .sk-alert-info{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);color:#04527a;}
-  .sk-alert-warning{background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);color:#7a4c00;}
+  .sk-alert-info{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);color:var(--sk-info-ink);}
+  .sk-alert-warning{background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);color:var(--sk-warning-ink);}
   .sk-alert-success{background:var(--sk-success-bg);border:1px solid #3fae63;color:#1a5c33;}
   .sk-alert-title{font-weight:800;margin-bottom:2px;}
 
   /* Resultado banner (sk-alert info, neutro — nunca success/error, ver wireframes sección 1) */
-  .result-banner{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);border-radius:12px;padding:20px 22px;margin-bottom:6px;}
-  .result-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#04527a;opacity:0.8;margin-bottom:6px;}
-  .result-title{font-size:17px;font-weight:800;color:#04527a;line-height:1.4;}
-  .result-sub{font-size:12.5px;color:#04527a;opacity:0.85;margin-top:6px;font-weight:500;}
+  .result-banner{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);border-radius:var(--sk-radius-sm);padding:20px 22px;margin-bottom:6px;}
+  .result-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--sk-info-ink);opacity:0.8;margin-bottom:6px;}
+  .result-title{font-size:17px;font-weight:800;color:var(--sk-info-ink);line-height:1.4;}
+  .result-sub{font-size:12.5px;color:var(--sk-info-ink);opacity:0.85;margin-top:6px;font-weight:500;}
 
   table.line-table{width:100%;border-collapse:collapse;margin-top:14px;}
   .line-table td{padding:9px 4px;font-size:13px;border-bottom:1px solid var(--sk-n2);}
@@ -123,24 +146,24 @@
 
   /* Ayuda inline (fallback <details>/<summary> — no existe sk-tooltip, ver wireframes sección 1) */
   .help-block{margin-top:18px;}
-  .help-block summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--sk-surface-800);padding:4px 0;}
+  .help-block summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--sk-surface-800);padding:4px 0;transition:color .15s var(--sk-ease);}
   .help-block[open] summary{color:var(--sk-primary-pressed);}
-  .help-body{background:var(--sk-n1);border:1px solid var(--sk-n3);border-radius:10px;padding:14px 16px;margin-top:6px;font-size:12.5px;line-height:1.6;}
+  .help-body{background:var(--sk-n1);border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);padding:14px 16px;margin-top:6px;font-size:12.5px;line-height:1.6;}
   .help-body .row{margin-bottom:8px;}
   .help-body .row b{color:var(--sk-surface-800);}
   .help-condensed{font-size:12.5px;color:var(--sk-n4);margin-top:2px;line-height:1.5;}
   .help-condensed .ver-ejemplo{color:var(--sk-primary-pressed);font-weight:700;cursor:pointer;}
 
-  .vigencia-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#7a4c00;background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:100px;padding:5px 12px;margin-bottom:16px;}
+  .vigencia-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--sk-warning-ink);background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:var(--sk-radius-pill);padding:5px 12px;margin-bottom:var(--sk-space-md);}
 
-  .disclaimer-block{margin-top:22px;}
+  .disclaimer-block{margin-top:var(--sk-space-lg);}
   .disclaimer-main{font-size:12.5px;color:var(--sk-surface-800);font-weight:600;line-height:1.6;margin-bottom:8px;}
-  .disclaimer-legal{font-size:10.5px;line-height:1.6;color:var(--sk-n4);font-weight:500;background:var(--sk-n1);border-radius:10px;padding:12px 14px;}
+  .disclaimer-legal{font-size:10.5px;line-height:1.6;color:var(--sk-n4);font-weight:500;background:var(--sk-n1);border-radius:var(--sk-radius-sm);padding:12px 14px;}
 
   /* Capa cliente */
   .cliente-shell{margin-top:32px;padding-top:26px;border-top:1px solid var(--sk-n3);}
   .segment-toggle{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
-  .segment-btn{font-size:11.5px;font-weight:700;padding:8px 14px;border-radius:100px;border:1.5px solid var(--sk-n3);background:#fff;color:var(--sk-n4);cursor:pointer;}
+  .segment-btn{font-size:11.5px;font-weight:700;padding:8px 14px;border-radius:var(--sk-radius-pill);border:1.5px solid var(--sk-n3);background:#fff;color:var(--sk-n4);cursor:pointer;transition:border-color .15s var(--sk-ease),color .15s var(--sk-ease),background .15s var(--sk-ease);}
   .segment-btn.active{border-color:var(--sk-primary);color:var(--sk-primary-pressed);background:var(--sk-primary-tint);}
 
   .acto-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--sk-primary-pressed);margin-bottom:4px;}
@@ -181,19 +204,23 @@
       <div class="card-title">¿De dónde sale la plata que vas a comparar?</div>
       <div class="card-desc">Elige la situación de tu cliente para ver solo el escenario que le aplica — ya no se muestran los dos siempre juntos.</div>
 
-      <div class="radio-card" data-branch="fvp" onclick="selectBranch('fvp')">
-        <div class="radio-dot"></div>
-        <div>
-          <div class="radio-title">De un Fondo Voluntario de Pensiones (FVP)</div>
-          <div class="radio-sub">Tu cliente tiene ahorro voluntario en Multifund y está evaluando si retirarlo o tomar Crédito Impulso.</div>
+      <div role="radiogroup" aria-label="¿De dónde sale la plata que vas a comparar?">
+        <div class="radio-card" data-branch="fvp" role="radio" aria-checked="false" tabindex="0"
+             onclick="selectBranch('fvp')" onkeydown="handleRadioKey(event,'fvp')">
+          <div class="radio-dot"></div>
+          <div>
+            <div class="radio-title">De un Fondo Voluntario de Pensiones (FVP)</div>
+            <div class="radio-sub">Tu cliente tiene ahorro voluntario en Multifund y está evaluando si retirarlo o tomar Crédito Impulso.</div>
+          </div>
         </div>
-      </div>
 
-      <div class="radio-card" data-branch="pac" onclick="selectBranch('pac')">
-        <div class="radio-dot"></div>
-        <div>
-          <div class="radio-title">De un PAC (Plan de Ahorro Contractual)</div>
-          <div class="radio-sub">Tu cliente tiene un PAC vigente y está evaluando consolidarlo o tomar Crédito Impulso.</div>
+        <div class="radio-card" data-branch="pac" role="radio" aria-checked="false" tabindex="0"
+             onclick="selectBranch('pac')" onkeydown="handleRadioKey(event,'pac')">
+          <div class="radio-dot"></div>
+          <div>
+            <div class="radio-title">De un PAC (Plan de Ahorro Contractual)</div>
+            <div class="radio-sub">Tu cliente tiene un PAC vigente y está evaluando consolidarlo o tomar Crédito Impulso.</div>
+          </div>
         </div>
       </div>
 
@@ -322,9 +349,9 @@
 
   <!-- CAPA CLIENTE -->
   <div class="cliente-shell" id="clienteShell" style="display:none;">
-    <div class="segment-toggle">
-      <button class="segment-btn active" id="seg-directa" onclick="setSegment('directa')">Vista resumida</button>
-      <button class="segment-btn" id="seg-acompanada" onclick="setSegment('acompanada')">Vista con más detalle</button>
+    <div class="segment-toggle" role="group" aria-label="Nivel de detalle">
+      <button class="segment-btn active" id="seg-directa" aria-pressed="true" onclick="setSegment('directa')">Vista resumida</button>
+      <button class="segment-btn" id="seg-acompanada" aria-pressed="false" onclick="setSegment('acompanada')">Vista con más detalle</button>
     </div>
 
     <div class="card" id="segmentWrap">
@@ -545,10 +572,12 @@ const steps = ['Ramificación','Datos del cliente','Supuestos','Comparación'];
 
 function renderStepper(){
   const el = document.getElementById('stepper');
+  el.setAttribute('role','list');
+  el.setAttribute('aria-label','Progreso del simulador');
   el.innerHTML = steps.map((s,i) => `
-    <div class="step-item ${i<currentStep?'done':i===currentStep?'active':''}">
+    <div class="step-item ${i<currentStep?'done':i===currentStep?'active':''}" role="listitem" ${i===currentStep?'aria-current="step"':''}>
       <div class="step-bar"></div>
-      <div class="step-label"><span class="step-check">✓</span>${s}</div>
+      <div class="step-label"><span class="step-check" aria-hidden="true">✓</span>${s}</div>
     </div>`).join('');
 }
 function goToStep(n){
@@ -561,8 +590,15 @@ function goToStep(n){
 }
 function selectBranch(b){
   branch = b;
-  document.querySelectorAll('.radio-card').forEach(c=>c.classList.toggle('selected', c.dataset.branch===b));
+  document.querySelectorAll('.radio-card').forEach(c=>{
+    const selected = c.dataset.branch===b;
+    c.classList.toggle('selected', selected);
+    c.setAttribute('aria-checked', String(selected));
+  });
   document.getElementById('btn-continuar-0').disabled = false;
+}
+function handleRadioKey(e, b){
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); selectBranch(b); }
 }
 function openHelp(id){ document.getElementById(id).open = true; }
 
@@ -642,8 +678,12 @@ function confirmarRevision(){
   document.getElementById('confirmRevision').style.display = 'block';
 }
 function setSegment(seg){
-  document.getElementById('seg-directa').classList.toggle('active', seg==='directa');
-  document.getElementById('seg-acompanada').classList.toggle('active', seg==='acompanada');
+  const directa = document.getElementById('seg-directa');
+  const acompanada = document.getElementById('seg-acompanada');
+  directa.classList.toggle('active', seg==='directa');
+  directa.setAttribute('aria-pressed', String(seg==='directa'));
+  acompanada.classList.toggle('active', seg==='acompanada');
+  acompanada.setAttribute('aria-pressed', String(seg==='acompanada'));
   document.getElementById('segmentWrap').classList.toggle('segment-acompanada', seg==='acompanada');
   document.getElementById('helpUVTCliente').open = (seg==='acompanada');
 }
