@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simuladores Crédito Impulso — Del diagnóstico a la primera propuesta visual · Skandia UX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & tokens (Skandia DS) ───────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* Primitivos Skandia */
+      --green-500: #00c73d;
+      --green-600: #03a835;
+      --green-700: #009a2f;
+      --green-50:  #f6fcf2;
+      --green-100: #caf9cb;
+      --lime-500:  #8fe000;
+      --yellow-400: #ffae08;
+      --yellow-50:  #fff3e0;
+      --red-500:    #e03430;
+      --red-50:     #fff5f4;
+      --blue-500:   #0099de;
+      --blue-50:    #ebf4ff;
+
+      --surface-0:   #ffffff;
+      --surface-50:  #fafafa;
+      --surface-100: #f7f7f7;
+      --surface-200: #e9e9e9;
+      --surface-300: #dddddd;
+      --surface-400: #c5c5c5;
+      --surface-600: #878787;
+      --surface-700: #565656;
+      --surface-800: #404040;
+      --surface-900: #232323;
+
+      --text-primary:   #404040;
+      --text-secondary: #666666;
+      --text-muted:     #878787;
+      --border:         #dddddd;
+
+      --font-body:  'Open Sans', system-ui, sans-serif;
+      --font-head:  'Montserrat', system-ui, sans-serif;
+
+      --radius-sm:  4px;
+      --radius-md:  8px;
+      --radius-lg:  12px;
+      --radius-xl:  16px;
+      --radius-pill: 100px;
+
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+      --gradient-brand: linear-gradient(135deg, #00c73d, #8fe000);
+
+      /* Paleta de gráficas del DS Skandia (charts-c01…c07) */
+      --chart-1: #a1dd70;
+      --chart-2: #a4d7e1;
+      --chart-3: #60a9a6;
+      --chart-4: #ff9460;
+      --chart-5: #8ba2c1;
+      --chart-6: #f67e7d;
+      --chart-7: #dddfd0;
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--surface-50);
+      line-height: 1.6;
+      padding: 0 20px 80px;
+    }
+
+    .page { max-width: 880px; margin: 0 auto; }
+
+    mark {
+      background: var(--green-100);
+      color: inherit;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    /* ─── Barra de progreso de lectura ──────────────────────── */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--gradient-brand);
+      z-index: 60;
+      transition: width 0.1s linear;
+    }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .doc-header {
+      background: var(--surface-900);
+      border-radius: var(--radius-xl);
+      padding: 40px 48px;
+      margin: 40px 0 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-header::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: var(--gradient-brand);
+    }
+
+    .doc-header::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(0,199,61,0.07);
+      pointer-events: none;
+    }
+
+    .header-eyebrow {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-500);
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-family: var(--font-head);
+      font-size: 27px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      max-width: 640px;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 28px;
+      max-width: 560px;
+    }
+
+    .header-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.72);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-pill);
+      padding: 4px 12px;
+    }
+
+    .meta-chip .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-500);
+    }
+
+    .meta-chip.warn .dot { background: var(--yellow-400); }
+
+    /* ─── Toolbar sticky: búsqueda + controles ──────────────── */
+    .toolbar {
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-wrap {
+      flex: 1 1 240px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      width: 14px; height: 14px;
+      stroke: var(--text-muted);
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--surface-100);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-pill);
+      padding: 8px 36px 8px 34px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    #searchInput:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(0,199,61,0.15);
+      background: var(--surface-0);
+    }
+
+    #searchClear {
+      position: absolute;
+      right: 8px;
+      border: none;
+      background: var(--surface-300);
+      color: var(--surface-700);
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+    }
+
+    .search-count {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .toolbar-btn {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-pill);
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .toolbar-btn:hover { background: var(--green-100); }
+    .toolbar-btn:active { transform: scale(0.97); }
+
+    /* ─── TOC ───────────────────────────────────────────────── */
+    .toc {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+    }
+
+    .toc-title {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 32px;
+    }
+
+    .toc-list li a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.15s;
+      border-radius: var(--radius-sm);
+    }
+
+    .toc-list li a:hover, .toc-list li a.active { color: var(--green-600); font-weight: 600; }
+
+    .toc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-500);
+      min-width: 18px;
+    }
+
+    /* ─── Section ───────────────────────────────────────────── */
+    .section {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      scroll-margin-top: 80px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--surface-100);
+    }
+
+    .section-number {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-500);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      min-width: 32px;
+      text-align: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .section p + p { margin-top: 10px; }
+    .section h3 {
+      font-family: var(--font-head);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .section > ul, .section > ol { padding-left: 20px; margin-top: 8px; }
+    .section > ul li, .section > ol li { margin-bottom: 6px; font-size: 13.5px; color: var(--text-secondary); }
+    .section > ul li::marker { color: var(--green-500); }
+    .section > ol li::marker { color: var(--green-500); font-weight: 700; }
+
+    /* ─── Callout (cómo leer / estado) ───────────────────────── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      background: var(--blue-50);
+      border: 1px solid #cfe7f8;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    .callout .icon { flex-shrink: 0; font-size: 15px; }
+
+    .callout-warn { background: var(--yellow-50); border-color: #ffe2b0; }
+    .callout-success { background: var(--green-50); border-color: var(--green-100); }
+
+    /* ─── Cards de hallazgos principales ─── */
+    .norm-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .norm-card {
+      border: 1px solid var(--surface-200);
+      border-top: 3px solid var(--green-500);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: var(--surface-0);
+    }
+
+    .norm-card h4 {
+      font-family: var(--font-head);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .norm-card p { font-size: 12.5px; color: var(--text-secondary); }
+
+    /* ─── Acordeones (hallazgos) ────────────────────────────── */
+    details.acc {
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      background: var(--surface-0);
+      overflow: hidden;
+      transition: box-shadow 0.15s;
+    }
+
+    details.acc[open] { box-shadow: var(--shadow-sm); border-color: var(--green-100); }
+
+    details.acc summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    details.acc summary::-webkit-details-marker { display: none; }
+    details.acc summary:hover { background: var(--green-50); }
+
+    .acc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--surface-0);
+      background: var(--green-500);
+      border-radius: var(--radius-sm);
+      padding: 3px 7px;
+      flex-shrink: 0;
+    }
+
+    .acc-num--theme { background: var(--surface-800); }
+    .acc-num--sev-4 { background: var(--red-500); }
+    .acc-num--sev-3 { background: var(--yellow-400); color: #5a3d00; }
+    .acc-num--sev-2 { background: var(--surface-600); }
+    .acc-num--sev-0 { background: var(--green-600); }
+
+    .acc-title {
+      font-family: var(--font-head);
+      font-size: 13.5px;
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .acc-chevron {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      stroke: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    details.acc[open] .acc-chevron { transform: rotate(180deg); }
+
+    .acc-body {
+      padding: 4px 18px 18px 18px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      border-top: 1px dashed var(--surface-200);
+    }
+
+    .acc-body > *:first-child { margin-top: 12px; }
+    .acc-body p + p, .acc-body p + ul, .acc-body ul + p, .acc-body ul + h5, .acc-body p + h5, .acc-body div.chart + h5, .acc-body h5 + p { margin-top: 10px; }
+
+    .acc-body ul { padding-left: 20px; }
+    .acc-body li { margin-bottom: 6px; }
+    .acc-body li::marker { color: var(--green-500); }
+
+    .acc-body h5 {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .acc-body h5::before {
+      content: '';
+      display: block;
+      width: 3px; height: 13px;
+      background: var(--green-500);
+      border-radius: 2px;
+    }
+
+    .acc-body strong { color: var(--text-primary); }
+
+    /* ─── Citas ─────────────────────────────── */
+    blockquote {
+      border-left: 3px solid var(--green-500);
+      background: var(--green-50);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 10px 16px;
+      margin: 10px 0;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    blockquote .src {
+      display: block;
+      font-style: normal;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ─── Tablas ────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    thead tr { background: var(--surface-100); border-bottom: 2px solid var(--border); }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    tbody tr { border-bottom: 1px solid var(--surface-100); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-50); }
+
+    td { padding: 10px 14px; vertical-align: top; }
+    td strong { font-weight: 700; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: var(--font-head);
+      border-radius: var(--radius-pill);
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+    .badge-ok { background: var(--green-50); color: var(--green-700); border: 1px solid var(--green-100); }
+    .badge-partial { background: var(--yellow-50); color: #8a5800; border: 1px solid #ffe2b0; }
+    .badge-no { background: var(--red-50); color: #b3241f; border: 1px solid #ffd2d0; }
+    .badge-high { background: var(--red-50); color: #b3241f; border: 1px solid #ffd2d0; }
+    .badge-medium { background: var(--yellow-50); color: #8a5800; border: 1px solid #ffe2b0; }
+    .badge-low { background: var(--surface-100); color: var(--text-secondary); border: 1px solid var(--surface-200); }
+    .badge-explore { background: var(--blue-50); color: #0b6693; border: 1px solid #cfe7f8; }
+
+    .link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-pill);
+      padding: 2px 10px;
+      text-decoration: none;
+      white-space: nowrap;
+      margin: 1px 2px 1px 0;
+      transition: background 0.15s;
+    }
+
+    .link-pill:hover { background: var(--green-100); }
+
+    /* ─── Stats grid ────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 14px 0 6px;
+    }
+
+    .stat-card {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .stat-value {
+      font-family: var(--font-head);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green-600);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* ─── Tarjetas de recomendaciones/implicaciones ─────────── */
+    .imp-list { list-style: none; counter-reset: imp; }
+
+    .imp-list li {
+      counter-increment: imp;
+      display: flex;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      background: var(--surface-0);
+    }
+
+    .imp-list li::before {
+      content: counter(imp, decimal-leading-zero);
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green-500);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .imp-list li strong { color: var(--text-primary); }
+    .imp-list li .badge { flex-shrink: 0; }
+    .imp-list li .imp-text { flex: 1; }
+
+    /* ─── Checklist ───────────────────────── */
+    .check-list { list-style: none; }
+    .check-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--surface-100);
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+    .check-list li:last-child { border-bottom: none; }
+    .check-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+    /* ─── Gráficas (CSS puro, paleta charts del DS) ─────────── */
+    .chart {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin: 14px 0;
+    }
+
+    .chart-title {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .chart-note {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 150px 1fr 56px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .bar-row:last-child { margin-bottom: 0; }
+
+    .bar-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: right;
+      line-height: 1.3;
+    }
+
+    .bar-track {
+      background: var(--surface-200);
+      border-radius: var(--radius-pill);
+      height: 14px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: var(--radius-pill);
+      background: var(--chart-1);
+      transition: width 0.9s cubic-bezier(0.25, 0.8, 0.3, 1);
+    }
+
+    .acc-static .bar-fill, .chart .bar-fill { width: var(--w); }
+
+    .bar-value {
+      font-family: var(--font-head);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      margin-bottom: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .legend-swatch {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 560px) {
+      .bar-row { grid-template-columns: 96px 1fr 50px; }
+      .bar-label { font-size: 11px; }
+    }
+
+    /* ─── Tarjeta de descarga Markdown ──────────────────────── */
+    .download-card {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      background: var(--surface-900);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--gradient-brand);
+    }
+
+    .download-icon { font-size: 22px; flex-shrink: 0; }
+
+    .download-text { flex: 1 1 320px; }
+
+    .download-text h3 {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .download-text p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.5;
+    }
+
+    .download-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn-download {
+      font-family: var(--font-head);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      transition: transform 0.1s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-download:hover { transform: translateY(-1px); text-decoration: none; }
+
+    .btn-download--primary { background: var(--green-500); color: #053d15; }
+    .btn-download--primary:hover { background: var(--lime-500); }
+
+    .btn-download--ghost {
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .btn-download--ghost:hover { border-color: var(--green-500); color: var(--green-500); }
+
+    /* ─── CTA de prototipo (sección 06) ─────────────────────── */
+    .proto-cta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      background: linear-gradient(135deg, #0d2b12, #163d1c);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-top: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .proto-cta::after {
+      content: '';
+      position: absolute;
+      right: -40px; bottom: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(0,199,61,0.14);
+      pointer-events: none;
+    }
+    .proto-cta-text { flex: 1 1 320px; }
+    .proto-cta-text h3 {
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .proto-cta-text p { font-size: 12.5px; color: rgba(255,255,255,0.68); }
+    .proto-cta-btn {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: #053d15;
+      background: var(--green-500);
+      border-radius: var(--radius-pill);
+      padding: 12px 24px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .proto-cta-btn:hover { background: var(--lime-500); transform: translateY(-1px); }
+
+    /* ─── Footer & back-to-top ──────────────────────────────── */
+    .doc-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 24px 0 0;
+    }
+
+    #backTop {
+      position: fixed;
+      right: 24px; bottom: 24px;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface-800);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.15s;
+      z-index: 55;
+    }
+
+    #backTop.visible { opacity: 1; pointer-events: auto; }
+    #backTop:hover { transform: translateY(-2px); background: var(--green-600); }
+
+    .no-results {
+      display: none;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 12px;
+      border: 1px dashed var(--surface-300);
+      border-radius: var(--radius-md);
+      margin-top: 10px;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      .doc-header { padding: 28px 24px; }
+      .section { padding: 24px 20px; }
+      .toc-list { grid-template-columns: 1fr; }
+      .norm-cards { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media print {
+      .toolbar, #backTop, .progress-bar { display: none; }
+      details.acc { border: none; }
+      details.acc summary { padding-left: 0; }
+      body { background: #fff; padding: 0; }
+      .section { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="page">
+
+    <!-- ═══ Header ═══ -->
+    <header class="doc-header">
+      <div class="header-eyebrow">UX Research &amp; Diseño · #UXplorers · Crédito Impulso</div>
+      <h1 class="header-title">Simuladores Crédito Impulso — del diagnóstico a la primera propuesta visual</h1>
+      <p class="header-subtitle">Piloto de rediseño del ecosistema de simuladores financieros de Skandia: evaluación heurística + research (Dovetail, Databricks, benchmarking externo) + decisiones de diseño, resumidos para el equipo y para quien no siguió el proceso día a día.</p>
+      <div class="header-meta">
+        <span class="meta-chip"><span class="dot"></span>Julio 2026</span>
+        <span class="meta-chip"><span class="dot"></span>2 prototipos evaluados</span>
+        <span class="meta-chip"><span class="dot"></span>3 fuentes de research</span>
+        <span class="meta-chip warn"><span class="dot"></span>Piloto en revisión — no es producción</span>
+      </div>
+    </header>
+
+    <!-- ═══ Toolbar ═══ -->
+    <div class="toolbar" role="search">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar en el documento… (ej: severidad, conviene, Databricks, stepper)" aria-label="Buscar en el documento">
+        <button id="searchClear" aria-label="Limpiar búsqueda">✕</button>
+      </div>
+      <span class="search-count" id="searchCount"></span>
+      <button class="toolbar-btn" id="expandAll">Expandir todo</button>
+      <button class="toolbar-btn" id="collapseAll">Contraer todo</button>
+    </div>
+
+    <!-- ═══ TOC ═══ -->
+    <nav class="toc" aria-label="Tabla de contenido">
+      <div class="toc-title">Contenido</div>
+      <ul class="toc-list">
+        <li><a href="#s0"><span class="toc-num">00</span>Cómo leer este documento</a></li>
+        <li><a href="#s1"><span class="toc-num">01</span>Resumen ejecutivo</a></li>
+        <li><a href="#s2"><span class="toc-num">02</span>Origen y metodología</a></li>
+        <li><a href="#s3"><span class="toc-num">03</span>Evaluación heurística</a></li>
+        <li><a href="#s4"><span class="toc-num">04</span>Research ampliado</a></li>
+        <li><a href="#s5"><span class="toc-num">05</span>De la evidencia a las decisiones</a></li>
+        <li><a href="#s6"><span class="toc-num">06</span>Primera propuesta visual</a></li>
+        <li><a href="#s7"><span class="toc-num">07</span>Qué sigue</a></li>
+      </ul>
+    </nav>
+
+    <!-- ═══ Descarga Markdown ═══ -->
+    <aside class="download-card">
+      <span class="download-icon">🤖</span>
+      <div class="download-text">
+        <h3>Este documento en formato Markdown</h3>
+        <p>Versión de texto plano del mismo contenido, pensada para <strong>consulta rápida</strong> y para <strong>alimentar herramientas de inteligencia artificial</strong> (asistentes, agentes, NotebookLM…) como contexto del piloto de Crédito Impulso.</p>
+      </div>
+      <div class="download-actions">
+        <a class="btn-download btn-download--primary" href="assets/simuladores-credito-impulso-proceso.md" download>⬇ Descargar .md</a>
+        <a class="btn-download btn-download--ghost" href="assets/simuladores-credito-impulso-proceso.md" target="_blank" rel="noopener">Ver en línea ↗</a>
+      </div>
+    </aside>
+
+    <!-- ═══ 00 Cómo leer este documento ═══ -->
+    <section class="section" id="s0">
+      <div class="section-header">
+        <div class="section-number">00</div>
+        <div>
+          <h2 class="section-title">Cómo leer este documento</h2>
+          <p class="section-desc">Glosario mínimo para seguir el resto del contenido sin haber estado en el proceso</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Término</th><th>Qué significa</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Crédito Impulso</strong></td><td>Crédito de libre inversión garantizado con el Fondo Voluntario de Pensiones (FVP) Multifund del cliente. Monto mínimo $10M COP, plazo 360 días, tasa preferencial (~15-17%) frente a un crédito de libre inversión de mercado (~22.4%), garantía bloqueada al 130% del monto.</td></tr>
+            <tr><td><strong>Evaluación heurística</strong></td><td>Método de diagnóstico UX: un equipo revisa una interfaz ya construida contra una lista de buenas prácticas conocidas ("heurísticas") y califica cada problema encontrado por severidad, sin necesitar pruebas con usuarios reales.</td></tr>
+            <tr><td><strong>Severidad (0-4)</strong></td><td>Escala usada en la evaluación heurística: 0 = fortaleza a mantener, 1 = cosmético, 2 = menor, 3 = mayor (debe corregirse), 4 = catastrófico (bloquea el uso o genera riesgo real, ej. normativo).</td></tr>
+            <tr><td><strong>Dovetail</strong></td><td>Repositorio donde Skandia guarda y analiza entrevistas y hallazgos de investigación de otros proyectos — se consultó para ver si ya existía evidencia relacionada.</td></tr>
+            <tr><td><strong>Databricks / CDP</strong></td><td>Plataforma de datos de clientes de Skandia. Se consultó para dimensionar cuántos clientes reales califican hoy para Crédito Impulso y cómo se comportan digitalmente.</td></tr>
+            <tr><td><strong>FVP / PAC</strong></td><td>Dos formas distintas en que un cliente puede tener su plata comprometida: un Fondo Voluntario de Pensiones (ahorro flexible) o un Plan de Ahorro Contractual (PAC). El simulador compara retirar esa plata vs. tomar Crédito Impulso.</td></tr>
+            <tr><td><strong>Design System <code>sk-*</code></strong></td><td>Librería oficial de componentes de interfaz de Skandia (botones, alertas, inputs, etc.), construida en Angular. Los simuladores originales no la usan — reconstruyen su propio CSS a mano.</td></tr>
+            <tr><td><strong>Capa asesor / capa cliente</strong></td><td>Los simuladores tienen hoy una sola audiencia visible (el asesor, que opera la herramienta frente al cliente). Una de las decisiones de este proceso es tratar "lo que ve el asesor" y "lo que ve el cliente cuando el asesor gira la pantalla" como dos niveles de un mismo motor, no como dos productos distintos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout callout-success">
+        <span class="icon">✅</span>
+        <span><strong>Estado del piloto:</strong> el diagnóstico (evaluación heurística + research) está completo y ya existe una primera propuesta visual navegable (sección 06). Lo que sigue abierto —validación legal, gobernanza de actualización normativa, si se invierte en la capa cliente— se detalla en la sección 07 y no está resuelto por este documento.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 01 Resumen ejecutivo ═══ -->
+    <section class="section" id="s1">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <div>
+          <h2 class="section-title">Resumen ejecutivo</h2>
+          <p class="section-desc">Pregunta central: ¿cómo hacer que los simuladores de Crédito Impulso —hoy piezas sueltas de asesor— se conviertan en el patrón de referencia para todo el ecosistema de simuladores de Skandia?</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">prototipos HTML evaluados con evaluación heurística</div></div>
+        <div class="stat-card"><div class="stat-value">28</div><div class="stat-label">hallazgos identificados en 11 heurísticas aplicadas</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">hallazgo de severidad máxima (4/4) — riesgo normativo</div></div>
+        <div class="stat-card"><div class="stat-value">~57.700</div><div class="stat-label">clientes reales elegibles para Crédito Impulso (Databricks), ~19% de la base total</div></div>
+      </div>
+
+      <h3>Hallazgos principales</h3>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--sev-4">!</span><span class="acc-title">La interfaz no muestra si la tasa y los parámetros tributarios (UVT, SMLMV) siguen vigentes</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Es el único hallazgo de severidad 4 (catastrófico) de todo el diagnóstico. Estos valores cambian cada año en Colombia y hoy están escritos directamente en el código, sin ninguna fecha de corte visible en pantalla — el asesor puede simular con una tasa o un parámetro ya desactualizado sin ninguna advertencia. Es también el hallazgo con mayor riesgo reputacional, porque este piloto es candidato a convertirse en el patrón para el resto de simuladores financieros de Skandia.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--sev-3">2</span><span class="acc-title">El banner de resultado usa "conviene", un verbo que la guía de voz de Skandia prohíbe explícitamente</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>"Conviene consolidar" / "No conviene consolidar" contradice el posicionamiento de marca ("no tomamos decisiones por el cliente") y es, además, lo primero que ve el cliente cuando el asesor gira la pantalla. Es el hallazgo de contenido más citable del diagnóstico: barato de corregir (es solo copy) y de alto impacto de marca.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--sev-3">3</span><span class="acc-title">El salto de Excel a HTML repintó el sistema de diseño, pero no rediseñó la experiencia</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Ninguno de los 2 prototipos originales usa un solo componente oficial del Design System de Skandia — reconstruyen a mano sus propios inputs, botones y alertas. Si el resto del ecosistema de simuladores (tributario, flujo de caja, planeación financiera) sigue el mismo patrón, Skandia terminará con varios simuladores parecidos entre sí pero inconsistentes con el resto de la plataforma digital.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--sev-2">4</span><span class="acc-title">El universo real de clientes elegibles es más chico y concentrado de lo que parecía</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>De 131.516 clientes con Fondo Multifund, solo ~57.700 (19% de la base total de Skandia) tienen saldo suficiente para calificar al mínimo del producto. Esa cartera está concentrada en 649 asesores, y su adopción digital es baja-media (26% con app, 6% activo en el portal de inversión) — un dato cuantitativo nuevo que matiza qué tan rápido tendría sentido invertir en que el cliente use el simulador por su cuenta.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--sev-2">5</span><span class="acc-title">La calidad del momento de decisión ya tiene evidencia histórica de que predice si el cliente vuelve a confiar en Skandia</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Investigación previa de Skandia sobre retiros de Fondos Voluntarios de Pensiones (no específica de Crédito Impulso, pero sobre el mismo tipo de decisión y el mismo producto de garantía) confirma que la experiencia en el momento en que el cliente decide qué hacer con su plata predice si vuelve a ahorrar con Skandia después. No es un detalle estético — es una variable de negocio con evidencia histórica de impacto.</p>
+        </div>
+      </details>
+
+      <h3>Recomendaciones clave (detalle en la sección 03)</h3>
+      <ul>
+        <li>Mostrar en la interfaz —no solo en el disclaimer final— la vigencia de tasas y parámetros tributarios, con fecha de corte visible.</li>
+        <li>Reescribir el copy de los banners de resultado quitando "conviene" por un dato objetivo con interpretación abierta.</li>
+        <li>Adoptar los componentes oficiales del Design System (inputs de moneda, alertas) como primer paso de consistencia de plataforma.</li>
+        <li>Separar la pregunta de "¿la plata viene de un FVP o de un PAC?" al inicio del flujo, en vez de mostrar siempre ambos escenarios completos.</li>
+        <li>Indicar con jerarquía visual real, no solo un subtítulo pequeño, que la herramienta es de uso del asesor.</li>
+      </ul>
+    </section>
+
+    <!-- ═══ 02 Origen y metodología ═══ -->
+    <section class="section" id="s2">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <div>
+          <h2 class="section-title">Origen y metodología</h2>
+          <p class="section-desc">Por qué existe este piloto y en qué orden se produjo la evidencia</p>
+        </div>
+      </div>
+
+      <p>Los simuladores de crédito nacieron de iniciativas puntuales (omnicanalidad, campañas comerciales) sin un dueño único, migrando de Excel a HTML con ayuda de IA generativa. En una reunión de negocio de julio de 2026, el equipo de Producto/Campañas identificó el riesgo de que este patrón se repita en el resto de simuladores financieros (tributario, flujo de caja, planeación financiera integral) sin conectar nunca con el Design System real ni con una revisión de contenido — cada simulador terminando como una pieza suelta en vez de parte de un ecosistema consistente.</p>
+      <p>Se decidió usar el paquete de <strong>Crédito Impulso</strong> (2 simuladores: consolidación de deudas, y retiro FVP/PAC vs. Crédito Impulso) como <strong>piloto</strong> de una nueva forma de trabajar: diagnosticar con evidencia antes de rediseñar, en vez de repintar directamente.</p>
+
+      <blockquote>"Él coge nuestro sistema de diseño, lo repinta, seguramente tendrá algunas mejoras en usabilidad" — de la discusión de negocio que originó este piloto, describiendo cómo se hizo el salto de Excel a HTML.<span class="src">Reunión de negocio, julio 2026</span></blockquote>
+
+      <h3>Orden del proceso</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Paso</th><th>Qué se produjo</th><th>Tipo de proyecto (playbook UX Skandia)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1 · Diagnóstico</strong></td><td>Evaluación heurística de los 2 prototipos HTML existentes</td><td><span class="badge badge-ok">Validar</span> algo ya construido</td></tr>
+            <tr><td><strong>2 · Research</strong></td><td>Evidencia complementaria: Dovetail (investigación histórica relacionada), Databricks (dimensionamiento real de clientes/asesores), benchmarking externo (mercado)</td><td><span class="badge badge-explore">Identificar</span> oportunidades y señales</td></tr>
+            <tr><td><strong>3 · Decisiones de diseño</strong></td><td>Clasificación de riesgo, arquitectura conceptual del flujo, estrategia de contenido, verificación real del Design System y wireframes</td><td>Insumo de trabajo del equipo, sin gate formal de producción todavía</td></tr>
+            <tr><td><strong>4 · Primera propuesta visual</strong></td><td>Mockup HTML navegable del simulador de retiro FVP/PAC, aplicando las decisiones anteriores</td><td>Mockup de socialización, no producción</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <span class="icon">💡</span>
+        <span>Este documento sigue ese mismo orden: la sección 03 profundiza en el diagnóstico (evaluación heurística), la sección 04 profundiza en el research, la sección 05 resume las decisiones que se tomaron con esa evidencia, y la sección 06 presenta el resultado navegable.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 03 Evaluación heurística ═══ -->
+    <section class="section" id="s3">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <div>
+          <h2 class="section-title">Evaluación heurística</h2>
+          <p class="section-desc">Diagnóstico de los 2 prototipos HTML existentes, contra 11 heurísticas de usabilidad, Design System y tono de marca</p>
+        </div>
+      </div>
+
+      <p>Se evaluaron los dos prototipos navegables que existen hoy (<em>consolidación de deudas</em> y <em>retiro FVP/PAC vs. Crédito Impulso</em>) bajo 4 lentes: usabilidad clásica (heurísticas de Nielsen), alineación con el Design System de Skandia, contenido y tono de marca, y encaje dentro del ecosistema completo de simuladores. Cada hallazgo se calificó en una escala de severidad de 0 (fortaleza) a 4 (catastrófico).</p>
+
+      <div class="chart">
+        <div class="chart-title">Severidad más alta encontrada, por heurística evaluada</div>
+        <div class="chart-note">11 heurísticas aplicadas · 28 hallazgos en total · escala 0 (fortaleza) a 4 (catastrófico)</div>
+        <div class="bar-row"><div class="bar-label">1 · Visibilidad del estado</div><div class="bar-track"><span class="bar-fill" style="--w:100%; background:var(--red-500)"></span></div><div class="bar-value">4</div></div>
+        <div class="bar-row"><div class="bar-label">2 · Mundo real</div><div class="bar-track"><span class="bar-fill" style="--w:75%; background:var(--yellow-400)"></span></div><div class="bar-value">3</div></div>
+        <div class="bar-row"><div class="bar-label">3 · Control y libertad</div><div class="bar-track"><span class="bar-fill" style="--w:75%; background:var(--yellow-400)"></span></div><div class="bar-value">3</div></div>
+        <div class="bar-row"><div class="bar-label">4 · Consistencia y estándares</div><div class="bar-track"><span class="bar-fill" style="--w:75%; background:var(--yellow-400)"></span></div><div class="bar-value">3</div></div>
+        <div class="bar-row"><div class="bar-label">5 · Prevención de errores</div><div class="bar-track"><span class="bar-fill" style="--w:75%; background:var(--yellow-400)"></span></div><div class="bar-value">3</div></div>
+        <div class="bar-row"><div class="bar-label">6 · Reconocer &gt; recordar</div><div class="bar-track"><span class="bar-fill" style="--w:50%; background:var(--chart-1)"></span></div><div class="bar-value">2</div></div>
+        <div class="bar-row"><div class="bar-label">7 · Estética y minimalismo</div><div class="bar-track"><span class="bar-fill" style="--w:50%; background:var(--chart-1)"></span></div><div class="bar-value">2</div></div>
+        <div class="bar-row"><div class="bar-label">8 · Ayuda y documentación</div><div class="bar-track"><span class="bar-fill" style="--w:75%; background:var(--yellow-400)"></span></div><div class="bar-value">3</div></div>
+        <div class="bar-row"><div class="bar-label">9 · Alineación Design System</div><div class="bar-track"><span class="bar-fill" style="--w:75%; background:var(--yellow-400)"></span></div><div class="bar-value">3</div></div>
+        <div class="bar-row"><div class="bar-label">10 · Claridad de audiencia</div><div class="bar-track"><span class="bar-fill" style="--w:50%; background:var(--chart-1)"></span></div><div class="bar-value">2</div></div>
+        <div class="bar-row"><div class="bar-label">11 · Cumplimiento normativo y tono</div><div class="bar-track"><span class="bar-fill" style="--w:75%; background:var(--yellow-400)"></span></div><div class="bar-value">3</div></div>
+      </div>
+
+      <h3>Los 2 hallazgos ancla</h3>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--sev-4">4</span><span class="acc-title">Parámetros tributarios y tasa Skandia sin indicador de vigencia</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Los valores de UVT y SMLMV (unidades que la ley colombiana usa para calcular impuestos, y que cambian cada año) están escritos directamente en el código del simulador, sin ninguna señal en pantalla de "vigente para [período]". Lo mismo ocurre con la tasa de Skandia, que el propio material comercial describe como "fija semanal" — es decir, cambia, pero el simulador no lo comunica.</p>
+          <p><strong>Por qué es el hallazgo más severo:</strong> alimenta un cálculo que informa una decisión de crédito real, desde $10M COP. Presentar un dato tributario o una tasa desactualizada sin advertencia no es solo un problema de interfaz — es el mismo riesgo que ya se había nombrado en la reunión de negocio que originó el piloto ("no lo pueden tomar como la palabra final").</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--sev-3">3</span><span class="acc-title">El banner de resultado usa el verbo "conviene"</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El simulador de consolidación de deudas presenta el resultado como "Conviene consolidar" / "No conviene consolidar". La guía de comunicación de Skandia lista "Te conviene" explícitamente entre los verbos a evitar, junto a "Te recomendamos" y "Deberías" — no es solo una preferencia de estilo, contradice el posicionamiento de marca ("no tomamos decisiones por el cliente", "comprensión antes que acción").</p>
+          <p>El simulador de retiro FVP/PAC redacta el veredicto de forma algo más descriptiva ("Tomar el Crédito Impulso conviene frente a…"), acercándose más al tono correcto al menos al contextualizar la comparación, pero sigue usando el verbo prohibido.</p>
+        </div>
+      </details>
+
+      <h3>Recomendaciones priorizadas</h3>
+      <ol class="imp-list">
+        <li><span class="badge badge-high">Prioridad 1</span><span class="imp-text">Mostrar en la interfaz —no solo en el disclaimer final— la vigencia de los parámetros tributarios y de la tasa usada en el cálculo, con fecha de corte visible. (Riesgo normativo, severidad 4, corrección relativamente simple.)</span></li>
+        <li><span class="badge badge-medium">Prioridad 2</span><span class="imp-text">Reescribir el copy de los banners quitando "conviene"; agregar confirmación antes de borrar una fila de deuda; agregar ayuda inline en los términos tributarios más críticos; rediseñar la jerarquía visual del disclaimer; adoptar los inputs de moneda y alertas oficiales del Design System. (Quick wins de contenido y confianza, severidad 3.)</span></li>
+        <li><span class="badge badge-medium">Prioridad 3</span><span class="imp-text">Separar la pregunta de origen de la plata (FVP o PAC) al inicio del flujo; indicar con jerarquía visual real que la herramienta es de uso del asesor; agregar función de guardar/exportar el resultado. (Rediseño de flujo, requiere más trabajo.)</span></li>
+        <li><span class="badge badge-low">Prioridad 4</span><span class="imp-text">Migrar colores hardcodeados a tokens del Design System; definir tokens de tipografía; evaluar promover un componente de stepper transversal para todo el ecosistema de simuladores. (Deuda de plataforma, no exclusiva de este piloto.)</span></li>
+      </ol>
+
+      <h3>Dos ideas de fondo</h3>
+      <div class="norm-cards">
+        <div class="norm-card">
+          <h4>El salto Excel → HTML resolvió fragilidad, no experiencia</h4>
+          <p>El paso a HTML mantuvo el modelo mental de Excel (tablas densas, resultado como fórmula) y no adoptó ningún componente oficial del Design System — repintó, no rediseñó.</p>
+        </div>
+        <div class="norm-card">
+          <h4>El copy de resultado nace de la fórmula de negocio, no de content design</h4>
+          <p>El banner de veredicto lo escribió el equipo de negocio/tributario con lógica de "resultado de fórmula" — nunca pasó por una revisión de contenido, por eso no sigue la guía de voz de la marca.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 04 Research ampliado ═══ -->
+    <section class="section" id="s4">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <div>
+          <h2 class="section-title">Research ampliado</h2>
+          <p class="section-desc">Las 3 fuentes de evidencia que complementan la evaluación heurística: investigación histórica, datos reales de clientes, y mercado</p>
+        </div>
+      </div>
+
+      <h3>Investigación histórica de Skandia (Dovetail)</h3>
+      <p>No existe investigación dedicada específicamente a "Crédito Impulso", pero sí evidencia histórica robusta sobre el mismo momento de decisión (un cliente evaluando qué hacer con su Fondo Voluntario de Pensiones) y sobre el mismo producto de garantía (el fondo Multifund).</p>
+      <blockquote>"El Financial Planner es el sistema de retención más efectivo": el 60-70% de los retiros grandes pasan por el asesor; los pequeños y autogestionados no. El asesor se entera tarde del retiro, sin poder identificar al cliente a tiempo.<span class="src">Investigación de retención ante retiros de Fondos Voluntarios de Pensiones, abril 2026</span></blockquote>
+      <blockquote>"La calidad de la experiencia de salida predice la probabilidad de reenganche": los clientes que retiran "bien" vuelven a ahorrar después.<span class="src">Misma investigación</span></blockquote>
+      <blockquote>Los clientes asocian el fondo Multifund solo con "pensión" por su nombre y no comprenden que también es un vehículo de inversión flexible — la misma confusión de nomenclatura es un riesgo directo para Crédito Impulso, que depende de que el cliente entienda ese fondo como garantía, no solo como ahorro pensional.<span class="src">Hallazgos sobre el fondo Multifund, octubre-noviembre 2025</span></blockquote>
+      <p><strong>Patrón que se repite:</strong> fricción y ambigüedad en momentos de decisión financiera sensible, jerga técnica sin capa educativa (compensada hoy con capacitación humana repetida), y ambigüedad sobre para quién es realmente la herramienta — los 3 mismos patrones que ya aparecían en la evaluación heurística de estos 2 simuladores.</p>
+
+      <h3>Datos reales de clientes (Databricks)</h3>
+      <p>Skandia mantiene una plataforma de datos de clientes (CDP). Se consultó para dimensionar, con datos reales y no solo evidencia cualitativa, cuántos clientes califican hoy para Crédito Impulso y cómo se comportan digitalmente.</p>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value">305.470</div><div class="stat-label">clientes totales en la base analizada</div></div>
+        <div class="stat-card"><div class="stat-value">131.516</div><div class="stat-label">tienen el fondo Multifund (43% de la base)</div></div>
+        <div class="stat-card"><div class="stat-value">57.737</div><div class="stat-label">tienen saldo suficiente para calificar al mínimo del producto (19% de la base)</div></div>
+        <div class="stat-card"><div class="stat-value">649</div><div class="stat-label">asesores distintos gestionan esa cartera elegible</div></div>
+      </div>
+
+      <div class="chart">
+        <div class="chart-title">Adopción digital: base elegible para Crédito Impulso vs. base total de clientes</div>
+        <div class="chart-note">% con la app activa y % activo en el portal de inversión (Invested)</div>
+        <div class="bar-row"><div class="bar-label">App — base elegible</div><div class="bar-track"><span class="bar-fill" style="--w:26%"></span></div><div class="bar-value">25,8%</div></div>
+        <div class="bar-row"><div class="bar-label">App — base total</div><div class="bar-track"><span class="bar-fill" style="--w:14%; background:var(--chart-7)"></span></div><div class="bar-value">13,9%</div></div>
+        <div class="bar-row"><div class="bar-label">Invested — base elegible</div><div class="bar-track"><span class="bar-fill" style="--w:6.2%; background:var(--chart-2)"></span></div><div class="bar-value">6,2%</div></div>
+        <div class="bar-row"><div class="bar-label">Invested — base total</div><div class="bar-track"><span class="bar-fill" style="--w:2.3%; background:var(--chart-7)"></span></div><div class="bar-value">2,3%</div></div>
+      </div>
+
+      <p>La cartera elegible está además concentrada de forma desigual: el asesor con más clientes elegibles gestiona 2.723, frente a una mediana muy inferior en el resto de los 649 asesores — la fricción de capacitación que hoy exige el simulador no se reparte parejo, golpea más a los asesores con cartera pequeña.</p>
+
+      <div class="callout callout-warn">
+        <span class="icon">🟡</span>
+        <span><strong>Límite de esta fuente:</strong> Databricks no tiene (todavía) ninguna tabla con originación real de créditos ni con uso/telemetría de estos 2 simuladores — solo analítica de perfil de cliente. Estos números dimensionan el universo de oportunidad, no cuántos créditos ya se han originado ni cuánto se usa el simulador hoy.</span>
+      </div>
+
+      <h3>Benchmarking externo</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Referente</th><th>Patrón UX destacado</th><th>Relevancia para el caso</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Banca colombiana</strong> (BBVA, Banco de Bogotá)</td><td>Simuladores de crédito de libre inversión en autogestión completa del cliente final</td><td>El mercado colombiano ya resuelve la consolidación de deuda con autogestión — Crédito Impulso hoy solo existe como herramienta de asesor.</td></tr>
+            <tr><td><strong>FINRA</strong> (regulador, EE.UU.)</td><td>El disclaimer se declara "informativo y educativo" de forma separada y explícita, nunca mezclado con el resultado del cálculo</td><td>Modelo de referencia para separar "resultado" de "esto no es asesoría" — coincide con el hallazgo sobre el disclaimer denso y de baja jerarquía.</td></tr>
+            <tr><td><strong>Caso Habstash</strong> (fintech)</td><td>Migró de un formulario de una sola página a un flujo por pasos tras detectar abandono</td><td>Mismo problema ya diagnosticado en el simulador de retiro FVP/PAC: 9+ campos en 2 tarjetas sin agrupación progresiva.</td></tr>
+            <tr><td><strong>Patrón fintech general</strong></td><td>Desglosan textos legales largos en pasos cortos y escaneables; muestran el costo total antes de que el usuario se comprometa</td><td>Respalda reestructurar el disclaimer en "mensaje claro + aviso legal breve".</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="icon">💡</span>
+        <span><strong>Síntesis:</strong> el mercado ya validó patrones que resuelven buena parte de lo que la evaluación heurística encontró (autogestión para este tipo de decisión, flujos por pasos, disclaimers integrados como educación) — pero el dato real de Databricks matiza qué tan rápido conviene moverse hacia la autogestión: la base elegible de Skandia todavía tiene poco hábito digital (26% app, 6% Invested), así que ese movimiento es una apuesta de mediano plazo, no de lanzamiento inmediato.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 05 De la evidencia a las decisiones ═══ -->
+    <section class="section" id="s5">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <div>
+          <h2 class="section-title">De la evidencia a las decisiones</h2>
+          <p class="section-desc">Resumen ejecutivo de cómo el diagnóstico y el research se tradujeron en decisiones concretas de diseño</p>
+        </div>
+      </div>
+
+      <h3>Arquitectura del flujo</h3>
+      <ul>
+        <li><strong>Un flujo con una pregunta inicial de ramificación, no dos escenarios siempre visibles:</strong> hoy "retiro FVP" y "consolidación PAC" se muestran siempre en paralelo, aunque son casos de uso distintos. La decisión es preguntar primero "¿de dónde sale la plata que vas a comparar?" y mostrar solo la rama relevante — sin perder los datos ya capturados si el asesor cambia de opción.</li>
+        <li><strong>Consolidación de deudas y retiro FVP/PAC se mantienen como simuladores separados</strong>, no se fusionan en un único flujo — son conversaciones distintas con el cliente que hoy comparten producto de garantía pero no comparten momento de decisión.</li>
+        <li><strong>Un solo motor de cálculo, dos capas de presentación</strong> (asesor / cliente) en vez de construir dos simuladores completos y duplicados: lo que cambia entre capas es densidad de información y tono, no la lógica de negocio.</li>
+      </ul>
+
+      <h3>Contenido y tono</h3>
+      <ul>
+        <li><strong>Promesa central adoptada:</strong> "Te mostramos cómo se compara tu situación hoy con Crédito Impulso, en tu idioma — la decisión siempre es tuya."</li>
+        <li><strong>Los banners de veredicto se reescriben sin "conviene"</strong>, mostrando siempre el dato con signo explícito ("El crédito único paga $X menos en intereses en este plazo…") en vez de una etiqueta de aprobación.</li>
+        <li><strong>Los términos tributarios críticos</strong> (cuenta contingente, UVT, SMLMV, Retefuente, IBC, ingreso gravado) se explican donde aparecen, con una estructura corta de concepto + ejemplo + beneficio + qué sigue, en vez de depender de capacitación humana repetida.</li>
+        <li><strong>El disclaimer se reestructura en capas:</strong> un mensaje principal en lenguaje claro primero, y un aviso legal breve después — nunca un único bloque legal denso.</li>
+      </ul>
+
+      <h3>Diseño de interfaz</h3>
+      <ul>
+        <li><strong>Se verificó el Design System real de Skandia contra el código</strong>, no contra la referencia habitual: existen 12 componentes oficiales (no 81 como se asumía por defecto) — alertas, botones, inputs de número y texto, checkbox, radio, select, entre otros. No existen todavía componentes de pasos (stepper), modal, tabla ni tooltip.</li>
+        <li><strong>Se definieron soluciones concretas para cada vacío</strong>, sin bloquear el diseño ni reinventar un sistema paralelo: un componente de pasos ya usado en otro proyecto interno se promueve para este piloto; el banner de resultado usa la alerta "informativa" (neutra) del Design System en vez de "éxito"/"error", para no reintroducir el juicio de valor binario que el copy ya eliminó; la confirmación antes de borrar una fila se resuelve en línea, sin modal; la ayuda tributaria usa un elemento nativo de HTML expandible en vez de un tooltip que no existe; la tabla de datos usa una tabla semántica estándar con los inputs oficiales dentro de cada celda.</li>
+      </ul>
+    </section>
+
+    <!-- ═══ 06 Primera propuesta visual ═══ -->
+    <section class="section" id="s6">
+      <div class="section-header">
+        <div class="section-number">06</div>
+        <div>
+          <h2 class="section-title">Primera propuesta visual</h2>
+          <p class="section-desc">Mockup navegable que implementa las decisiones de la sección 05, sobre el simulador de retiro FVP/PAC</p>
+        </div>
+      </div>
+
+      <p>Entre los dos simuladores del piloto, se eligió <strong>retiro FVP/PAC vs. Crédito Impulso</strong> para construir la primera propuesta visual, por ser el que tiene más cambios de arquitectura que mostrar (la ramificación inicial, las dos capas de presentación). Es un mockup HTML de un solo archivo, pensado para socializar con el equipo — no es el simulador en producción ni un componente Angular real.</p>
+
+      <p>Implementa, en un flujo navegable:</p>
+      <ul>
+        <li>La pregunta de ramificación inicial (FVP o PAC) antes de mostrar cualquier campo.</li>
+        <li>Un indicador de pasos (stepper) que ubica al asesor dentro del flujo.</li>
+        <li>El indicador de vigencia de tasa y parámetros tributarios, visible junto a los campos, no solo al final.</li>
+        <li>Los banners de resultado reescritos sin "conviene".</li>
+        <li>Ayuda tributaria inline para los términos más críticos, expandible sin salir de la pantalla.</li>
+        <li>El disclaimer reestructurado en capas (mensaje claro + aviso legal breve), con versión de asesor y versión de cliente.</li>
+        <li>La capa cliente en dos actos ("Así está tu situación hoy" → "Así se compara con Crédito Impulso"), con profundidad ajustable.</li>
+      </ul>
+
+      <p>El motor de cálculo tributario se reutilizó tal cual del prototipo original —no se tocó la lógica de negocio— y se validó contra las cifras exactas citadas en la reunión de negocio que originó el piloto (costo de retiro FVP ≈ $49M, costo de consolidar PAC ≈ $108,7M, ahorro del PAC ≈ $66,7M), que coinciden.</p>
+
+      <div class="proto-cta">
+        <div class="proto-cta-text">
+          <h3>Simulador Retiro FVP/PAC vs. Crédito Impulso — v1</h3>
+          <p>Mockup navegable, en revisión con el equipo. Ábrelo para recorrer el flujo completo: ramificación, captura de datos, resultado y la vista de cliente.</p>
+        </div>
+        <a class="proto-cta-btn" href="https://uxplorerscolombia.github.io/ux-prototypes/projects/simulador-retiro-fvp-pac/v1/" target="_blank" rel="noopener">Ver el prototipo ↗</a>
+      </div>
+    </section>
+
+    <!-- ═══ 07 Qué sigue ═══ -->
+    <section class="section" id="s7">
+      <div class="section-header">
+        <div class="section-number">07</div>
+        <div>
+          <h2 class="section-title">Qué sigue</h2>
+          <p class="section-desc">Preguntas abiertas que este documento no resuelve — quedan para el equipo</p>
+        </div>
+      </div>
+      <ul class="check-list">
+        <li><span class="check-icon">🟡</span><span><strong>Validación legal</strong> de qué nivel de indicador de vigencia es normativamente suficiente para tasa y parámetros tributarios, y si un veredicto de sistema (aunque ya no diga "conviene") necesita un tratamiento adicional de disclaimer por riesgo de asesoría no licenciada.</span></li>
+        <li><span class="check-icon">🟡</span><span><strong>Gobernanza de actualización normativa:</strong> quién es responsable de mantener vigentes los parámetros tributarios y la tasa en todos los simuladores que los usan, y con qué mecanismo (actualización manual vs. integración en tiempo real).</span></li>
+        <li><span class="check-icon">🟡</span><span><strong>Si y cuándo se invierte en construir la capa cliente</strong> — los datos de Databricks ya dimensionan el universo elegible y su adopción digital, pero no hay todavía telemetría real de uso del simulador que confirme la demanda.</span></li>
+        <li><span class="check-icon">🟡</span><span><strong>Orquestación del ecosistema completo de simuladores:</strong> quién centraliza el inventario hacia adelante y cómo se conecta cada simulador a la campaña comercial vigente en vez de quedar como una pieza suelta.</span></li>
+        <li><span class="check-icon">🟡</span><span><strong>Prioridad de inversión en los componentes de plataforma que todavía faltan</strong> (pasos, tabla, ayuda contextual) frente a otros compromisos del Design System.</span></li>
+      </ul>
+    </section>
+
+    <footer class="doc-footer">
+      <strong>Fuentes</strong><br>
+      Evaluación heurística de los 2 prototipos HTML de Crédito Impulso (metodología UOC + heurísticas de Nielsen), julio 2026.<br>
+      Research ampliado: Dovetail (proyectos de investigación sobre retiros de Fondos Voluntarios de Pensiones y sobre el fondo Multifund), Databricks (analítica de clientes, tabla <code>data_prd.cdp.analiticaclientesux</code>), benchmarking externo (banca colombiana, FINRA, casos fintech).<br>
+      Decisiones de diseño: clasificación de riesgo y arquitectura conceptual, estrategia de contenido, verificación del Design System y wireframes — documentos internos del piloto.<br>
+      Reunión de negocio que originó el piloto, julio 2026.<br><br>
+      Elaborado por el equipo UX (#UXplorers) · Piloto Crédito Impulso · julio 2026.
+    </footer>
+  </div>
+
+  <button id="backTop" aria-label="Volver arriba">↑</button>
+
+  <script>
+    // ── Barra de progreso de lectura ──
+    const progressBar = document.getElementById('progressBar');
+    const backTop = document.getElementById('backTop');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+      progressBar.style.width = pct + '%';
+      backTop.classList.toggle('visible', h.scrollTop > 600);
+    }, { passive: true });
+
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ── Expandir / contraer todo ──
+    const allAccs = [...document.querySelectorAll('details.acc')];
+    document.getElementById('expandAll').addEventListener('click', () => allAccs.forEach(d => d.open = true));
+    document.getElementById('collapseAll').addEventListener('click', () => allAccs.forEach(d => d.open = false));
+
+    // ── Búsqueda global ──
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    const searchCount = document.getElementById('searchCount');
+    const searchScopes = allAccs;
+
+    function clearHighlights(root) {
+      root.querySelectorAll('mark').forEach(m => {
+        m.replaceWith(document.createTextNode(m.textContent));
+      });
+      root.normalize?.();
+    }
+
+    function highlight(root, term) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: n => n.parentElement.closest('script,style,summary svg') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+      });
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      const re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      nodes.forEach(node => {
+        if (!re.test(node.textContent)) return;
+        const frag = document.createDocumentFragment();
+        node.textContent.split(re).forEach((part, i) => {
+          if (i % 2 === 1) {
+            const mark = document.createElement('mark');
+            mark.textContent = part;
+            frag.appendChild(mark);
+          } else if (part) {
+            frag.appendChild(document.createTextNode(part));
+          }
+        });
+        node.replaceWith(frag);
+      });
+    }
+
+    let searchTimer;
+    function runSearch() {
+      const term = searchInput.value.trim().toLowerCase();
+      searchClear.style.display = term ? 'block' : 'none';
+
+      searchScopes.forEach(el => { clearHighlights(el); el.style.display = ''; });
+
+      if (term.length < 2) {
+        searchCount.textContent = '';
+        return;
+      }
+
+      let hits = 0;
+      allAccs.forEach(d => {
+        const match = d.textContent.toLowerCase().includes(term);
+        d.style.display = match ? '' : 'none';
+        if (match) { d.open = true; highlight(d, term); hits++; }
+      });
+
+      searchCount.textContent = hits + ' resultado' + (hits === 1 ? '' : 's');
+    }
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(runSearch, 180);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      runSearch();
+      searchInput.focus();
+    });
+
+    // ── TOC activo según scroll ──
+    const tocLinks = [...document.querySelectorAll('.toc-list a')];
+    const sections = tocLinks.map(a => document.querySelector(a.getAttribute('href')));
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => s && obs.observe(s));
+  </script>
+</body>
+</html>
