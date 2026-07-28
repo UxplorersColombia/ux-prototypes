@@ -2677,5 +2677,202 @@ class Component extends DCLogic {
   }
 }
 </script>
+
+<!-- ============ INSPECTOR DE ESTILOS (dev) ============ -->
+<style id="sk-insp-style">
+  #sk-insp-fab{position:fixed;right:24px;bottom:24px;width:56px;height:56px;border-radius:50%;background:#00c73d;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.28);z-index:2147483001;transition:transform .15s ease,background .15s ease;}
+  #sk-insp-fab:hover{transform:translateY(-2px);}
+  #sk-insp-fab.active{background:#02271a;}
+  #sk-insp-fab svg{width:26px;height:26px;pointer-events:none;}
+  #sk-insp-panel{position:fixed;top:0;right:0;width:340px;max-width:90vw;height:100vh;background:#fff;box-shadow:-4px 0 28px rgba(0,0,0,.14);z-index:2147483000;transform:translateX(105%);transition:transform .25s ease;overflow-y:auto;font-family:'Open Sans',system-ui,sans-serif;color:#232323;}
+  #sk-insp-panel.open{transform:translateX(0);}
+  .sk-insp-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 18px 12px;}
+  .sk-insp-tag{font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;color:#232323;}
+  .sk-insp-dim{font-size:11px;color:#878787;margin-top:2px;}
+  .sk-insp-x{background:none;border:none;cursor:pointer;font-size:20px;line-height:1;color:#878787;padding:2px 6px;border-radius:8px;}
+  .sk-insp-x:hover{background:#f2f2f2;color:#232323;}
+  .sk-insp-copycss{display:block;width:calc(100% - 36px);margin:0 18px 14px;padding:9px;border:1px solid #00c73d;background:#f6fcf2;color:#02842a;font-weight:700;font-size:13px;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s;}
+  .sk-insp-copycss:hover{background:#e8f8df;}
+  .sk-insp-note{display:flex;gap:8px;align-items:flex-start;margin:0 18px 16px;padding:10px 12px;background:#eef4ff;border-radius:10px;font-size:12px;color:#40546e;line-height:1.4;}
+  .sk-insp-sec{padding:0 18px;margin-bottom:16px;}
+  .sk-insp-sectitle{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#878787;margin-bottom:8px;}
+  .sk-insp-content{position:relative;background:#f7f7f7;border-radius:10px;padding:10px 40px 10px 12px;font-size:13px;line-height:1.4;word-break:break-word;min-height:20px;}
+  .sk-insp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+  .sk-insp-row:last-child{border-bottom:none;}
+  .sk-insp-row:hover{background:#fafafa;}
+  .sk-insp-k{font-size:12px;color:#878787;flex-shrink:0;}
+  .sk-insp-v{font-size:12px;color:#232323;font-weight:600;text-align:right;display:flex;align-items:center;gap:7px;word-break:break-all;}
+  .sk-insp-sw{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.12);flex-shrink:0;}
+  .sk-insp-cp{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:#878787;padding:4px;border-radius:6px;}
+  .sk-insp-cp:hover{background:#e8e8e8;color:#232323;}
+  .sk-insp-cp svg{width:15px;height:15px;display:block;}
+  .sk-insp-toast{position:fixed;bottom:92px;right:24px;background:#232323;color:#fff;font-size:12px;padding:8px 14px;border-radius:8px;z-index:2147483002;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none;font-family:'Open Sans',sans-serif;}
+  .sk-insp-toast.show{opacity:1;transform:translateY(0);}
+  #sk-insp-hover-box{position:fixed;z-index:2147482998;border:2px dashed #00c73d;background:rgba(0,199,61,.10);border-radius:3px;pointer-events:none;display:none;transition:all .04s linear;}
+  #sk-insp-sel-box{position:fixed;z-index:2147482998;border:2px solid #00c73d;box-shadow:0 0 0 3px rgba(0,199,61,.20);border-radius:3px;pointer-events:none;display:none;}
+  #sk-insp-badge{position:fixed;z-index:2147483002;background:#02271a;color:#fff;font-family:'Open Sans',sans-serif;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .1s;}
+  #sk-insp-badge.show{opacity:1;}
+  #sk-insp-badge b{color:#8fe000;font-weight:700;}
+  body.sk-insp-active,body.sk-insp-active *{cursor:crosshair !important;}
+  /* sobre el panel y el FAB: cursor y clic normales */
+  body.sk-insp-active #sk-insp-panel,body.sk-insp-active #sk-insp-panel *,body.sk-insp-active #sk-insp-fab{cursor:auto !important;}
+  body.sk-insp-active #sk-insp-fab,body.sk-insp-active #sk-insp-panel button,body.sk-insp-active #sk-insp-panel .sk-insp-row,body.sk-insp-active #sk-insp-panel [data-copy]{cursor:pointer !important;}
+</style>
+
+<button id="sk-insp-fab" title="Inspector de estilos" aria-label="Inspector de estilos">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+</button>
+<div id="sk-insp-panel" aria-hidden="true"></div>
+<div id="sk-insp-hover-box"></div>
+<div id="sk-insp-sel-box"></div>
+<div id="sk-insp-badge"></div>
+<div class="sk-insp-toast" id="sk-insp-toast"></div>
+
+<script>
+(function(){
+  var fab = document.getElementById('sk-insp-fab');
+  var panel = document.getElementById('sk-insp-panel');
+  var toast = document.getElementById('sk-insp-toast');
+  var badge = document.getElementById('sk-insp-badge');
+  var hoverBox = document.getElementById('sk-insp-hover-box');
+  var selBox = document.getElementById('sk-insp-sel-box');
+  var active = false, current = null, hovered = null;
+
+  function placeBox(box, el){
+    var r = el.getBoundingClientRect();
+    box.style.left = r.left + 'px';
+    box.style.top = r.top + 'px';
+    box.style.width = r.width + 'px';
+    box.style.height = r.height + 'px';
+    box.style.display = 'block';
+  }
+
+  var copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+
+  function showToast(msg){
+    toast.textContent = msg; toast.classList.add('show');
+    clearTimeout(toast._t); toast._t = setTimeout(function(){ toast.classList.remove('show'); }, 1400);
+  }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){ showToast('Copiado'); }); }
+    else { var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); showToast('Copiado');}catch(e){} document.body.removeChild(ta); }
+  }
+  function esc(s){ return (s||'').replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function isSwatch(v){ return /^(rgb|#|hsl)/i.test(v) && v !== 'rgba(0, 0, 0, 0)' && v !== 'transparent'; }
+
+  function inPanel(el){ return el && (el.closest && (el.closest('#sk-insp-panel') || el.closest('#sk-insp-fab'))); }
+
+  function render(el){
+    current = el;
+    var cs = getComputedStyle(el);
+    var rect = el.getBoundingClientRect();
+    var tag = el.tagName.toLowerCase();
+    var cls = el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).slice(0,2).join('.') : '';
+    var txt = (el.textContent || '').trim().replace(/\s+/g,' ').slice(0,160);
+
+    var typo = [
+      ['color', cs.color],
+      ['font-size', cs.fontSize],
+      ['font-weight', cs.fontWeight],
+      ['font-family', cs.fontFamily],
+      ['line-height', cs.lineHeight],
+      ['letter-spacing', cs.letterSpacing]
+    ];
+    var colors = [
+      ['background', cs.backgroundColor],
+      ['border-color', cs.borderTopColor]
+    ];
+    var layout = [
+      ['display', cs.display],
+      ['width', Math.round(rect.width)+'px'],
+      ['height', Math.round(rect.height)+'px'],
+      ['padding', cs.padding],
+      ['border-radius', cs.borderRadius]
+    ];
+
+    function rows(arr){
+      return arr.filter(function(r){ return r[1] && r[1]!=='normal'&&r[1]!=='none'&&r[1]!=='0px'; }).map(function(r){
+        var sw = isSwatch(r[1]) ? '<span class="sk-insp-sw" style="background:'+esc(r[1])+'"></span>' : '';
+        return '<div class="sk-insp-row" data-copy="'+esc(r[1])+'"><span class="sk-insp-k">'+r[0]+'</span><span class="sk-insp-v">'+sw+esc(r[1])+'</span></div>';
+      }).join('');
+    }
+
+    panel.innerHTML =
+      '<div class="sk-insp-head"><div><div class="sk-insp-tag">&lt;'+tag+'&gt;'+esc(cls)+'</div><div class="sk-insp-dim">'+Math.round(rect.width)+' × '+Math.round(rect.height)+' px</div></div><button class="sk-insp-x" id="sk-insp-close" title="Cerrar y salir">×</button></div>'+
+      '<button class="sk-insp-copycss" id="sk-insp-copycss">Copiar CSS</button>'+
+      '<div class="sk-insp-note">ℹ️ Prioriza los componentes de nuestra librería.</div>'+
+      (txt ? '<div class="sk-insp-sec"><div class="sk-insp-sectitle">Contenido</div><div class="sk-insp-content">'+esc(txt)+'<button class="sk-insp-cp" data-copy="'+esc(txt)+'" title="Copiar texto">'+copyIcon+'</button></div></div>' : '')+
+      '<div class="sk-insp-sec"><div class="sk-insp-sectitle">Tipografía</div>'+rows(typo)+'</div>'+
+      '<div class="sk-insp-sec"><div class="sk-insp-sectitle">Colores</div>'+rows(colors)+'</div>'+
+      '<div class="sk-insp-sec"><div class="sk-insp-sectitle">Layout</div>'+rows(layout)+'</div>';
+
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden','false');
+
+    document.getElementById('sk-insp-close').onclick = function(){ setActive(false); };
+    document.getElementById('sk-insp-copycss').onclick = function(){
+      var css = typo.concat(colors, layout).filter(function(r){return r[1]&&r[1]!=='normal'&&r[1]!=='none'&&r[1]!=='0px';})
+        .map(function(r){ return '  '+r[0]+': '+r[1]+';'; }).join('\n');
+      copy(tag+cls+' {\n'+css+'\n}');
+    };
+    panel.querySelectorAll('[data-copy]').forEach(function(n){
+      n.addEventListener('click', function(e){ e.stopPropagation(); copy(n.getAttribute('data-copy')); });
+    });
+  }
+
+  function closePanel(){
+    panel.classList.remove('open'); panel.setAttribute('aria-hidden','true');
+    selBox.style.display='none'; current=null;
+  }
+
+  function clearHover(){ hovered=null; hoverBox.style.display='none'; badge.classList.remove('show'); }
+
+  function setActive(on){
+    active = on;
+    fab.classList.toggle('active', on);
+    document.body.classList.toggle('sk-insp-active', on);
+    if(!on){ closePanel(); clearHover(); selBox.style.display='none'; }
+    showToast(on ? 'Inspector activado · pasa el mouse y haz clic' : 'Inspector desactivado');
+  }
+
+  fab.addEventListener('click', function(e){ e.stopPropagation(); setActive(!active); });
+
+  document.addEventListener('mousemove', function(e){
+    if(!active) return;
+    var t = e.target;
+    if(inPanel(t) || t===badge || t===hoverBox || t===selBox){ clearHover(); return; }
+    hovered = t;
+    placeBox(hoverBox, t);
+    // etiqueta flotante estilo devtools
+    var r = t.getBoundingClientRect();
+    var tag = t.tagName.toLowerCase();
+    badge.innerHTML = '<b>&lt;'+tag+'&gt;</b> ' + Math.round(r.width) + ' × ' + Math.round(r.height);
+    badge.classList.add('show');
+    var bx = Math.min(e.clientX + 14, window.innerWidth - badge.offsetWidth - 8);
+    var by = e.clientY + 18;
+    if(by > window.innerHeight - 30) by = e.clientY - 26;
+    badge.style.left = bx + 'px';
+    badge.style.top = by + 'px';
+  }, true);
+
+  document.addEventListener('click', function(e){
+    if(!active) return;
+    if(inPanel(e.target)) return;
+    e.preventDefault(); e.stopPropagation();
+    current = e.target;
+    clearHover();
+    placeBox(selBox, current);
+    render(current);
+  }, true);
+
+  // reposicionar caja de selección al hacer scroll / resize
+  function reposSel(){ if(active && current && panel.classList.contains('open')){ placeBox(selBox, current); } }
+  window.addEventListener('scroll', reposSel, true);
+  window.addEventListener('resize', reposSel);
+
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'&&active){ setActive(false); } });
+})();
+</script>
+<!-- ============ /INSPECTOR DE ESTILOS ============ -->
 </body>
 </html>
