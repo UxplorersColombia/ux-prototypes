@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta v1 — Simulador Consolidación de Deudas | Skandia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     Tokens REALES del Design System Skandia (sk-components-angular)
+     Verificados contra codigo: sk-theme/tokens/colors.ts, el preset
+     skandia-default.ts y el SCSS de sk-button, sk-alert, sk-input,
+     sk-select, sk-radio y el ui-stepper de vacantes-prototipo.
+     ============================================================ */
+  :root{
+    /* primary (verde corporativo) */
+    --primary-50:#caf9cb; --primary-300:#5fed73; --primary:#00c73d;
+    --primary-hover:#03a835; --primary-pressed:#009a2f;
+    /* surface / neutrales */
+    --surface-0:#ffffff; --surface-50:#f8f9fa; --surface-100:#f1f3f5;
+    --surface-200:#e2e2e2; --surface-300:#dee2e6; --surface-400:#ced4da;
+    --surface-500:#adb5bd; --surface-600:#868e96; --surface-700:#495057;
+    --surface-800:#404040; --surface-900:#212529;
+    --n1:#f7f7f7; --n2:#e9e9e9; --n3:#dddddd; --n4:#666666;
+    --placeholder:#a5a5a5;
+    /* inputs */
+    --input-border:#dddddd; --input-focus:#16d727; --input-error:#e03430;
+    --tertiary-hover-bg:#f6fcf2;
+    /* semánticos (sk-alert) */
+    --info-bg:#ebf4ff; --info-border:#0099de; --info-ink:#04527a;
+    --warning-bg:#fff3e0; --warning-border:#ffae08; --warning-ink:#7a4c00;
+    --error-bg:#fff5f4; --error-border:#e03430;
+    --success-bg:#ecfdf3; --success-border:#87f491; --success-icon:#00a34e;
+    /* link */
+    --link:#0099de; --link-hover:#007ab5; --link-active:#005c88;
+    /* radios / espaciado */
+    --r-sm:8px; --r-md:12px; --r-lg:14px; --r-pill:100px;
+    --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px;
+    --ease:cubic-bezier(0.4,0,0.2,1);
+    --shadow-card:0 1px 2px rgba(0,0,0,0.03);
+    /* familias: Montserrat = voz de marca (display/labels/botones);
+       Open Sans = contenido/inputs/datos (como los declara el DS) */
+    --font-brand:'Montserrat',Verdana,Arial,sans-serif;
+    --font-body:'Open Sans','Segoe UI',Arial,sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; font-family:var(--font-body); background:var(--n1);
+    color:var(--surface-800); -webkit-font-smoothing:antialiased;
+    font-size:14px; line-height:1.5;
+  }
+  .wrap{max-width:1040px; margin:0 auto; padding:0 20px 80px;}
+
+  /* Foco visible consistente (teclado) — replica los focus del DS */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+  summary:focus-visible, [tabindex]:focus-visible, .radio-card:focus-visible{
+    outline:3px solid var(--primary); outline-offset:2px; border-radius:4px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+  @keyframes panelIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .panel.active{ animation:panelIn .25s var(--ease); }
+
+  /* ---------- Header + audiencia ---------- */
+  .header{display:flex; align-items:center; gap:12px; margin:24px 0 18px; flex-wrap:wrap;}
+  .brand-mark{
+    width:36px; height:36px; border-radius:9px; background:var(--primary);
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    font-family:var(--font-brand); font-weight:800; font-size:16px; flex:none;
+  }
+  .brand-name{font-family:var(--font-brand); font-weight:800; letter-spacing:.4px; font-size:15px;}
+  .brand-sub{font-size:12px; color:var(--n4);}
+  .audience-tag{
+    margin-left:auto; display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--font-brand); font-weight:700; font-size:11px; letter-spacing:.4px;
+    text-transform:uppercase; color:var(--surface-700);
+    background:var(--surface-100); border:1px solid var(--surface-200);
+    border-radius:var(--r-pill); padding:6px 12px;
+  }
+  .audience-tag svg{width:14px; height:14px;}
+
+  h1{font-family:var(--font-brand); font-size:26px; font-weight:800; line-height:1.2; margin:0 0 6px;}
+  .subtitle{font-size:14px; color:var(--n4); max-width:660px; line-height:1.55; margin:0 0 22px;}
+
+  /* ---------- Stepper (ui-stepper real: marcadores circulares) ---------- */
+  .stepper{display:flex; list-style:none; margin:0 0 var(--sp-lg); padding:0;}
+  .step-item{position:relative; flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; min-width:0;}
+  .step-item::before{
+    content:''; position:absolute; top:13px; left:-50%; width:100%; height:2px;
+    background:var(--surface-200); z-index:0; transition:background-color .2s var(--ease);
+  }
+  .step-item:first-child::before{display:none;}
+  .step-item.done::before, .step-item.active::before{background:var(--primary);}
+  .step-marker{
+    position:relative; z-index:1; width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-brand); font-weight:700; font-size:12px;
+    background:var(--surface-100); color:var(--surface-600); border:2px solid var(--surface-200);
+    transition:background-color .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+  }
+  .step-marker svg{width:14px; height:14px; display:none;}
+  .step-item.active .step-marker{background:var(--surface-0); border-color:var(--primary); color:var(--primary-pressed);}
+  .step-item.done .step-marker{background:var(--primary); border-color:var(--primary); color:#fff;}
+  .step-item.done .step-marker .num{display:none;}
+  .step-item.done .step-marker svg{display:block;}
+  .step-label{
+    font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.3px;
+    text-transform:uppercase; text-align:center; color:var(--surface-600); line-height:1.3;
+  }
+  .step-item.active .step-label{color:var(--surface-900);}
+  .step-item.done .step-label{color:var(--primary-pressed);}
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:var(--surface-0); border:1px solid var(--n3); border-radius:var(--r-lg);
+    padding:22px 24px; margin-bottom:18px; box-shadow:var(--shadow-card);
+  }
+  .card-title{font-family:var(--font-brand); font-size:15px; font-weight:800; margin:0 0 4px;}
+  .card-desc{font-size:13px; color:var(--n4); margin:0 0 18px; line-height:1.5;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* ---------- Tabla de deudas (no hay sk-table: <table> semántica) ---------- */
+  .table-scroll{overflow-x:auto; margin:0 -4px;}
+  table.debts{width:100%; border-collapse:collapse; min-width:760px;}
+  table.debts th{
+    text-align:left; font-family:var(--font-brand); font-size:11px; font-weight:700;
+    letter-spacing:.3px; text-transform:uppercase; color:var(--n4);
+    padding:0 8px 10px; border-bottom:1px solid var(--surface-200); white-space:nowrap;
+  }
+  table.debts th.num, table.debts td.num{text-align:right;}
+  table.debts td{padding:6px 8px; border-bottom:1px solid var(--surface-200); vertical-align:middle;}
+  table.debts tfoot td{
+    border-bottom:none; border-top:2px solid var(--surface-300);
+    font-weight:700; padding-top:12px; color:var(--surface-800);
+  }
+  table.debts tfoot td.num, td.ro{font-variant-numeric:tabular-nums;}
+  td.ro{font-size:13px; color:var(--surface-800); font-weight:600; white-space:nowrap; text-align:right;}
+  td.ro.muted{color:var(--n4); font-weight:400;}
+
+  /* Inputs — estilo real del DS. Versión "small" (40px) dentro de la tabla */
+  .in{
+    width:100%; font-family:var(--font-body); font-size:14px; color:var(--surface-800);
+    background:var(--surface-0); border:1px solid var(--input-border); border-radius:4px;
+    padding:8px 12px; height:40px; transition:border-color .15s var(--ease), border-radius .15s var(--ease), box-shadow .15s var(--ease);
+  }
+  .in::placeholder{color:var(--placeholder);}
+  .in:focus{outline:none; border-color:var(--input-focus); border-radius:var(--r-sm); box-shadow:0 0 0 3px rgba(0,199,61,.14);}
+  .in.small{font-size:13px; padding:6px 10px;}
+  .in.num{text-align:right; font-variant-numeric:tabular-nums;}
+  .affix{position:relative; display:flex; align-items:center;}
+  .affix .pre{position:absolute; left:10px; color:var(--placeholder); font-size:13px; pointer-events:none;}
+  .affix .suf{position:absolute; right:10px; color:var(--placeholder); font-size:13px; pointer-events:none;}
+  .affix .in.has-pre{padding-left:22px;}
+  .affix .in.has-suf{padding-right:26px; text-align:right;}
+
+  .row-actions{width:44px; text-align:center;}
+  .icon-btn{
+    width:34px; height:34px; border-radius:var(--r-pill); border:1px solid var(--n3); background:var(--surface-0);
+    color:var(--n4); cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+    transition:background-color .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease);
+  }
+  .icon-btn:hover{background:var(--error-bg); border-color:var(--error-border); color:var(--error-border);}
+  .icon-btn svg{width:16px; height:16px;}
+  /* Confirmación inline de borrado (sin modal — no existe sk-dialog) */
+  tr.confirming td{background:var(--warning-bg);}
+  .confirm-inline{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; color:var(--warning-ink); font-weight:600;}
+  .confirm-inline .msg{flex:1; min-width:180px;}
+
+  /* ---------- Botones (Montserrat 700, pill) ---------- */
+  .btn{
+    font-family:var(--font-brand); font-weight:700; font-size:14px; line-height:1;
+    border-radius:var(--r-pill); padding:12px 22px; cursor:pointer; border:2px solid transparent;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:background-color .2s, border-color .2s, color .2s, box-shadow .2s;
+  }
+  .btn svg{width:16px; height:16px;}
+  .btn-primary{background:var(--primary); color:#fff; border-color:var(--primary);}
+  .btn-primary:hover{background:var(--primary-hover); border-color:var(--primary-hover);}
+  .btn-primary:active{background:var(--primary-pressed); border-color:var(--primary-pressed);}
+  .btn-primary:disabled{background:var(--n2); border-color:var(--n2); color:var(--n4); cursor:not-allowed;}
+  .btn-secondary{background:var(--surface-0); color:var(--primary-pressed); border-color:var(--primary);}
+  .btn-secondary:hover{background:var(--primary-50);}
+  .btn-tertiary{background:transparent; color:var(--primary-pressed); border-color:transparent; padding:10px 12px;}
+  .btn-tertiary:hover{background:var(--tertiary-hover-bg);}
+  .btn-row{display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;}
+  .btn-row.split{justify-content:space-between; align-items:center;}
+  .add-btn{margin-top:14px;}
+
+  /* ---------- Campos verticales (paso 2) ---------- */
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px;}
+  .field label{display:block; font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--n4); margin-bottom:7px;}
+  .field .help{font-size:12px; color:var(--n4); margin-top:6px; line-height:1.5;}
+  .field .in{height:48px;}
+
+  /* ---------- sk-alert (4 tipos reales, radio 8px, blur) ---------- */
+  .alert{
+    display:flex; gap:8px; align-items:flex-start; padding:12px; border-radius:var(--r-sm);
+    border:1px solid; backdrop-filter:blur(4px); margin-bottom:16px;
+  }
+  .alert .ico{flex:none; width:32px; height:32px; display:flex; align-items:center; justify-content:center;}
+  .alert .ico svg{width:20px; height:20px;}
+  .alert .body{flex:1 0 0; min-width:0; color:var(--surface-800);}
+  .alert .title{font-weight:700; font-size:14px; line-height:1.55; margin-bottom:2px;}
+  .alert .msg{font-size:14px; line-height:1.55;}
+  .alert-info{background:var(--info-bg); border-color:var(--info-border);}
+  .alert-info .ico{color:var(--info-border);}
+  .alert-warning{background:var(--warning-bg); border-color:var(--warning-border);}
+  .alert-warning .ico{color:var(--warning-border);}
+  .alert-error{background:var(--error-bg); border-color:var(--error-border);}
+  .alert-error .ico{color:var(--error-border);}
+
+  /* Badge de vigencia (estilo warning, primera clase) */
+  .vigencia{
+    display:inline-flex; align-items:center; gap:8px; font-family:var(--font-brand);
+    font-size:12px; font-weight:700; color:var(--warning-ink);
+    background:var(--warning-bg); border:1px solid var(--warning-border);
+    border-radius:var(--r-pill); padding:7px 14px; margin-bottom:16px;
+  }
+  .vigencia svg{width:15px; height:15px; flex:none;}
+
+  /* ---------- Banner de resultado (sk-alert info SIEMPRE — veredicto neutro) ---------- */
+  .result{
+    background:var(--info-bg); border:1px solid var(--info-border); border-radius:var(--r-sm);
+    padding:18px 20px; margin-bottom:18px; backdrop-filter:blur(4px);
+  }
+  .result .tag{font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--info-ink); opacity:.85; margin-bottom:6px;}
+  .result .headline{font-family:var(--font-brand); font-size:18px; font-weight:800; color:var(--info-ink); line-height:1.4;}
+  .result .headline .amt{font-variant-numeric:tabular-nums;}
+  .result .sub{font-size:13px; color:var(--info-ink); opacity:.9; margin-top:8px; line-height:1.5;}
+
+  /* ---------- Visualización distintiva: muchas → una ---------- */
+  .compare-viz{margin:4px 0 20px;}
+  .viz-row{margin-bottom:16px;}
+  .viz-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .viz-title{font-family:var(--font-brand); font-size:12px; font-weight:700; color:var(--surface-800);}
+  .viz-title .count{color:var(--n4); font-weight:600;}
+  .viz-meta{font-size:12px; color:var(--n4); font-variant-numeric:tabular-nums;}
+  .viz-meta b{color:var(--surface-800); font-weight:700;}
+  .viz-bar{display:flex; height:34px; border-radius:var(--r-sm); overflow:hidden; background:var(--surface-100); border:1px solid var(--surface-200);}
+  .viz-seg{display:flex; align-items:center; justify-content:center; overflow:hidden; white-space:nowrap; font-size:11px; font-weight:600; padding:0 6px; min-width:2px; border-right:1px solid rgba(255,255,255,.6);}
+  .viz-seg:last-child{border-right:none;}
+  .viz-seg.single{background:var(--primary); color:#fff; border-right:none; font-family:var(--font-brand); font-weight:700;}
+  .viz-caption{font-size:12px; color:var(--n4); margin-top:6px; line-height:1.5;}
+
+  /* ---------- Tabla comparativa (patrón comparison table) ---------- */
+  table.compare{width:100%; border-collapse:collapse; margin-top:6px;}
+  table.compare th, table.compare td{padding:11px 12px; text-align:right; font-variant-numeric:tabular-nums;}
+  table.compare thead th{font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--n4); border-bottom:1px solid var(--surface-200);}
+  table.compare th.concept, table.compare td.concept{text-align:left; color:var(--n4); font-weight:400; font-variant-numeric:normal;}
+  table.compare td{font-size:14px; font-weight:700; color:var(--surface-800); border-bottom:1px solid var(--surface-100);}
+  table.compare .col-sk{background:var(--primary-50); color:var(--primary-pressed);}
+  table.compare thead .col-sk{color:var(--primary-pressed); border-bottom-color:var(--primary-300);}
+  table.compare tr.diff td{border-top:2px solid var(--surface-300); border-bottom:none; font-family:var(--font-brand); font-size:15px; padding-top:14px;}
+  table.compare tr.diff td.concept{color:var(--surface-900); font-weight:800;}
+  table.compare tr.diff td.good{color:var(--primary-pressed);}
+  .compare-note{font-size:12px; color:var(--n4); margin-top:10px; line-height:1.5;}
+
+  /* Sub-escenario FVP (informativo, neutro) */
+  .subscene{margin-top:20px; padding-top:18px; border-top:1px solid var(--surface-200);}
+  .subscene .card-title{font-size:14px;}
+  .stat-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin-top:12px;}
+  .stat{background:var(--n1); border:1px solid var(--surface-200); border-radius:var(--r-md); padding:14px 16px;}
+  .stat .k{font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--n4); margin-bottom:6px;}
+  .stat .v{font-size:18px; font-weight:700; color:var(--surface-800); font-variant-numeric:tabular-nums;}
+
+  /* ---------- Ayuda inline (<details>, no hay sk-tooltip) ---------- */
+  details.help-block{margin-top:16px;}
+  details.help-block summary{cursor:pointer; font-family:var(--font-brand); font-weight:700; font-size:13px; color:var(--surface-800); padding:6px 0; list-style:none; display:flex; align-items:center; gap:8px;}
+  details.help-block summary::-webkit-details-marker{display:none;}
+  details.help-block summary .chev{transition:transform .15s var(--ease); color:var(--n4);}
+  details.help-block[open] summary{color:var(--primary-pressed);}
+  details.help-block[open] summary .chev{transform:rotate(90deg);}
+  details.help-block summary .chev svg{width:14px; height:14px; display:block;}
+  .help-body{background:var(--n1); border:1px solid var(--n3); border-radius:var(--r-sm); padding:14px 16px; margin-top:6px; font-size:13px; line-height:1.6; color:var(--surface-800);}
+  .help-body .r{margin-bottom:8px;}
+  .help-body .r:last-child{margin-bottom:0;}
+  .help-body b{color:var(--surface-900);}
+
+  /* ---------- Disclaimer en capas ---------- */
+  .disclaimer{margin-top:var(--sp-lg);}
+  .disclaimer .main{font-size:13px; color:var(--surface-800); font-weight:600; line-height:1.6; margin-bottom:8px;}
+  .disclaimer .legal{font-size:12px; line-height:1.6; color:var(--n4); background:var(--n1); border-radius:var(--r-sm); padding:12px 14px;}
+
+  @media (max-width:600px){
+    h1{font-size:21px;}
+    .card{padding:16px;}
+    .audience-tag{margin-left:0;}
+    .step-label{font-size:10px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header class="header">
+    <div class="brand-mark">Sk</div>
+    <div>
+      <div class="brand-name">SKANDIA</div>
+      <div class="brand-sub">Crédito Impulso</div>
+    </div>
+    <span class="audience-tag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Herramienta de asesor
+    </span>
+  </header>
+
+  <h1>Simulador de consolidación de deudas</h1>
+  <p class="subtitle">Compara las deudas actuales de tu cliente contra un crédito único en Skandia y muestra la diferencia en intereses y en cuota. Muestra el dato para conversarlo con el cliente — la decisión siempre es suya.</p>
+
+  <!-- ============ STEPPER ============ -->
+  <ol class="stepper" id="stepper" aria-label="Progreso del simulador"></ol>
+
+  <!-- ============ PASO 0 · DEUDAS ============ -->
+  <section class="panel active" id="panel-0" aria-labelledby="t0">
+    <div class="card">
+      <h2 class="card-title" id="t0">Deudas actuales del cliente</h2>
+      <p class="card-desc">Registra cada deuda vigente. Usa la tasa E.A. y el plazo en meses tal como figuran en el extracto o pagaré del cliente. Los resultados se recalculan solos.</p>
+
+      <div class="table-scroll">
+        <table class="debts">
+          <thead>
+            <tr>
+              <th scope="col" style="min-width:150px;">Nombre de la deuda</th>
+              <th scope="col" class="num" style="min-width:140px;">Monto</th>
+              <th scope="col" class="num" style="min-width:96px;">Tasa E.A.</th>
+              <th scope="col" class="num" style="min-width:96px;">Plazo (meses)</th>
+              <th scope="col" class="num" style="min-width:78px;">% del total</th>
+              <th scope="col" class="num" style="min-width:120px;">Cuota mensual</th>
+              <th scope="col" class="num" style="min-width:130px;">Intereses totales</th>
+              <th scope="col" class="row-actions" aria-label="Acciones"></th>
+            </tr>
+          </thead>
+          <tbody id="debtsBody"></tbody>
+          <tfoot>
+            <tr>
+              <td>Totales</td>
+              <td class="num" id="tMonto">—</td>
+              <td class="num muted" id="tEa">—</td>
+              <td class="num" id="tPlazo">—</td>
+              <td class="num" id="tPeso">—</td>
+              <td class="num" id="tCuota">—</td>
+              <td class="num" id="tInt">—</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <button class="btn btn-secondary add-btn" id="addBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar deuda
+      </button>
+
+      <div id="emptyWarn" class="alert alert-warning" style="display:none; margin-top:16px;">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <div class="body"><div class="msg">Agrega al menos una deuda con monto mayor a cero para poder comparar.</div></div>
+      </div>
+
+      <details class="help-block">
+        <summary><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>¿Qué tasa uso: E.A. o mensual?</summary>
+        <div class="help-body">
+          <div class="r"><b>Qué es:</b> La tasa E.A. (efectiva anual) es la que aparece en el extracto o pagaré del cliente. El simulador la convierte internamente a tasa mensual para calcular la cuota.</div>
+          <div class="r"><b>Ejemplo:</b> Una tarjeta al 28% E.A. equivale a ≈2.08% mensual — no dividas 28 entre 12.</div>
+          <div class="r"><b>Por qué importa:</b> Usar la mensual en el campo E.A. subestima el costo real de la deuda.</div>
+        </div>
+      </details>
+
+      <div class="btn-row" style="justify-content:flex-end;">
+        <button class="btn btn-primary" id="next0" type="button" onclick="goToStep(1)">
+          Continuar
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PASO 1 · ESCENARIO CONSOLIDADO ============ -->
+  <section class="panel" id="panel-1" aria-labelledby="t1">
+    <div class="card">
+      <h2 class="card-title" id="t1">Escenario consolidado en Skandia</h2>
+      <p class="card-desc">Simula un crédito único (Crédito Impulso) por el monto total de las deudas actuales.</p>
+
+      <div class="vigencia" role="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Tasa Skandia vigente para la semana del 27 de julio de 2026 · se actualiza cada semana
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label for="eaSk">Tasa E.A. Skandia</label>
+          <div class="affix">
+            <input class="in num has-suf" id="eaSk" type="text" inputmode="decimal" value="16,79" aria-describedby="eaSkHelp">
+            <span class="suf">%</span>
+          </div>
+          <div class="help" id="eaSkHelp">Tasa fija semanal del Crédito Impulso a la fecha de desembolso.</div>
+        </div>
+        <div class="field">
+          <label for="rentFvp">Rentabilidad esperada FVP</label>
+          <div class="affix">
+            <input class="in num has-suf" id="rentFvp" type="text" inputmode="decimal" value="10" aria-describedby="rentHelp">
+            <span class="suf">%</span>
+          </div>
+          <div class="help" id="rentHelp">Se usa solo para el escenario opcional de invertir la provisión mensual.</div>
+        </div>
+      </div>
+
+      <p class="card-desc" style="margin:18px 0 0;">El crédito único toma el <b>monto total</b> de las deudas y el <b>plazo promedio</b> de las mismas. Crédito Impulso tiene periodicidad anual: si el cliente renueva por un plazo igual, al final de cada año paga los intereses causados.</p>
+
+      <div class="btn-row split">
+        <button class="btn btn-secondary" type="button" onclick="goToStep(0)">Atrás</button>
+        <button class="btn btn-primary" type="button" onclick="goToStep(2)">
+          Ver comparación
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PASO 2 · COMPARACIÓN ============ -->
+  <section class="panel" id="panel-2" aria-labelledby="t2">
+    <!-- Banner neutro (info) -->
+    <div class="result" role="status" aria-live="polite">
+      <div class="tag">Resultado</div>
+      <div class="headline" id="resHeadline">—</div>
+      <div class="sub">Revisa el detalle antes de compartirlo con tu cliente. Este simulador muestra el dato; la decisión es del cliente.</div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" id="t2">Deudas separadas vs. crédito único</h2>
+      <p class="card-desc">Mismo dinero, dos formas de pagarlo. La barra muestra cómo se reorganiza la deuda; la tabla, cuánto cuesta cada camino en el plazo.</p>
+
+      <!-- Visualización distintiva muchas → una -->
+      <div class="compare-viz">
+        <div class="viz-row">
+          <div class="viz-head">
+            <div class="viz-title">Hoy · <span class="count" id="vizCount">— deudas</span> por separado</div>
+            <div class="viz-meta">Tasa ponderada <b id="vizEa">—</b> · intereses <b id="vizIntActual">—</b></div>
+          </div>
+          <div class="viz-bar" id="vizBarActual" aria-hidden="true"></div>
+          <div class="viz-caption">Cada segmento es una deuda; su ancho es su peso en el total.</div>
+        </div>
+        <div class="viz-row">
+          <div class="viz-head">
+            <div class="viz-title">Con Crédito Impulso · 1 crédito único</div>
+            <div class="viz-meta">Tasa <b id="vizEaSk">—</b> · intereses <b id="vizIntSk">—</b></div>
+          </div>
+          <div class="viz-bar" aria-hidden="true"><div class="viz-seg single" style="width:100%;" id="vizSingle">Crédito único Skandia</div></div>
+          <div class="viz-caption">Un solo saldo, una sola cuota, una sola tasa.</div>
+        </div>
+      </div>
+
+      <!-- Tabla comparativa -->
+      <div class="table-scroll">
+        <table class="compare">
+          <thead>
+            <tr>
+              <th class="concept" scope="col">Concepto</th>
+              <th scope="col">Deudas actuales</th>
+              <th scope="col" class="col-sk">Crédito único Skandia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="concept">Monto</td><td id="cMontoAct">—</td><td class="col-sk" id="cMontoSk">—</td></tr>
+            <tr><td class="concept">Cuota / provisión mensual</td><td id="cCuotaAct">—</td><td class="col-sk" id="cCuotaSk">—</td></tr>
+            <tr><td class="concept" id="cIntConcept">Intereses totales en el plazo</td><td id="cIntAct">—</td><td class="col-sk" id="cIntSk">—</td></tr>
+            <tr class="diff"><td class="concept">Diferencia en intereses</td><td colspan="2" id="cDiff" style="text-align:right;">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="compare-note" id="plazoNote">Plazo de comparación: — meses (promedio de las deudas actuales).</p>
+
+      <!-- Sub-escenario FVP opcional -->
+      <div class="subscene">
+        <h3 class="card-title">Si el cliente invierte la provisión mensual en su FVP</h3>
+        <p class="card-desc" style="margin-bottom:0;">Escenario opcional: en vez de pagar las cuotas dispersas, el cliente destina la provisión mensual del crédito único a su Fondo Voluntario de Pensiones.</p>
+        <div class="stat-row">
+          <div class="stat"><div class="k">Valor final proyectado</div><div class="v" id="fvpFinal">—</div></div>
+          <div class="stat"><div class="k">Rentabilidad generada</div><div class="v" id="fvpRent">—</div></div>
+        </div>
+      </div>
+
+      <details class="help-block">
+        <summary><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>Cómo leer esta comparación</summary>
+        <div class="help-body">
+          <div class="r"><b>Intereses totales:</b> lo que el cliente paga en intereses durante el plazo, sumando todas las deudas actuales vs. el crédito único.</div>
+          <div class="r"><b>Provisión mensual:</b> lo que tendría que apartar cada mes para el crédito único (Crédito Impulso paga capital e intereses al final del plazo).</div>
+          <div class="r"><b>Diferencia:</b> es un dato, no una recomendación. Compárala con tu cliente y deja que decida.</div>
+        </div>
+      </details>
+
+      <!-- Disclaimer en capas -->
+      <div class="disclaimer">
+        <p class="main">Esta simulación es una guía para tu conversación con el cliente — no es la última palabra sobre su situación crediticia.</p>
+        <p class="legal">Los cálculos se basan en la información ingresada y en la tasa Skandia vigente en la fecha indicada arriba; asumen tasa fija. Esta información es de carácter informativo y no constituye asesoría financiera, tributaria o legal. Los valores reales pueden variar según las condiciones finales de aprobación y las políticas vigentes de Skandia.</p>
+      </div>
+
+      <div class="btn-row split">
+        <button class="btn btn-secondary" type="button" onclick="goToStep(1)">Atrás</button>
+        <button class="btn btn-tertiary" type="button" onclick="alert('En la versión final: guardar o exportar el resultado para dejarlo con el cliente.')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Guardar / exportar
+        </button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   Motor de cálculo — idéntico al prototipo original
+   (conocimiento/simulador-consolidacion-deudas (1).html).
+   No se toca la lógica de negocio; solo cambia la presentación.
+   ============================================================ */
+const fmtCOP = n => isFinite(n) ? n.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}) : '—';
+const fmtPct = (n,d=2) => isFinite(n) ? (n*100).toLocaleString('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d})+'%' : '—';
+const fmtNum = (n,d=1) => isFinite(n) ? n.toLocaleString('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d}) : '—';
+
+function pmt(rate, nper, pv){
+  if(nper<=0) return 0;
+  if(rate===0) return pv/nper;
+  return rate*pv/(1-Math.pow(1+rate,-nper));
+}
+function fvAnnuity(rate, nper, pmtVal){
+  if(nper<=0) return 0;
+  if(rate===0) return pmtVal*nper;
+  return pmtVal*(Math.pow(1+rate,nper)-1)/rate;
+}
+
+/* ---------- Estado ---------- */
+let debts = [
+  {name:'Bancolombia',         monto:15000000,  ea:14, plazo:12},
+  {name:'Davivienda',          monto:20000000,  ea:16, plazo:60},
+  {name:'Tarjeta de crédito',  monto:100000000, ea:28, plazo:12},
+  {name:'Crédito de consumo',  monto:80000000,  ea:26, plazo:36},
+];
+let rowId = 0;
+debts.forEach(d => d.id = rowId++);
+
+/* Paleta neutra para segmentos de deuda (fragmentación) */
+const SEG_COLORS = ['#495057','#868e96','#adb5bd','#ced4da','#dee2e6','#e9ecef'];
+const SEG_TEXT   = ['#ffffff','#ffffff','#404040','#404040','#404040','#404040'];
+
+const debtsBody = document.getElementById('debtsBody');
+
+/* ---------- Formateo de moneda en inputs ---------- */
+function digitsOnly(s){ return (s||'').replace(/[^\d]/g,''); }
+function formatThousands(d){ return d ? d.replace(/\B(?=(\d{3})+(?!\d))/g,'.') : ''; }
+function parseDecimal(s){ return parseFloat((s||'').replace(/\./g,'').replace(',', '.')) || 0; }
+
+/* ---------- Render de filas ---------- */
+function renderRows(){
+  debtsBody.innerHTML = '';
+  debts.forEach(d => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = d.id;
+    tr.innerHTML = `
+      <td><input class="in small" type="text" value="${d.name}" aria-label="Nombre de la deuda"></td>
+      <td class="num"><div class="affix"><span class="pre">$</span><input class="in small num has-pre" type="text" inputmode="numeric" value="${formatThousands(String(d.monto))}" aria-label="Monto de la deuda"></div></td>
+      <td class="num"><div class="affix"><span class="suf">%</span><input class="in small num has-suf" type="text" inputmode="decimal" value="${String(d.ea).replace('.',',')}" aria-label="Tasa efectiva anual"></div></td>
+      <td class="num"><input class="in small num" type="text" inputmode="numeric" value="${d.plazo}" aria-label="Plazo en meses"></td>
+      <td class="ro muted r-peso">—</td>
+      <td class="ro r-cuota">—</td>
+      <td class="ro r-int">—</td>
+      <td class="row-actions">
+        <button class="icon-btn r-del" type="button" aria-label="Quitar ${d.name}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </td>`;
+    debtsBody.appendChild(tr);
+
+    const [nameEl, montoEl, eaEl, plazoEl] = tr.querySelectorAll('input');
+    nameEl.addEventListener('input', e => { d.name = e.target.value; });
+    montoEl.addEventListener('input', e => {
+      const el = e.target, caret = el.value.length - el.selectionStart;
+      const dig = digitsOnly(el.value);
+      el.value = formatThousands(dig);
+      const pos = Math.max(0, el.value.length - caret);
+      el.setSelectionRange(pos,pos);
+      d.monto = parseFloat(dig)||0; recalc();
+    });
+    eaEl.addEventListener('input', e => { d.ea = parseDecimal(e.target.value); recalc(); });
+    plazoEl.addEventListener('input', e => { d.plazo = parseFloat(digitsOnly(e.target.value))||0; recalc(); });
+
+    tr.querySelector('.r-del').addEventListener('click', () => askRemove(tr, d));
+  });
+}
+
+/* Confirmación inline de borrado (sin modal) */
+function askRemove(tr, d){
+  tr.classList.add('confirming');
+  tr.innerHTML = `<td colspan="8"><div class="confirm-inline">
+      <span class="msg">¿Quitar <b>${d.name || 'esta deuda'}</b> de la comparación? Puedes volver a agregarla después.</span>
+      <button class="btn btn-tertiary confirm-yes" type="button">Sí, quitar</button>
+      <button class="btn btn-secondary confirm-no" type="button">Cancelar</button>
+    </div></td>`;
+  tr.querySelector('.confirm-yes').addEventListener('click', () => {
+    debts = debts.filter(x => x.id !== d.id);
+    renderRows(); recalc();
+  });
+  tr.querySelector('.confirm-no').addEventListener('click', () => { renderRows(); recalc(); });
+  tr.querySelector('.confirm-yes').focus();
+}
+
+document.getElementById('addBtn').addEventListener('click', () => {
+  debts.push({id: rowId++, name:'Nueva deuda', monto:0, ea:15, plazo:12});
+  renderRows(); recalc();
+  const last = debtsBody.querySelector('tr:last-child input');
+  if(last){ last.focus(); last.select(); }
+});
+
+/* ---------- Cálculo + presentación ---------- */
+function recalc(){
+  const totalMonto = debts.reduce((s,d)=> s + (d.monto||0), 0);
+  let sumCuota=0, sumInt=0, sumPlazo=0, sumNMVxPeso=0, sumEAxPeso=0;
+
+  debts.forEach(d => {
+    const peso = totalMonto>0 ? d.monto/totalMonto : 0;
+    const ea = (d.ea||0)/100;
+    const nmv = Math.pow(1+ea,1/12)-1;
+    const cuota = pmt(nmv, d.plazo, d.monto);
+    const interes = d.monto * (Math.pow(1+nmv, d.plazo) - 1);
+    d._peso=peso; d._nmv=nmv; d._cuota=cuota; d._int=interes;
+    sumCuota+=cuota; sumInt+=interes; sumPlazo+=d.plazo;
+    sumNMVxPeso+=nmv*peso; sumEAxPeso+=ea*peso;
+  });
+  const plazoProm = debts.length ? sumPlazo/debts.length : 0;
+
+  // Pintar filas de la tabla de deudas
+  debtsBody.querySelectorAll('tr').forEach(tr => {
+    if(tr.classList.contains('confirming')) return;
+    const d = debts.find(x => x.id === parseInt(tr.dataset.id));
+    if(!d) return;
+    tr.querySelector('.r-peso').textContent = fmtPct(d._peso,0);
+    tr.querySelector('.r-cuota').textContent = fmtCOP(d._cuota);
+    tr.querySelector('.r-int').textContent = fmtCOP(d._int);
+  });
+  document.getElementById('tMonto').textContent = fmtCOP(totalMonto);
+  document.getElementById('tEa').textContent = totalMonto>0 ? fmtPct(sumEAxPeso) : '—';
+  document.getElementById('tPlazo').textContent = totalMonto>0 ? fmtNum(plazoProm,0)+' m' : '—';
+  document.getElementById('tPeso').textContent = totalMonto>0 ? '100%' : '—';
+  document.getElementById('tCuota').textContent = fmtCOP(sumCuota);
+  document.getElementById('tInt').textContent = fmtCOP(sumInt);
+
+  // Validación paso 0
+  const hasData = totalMonto>0;
+  document.getElementById('emptyWarn').style.display = hasData ? 'none' : 'flex';
+  document.getElementById('next0').disabled = !hasData;
+
+  // Escenario consolidado
+  const eaSk = parseDecimal(document.getElementById('eaSk').value)/100 || 0;
+  const rentFvp = parseDecimal(document.getElementById('rentFvp').value)/100 || 0;
+  const nmvSk = Math.pow(1+eaSk,1/12)-1;
+  const provision = pmt(nmvSk, plazoProm, totalMonto);
+  const interesesSk = (provision*plazoProm - totalMonto) * (plazoProm/12);
+  const difCuota = sumCuota - provision;
+  const beneficio = sumInt - interesesSk; // >0 => Skandia paga menos intereses
+
+  // ---- Banner neutro (info), copy SIN "conviene" ----
+  const headline = document.getElementById('resHeadline');
+  if(!hasData){
+    headline.innerHTML = 'Agrega al menos una deuda para ver la comparación.';
+  } else if(beneficio >= 0){
+    headline.innerHTML = `El crédito único paga <span class="amt">${fmtCOP(Math.abs(beneficio))}</span> menos en intereses en este plazo que tus deudas actuales por separado.`;
+  } else {
+    headline.innerHTML = `Tus deudas actuales por separado pagan <span class="amt">${fmtCOP(Math.abs(beneficio))}</span> menos en intereses en este plazo que el crédito único.`;
+  }
+
+  // ---- Visualización muchas → una ----
+  const bar = document.getElementById('vizBarActual');
+  bar.innerHTML = '';
+  debts.forEach((d,i) => {
+    const w = (d._peso||0)*100;
+    const seg = document.createElement('div');
+    seg.className='viz-seg';
+    seg.style.width = w+'%';
+    seg.style.background = SEG_COLORS[i % SEG_COLORS.length];
+    seg.style.color = SEG_TEXT[i % SEG_TEXT.length];
+    seg.title = `${d.name}: ${fmtCOP(d.monto)} (${fmtPct(d._peso,0)})`;
+    if(w >= 11) seg.textContent = d.name;
+    bar.appendChild(seg);
+  });
+  document.getElementById('vizCount').textContent = `${debts.length} ${debts.length===1?'deuda':'deudas'}`;
+  document.getElementById('vizEa').textContent = fmtPct(sumEAxPeso);
+  document.getElementById('vizIntActual').textContent = fmtCOP(sumInt);
+  document.getElementById('vizEaSk').textContent = fmtPct(eaSk);
+  document.getElementById('vizIntSk').textContent = fmtCOP(interesesSk);
+
+  // ---- Tabla comparativa ----
+  document.getElementById('cMontoAct').textContent = fmtCOP(totalMonto);
+  document.getElementById('cMontoSk').textContent = fmtCOP(totalMonto);
+  document.getElementById('cCuotaAct').textContent = fmtCOP(sumCuota);
+  document.getElementById('cCuotaSk').textContent = fmtCOP(provision);
+  document.getElementById('cIntAct').textContent = fmtCOP(sumInt);
+  document.getElementById('cIntSk').textContent = fmtCOP(interesesSk);
+
+  const diffCell = document.getElementById('cDiff');
+  if(!hasData){ diffCell.textContent='—'; diffCell.className=''; }
+  else {
+    const menos = beneficio>=0 ? 'a favor del crédito único' : 'a favor de las deudas actuales';
+    diffCell.innerHTML = `${fmtCOP(Math.abs(beneficio))} <span style="font-weight:600; font-family:var(--font-body); font-size:12px;">${menos}</span>`;
+    diffCell.className = beneficio>=0 ? 'good' : '';
+  }
+  document.getElementById('plazoNote').textContent = `Plazo de comparación: ${fmtNum(plazoProm,0)} meses (promedio de las deudas actuales).`;
+
+  // ---- Sub-escenario FVP ----
+  const valorFinal = fvAnnuity(rentFvp/12, plazoProm, provision);
+  const rentGen = valorFinal - provision*plazoProm;
+  document.getElementById('fvpFinal').textContent = fmtCOP(valorFinal);
+  document.getElementById('fvpRent').textContent = fmtCOP(rentGen);
+}
+
+/* ---------- Stepper + navegación ---------- */
+const steps = ['Deudas','Escenario consolidado','Comparación'];
+let currentStep = 0;
+const checkSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+
+function renderStepper(){
+  const el = document.getElementById('stepper');
+  el.innerHTML = steps.map((s,i)=>{
+    const state = i<currentStep ? 'done' : (i===currentStep ? 'active' : '');
+    return `<li class="step-item ${state}" ${i===currentStep?'aria-current="step"':''}>
+      <span class="step-marker"><span class="num">${i+1}</span>${checkSVG}</span>
+      <span class="step-label">${s}</span>
+    </li>`;
+  }).join('');
+}
+function goToStep(n){
+  if(n>0 && document.getElementById('next0').disabled){ return; } // no avanzar sin datos
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+  currentStep = n;
+  renderStepper();
+  if(n===2) recalc();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.getElementById('eaSk').addEventListener('input', recalc);
+document.getElementById('rentFvp').addEventListener('input', recalc);
+
+renderRows();
+renderStepper();
+recalc();
+</script>
+</body>
+</html>
