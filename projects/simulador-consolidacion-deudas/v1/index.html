@@ -228,6 +228,9 @@
     width:fit-content; max-width:100%; margin:0 auto 16px; text-align:center;
   }
   .vigencia svg{width:15px; height:15px; flex:none;}
+  /* Footer de vigencia al pie de la página, fuera de las tarjetas */
+  .sim-footer{margin-top:28px; display:flex; justify-content:center;}
+  .sim-footer .vigencia{margin:0;}
 
   /* ---------- Banner de resultado (sk-alert info SIEMPRE — veredicto neutro) ---------- */
   .result{
@@ -392,11 +395,6 @@
       <h2 class="card-title" id="t1">Escenario consolidado en Skandia</h2>
       <p class="card-desc">Simula un crédito único (Crédito Impulso) por el monto total de las deudas actuales.</p>
 
-      <div class="vigencia" role="note">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Tasa Skandia vigente para la semana del 27 de julio de 2026 · se actualiza cada semana
-      </div>
-
       <div class="grid">
         <div class="field">
           <label for="eaSk">Tasa E.A. Skandia</label>
@@ -503,7 +501,7 @@
       <!-- Disclaimer en capas -->
       <div class="disclaimer">
         <p class="main">Esta simulación es una guía para tu conversación con el cliente — no es la última palabra sobre su situación crediticia.</p>
-        <p class="legal">Los cálculos se basan en la información ingresada y en la tasa Skandia vigente en la fecha indicada arriba; asumen tasa fija. Esta información es de carácter informativo y no constituye asesoría financiera, tributaria o legal. Los valores reales pueden variar según las condiciones finales de aprobación y las políticas vigentes de Skandia.</p>
+        <p class="legal">Los cálculos se basan en la información ingresada y en la tasa Skandia vigente en la fecha indicada al pie de la página; asumen tasa fija. Esta información es de carácter informativo y no constituye asesoría financiera, tributaria o legal. Los valores reales pueden variar según las condiciones finales de aprobación y las políticas vigentes de Skandia.</p>
       </div>
 
       <div class="btn-row split">
@@ -515,6 +513,13 @@
       </div>
     </div>
   </section>
+
+  <footer class="sim-footer" id="simFooter" style="display:none;">
+    <div class="vigencia" role="note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Tasa Skandia vigente para la semana del 27 de julio de 2026 · se actualiza cada semana
+    </div>
+  </footer>
 
 </div>
 
@@ -743,6 +748,8 @@ function goToStep(n){
   document.getElementById('panel-'+n).classList.add('active');
   currentStep = n;
   renderStepper();
+  // El badge de vigencia solo aparece donde se nombra la tasa Skandia (Escenario consolidado y Comparación)
+  document.getElementById('simFooter').style.display = (n === 0) ? 'none' : 'flex';
   if(n===2) recalc();
   window.scrollTo({top:0, behavior:'smooth'});
 }

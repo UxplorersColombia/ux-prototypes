@@ -203,6 +203,9 @@
   /* Íconos SVG en avisos de validación y vigencia */
   .split-note .wico{width:16px;height:16px;flex:none;margin-top:1px;}
   .vigencia-badge svg{width:15px;height:15px;flex:none;}
+  /* Footer de vigencia al pie de la página, fuera de las tarjetas */
+  .sim-footer{margin-top:28px;display:flex;justify-content:center;}
+  .sim-footer .vigencia-badge{margin:0;}
 
   @media (max-width:600px){
     h1{font-size:19px;}
@@ -270,8 +273,6 @@
 
   <!-- PASO 1: DATOS DEL CLIENTE -->
   <div class="panel" id="panel-1">
-    <div class="vigencia-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Tasa Skandia y parámetros tributarios vigentes desde el 1 de enero de 2026</div>
-
     <div class="card">
       <div class="card-title">Datos del cliente</div>
       <div class="card-desc">Información base del cliente y del monto a retirar o consolidar.</div>
@@ -365,15 +366,15 @@
         <div class="help-body">
           <div class="row"><b>Ingreso gravado</b> — Es la parte de tu ingreso sobre la que se calculan impuestos, no todo tu ingreso se grava igual. Ej: de $5M, puede que solo $3M sean ingreso gravado si el resto tiene alguna exención. Te ayuda a entender por qué el impuesto no se calcula sobre el 100% de lo que recibes.</div>
           <div class="row"><b>Retefuente (Retención en la fuente)</b> — Es un adelanto del impuesto de renta que se descuenta antes de que recibas el pago, no un impuesto adicional. Ej: si retiras $1.000.000 y tu Retefuente es del 10%, recibes $900.000 — los $100.000 ya quedaron abonados a tu declaración de renta.</div>
-          <div class="row"><b>UVT (Unidad de Valor Tributario)</b> — Es la unidad que usa la ley colombiana para calcular impuestos y cambia cada año. Verifica siempre la fecha de vigencia junto al valor de UVT que usa este simulador (badge de arriba).</div>
-          <div class="row"><b>SMLMV</b> — Es el salario mínimo que fija el gobierno cada año; varias fórmulas tributarias lo usan como referencia. Este simulador muestra el SMLMV vigente para el período indicado en el badge de arriba.</div>
+          <div class="row"><b>UVT (Unidad de Valor Tributario)</b> — Es la unidad que usa la ley colombiana para calcular impuestos y cambia cada año. Verifica siempre la fecha de vigencia junto al valor de UVT que usa este simulador (badge al pie de la página).</div>
+          <div class="row"><b>SMLMV</b> — Es el salario mínimo que fija el gobierno cada año; varias fórmulas tributarias lo usan como referencia. Este simulador muestra el SMLMV vigente para el período indicado en el badge al pie de la página.</div>
           <div class="row"><b>IBC (Ingreso Base de Cotización)</b> — Es el valor sobre el que se calculan tus aportes a salud y pensión, puede ser distinto de tu ingreso total.</div>
         </div>
       </details>
 
       <div class="disclaimer-block">
         <div class="disclaimer-main">Esta simulación es una guía para tu conversación con el cliente — no es la última palabra sobre su situación tributaria o crediticia.</div>
-        <div class="disclaimer-legal">Los cálculos se basan en los parámetros tributarios y la tasa vigentes en la fecha indicada arriba. Esta información es de carácter informativo y no constituye asesoría financiera, tributaria o legal.</div>
+        <div class="disclaimer-legal">Los cálculos se basan en los parámetros tributarios y la tasa vigentes en la fecha indicada al pie de la página. Esta información es de carácter informativo y no constituye asesoría financiera, tributaria o legal.</div>
       </div>
 
       <div class="btn-row split">
@@ -434,6 +435,10 @@
       </div>
     </div>
   </div>
+
+  <footer class="sim-footer" id="simFooter" style="display:none;">
+    <div class="vigencia-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Tasa Skandia y parámetros tributarios vigentes desde el 1 de enero de 2026</div>
+  </footer>
 
 </div>
 
@@ -622,6 +627,8 @@ function goToStep(n){
   document.getElementById('panel-'+n).classList.add('active');
   currentStep = n;
   renderStepper();
+  // El badge de vigencia solo aparece donde se nombra la tasa Skandia (Supuestos y Comparación)
+  document.getElementById('simFooter').style.display = (n >= 2) ? 'flex' : 'none';
   if(n===3) recalc();
   window.scrollTo({top:0,behavior:'smooth'});
 }
