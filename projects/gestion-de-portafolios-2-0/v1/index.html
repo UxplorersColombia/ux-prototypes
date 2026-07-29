@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestión de Portafolios · De transacción a relación</title>
+<style>
+  :root{
+    --verde:#00C73D;
+    --verde-deep:#0A4C2A;     /* chapter ground */
+    --verde-deeper:#053018;   /* portada / cierre */
+    --paper:#F3F7F2;
+    --paper-2:#E8F0E7;
+    --card:#FFFFFF;
+    --ink:#0E2018;
+    --grey:#5A6A60;
+    --line:#CFE3D2;
+    --alert:#D64545;
+    --bubble-me:#E7ECE4;
+    --sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --maxw:1060px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-snap-type:y proximity;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{font-family:var(--sans);background:var(--verde-deeper);color:var(--ink);line-height:1.5;font-size:clamp(15px,1.05vw,17px);overflow-x:hidden}
+
+  .progress{position:fixed;top:0;left:0;height:3px;background:var(--verde);width:0;z-index:60;transition:width .15s linear}
+  nav.dots{position:fixed;right:clamp(12px,2vw,26px);top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:11px}
+  nav.dots a{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .25s;display:block}
+  nav.dots a.on{background:var(--verde);transform:scale(1.35)}
+  nav.dots a.dark-dot{background:rgba(14,32,24,.22)}
+  nav.dots a.dark-dot.on{background:var(--verde-deep)}
+  @media(max-width:640px){nav.dots{display:none}}
+
+  .slide{min-height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;padding:clamp(40px,7vh,90px) clamp(22px,7vw,96px);position:relative}
+  .slide .inner{width:100%;max-width:var(--maxw);margin:0 auto}
+  .slide.light{background:var(--paper);color:var(--ink)}
+  .slide.light.alt{background:var(--paper-2)}
+  .slide.chapter{background:var(--verde-deep);color:#EAF7EE}
+  .slide.deep{background:var(--verde-deeper);color:#EAF7EE}
+
+  .kicker{font-size:.74rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:clamp(18px,3vh,30px);color:var(--verde-deep)}
+  .light .kicker{color:var(--verde-deep)}
+  .kicker .rule{height:1px;width:40px;background:currentColor;opacity:.5}
+
+  h1{font-size:clamp(2.3rem,6.2vw,4.4rem);line-height:1.02;font-weight:800;letter-spacing:-.03em;text-wrap:balance}
+  h2{font-size:clamp(1.7rem,4.2vw,3rem);line-height:1.07;font-weight:800;letter-spacing:-.025em;text-wrap:balance}
+  .lead{font-size:clamp(1.05rem,1.9vw,1.38rem);font-weight:400;max-width:60ch}
+  .light .muted{color:var(--grey)}
+  .chapter .muted,.deep .muted{color:#A9D4B6}
+
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em;font-size:1.05rem}
+  .brand .dot{width:14px;height:14px;border-radius:50%;background:var(--verde);display:inline-block}
+  .foot{margin-top:clamp(26px,5vh,50px);font-size:.82rem}
+  .foot .muted{display:block}
+
+  /* three-verb chips (portada) */
+  .verbs{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(28px,4vh,44px)}
+  .verb-chip{border:1.5px solid rgba(255,255,255,.32);border-radius:100px;padding:11px 24px;font-weight:700;font-size:clamp(1rem,1.9vw,1.35rem);display:flex;align-items:center;gap:10px}
+  .verb-chip .n{color:var(--verde);font-weight:800}
+
+  /* chapter opener */
+  .rn{font-size:.95rem;font-weight:800;letter-spacing:.34em;color:var(--verde);margin-bottom:18px}
+  .verb{font-size:clamp(3rem,11vw,7.4rem);font-weight:800;letter-spacing:-.045em;line-height:.92;text-wrap:balance}
+  .promise{font-size:clamp(1.15rem,2.3vw,1.7rem);max-width:26ch;margin-top:clamp(20px,3vh,30px);color:#BEE7C9;font-weight:500;line-height:1.35}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,3vw,40px);margin-top:clamp(24px,4vh,42px)}
+  @media(max-width:720px){.stats{grid-template-columns:1fr;gap:20px}}
+  .stat .n{font-size:clamp(2.2rem,5.2vw,3.6rem);font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;color:var(--verde-deep)}
+  .stat .n.warn{color:var(--alert)}
+  .stat .lbl{margin-top:9px;font-size:.93rem;max-width:26ch}
+  .stat .lbl b{font-weight:700}
+
+  /* segment matrix */
+  .segs{margin-top:clamp(18px,3vh,30px);display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .seg-row{display:grid;grid-template-columns:206px 1fr;gap:clamp(14px,2.4vw,28px);padding:14px 4px;border-bottom:1px solid var(--line);align-items:center}
+  .seg-row .who{display:flex;flex-direction:column;gap:4px}
+  .seg-row .who .nm{font-weight:800;font-size:1rem;letter-spacing:-.01em}
+  .seg-row .who .dr{font-size:.71rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--verde-deep)}
+  .seg-row .who .bs{font-size:.75rem;color:var(--grey);font-variant-numeric:tabular-nums}
+  .seg-row .msg{font-size:.99rem;font-style:italic;color:var(--ink);border-left:3px solid var(--verde);padding-left:15px;line-height:1.4}
+  @media(max-width:640px){.seg-row{grid-template-columns:1fr;gap:8px}}
+
+  /* channel matrix */
+  .chans{margin-top:clamp(16px,2.5vh,26px);display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .chan-row{display:grid;grid-template-columns:198px 1fr;gap:clamp(14px,2.4vw,28px);padding:15px 4px;border-bottom:1px solid var(--line);align-items:center}
+  .chan-row .who{display:flex;flex-direction:column;gap:4px}
+  .chan-row .who .nm{font-weight:800;font-size:1rem;letter-spacing:-.01em}
+  .chan-row .who .dr{font-size:.71rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--verde-deep)}
+  .chan-row .ch{display:flex;flex-direction:column;gap:8px}
+  .pills{display:flex;flex-wrap:wrap;gap:7px}
+  .pill{font-size:.77rem;font-weight:700;padding:5px 12px;border-radius:100px;white-space:nowrap}
+  .pill.pri{background:var(--verde);color:#053018}
+  .pill.sec{background:#E4EFE4;color:var(--verde-deep);border:1px solid var(--line)}
+  .chan-row .why{font-size:.82rem;color:var(--grey);max-width:56ch}
+  .legend{display:flex;gap:18px;margin-top:14px;font-size:.78rem;color:var(--grey);flex-wrap:wrap}
+  .legend .k{display:inline-flex;align-items:center;gap:7px}
+  .legend .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  @media(max-width:640px){.chan-row{grid-template-columns:1fr;gap:9px}}
+
+  /* chat bubbles */
+  .chat{display:flex;flex-direction:column;gap:12px;max-width:600px;margin-top:clamp(24px,4vh,38px)}
+  .bubble{padding:14px 18px;border-radius:20px;font-size:1.03rem;line-height:1.4;max-width:88%}
+  .bubble .who2{font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;opacity:.65;display:block;margin-bottom:4px}
+  .bubble.me{background:var(--bubble-me);color:var(--ink);align-self:flex-end;border-bottom-right-radius:6px}
+  .bubble.sk{background:var(--verde);color:#053018;align-self:flex-start;border-bottom-left-radius:6px;font-weight:600}
+
+  /* gaps list */
+  .gaps{margin-top:clamp(20px,3vh,32px);display:flex;flex-direction:column;gap:12px;max-width:760px}
+  .gap{display:flex;gap:13px;align-items:flex-start;font-size:1rem}
+  .gap .x{color:var(--alert);font-weight:800;font-size:1.1rem;flex:none;line-height:1.3}
+  .gap b{font-weight:700}
+
+  /* moves */
+  .moves{margin-top:clamp(20px,3vh,32px);display:flex;flex-direction:column;border-top:1px solid var(--line)}
+  .move{display:grid;grid-template-columns:auto 1fr;gap:clamp(13px,2vw,22px);align-items:baseline;padding:14px 4px;border-bottom:1px solid var(--line)}
+  .move .idx{font-weight:800;font-variant-numeric:tabular-nums;color:var(--verde);font-size:1.05rem;width:1.5em}
+  .move .t{font-weight:800;font-size:1.03rem;letter-spacing:-.01em;display:inline}
+  .move .d{font-size:.93rem;color:var(--grey);margin-top:3px}
+
+  /* loop (close) */
+  .loop{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(10px,1.6vw,18px);margin:clamp(8px,2vh,18px) 0 clamp(24px,4vh,38px)}
+  .loop .w{font-size:clamp(1.5rem,4vw,2.9rem);font-weight:800;letter-spacing:-.02em}
+  .loop .w.hl{color:var(--verde)}
+  .loop .arw{color:var(--verde);font-size:clamp(1.3rem,2.8vw,2.2rem);opacity:.85}
+  .biz{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .biz span{border:1px solid rgba(255,255,255,.28);border-radius:100px;padding:7px 18px;font-weight:700;font-size:.92rem}
+
+  .note-line{margin-top:clamp(18px,2.5vh,26px);font-size:.87rem;color:var(--grey);display:flex;gap:9px;align-items:baseline;max-width:70ch}
+  .note-line .b{color:#C77D00;font-weight:800;white-space:nowrap}
+
+  .rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rv{opacity:1;transform:none;transition:none}}
+  a:focus-visible{outline:2px solid var(--verde);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="progress" id="prog"></div>
+<nav class="dots" id="dots"></nav>
+
+<!-- 1 · PORTADA -->
+<section class="slide deep" data-dot="Portada">
+  <div class="inner">
+    <div class="brand rv"><span class="dot"></span>SKANDIA · Gestión de Portafolios</div>
+    <h1 class="rv" style="margin-top:26px">No es una transacción.<br>Es una relación.</h1>
+    <p class="lead muted rv" style="margin-top:22px">Cómo el portal deja de ser una ventanilla y empieza a acompañar al usuario en la decisión más importante: qué hace con su dinero. En tres movimientos.</p>
+    <div class="verbs">
+      <span class="verb-chip rv"><span class="n">I</span>Te llamo</span>
+      <span class="verb-chip rv"><span class="n">II</span>Te explico</span>
+      <span class="verb-chip rv"><span class="n">III</span>Te lo hago fácil</span>
+    </div>
+    <div class="foot rv"><span class="muted">Basado en 6 meses de comportamiento real del portal · Databricks · Segmentación Skandia 2026</span></div>
+  </div>
+</section>
+
+<!-- 2 · EL PROBLEMA -->
+<section class="slide light" data-dot="El punto de partida">
+  <div class="inner">
+    <div class="kicker rv"><span class="rule"></span>El punto de partida</div>
+    <h2 class="rv">Hoy el usuario entra solo cuando tiene que hacer un trámite. Y se va.</h2>
+    <div class="stats">
+      <div class="stat rv"><div class="n">96%</div><div class="lbl">visita su perfil de inversión <b>una sola vez</b></div></div>
+      <div class="stat rv"><div class="n">59%</div><div class="lbl">gestiona su portafolio <b>una vez y no vuelve</b></div></div>
+      <div class="stat rv"><div class="n">69%</div><div class="lbl">completa su perfil pero <b>no actúa</b> sobre él</div></div>
+    </div>
+    <p class="lead rv" style="margin-top:34px;font-weight:600">No es desinterés. Es que <span style="color:var(--verde-deep)">nadie lo acompaña</span> entre una operación y la siguiente. Falta relación — y la relación se construye en tres movimientos.</p>
+  </div>
+</section>
+
+<!-- 3 · CAPÍTULO I -->
+<section class="slide chapter" data-dot="I · Te llamo">
+  <div class="inner">
+    <div class="rn rv">MOVIMIENTO I</div>
+    <div class="verb rv">Te llamo</div>
+    <p class="promise rv">La relación empieza cuando doy el primer paso — con una razón para volver que no es un trámite.</p>
+  </div>
+</section>
+
+<!-- 4 · TE LLAMO -->
+<section class="slide light" data-dot="En su idioma">
+  <div class="inner">
+    <div class="kicker rv"><span class="rule"></span>I · Te llamo</div>
+    <h2 class="rv">Un mensaje que le importa, en su idioma.</h2>
+    <p class="lead muted rv" style="margin-top:16px">Las notificaciones dejan de ser recordatorios de trámite y se vuelven la voz de Skandia. <b>Lo que le digo, y por qué lo llamo, depende de quién es</b> (Segmentación 2026).</p>
+    <div class="segs">
+      <div class="seg-row rv"><div class="who"><span class="nm">Financial Explorer</span><span class="dr">Guía cercana</span><span class="bs">57% de la base</span></div><div class="msg">“Vas por buen camino: mira cómo crece tu primera meta 🌱”</div></div>
+      <div class="seg-row rv"><div class="who"><span class="nm">Wealth Builders</span><span class="dr">Progreso claro</span><span class="bs">~20% de la base</span></div><div class="msg">“Tu portafolio rindió este mes. Aquí tu proyección a hoy.”</div></div>
+      <div class="seg-row rv"><div class="who"><span class="nm">Family Guardians</span><span class="dr">Protección</span><span class="bs">~30% de la base</span></div><div class="msg">“Tu cobertura vence pronto. Revisémosla para que tu familia siga protegida.”</div></div>
+      <div class="seg-row rv"><div class="who"><span class="nm">Capital Investor</span><span class="dr">Oportunidad</span><span class="bs">18% · 31% del AUM</span></div><div class="msg">“Nueva opción alternativa que encaja con tu perfil. Ver análisis →”</div></div>
+      <div class="seg-row rv"><div class="who"><span class="nm">Stability Seekers</span><span class="dr">Tranquilidad</span><span class="bs">50+ años</span></div><div class="msg">“¿Qué pasaría si te retiras en 2 años? Te muestro el escenario, con calma.”</div></div>
+    </div>
+    <p class="lead rv" style="margin-top:22px;font-weight:600">El motivo puede ser el mismo; <span class="muted" style="font-weight:400">la voz y el porqué, nunca.</span></p>
+  </div>
+</section>
+
+<!-- 5 · TE LLAMO · CANALES -->
+<section class="slide light alt" data-dot="¿Por dónde?">
+  <div class="inner">
+    <div class="kicker rv"><span class="rule"></span>I · Te llamo · ¿Por dónde?</div>
+    <h2 class="rv">El canal también habla. Lo elijo por ti.</h2>
+    <p class="lead muted rv" style="margin-top:14px">No es aleatorio: el medio se escoge por la <b>preferencia del segmento</b> y por la <b>urgencia del mensaje</b>.</p>
+    <div class="chans">
+      <div class="chan-row rv"><div class="who"><span class="nm">Financial Explorer</span><span class="dr">Nativo digital</span></div><div class="ch"><div class="pills"><span class="pill pri">Notificación app</span><span class="pill pri">Sami (chatbot)</span><span class="pill sec">Newsletter</span><span class="pill sec">WhatsApp</span></div><div class="why">Vive en el celular; micro-contenido y cercanía dentro de la app.</div></div></div>
+      <div class="chan-row rv"><div class="who"><span class="nm">Wealth Builders</span><span class="dr">Eficiencia</span></div><div class="ch"><div class="pills"><span class="pill pri">Notificación app</span><span class="pill pri">Portal</span><span class="pill sec">Correo</span></div><div class="why">Alerta accionable al instante + reporte mensual al correo. Cero fricción.</div></div></div>
+      <div class="chan-row rv"><div class="who"><span class="nm">Family Guardians</span><span class="dr">Cercanía humana</span></div><div class="ch"><div class="pills"><span class="pill pri">WhatsApp</span><span class="pill sec">Correo</span><span class="pill sec">Push de vencimientos</span></div><div class="why">Canal humano y de confianza; los vencimientos de cobertura no pueden pasarse.</div></div></div>
+      <div class="chan-row rv"><div class="who"><span class="nm">Capital Investor</span><span class="dr">Control · tiempo real</span></div><div class="ch"><div class="pills"><span class="pill pri">Alertas configurables</span><span class="pill pri">WhatsApp a research</span><span class="pill sec">Correo (reportes)</span></div><div class="why">Él define qué, cuándo y cómo; autonomía y trazabilidad.</div></div></div>
+      <div class="chan-row rv"><div class="who"><span class="nm">Stability Seekers</span><span class="dr">Simple · previsible</span></div><div class="ch"><div class="pills"><span class="pill pri">Correo</span><span class="pill pri">SMS / recordatorio</span><span class="pill sec">Llamada del asesor</span><span class="pill sec">Portal</span></div><div class="why">50+ años; prefieren lo claro y lo humano, sin depender de la app.</div></div></div>
+    </div>
+    <div class="legend rv"><span class="k"><span class="sw" style="background:var(--verde)"></span>Canal principal</span><span class="k"><span class="sw" style="background:#E4EFE4;border:1px solid var(--line)"></span>Canal de apoyo</span></div>
+    <div class="note-line rv"><span class="b">Y escala solo</span><span>Cuando el dato detecta fricción — reintentos, abandono — el canal sube de una notificación a un WhatsApp o a la llamada de un asesor. Ese salto es lo que evita perder al 10,7% que hoy lucha solo.</span></div>
+  </div>
+</section>
+
+<!-- 6 · CAPÍTULO II -->
+<section class="slide chapter" data-dot="II · Te explico">
+  <div class="inner">
+    <div class="rn rv">MOVIMIENTO II</div>
+    <div class="verb rv">Te explico</div>
+    <p class="promise rv">Ya que estás aquí, no te muestro datos: te explico qué significan para ti.</p>
+  </div>
+</section>
+
+<!-- 6 · TE EXPLICO -->
+<section class="slide light alt" data-dot="Elige sin entender">
+  <div class="inner">
+    <div class="kicker rv"><span class="rule"></span>II · Te explico</div>
+    <h2 class="rv">Hoy elige sin saber qué está eligiendo.</h2>
+    <div class="gaps">
+      <div class="gap rv"><span class="x">✕</span><span><b>No ve cómo le ha ido:</b> solo 1 de cada 3 revisa su rentabilidad antes de mover su dinero.</span></div>
+      <div class="gap rv"><span class="x">✕</span><span><b>No hay señal de riesgo:</b> nada le advierte cuando su mezcla contradice su perfil.</span></div>
+      <div class="gap rv"><span class="x">✕</span><span><b>Tantea:</b> el 82,4% cambia su elección varias veces — prueba y corrige a ciegas.</span></div>
+      <div class="gap rv"><span class="x">✕</span><span><b>Y no encuentra ayuda:</b> solo el 0,09% la usa en Gestión — porque no aparece.</span></div>
+    </div>
+    <div class="chat">
+      <div class="bubble me rv"><span class="who2">El usuario elige</span>50% Bitcoin · 50% Acciones Emergentes</div>
+      <div class="bubble sk rv"><span class="who2">Skandia · en el momento</span>Tu perfil es <b>Prudente</b> y esta mezcla sube bastante tu riesgo — más de lo que sueles tolerar. ¿Te muestro qué significa antes de confirmar?</div>
+    </div>
+    <p class="lead rv" style="margin-top:24px;font-weight:600">Explicar en el momento: rentabilidad en el flujo, riesgo en tiempo real, lenguaje simple y ayuda a un toque.</p>
+  </div>
+</section>
+
+<!-- 7 · CAPÍTULO III -->
+<section class="slide chapter" data-dot="III · Te lo hago fácil">
+  <div class="inner">
+    <div class="rn rv">MOVIMIENTO III</div>
+    <div class="verb rv">Te lo hago<br>fácil</div>
+    <p class="promise rv">Entender no basta si decidir sigue costando. Te doy el camino más simple para elegir con confianza.</p>
+  </div>
+</section>
+
+<!-- 8 · TE LO HAGO FÁCIL -->
+<section class="slide light" data-dot="Sin fricción">
+  <div class="inner">
+    <div class="kicker rv"><span class="rule"></span>III · Te lo hago fácil</div>
+    <h2 class="rv">La decisión, sin fricción y sin miedo.</h2>
+    <div class="stats" style="margin-top:26px">
+      <div class="stat rv"><div class="n warn">3,81 min</div><div class="lbl">en seleccionar contrato: <b>la pantalla más lenta y la de mayor abandono</b></div></div>
+      <div class="stat rv"><div class="n warn">55%</div><div class="lbl">de abandono <b>en móvil</b> — la mitad de tus usuarios se quedan afuera</div></div>
+      <div class="stat rv"><div class="n warn">10,7%</div><div class="lbl">reinicia el flujo <b>sin completarlo</b>; y el simulador simplemente <b>no existe</b></div></div>
+    </div>
+    <div class="moves">
+      <div class="move rv"><span class="idx">1</span><div><span class="t">Opciones guiadas.</span><div class="d">Conservador · Moderado · Agresivo, según tu perfil, con un solo toque. Personaliza después si quieres.</div></div></div>
+      <div class="move rv"><span class="idx">2</span><div><span class="t">Comparador mezcla vs. perfil.</span><div class="d">“Tu perfil sugiere 60/40; estás eligiendo 80/20.” La decisión, alineada con tu idoneidad.</div></div></div>
+      <div class="move rv"><span class="idx">3</span><div><span class="t">Simulador de escenarios.</span><div class="d">Proyecta y compara antes de ejecutar. Hoy los usuarios ya lo hacen a mano, cambiando y deshaciendo.</div></div></div>
+      <div class="move rv"><span class="idx">4</span><div><span class="t">Guardar progreso.</span><div class="d">Retoma donde quedaste, sin perder lo avanzado ni empezar de cero.</div></div></div>
+      <div class="move rv"><span class="idx">5</span><div><span class="t">Móvil rediseñado.</span><div class="d">Donde hoy se cae la mitad de la gente — cards táctiles, sliders y preview en tiempo real.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · CIERRE -->
+<section class="slide deep" data-dot="La relación">
+  <div class="inner">
+    <div class="kicker rv" style="color:var(--verde)"><span class="rule"></span>La relación, en un ciclo</div>
+    <div class="loop rv">
+      <span class="w hl">Te llamo</span><span class="arw">→</span>
+      <span class="w hl">Te explico</span><span class="arw">→</span>
+      <span class="w hl">Te lo hago fácil</span><span class="arw">→</span>
+      <span class="w">vuelves</span>
+    </div>
+    <p class="lead muted rv" style="max-width:60ch">Cada vuelta refuerza el vínculo. Y una <b style="color:#EAF7EE">relación</b> — no una transacción suelta — es lo que retiene clientes, hace crecer el AUM y cumple la promesa de Skandia: <b style="color:#EAF7EE">un ecosistema, no una ventanilla.</b></p>
+    <div class="biz rv">
+      <span>+ Recurrencia</span><span>+ Retención</span><span>+ AUM</span><span>+ Confianza</span>
+    </div>
+    <div class="note-line rv"><span class="b">Para que funcione</span><span>Integrar segmento + perfil + asignación real al warehouse: sin ese dato no hay ni el “te llamo” segmentado ni el comparador del “te lo hago fácil”.</span></div>
+    <div class="foot rv"><span class="muted">Fuente: análisis de comportamiento (Databricks · 6 meses) · Segmentación Skandia 2026.</span><span class="muted" style="margin-top:4px">Próximo paso: cruzar con research cualitativo (Dovetail) y aterrizar microcopy con Kiki.</span></div>
+  </div>
+</section>
+
+<script>
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var dots=document.getElementById('dots');
+  slides.forEach(function(s,i){
+    var a=document.createElement('a');
+    a.href='#';a.setAttribute('aria-label',s.dataset.dot||('Slide '+(i+1)));
+    if(s.classList.contains('light'))a.className='dark-dot';
+    a.addEventListener('click',function(e){e.preventDefault();s.scrollIntoView({behavior:'smooth'});});
+    dots.appendChild(a);
+  });
+  var dotEls=[].slice.call(dots.children);
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        en.target.querySelectorAll('.rv').forEach(function(el,i){setTimeout(function(){el.classList.add('in')},i*70)});
+        var idx=slides.indexOf(en.target);
+        dotEls.forEach(function(d,i){d.classList.toggle('on',i===idx)});
+      }
+    });
+  },{threshold:.45});
+  slides.forEach(function(s){io.observe(s)});
+  window.addEventListener('scroll',function(){
+    var h=document.documentElement;
+    document.getElementById('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  },{passive:true});
+  document.addEventListener('keydown',function(e){
+    var cur=slides.findIndex(function(s){var r=s.getBoundingClientRect();return r.top>=-5&&r.top<window.innerHeight*0.5});
+    if(cur<0)cur=0;
+    if(e.key==='ArrowDown'||e.key==='PageDown'){e.preventDefault();if(slides[cur+1])slides[cur+1].scrollIntoView({behavior:'smooth'})}
+    if(e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();if(slides[cur-1])slides[cur-1].scrollIntoView({behavior:'smooth'})}
+  });
+</script>
+</body>
+</html>
