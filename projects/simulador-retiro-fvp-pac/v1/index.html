@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Propuesta v1 — Simulador Retiro FVP/PAC | Skandia</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap');
 
   :root{
     --sk-primary:#00c73d;
@@ -31,15 +31,20 @@
     --sk-space-xs:4px; --sk-space-sm:8px; --sk-space-md:16px; --sk-space-lg:24px; --sk-space-xl:32px;
     --sk-ease:cubic-bezier(0.4,0,0.2,1);
     --sk-focus-ring:0 0 0 3px var(--sk-primary-tint);
+    --sk-primary-300:#5fed73;
+    --sk-surface-100:#f1f3f5; --sk-surface-200:#e2e2e2; --sk-surface-600:#868e96;
+    --sk-input-focus:#16d727; --sk-placeholder:#a5a5a5; --sk-tertiary-hover:#f6fcf2;
+    --font-brand:'Montserrat',Verdana,Arial,sans-serif;
+    --font-body:'Open Sans','Segoe UI',Arial,sans-serif;
   }
   *{box-sizing:border-box;}
-  body{margin:0;font-family:'Montserrat',Verdana,Arial,sans-serif;background:var(--sk-n1);color:var(--sk-surface-800);-webkit-font-smoothing:antialiased;}
+  body{margin:0;font-family:var(--font-body);background:var(--sk-n1);color:var(--sk-surface-800);-webkit-font-smoothing:antialiased;}
   .wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
 
   /* Foco visible consistente en todo elemento interactivo (teclado) */
   a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
   summary:focus-visible, [tabindex]:focus-visible{
-    outline:2px solid var(--sk-primary-pressed); outline-offset:2px; border-radius:4px;
+    outline:3px solid var(--sk-primary); outline-offset:2px; border-radius:4px;
   }
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
@@ -48,23 +53,28 @@
   .panel.active{ animation:sk-panel-in .25s var(--sk-ease); }
 
   .header{display:flex;align-items:center;gap:10px;margin:24px 0 20px;}
-  .brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--sk-primary),var(--sk-primary-tint));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px;flex:none;}
+  .brand-mark{width:36px;height:36px;border-radius:9px;background:var(--sk-primary);display:flex;align-items:center;justify-content:center;font-family:var(--font-brand);font-weight:800;color:#fff;font-size:16px;flex:none;}
   .brand-name{font-weight:800;letter-spacing:0.3px;font-size:15px;}
   .brand-sub{font-size:11px;color:var(--sk-n4);font-weight:600;}
 
   h1{font-size:23px;font-weight:800;margin:0 0 4px;}
   .subtitle{font-size:13.5px;color:var(--sk-n4);font-weight:500;max-width:680px;line-height:1.5;margin:0 0 22px;}
 
-  /* Stepper (fallback pattern: ui-stepper promovido, ver simuladores-credito-impulso-wireframes.md sección 1) */
-  .stepper{display:flex;gap:6px;margin-bottom:var(--sk-space-lg);}
-  .step-item{flex:1;display:flex;flex-direction:column;gap:6px;}
-  .step-bar{height:4px;border-radius:4px;background:var(--sk-n3);transition:background-color .2s var(--sk-ease);}
-  .step-item.done .step-bar, .step-item.active .step-bar{background:var(--sk-primary);}
-  .step-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--sk-n4);display:flex;align-items:center;gap:4px;}
-  .step-item.active .step-label{color:var(--sk-surface-800);}
+  /* Stepper (ui-stepper real: marcadores circulares numerados) */
+  .stepper{display:flex;list-style:none;margin:0 0 var(--sk-space-lg);padding:0;}
+  .step-item{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;}
+  .step-item::before{content:'';position:absolute;top:13px;left:-50%;width:100%;height:2px;background:var(--sk-surface-200);z-index:0;transition:background-color .2s var(--sk-ease);}
+  .step-item:first-child::before{display:none;}
+  .step-item.done::before, .step-item.active::before{background:var(--sk-primary);}
+  .step-marker{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-brand);font-weight:700;font-size:12px;background:var(--sk-surface-100);color:var(--sk-surface-600);border:2px solid var(--sk-surface-200);transition:background-color .2s var(--sk-ease),border-color .2s var(--sk-ease),color .2s var(--sk-ease);}
+  .step-marker svg{width:14px;height:14px;display:none;}
+  .step-item.active .step-marker{background:var(--sk-surface-0);border-color:var(--sk-primary);color:var(--sk-primary-pressed);}
+  .step-item.done .step-marker{background:var(--sk-primary);border-color:var(--sk-primary);color:#fff;}
+  .step-item.done .step-marker .num{display:none;}
+  .step-item.done .step-marker svg{display:block;}
+  .step-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--sk-n4);text-align:center;line-height:1.3;}
+  .step-item.active .step-label{color:var(--sk-surface-900);}
   .step-item.done .step-label{color:var(--sk-primary-pressed);}
-  .step-check{display:none;}
-  .step-item.done .step-check{display:inline;}
 
   /* Cards */
   .card{background:var(--sk-surface-0);border:1px solid var(--sk-n3);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 2px rgba(0,0,0,0.03);}
@@ -94,13 +104,17 @@
   .field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px;}
   .field .unit-input{position:relative;}
   .field .unit-input input{padding-right:32px;}
-  .field .unit-input span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sk-n4);font-weight:600;}
+  .field .unit-input span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sk-placeholder);font-weight:600;}
   input[type="text"], input[type="number"], select{
-    width:100%;border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);padding:9px 10px;
-    font-family:'Montserrat',sans-serif;font-size:13.5px;color:var(--sk-surface-800);
-    background:var(--sk-n1);transition:border-color .15s var(--sk-ease), background .15s var(--sk-ease), box-shadow .15s var(--sk-ease);
+    width:100%;border:1px solid var(--sk-n3);border-radius:4px;padding:12px 12px;
+    font-family:var(--font-body);font-size:14px;line-height:1.5;color:var(--sk-surface-800);
+    background:var(--sk-surface-0);transition:border-color .15s var(--sk-ease), border-radius .15s var(--sk-ease), box-shadow .15s var(--sk-ease);
   }
-  input:focus, select:focus{outline:none;border-color:var(--sk-primary);background:#fff;box-shadow:var(--sk-focus-ring);}
+  input::placeholder{color:var(--sk-placeholder);}
+  input:focus, select:focus{outline:none;border-color:var(--sk-input-focus);border-radius:8px;box-shadow:0 0 0 3px rgba(0,199,61,.14);}
+  /* Campos monetarios/numéricos = firma real de sk-input-number (borde transparente + sombra ambiental, foco #00c73d); select y texto = sk-input-text/sk-select */
+  input.money, input[type="number"]{border-color:transparent;border-radius:var(--sk-radius-sm);box-shadow:0 0 4px rgba(68,68,68,0.15);}
+  input.money:focus, input[type="number"]:focus{border-color:var(--sk-primary);border-radius:var(--sk-radius-sm);box-shadow:0 0 4px rgba(68,68,68,0.15), 0 0 0 3px rgba(0,199,61,0.18);}
   .field .help{font-size:11px;color:var(--sk-n4);margin-top:5px;line-height:1.5;}
   .split-note{font-size:11px;color:var(--sk-n4);margin-top:8px;font-weight:500;}
   .split-note.warn{
@@ -110,7 +124,7 @@
   }
 
   /* sk-button (skType primary/secondary/tertiary) */
-  .btn{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;border-radius:100px;padding:11px 22px;cursor:pointer;border:1.5px solid transparent;transition:background .15s,border-color .15s;}
+  .btn{font-family:var(--font-brand);font-weight:700;font-size:14px;line-height:1;border-radius:100px;padding:12px 22px;cursor:pointer;border:2px solid transparent;display:inline-flex;align-items:center;gap:8px;transition:background .2s,border-color .2s,color .2s,box-shadow .2s;}
   .btn-primary{background:var(--sk-primary);color:#fff;}
   .btn-primary:hover{background:var(--sk-primary-hover);}
   .btn-primary:active{background:var(--sk-primary-pressed);}
@@ -118,7 +132,7 @@
   .btn-secondary{background:#fff;color:var(--sk-primary-pressed);border-color:var(--sk-primary);}
   .btn-secondary:hover{background:var(--sk-primary-tint);}
   .btn-tertiary{background:none;color:var(--sk-primary-pressed);padding:8px 10px;}
-  .btn-tertiary:hover{text-decoration:underline;}
+  .btn-tertiary:hover{background:var(--sk-tertiary-hover);}
   .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;}
   .btn-row.split{justify-content:space-between;}
 
@@ -139,7 +153,7 @@
   table.line-table{width:100%;border-collapse:collapse;margin-top:14px;}
   .line-table td{padding:9px 4px;font-size:13px;border-bottom:1px solid var(--sk-n2);}
   .line-table td.lbl{color:var(--sk-n4);font-weight:500;}
-  .line-table td.val{text-align:right;font-weight:700;color:var(--sk-surface-800);white-space:nowrap;}
+  .line-table td.val{text-align:right;font-weight:700;color:var(--sk-surface-800);white-space:nowrap;font-variant-numeric:tabular-nums;}
   .line-table tr.subtotal td{background:var(--sk-n1);font-weight:800;border-top:1.5px solid var(--sk-n3);}
   .line-table tr.final td{background:var(--sk-primary-tint);font-weight:800;font-size:14px;color:var(--sk-primary-pressed);border-top:2px solid var(--sk-primary);}
   .term-ico{cursor:pointer;color:var(--sk-info-border);font-weight:800;margin-left:4px;text-decoration:none;}
@@ -154,7 +168,7 @@
   .help-condensed{font-size:12.5px;color:var(--sk-n4);margin-top:2px;line-height:1.5;}
   .help-condensed .ver-ejemplo{color:var(--sk-primary-pressed);font-weight:700;cursor:pointer;}
 
-  .vigencia-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--sk-warning-ink);background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:var(--sk-radius-pill);padding:5px 12px;margin-bottom:var(--sk-space-md);}
+  .vigencia-badge{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--sk-warning-ink);background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:var(--sk-radius-pill);padding:5px 12px;width:fit-content;max-width:100%;margin:0 auto var(--sk-space-md);text-align:center;}
 
   .disclaimer-block{margin-top:var(--sk-space-lg);}
   .disclaimer-main{font-size:12.5px;color:var(--sk-surface-800);font-weight:600;line-height:1.6;margin-bottom:8px;}
@@ -173,10 +187,28 @@
   .segment-acompanada .acto-narrative.extra{display:block;}
   .acto-support{font-size:12px;color:var(--sk-n4);margin-top:10px;font-style:italic;}
 
+  /* Voz de marca (Montserrat) en títulos, etiquetas y acciones; el resto hereda Open Sans */
+  h1, .brand-name, .card-title, .field label, .step-label, .result-title, .result-tag,
+  .acto-tag, .acto-title, .vigencia-badge, .segment-btn, .radio-title, .disclaimer-main{
+    font-family:var(--font-brand);
+  }
+  /* Pill de audiencia explícita (jerarquía real, no subtítulo 11px) */
+  .audience-tag{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-brand);font-weight:700;font-size:11px;letter-spacing:0.4px;text-transform:uppercase;color:var(--sk-surface-800);background:var(--sk-surface-100);border:1px solid var(--sk-surface-200);border-radius:var(--sk-radius-pill);padding:6px 12px;}
+  .audience-tag svg{width:14px;height:14px;}
+  /* Chevron de ayuda inline sin depender de emoji */
+  .help-block summary{list-style:none;display:flex;align-items:center;gap:8px;}
+  .help-block summary::-webkit-details-marker{display:none;}
+  .help-block summary::before{content:'';width:7px;height:7px;border-right:2px solid var(--sk-n4);border-bottom:2px solid var(--sk-n4);transform:rotate(-45deg);transition:transform .15s var(--sk-ease);flex:none;}
+  .help-block[open] summary::before{transform:rotate(45deg);border-color:var(--sk-primary-pressed);}
+  /* Íconos SVG en avisos de validación y vigencia */
+  .split-note .wico{width:16px;height:16px;flex:none;margin-top:1px;}
+  .vigencia-badge svg{width:15px;height:15px;flex:none;}
+
   @media (max-width:600px){
     h1{font-size:19px;}
     .card{padding:16px;}
-    .stepper{flex-wrap:wrap;}
+    .step-label{font-size:9.5px;}
+    .audience-tag{margin-left:0;}
   }
 </style>
 </head>
@@ -184,19 +216,23 @@
 
 <div class="wrap">
 
-  <div class="header">
+  <header class="header">
     <div class="brand-mark">Sk</div>
     <div>
       <div class="brand-name">SKANDIA</div>
-      <div class="brand-sub">Crédito Impulso · Herramienta comercial</div>
+      <div class="brand-sub">Crédito Impulso</div>
     </div>
-  </div>
+    <span class="audience-tag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Herramienta de asesor
+    </span>
+  </header>
 
   <h1>Simulador de retiro FVP vs. consolidación PAC</h1>
   <p class="subtitle">Compara cuánto le cuesta a tu cliente retirar del FVP o consolidar vía PAC sin cumplir los requisitos tributarios, frente a tomar un Crédito Impulso. Herramienta de uso del asesor — la capa para el cliente aparece al final del flujo.</p>
 
-  <!-- STEPPER (fallback ui-stepper promovido) -->
-  <div class="stepper" id="stepper"></div>
+  <!-- STEPPER (ui-stepper real: marcadores circulares numerados) -->
+  <ol class="stepper" id="stepper" aria-label="Progreso del simulador"></ol>
 
   <!-- PASO 0: RAMIFICACIÓN -->
   <div class="panel active" id="panel-0">
@@ -234,7 +270,7 @@
 
   <!-- PASO 1: DATOS DEL CLIENTE -->
   <div class="panel" id="panel-1">
-    <div class="vigencia-badge">⏱ Tasa Skandia y parámetros tributarios vigentes desde el 1 de enero de 2026</div>
+    <div class="vigencia-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Tasa Skandia y parámetros tributarios vigentes desde el 1 de enero de 2026</div>
 
     <div class="card">
       <div class="card-title">Datos del cliente</div>
@@ -301,7 +337,7 @@
       <div class="card-desc">Se aplican al escenario elegido.</div>
       <div class="grid">
         <div class="field"><label>% Rentabilidad cliente (FVP)</label><div class="unit-input"><input type="number" id="rentCliente" value="8" step="0.1"><span>%</span></div></div>
-        <div class="field"><label>Meses (rentabilidad dejada de percibir)</label><input type="number" id="mesesRent" value="12" step="1"></div>
+        <div class="field"><label>Meses (rent. dejada de percibir)</label><input type="number" id="mesesRent" value="12" step="1"></div>
         <div class="field"><label>Tasa crédito Skandia (E.A.)</label><div class="unit-input"><input type="number" id="tasaSk" value="16.79" step="0.01"><span>%</span></div></div>
         <div class="field"><label>Meses del préstamo</label><input type="number" id="mesesSk" value="12" step="1"></div>
       </div>
@@ -570,15 +606,16 @@ let branch = null;
 let currentStep = 0;
 const steps = ['Ramificación','Datos del cliente','Supuestos','Comparación'];
 
+const checkSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
 function renderStepper(){
   const el = document.getElementById('stepper');
-  el.setAttribute('role','list');
-  el.setAttribute('aria-label','Progreso del simulador');
-  el.innerHTML = steps.map((s,i) => `
-    <div class="step-item ${i<currentStep?'done':i===currentStep?'active':''}" role="listitem" ${i===currentStep?'aria-current="step"':''}>
-      <div class="step-bar"></div>
-      <div class="step-label"><span class="step-check" aria-hidden="true">✓</span>${s}</div>
-    </div>`).join('');
+  el.innerHTML = steps.map((s,i) => {
+    const state = i<currentStep ? 'done' : (i===currentStep ? 'active' : '');
+    return `<li class="step-item ${state}" ${i===currentStep?'aria-current="step"':''}>
+      <span class="step-marker"><span class="num">${i+1}</span>${checkSVG}</span>
+      <span class="step-label">${s}</span>
+    </li>`;
+  }).join('');
 }
 function goToStep(n){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -626,7 +663,7 @@ function recalc(){
   const rendMonto = valorRetiro*(pctRend/100);
   if(Math.abs(sumPct-100) > 0.01){
     splitNote.className = 'split-note warn';
-    splitNote.textContent = `⚠ Capital + Rendimientos debe sumar 100% (actual: ${sumPct.toFixed(1)}%). Capital: ${fmtCOP(capMonto)} · Rendimientos: ${fmtCOP(rendMonto)}`;
+    splitNote.innerHTML = `<svg class="wico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Capital + Rendimientos debe sumar 100% (actual: ${sumPct.toFixed(1)}%). Capital: ${fmtCOP(capMonto)} · Rendimientos: ${fmtCOP(rendMonto)}</span>`;
   } else {
     splitNote.className = 'split-note';
     splitNote.textContent = `Capital: ${fmtCOP(capMonto)} · Rendimientos: ${fmtCOP(rendMonto)}`;
