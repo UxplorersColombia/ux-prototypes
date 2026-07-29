@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Skandia · Migra al nuevo portal</title>
+<style>
+  :root{
+    /* Tokens Skandia Design System 0.1.0 */
+    --color-green-d04:#006E22; --color-green-d03:#007C26; --color-green-d02:#009A2F;
+    --color-green-d01:#03A835; --color-green-n00:#00C73D; --color-green-l01:#1DD64C;
+    --color-green-l02:#47E264; --color-green-l04:#CAF9CB; --color-green-l05:#F6FCF2;
+    --color-grey-d05:#000000; --color-grey-d04:#232323; --color-grey-n00:#404040;
+    --color-grey-l03:#666666; --color-grey-l04:#878787; --color-grey-l05:#A5A5A5;
+    --radius:14px;
+    --shadow:0 10px 40px rgba(0,0,0,.08);
+    --font:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--font);
+    background:
+      radial-gradient(1200px 600px at 85% -10%, var(--color-green-l05) 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, var(--color-green-l05) 0%, transparent 55%),
+      #ffffff;
+    color:var(--color-grey-d04);
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+  }
+
+  .card{
+    width:100%; max-width:440px;
+    background:#fff;
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid #eef0ee;
+    overflow:hidden;
+    position:relative;
+  }
+  .topbar{height:6px;background:linear-gradient(90deg,var(--color-green-n00),var(--color-green-l01))}
+  .inner{padding:36px 34px 30px}
+
+  /* Logo */
+  .brand{display:flex;align-items:center;gap:9px;margin-bottom:26px}
+  .brand svg{width:30px;height:30px}
+  .brand span{font-weight:700;font-size:22px;letter-spacing:-.5px;color:var(--color-grey-d05)}
+
+  /* Stepper */
+  .steps{display:flex;gap:6px;margin-bottom:26px}
+  .steps i{flex:1;height:4px;border-radius:4px;background:#e8ebe8;transition:background .35s ease}
+  .steps i.on{background:var(--color-green-n00)}
+
+  h1{font-size:22px;font-weight:700;line-height:1.25;margin-bottom:8px;color:var(--color-grey-d04)}
+  .sub{font-size:14.5px;color:var(--color-grey-l03);line-height:1.5;margin-bottom:24px}
+
+  label{display:block;font-size:13.5px;font-weight:600;margin-bottom:8px;color:var(--color-grey-n00)}
+  .field{position:relative;margin-bottom:6px}
+  input[type=text]{
+    width:100%;height:52px;padding:0 16px;font-size:16px;font-family:var(--font);
+    border:1.5px solid #d9ddd9;border-radius:10px;background:#fff;color:var(--color-grey-d04);
+    transition:border-color .15s ease, box-shadow .15s ease;outline:none;
+  }
+  input[type=text]:focus{border-color:var(--color-green-n00);box-shadow:0 0 0 4px var(--color-green-l05)}
+  input.err{border-color:#d64545;box-shadow:0 0 0 4px #fdecec}
+
+  .hint{font-size:12.5px;color:var(--color-grey-l04);min-height:18px;margin-top:4px}
+  .hint.error{color:#d64545;font-weight:500}
+
+  /* OTP boxes */
+  .otp{display:flex;gap:10px;justify-content:space-between;margin-bottom:6px}
+  .otp input{
+    width:100%;height:58px;text-align:center;font-size:22px;font-weight:600;
+    border:1.5px solid #d9ddd9;border-radius:10px;font-family:var(--font);outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;color:var(--color-grey-d04);
+  }
+  .otp input:focus{border-color:var(--color-green-n00);box-shadow:0 0 0 4px var(--color-green-l05)}
+  .otp.err input{border-color:#d64545}
+
+  /* Buttons */
+  .btn{
+    width:100%;height:52px;border:none;border-radius:10px;font-family:var(--font);
+    font-weight:700;font-size:16px;cursor:pointer;margin-top:18px;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    transition:background .12s ease, transform .08s ease, opacity .12s ease;
+  }
+  .btn--primary{background:var(--color-green-n00);color:#fff}
+  .btn--primary:hover{background:var(--color-green-d01)}
+  .btn--primary:active{transform:scale(.985)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn--ghost{background:transparent;color:var(--color-grey-l03);height:auto;margin-top:14px;font-size:14px;font-weight:600}
+  .btn--ghost:hover{color:var(--color-green-d01)}
+
+  .link{background:none;border:none;color:var(--color-green-d02);font-weight:600;
+    font-family:var(--font);font-size:13.5px;cursor:pointer;padding:0}
+  .link:hover{text-decoration:underline}
+
+  /* Trust footer */
+  .trust{
+    display:flex;align-items:center;gap:9px;margin-top:24px;padding-top:18px;
+    border-top:1px solid #f0f2f0;font-size:12.5px;color:var(--color-grey-l04);line-height:1.4;
+  }
+  .trust svg{flex-shrink:0;width:18px;height:18px;color:var(--color-green-d02)}
+  .masked{background:var(--color-green-l05);border:1px solid var(--color-green-l04);
+    border-radius:8px;padding:11px 14px;font-size:13.5px;color:var(--color-grey-n00);
+    margin-bottom:20px;display:flex;align-items:center;gap:9px}
+  .masked b{color:var(--color-grey-d04)}
+  .masked svg{width:17px;height:17px;color:var(--color-green-d02);flex-shrink:0}
+
+  /* Result screens */
+  .result{text-align:center;padding-top:6px}
+  .badge{
+    width:82px;height:82px;border-radius:50%;margin:6px auto 22px;
+    display:flex;align-items:center;justify-content:center;
+    animation:pop .5s cubic-bezier(.2,.9,.3,1.3);
+  }
+  .badge svg{width:42px;height:42px}
+  .badge--ok{background:var(--color-green-l05);border:2px solid var(--color-green-l02)}
+  .badge--ok svg{color:var(--color-green-d02)}
+  .badge--wait{background:#fff7e8;border:2px solid #ffd784}
+  .badge--wait svg{color:#e0930a}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+
+  .result h1{font-size:23px}
+  .result .sub{margin-bottom:22px}
+
+  .redir{
+    background:#f7f9f7;border-radius:10px;padding:14px;font-size:13px;color:var(--color-grey-l03);
+    display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px;
+  }
+  .spinner{width:16px;height:16px;border:2.5px solid var(--color-green-l04);
+    border-top-color:var(--color-green-n00);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Screen transitions */
+  .screen{display:none;animation:fade .4s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  .demo-note{position:fixed;bottom:14px;left:0;right:0;text-align:center;
+    font-size:11.5px;color:var(--color-grey-l05);font-family:var(--font)}
+  .demo-note code{background:#f0f2f0;padding:2px 6px;border-radius:4px;color:var(--color-grey-l03)}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="topbar"></div>
+  <div class="inner">
+
+    <div class="brand">
+      <svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg>
+      <span>skandia</span>
+    </div>
+
+    <!-- ===== SCREEN 1: CÉDULA ===== -->
+    <section class="screen active" id="s1">
+      <div class="steps"><i class="on"></i><i></i><i></i></div>
+      <h1>Verifica tu identidad</h1>
+      <p class="sub">Antes de darte acceso al nuevo Portal Skandia, confirmamos que eres tú. Ingresa tu número de documento.</p>
+
+      <label for="ced">Número de documento</label>
+      <div class="field">
+        <input type="text" id="ced" inputmode="numeric" autocomplete="off" placeholder="Ej: 1026295142" maxlength="12" />
+      </div>
+      <div class="hint" id="ced-hint">Solo números, sin puntos ni espacios.</div>
+
+      <button class="btn btn--primary" id="s1-btn" disabled>
+        Continuar
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+
+      <div class="trust">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Tus datos están protegidos. Nunca compartimos tu información y esta validación es cifrada de extremo a extremo.</span>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN 2: OTP ===== -->
+    <section class="screen" id="s2">
+      <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
+      <h1>Ingresa tu código</h1>
+      <p class="sub">Por tu seguridad, enviamos un código de verificación de 6 dígitos.</p>
+
+      <div class="masked">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>Código enviado a tu celular <b>•••• 4821</b></span>
+      </div>
+
+      <label>Código de verificación</label>
+      <div class="otp" id="otp">
+        <input type="text" inputmode="numeric" maxlength="1" />
+        <input type="text" inputmode="numeric" maxlength="1" />
+        <input type="text" inputmode="numeric" maxlength="1" />
+        <input type="text" inputmode="numeric" maxlength="1" />
+        <input type="text" inputmode="numeric" maxlength="1" />
+        <input type="text" inputmode="numeric" maxlength="1" />
+      </div>
+      <div class="hint" id="otp-hint">Tienes <b id="attempts">5</b> intentos disponibles.</div>
+
+      <button class="btn btn--primary" id="s2-btn" disabled>Validar y continuar</button>
+      <button class="btn btn--ghost" id="resend">¿No te llegó? Reenviar código</button>
+
+      <div class="trust">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>El código expira en 5 minutos y es de un solo uso.</span>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN 3a: SUCCESS ===== -->
+    <section class="screen" id="s3a">
+      <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      <div class="result">
+        <div class="badge badge--ok">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <h1>¡Identidad verificada!</h1>
+        <p class="sub">Tu acceso al nuevo Portal Skandia está listo. Te llevaremos allí para que crees tu nueva contraseña.</p>
+        <div class="redir">
+          <span class="spinner"></span>
+          <span>Redirigiendo al nuevo portal de forma segura…</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN 3b: NOT MIGRATED ===== -->
+    <section class="screen" id="s3b">
+      <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      <div class="result">
+        <div class="badge badge--wait">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <h1>Aún estamos habilitando tu acceso</h1>
+        <p class="sub">¡Verificamos tu identidad con éxito! 🎉 El nuevo portal se está liberando por etapas y tu cuenta todavía no está habilitada. Déjanos tu correo y te avisamos apenas puedas entrar.</p>
+
+        <div style="text-align:left">
+          <label for="mail">Correo electrónico</label>
+          <div class="field">
+            <input type="text" id="mail" autocomplete="off" placeholder="nombre@correo.com" />
+          </div>
+          <div class="hint" id="mail-hint">Te escribiremos solo para avisarte de tu acceso.</div>
+        </div>
+
+        <button class="btn btn--primary" id="s3b-btn" disabled>Avísenme cuando esté listo</button>
+        <p class="sub" style="margin-top:16px;margin-bottom:0;font-size:13.5px">Mientras tanto, puedes seguir usando el <b>portal actual</b> con normalidad.</p>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN 3c: WAITLIST CONFIRMED ===== -->
+    <section class="screen" id="s3c">
+      <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+      <div class="result">
+        <div class="badge badge--ok">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        </div>
+        <h1>¡Listo! Te avisaremos 📩</h1>
+        <p class="sub">Registramos tu correo. Apenas tu acceso al nuevo portal esté habilitado, te enviaremos la invitación. Gracias por tu interés.</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="demo-note">
+  Prototipo simulado · Migrado: cédula <code>1026295142</code> · No migrado: <code>52000111</code> · OTP válido: <code>123456</code>
+</div>
+
+<script>
+  /* =========================================================
+     DATOS SIMULADOS (en producción esto vive en el backend)
+     - El front NUNCA sabe si una cédula existe hasta validar
+       el 2º factor → evita enumeración de usuarios.
+  ==========================================================*/
+  const DB = {
+    "1026295142": { existe:true, migrado:true,  otp:"123456" }, // válido + habilitado → 3a
+    "52000111":   { existe:true, migrado:false, otp:"123456" }, // válido + NO habilitado → 3b
+  };
+  const MAX_ATTEMPTS = 5;
+
+  let currentCed = null;
+  let attempts = MAX_ATTEMPTS;
+
+  const $ = s => document.querySelector(s);
+  const screens = { s1:$("#s1"), s2:$("#s2"), s3a:$("#s3a"), s3b:$("#s3b"), s3c:$("#s3c") };
+
+  function goto(id){
+    Object.values(screens).forEach(s=>s.classList.remove("active"));
+    screens[id].classList.add("active");
+  }
+
+  /* ---------- SCREEN 1: cédula ---------- */
+  const ced = $("#ced"), s1btn = $("#s1-btn"), cedHint = $("#ced-hint");
+  ced.addEventListener("input", ()=>{
+    ced.value = ced.value.replace(/\D/g,"");
+    ced.classList.remove("err"); cedHint.classList.remove("error");
+    cedHint.innerHTML = "Solo números, sin puntos ni espacios.";
+    s1btn.disabled = ced.value.length < 6;
+  });
+  ced.addEventListener("keydown", e=>{ if(e.key==="Enter" && !s1btn.disabled) s1btn.click(); });
+
+  s1btn.addEventListener("click", ()=>{
+    currentCed = ced.value;
+    attempts = MAX_ATTEMPTS;
+    $("#attempts").textContent = attempts;
+    // Anti-enumeración: SIEMPRE avanzamos, exista o no la cédula.
+    // (El backend real enviaría OTP solo si existe, pero la UI es idéntica.)
+    resetOtp();
+    goto("s2");
+    setTimeout(()=>otpInputs[0].focus(), 350);
+  });
+
+  /* ---------- SCREEN 2: OTP ---------- */
+  const otpInputs = [...document.querySelectorAll("#otp input")];
+  const s2btn = $("#s2-btn"), otpHint = $("#otp-hint"), otpBox = $("#otp");
+
+  function otpValue(){ return otpInputs.map(i=>i.value).join(""); }
+  function checkOtpComplete(){ s2btn.disabled = otpValue().length !== 6; }
+  function resetOtp(){
+    otpInputs.forEach(i=>i.value="");
+    otpBox.classList.remove("err");
+    otpHint.classList.remove("error");
+    otpHint.innerHTML = `Tienes <b id="attempts">${attempts}</b> intentos disponibles.`;
+    s2btn.disabled = true;
+  }
+
+  otpInputs.forEach((inp, idx)=>{
+    inp.addEventListener("input", ()=>{
+      inp.value = inp.value.replace(/\D/g,"");
+      otpBox.classList.remove("err"); otpHint.classList.remove("error");
+      if(inp.value && idx < 5) otpInputs[idx+1].focus();
+      checkOtpComplete();
+    });
+    inp.addEventListener("keydown", e=>{
+      if(e.key==="Backspace" && !inp.value && idx>0) otpInputs[idx-1].focus();
+      if(e.key==="Enter" && !s2btn.disabled) s2btn.click();
+    });
+    inp.addEventListener("paste", e=>{
+      e.preventDefault();
+      const digits = (e.clipboardData.getData("text").replace(/\D/g,"")).slice(0,6).split("");
+      digits.forEach((d,i)=>{ if(otpInputs[i]) otpInputs[i].value=d; });
+      checkOtpComplete();
+      otpInputs[Math.min(digits.length,5)].focus();
+    });
+  });
+
+  s2btn.addEventListener("click", ()=>{
+    const record = DB[currentCed];
+    const ok = record && record.existe && otpValue() === record.otp;
+
+    if(ok){
+      // Identidad válida → decidir ruta por cohorte
+      if(record.migrado){
+        goto("s3a");
+        // Redirección simulada al portal nuevo (handoff con token firmado single-use)
+        setTimeout(()=>{
+          $("#s3a .redir").innerHTML =
+            '<span style="color:var(--color-green-d02);font-weight:600">✓ Conectado. En el portal real aterrizarías en “Crea tu contraseña”.</span>';
+        }, 2600);
+      } else {
+        goto("s3b");
+        setTimeout(()=>$("#mail").focus(), 350);
+      }
+      return;
+    }
+
+    // Fallo: error genérico (no revela si la cédula existe) + descuenta intento
+    attempts--;
+    otpBox.classList.add("err");
+    otpHint.classList.add("error");
+    if(attempts > 0){
+      otpHint.innerHTML = `No pudimos validar tus datos. Te quedan <b>${attempts}</b> intento(s).`;
+      otpInputs.forEach(i=>i.value=""); otpInputs[0].focus(); s2btn.disabled = true;
+    } else {
+      otpHint.innerHTML = "Alcanzaste el máximo de intentos. Por seguridad, inténtalo de nuevo en unos minutos.";
+      otpInputs.forEach(i=>i.disabled = true);
+      s2btn.disabled = true;
+    }
+  });
+
+  $("#resend").addEventListener("click", ()=>{
+    otpHint.classList.remove("error");
+    otpHint.innerHTML = "Enviamos un nuevo código a tu celular <b>•••• 4821</b>.";
+  });
+
+  /* ---------- SCREEN 3b: captura de correo ---------- */
+  const mail = $("#mail"), s3bBtn = $("#s3b-btn"), mailHint = $("#mail-hint");
+  const mailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  mail.addEventListener("input", ()=>{
+    const valid = mailRe.test(mail.value.trim());
+    s3bBtn.disabled = !valid;
+    mail.classList.remove("err"); mailHint.classList.remove("error");
+    mailHint.innerHTML = "Te escribiremos solo para avisarte de tu acceso.";
+  });
+  mail.addEventListener("keydown", e=>{ if(e.key==="Enter" && !s3bBtn.disabled) s3bBtn.click(); });
+  s3bBtn.addEventListener("click", ()=> goto("s3c"));
+</script>
+</body>
+</html>

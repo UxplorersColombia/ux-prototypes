@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Skandia · Flujo 2 — Identifier-first</title>
+<style>
+  :root{
+    --green:#00C73D; --green-d1:#03A835; --green-d2:#009A2F; --green-d3:#007C26; --green-d4:#006E22;
+    --green-l4:#CAF9CB; --green-l5:#F6FCF2;
+    --grey-d5:#000; --grey-d4:#232323; --grey:#404040; --grey-l3:#666666; --grey-l4:#878787; --grey-l5:#A5A5A5;
+    --line:#e8ebe8; --danger:#d64545;
+    --font:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);color:var(--grey-d4);background:#fff;padding-bottom:52px}
+  a{color:inherit} button{font-family:var(--font)}
+  .view{display:none}.view.active{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+
+  /* ===== PÁGINA PÚBLICA ===== */
+  .pub-topbar{background:#232323;color:#d8d8d8;font-size:13px;font-weight:600}
+  .pub-topbar .in{max-width:1280px;margin:0 auto;padding:11px 32px;display:flex;justify-content:space-between;align-items:center}
+  .pub-topbar a{color:#d8d8d8;text-decoration:none;margin-right:26px;display:inline-flex;align-items:center;gap:5px}
+  .pub-topbar a:hover{color:#fff}.pub-topbar .right a{margin:0 0 0 26px}
+  .caret{font-size:9px;opacity:.8}
+  .pub-header{background:#fff;border-bottom:1px solid #f0f0f0}
+  .pub-header .in{max-width:1280px;margin:0 auto;padding:20px 32px;display:flex;align-items:center;gap:40px}
+  .pub-logo{display:flex;align-items:center;gap:9px}.pub-logo svg{width:32px;height:32px}.pub-logo b{font-size:24px;letter-spacing:-.5px;color:#000}
+  .pub-nav{display:flex;gap:34px;flex:1}
+  .pub-nav a{text-decoration:none;font-weight:700;font-size:15.5px;color:var(--grey-d4);display:inline-flex;align-items:center;gap:6px}
+  .pub-nav a:hover{color:var(--green-d2)}
+  .pub-cta{background:var(--green);color:#fff;font-weight:700;font-size:15px;letter-spacing:.3px;border:none;border-radius:40px;padding:14px 30px;cursor:pointer}
+  .pub-cta:hover{background:var(--green-d1)}
+  .hero{position:relative;background:#f1f2f1;overflow:hidden}
+  .hero .in{max-width:1280px;margin:0 auto;padding:70px 32px 90px;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;min-height:470px}
+  .hero .eyebrow{color:var(--green-d1);font-weight:700;font-size:15px;letter-spacing:1px;margin-bottom:20px}
+  .hero h1{font-size:52px;line-height:1.08;font-weight:700;margin-bottom:22px;letter-spacing:-1px}
+  .hero p{font-size:22px;color:var(--grey);margin-bottom:30px}
+  .hero .qcta{background:var(--green);color:#fff;border:none;border-radius:6px;font-weight:700;font-size:16px;letter-spacing:.5px;padding:16px 34px;cursor:pointer}
+  .hero-img{position:relative;height:360px;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .hero-img .ring{position:absolute;width:300px;height:300px;border:26px solid var(--green);border-radius:50%;right:120px}
+  .hero-img .photo{position:absolute;right:0;bottom:0;width:520px;height:360px;background:linear-gradient(135deg,#d9dbd6,#c3c8bf 60%,#b7bdb2);border-radius:12px}
+  .hero-img .photo::after{content:"👨‍👩‍👦";position:absolute;right:120px;bottom:40px;font-size:120px}
+  .hero .arrow{position:absolute;top:50%;transform:translateY(-50%);color:var(--green);font-size:44px;cursor:pointer;user-select:none}
+  .hero .arrow.l{left:26px}.hero .arrow.r{right:26px}
+  .hero .dots{position:absolute;bottom:26px;left:0;right:0;display:flex;gap:9px;justify-content:center}
+  .hero .dots i{width:34px;height:5px;border-radius:5px;background:#c9ccc7}.hero .dots i.on{background:var(--green)}
+  .power{text-align:center;padding:64px 32px 30px}
+  .power h2{font-size:34px;font-weight:700;line-height:1.15}
+  .power h2 .l1{color:var(--green);display:block;font-weight:600}.power h2 .l2{color:var(--green-d2);display:block}
+  .power .psub{font-size:22px;margin-top:26px}
+  .prod-row{max-width:1280px;margin:26px auto 80px;padding:0 32px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+  .prod{height:210px;border-radius:12px;background:linear-gradient(150deg,#e4e7e2,#d3d8cf)}
+  .prod:nth-child(2){background:linear-gradient(150deg,#dbe6d6,#c6d8bd)}
+  .cookie{position:fixed;left:26px;bottom:26px;z-index:30;width:320px;background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.16);padding:22px;text-align:center}
+  .cookie p{font-size:13px;color:var(--grey-l3);line-height:1.5;margin-bottom:6px}
+  .cookie .clink{color:var(--green-d2);font-weight:600;text-decoration:none;font-size:13px}
+  .cookie .cbtn{margin-top:14px;background:var(--green);color:#fff;border:none;border-radius:40px;padding:11px 20px;font-weight:600;font-size:13.5px;cursor:pointer;width:100%}
+  .bot{position:fixed;right:24px;bottom:24px;z-index:30;width:66px;height:66px;border-radius:50%;background:#1c2620;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(0,0,0,.28)}
+  .bot .eyes{color:var(--green-l4);font-size:26px}.bot .badge{position:absolute;top:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:#e23;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+  /* ===== LOGIN NUEVO (identifier-first) ===== */
+  #loginNuevo{min-height:100vh}
+  #loginNuevo.active{display:flex}
+  .ln-left{width:620px;max-width:46%;background:#fff;padding:44px 70px;display:flex;flex-direction:column}
+  .ln-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin:20px 0 40px}
+  .ln-logo svg{width:34px;height:34px}.ln-logo b{font-size:27px;letter-spacing:-.5px}
+  .ln-left h2{text-align:center;font-size:22px;font-weight:700;margin-bottom:8px}
+  .ln-left .ln-wel{text-align:center;font-size:15px;color:var(--grey-l3);margin-bottom:36px}
+  .ln-field{margin-bottom:18px}
+  .ln-field label{font-size:14px;color:var(--grey-l3);font-weight:400;margin-bottom:7px;display:block}
+  .ln-field input{width:100%;height:58px;border:1.5px solid #cfd3cf;border-radius:12px;padding:0 18px;font-size:16px;outline:none;font-family:var(--font);color:var(--grey-d4);transition:border-color .15s,box-shadow .15s}
+  .ln-field input:focus{border-color:var(--green);box-shadow:0 0 0 4px var(--green-l5)}
+  .ln-field input:disabled,.ln-field input:read-only{background:#f5f7f5;color:var(--grey-l3)}
+  .ln-field input.err{border-color:var(--danger);box-shadow:0 0 0 4px #fdecec}
+  .ln-inlinehint{font-size:12.5px;color:var(--grey-l4);margin:-10px 0 14px;min-height:16px;line-height:1.4}
+  .ln-inlinehint.error{color:var(--danger);font-weight:500}
+  /* reveal wrapper: transición suave de altura */
+  .reveal{overflow:hidden;max-height:0;opacity:0;transition:max-height .45s ease,opacity .35s ease}
+  .reveal.show{max-height:260px;opacity:1}
+  .ln-recuperar{text-align:center;color:var(--green-d2);font-weight:700;font-size:15px;text-decoration:none;display:block;margin:6px 0 24px;cursor:pointer}
+  .ln-primary{width:100%;height:56px;background:var(--green);color:#fff;border:none;border-radius:40px;font-weight:700;font-size:17px;cursor:pointer;transition:background .12s}
+  .ln-primary:hover{background:var(--green-d1)}
+  .ln-primary:disabled{opacity:.45;cursor:not-allowed}
+  .ln-reglamento{text-align:center;font-size:13.5px;color:var(--grey-l3);margin-top:18px}
+  .ln-reglamento a{color:var(--green-d2);font-weight:700;text-decoration:none}
+  .ln-detected{display:flex;align-items:center;gap:9px;background:var(--green-l5);border:1px solid var(--green-l4);border-radius:10px;padding:11px 14px;font-size:13px;color:var(--grey);margin-bottom:20px}
+  .ln-detected b{color:var(--grey-d4)}.ln-detected .link{margin-left:auto;color:var(--green-d2);font-weight:600;cursor:pointer;white-space:nowrap}
+  .ln-detected svg{width:17px;height:17px;color:var(--green-d2);flex-shrink:0}
+  /* mensaje "no migrado" */
+  .notmig{background:#fff;border:1.5px solid var(--green-l4);border-radius:14px;padding:22px;margin-top:6px;text-align:center;animation:fade .4s ease}
+  .notmig .nm-ic{width:56px;height:56px;border-radius:14px;background:#eef1f4;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+  .notmig .nm-ic svg{width:28px;height:28px;color:#5a6b7a}
+  .notmig h3{font-size:18px;margin-bottom:8px}
+  .notmig p{font-size:14px;color:var(--grey-l3);line-height:1.55;margin-bottom:18px}
+  .ln-prev{margin-top:auto;border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:13.5px}
+  .ln-prev .t{font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .ln-prev .s{color:var(--grey-l3)}.ln-prev a{color:var(--green-d2);font-weight:700;text-decoration:none;cursor:pointer}
+  .ln-right{flex:1;background:linear-gradient(150deg,#25d24a 0%,#00c73d 45%,#0bb23a 100%);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:40px}
+  .ln-right .glow{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,#7bf59a55,transparent 65%)}
+  .ln-shield{position:relative;width:230px;height:250px;display:flex;align-items:center;justify-content:center;margin-bottom:30px}
+  .ln-shield .sh{width:150px;height:180px;background:linear-gradient(160deg,#0f9a34,#0a7a29);clip-path:polygon(50% 0,100% 16%,100% 60%,50% 100%,0 60%,0 16%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px #7bf59a88}
+  .ln-shield .sh svg{width:56px;height:56px;color:#d7ffe0}
+  .ln-shield .chip{position:absolute;width:56px;height:56px;background:rgba(255,255,255,.9);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 20px rgba(0,0,0,.15)}
+  .ln-shield .c1{top:0;left:6px}.ln-shield .c2{top:70px;left:-26px}.ln-shield .c3{top:8px;right:0}.ln-shield .c4{bottom:26px;left:0}.ln-shield .c5{bottom:8px;right:2px}
+  .ln-right h3{color:#fff;font-size:30px;font-weight:700;text-align:center;margin-bottom:12px}
+  .ln-right p{color:#eafff0;font-size:16px;text-align:center;margin-bottom:22px;max-width:360px}
+  .ln-right .rbtn{background:transparent;color:#0a3d18;border:2px solid #0a5d24;border-radius:40px;padding:14px 30px;font-weight:700;font-size:15px;cursor:pointer}
+  .ln-right .rarrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:#0a4a1e;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+  .ln-right .rarrow.l{left:26px}.ln-right .rarrow.r{right:26px}
+  .ln-right .rdots{position:absolute;bottom:26px;display:flex;gap:9px}.ln-right .rdots i{width:9px;height:9px;border-radius:50%;background:#ffffff88}.ln-right .rdots i.on{background:#fff}
+  @media(max-width:820px){.ln-right{display:none}.ln-left{max-width:100%;width:100%}}
+
+  /* ===== LOGIN VIEJO ===== */
+  #loginViejo{min-height:100vh;background:#fff}
+  .lv-head{display:flex;align-items:center;padding:26px 40px 0}
+  .lv-logo{display:flex;align-items:center;gap:8px}.lv-logo svg{width:30px;height:30px}.lv-logo b{font-size:23px;letter-spacing:-.5px}
+  .lv-rule{height:4px;background:#232323;margin-top:20px}
+  .lv-detected{max-width:270px;margin:20px auto 0;display:flex;align-items:center;gap:9px;background:var(--green-l5);border:1px solid var(--green-l4);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--grey)}
+  .lv-detected b{color:var(--grey-d4)}.lv-detected .link{margin-left:auto;color:var(--green-d2);font-weight:600;cursor:pointer;white-space:nowrap}
+  .lv-detected svg{width:15px;height:15px;color:var(--green-d2)}
+  .lv-form{max-width:270px;margin:26px auto 0;display:flex;flex-direction:column}
+  .lv-form label{font-size:15px;color:var(--grey-d4);margin-bottom:6px}.lv-form label .req{color:#e23;margin-left:2px}
+  .lv-form input{height:38px;border:1px solid #b9b9b9;border-radius:4px;padding:0 10px;font-size:15px;margin-bottom:18px;outline:none;font-family:var(--font)}
+  .lv-form input:focus{border-color:var(--green)}
+  .lv-form .ingresar{height:42px;background:var(--green);color:#fff;border:none;font-weight:700;letter-spacing:1px;font-size:14px;cursor:pointer;margin-top:4px}
+  .lv-form .ingresar:hover{background:var(--green-d1)}
+  .lv-links{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+  .lv-links a{color:var(--green-d2);font-weight:600;font-size:13.5px;text-decoration:none;cursor:pointer}.lv-links a:hover{text-decoration:underline}
+  .lv-links .sep{height:10px}
+
+  /* demo bar */
+  .demobar{position:fixed;left:0;right:0;bottom:0;z-index:120;background:#1c2620;color:#cfe8d5;font-size:12px;padding:9px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+  .demobar .db-t{font-weight:700;color:#8ff0a8;display:flex;align-items:center;gap:7px}.demobar .db-t svg{width:15px;height:15px}
+  .demobar .segs{display:flex;gap:4px;background:#0f1712;border-radius:8px;padding:3px}
+  .demobar .segs button{font-family:var(--font);font-size:11.5px;font-weight:600;color:#9db3a4;background:none;border:none;padding:6px 11px;border-radius:6px;cursor:pointer;transition:.15s}
+  .demobar .segs button.on{background:var(--green);color:#fff}
+  .demobar .state{color:#8fa79a;font-family:var(--mono);font-size:11px}.demobar .state b{color:#cfe8d5}
+  .demobar .forget{margin-left:auto;background:#2e3d33;color:#cfe8d5;border:1px solid #3f5245;border-radius:7px;padding:7px 13px;font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px}
+  .demobar .forget:hover{background:#3a4d40}.demobar .forget svg{width:14px;height:14px}
+  @media(max-width:640px){.demobar .db-t span,.demobar .state{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ============ PÁGINA PÚBLICA ============ -->
+<div class="view active" id="publico">
+  <div class="pub-topbar"><div class="in">
+    <div><a href="#">Personas <span class="caret">▾</span></a><a href="#">Empresas <span class="caret">▾</span></a><a href="#">Distribuidores</a></div>
+    <div class="right"><a href="#">Rentabilidades</a><a href="#">Acciones rápidas <span class="caret">▾</span></a><a href="#">Atención al cliente <span class="caret">▾</span></a><a href="#">Canales <span class="caret">▾</span></a><a href="#">🔍</a></div>
+  </div></div>
+  <div class="pub-header"><div class="in">
+    <div class="pub-logo"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg><b>skandia</b></div>
+    <nav class="pub-nav"><a href="#">Hoy quiero <span class="caret">▾</span></a><a href="#">Somos Skandia <span class="caret">▾</span></a><a href="#">Skandia digital <span class="caret">▾</span></a></nav>
+    <button class="pub-cta" id="iniciaSesion">INICIA SESIÓN</button>
+  </div></div>
+  <section class="hero">
+    <span class="arrow l">‹</span><span class="arrow r">›</span>
+    <div class="in">
+      <div><div class="eyebrow">TE PUEDE INTERESAR</div><h1>Para cuidar a los que más quieres, está Skandia.<br>El que sabe, sabe.</h1><p>Elige el plan que se adapta a tu momento de vida.</p><button class="qcta">QUIERO SABER MÁS</button></div>
+      <div class="hero-img"><div class="ring"></div><div class="photo"></div></div>
+    </div>
+    <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+  </section>
+  <section class="power"><h2><span class="l1">Tener el poder es…</span><span class="l2">Elegir una solución a tu medida</span></h2><div class="psub">Pensiones en Colombia: descubre nuestros productos destacados.</div></section>
+  <div class="prod-row"><div class="prod"></div><div class="prod"></div><div class="prod"></div><div class="prod"></div></div>
+  <div class="cookie"><p>Este sitio utiliza cookies para mejorar tu experiencia. Por favor acepta nuestra</p><a class="clink" href="#">Política de Cookies</a><button class="cbtn" onclick="this.closest('.cookie').style.display='none'">Autorizo el uso de cookies</button></div>
+  <div class="bot"><span class="eyes">^ ^</span><span class="badge">1</span></div>
+</div>
+
+<!-- ============ LOGIN NUEVO (identifier-first) ============ -->
+<div class="view" id="loginNuevo">
+  <div class="ln-left">
+    <div class="ln-logo"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg><b>skandia</b></div>
+    <h2>¡Hola!</h2>
+    <div class="ln-wel">Te damos la bienvenida al Portal clientes de Skandia</div>
+
+    <!-- banner "detectado" (solo cuando la cédula ya está resuelta / recordada) -->
+    <div class="ln-detected" id="lnDetected" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>Documento <b class="cedShowN"></b></span>
+      <span class="link forgetInline">No soy yo</span>
+    </div>
+
+    <!-- Paso 1: cédula (identifier-first) -->
+    <div class="ln-field" id="fieldCed">
+      <label>Usuario (número de documento)</label>
+      <input type="text" id="usuarioN" inputmode="numeric" autocomplete="off" placeholder="Escribe tu documento" maxlength="12" />
+    </div>
+    <div class="ln-inlinehint" id="cedHint">Ingresa tu documento para continuar.</div>
+
+    <!-- Paso 2: contraseña (se revela si está migrado) -->
+    <div class="reveal" id="pwReveal">
+      <div class="ln-field"><label>Contraseña</label><input type="password" id="pwN" placeholder="Tu contraseña" /></div>
+      <a class="ln-recuperar">Crear o recuperar contraseña</a>
+    </div>
+
+    <!-- mensaje "no migrado" -->
+    <div class="notmig" id="notMig" style="display:none">
+      <div class="nm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg></div>
+      <h3>Tu cuenta aún está en nuestra plataforma actual</h3>
+      <p>Todavía no habilitamos tu acceso al nuevo portal. Continúa en el portal anterior con normalidad; te avisaremos cuando puedas migrar.</p>
+      <button class="ln-primary" id="goViejoBtn">Ir al portal anterior</button>
+    </div>
+
+    <!-- botón principal (Continuar → Iniciar sesión) -->
+    <button class="ln-primary" id="mainBtn" disabled>Continuar</button>
+    <div class="ln-reglamento">Al ingresar aceptas el <a href="#">Reglamento de uso del Portal Clientes</a></div>
+
+    <div class="ln-prev"><div class="t">💻 Portal anterior</div><div class="s">Si prefieres la versión anterior, <a class="goViejoLink">ingresa aquí.</a></div></div>
+  </div>
+  <div class="ln-right">
+    <div class="glow"></div><span class="rarrow l">‹</span><span class="rarrow r">›</span>
+    <div class="ln-shield"><div class="chip c1">🔑</div><div class="chip c2">👤</div><div class="chip c3">🔒</div><div class="chip c4">✳️</div><div class="chip c5">🛡️</div>
+      <div class="sh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div></div>
+    <h3>Actualiza tu contraseña</h3><p>Estrena el nuevo portal con una contraseña actualizada</p>
+    <button class="rbtn">Actualizar Contraseña</button>
+    <div class="rdots"><i></i><i class="on"></i><i></i></div>
+  </div>
+</div>
+
+<!-- ============ LOGIN VIEJO ============ -->
+<div class="view" id="loginViejo">
+  <div class="lv-head"><div class="lv-logo"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg><b>skandia</b></div></div>
+  <div class="lv-rule"></div>
+  <div class="lv-detected">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span>Usuario <b class="cedShowO"></b></span><span class="link forgetInline">No soy yo</span>
+  </div>
+  <div class="lv-form">
+    <label>Usuario <span class="req">*</span></label><input type="text" id="usuarioO" readonly />
+    <label>Contraseña <span class="req">*</span></label><input type="password" id="pwO" />
+    <button class="ingresar" id="loginViejoBtn">INGRESAR</button>
+    <div class="lv-links"><a>¿Olvidaste tu contraseña?</a><a>Contraseña por primera vez.</a><div class="sep"></div><a>Términos de Uso Portal Clientes</a><a>Términos de Uso Audiorespuesta</a></div>
+  </div>
+</div>
+
+<!-- ============ DEMO BAR ============ -->
+<div class="demobar">
+  <span class="db-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Simulación</span></span>
+  <div class="segs" id="segs">
+    <button data-sc="nuevo" class="on">Usuario migrado</button>
+    <button data-sc="viejo">No migrado</button>
+    <button data-sc="nf">Cédula no encontrada</button>
+  </div>
+  <span class="state" id="stateLbl">dispositivo: <b>sin recordar</b></span>
+  <button class="forget" id="forget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Olvidar este dispositivo (simular primera visita)</button>
+</div>
+
+<script>
+/* =============================================================
+   FLUJO 2 — Identifier-first en el login del portal NUEVO
+   público → INICIA SESIÓN → login nuevo (solo cédula) → Continuar:
+     · migrado → revela campo contraseña (transición suave)
+     · no migrado → mensaje + "Ir al portal anterior" (login viejo)
+     · no encontrada → error inline
+   Recordar dispositivo (localStorage): nuevo→login nuevo con pw visible;
+   viejo→login viejo directo. Todo con cédula precargada.
+============================================================= */
+const KEY="sk_flujo2_decision", TTL_DIAS=30;
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const views={publico:$("#publico"),loginNuevo:$("#loginNuevo"),loginViejo:$("#loginViejo")};
+function showView(id){Object.values(views).forEach(v=>v.classList.remove("active"));views[id].classList.add("active");window.scrollTo(0,0);}
+let scenario="nuevo";
+
+function saveDecision(portal_destino,cedula){localStorage.setItem(KEY,JSON.stringify({portal_destino,cedula,exp:Date.now()+TTL_DIAS*864e5}));renderState();}
+function readDecision(){try{const d=JSON.parse(localStorage.getItem(KEY));if(!d)return null;if(Date.now()>d.exp){localStorage.removeItem(KEY);return null;}return d;}catch(e){return null;}}
+function forgetDevice(){localStorage.removeItem(KEY);renderState();}
+function renderState(){const d=readDecision();$("#stateLbl").innerHTML=d?`dispositivo: <b>${d.portal_destino.toUpperCase()}</b> · doc ${d.cedula}`:`dispositivo: <b>sin recordar</b>`;}
+function prefill(c){$$(".cedShowN").forEach(e=>e.textContent=c);$$(".cedShowO").forEach(e=>e.textContent=c);$("#usuarioN").value=c;$("#usuarioO").value=c;}
+
+const usuarioN=$("#usuarioN"), mainBtn=$("#mainBtn"), cedHint=$("#cedHint"),
+      pwReveal=$("#pwReveal"), pwN=$("#pwN"), notMig=$("#notMig"),
+      lnDetected=$("#lnDetected"), fieldCed=$("#fieldCed");
+
+/* estado del login nuevo: 'cedula' | 'password' */
+let stage="cedula";
+
+function resetLoginNuevo(){
+  stage="cedula";
+  usuarioN.value=""; usuarioN.readOnly=false; usuarioN.classList.remove("err");
+  pwN.value=""; pwReveal.classList.remove("show");
+  notMig.style.display="none"; lnDetected.style.display="none"; fieldCed.style.display="";
+  cedHint.textContent="Ingresa tu documento para continuar."; cedHint.classList.remove("error");
+  mainBtn.style.display=""; mainBtn.textContent="Continuar"; mainBtn.disabled=true;
+}
+
+/* revelar contraseña (migrado) */
+function revealPassword(c){
+  stage="password";
+  prefill(c);
+  usuarioN.readOnly=true;
+  lnDetected.style.display="flex";
+  fieldCed.style.display="none";        // ocultamos el input crudo; el doc se muestra en el banner
+  cedHint.textContent="";
+  pwReveal.classList.add("show");
+  mainBtn.textContent="Iniciar sesión"; mainBtn.disabled=false;
+  setTimeout(()=>pwN.focus(),250);
+}
+
+/* INICIA SESIÓN → siempre al login nuevo (identifier-first) */
+$("#iniciaSesion").addEventListener("click",()=>{
+  const d=readDecision();
+  if(d && d.portal_destino==="viejo"){ prefill(d.cedula); showView("loginViejo"); return; }
+  resetLoginNuevo();
+  if(d && d.portal_destino==="nuevo"){ showView("loginNuevo"); revealPassword(d.cedula); return; }
+  showView("loginNuevo");
+  setTimeout(()=>usuarioN.focus(),300);
+});
+
+usuarioN.addEventListener("input",()=>{
+  usuarioN.value=usuarioN.value.replace(/\D/g,""); usuarioN.classList.remove("err"); cedHint.classList.remove("error");
+  cedHint.textContent="Ingresa tu documento para continuar.";
+  if(stage==="cedula") mainBtn.disabled=usuarioN.value.length<6;
+});
+usuarioN.addEventListener("keydown",e=>{if(e.key==="Enter"&&!mainBtn.disabled)mainBtn.click();});
+pwN.addEventListener("keydown",e=>{if(e.key==="Enter"&&stage==="password")mainBtn.click();});
+
+mainBtn.addEventListener("click",()=>{
+  if(stage==="password"){ pwN.value?alert("✓ Ingreso simulado al NUEVO portal."):pwN.focus(); return; }
+  // stage === cédula → resolver escenario
+  const c=usuarioN.value;
+  if(scenario==="nf"){
+    usuarioN.classList.add("err"); cedHint.classList.add("error");
+    cedHint.innerHTML='No encontramos ese documento. Revísalo o <b style="cursor:pointer;text-decoration:underline" id="supp">contacta a soporte</b>.';
+    const s=document.getElementById("supp"); if(s) s.onclick=()=>{cedHint.innerHTML="📞 Línea Skandia 018000 XXX XXX · Lun a Vie 8am–6pm (demo)";};
+    return;
+  }
+  if(scenario==="nuevo"){ saveDecision("nuevo",c); revealPassword(c); }
+  else {
+    saveDecision("viejo",c);
+    fieldCed.style.display="none"; mainBtn.style.display="none"; cedHint.textContent="";
+    notMig.style.display="block";
+  }
+});
+
+/* ir al portal viejo */
+function toViejo(){ const c=usuarioN.value || (readDecision()&&readDecision().cedula) || ""; prefill(c); saveDecision("viejo",c); showView("loginViejo"); setTimeout(()=>$("#pwO").focus(),300); }
+$("#goViejoBtn").addEventListener("click",toViejo);
+$$(".goViejoLink").forEach(a=>a.addEventListener("click",()=>{ const c=usuarioN.value||""; if(c)prefill(c); saveDecision("viejo",c||""); showView("loginViejo"); }));
+
+/* login viejo submit */
+$("#loginViejoBtn").addEventListener("click",()=>{$("#pwO").value?alert("✓ Ingreso simulado al portal ACTUAL."):$("#pwO").focus();});
+
+/* "No soy yo" */
+$$(".forgetInline").forEach(b=>b.addEventListener("click",()=>{ forgetDevice(); resetLoginNuevo(); showView("loginNuevo"); setTimeout(()=>usuarioN.focus(),250); }));
+
+/* demo bar */
+$$("#segs button").forEach(b=>b.addEventListener("click",()=>{$$("#segs button").forEach(x=>x.classList.remove("on"));b.classList.add("on");scenario=b.dataset.sc;}));
+$("#forget").addEventListener("click",()=>{forgetDevice();resetLoginNuevo();showView("publico");});
+
+renderState();
+</script>
+</body>
+</html>

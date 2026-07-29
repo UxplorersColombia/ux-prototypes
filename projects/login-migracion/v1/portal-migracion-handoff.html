@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Skandia · Flujo A — Handoff autenticado</title>
+<style>
+  :root{
+    --green:#00C73D; --green-d1:#03A835; --green-d2:#009A2F; --green-d3:#007C26; --green-d4:#006E22;
+    --green-l4:#CAF9CB; --green-l5:#F6FCF2;
+    --grey-d5:#000; --grey-d4:#232323; --grey:#404040; --grey-l3:#666666; --grey-l4:#878787; --grey-l5:#A5A5A5;
+    --line:#e8ebe8;
+    --font:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);color:var(--grey-d4);background:#eef1ee;min-height:100vh}
+
+  /* screens */
+  .screen{display:none;animation:fade .45s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ============ SCREEN 0 · PORTAL LEGADO ============ */
+  .legacy-top{background:#232323;color:#cfcfcf;font-size:11.5px;padding:9px 26px;display:flex;justify-content:space-between;align-items:center}
+  .legacy-top .who{color:#fff;font-weight:600;font-size:13px;display:flex;align-items:center;gap:14px}
+  .legacy-top .salir{background:var(--green);color:#fff;font-weight:700;font-size:12px;border:none;padding:6px 14px;border-radius:5px;cursor:pointer}
+  .legacy-wrap{max-width:1120px;margin:0 auto;padding:26px 26px 60px}
+  .legacy-nav{display:flex;align-items:center;gap:34px;padding:6px 0 26px}
+  .legacy-nav .logo{display:flex;align-items:center;gap:8px;margin-right:12px}
+  .legacy-nav .logo svg{width:30px;height:30px}
+  .legacy-nav .logo b{font-size:22px;letter-spacing:-.5px;color:#000}
+  .legacy-nav a{font-size:13.5px;font-weight:600;color:var(--grey-d4);text-decoration:none;letter-spacing:.3px}
+  .legacy-balances{display:flex;gap:60px;justify-content:center;padding:10px 0 26px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .lb{text-align:center}
+  .lb small{display:block;color:var(--grey-l3);font-size:14px;margin-bottom:6px}
+  .lb b{font-size:22px;color:var(--green-d2);font-weight:700}
+
+  .migrate-banner{
+    margin:30px 0;border:2px solid var(--green);border-radius:16px;overflow:hidden;
+    background:linear-gradient(90deg,#fff 0%,var(--green-l5) 100%);
+    display:flex;align-items:center;gap:26px;padding:30px 34px;position:relative;
+    animation:rise .5s ease;
+  }
+  .migrate-banner .deco{position:absolute;left:0;top:0;bottom:0;width:120px;
+    background:linear-gradient(120deg,var(--green-l4),transparent);opacity:.5;pointer-events:none}
+  .migrate-banner .txt{flex:1;z-index:1}
+  .migrate-banner h2{font-size:23px;margin-bottom:8px;color:var(--grey-d4)}
+  .migrate-banner p{font-size:15px;color:var(--grey-l3);line-height:1.5;max-width:560px}
+  .migrate-banner .pill{display:inline-block;background:var(--green-l4);color:var(--green-d4);font-size:12px;font-weight:700;padding:4px 11px;border-radius:20px;margin-bottom:12px}
+
+  .contracts{margin-top:14px}
+  .contracts h3{font-size:14px;color:var(--grey-l3);font-weight:600;margin-bottom:12px}
+  .contract-row{display:flex;justify-content:space-between;align-items:center;background:#fafbfa;border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:10px}
+  .contract-row .c-name{font-weight:700;font-size:14.5px}
+  .contract-row .c-sub{font-size:12.5px;color:var(--grey-l4);margin-top:3px}
+  .contract-row .c-bal{font-weight:700;color:var(--green-d2);font-size:15px}
+
+  /* ============ CARD SHELL (screens 1-4) ============ */
+  .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:26px;
+    background:
+      radial-gradient(1100px 560px at 85% -10%, var(--green-l5) 0%, transparent 60%),
+      radial-gradient(820px 460px at -10% 110%, var(--green-l5) 0%, transparent 55%),
+      #eef1ee;}
+  .card{width:100%;max-width:460px;background:#fff;border-radius:16px;box-shadow:0 14px 48px rgba(0,0,0,.09);border:1px solid #eef0ee;overflow:hidden}
+  .topbar{height:6px;background:linear-gradient(90deg,var(--green),#1DD64C)}
+  .inner{padding:38px 36px 32px}
+  .brand{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .brand svg{width:28px;height:28px}
+  .brand span{font-weight:700;font-size:20px;letter-spacing:-.5px;color:#000}
+
+  .ctx-chip{display:inline-flex;align-items:center;gap:7px;background:var(--green-l5);border:1px solid var(--green-l4);
+    color:var(--green-d3);font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;margin-bottom:20px}
+  .ctx-chip svg{width:14px;height:14px}
+
+  h1{font-size:22px;font-weight:700;line-height:1.25;margin-bottom:9px}
+  .sub{font-size:14.5px;color:var(--grey-l3);line-height:1.55;margin-bottom:24px}
+
+  .steps{display:flex;gap:6px;margin-bottom:24px}
+  .steps i{flex:1;height:4px;border-radius:4px;background:#e8ebe8;transition:background .35s ease}
+  .steps i.on{background:var(--green)}
+
+  label{display:block;font-size:13.5px;font-weight:600;margin-bottom:8px;color:var(--grey)}
+  input[type=text],input[type=password]{
+    width:100%;height:52px;padding:0 16px;font-size:16px;font-family:var(--font);
+    border:1.5px solid #d9ddd9;border-radius:10px;background:#fff;color:var(--grey-d4);
+    transition:border-color .15s,box-shadow .15s;outline:none;
+  }
+  input:focus{border-color:var(--green);box-shadow:0 0 0 4px var(--green-l5)}
+  .field{position:relative;margin-bottom:8px}
+  .field .eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--grey-l4);padding:4px}
+  .field .eye svg{width:20px;height:20px}
+
+  .otp{display:flex;gap:10px;justify-content:space-between;margin-bottom:8px}
+  .otp input{width:100%;height:58px;text-align:center;font-size:22px;font-weight:600;border:1.5px solid #d9ddd9;border-radius:10px;font-family:var(--font);outline:none;transition:border-color .15s,box-shadow .15s}
+  .otp input:focus{border-color:var(--green);box-shadow:0 0 0 4px var(--green-l5)}
+  .otp.err input{border-color:#d64545}
+
+  .hint{font-size:12.5px;color:var(--grey-l4);min-height:18px;margin-top:2px}
+  .hint.error{color:#d64545;font-weight:500}
+
+  .reqs{list-style:none;margin:6px 0 4px;padding:0;display:grid;gap:6px}
+  .reqs li{font-size:12.5px;color:var(--grey-l4);display:flex;align-items:center;gap:8px;transition:color .2s}
+  .reqs li .dot{width:15px;height:15px;border-radius:50%;border:1.6px solid var(--grey-l5);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+  .reqs li .dot svg{width:9px;height:9px;color:#fff;opacity:0}
+  .reqs li.ok{color:var(--green-d3)}
+  .reqs li.ok .dot{background:var(--green);border-color:var(--green)}
+  .reqs li.ok .dot svg{opacity:1}
+
+  .btn{width:100%;height:52px;border:none;border-radius:10px;font-family:var(--font);font-weight:700;font-size:16px;cursor:pointer;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .12s,transform .08s,opacity .12s}
+  .btn--primary{background:var(--green);color:#fff}
+  .btn--primary:hover{background:var(--green-d1)}
+  .btn--primary:active{transform:scale(.985)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn--ghost{background:transparent;color:var(--grey-l3);height:auto;margin-top:14px;font-size:14px;font-weight:600}
+  .btn--ghost:hover{color:var(--green-d1)}
+  .btn--big{font-size:16px;padding:16px 30px;height:auto;width:auto;border-radius:10px}
+
+  .masked{background:var(--green-l5);border:1px solid var(--green-l4);border-radius:8px;padding:11px 14px;font-size:13.5px;color:var(--grey);margin-bottom:20px;display:flex;align-items:center;gap:9px}
+  .masked b{color:var(--grey-d4)}
+  .masked svg{width:17px;height:17px;color:var(--green-d2);flex-shrink:0}
+
+  .trust{display:flex;align-items:center;gap:9px;margin-top:22px;padding-top:18px;border-top:1px solid #f0f2f0;font-size:12.5px;color:var(--grey-l4);line-height:1.4}
+  .trust svg{flex-shrink:0;width:18px;height:18px;color:var(--green-d2)}
+
+  /* loading / transition */
+  .loadbox{text-align:center;padding:14px 0 6px}
+  .lock-anim{width:76px;height:76px;border-radius:50%;background:var(--green-l5);border:2px solid var(--green-l4);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;position:relative}
+  .lock-anim svg{width:34px;height:34px;color:var(--green-d2)}
+  .lock-ring{position:absolute;inset:-2px;border-radius:50%;border:3px solid transparent;border-top-color:var(--green);animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .prog{height:6px;background:#eef1ee;border-radius:6px;overflow:hidden;margin:22px 0 8px}
+  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#1DD64C);border-radius:6px;transition:width .4s ease}
+  .check-list{list-style:none;padding:0;margin:18px 0 0;text-align:left;display:grid;gap:11px}
+  .check-list li{font-size:13.5px;color:var(--grey-l4);display:flex;align-items:center;gap:10px;transition:color .3s}
+  .check-list li .cd{width:20px;height:20px;border-radius:50%;border:2px solid #e2e6e2;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .check-list li .cd svg{width:11px;height:11px;color:#fff;opacity:0;transition:opacity .3s}
+  .check-list li.done{color:var(--grey)}
+  .check-list li.done .cd{background:var(--green);border-color:var(--green)}
+  .check-list li.done .cd svg{opacity:1}
+
+  /* result */
+  .result{text-align:center;padding-top:4px}
+  .badge{width:82px;height:82px;border-radius:50%;margin:6px auto 22px;display:flex;align-items:center;justify-content:center;animation:pop .5s cubic-bezier(.2,.9,.3,1.3)}
+  .badge svg{width:42px;height:42px}
+  .badge--ok{background:var(--green-l5);border:2px solid #47E264}.badge--ok svg{color:var(--green-d2)}
+  .badge--wait{background:#fff7e8;border:2px solid #ffd784}.badge--wait svg{color:#e0930a}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+  .redir{background:#f7f9f7;border-radius:10px;padding:14px;font-size:13px;color:var(--grey-l3);display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px}
+  .spinner{width:16px;height:16px;border:2.5px solid var(--green-l4);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+
+  /* new portal preview (screen 4) */
+  .newportal{max-width:1120px;margin:0 auto;background:#fff;min-height:100vh}
+  .np-top{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--line)}
+  .np-top .np-logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;color:var(--grey-d4)}
+  .np-top .np-logo svg{width:26px;height:26px}
+  .np-top .np-user{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+  .np-top .np-av{width:36px;height:36px;border-radius:50%;border:2px solid var(--green);color:var(--green-d3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .np-body{padding:36px 40px}
+  .np-welcome{background:var(--green-l5);border:1px solid var(--green-l4);border-radius:14px;padding:22px 26px;margin-bottom:26px;display:flex;align-items:center;gap:16px}
+  .np-welcome svg{width:34px;height:34px;color:var(--green-d2);flex-shrink:0}
+  .np-welcome h2{font-size:19px;margin-bottom:4px}
+  .np-welcome p{font-size:14px;color:var(--grey-l3)}
+  .np-hero{font-size:15px;color:var(--grey-l3);margin-bottom:6px}
+  .np-total{font-size:30px;font-weight:700;color:var(--green-d2);margin-bottom:26px}
+  .np-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+  .np-c{border:1px solid var(--line);border-radius:14px;padding:20px}
+  .np-c.sel{border:2px solid var(--green);background:var(--green-l5)}
+  .np-c small{color:var(--grey-l3);font-size:13px}
+  .np-c b{display:block;font-size:19px;margin-top:6px}
+
+  .demo-note{position:fixed;bottom:14px;left:0;right:0;text-align:center;font-size:11.5px;color:var(--grey-l5);pointer-events:none}
+  .demo-note code{background:#e3e7e3;padding:2px 6px;border-radius:4px;color:var(--grey-l3)}
+  .demo-toggle{position:fixed;top:14px;right:14px;z-index:50;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:11.5px;box-shadow:0 4px 16px rgba(0,0,0,.08);font-family:var(--font)}
+  .demo-toggle label{display:flex;align-items:center;gap:7px;font-weight:600;color:var(--grey-l3);cursor:pointer;margin:0}
+</style>
+</head>
+<body>
+
+<!-- Demo control: simular cohorte -->
+<div class="demo-toggle">
+  <label><input type="checkbox" id="cohortToggle" checked /> Simular usuario habilitado</label>
+</div>
+
+<!-- ============ SCREEN 0 · PORTAL LEGADO ============ -->
+<section class="screen active" id="s0">
+  <div class="legacy-top">
+    <span>Su último ingreso al portal fue: 2026-07-24 12:40:10 PM &nbsp;·&nbsp; IP: 206.62.142.15</span>
+    <span class="who">Valeria Garzon Triana ▾ <button class="salir">Salir ⤴</button></span>
+  </div>
+  <div class="legacy-wrap">
+    <div class="legacy-nav">
+      <div class="logo">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg>
+        <b>skandia</b>
+      </div>
+      <a href="#">MIS PRODUCTOS</a><a href="#">CRÉDITOS</a><a href="#">HERRAMIENTAS</a><a href="#">SERVICIO AL CLIENTE</a>
+    </div>
+
+    <div class="legacy-balances">
+      <div class="lb"><small>Ahorro e Inversión</small><b>$544,063.85</b></div>
+      <div class="lb"><small>Pensión Obligatoria y Cesantías</small><b>$46,517,669.42</b></div>
+      <div class="lb"><small>Invierte en tu protección</small><b style="color:var(--grey-l3);font-size:15px;font-weight:600">Ingresa y conoce más</b></div>
+    </div>
+
+    <!-- BANNER DE MIGRACIÓN = arranque del Flujo A -->
+    <div class="migrate-banner">
+      <div class="deco"></div>
+      <div class="txt">
+        <span class="pill">🎉 Ya tienes acceso anticipado</span>
+        <h2>¡Migra antes del cambio!</h2>
+        <p>Entra hoy al nuevo Portal Skandia y sigue gestionando tus productos con una experiencia más ágil. Como ya iniciaste sesión, tu traspaso es seguro y toma menos de un minuto.</p>
+      </div>
+      <button class="btn btn--primary btn--big" id="startHandoff" style="margin-top:0;flex-shrink:0">
+        Ingresa aquí
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+
+    <div class="contracts">
+      <h3>Contratos en Ahorro e Inversión</h3>
+      <div class="contract-row">
+        <div><div class="c-name">Potencializar mi inversión · Invest-ed</div><div class="c-sub">Pensiones Voluntarias · Contrato 100006369833</div></div>
+        <div class="c-bal">$544,063.85</div>
+      </div>
+      <div class="contract-row">
+        <div><div class="c-name">Cuota inicial casa 🏠</div><div class="c-sub">Fondos de Inversión Colectiva · Contrato 301000420093</div></div>
+        <div class="c-bal">$0.00</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 1 · TRANSICIÓN + COHORT CHECK ============ -->
+<section class="screen" id="s1">
+  <div class="stage"><div class="card"><div class="topbar"></div><div class="inner">
+    <div class="brand"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg><span>skandia</span></div>
+    <div class="loadbox">
+      <div class="lock-anim"><div class="lock-ring"></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h1>Preparando tu acceso seguro</h1>
+      <p class="sub">Estamos verificando tu sesión y creando un enlace cifrado hacia el nuevo portal. No cierres esta ventana.</p>
+      <div class="prog"><i id="progBar"></i></div>
+      <ul class="check-list" id="checks">
+        <li data-step="0"><span class="cd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Validando tu sesión activa</li>
+        <li data-step="1"><span class="cd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Verificando que tu cuenta esté habilitada</li>
+        <li data-step="2"><span class="cd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Generando enlace seguro de un solo uso</li>
+      </ul>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- ============ SCREEN 2 · STEP-UP OTP ============ -->
+<section class="screen" id="s2">
+  <div class="stage"><div class="card"><div class="topbar"></div><div class="inner">
+    <div class="brand"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg><span>skandia</span></div>
+    <div class="ctx-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Confirmación de seguridad
+    </div>
+    <div class="steps"><i class="on"></i><i></i><i></i></div>
+    <h1>Confirma que eres tú</h1>
+    <p class="sub">Como vas a crear tu acceso al nuevo portal por primera vez, te pedimos un código de un solo uso. Es la única vez que lo haremos.</p>
+
+    <div class="masked">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span>Enviamos un código a tu celular <b>•••• 4821</b></span>
+    </div>
+
+    <label>Código de verificación</label>
+    <div class="otp" id="otp">
+      <input type="text" inputmode="numeric" maxlength="1" /><input type="text" inputmode="numeric" maxlength="1" /><input type="text" inputmode="numeric" maxlength="1" /><input type="text" inputmode="numeric" maxlength="1" /><input type="text" inputmode="numeric" maxlength="1" /><input type="text" inputmode="numeric" maxlength="1" />
+    </div>
+    <div class="hint" id="otpHint">Tienes <b id="att">5</b> intentos disponibles.</div>
+
+    <button class="btn btn--primary" id="otpBtn" disabled>Confirmar y continuar</button>
+    <button class="btn btn--ghost" id="resend">¿No te llegó? Reenviar código</button>
+
+    <div class="trust">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>Skandia nunca te pedirá tu contraseña por teléfono ni correo. El código expira en 5 minutos.</span>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- ============ SCREEN 3 · CREAR CONTRASEÑA (portal nuevo) ============ -->
+<section class="screen" id="s3">
+  <div class="stage"><div class="card"><div class="topbar"></div><div class="inner">
+    <div class="brand"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg><span>skandia</span></div>
+    <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
+    <h1>Crea tu contraseña del nuevo portal</h1>
+    <p class="sub">Por seguridad, el nuevo portal usa una contraseña independiente de la del portal anterior. Créala una sola vez.</p>
+
+    <label for="pw">Nueva contraseña</label>
+    <div class="field">
+      <input type="password" id="pw" autocomplete="new-password" placeholder="Escribe tu contraseña" />
+      <button class="eye" id="eye1" type="button" aria-label="Mostrar u ocultar contraseña"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+    <ul class="reqs" id="reqs">
+      <li data-rule="len"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Mínimo 8 caracteres</li>
+      <li data-rule="upper"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Una letra mayúscula</li>
+      <li data-rule="num"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Un número</li>
+    </ul>
+
+    <label for="pw2" style="margin-top:16px">Confirma tu contraseña</label>
+    <div class="field">
+      <input type="password" id="pw2" autocomplete="new-password" placeholder="Repite tu contraseña" />
+    </div>
+    <div class="hint" id="pwHint"></div>
+
+    <button class="btn btn--primary" id="pwBtn" disabled>Crear contraseña y entrar</button>
+
+    <div class="trust">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>Tu contraseña se guarda cifrada. Nunca la compartas con nadie.</span>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- ============ SCREEN 4 · ÉXITO → PORTAL NUEVO ============ -->
+<section class="screen" id="s4">
+  <div class="stage"><div class="card"><div class="topbar"></div><div class="inner">
+    <div class="brand"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg><span>skandia</span></div>
+    <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div class="result">
+      <div class="badge badge--ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h1>¡Bienvenida al nuevo portal! 🎉</h1>
+      <p class="sub">Tu acceso quedó listo. Ya puedes gestionar tus productos con la nueva experiencia Skandia.</p>
+      <div class="redir"><span class="spinner"></span><span>Entrando al nuevo Portal Clientes…</span></div>
+    </div>
+  </div></div></div>
+</section>
+
+<!-- ============ SCREEN 4b · PORTAL NUEVO (preview) ============ -->
+<section class="screen" id="s4b">
+  <div class="newportal">
+    <div class="np-top">
+      <div class="np-logo"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg> Portal Clientes</div>
+      <div class="np-user"><span class="np-av">VG</span> Hola, Valeria 👋</div>
+    </div>
+    <div class="np-body">
+      <div class="np-welcome">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <div><h2>Migración completada</h2><p>Estás usando el nuevo Portal Skandia. Tu contraseña anterior ya no aplica aquí.</p></div>
+      </div>
+      <div class="np-hero">Lo que has logrado</div>
+      <div class="np-total">$ 47.061.733,28 COP</div>
+      <div class="np-cards">
+        <div class="np-c sel"><small>Ahorro e Inversión</small><b>$ 544.063,85</b></div>
+        <div class="np-c"><small>Pensiones y Cesantías</small><b>$ 46.517.669,43</b></div>
+        <div class="np-c"><small>Protección</small><b style="font-size:15px;color:var(--grey-l3)">Conoce más</b></div>
+        <div class="np-c"><small>Crédito</small><b style="font-size:15px;color:var(--grey-l3)">Solicita aquí</b></div>
+      </div>
+      <button class="btn btn--primary btn--big" id="restart" style="margin-top:30px">↺ Reiniciar demo</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 5 · NO HABILITADO (fuera de cohorte) ============ -->
+<section class="screen" id="s5">
+  <div class="stage"><div class="card"><div class="topbar"></div><div class="inner">
+    <div class="brand"><svg viewBox="0 0 32 32" fill="none"><path d="M4 28 L18 4 L18 14 L28 14 L14 28 Z" fill="#00C73D"/><path d="M4 28 L11 16 L18 28 Z" fill="#232323"/></svg><span>skandia</span></div>
+    <div class="result">
+      <div class="badge badge--wait"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <h1>Aún estamos habilitando tu acceso</h1>
+      <p class="sub">El nuevo portal se está liberando por etapas y tu cuenta todavía no está habilitada. No te preocupes: sigue usando el portal actual con normalidad y te avisaremos apenas puedas entrar.</p>
+      <button class="btn btn--primary" id="backLegacy">Volver al portal actual</button>
+    </div>
+  </div></div></div>
+</section>
+
+<div class="demo-note">Flujo A · Handoff autenticado — demo simulada · OTP válido: <code>123456</code> · Usa el switch de arriba para simular usuario NO habilitado</div>
+
+<script>
+  const $=s=>document.querySelector(s);
+  const scr={s0:$("#s0"),s1:$("#s1"),s2:$("#s2"),s3:$("#s3"),s4:$("#s4"),s4b:$("#s4b"),s5:$("#s5")};
+  function goto(id){Object.values(scr).forEach(s=>s.classList.remove("active"));scr[id].classList.add("active");window.scrollTo(0,0);}
+
+  const OTP_OK="123456";
+  let attempts=5;
+
+  /* ---- Screen 0 → 1: iniciar handoff ---- */
+  $("#startHandoff").addEventListener("click",()=>{
+    goto("s1");
+    runChecks();
+  });
+
+  /* ---- Screen 1: cohort check animado ---- */
+  function runChecks(){
+    const bar=$("#progBar"), items=[...document.querySelectorAll("#checks li")];
+    items.forEach(i=>i.classList.remove("done"));
+    bar.style.width="0";
+    const enabled=$("#cohortToggle").checked;
+    const times=[500,1200,1900];
+    times.forEach((t,idx)=>setTimeout(()=>{
+      items[idx].classList.add("done");
+      bar.style.width=((idx+1)/3*100)+"%";
+    },t));
+    setTimeout(()=>{
+      if(enabled){ resetOtp(); goto("s2"); setTimeout(()=>otpIn[0].focus(),350); }
+      else { goto("s5"); }
+    },2500);
+  }
+
+  /* ---- Screen 2: OTP ---- */
+  const otpIn=[...document.querySelectorAll("#otp input")];
+  const otpBtn=$("#otpBtn"), otpHint=$("#otpHint"), otpBox=$("#otp");
+  const otpVal=()=>otpIn.map(i=>i.value).join("");
+  function resetOtp(){attempts=5;otpIn.forEach(i=>{i.value="";i.disabled=false});otpBox.classList.remove("err");otpHint.classList.remove("error");otpHint.innerHTML='Tienes <b id="att">5</b> intentos disponibles.';otpBtn.disabled=true;}
+  otpIn.forEach((inp,idx)=>{
+    inp.addEventListener("input",()=>{inp.value=inp.value.replace(/\D/g,"");otpBox.classList.remove("err");otpHint.classList.remove("error");if(inp.value&&idx<5)otpIn[idx+1].focus();otpBtn.disabled=otpVal().length!==6;});
+    inp.addEventListener("keydown",e=>{if(e.key==="Backspace"&&!inp.value&&idx>0)otpIn[idx-1].focus();if(e.key==="Enter"&&!otpBtn.disabled)otpBtn.click();});
+    inp.addEventListener("paste",e=>{e.preventDefault();const d=(e.clipboardData.getData("text").replace(/\D/g,"")).slice(0,6).split("");d.forEach((x,i)=>{if(otpIn[i])otpIn[i].value=x});otpBtn.disabled=otpVal().length!==6;otpIn[Math.min(d.length,5)].focus();});
+  });
+  otpBtn.addEventListener("click",()=>{
+    if(otpVal()===OTP_OK){ goto("s3"); setTimeout(()=>$("#pw").focus(),350); return; }
+    attempts--;
+    otpBox.classList.add("err");otpHint.classList.add("error");
+    if(attempts>0){otpHint.innerHTML=`Código incorrecto. Te quedan <b>${attempts}</b> intento(s).`;otpIn.forEach(i=>i.value="");otpIn[0].focus();otpBtn.disabled=true;}
+    else{otpHint.innerHTML="Alcanzaste el máximo de intentos. Inténtalo de nuevo en unos minutos.";otpIn.forEach(i=>i.disabled=true);otpBtn.disabled=true;}
+  });
+  $("#resend").addEventListener("click",()=>{otpHint.classList.remove("error");otpHint.innerHTML="Enviamos un nuevo código a tu celular <b>•••• 4821</b>.";});
+
+  /* ---- Screen 3: crear contraseña ---- */
+  const pw=$("#pw"), pw2=$("#pw2"), pwBtn=$("#pwBtn"), pwHint=$("#pwHint");
+  const rules={len:v=>v.length>=8,upper:v=>/[A-Z]/.test(v),num:v=>/[0-9]/.test(v)};
+  function evalPw(){
+    const v=pw.value; let allRules=true;
+    document.querySelectorAll("#reqs li").forEach(li=>{
+      const ok=rules[li.dataset.rule](v); li.classList.toggle("ok",ok); if(!ok)allRules=false;
+    });
+    let match=pw2.value.length>0 && pw.value===pw2.value;
+    if(pw2.value.length>0){
+      pwHint.textContent = match ? "✓ Las contraseñas coinciden" : "Las contraseñas no coinciden.";
+      pwHint.classList.toggle("error",!match);
+      pwHint.style.color = match ? "var(--green-d3)" : "";
+    } else { pwHint.textContent=""; }
+    pwBtn.disabled = !(allRules && match);
+  }
+  pw.addEventListener("input",evalPw); pw2.addEventListener("input",evalPw);
+  $("#eye1").addEventListener("click",()=>{const t=pw.type==="password"?"text":"password";pw.type=t;pw2.type=t;});
+  pw2.addEventListener("keydown",e=>{if(e.key==="Enter"&&!pwBtn.disabled)pwBtn.click();});
+  pwBtn.addEventListener("click",()=>{
+    goto("s4");
+    setTimeout(()=>goto("s4b"),2400);
+  });
+
+  /* ---- Reinicios ---- */
+  $("#restart").addEventListener("click",()=>{pw.value="";pw2.value="";evalPw();resetOtp();goto("s0");});
+  $("#backLegacy").addEventListener("click",()=>goto("s0"));
+</script>
+</body>
+</html>
