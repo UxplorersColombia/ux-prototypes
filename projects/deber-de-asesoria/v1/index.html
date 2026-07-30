@@ -29,7 +29,8 @@
     var name=el.getAttribute('name')||'circle';
     var size=el.getAttribute('size')||'20';
     var pascal=name.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join('');
-    var node=L.icons[pascal]||L.icons['Circle'];
+    var ALIAS={Headset:'Headphones',Youtube:'Youtube',SearchCheck:'Search'};
+    var node=L.icons[pascal]||(ALIAS[pascal]&&L.icons[ALIAS[pascal]])||L.icons['Circle'];
     var svg;
     if(node && typeof node[0]==='string' && node[0]==='svg'){ svg=make(node); }
     else {
@@ -81,7 +82,7 @@
 </style>
 </helmet>
 
-<div style="min-height:100vh;background:radial-gradient(120% 80% at 50% -10%,#eafaef 0%,#eef1f3 46%,#e7ebee 100%);display:flex;flex-direction:column">
+<div style="min-height:100vh;background:{{ stageBg }};display:flex;flex-direction:column">
 
   <!-- ══ Barra de revisión (herramienta, no es UI del producto) ══ -->
   <div style="background:#12333a;color:#dfeef0;padding:9px 16px;display:{{ demoBarDisp }};flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:0;z-index:400;box-shadow:0 2px 8px rgba(0,0,0,.14)">
@@ -94,7 +95,6 @@
       <option value="wf01">WF-01 Site educativo</option>
       <option value="wf02">WF-02 One page</option>
       <option value="wf03">WF-03 Rutas de necesidad</option>
-      <option value="wf03b">WF-03b Control / delegar</option>
       <option value="wf04">WF-04 Catálogo</option>
       <option value="wf05">WF-05 Simulador</option>
       <option value="wf06">WF-06 Tu selección</option>
@@ -119,8 +119,29 @@
     </div>
   </div>
 
+  <!-- ══ Chrome Vinculación Digital (escritorio, desde WF-07a) ══ -->
+  <div style="display:{{ vincChromeDisp }};align-items:center;gap:16px;background:#fff;border-bottom:1px solid #eef0f1;padding:22px 40px;position:sticky;top:0;z-index:120">
+    <img onClick="{{ goWf00 }}" src="assets/brand/logo-color.svg" alt="Skandia" style="height:26px;width:auto;display:block;cursor:pointer;flex:none">
+    <span style="width:1px;height:26px;background:#dcdcdc;flex:none"></span>
+    <span style="font-family:'Open Sans',sans-serif;font-size:17px;color:#404040">Vinculación Digital</span>
+  </div>
+
+  <!-- ══ Chrome de sitio (solo escritorio) ══ -->
+  <div style="display:{{ siteChromeDisp }};flex-direction:column;position:sticky;top:0;z-index:120;box-shadow:0 1px 0 #eef0f1">
+    <div class="sk-scroll" style="background:#2b2b2b;color:#cfcfcf;display:flex;align-items:center;gap:18px;padding:9px 24px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden">
+      <span style="color:#fff">Personas</span><span style="cursor:pointer" style-hover="color:#fff">Empresas</span><span style="cursor:pointer" style-hover="color:#fff">Distribuidores</span>
+      <span style="margin-left:auto;display:flex;gap:18px;align-items:center"><span style="cursor:pointer" style-hover="color:#fff">Rentabilidades</span><span style="cursor:pointer" style-hover="color:#fff">Acciones rápidas</span><span style="cursor:pointer" style-hover="color:#fff">Atención al cliente</span><span style="cursor:pointer" style-hover="color:#fff">Canales</span><sk-icon name="search" size="15" style="color:#8fe000"></sk-icon></span>
+    </div>
+    <div style="background:#fff;display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #eef0f1">
+      <img onClick="{{ goWf00 }}" src="assets/brand/logo-color.svg" alt="Skandia" style="height:24px;width:auto;display:block;cursor:pointer;flex:none">
+      <span style="display:flex;gap:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;color:#404040;white-space:nowrap;min-width:0;flex:1"><span onClick="{{ goRutas }}" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer" style-hover="color:#00c73d">Hoy quiero <sk-icon name="chevron-down" size="14"></sk-icon></span><span style="display:inline-flex;align-items:center;gap:4px;cursor:pointer" style-hover="color:#00c73d">Somos Skandia <sk-icon name="chevron-down" size="14"></sk-icon></span><span onClick="{{ goEdu }}" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer" style-hover="color:#00c73d">Skandia digital <sk-icon name="chevron-down" size="14"></sk-icon></span><span onClick="{{ goOnepage }}" style="cursor:pointer" style-hover="color:#00c73d">Productos</span></span>
+      <button onClick="{{ asesoriaHere }}" style="flex:none;white-space:nowrap;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:9px 16px;font-family:Montserrat,sans-serif;font-weight:700;font-size:12.5px;cursor:pointer" style-hover="background:#f6fcf2">Quiero asesoría</button>
+      <button style="flex:none;white-space:nowrap;background:#00c73d;color:#fff;border:none;border-radius:100px;padding:10px 18px;font-family:Montserrat,sans-serif;font-weight:700;font-size:12.5px;cursor:pointer" style-hover="background:#03a835">Inicia sesión</button>
+    </div>
+  </div>
+
   <!-- ══ Escenario ══ -->
-  <div style="flex:1;display:flex;flex-direction:{{ escenarioDir }};justify-content:center;align-items:{{ escenarioAlign }};gap:24px;padding:32px 24px 40px;max-width:1120px;margin:0 auto;width:100%">
+  <div style="flex:1;display:flex;flex-direction:{{ escenarioDir }};justify-content:center;align-items:{{ escenarioAlign }};gap:{{ escenarioGap }};padding:{{ escenarioPad }};max-width:{{ escenarioMax }};margin:0 auto;width:100%">
     <div style="display:{{ sidebarDisp }};flex-direction:column;gap:16px;width:260px;flex:none;position:sticky;top:32px">
       <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:18px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="flex:none;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="{{ sbRutaIcon }}" size="17"></sk-icon></span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:13.5px;color:#232323;line-height:1.3">{{ sbRutaLabel }}</span></div>
@@ -133,38 +154,22 @@
         <sc-for list="{{ sbEntidades }}" as="e" hint-placeholder-count="2"><div style="margin-top:3px">{{ e }}</div></sc-for>
       </div>
     </div>
-    <div style="width:100%;max-width:{{ cardWidth }};background:#fff;border-radius:{{ cardRadius }};overflow:hidden;box-shadow:0 26px 60px -20px rgba(18,51,58,.4),0 8px 22px -12px rgba(0,0,0,.2);border:1px solid #e3e7ea;display:flex;flex-direction:column;min-height:788px;position:relative">
+    <div style="width:100%;max-width:{{ cardWidth }};background:#fff;border-radius:{{ cardRadius }};overflow:hidden;box-shadow:{{ cardShadow }};border:{{ cardBorder }};display:flex;flex-direction:column;min-height:788px;position:relative">
 
       <!-- App bar -->
-      <div style="display:{{ appbarDisp }};align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #eef0f1;background:#fff;position:sticky;top:0;z-index:50">
-        <button onClick="{{ goBack }}" aria-label="Volver" style="border:none;background:transparent;color:#404040;cursor:pointer;padding:4px;border-radius:9px;display:{{ backDisp }};align-items:center;justify-content:center" style-hover="background:#f2f4f5"><sk-icon name="arrow-left" size="20"></sk-icon></button>
-        <img src="assets/brand/logo-color.svg" alt="Skandia" style="height:24px;width:auto;display:block">
-        <div style="margin-left:auto;display:{{ chipDisp }};align-items:center;gap:6px;background:#f6fcf2;border:1px solid #caf9cb;color:#0a7a2f;border-radius:100px;padding:5px 12px;font-size:12px;font-weight:700;max-width:52%;overflow:hidden">
-          <sk-icon name="target" size="12"></sk-icon><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ metaText }}</span>
-        </div>
-      </div>
+      <div ref="{{ mainRef }}" class="sk-scroll" style="flex:1;overflow-y:auto;padding:{{ mainPad }};display:flex;flex-direction:column">
 
-      <!-- Main -->
-      <div ref="{{ mainRef }}" class="sk-scroll" style="flex:1;overflow-y:auto;padding:22px 18px 10px;display:flex;flex-direction:column">
+        <a onClick="{{ goBack }}" style="display:{{ topBackDisp }};gap:8px;align-items:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:16px;align-self:flex-start"><sk-icon name="arrow-left" size="16"></sk-icon>Atrás</a>
 
         <!-- ═══ WF-00 · NEW HUB ═══ -->
         <section hidden="{{ h.wf00 }}" class="skpop">
 
           <!-- Landing escritorio (replica del sitio Skandia) -->
           <div style="display:{{ hubDesktopDisp }};margin:-22px -18px 0">
-            <div style="background:#2b2b2b;color:#cfcfcf;display:flex;align-items:center;gap:20px;padding:9px 22px;font-size:12px;font-weight:600">
-              <span style="color:#fff">Personas</span><span>Empresas</span><span>Distribuidores</span>
-              <span style="margin-left:auto;display:flex;gap:18px;align-items:center"><span>Rentabilidades</span><span>Acciones rápidas</span><span>Atención al cliente</span><span>Canales</span><sk-icon name="search" size="15" style="color:#8fe000"></sk-icon></span>
-            </div>
-            <div style="background:#fff;display:flex;align-items:center;gap:20px;padding:16px 22px;border-bottom:1px solid #eef0f1">
-              <img src="assets/brand/logo-color.svg" alt="Skandia" style="height:26px;width:auto;display:block">
-              <span style="margin-left:12px;display:flex;gap:22px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#404040"><span style="display:inline-flex;align-items:center;gap:4px">Hoy quiero <sk-icon name="chevron-down" size="14"></sk-icon></span><span style="display:inline-flex;align-items:center;gap:4px">Somos Skandia <sk-icon name="chevron-down" size="14"></sk-icon></span><span style="display:inline-flex;align-items:center;gap:4px">Skandia digital <sk-icon name="chevron-down" size="14"></sk-icon></span></span>
-              <button style="margin-left:auto;background:#00c73d;color:#fff;border:none;border-radius:100px;padding:11px 22px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#03a835">Inicia sesión</button>
-            </div>
             <div style="padding:30px 24px 34px;text-align:center">
               <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:30px;line-height:1.25;color:#00c73d;margin:0 0 12px">Tener el poder es…<br>Elegir una solución a tu medida</h1>
               <p style="font-size:16px;color:#6b6b6b;margin:0 0 26px">Inversiones, seguros y pensiones en Colombia: descubre nuestros productos destacados.</p>
-              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:760px;margin:0 auto">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:760px;margin:0 auto">
                 <button onClick="{{ pickMeta }}" style="position:relative;height:340px;border:none;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;background:linear-gradient(135deg,#1c2b22,#00c73d)" style-hover="box-shadow:0 12px 28px -10px rgba(0,0,0,.4)">
                   <span style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 22%,rgba(0,0,0,0) 60%);pointer-events:none"></span>
                   <span style="position:absolute;left:14px;right:14px;bottom:16px;text-align:left;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.25;pointer-events:none">Tengo una meta con fecha<span style="display:block;font-family:'Open Sans',sans-serif;font-weight:400;font-size:11.5px;color:#e4e9e6;margin-top:4px;line-height:1.4">Un viaje, una moto, un posgrado. Sabes cuánto necesitas y para cuándo.</span></span>
@@ -172,10 +177,6 @@
                 <button onClick="{{ pickLiquidez }}" style="position:relative;height:340px;border:none;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;background:linear-gradient(135deg,#123322,#03a835)" style-hover="box-shadow:0 12px 28px -10px rgba(0,0,0,.4)">
                   <span style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 22%,rgba(0,0,0,0) 60%);pointer-events:none"></span>
                   <span style="position:absolute;left:14px;right:14px;bottom:16px;text-align:left;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.25;pointer-events:none">Quiero tenerlo a la mano<span style="display:block;font-family:'Open Sans',sans-serif;font-weight:400;font-size:11.5px;color:#e4e9e6;margin-top:4px;line-height:1.4">Disponible cuando lo necesites, creciendo mientras tanto.</span></span>
-                </button>
-                <button onClick="{{ pickCrecer }}" style="position:relative;height:340px;border:none;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;background:linear-gradient(135deg,#0f4a2c,#8fe000)" style-hover="box-shadow:0 12px 28px -10px rgba(0,0,0,.4)">
-                  <span style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 22%,rgba(0,0,0,0) 60%);pointer-events:none"></span>
-                  <span style="position:absolute;left:14px;right:14px;bottom:16px;text-align:left;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.25;pointer-events:none">Quiero que crezca a futuro<span style="display:block;font-family:'Open Sans',sans-serif;font-weight:400;font-size:11.5px;color:#e4e9e6;margin-top:4px;line-height:1.4">No tienes afán. Quieres que el tiempo juegue a tu favor.</span></span>
                 </button>
                 <button onClick="{{ goEdu }}" style="position:relative;height:340px;border:none;border-radius:16px;overflow:hidden;cursor:pointer;padding:0;background:#1c1c1c" style-hover="box-shadow:0 12px 28px -10px rgba(0,0,0,.4)">
                   <span style="position:absolute;left:16px;right:16px;bottom:16px;text-align:left;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#fff;line-height:1.25;pointer-events:none">Aún no lo sé — muéstrame cómo funciona<span style="display:block;font-family:'Open Sans',sans-serif;font-weight:400;font-size:11.5px;color:#dfe6e2;margin-top:4px;line-height:1.4">Invertir, explicado fácil. Empieza por entender, sin compromiso.</span></span>
@@ -198,10 +199,6 @@
             <button onClick="{{ pickLiquidez }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.04);margin-bottom:12px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)">
               <span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="wallet" size="21"></sk-icon></span>
               <span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:2px">Quiero tenerlo a la mano</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; font-family: Open Sans">Disponible cuando lo necesites, creciendo mientras tanto.</span></span>
-            </button>
-            <button onClick="{{ pickCrecer }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.04);margin-bottom:12px" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)">
-              <span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="trending-up" size="21"></sk-icon></span>
-              <span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:2px">Quiero que crezca a futuro</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; font-family: Open Sans">No tienes afán. Quieres que el tiempo juegue a tu favor.</span></span>
             </button>
             <button onClick="{{ goEdu }}" style="text-align:left;background:#f7f7f7;border:1px solid transparent;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start;margin-bottom:12px" style-hover="background:#eef6ee;border-color:#caf9cb">
               <span style="flex:none;width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid #e3e7ea;color:#00c73d;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="compass" size="21"></sk-icon></span>
@@ -272,8 +269,8 @@
           <div style="display:flex;flex-direction:column;gap:12px">
             <button onClick="{{ rutaMeta }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="calendar-check" size="21"></sk-icon></span><span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323">Tengo una meta con fecha</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; margin-top: 2px; font-family: Open Sans">Un viaje, una moto, un posgrado. Sabes cuánto necesitas y para cuándo.</span></span></button>
             <button onClick="{{ rutaLiq }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="wallet" size="21"></sk-icon></span><span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323">Quiero tenerlo a la mano</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; margin-top: 2px; font-family: Open Sans">Disponible cuando lo necesites, creciendo mientras tanto.</span></span></button>
-            <button onClick="{{ rutaCrecer }}" style="text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;cursor:pointer;display:flex;gap:14px;align-items:flex-start" style-hover="border-color:#00c73d;box-shadow:0 8px 22px -10px rgba(0,199,61,.28)"><span style="flex:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="trending-up" size="21"></sk-icon></span><span><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323">Quiero que crezca a futuro</span><span style="display: block; font-size: 13px; color: #666; line-height: 1.45; margin-top: 2px; font-family: Open Sans">No tienes afán. Quieres que el tiempo juegue a tu favor.</span></span></button>
-          </div>
+            
+            </div>
           <p style="text-align:center;font-size:13px;color:#888;margin:16px 0 6px">Elegir una ruta no te compromete: puedes explorar y cambiar de idea.</p>
           <button onClick="{{ asesoriaHere }}" style="width: 100%; background: transparent; color: #0a7a2f; border: none; padding: 10px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">¿No estás seguro? Un asesor puede ayudarte a decidir.</button>
         </section>
@@ -292,8 +289,14 @@
         <!-- ═══ WF-04 · CATÁLOGO ═══ -->
         <section hidden="{{ h.wf04 }}" class="skpop">
           <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 10px">{{ catTitle }}</h1>
-          <p style="font-size:12px;color:#888;line-height:1.45;margin:0 0 12px">Portafolios de Skandia AFP–ACCAI S.A. y fondos de Inversión Colectiva de Skandia Fiduciaria S.A. Puedes combinarlos en un mismo proceso.</p>
+          <div style="display:flex;gap:4px;background:#f2f4f3;border-radius:100px;padding:4px;margin-bottom:8px">
+            <button onClick="{{ setVehFvp }}" style="{{ vehFvpSty }}">Fondo voluntario</button>
+            <button onClick="{{ setVehFic }}" style="{{ vehFicSty }}">Inversión Colectiva</button>
+          </div>
+          <p style="font-size:12px;color:#888;line-height:1.45;margin:0 0 12px">{{ vehNota }}</p>
+          <div style="display:{{ vehBloqueadoDisp }};gap:10px;background:#fff3e0;border-left:4px solid #ffae08;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:12.5px;line-height:1.45;color:#7a5300"><sk-icon name="alert-triangle" size="17" style="color:#ffae08;flex:none;margin-top:1px"></sk-icon><span>Ya tienes una selección en {{ cartVehNombre }}. En esta fase los dos caminos no se combinan: termina ese proceso y después inicia el de {{ vehNombre }}.</span></div>
           <p style="font-size:12.5px;color:#888;margin:0 0 14px">En orden alfabético. Ninguna opción está por encima de otra: la que se ajusta a ti depende de ti.</p>
+          <div style="display:{{ vehEmptyDisp }};background:#f7f7f7;border-radius:14px;padding:18px;font-size:13.5px;color:#666;line-height:1.5;margin-bottom:12px">Aún no tenemos portafolios de {{ vehNombre }} para este objetivo. Cambia de pestaña para ver las opciones disponibles.</div>
 
           <sc-if value="{{ catGrouped }}" hint-placeholder-val="{{ false }}">
             <sc-for list="{{ catGroups }}" as="grp" hint-placeholder-count="2">
@@ -446,7 +449,7 @@
         </section>
 
         <!-- ═══ WF-07 · PERFILAMIENTO APERTURA ═══ -->
-        <section hidden="{{ h.wf07 }}" class="skpop" style="flex:1;display:flex;flex-direction:column">
+        <section hidden="{{ h.wf07 }}" class="skpop" style="display:flex;flex-direction:column">
           <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:24px;line-height:1.25;color:#232323;margin:0 0 16px">Queremos conocerte antes de dar el siguiente paso</h1>
           <p style="font-size:15px;line-height:1.5;color:#404040;margin:0 0 20px">Tus respuestas nos permiten confirmar que lo que elegiste se ajusta a ti. Es la forma responsable de invertir — y tu perfil queda guardado para la próxima vez.</p>
           <div style="margin-top:20px;display:grid;gap:12px">
@@ -479,8 +482,7 @@
             <summary style="font-weight:700;color:#404040;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px">Este paso hace parte de la normativa que protege a quienes invierten en Colombia<span class="chev" style="color:#00c73d;flex:none"><sk-icon name="chevron-down" size="16"></sk-icon></span></summary>
             <div style="margin-top:9px">Decreto 1239 de 2024 y Circular Externa 014 de 2025: antes de vincularte evaluamos que tus elecciones se ajusten a tu perfil. El análisis queda documentado y disponible para ti. <em>[Texto final: Legal]</em></div>
           </details>
-          <div style="flex:1"></div>
-          <button disabled="{{ leadInvalid }}" onClick="{{ startPerfilamiento }}" style="width:100%;margin-top:24px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:{{ leadBtnFg }};background:{{ leadBtnBg }}">Empezar</button>
+          <button disabled="{{ leadInvalid }}" onClick="{{ startPerfilamiento }}" style="width:100%;margin-top:20px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:{{ leadBtnFg }};background:{{ leadBtnBg }}">Empezar</button>
         </section>
 
         <!-- ═══ WF-07a · TARJETAS ═══ -->
@@ -488,22 +490,33 @@
           <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:21px;color:#232323;margin:0 0 6px">¡Selecciona tu perfil de inversionista!</h1>
           <p style="font-size:13.5px;line-height:1.5;color:#666;margin:0 0 16px">Tu perfil te permitirá invertir según tus objetivos, tiempos y tolerancia al riesgo. Elige el que te describa mejor. <b style="color:#404040">Puedes actualizarlo cuando quieras.</b></p>
           <div style="background:#f7f7f7;border-radius:14px;padding:16px;font-size:13.5px;color:#404040;display:flex;gap:9px;align-items:center;margin-bottom:16px"><sk-icon name="clock" size="17" style="color:#00c73d"></sk-icon>{{ durText }}</div>
-          <sc-for list="{{ tarjetas }}" as="t" hint-placeholder-count="3">
-            <div style="border-radius:16px;padding:20px 18px;margin-bottom:14px;text-align:center;{{ t.sty }}">
-              
-              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px;color:#232323">{{ t.name }}</div>
-              <div style="font-size:13.5px;font-weight:600;color:#404040;margin-top:2px">{{ t.subt }}</div>
-              <p style="font-size:13px;line-height:1.5;color:#666;margin:10px 0 14px">{{ t.desc }}</p>
-              <button onClick="{{ t.select }}" style="width:100%;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:11px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="background:#caf9cb">Seleccionar</button>
+          <div style="{{ perfilGridSty }}">
+            <div style="border-radius:16px;padding:18px;margin-bottom:14px;text-align:center;display:flex;flex-direction:column;box-shadow:0 4px 12px -2px rgba(0,0,0,.08);{{ tar1.sty }}">
+              <div style="text-align:right"><a onClick="{{ tar1.pick }}" style="cursor:pointer;font-size:13px;font-weight:700">Ver más</a></div>
+              <img src="assets/perfil-montana-1.png" alt="" style="display:{{ perfilImgDisp }};width:100%;max-width:230px;margin:6px auto 14px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:20px;color:#232323">{{ tar1.name }}</div>
+              <div style="font-size:14px;color:#404040;margin-top:4px">{{ tar1.subt }}</div>
+              <p style="font-size:13px;line-height:1.55;color:#666;margin:14px 0 18px">{{ tar1.desc }}</p>
+              <button onClick="{{ tar1.select }}" style="width:100%;margin-top:auto;background:transparent;color:#00c73d;border:1.5px solid #00c73d;border-radius:100px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="background:#caf9cb">Seleccionar</button>
             </div>
-          </sc-for>
-          <div style="background:#f7f7f7;border-radius:16px;padding:16px">
-            <div style="display:flex;gap:14px;align-items:center">
-              <span style="flex:none;width:48px;height:48px;border-radius:50%;background:#f6fcf2;color:#00c73d;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="search-check" size="24"></sk-icon></span>
-              <div style="flex:1"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323;margin-bottom:3px">¿Aún no tienes claro cuál es tu perfil?</div><p style="font-size:12.5px;line-height:1.4;color:#666;margin:0">Responde un cuestionario corto y <b style="color:#0a7a2f">desbloquea 6 opciones adicionales de portafolio</b>.</p></div>
+            <div style="border-radius:16px;padding:18px;margin-bottom:14px;text-align:center;display:flex;flex-direction:column;box-shadow:0 4px 12px -2px rgba(0,0,0,.08);{{ tar2.sty }}">
+              <div style="text-align:right"><a onClick="{{ tar2.pick }}" style="cursor:pointer;font-size:13px;font-weight:700">Ver más</a></div>
+              <img src="assets/perfil-montana-2.png" alt="" style="display:{{ perfilImgDisp }};width:100%;max-width:230px;margin:6px auto 14px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:20px;color:#232323">{{ tar2.name }}</div>
+              <div style="font-size:14px;color:#404040;margin-top:4px">{{ tar2.subt }}</div>
+              <p style="font-size:13px;line-height:1.55;color:#666;margin:14px 0 18px">{{ tar2.desc }}</p>
+              <button onClick="{{ tar2.select }}" style="width:100%;margin-top:auto;background:transparent;color:#00c73d;border:1.5px solid #00c73d;border-radius:100px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="background:#caf9cb">Seleccionar</button>
             </div>
-            <button onClick="{{ goTransB }}" style="width:100%;margin-top:12px;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="background:#caf9cb">Realizar cuestionario</button>
+            <div style="border-radius:16px;padding:18px;margin-bottom:14px;text-align:center;display:flex;flex-direction:column;box-shadow:0 4px 12px -2px rgba(0,0,0,.08);{{ tar3.sty }}">
+              <div style="text-align:right"><a onClick="{{ tar3.pick }}" style="cursor:pointer;font-size:13px;font-weight:700">Ver más</a></div>
+              <img src="assets/perfil-montana-3.png" alt="" style="display:{{ perfilImgDisp }};width:100%;max-width:230px;margin:6px auto 14px">
+              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:20px;color:#232323">{{ tar3.name }}</div>
+              <div style="font-size:14px;color:#404040;margin-top:4px">{{ tar3.subt }}</div>
+              <p style="font-size:13px;line-height:1.55;color:#666;margin:14px 0 18px">{{ tar3.desc }}</p>
+              <button onClick="{{ tar3.select }}" style="width:100%;margin-top:auto;background:transparent;color:#00c73d;border:1.5px solid #00c73d;border-radius:100px;padding:12px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="background:#caf9cb">Seleccionar</button>
+            </div>
           </div>
+          
         </section>
 
         <!-- ═══ WF-07b transición ═══ -->
@@ -525,13 +538,13 @@
           <sc-for list="{{ q.options }}" as="o" hint-placeholder-count="3">
             <button onClick="{{ o.pick }}" style="width:100%;text-align:left;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:9px;font-family:'Open Sans',sans-serif;font-size:14.5px;line-height:1.4;color:#404040;{{ o.sty }}">{{ o.text }}</button>
           </sc-for>
-          <button onClick="{{ nextQ }}" style="width:100%;margin-top:6px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">{{ q.nextLabel }}</button>
+          <button onClick="{{ nextQ }}" style="width:100%;margin-top:20px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">{{ q.nextLabel }}</button>
           <button onClick="{{ prevQ }}" style="width: 100%; display: {{ q.backDisp }}; background: transparent; color: #0a7a2f; border: none; padding: 10px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">Atrás</button>
           <p style="text-align:center;font-size:12px;color:#aaa;margin-top:6px">Respuestas de ejemplo precargadas para la demo — cámbialas si quieres.</p>
         </section>
 
         <!-- ═══ WF-08 resultado ═══ -->
-        <section hidden="{{ h.wf08 }}" class="skpop" style="flex:1;display:flex;flex-direction:column">
+        <section hidden="{{ h.wf08 }}" class="skpop" style="display:flex;flex-direction:column">
           <div style="background:linear-gradient(135deg,#00c73d,#8fe000);border-radius:18px;padding:22px 18px 8px;text-align:center;color:#fff;overflow:hidden">
             <p style="font-size:13px;opacity:.92;margin:0 0 6px">Tu perfil</p>
             <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:30px;margin:0 0 12px">{{ perfil.name }}</h1>
@@ -541,13 +554,12 @@
           <p style="font-size:15px;line-height:1.5;color:#404040;margin:26px 0 24px">{{ perfil.trad }}</p>
           <div style="height:10px;background:#eef0f1;border-radius:100px;overflow:hidden;margin-bottom:8px"><div style="height:100%;background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px;width:{{ perfil.meter }}"></div></div>
           <div style="display:flex;justify-content:space-between;font-size:12px;color:#888"><span>Más estable</span><span>Más altibajos</span></div>
-          <div style="flex:1"></div>
-          <p style="font-size:13px;color:#666;margin:24px 0 10px">¿No te identificas? <a onClick="{{ revisarPerfil }}" style="cursor:pointer">Puedes revisar tus respuestas.</a></p>
-          <button onClick="{{ perfilContinue }}" style="width:100%;margin-top:6px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+          <p style="font-size:13px;color:#666;margin:20px 0 4px">¿No te identificas? <a onClick="{{ revisarPerfil }}" style="cursor:pointer">Puedes revisar tus respuestas.</a></p>
+          <button onClick="{{ perfilContinue }}" style="width:100%;margin-top:20px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
         </section>
 
         <!-- ═══ WF-08b · RESULTADO DE PERFIL · OPCIÓN B ═══ -->
-        <section hidden="{{ h.wf08b }}" class="skpop" style="flex:1;display:flex;flex-direction:column;text-align:center">
+        <section hidden="{{ h.wf08b }}" class="skpop" style="display:flex;flex-direction:column;text-align:center">
           <img ref="{{ perfilBImgRef }}" src="assets/perfil-montana-2.png" alt="" style="display:block;width:100%;max-width:280px;margin:8px auto 6px">
           <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:26px;line-height:1.25;color:#232323;margin:10px 0 12px">Eres {{ perfilB.name }}</h1>
           <p style="font-size:15px;line-height:1.55;color:#404040;margin:0 0 22px;text-align:left">{{ perfilB.trad }}</p>
@@ -557,8 +569,7 @@
               <span style="font-size:14px;line-height:1.5;color:#404040;padding-top:2px">{{ b.text }}</span>
             </div>
           </sc-for>
-          <div style="flex:1"></div>
-          <button onClick="{{ perfilContinue }}" style="width:100%;margin-top:6px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
+          <button onClick="{{ perfilContinue }}" style="width:100%;margin-top:20px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Continuar</button>
           <p style="font-size:11.5px;color:#aaa;margin-top:10px">Al continuar, confirmas que este perfil refleja tu situación actual.</p>
         </section>
 
@@ -577,7 +588,7 @@
 
           <!-- Intro: iniciar proceso -->
           <div style="display:{{ v10Disp.intro }}">
-            <div style="display:flex;gap:10px;background:#ebf4ff;border-left:4px solid #0099de;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;line-height:1.45;color:#404040"><sk-icon name="info" size="17" style="color:#0099de;flex:none;margin-top:1px"></sk-icon><span>Estás vinculándote a <b>{{ cartVehNombre }}</b>. En esta fase cada línea lleva su propio proceso.</span></div>
+            
             <div style="background:#f7f7f7;border-radius:14px;padding:18px;margin-bottom:16px">
               <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:4px">{{ v10Banner }}</div>
               <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">{{ v10Sub }}</p>
@@ -602,10 +613,10 @@
                   <div><div style="font-weight:700;font-size:13.5px;color:#232323">Ten listo tu certificado laboral</div><p style="font-size:12.5px;color:#666;line-height:1.4;margin:2px 0 0">Más adelante te pediremos adjuntarlo en PDF, JPG o PNG (máx. 5 MB). Si eres independiente, puedes adjuntar tu declaración de renta o un extracto bancario.</p></div>
                 </div>
                 <div style="display:flex;gap:10px;background:#fff3e0;border-left:4px solid #ffae08;border-radius:10px;padding:11px 12px;margin-top:14px"><sk-icon name="alert-triangle" size="16" style="color:#c97a00;flex:none;margin-top:1px"></sk-icon><div><div style="font-weight:700;font-size:12.5px;color:#7a5300">Descárgalo antes de empezar</div><p style="font-size:12px;color:#7a5300;line-height:1.4;margin:2px 0 0">Si tienes que salir a buscar el certificado durante el proceso, podrías perder tu avance. Tenlo guardado en este dispositivo.</p></div></div>
-                <div style="display:flex;gap:10px;background:#f0f0f0;border-radius:10px;padding:11px 12px;margin-top:10px"><sk-icon name="alert-circle" size="16" style="color:#404040;flex:none;margin-top:1px"></sk-icon><div><div style="font-weight:700;font-size:12.5px;color:#232323">No cierres la ventana de tu navegador</div><p style="font-size:12px;color:#666;line-height:1.4;margin:2px 0 0">Una vez inicies tu validación si cierras la ventana de tu navegador perderás tu avance.</p></div></div>
+                
               </div>
             </div>
-            <button onClick="{{ startProceso }}" style="width:100%;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">{{ bioBtnLabel }}</button>
+            <div style="display:flex;gap:10px;background:#f0f0f0;border-radius:10px;padding:11px 12px;margin-top:10px"><sk-icon name="alert-circle" size="16" style="color:#404040;flex:none;margin-top:1px"></sk-icon><div><div style="font-weight:700;font-size:12.5px;color:#232323">No cierres la ventana de tu navegador</div><p style="font-size:12px;color:#666;line-height:1.4;margin:2px 0 0">Una vez inicies tu validación si cierras la ventana de tu navegador perderás tu avance.</p></div></div><button onClick="{{ startProceso }}" style="width:100%;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">{{ bioBtnLabel }}</button>
             <p style="font-size:13px;color:#0a7a2f;font-weight:600;margin-top:10px;text-align:center">{{ bioStatus }}</p>
           </div>
 
@@ -627,6 +638,20 @@
                   <sk-icon name="chevron-right" size="18" style="color:#9aa0a3;flex:none"></sk-icon>
                 </button>
               </sc-for>
+              <div style="border-top:1px solid #eef0f1;margin-top:6px;padding-top:14px">
+                <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">¿Recibiste acompañamiento de un asesor financiero?</div>
+                <p style="font-size:12.5px;color:#888;line-height:1.45;margin:4px 0 12px">Esta respuesta es obligatoria: queda en el registro de tu proceso.</p>
+                <div style="display:flex;gap:10px">
+                  <button onClick="{{ asesorSi }}" style="{{ asesorSiSty }}">Sí</button>
+                  <button onClick="{{ asesorNo }}" style="{{ asesorNoSty }}">No</button>
+                </div>
+                <div style="display:{{ asesorSelDisp }};align-items:center;gap:10px;background:#f6fcf2;border:1px solid #caf9cb;border-radius:12px;padding:12px;margin-top:12px">
+                  <span style="flex:none;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px">{{ asesorSelIni }}</span>
+                  <span style="flex:1"><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:13.5px;color:#232323">{{ asesorSelName }}</span><span style="display:block;font-size:12px;color:#666">{{ asesorSelMeta }}</span></span>
+                  <a onClick="{{ asesorCambiar }}" style="cursor:pointer;font-size:12.5px;font-weight:700;flex:none">Cambiar</a>
+                </div>
+                <div style="display:{{ asesorNoDisp }};gap:8px;align-items:center;background:#f7f7f7;border-radius:12px;padding:12px;margin-top:12px;font-size:12.5px;color:#666"><sk-icon name="check-circle-2" size="16" style="color:#00c73d;flex:none"></sk-icon><span>Registramos que tomaste esta decisión sin acompañamiento de un asesor.</span></div>
+              </div>
             </div>
             <button disabled="{{ v10FinalDisabled }}" onClick="{{ goDocs }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ v10FinalBg }}">Continuar</button>
             <button onClick="{{ guardarHere }}" style="width:100%;background:transparent;color:#0a7a2f;border:none;padding:10px;font-weight:600;font-size:14px;text-decoration:underline;cursor:pointer;font-family:Montserrat,sans-serif">Guardar y continuar después</button>
@@ -734,22 +759,8 @@
                 <p style="font-size:12px;color:#9aa0a3;margin-top:10px">Tamaño Max: 5MB</p>
               </div>
             </div>
-            <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;margin-top:12px">
-              <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323;text-align:center">¿Recibiste acompañamiento de un asesor financiero?</div>
-              <p style="font-size:12.5px;color:#888;line-height:1.45;margin:6px 0 14px;text-align:center">Esta respuesta es obligatoria: queda en el registro de tu proceso.</p>
-              <div style="display:flex;gap:10px">
-                <button onClick="{{ asesorSi }}" style="{{ asesorSiSty }}">Sí</button>
-                <button onClick="{{ asesorNo }}" style="{{ asesorNoSty }}">No</button>
-              </div>
-              <div style="display:{{ asesorSelDisp }};align-items:center;gap:10px;background:#f6fcf2;border:1px solid #caf9cb;border-radius:12px;padding:12px;margin-top:12px">
-                <span style="flex:none;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00c73d,#8fe000);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px">{{ asesorSelIni }}</span>
-                <span style="flex:1"><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:13.5px;color:#232323">{{ asesorSelName }}</span><span style="display:block;font-size:12px;color:#666">{{ asesorSelMeta }}</span></span>
-                <a onClick="{{ asesorCambiar }}" style="cursor:pointer;font-size:12.5px;font-weight:700;flex:none">Cambiar</a>
-              </div>
-              <div style="display:{{ asesorNoDisp }};gap:8px;align-items:center;background:#f7f7f7;border-radius:12px;padding:12px;margin-top:12px;font-size:12.5px;color:#666"><sk-icon name="check-circle-2" size="16" style="color:#00c73d;flex:none"></sk-icon><span>Registramos que tomaste esta decisión sin acompañamiento de un asesor.</span></div>
-            </div>
             <button disabled="{{ docContinueDisabled }}" onClick="{{ finalizarTraslado }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ docBtnBg }}">Continuar</button>
-            <p style="text-align:center;margin-top:12px"><a style="cursor:pointer;font-size:13.5px;font-weight:700">¿Quieres realizar este aporte por descuento por nómina?</a></p>
+            <p style="text-align:center;margin-top:12px"><a onClick="{{ guardarHere }}" style="cursor:pointer;font-size:13.5px;font-weight:700">Guardar y continuar después</a></p>
           </div>
         </section>
 
@@ -774,7 +785,7 @@
             <a onClick="{{ goBack }}" style="display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:14px"><sk-icon name="arrow-left" size="16"></sk-icon>Atrás</a>
             <div style="background:#f7f7f7;border-radius:14px;padding:18px;margin-bottom:16px">
               <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:4px">¡Último paso!</div>
-              <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">{{ contratosIntro }}</p>
+              <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">Ya tienes creado tu contrato, solo nos queda realizar tu primer aporte.</p>
               <div style="font-size:12px;font-weight:700;color:#232323;margin-bottom:6px">85%</div>
               <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:85%;background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div><sk-icon name="check-circle-2" size="18" style="color:#00c73d;flex:none"></sk-icon></div>
             </div>
@@ -782,24 +793,17 @@
               <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Realiza tu primer aporte</div>
               <p style="font-size:12.5px;color:#888;margin:2px 0 16px">0/1 campos completados</p>
               <p style="text-align:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:17px;line-height:1.35;color:#232323;margin:0 0 16px">Laura, con tu primer aporte empieza el camino a tus objetivos</p>
-              <div style="display:{{ contratosDobleDisp }};gap:10px;background:#ebf4ff;border-left:4px solid #0099de;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:12.5px;line-height:1.45;color:#0b5f8a"><sk-icon name="info" size="17" style="color:#0099de;flex:none;margin-top:1px"></sk-icon><span>Firmaste un solo proceso, pero tu selección genera dos contratos: uno con Skandia AFP–ACCAI S.A. y otro con Skandia Fiduciaria S.A.</span></div>
-              <div style="display:grid;gap:12px">
-                <sc-for list="{{ contratos }}" as="ct" hint-placeholder-count="2">
-                  <div style="background:#fbfbfb;border:1px solid #eef0f1;border-radius:12px;padding:16px 16px 18px;position:relative">
-                    <span style="position:absolute;top:0;left:0;background:#ffae08;color:#fff;border-radius:8px 0 8px 0;padding:5px 12px;font-size:12px;font-weight:700">{{ ct.tag }}</span>
-                    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-top:16px">
-                      <div style="flex:1">
-                        <p style="font-size:13.5px;line-height:1.5;color:#404040;margin:0">{{ ct.desc }}</p>
-                        <p style="font-size:12px;line-height:1.45;color:#888;margin:6px 0 0">{{ ct.entidad }}</p>
-                      </div>
-                      <div style="flex:none;background:#ebf4ff;border-radius:10px;padding:9px 12px;text-align:center"><div style="font-size:11px;color:#666">Contrato</div><div style="font-weight:700;font-size:13px;color:#232323">{{ ct.num }}</div></div>
-                    </div>
-                  </div>
-                </sc-for>
+              <div style="background:#fbfbfb;border:1px solid #eef0f1;border-radius:12px;padding:16px 16px 18px;position:relative">
+                <span style="position:absolute;top:0;left:0;background:#ffae08;color:#fff;border-radius:8px 0 8px 0;padding:5px 12px;font-size:12px;font-weight:700">{{ contratoVeh }}</span>
+                <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-top:16px">
+                  <p style="font-size:13.5px;line-height:1.5;color:#404040;margin:0">Tu contrato creado para los Universales de Skandia Inversiones.</p>
+                  <div style="flex:none;background:#ebf4ff;border-radius:10px;padding:9px 12px;text-align:center"><div style="font-size:11px;color:#666">Contrato</div><div style="font-weight:700;font-size:13px;color:#232323">#100006077905</div></div>
+                </div>
+                <p style="font-size:12.5px;line-height:1.55;color:#666;text-align:center;margin:18px 0 0">A tu correo enviaremos el resumen de tu proceso de vinculación. En caso de requerir el apoyo de un asesor certificado contáctanos a través de nuestro<br><b style="color:#404040">PBX 658 4000 y línea nacional 01 8000 517 526</b></p>
               </div>
-              <p style="font-size:12.5px;line-height:1.55;color:#666;text-align:center;margin:14px 0 0">A tu correo enviaremos el resumen de tu proceso de vinculación. En caso de requerir el apoyo de un asesor certificado contáctanos a través de nuestro<br><b style="color:#404040">PBX 658 4000 y línea nacional 01 8000 517 526</b></p>
             </div>
             <button onClick="{{ goResumenAporte }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Realizar aporte por PSE</button>
+            <button onClick="{{ openProgramar }}" style="width:100%;margin-top:10px;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;justify-content:center" style-hover="background:#caf9cb"><sk-icon name="calendar-clock" size="17"></sk-icon>Programar mi aporte</button>
             <p style="text-align:center;margin-top:12px"><a onClick="{{ goNominaAporte }}" style="cursor:pointer;font-size:13.5px;font-weight:700">¿Quieres realizar este aporte por descuento por nómina?</a></p>
           </div>
 
@@ -823,7 +827,7 @@
               <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px"><span style="font-size:13px;color:#404040;font-weight:600">Podrías ganar en 1 año</span><span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#03a835">+{{ resumenGainFmt }}</span></div>
               <p style="font-size:11.5px;color:#7a9482;margin:8px 0 0">Estimado con una rentabilidad promedio ponderada de {{ resumenRatePct }}% E.A. No garantiza resultados futuros.</p>
             </div>
-            <button onClick="{{ goMontoAporte }}" style="width:100%;margin-top:6px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Confirmar aporte</button>
+            <button onClick="{{ goMontoAporte }}" style="width:100%;margin-top:20px;border:none;border-radius:100px;padding:14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Confirmar aporte</button>
           </div>
 
           <!-- Pantalla 3: monto y medio de pago -->
@@ -870,6 +874,11 @@
             <button onClick="{{ descargarResumen }}" style="width: 100%; background: transparent; color: #0a7a2f; border: 1.5px solid #00c73d; border-radius: 100px; padding: 10px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; font-family: Montserrat" style-hover="background:#caf9cb"><sk-icon name="download" size="16"></sk-icon>Descargar mi resumen</button>
           </div>
           <div style="background:#f7f7f7;border-radius:14px;padding:15px;margin-top:12px"><div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323;margin-bottom:4px">¿Qué sigue?</div><p style="font-size:13px;color:#666;line-height:1.5;margin:0">Verás tu inversión en la app de Skandia. Te contamos cómo va, sin tecnicismos.</p></div>
+          <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px;margin-top:12px">
+            <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323;margin-bottom:4px">¿También quieres invertir en {{ otroVehNombre }}?</div>
+            <p style="font-size:12.5px;color:#666;line-height:1.5;margin:0 0 12px">Es un proceso de vinculación aparte. Tus datos quedan precargados, así que será más corto.</p>
+            <button onClick="{{ iniciarOtroProceso }}" style="width:100%;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:11px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;cursor:pointer" style-hover="background:#caf9cb">Iniciar proceso de {{ otroVehNombre }}</button>
+          </div>
           <button onClick="{{ resetAll }}" style="width:100%;margin-top:14px;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d" style-hover="background:#03a835">Ir a mi inversión</button>
         </section>
 
@@ -901,42 +910,103 @@
         <!-- MORE_SCREENS -->
 
         <!-- Footer regulatorio permanente -->
-        <div style="border-top:1px solid #eef0f1;margin:18px -18px 0;padding:14px 18px 20px;font-size:11.5px;line-height:1.5;color:#888">
+        <div style="display:{{ footerRegDisp }};border-top:1px solid #eef0f1;margin:18px -18px 0;padding:14px 18px 20px;font-size:11.5px;line-height:1.5;color:#888">
           <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#404040"><sk-icon name="shield-check" size="14" style="color:#666"></sk-icon>Vigilado Superintendencia Financiera de Colombia</div>
           <sc-for list="{{ footerEntidades }}" as="e" hint-placeholder-count="2"><div style="margin-top:3px">{{ e }}</div></sc-for>
           <div style="opacity:.85;margin-top:5px">Contenido informativo — no constituye recomendación profesional. Decreto 1239 de 2024 · CE 014 de 2025.</div>
         </div>
       </div>
 
-      <div style="position:absolute;left:16px;right:16px;bottom:16px;display:{{ floatingCartDisp }};align-items:center;justify-content:space-between;gap:10px;background:#12333a;color:#fff;border-radius:100px;padding:8px 8px 8px 16px;box-shadow:0 14px 32px -10px rgba(0,0,0,.35);z-index:45">
-        <span style="display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700"><sk-icon name="shopping-cart" size="16" style="color:#8fe000"></sk-icon>{{ floatingCartCount }} · {{ floatingCartTotal }}</span>
-        <button onClick="{{ goWf06 }}" style="background:#00c73d;color:#fff;border:none;border-radius:100px;padding:9px 16px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#03a835">Ver selección</button>
+      <!-- Main -->
+      
+
+      <div style="position:fixed;left:50%;transform:translateX(-50%);bottom:26px;display:{{ floatingCartDisp }};width:max-content;max-width:calc(100% - 32px);align-items:center;gap:14px;background:#12333a;color:#fff;border-radius:100px;padding:8px 8px 8px 18px;box-shadow:0 14px 32px -10px rgba(0,0,0,.35);z-index:300">
+        <span style="display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;white-space:nowrap"><sk-icon name="shopping-cart" size="16" style="color:#8fe000"></sk-icon>{{ floatingCartCount }} · {{ floatingCartTotal }}</span>
+        <button onClick="{{ goWf06 }}" style="flex:none;white-space:nowrap;background:#00c73d;color:#fff;border:none;border-radius:100px;padding:9px 16px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer" style-hover="background:#03a835">Ver selección</button>
       </div>
 
     </div>
   </div>
+
+  <!-- ══ Footer Vinculación Digital (escritorio, desde WF-07a) ══ -->
+  <div style="display:{{ vincChromeDisp }};flex-direction:column;background:#fff;border-top:1px solid #eef0f1;margin-top:auto">
+    <div style="padding:26px 40px 16px">
+      <img src="assets/brand/logo-color.svg" alt="Skandia" style="height:26px;width:auto;display:block;margin-bottom:8px">
+      <p style="font-size:11.5px;color:#666;margin:0">*Cada micrositio es firmado por la entidad Skandia responsable de los contenidos y productos.</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;border-top:1px solid #eef0f1;padding:16px 40px">
+      <span style="display:flex;align-items:center;gap:10px;font-size:10px;font-weight:700;color:#888;letter-spacing:.5px"><span style="border:1px solid #c5c5c5;border-radius:3px;padding:3px 7px">Vigilado</span>Superintendencia Financiera de Colombia</span>
+      <span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:12px;color:#888;letter-spacing:.5px">Skandia AFP – ACCAI S.A.</span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:24px;font-family:Montserrat,sans-serif;font-weight:700;font-size:12px;color:#9aa0a3">
+        <span style="display:flex;align-items:center;gap:6px"><sk-icon name="users" size="15"></sk-icon>RUS</span>
+        <span style="display:flex;align-items:center;gap:6px"><sk-icon name="activity" size="15"></sk-icon>asofondos</span>
+        <span style="display:flex;align-items:center;gap:6px"><sk-icon name="shield-check" size="15"></sk-icon>sfc</span>
+      </span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#3a3a3a;color:#e0e0e0;padding:14px 40px;font-size:13px">
+      <sk-icon name="headset" size="17" style="color:#8fe000;flex:none"></sk-icon>
+      <span>Canales de atención</span>
+      <span style="color:#6b6b6b">|</span>
+      <a style="cursor:pointer;color:#8fe000;text-decoration:underline">Radica tu solicitud</a>
+      <span style="color:#6b6b6b">|</span>
+      <a style="cursor:pointer;color:#8fe000;text-decoration:underline">Nuestras oficinas</a>
+      <span style="color:#6b6b6b">|</span>
+      <a style="cursor:pointer;color:#8fe000;text-decoration:underline">Chat de servicios</a>
+      <span style="margin-left:auto;color:#bdbdbd">Derechos reservados © 2026 SKANDIA</span>
+    </div>
+  </div>
+
+  <!-- ══ Footer de sitio (solo escritorio) ══ -->
+  <div style="display:{{ siteChromeDisp }};flex-direction:column;background:#1c1c1c;color:#bdbdbd;margin-top:auto">
+    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px;padding:44px 24px 32px;max-width:1200px;margin:0 auto;width:100%">
+      <div>
+        <img src="assets/brand/logo-blanco.svg" alt="Skandia" style="height:26px;width:auto;display:block;margin-bottom:14px">
+        <p style="font-size:13px;line-height:1.6;margin:0 0 14px">Inversiones, pensiones y seguros. Acompañamos tus decisiones con información clara y respaldo profesional.</p>
+        <div style="display:flex;gap:12px;color:#8fe000"><sk-icon name="facebook" size="18"></sk-icon><sk-icon name="instagram" size="18"></sk-icon><sk-icon name="linkedin" size="18"></sk-icon><sk-icon name="youtube" size="18"></sk-icon></div>
+      </div>
+      <div>
+        <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#fff;margin-bottom:12px">Productos</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13px"><span style="cursor:pointer">Fondos de inversión</span><span style="cursor:pointer">Pensión voluntaria</span><span style="cursor:pointer">Cesantías</span><span style="cursor:pointer">Seguros</span></div>
+      </div>
+      <div>
+        <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#fff;margin-bottom:12px">Atención</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13px"><span style="cursor:pointer">Centro de ayuda</span><span style="cursor:pointer">PQRS</span><span style="cursor:pointer">Oficinas</span><span style="cursor:pointer">Rentabilidades</span></div>
+      </div>
+      <div>
+        <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#fff;margin-bottom:12px">Contáctanos</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13px"><span style="display:flex;gap:8px;align-items:center"><sk-icon name="phone" size="15" style="color:#8fe000"></sk-icon>PBX 658 4000</span><span style="display:flex;gap:8px;align-items:center"><sk-icon name="headset" size="15" style="color:#8fe000"></sk-icon>01 8000 517 526</span><span style="display:flex;gap:8px;align-items:center"><sk-icon name="map-pin" size="15" style="color:#8fe000"></sk-icon>Bogotá, Colombia</span></div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #333;padding:16px 24px 22px;max-width:1200px;margin:0 auto;width:100%;font-size:11.5px;line-height:1.6;color:#8f8f8f">
+      <div style="display:flex;align-items:center;gap:7px;font-weight:700;color:#e0e0e0;margin-bottom:5px"><sk-icon name="shield-check" size="14" style="color:#8fe000"></sk-icon>Vigilado Superintendencia Financiera de Colombia</div>
+      <sc-for list="{{ footerEntidades }}" as="e" hint-placeholder-count="2"><div>{{ e }}</div></sc-for>
+      <div style="margin-top:6px">Contenido informativo — no constituye recomendación profesional. Decreto 1239 de 2024 · CE 014 de 2025.</div>
+      <div style="display:flex;gap:18px;margin-top:12px"><span style="cursor:pointer">Términos y condiciones</span><span style="cursor:pointer">Política de privacidad</span><span style="cursor:pointer">Tratamiento de datos</span></div>
+    </div>
+  </div>
 </div>
 
-<div onClick="{{ backdropMasesor }}" style="position:fixed;inset:0;background:rgba(18,25,28,.55);z-index:520;display:{{ disp.masesor }};align-items:{{ modalAlign }};justify-content:center">
-  <div class="skpop" style="background:#fff;border-radius:{{ modalRadius }};max-width:{{ modalWidth }};width:100%;padding:22px 20px 24px;max-height:88vh;overflow:auto;animation:skslide .3s ease">
-    <div style="width:38px;height:4px;border-radius:100px;background:#e0e0e0;margin:0 auto 14px"></div>
-    <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:18px;color:#232323;margin:0 0 4px">Busca a tu asesor</h2>
-    <p style="font-size:13px;color:#666;line-height:1.45;margin:0 0 14px">Escribe su nombre, código o ciudad y selecciónalo de la lista.</p>
-    <div style="display:flex;align-items:center;gap:8px;border:1px solid #dcdfe1;border-radius:10px;padding:11px 12px;margin-bottom:12px">
-      <sk-icon name="search" size="17" style="color:#9aa0a3;flex:none"></sk-icon>
-      <input value="{{ asesorQuery }}" onChange="{{ asesorQueryChange }}" placeholder="Ej.: Camila, AS-1042, Bogotá" style="flex:1;border:none;outline:none;font-family:inherit;font-size:14px;color:#232323;background:transparent">
+<div onClick="{{ backdropMasesor }}" style="position:fixed;inset:0;background:rgba(18,25,28,.55);z-index:520;display:{{ disp.masesor }};align-items:center;justify-content:center;padding:20px">
+  <div class="skpop" style="background:#fff;border-radius:20px;max-width:{{ modalWidth }};width:100%;padding:32px 26px 28px;max-height:88vh;overflow:auto;text-align:center">
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:76px;height:76px;border-radius:50%;background:#eaf2fe;color:#0099de;margin-bottom:18px"><sk-icon name="alert-circle" size="36"></sk-icon></span>
+    <h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:24px;color:#404040;margin:0 0 10px">¿Quién te asesoró?</h2>
+    <p style="font-size:15px;color:#666;line-height:1.45;margin:0 0 22px">Ingresar el código de identificación de tu Asesor.</p>
+    <div style="display:flex;align-items:center;gap:10px;background:#f7f7f7;border:1px solid #f0f0f0;border-radius:12px;padding:16px 16px;text-align:left">
+      <input value="{{ asesorQuery }}" onChange="{{ asesorQueryChange }}" placeholder="Escribe el nombre de tu FP" style="flex:1;border:none;outline:none;font-family:inherit;font-size:15px;color:#404040;background:transparent">
+      <button onClick="{{ toggleAsesorList }}" aria-label="Ver listado" style="flex:none;border:none;background:transparent;color:#666;cursor:pointer;display:inline-flex;padding:2px"><sk-icon name="chevron-down" size="20"></sk-icon></button>
     </div>
-    <div class="sk-scroll" style="max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:8px">
+    <div class="sk-scroll" style="display:{{ asesorListDisp }};max-height:230px;overflow:auto;flex-direction:column;gap:8px;margin-top:12px;text-align:left">
       <sc-for list="{{ asesorList }}" as="a" hint-placeholder-count="4">
         <button onClick="{{ a.onPick }}" style="display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:1px solid #e3e7ea;border-radius:12px;padding:12px;cursor:pointer" style-hover="border-color:#00c73d;background:#f6fcf2">
           <span style="flex:none;width:36px;height:36px;border-radius:50%;background:#f2f4f3;color:#0a7a2f;display:inline-flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px">{{ a.ini }}</span>
-          <span style="flex:1"><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">{{ a.n }}</span><span style="display: block; font-size: 12px; color: #888; margin-top: 2px; font-family: Open Sans">{{ a.meta }}</span></span>
+          <span style="flex:1"><span style="display:block;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#232323">{{ a.n }}</span><span style="display:block;font-size:12px;color:#888;margin-top:2px;font-family:'Open Sans',sans-serif">{{ a.meta }}</span></span>
           <sk-icon name="chevron-right" size="18" style="color:#9aa0a3;flex:none"></sk-icon>
         </button>
       </sc-for>
       <div style="display:{{ asesorEmptyDisp }};background:#f7f7f7;border-radius:12px;padding:16px;font-size:13px;color:#666;line-height:1.5">No encontramos asesores con ese dato. Revisa el nombre o el código.</div>
     </div>
-    <button onClick="{{ closeMasesor }}" style="width: 100%; margin-top: 14px; background: transparent; color: #0a7a2f; border: none; padding: 10px; font-weight: 700; font-size: 14px; text-decoration: underline; cursor: pointer; font-family: Montserrat">Cancelar</button>
+    <button disabled="{{ asesorEnviarDisabled }}" onClick="{{ asesorEnviar }}" style="width:100%;margin-top:24px;border:none;border-radius:100px;padding:16px;font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;cursor:pointer;color:#fff;background:{{ asesorEnviarBg }}">Enviar</button>
+    <button onClick="{{ closeMasesor }}" style="width:100%;margin-top:8px;background:transparent;color:#0a7a2f;border:none;padding:10px;font-weight:700;font-size:14px;text-decoration:underline;cursor:pointer;font-family:Montserrat,sans-serif">Cancelar</button>
   </div>
 </div>
 
@@ -952,6 +1022,20 @@
     <label style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.4;margin:14px 0;cursor:pointer"><input type="checkbox" checked="{{ leadhabeas }}" onChange="{{ toggleLeadHabeas }}" style="width:19px;height:19px;accent-color:#00c73d;flex:none;margin-top:1px"><span>Autorizo el tratamiento de mis datos para que un asesor me contacte.</span></label>
     <button disabled="{{ leadDisabled }}" onClick="{{ sendLead }}" style="width:100%;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:{{ leadBtnBg }}">Que me contacten</button>
     <button onClick="{{ closeM01 }}" style="width: 100%; background: transparent; color: #0a7a2f; border: none; padding: 11px; font-weight: 600; font-size: 14px; text-decoration: underline; cursor: pointer; margin-top: 4px; font-family: Montserrat">Seguir por mi cuenta</button>
+  </div>
+</div>
+
+<div onClick="{{ backdropProgramar }}" style="position:fixed;inset:0;background:rgba(18,25,28,.55);z-index:500;display:{{ disp.mprogramar }};align-items:{{ modalAlign }};justify-content:center">
+  <div class="skpop" style="background:#fff;border-radius:{{ modalRadius }};max-width:{{ modalWidth }};width:100%;padding:24px 20px 26px;max-height:88vh;overflow:auto;animation:skslide .3s ease">
+    <div style="width:38px;height:4px;border-radius:100px;background:#e0e0e0;margin:0 auto 14px"></div>
+    <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:10px"><span style="flex:none;width:40px;height:40px;border-radius:11px;background:#f6fcf2;color:#00c73d;display:inline-flex;align-items:center;justify-content:center"><sk-icon name="calendar-clock" size="21"></sk-icon></span><h2 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:19px;color:#232323;margin:0">Programa tu aporte</h2></div>
+    <p style="font-size:14px;line-height:1.55;color:#555;margin:0 0 14px">Para programar aportes automáticos necesitas entrar al <b>Portal de clientes</b>. Ahí eliges el monto, la frecuencia y la fecha — y puedes cambiarlo o cancelarlo cuando quieras.</p>
+    <div style="background:#f7f7f7;border-radius:14px;padding:14px;font-size:13.5px;line-height:1.5;color:#404040;margin-bottom:16px">
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px"><sk-icon name="user-plus" size="17" style="color:#00c73d;flex:none;margin-top:1px"></sk-icon><span><b>Si es tu primera vez:</b> regístrate en el portal con tu documento y el correo que acabas de usar.</span></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><sk-icon name="log-in" size="17" style="color:#00c73d;flex:none;margin-top:1px"></sk-icon><span><b>Si ya eres cliente:</b> inicia sesión y programa tu aporte desde tu contrato.</span></div>
+    </div>
+    <button onClick="{{ closeProgramar }}" style="width:100%;border:none;border-radius:100px;padding:13px;font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:#00c73d;margin-bottom:9px" style-hover="background:#03a835">Ir al Portal de clientes</button>
+    <button onClick="{{ closeProgramar }}" style="width:100%;background:transparent;color:#0a7a2f;border:1.5px solid #00c73d;border-radius:100px;padding:12px;font-family:Montserrat,sans-serif;font-weight:600;font-size:15px;cursor:pointer" style-hover="background:#caf9cb">Aportar ahora por PSE</button>
   </div>
 </div>
 
@@ -1011,7 +1095,7 @@
 </div>
 
 <!-- Toast -->
-<div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#22282c;color:#fff;padding:11px 20px;border-radius:100px;font-size:13.5px;font-weight:500;z-index:600;max-width:88%;text-align:center;box-shadow:0 12px 32px -8px rgba(0,0,0,.4);display:{{ disp.toast }};gap:8px;align-items:center"><sk-icon name="check-circle-2" size="16" style="color:#8fe000"></sk-icon>{{ toast }}</div>
+<div style="position:fixed;bottom:{{ toastBottom }};left:50%;transform:translateX(-50%);background:#22282c;color:#fff;padding:11px 20px;border-radius:100px;font-size:13.5px;font-weight:500;z-index:600;max-width:88%;text-align:center;box-shadow:0 12px 32px -8px rgba(0,0,0,.4);display:{{ disp.toast }};gap:8px;align-items:center"><sk-icon name="check-circle-2" size="16" style="color:#8fe000"></sk-icon>{{ toast }}</div>
 
 <!-- Panel de eventos [Trz] -->
 <div class="sk-scroll" style="display:{{ disp.trz }};position:fixed;right:14px;top:60px;width:340px;max-height:74vh;overflow:auto;background:#0e161a;color:#9fe8b8;font-family:'Open Sans',sans-serif;font-size:11.5px;padding:14px;border-radius:14px;z-index:700;line-height:1.4;box-shadow:0 20px 50px -12px rgba(0,0,0,.55);border:1px solid #1e2c33">
@@ -1178,6 +1262,12 @@ class Component extends DCLogic {
   };
 
   addToCart = (id, montoSim)=>{
+    const cv=this.cartVeh();
+    if(cv && cv!==this.vehOf(id)){
+      this.trz('da_mezcla_vehiculo_bloqueada',{producto:id});
+      this.showToast('Por ahora no puedes combinar Fondo Voluntario e Inversión Colectiva en un mismo proceso.');
+      return;
+    }
     this.setState(s=>{
       if(s.cart.some(c=>c.id===id)) return {};
       const prevVar=this.varianteFor(s.cart);
@@ -1355,10 +1445,17 @@ class Component extends DCLogic {
     {n:'Laura Ospina Cardona', c:'AS-1601', ciudad:'Pereira', esp:'Primeras inversiones'},
     {n:'Sergio Alejandro Pardo', c:'AS-1688', ciudad:'Medellín', esp:'Empresas y nómina'}
   ];
-  asesorSi = ()=>{ this.trz('da_acompanamiento_asesor',{respuesta:'si'}); this.setState(s=>({asesorAcomp:'si', asesorQuery:'', modals:{...s.modals, masesor:true}})); };
+  asesorSi = ()=>{ this.trz('da_acompanamiento_asesor',{respuesta:'si'}); this.setState(s=>({asesorAcomp:'si', asesorQuery:'', asesorListOpen:false, modals:{...s.modals, masesor:true}})); };
+  toggleAsesorList = ()=> this.setState(s=>({asesorListOpen:!s.asesorListOpen}));
+  asesorEnviar = ()=>{
+    const q=(this.state.asesorQuery||'').toLowerCase().trim();
+    const match=this.ASESORES.filter(a=>!q||a.n.toLowerCase().includes(q)||a.c.toLowerCase().includes(q)||a.ciudad.toLowerCase().includes(q));
+    if(match.length===1) return this.asesorPick(match[0])();
+    this.setState({asesorListOpen:true});
+  };
   asesorNo = ()=>{ this.trz('da_acompanamiento_asesor',{respuesta:'no'}); this.setState({asesorAcomp:'no', asesorSel:null}); this.showToast('Registramos que no recibiste acompañamiento de un asesor.'); };
   asesorQueryChange = (e)=> this.setState({asesorQuery:e.target.value});
-  asesorPick = (a)=>()=>{ this.trz('da_asesor_seleccionado',{asesor:a.c}); this.setState(s=>({asesorSel:a, modals:{...s.modals, masesor:false}}),()=>this.showToast('Asesor registrado: '+a.n)); };
+  asesorPick = (a)=>()=>{ this.trz('da_asesor_seleccionado',{asesor:a.c}); this.setState(s=>({asesorSel:a, asesorListOpen:false, modals:{...s.modals, masesor:false}}),()=>this.showToast('Asesor registrado: '+a.n)); };
   closeMasesor = ()=> this.setState(s=>({modals:{...s.modals,masesor:false}, asesorAcomp:s.asesorSel?'si':null}));
   backdropMasesor = (e)=>{ if(e.target===e.currentTarget) this.closeMasesor(); };
 
@@ -1385,9 +1482,32 @@ class Component extends DCLogic {
     this.setState(s=>({ficPend:s.ficPend.slice(1)}), this.nextFic);
   };
 
+  openProgramar = ()=>{ this.trz('da_aporte_programado_intent',{destino:'portal_clientes'}); this.openModal('mprogramar'); };
+  closeProgramar = ()=> this.closeModal('mprogramar');
+  backdropProgramar = (e)=>{ if(e.target===e.currentTarget) this.closeModal('mprogramar'); };
+
   /* ── Aporte ── */
   goResumenAporte = ()=>{ this.setState({medio:'pse'}); this.trz('da_aporte_resumen_view'); this.setState({v11:'resumen'}); };
-  goNominaAporte = ()=>{ this.setState({medio:'nomina'}); this.trz('da_aporte_resumen_view',{medio:'nomina'}); this.setState({v11:'resumen'}); };
+  goNominaAporte = ()=>{
+    this.setState({medio:'nomina'});
+    this.trz('da_formato_nomina_descargado',{contrato:'100006077905'});
+    const txt='FORMATO DE DESCUENTO POR NÓMINA — Skandia\n(documento simulado · prototipo)\n\n'
+      +'Contrato n.º 100006077905\n'
+      +'Titular: Laura Gómez Rincón · CC 1.023.456.789\n'
+      +'Producto: Universales de Skandia Inversiones\n\n'
+      +'Instrucciones:\n'
+      +'1. Firma este formato.\n'
+      +'2. Entrégalo al área de nómina de tu empresa.\n'
+      +'3. El descuento se aplica desde el siguiente ciclo de pago.\n\n'
+      +'Autorizo a mi empleador a descontar de mi salario el monto acordado y\n'
+      +'trasladarlo a Skandia con destino al contrato indicado.\n\n'
+      +'Firma: ______________________   Fecha: ______________\n\n'
+      +'Vigilado Superintendencia Financiera de Colombia.';
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([txt],{type:'application/pdf'}));
+    a.download='skandia-formato-descuento-nomina.pdf'; a.click();
+    this.showToast('Descargamos tu formato de descuento por nómina.');
+  };
   pickMedio = (m)=>()=>{ this.setState({medio:m, debitoOpen:m==='debito'}); if(m==='debito') this.trz('da_debito_configurado',{condiciones_informadas:true}); };
   hidePagoError = ()=> this.setState({pagoError:false});
   confirmAporteDirecto = ()=>{
@@ -1466,7 +1586,7 @@ class Component extends DCLogic {
   };
   demoB = ()=>{
     const st=this.freshState();
-    st.ruta='crecer'; st.meta=this.METAS.crecer;
+    st.ruta='meta'; st.meta=this.METAS.meta;
     st.cart=this.rebalance([{id:'cat12',pct:0,montoSim:500000},{id:'demoF2',pct:0,montoSim:null}]);
     st.variante='preguntas'; st.upgraded=true; st.screen='wf06';
     this.setState(st, ()=>{ this.trz('da_perfilamiento_upgraded',{de:'tarjetas',a:'preguntas',trigger_producto:'demoF2'}); this.showToast('Demo B: Strategist Acciones Colombia → preguntas + desviación'); this.enterCart(); });
@@ -1474,9 +1594,11 @@ class Component extends DCLogic {
 
   renderVals(){
     const s=this.state;
+    const WIDE=['wf02','wf04','wf06','wf07a'];
+    const VINC=['wf07a','wf07trans','wf07b','wf08','wf08b','wf09confirm','wf10','wf10fic','wf11','wf12'];
     const h={}; this.SCREENS.forEach(id=>h[id]=s.screen!==id);
     const mh={}; ['m01','m02','m09','mf302','mcapa3'].forEach(id=>mh[id]=!s.modals[id]);
-    const disp={}; ['m01','m02','m09','mf302','mcapa3','masesor'].forEach(id=>disp[id]=s.modals[id]?'flex':'none');
+    const disp={}; ['m01','m02','m09','mf302','mcapa3','masesor','mprogramar'].forEach(id=>disp[id]=s.modals[id]?'flex':'none');
     disp.toast=s.toast?'flex':'none'; disp.trz=s.trzOpen?'block':'none';
 
     // footer entidades (S7)
@@ -1511,7 +1633,7 @@ class Component extends DCLogic {
     ].map(m=>({...m, onToggle:this.eduToggle(m.mod)}));
 
     // one page
-    const secMap={'Tengo una meta con fecha':['cat12','cat6','ficcat'],'Quiero tenerlo a la mano':['vista','liqcol','ficefe','ficmon'],'Quiero que crezca a futuro':['pro','invested']};
+    const secMap={'Tengo una meta con fecha':['cat12','cat6','ficcat'],'Quiero tenerlo a la mano':['vista','liqcol','ficefe','ficmon']};
     const onepageSecs=Object.entries(secMap).map(([title,ids])=>({title, items:ids.map(id=>({name:this.CAT[id].n,pq:this.CAT[id].pq,desde:this.CAT[id].desde,onMas:this.capa3(id)}))}));
 
     // ── catálogo ──
@@ -1542,8 +1664,8 @@ class Component extends DCLogic {
         vehTag:(p.v==='FVP'?('Mfund · FVP'+(p.isCat?' · CAT':'')):'Fiduciaria · FIC'), simLabel:'Simula con tu monto',
         addLabel:s.cart.some(c=>c.id===id)?'Agregada':'Agregar', added:s.cart.some(c=>c.id===id),
         onSim:()=>{ this.trz('da_sim_cta_click',{producto:id,origen:'card_catalogo'}); this.openSim(id,'wf04'); }, onAdd:this.addFromCatalog(id), onMas:this.capa3(id) }; };
-    const catEntries=Object.entries(this.CAT).filter(([id,p])=>p.ruta===s.ruta&&!p.soloCats).sort((a,b)=>a[1].n.localeCompare(b[1].n));
-    const catGrouped=(s.ruta==='crecer');
+    const catEntries=Object.entries(this.CAT).filter(([id,p])=>p.ruta===s.ruta&&!p.soloCats&&p.v===s.veh).sort((a,b)=>a[1].n.localeCompare(b[1].n));
+    const catGrouped=(s.ruta==='crecer'&&s.veh==='FVP');
     const cartVehCur=s.cart.length?this.CAT[s.cart[0].id].v:null;
     const vehTabSty=(v)=>s.veh===v
       ? 'flex:1;border:none;border-radius:100px;padding:10px 14px;font-family:Montserrat,sans-serif;font-weight:700;font-size:13px;cursor:pointer;background:#00c73d;color:#fff'
@@ -1570,14 +1692,10 @@ class Component extends DCLogic {
     const hasInv=s.cart.some(c=>c.id==='invested');
     const nonCat=s.cart.some(c=>!['invested','cat12','cat6','ficcat'].includes(c.id));
     if(hasInv&&nonCat){ cartAlerts.push({sev:'info',text:'La opción de expertos (Invested Mezcla Cauta) se combina únicamente con las de meta con fecha. Quita una de las dos para continuar.'}); block=true; }
-    if(s.cart.some(c=>this.CAT[c.id].v==='FIC')&&s.cart.some(c=>this.CAT[c.id].v==='FVP')) cartAlerts.push({sev:'info',text:'Tu selección combina Fondo Voluntario (Skandia AFP–ACCAI S.A.) e Inversión Colectiva (Skandia Fiduciaria S.A.). Haces un solo proceso: al final firmarás un contrato por cada administradora.'});
+    if(s.cart.some(c=>this.CAT[c.id].v==='FIC')) cartAlerts.push({sev:'info',text:'Los fondos de Inversión Colectiva se vinculan con Skandia Fiduciaria S.A. Este proceso es independiente del Fondo Voluntario: si también quieres invertir allí, harás un segundo proceso.'});
     const AS={warn:['#fff3e0','#ffae08','alert-triangle','#7a5300'],info:['#ebf4ff','#0099de','info','#0b5f8a'],success:['#ecfdf3','#16d727','check-circle-2','#087a34']};
     cartAlerts.forEach(a=>{const x=AS[a.sev];a.bg=x[0];a.bar=x[1];a.ic=x[2];a.fg=x[3];});
     const cartEmpty=s.cart.length===0;
-    const _hasFvp=s.cart.some(c=>this.CAT[c.id].v==='FVP'), _hasFic=s.cart.some(c=>this.CAT[c.id].v==='FIC');
-    const contratosList=[];
-    if(_hasFvp||!s.cart.length) contratosList.push({tag:'Multifund', desc:'Tu contrato creado para los Universales de Skandia Inversiones.', entidad:'Skandia AFP–ACCAI S.A.', num:'#100006077905'});
-    if(_hasFic) contratosList.push({tag:'Fiduciaria', desc:'Tu contrato creado para los Fondos de Inversión Colectiva.', entidad:'Skandia Fiduciaria S.A.', num:'#200004431187'});
 
     // ── perfilamiento ──
     const durText=s.variante==='tarjetas'?'Te toma menos de un minuto: eliges la frase que más se parece a ti.':'Te toma unos minutos: unas preguntas cortas que hacen tu perfil más preciso.';
@@ -1593,7 +1711,9 @@ class Component extends DCLogic {
       3:{subt:'Máxima ganancia, máximo riesgo',desc:'Priorizas la rentabilidad sobre la estabilidad. Aceptas riesgos altos para maximizar ganancias a largo plazo.',pts:'0,30 10,4 20,34 32,2 44,32 56,2 68,32 80,4 90,28 100,10'}
     };
     const tarjetas=[1,2,3].map(n=>({n,on:s.tarjetaSel===n,pick:this.pickTarjeta(n),select:this.selectTarjeta(n),
-      name:this.PERFILES[n].n,subt:TARCARD[n].subt,desc:TARCARD[n].desc,pts:TARCARD[n].pts,sty:radioSel(s.tarjetaSel===n)}));
+      name:this.PERFILES[n].n,subt:TARCARD[n].subt,desc:TARCARD[n].desc,pts:TARCARD[n].pts,
+      img:'assets/perfil-montana-'+n+'.png',
+      sty:radioSel(s.tarjetaSel===n)}));
     let perfil=null;
     if(s.perfilNivel){ const P=this.PERFILES[s.perfilNivel]; perfil={name:s.perfil,varLabel:s.perfilVariante==='tarjetas'?'Perfilamiento simplificado':'Perfilamiento completo',trad:'Esto significa que '+P.trad+'. Lo usamos para confirmar que tus elecciones se ajustan a ti.',meter:P.m,img:'assets/perfil-montana-'+s.perfilNivel+'.png'}; }
     const perfilB=perfil?{...perfil, bullets:[
@@ -1629,7 +1749,8 @@ class Component extends DCLogic {
     const allDone=doneCount===4;
     const v10D=(k)=>(s.v10===k?'block':'none');
     const asesorOk = s.asesorAcomp==='no' || (s.asesorAcomp==='si' && !!s.asesorSel);
-    const docReady = s.docSelected && asesorOk;
+    const docReady = s.docSelected;
+    const overviewReady = allDone && asesorOk;
     const docBtnBg=docReady?'#00c73d':'#e9e9e9';
     const asBtn=(on)=>on
       ? 'flex:1;border:none;border-radius:100px;padding:11px;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;cursor:pointer;background:#00c73d;color:#fff'
@@ -1661,17 +1782,31 @@ class Component extends DCLogic {
       demoBarDisp: (this.props.showDemoBar===false)?'none':'flex',
       isDesktop: s.viewMode==='desktop',
       hubDesktopDisp: (s.viewMode==='desktop'&&s.screen==='wf00')?'block':'none',
+      cardBodyMargin: s.viewMode==='desktop'?'0':'18px -18px 0',
+      footerRegDisp: s.viewMode==='desktop'?'none':'block',
       hubMobileDisp: (s.viewMode==='desktop'&&s.screen==='wf00')?'none':'block',
-      cardWidth: (s.viewMode==='desktop'&&s.screen==='wf00')?'900px':(s.viewMode==='desktop'?'720px':'412px'),
-      cardRadius: s.viewMode==='desktop'?'20px':'30px',
+      cardWidth: (s.viewMode==='desktop'&&s.screen==='wf00')?'100%':(s.viewMode==='desktop'?(WIDE.includes(s.screen)?'960px':'620px'):'412px'),
+      cardRadius: s.viewMode==='desktop'?'0':'30px',
+      mainPad: s.viewMode==='desktop'?(s.screen==='wf00'?'0':'8px 0 40px'):'22px 18px 10px',
       modalWidth: s.viewMode==='desktop'?'480px':'412px',
       modalAlign: s.viewMode==='desktop'?'center':'flex-end',
       modalRadius: s.viewMode==='desktop'?'20px':'22px 22px 0 0',
+      siteChromeDisp: (s.viewMode==='desktop'&&!VINC.includes(s.screen))?'flex':'none',
+      vincChromeDisp: (s.viewMode==='desktop'&&VINC.includes(s.screen))?'flex':'none',
+      cardShadow: s.viewMode==='desktop'?'none':'0 26px 60px -20px rgba(18,51,58,.4),0 8px 22px -12px rgba(0,0,0,.2)',
+      cardBorder: s.viewMode==='desktop'?'none':'1px solid #e3e7ea',
+      escenarioGap: s.viewMode==='desktop'?'32px':'24px',
+      escenarioPad: s.viewMode==='desktop'?'32px 24px 56px':'32px 24px 40px',
+      escenarioMax: s.viewMode==='desktop'?'1200px':'1120px',
+      cardLogoDisp: s.viewMode==='desktop'?'none':'block',
+      stageBg: s.viewMode==='desktop'?'#ffffff':'radial-gradient(120% 80% at 50% -10%,#eafaef 0%,#eef1f3 46%,#e7ebee 100%)',
       escenarioDir: s.viewMode==='desktop'?'row':'column',
       escenarioAlign: s.viewMode==='desktop'?'flex-start':'center',
-      sidebarDisp: (s.viewMode==='desktop'&&s.screen!=='wf00')?'flex':'none',
+      sidebarDisp: 'none',
       appbarDisp: (s.viewMode==='desktop'&&s.screen==='wf00')?'none':'flex',
-      catGridSty: s.viewMode==='desktop'?'display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:start':'display:flex;flex-direction:column;gap:0',
+      catGridSty: s.viewMode==='desktop'?('display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px;align-items:start'):'display:flex;flex-direction:column;gap:0',
+      perfilGridSty: s.viewMode==='desktop'?'display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch':'display:flex;flex-direction:column;gap:0',
+      perfilImgDisp: s.viewMode==='desktop'?'block':'none',
       viewToggleSty: {
         mobile: s.viewMode==='mobile'?'background:#245a63;color:#fff':'background:transparent;color:#9fc3c8',
         desktop: s.viewMode==='desktop'?'background:#245a63;color:#fff':'background:transparent;color:#9fc3c8'
@@ -1679,6 +1814,7 @@ class Component extends DCLogic {
       setViewMobile:this.setViewMobile, setViewDesktop:this.setViewDesktop,
       sbSteps:sbSteps, sbRutaIcon:sbRutaIcon, sbRutaLabel:(s.meta||'Aún explorando tus opciones'), sbEntidades:footerEntidades,
       backDisp: s.prev.length? 'inline-flex':'none',
+      topBackDisp: (s.prev.length && !['wf10','wf11'].includes(s.screen))? 'inline-flex':'none',
       chipDisp: s.meta? 'inline-flex':'none',
       metaText: s.meta?('Para: '+s.meta):'', metaOr: s.meta||'tu meta',
       footerEntidades,
@@ -1710,6 +1846,7 @@ class Component extends DCLogic {
       vehNombre, vehNota, vehBloqueadoDisp:vehBloqueado?'flex':'none', vehEmptyDisp:catEntries.length?'none':'block',
       cartVehNombre:cartVehCur==='FIC'?'Inversión Colectiva':'Fondo Voluntario',
       otroVehNombre:(s.cierreVeh==='FIC')?'Fondo Voluntario':'Inversión Colectiva', iniciarOtroProceso:this.iniciarOtroProceso,
+      toastBottom:(s.screen==='wf04'&&s.cart.length>0)?'92px':'26px',
       floatingCartDisp:(s.screen==='wf04'&&s.cart.length>0)?'flex':'none', floatingCartCount:s.cart.length+(s.cart.length===1?' seleccionado':' seleccionados'), floatingCartTotal:this.fmt(cartTotalsData.total),
       // carrito
       cartItems, cartAlerts, cartEmpty, cartMeta:(s.meta?('Para: '+s.meta+' — la meta viaja contigo hasta el final.'):''),
@@ -1717,7 +1854,7 @@ class Component extends DCLogic {
       distBar, cartTotalFmt:this.fmt(cartTotalsData.total), cartGainFmt:this.fmt(cartTotalsData.gain), cartRatePct:(cartTotalsData.rateAvg*100).toFixed(1).replace('.',','),
       goWf04:()=>this.go('wf04'), goWf06:()=>this.go('wf06'),
       // perfilamiento
-      durText, q, tarjetas, tarNextDisabled:(s.tarjetaSel===0), tarNextBg:(s.tarjetaSel===0)?'#e9e9e9':'#00c73d',
+      durText, q, tarjetas, tar1:tarjetas[0], tar2:tarjetas[1], tar3:tarjetas[2], tarNextDisabled:(s.tarjetaSel===0), tarNextBg:(s.tarjetaSel===0)?'#e9e9e9':'#00c73d',
       perfil:perfil||{name:this.PERFILES[2].n,varLabel:'Perfilamiento completo',trad:'Esto significa que '+this.PERFILES[2].trad+'.',meter:this.PERFILES[2].m,img:'assets/perfil-montana-2.png'},
       perfilB:perfilB||{name:this.PERFILES[2].n,trad:'Esto significa que '+this.PERFILES[2].trad+'.',img:'assets/perfil-montana-2.png',bullets:[{icon:'shield-check',text:'Válido por 12 meses — puedes actualizarlo cuando quieras.'},{icon:'target',text:'Se usa para confirmar que tu selección se ajusta a ti.'},{icon:'lock',text:'Queda guardado y disponible para tu consulta.'}]},
       perfilHasImg:!!(perfil&&perfil.img), desvRegistro:s.desvRegistro,
@@ -1735,12 +1872,15 @@ class Component extends DCLogic {
       asesorSiSty:asBtn(s.asesorAcomp==='si'), asesorNoSty:asBtn(s.asesorAcomp==='no'),
       asesorSi:this.asesorSi, asesorNo:this.asesorNo, asesorQuery:s.asesorQuery, asesorQueryChange:this.asesorQueryChange,
       asesorList, asesorEmptyDisp:asesorList.length?'none':'block', closeMasesor:this.closeMasesor, backdropMasesor:this.backdropMasesor,
+      asesorListDisp:((s.asesorListOpen||(s.asesorQuery||'').trim())?'flex':'none'),
+      toggleAsesorList:this.toggleAsesorList, asesorEnviar:this.asesorEnviar,
+      asesorEnviarDisabled:!(s.asesorQuery||'').trim(), asesorEnviarBg:(s.asesorQuery||'').trim()?'#00c73d':'#e9e9e9',
       asesorSelDisp:s.asesorSel?'flex':'none', asesorSelIni:s.asesorSel?s.asesorSel.n.charAt(0):'', asesorSelName:s.asesorSel?s.asesorSel.n:'', asesorSelMeta:s.asesorSel?(s.asesorSel.c+' · '+s.asesorSel.ciudad):'',
       asesorNoDisp:s.asesorAcomp==='no'?'flex':'none', asesorCambiar:this.asesorSi,
       docCountText:s.docSelected?'1/1 campos completados':'0/1 campos completados',
       goDocs:this.goDocs, selectDoc:this.selectDoc,
       v10Pct:v10Pct+'%', v10Banner, v10Sub, v10Sections, allDone, allDoneColor:allDone?'#00c73d':'#dcdfe1', v10SecDoneCount:doneCount,
-      v10FinalBg:allDone?'#00c73d':'#e9e9e9', v10FinalDisabled:!allDone,
+      v10FinalBg:overviewReady?'#00c73d':'#e9e9e9', v10FinalDisabled:!overviewReady,
       asesoriaComercial:s.asesoriaComercial, toggleAsesoria:this.toggleAsesoria,
       v10Back:s.v10==='intro'?this.goBack:this.v10Go(s.v10==='docs'?'overview':'overview'),
       v10GoOverview:this.v10Go('overview'),
@@ -1753,8 +1893,7 @@ class Component extends DCLogic {
       // aporte
       wf11meta:(s.medio,'Este es el paso donde '+(s.meta?('“'+String(s.meta).toLowerCase()+'”'):'tu meta')+' empieza a moverse. Puedes empezar con $50.000.'),
       v11Disp:{contrato:(s.v11==='contrato'?'block':'none'), resumen:(s.v11==='resumen'?'block':'none'), monto:(s.v11==='monto'?'block':'none')},
-      contratos:contratosList, contratosDobleDisp:contratosList.length>1?'flex':'none',
-      contratosIntro:contratosList.length>1?'Ya tienes creados tus dos contratos, solo nos queda realizar tu primer aporte.':'Ya tienes creado tu contrato, solo nos queda realizar tu primer aporte.',
+      contratoVeh:(s.cart.length?this.CAT[s.cart[0].id].v:'FVP')==='FVP'?'Multifund':'Fiduciaria',
       goResumenAporte:this.goResumenAporte, goNominaAporte:this.goNominaAporte,
       resumenCartItems:cartItems.map(it=>({id:it.id,name:it.name,tag:it.tag,meta:it.meta,pctLabel:it.pctLabel,montoDisplay:it.montoDisplay,color:it.color})),
       resumenTotalFmt:this.fmt(cartTotalsData.total), resumenGainFmt:this.fmt(cartTotalsData.gain), resumenRatePct:(cartTotalsData.rateAvg*100).toFixed(1).replace('.',','),
@@ -1786,6 +1925,7 @@ class Component extends DCLogic {
       toggleFicCheck:this.toggleFicCheck, ficConfirm:this.ficConfirm,
       medioPse:this.pickMedio('pse'), medioDebito:this.pickMedio('debito'), medioNomina:this.pickMedio('nomina'), medioDespues:this.pickMedio('despues'),
       backToResumen:()=>this.setState({v11:'resumen'}),
+      openProgramar:this.openProgramar, closeProgramar:this.closeProgramar, backdropProgramar:this.backdropProgramar,
       hidePagoError:this.hidePagoError, confirmAporte:this.confirmAporte, descargarResumen:this.descargarResumen,
       resetAll:this.resetAll,
       goWf10:()=>this.go('wf10'),
