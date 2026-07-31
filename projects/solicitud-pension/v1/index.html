@@ -278,6 +278,19 @@
               </sc-if>
               <!-- Campos Entidad financiera -->
               <sc-if value="{{ excedShowBancoFields }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:14px;">
+                <div style="position:relative;">
+                  <div onClick="{{ excedBancoSelect.onToggle }}" style="width:100%;height:58px;box-sizing:border-box;padding:25px 38px 7px 14px;border:1.5px solid {{ excedBancoSelect.border }};border-radius:8px;background:#fff;box-shadow:0 0 6px 0 rgba(61,75,92,0.15);font-family:'Open Sans',sans-serif;font-size:15px;color:{{ excedBancoSelect.color }};cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:26px;transition:border-color .15s;">{{ excedBancoSelect.value }}</div>
+                  <label style="position:absolute;top:9px;left:14px;font-size:12px;color:#878787;pointer-events:none;">Entidad financiera</label>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#878787" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:21px;pointer-events:none;transform:{{ excedBancoSelect.chevron }};transition:transform .2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  <sc-if value="{{ excedBancoSelect.isOpen }}" hint-placeholder-val="{{ false }}">
+                    <div class="sk-dd-scroll" style="position:absolute;top:64px;left:0;right:0;z-index:30;background:#fff;border-radius:8px;box-shadow:0 4px 20px rgba(61,75,92,0.18);overflow-y:auto;max-height:230px;">
+                      <sc-for list="{{ excedBancoSelect.opts }}" as="o" hint-placeholder-count="5">
+                        <div onClick="{{ o.onClick }}" style="padding:13px 16px;font-family:'Open Sans',sans-serif;font-size:14px;color:#404040;background:{{ o.bg }};cursor:pointer;" style-hover="background:#f6fcf2;">{{ o.label }}</div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
                 <div class="sk-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:center;">
                   <div style="position:relative;">
                     <input type="tel" inputmode="numeric" pattern="[0-9]*" onInput="{{ onExcedEntidadInput }}" defaultValue="{{ excedEntidad }}" placeholder=" " style="width:100%;height:58px;box-sizing:border-box;padding:25px 14px 7px;border:1.5px solid #c5c5c5;border-radius:8px;background:#fff;box-shadow:0 0 6px 0 rgba(61,75,92,0.15);font-family:'Open Sans',sans-serif;font-size:15px;color:#404040;outline:none;" style-focus="border-color:#00c73d;">
@@ -291,6 +304,7 @@
                       </sc-for>
                     </div>
                   </div>
+                </div>
                 </div>
               </sc-if>
             </div>
@@ -1331,16 +1345,16 @@ class Component extends DCLogic {
   state = {
     type: null, subtipo: null, vejezOpen: false,
     stepIdx: 0, done: false,
-    excedentes: false, excedTooltip: false, cuentaDocState: 'empty', docsState: 'empty', recibe: false, tramita: false, recibeEntidad: null, tramitaEntidad: null, excedCalc: 'si', excedGiroCuenta: '', excedGiroTipo: '', excedTipo: '', excedNota: false, excedTransfCual: '', excedTransfNo: '', excedEntidad: '',
+    excedentes: false, excedTooltip: false, cuentaDocState: 'empty', docsState: 'empty', recibe: false, tramita: false, recibeEntidad: null, tramitaEntidad: null, excedCalc: 'si', excedGiroCuenta: '', excedGiroTipo: '', excedTipo: '', excedNota: false, excedTransfCual: '', excedTransfNo: '', excedEntidad: '', excedBanco: '',
     email: 'and****@correo.com', emailErr: false,
     ddOpen: null, ddCivil: 'Casado/a', ddLugar: 'Bogotá D.C.', ddTrabajador: 'Empleado', ddEps: 'Sura EPS', ddPais: 'Colombia', ddDepartamento: 'Cundinamarca', ddCiudadAfiliado: 'Bogotá D.C.', ddLugarQuery: '', ddCiudadAfiliQuery: '', epsOtro: '', epsOtroErr: false, epsOpen: false,
     ddRecibeTipo: 'Vejez', ddTramitaTipo: 'Vejez', ddRecibeInvalidezOrigen: '', ddTramitaInvalidezOrigen: '',
     datosHijos: '2', datosDir: 'Calle 123 # 45-67', datosCelular: '300 *** **45', datosTelefono: '6012345678', datosTelefonoEmp: '', datosEdad: '62', datosGenero: 'Masculino',
     datosHijosErr: false, datosDirErr: false, ddLugarErr: false, datosCelularErr: false, emailErrMsg: '',
     benNombre: '', benNumDoc: '', benFechaNac: '', benEdad: '', benDir: '', benTelFijo: '', benCelular: '',
-    benTipoDoc: '', benLugarNac: '', benParentesco: '', benGenero: '', benInvalidez: '', benLugarRes: '',
+    benTipoDoc: '', benLugarNac: '', benParentesco: '', benGenero: '', benInvalidez: '', benDepRes: '', benLugarRes: '',
     benEmail: '', benEmailErr: false, benEmailErrMsg: '',
-    benNombreErr: false, benNumDocErr: false, benFechaNacErr: false, benFechaNacErrMsg: '', benEdadErr: false, benLugarNacErr: false, benDirErr: false, benLugarResErr: false, benCelularErr: false,
+    benNombreErr: false, benNumDocErr: false, benFechaNacErr: false, benFechaNacErrMsg: '', benEdadErr: false, benLugarNacErr: false, benDirErr: false, benDepResErr: false, benLugarResErr: false, benCelularErr: false,
     sinFecha: '', sinFechaErr: false, sinCausa: '', ocurrio: false, hClinica: false,
     beps: false, bepsDec: '', bepsC: false, bepsD: '', gpm: false, pfDec: '', showPfModal: false, conv: false, convAccede: '', showConvModal: false, conformidad: false, modDecInfo: '',
     noBono: false, noBonoOpc: '',
@@ -1642,6 +1656,12 @@ class Component extends DCLogic {
       ['Ocupación', 'Selecciona', false, true, false, 'Empleado', true],
       ['EPS', 'Selecciona', false, true, false, 'Sura EPS', true],
     ];
+    const BANCOS = [
+      'Bancolombia', 'Banco de Bogotá', 'Davivienda', 'BBVA Colombia', 'Banco de Occidente',
+      'Banco Popular', 'Banco Caja Social', 'Banco AV Villas', 'Scotiabank Colpatria', 'Itaú',
+      'Banco Agrario de Colombia', 'Banco GNB Sudameris', 'Banco Falabella', 'Banco Pichincha',
+      'Bancoomeva', 'Banco Serfinanza', 'Banco W', 'Bancamía', 'Nequi', 'Daviplata',
+    ];
     const paisesMap = {
       'Colombia': {
         departamentos: ['Amazonas', 'Antioquia', 'Arauca', 'Atlántico', 'Bolívar', 'Boyacá', 'Caldas', 'Caquetá', 'Cauca', 'Cesar', 'Chocó', 'Córdoba', 'Cundinamarca', 'Guainía', 'Guaviare', 'Huila', 'La Guajira', 'Magdalena', 'Meta', 'Nariño', 'Norte de Santander', 'Putumayo', 'Quindío', 'Risaralda', 'San Andrés y Providencia', 'Santander', 'Sucre', 'Tolima', 'Valle del Cauca', 'Vaupés', 'Vichada'],
@@ -1800,14 +1820,15 @@ class Component extends DCLogic {
       'Edad':                             { val: 'benEdad',     err: 'benEdadErr',     req: true },
       'Lugar de nacimiento':              { val: 'benLugarNac', err: 'benLugarNacErr', req: true },
       'Dirección de residencia':          { val: 'benDir',      err: 'benDirErr',      req: true },
-      'Lugar de residencia':              { val: 'benLugarRes', err: 'benLugarResErr', req: true },
+      'Departamento de residencia':       { val: 'benDepRes',   err: 'benDepResErr',   req: true },
+      'Ciudad de residencia':             { val: 'benLugarRes', err: 'benLugarResErr', req: true },
       'Teléfono fijo':                    { val: 'benTelFijo',  err: null,             req: false },
       'Número celular':                   { val: 'benCelular',  err: 'benCelularErr',  req: true },
     };
     const numericLabelsBen = ['Número de documento', 'Teléfono fijo', 'Número celular', 'Edad'];
     // [label, ph, isSelect, isEmail, fullWidth, required]
     const bbf = [
-      ['Nombre completo del beneficiario', 'Nombres y apellidos', false, false, false, true],
+      ['Nombre completo del beneficiario', 'Nombres y apellidos', false, false, true, true],
       ['Tipo de documento', 'Selecciona', true, false, false, true],
       ['Número de documento', 'Número', false, false, false, true],
       ['Fecha de nacimiento', 'DD/MM/AAAA', false, false, false, true],
@@ -1816,7 +1837,8 @@ class Component extends DCLogic {
       ['Parentesco', 'Selecciona', true, false, false, true],
       ['Género', 'Selecciona', true, false, false, true],
       ['Dirección de residencia', 'Ej. Calle 00 # 00-00', false, false, false, true],
-      ['Lugar de residencia', 'Ciudad, Departamento', false, false, false, true],
+      ['Departamento de residencia', 'Ej. Cundinamarca', false, false, false, true],
+      ['Ciudad de residencia', 'Ej. Bogotá D.C.', false, false, false, true],
       ['Número celular', 'Ej. 300 333 4445', false, false, false, true],
       ['Teléfono fijo', 'Ej. 601 000 0000', false, false, false, false],
       ['Correo electrónico', 'nombre@correo.com', false, true, false, true],
@@ -1934,7 +1956,7 @@ class Component extends DCLogic {
       return field;
     });
     const benFechaOk = /^\d{2}\/\d{2}\/\d{4}$/.test(s.benFechaNac) && !s.benFechaNacErr;
-    const benefFormValid = !!s.benNombre && !!s.benTipoDoc && !!s.benNumDoc && benFechaOk && !!s.benEdad && !!s.benLugarNac && !!s.benParentesco && !!s.benGenero && !!s.benInvalidez && !!s.benDir && !!s.benLugarRes && !!s.benCelular && !!s.benEmail && !s.benEmailErr;
+    const benefFormValid = !!s.benNombre && !!s.benTipoDoc && !!s.benNumDoc && benFechaOk && !!s.benEdad && !!s.benLugarNac && !!s.benParentesco && !!s.benGenero && !!s.benInvalidez && !!s.benDir && !!s.benDepRes && !!s.benLugarRes && !!s.benCelular && !!s.benEmail && !s.benEmailErr;
 
     // modalidades
     const mods = [
@@ -2121,7 +2143,7 @@ class Component extends DCLogic {
     const adjuntosValid = (!is('adjuntos') && !is('adjuntosBenef')) || s.docsState === 'success';
     const excedValid = !is('excedentes') || (() => {
       if (!s.excedGiroTipo) return false;
-      if (s.excedGiroTipo === 'banco' && (!s.excedEntidad || !s.excedTipo)) return false;
+      if (s.excedGiroTipo === 'banco' && (!s.excedBanco || !s.excedEntidad || !s.excedTipo)) return false;
       if (s.excedGiroTipo === 'skandia' && !s.excedTransfCual) return false;
       return s.excedNota;
     })();
@@ -2277,7 +2299,7 @@ class Component extends DCLogic {
           onClick: () => this.setState({
             excedGiroTipo: v,
             ...(v === 'banco'    ? { excedTransfCual: '' }              : {}),
-            ...(v === 'skandia'  ? { excedEntidad: '', excedTipo: '' }  : {}),
+            ...(v === 'skandia'  ? { excedEntidad: '', excedTipo: '', excedBanco: '' }  : {}),
           }),
         };
       }),
@@ -2293,6 +2315,8 @@ class Component extends DCLogic {
         ];
         const cur = s.excedTransfCual;
         const isOpen = s.ddOpen === 'excedTransf';
+        const bancoCur = s.excedBanco;
+        const bancoOpen = s.ddOpen === 'excedBanco';
         return {
           excedTransfSelect: {
             value: cur || 'Selecciona un producto',
@@ -2302,6 +2326,15 @@ class Component extends DCLogic {
             chevron: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
             onToggle: () => this.setState({ ddOpen: s.ddOpen === 'excedTransf' ? null : 'excedTransf' }),
             opts: excedTransfOpts.map(o => ({ label: o, bg: o === cur ? '#f6fcf2' : '#fff', onClick: () => this.setState({ excedTransfCual: o, ddOpen: null }) })),
+          },
+          excedBancoSelect: {
+            value: bancoCur || 'Selecciona la entidad',
+            isOpen: bancoOpen,
+            color: bancoCur ? '#404040' : '#878787',
+            border: bancoOpen || bancoCur ? '#00c73d' : 'transparent',
+            chevron: bancoOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            onToggle: () => this.setState({ ddOpen: s.ddOpen === 'excedBanco' ? null : 'excedBanco' }),
+            opts: BANCOS.map(o => ({ label: o, bg: o === bancoCur ? '#f6fcf2' : '#fff', onClick: () => this.setState({ excedBanco: o, ddOpen: null }) })),
           },
         };
       })(),
@@ -2408,7 +2441,7 @@ class Component extends DCLogic {
         const tycIsFisico = ['gpm', 'familiar'].includes(s.type);
         const tycShowBenef = f.includes('beneficiarios') || tycIsFisico;
         let tycExcedDest = '—';
-        if (s.excedGiroTipo === 'banco') tycExcedDest = s.excedEntidad ? `No. ${s.excedEntidad} | ${s.excedTipo === 'corriente' ? 'C. Corriente' : 'C. Ahorros'}` : 'Entidad financiera';
+        if (s.excedGiroTipo === 'banco') tycExcedDest = s.excedEntidad ? `${s.excedBanco ? s.excedBanco + ' | ' : ''}No. ${s.excedEntidad} | ${s.excedTipo === 'corriente' ? 'C. Corriente' : 'C. Ahorros'}` : 'Entidad financiera';
         else if (s.excedGiroTipo === 'skandia') tycExcedDest = s.excedTransfCual || 'Producto Skandia';
         const tycBenefRows = tycIsFisico
           ? [{ label: 'Beneficiario', value: parentescoLabel || '—' }]
@@ -2433,7 +2466,7 @@ class Component extends DCLogic {
         chevron: s.benefEditIdx === i ? 'rotate(180deg)' : 'rotate(0deg)',
         onEdit: () => this.setState(s.benefEditIdx === i
           ? { benefEditIdx: null }
-          : { benefEditIdx: i, benefFormOpen: false, benNombre: b.nombre, benTipoDoc: b.tipoDoc, benNumDoc: b.numDoc, benFechaNac: b.fechaNac, benEdad: b.edad || '', benLugarNac: b.lugarNac, benParentesco: b.parentesco, benGenero: b.genero, benInvalidez: b.invalidez, benDir: b.dir, benLugarRes: b.lugarRes, benCelular: b.celular, benTelFijo: b.telFijo || '', benEmail: b.email }),
+          : { benefEditIdx: i, benefFormOpen: false, benNombre: b.nombre, benTipoDoc: b.tipoDoc, benNumDoc: b.numDoc, benFechaNac: b.fechaNac, benEdad: b.edad || '', benLugarNac: b.lugarNac, benParentesco: b.parentesco, benGenero: b.genero, benInvalidez: b.invalidez, benDir: b.dir, benDepRes: b.depRes || '', benLugarRes: b.lugarRes, benCelular: b.celular, benTelFijo: b.telFijo || '', benEmail: b.email }),
         onDelete: (e) => { e.stopPropagation(); this.setState({ benefList: s.benefList.filter((_, j) => j !== i), benefEditIdx: s.benefEditIdx === i ? null : s.benefEditIdx }); },
       })),
       benefAddBd: benefAddSel ? '#00c73d' : 'transparent', benefAddBg: benefAddSel ? '#f6fcf2' : '#fff', benefAddRb: benefAddSel ? '#00c73d' : '#c5c5c5',
@@ -2449,9 +2482,9 @@ class Component extends DCLogic {
       benefAddBtnOpacity: benefFormValid ? '1' : '0.6',
       onBenefAddBtn: () => {
         if (!benefFormValid) return;
-        const newBen = { nombre: s.benNombre, parentesco: s.benParentesco, tipoDoc: s.benTipoDoc, numDoc: s.benNumDoc, fechaNac: s.benFechaNac, edad: s.benEdad, lugarNac: s.benLugarNac, genero: s.benGenero, invalidez: s.benInvalidez, dir: s.benDir, lugarRes: s.benLugarRes, celular: s.benCelular, telFijo: s.benTelFijo, email: s.benEmail };
+        const newBen = { nombre: s.benNombre, parentesco: s.benParentesco, tipoDoc: s.benTipoDoc, numDoc: s.benNumDoc, fechaNac: s.benFechaNac, edad: s.benEdad, lugarNac: s.benLugarNac, genero: s.benGenero, invalidez: s.benInvalidez, dir: s.benDir, depRes: s.benDepRes, lugarRes: s.benLugarRes, celular: s.benCelular, telFijo: s.benTelFijo, email: s.benEmail };
         const newList = s.benefEditIdx !== null ? s.benefList.map((b, i) => i === s.benefEditIdx ? newBen : b) : [...s.benefList, newBen];
-        this.setState({ benefList: newList, benefFormOpen: false, benefEditIdx: null, benNombre: '', benTipoDoc: '', benNumDoc: '', benFechaNac: '', benLugarNac: '', benParentesco: '', benGenero: '', benInvalidez: '', benDir: '', benLugarRes: '', benCelular: '', benTelFijo: '', benEmail: '', benEmailErr: false, benEmailErrMsg: '', benNombreErr: false, benNumDocErr: false, benFechaNacErr: false, benFechaNacErrMsg: '', benLugarNacErr: false, benDirErr: false, benLugarResErr: false, benCelularErr: false });
+        this.setState({ benefList: newList, benefFormOpen: false, benefEditIdx: null, benNombre: '', benTipoDoc: '', benNumDoc: '', benFechaNac: '', benLugarNac: '', benParentesco: '', benGenero: '', benInvalidez: '', benDir: '', benDepRes: '', benLugarRes: '', benCelular: '', benTelFijo: '', benEmail: '', benEmailErr: false, benEmailErrMsg: '', benNombreErr: false, benNumDocErr: false, benFechaNacErr: false, benFechaNacErrMsg: '', benLugarNacErr: false, benDirErr: false, benDepResErr: false, benLugarResErr: false, benCelularErr: false });
       },
       isBenefNoneSelected,
       // adjuntos
