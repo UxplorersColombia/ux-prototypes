@@ -32,7 +32,7 @@
     --info-bg:#ebf4ff; --info-border:#0099de; --info-ink:#04527a;
     --warning-bg:#fff3e0; --warning-border:#ffae08; --warning-ink:#7a4c00;
     --error-bg:#fff5f4; --error-border:#e03430;
-    --success-bg:#ecfdf3; --success-border:#87f491; --success-icon:#00a34e;
+    --success-bg:#ecfdf3; --success-border:#87f491; --success-icon:#00a34e; --success-ink:#1a5c33;
     /* link */
     --link:#0099de; --link-hover:#007ab5; --link-active:#005c88;
     /* radios / espaciado */
@@ -63,9 +63,6 @@
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
   }
-  @keyframes panelIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-  .panel.active{ animation:panelIn .25s var(--ease); }
-
   /* ---------- Header + audiencia ---------- */
   .header{display:flex; align-items:center; gap:12px; margin:24px 0 18px; flex-wrap:wrap;}
   .brand-mark{
@@ -87,34 +84,6 @@
   h1{font-family:var(--font-brand); font-size:26px; font-weight:800; line-height:1.2; margin:0 0 6px;}
   .subtitle{font-size:14px; color:var(--n4); max-width:660px; line-height:1.55; margin:0 0 22px;}
 
-  /* ---------- Stepper (ui-stepper real: marcadores circulares) ---------- */
-  .stepper{display:flex; list-style:none; margin:0 0 var(--sp-lg); padding:0;}
-  .step-item{position:relative; flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; min-width:0;}
-  .step-item::before{
-    content:''; position:absolute; top:13px; left:-50%; width:100%; height:2px;
-    background:var(--surface-200); z-index:0; transition:background-color .2s var(--ease);
-  }
-  .step-item:first-child::before{display:none;}
-  .step-item.done::before, .step-item.active::before{background:var(--primary);}
-  .step-marker{
-    position:relative; z-index:1; width:28px; height:28px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    font-family:var(--font-brand); font-weight:700; font-size:12px;
-    background:var(--surface-100); color:var(--surface-600); border:2px solid var(--surface-200);
-    transition:background-color .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
-  }
-  .step-marker svg{width:14px; height:14px; display:none;}
-  .step-item.active .step-marker{background:var(--surface-0); border-color:var(--primary); color:var(--primary-pressed);}
-  .step-item.done .step-marker{background:var(--primary); border-color:var(--primary); color:#fff;}
-  .step-item.done .step-marker .num{display:none;}
-  .step-item.done .step-marker svg{display:block;}
-  .step-label{
-    font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.3px;
-    text-transform:uppercase; text-align:center; color:var(--surface-600); line-height:1.3;
-  }
-  .step-item.active .step-label{color:var(--surface-900);}
-  .step-item.done .step-label{color:var(--primary-pressed);}
-
   /* ---------- Cards ---------- */
   .card{
     background:var(--surface-0); border:1px solid var(--n3); border-radius:var(--r-lg);
@@ -122,8 +91,6 @@
   }
   .card-title{font-family:var(--font-brand); font-size:15px; font-weight:800; margin:0 0 4px;}
   .card-desc{font-size:13px; color:var(--n4); margin:0 0 18px; line-height:1.5;}
-  .panel{display:none;}
-  .panel.active{display:block;}
 
   /* ---------- Tabla de deudas (no hay sk-table: <table> semántica) ---------- */
   .table-scroll{overflow-x:auto; margin:0 -4px;}
@@ -200,6 +167,8 @@
   .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px;}
   .field label{display:block; font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--n4); margin-bottom:7px;}
   .field .help{font-size:12px; color:var(--n4); margin-top:6px; line-height:1.5;}
+  .field .help a{color:var(--link); font-weight:700; text-decoration:none;}
+  .field .help a:hover{color:var(--link-hover); text-decoration:underline;}
   .field .in{height:48px;}
 
   /* ---------- sk-alert (4 tipos reales, radio 8px, blur) ---------- */
@@ -232,15 +201,15 @@
   .sim-footer{margin-top:28px; display:flex; justify-content:center;}
   .sim-footer .vigencia{margin:0;}
 
-  /* ---------- Banner de resultado (sk-alert info SIEMPRE — veredicto neutro) ---------- */
+  /* ---------- Banner de resultado (sk-alert success — decisión de producto: diferenciarlo de la alerta info del escenario consolidado, ver ajuste de agosto 2026) ---------- */
   .result{
-    background:var(--info-bg); border:1px solid var(--info-border); border-radius:var(--r-sm);
+    background:var(--success-bg); border:1px solid #3fae63; border-radius:var(--r-sm);
     padding:18px 20px; margin-bottom:18px; backdrop-filter:blur(4px);
   }
-  .result .tag{font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--info-ink); opacity:.85; margin-bottom:6px;}
-  .result .headline{font-family:var(--font-brand); font-size:18px; font-weight:800; color:var(--info-ink); line-height:1.4;}
+  .result .tag{font-family:var(--font-brand); font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--success-ink); opacity:.85; margin-bottom:6px;}
+  .result .headline{font-family:var(--font-brand); font-size:18px; font-weight:800; color:var(--success-ink); line-height:1.4;}
   .result .headline .amt{font-variant-numeric:tabular-nums;}
-  .result .sub{font-size:13px; color:var(--info-ink); opacity:.9; margin-top:8px; line-height:1.5;}
+  .result .sub{font-size:13px; color:var(--success-ink); opacity:.9; margin-top:8px; line-height:1.5;}
 
   /* ---------- Visualización distintiva: muchas → una ---------- */
   .compare-viz{margin:4px 0 20px;}
@@ -286,9 +255,15 @@
   details.help-block[open] summary .chev{transform:rotate(90deg);}
   details.help-block summary .chev svg{width:14px; height:14px; display:block;}
   .help-body{background:var(--n1); border:1px solid var(--n3); border-radius:var(--r-sm); padding:14px 16px; margin-top:6px; font-size:13px; line-height:1.6; color:var(--surface-800);}
+  details.detalle-block .help-body{background:none; border:none; padding:0;}
   .help-body .r{margin-bottom:8px;}
   .help-body .r:last-child{margin-bottom:0;}
   .help-body b{color:var(--surface-900);}
+  .help-body p{margin:0 0 10px;}
+  .help-body p.legal-title{font-weight:800; color:var(--surface-900);}
+  .help-body ol{margin:0 0 10px; padding-left:20px;}
+  .help-body ol li{margin-bottom:8px;}
+  .legal-section{margin-top:24px; padding-top:20px; border-top:1px solid var(--n3);}
 
   /* ---------- Disclaimer en capas ---------- */
   .disclaimer{margin-top:var(--sp-lg);}
@@ -299,7 +274,14 @@
     h1{font-size:21px;}
     .card{padding:16px;}
     .audience-tag{margin-left:0;}
-    .step-label{font-size:10px;}
+  }
+
+  /* Exportar / imprimir (ver plan de mejoras Fase 4): solo el resultado + el texto legal completo */
+  @media print{
+    .audience-tag, .subtitle, #captureSection, .btn-row{display:none !important;}
+    details{display:block !important;}
+    details > summary{display:none !important;}
+    .legal-section{border-top:none; margin-top:12px;}
   }
 </style>
 </head>
@@ -320,16 +302,14 @@
   </header>
 
   <h1>Simulador de consolidación de deudas</h1>
-  <p class="subtitle">Compara las deudas actuales de tu cliente contra un crédito único en Skandia y muestra la diferencia en intereses y en cuota. Muestra el dato para conversarlo con el cliente — la decisión siempre es suya.</p>
+  <p class="subtitle">Compara las deudas actuales de tu cliente contra un crédito único en Skandia y muestra la diferencia en intereses y en cuota. Cambia cualquier valor y el resultado se actualiza al instante.</p>
 
-  <!-- ============ STEPPER ============ -->
-  <ol class="stepper" id="stepper" aria-label="Progreso del simulador"></ol>
-
-  <!-- ============ PASO 0 · DEUDAS ============ -->
-  <section class="panel active" id="panel-0" aria-labelledby="t0">
+  <div id="captureSection">
+  <!-- ============ DEUDAS ============ -->
+  <section aria-labelledby="t0">
     <div class="card">
       <h2 class="card-title" id="t0">Deudas actuales del cliente</h2>
-      <p class="card-desc">Registra cada deuda vigente. Usa la tasa E.A. y el plazo en meses tal como figuran en el extracto o pagaré del cliente. Los resultados se recalculan solos.</p>
+      <p class="card-desc">Registra cada deuda vigente. Usa la tasa E.A. y el plazo en meses tal como figuran en el extracto o pagaré de tu cliente. Los resultados se recalculan solos.</p>
 
       <div class="table-scroll">
         <table class="debts">
@@ -374,26 +354,21 @@
       <details class="help-block">
         <summary><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>¿Qué tasa uso: E.A. o mensual?</summary>
         <div class="help-body">
-          <div class="r"><b>Qué es:</b> La tasa E.A. (efectiva anual) es la que aparece en el extracto o pagaré del cliente. El simulador la convierte internamente a tasa mensual para calcular la cuota.</div>
-          <div class="r"><b>Ejemplo:</b> Una tarjeta al 28% E.A. equivale a ≈2.08% mensual — no dividas 28 entre 12.</div>
+          <div class="r"><b>Qué es:</b> La tasa E.A. (efectiva anual) es la que aparece en el extracto o pagaré de tu cliente. El simulador la convierte internamente a tasa mensual para calcular la cuota.</div>
+          <div class="r"><b>Ejemplo:</b> Una tarjeta al 28% E.A. equivale a ≈2.08% mensual, no dividas 28 entre 12.</div>
           <div class="r"><b>Por qué importa:</b> Usar la mensual en el campo E.A. subestima el costo real de la deuda.</div>
         </div>
       </details>
 
-      <div class="btn-row" style="justify-content:flex-end;">
-        <button class="btn btn-primary" id="next0" type="button" onclick="goToStep(1)">
-          Continuar
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
-      </div>
+      <!-- Sin botón de navegación: el escenario consolidado sigue justo debajo (pantalla única, ver plan de mejoras Fase 1) -->
     </div>
   </section>
 
-  <!-- ============ PASO 1 · ESCENARIO CONSOLIDADO ============ -->
-  <section class="panel" id="panel-1" aria-labelledby="t1">
+  <!-- ============ ESCENARIO CONSOLIDADO ============ -->
+  <section aria-labelledby="t1">
     <div class="card">
       <h2 class="card-title" id="t1">Escenario consolidado en Skandia</h2>
-      <p class="card-desc">Simula un crédito único (Crédito Impulso) por el monto total de las deudas actuales.</p>
+      <p class="card-desc">Simula un crédito único (Crédito Impulso) por el monto total de las deudas actuales. Cambia cualquier valor y el resultado de abajo se actualiza al instante.</p>
 
       <div class="grid">
         <div class="field">
@@ -402,7 +377,7 @@
             <input class="in num has-suf" id="eaSk" type="text" inputmode="decimal" value="16,79" aria-describedby="eaSkHelp">
             <span class="suf">%</span>
           </div>
-          <div class="help" id="eaSkHelp">Tasa fija semanal del Crédito Impulso a la fecha de desembolso.</div>
+          <div class="help" id="eaSkHelp">Tasa fija semanal del Crédito Impulso a la fecha de desembolso. <a href="https://www.skandia.co" target="_blank" rel="noopener">Consulta la tasa vigente en skandia.co</a> antes de simular con tu cliente.</div>
         </div>
         <div class="field">
           <label for="rentFvp">Rentabilidad esperada FVP</label>
@@ -414,25 +389,23 @@
         </div>
       </div>
 
-      <p class="card-desc" style="margin:18px 0 0;">El crédito único toma el <b>monto total</b> de las deudas y el <b>plazo promedio</b> de las mismas. Crédito Impulso tiene periodicidad anual: si el cliente renueva por un plazo igual, al final de cada año paga los intereses causados.</p>
-
-      <div class="btn-row split">
-        <button class="btn btn-secondary" type="button" onclick="goToStep(0)">Atrás</button>
-        <button class="btn btn-primary" type="button" onclick="goToStep(2)">
-          Ver comparación
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
+      <div class="alert alert-info" style="margin-top:18px;">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+        <div class="body"><div class="msg">El crédito único toma el <b>monto total</b> de las deudas y el <b>plazo promedio ponderado</b> de estas —no un plazo fijo— porque la mayoría de los clientes hace varios ciclos de renovación. Como Crédito Impulso tiene periodicidad anual, si tu cliente renueva por un plazo igual, paga los intereses causados al final de cada año.</div></div>
       </div>
+
+      <!-- Sin botón de navegación: el resultado sigue justo debajo -->
     </div>
   </section>
+  </div><!-- /captureSection -->
 
-  <!-- ============ PASO 2 · COMPARACIÓN ============ -->
-  <section class="panel" id="panel-2" aria-labelledby="t2">
+  <!-- ============ COMPARACIÓN (RESULTADO) ============ -->
+  <section id="resultSection" aria-labelledby="t2">
     <!-- Banner neutro (info) -->
     <div class="result" role="status" aria-live="polite">
       <div class="tag">Resultado</div>
       <div class="headline" id="resHeadline">—</div>
-      <div class="sub">Revisa el detalle antes de compartirlo con tu cliente. Este simulador muestra el dato; la decisión es del cliente.</div>
+      <div class="sub">Revisa el detalle antes de compartirlo con tu cliente. Este simulador muestra el dato; la decisión es de tu cliente.</div>
     </div>
 
     <div class="card">
@@ -459,40 +432,45 @@
         </div>
       </div>
 
-      <!-- Tabla comparativa -->
-      <div class="table-scroll">
-        <table class="compare">
-          <thead>
-            <tr>
-              <th class="concept" scope="col">Concepto</th>
-              <th scope="col">Deudas actuales</th>
-              <th scope="col" class="col-sk">Crédito único Skandia</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td class="concept">Monto</td><td id="cMontoAct">—</td><td class="col-sk" id="cMontoSk">—</td></tr>
-            <tr><td class="concept">Cuota / provisión mensual</td><td id="cCuotaAct">—</td><td class="col-sk" id="cCuotaSk">—</td></tr>
-            <tr><td class="concept" id="cIntConcept">Intereses totales en el plazo</td><td id="cIntAct">—</td><td class="col-sk" id="cIntSk">—</td></tr>
-            <tr class="diff"><td class="concept">Diferencia en intereses</td><td colspan="2" id="cDiff" style="text-align:right;">—</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="compare-note" id="plazoNote">Plazo de comparación: — meses (promedio de las deudas actuales).</p>
+      <!-- Detalle numérico completo, en acordeón (gráfica primero — ver plan de mejoras Fase 3) -->
+      <details class="help-block detalle-block">
+        <summary><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>Ver detalle numérico completo</summary>
+        <div class="help-body">
+          <div class="table-scroll">
+            <table class="compare">
+              <thead>
+                <tr>
+                  <th class="concept" scope="col">Concepto</th>
+                  <th scope="col">Deudas actuales</th>
+                  <th scope="col" class="col-sk">Crédito único Skandia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="concept">Monto</td><td id="cMontoAct">—</td><td class="col-sk" id="cMontoSk">—</td></tr>
+                <tr><td class="concept">Cuota / provisión mensual</td><td id="cCuotaAct">—</td><td class="col-sk" id="cCuotaSk">—</td></tr>
+                <tr><td class="concept" id="cIntConcept">Intereses totales en el plazo</td><td id="cIntAct">—</td><td class="col-sk" id="cIntSk">—</td></tr>
+                <tr class="diff"><td class="concept">Diferencia en intereses</td><td colspan="2" id="cDiff" style="text-align:right;">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="compare-note" id="plazoNote">Plazo de comparación: — meses.</p>
 
-      <!-- Sub-escenario FVP opcional -->
-      <div class="subscene">
-        <h3 class="card-title">Si el cliente invierte la provisión mensual en su FVP</h3>
-        <p class="card-desc" style="margin-bottom:0;">Escenario opcional: en vez de pagar las cuotas dispersas, el cliente destina la provisión mensual del crédito único a su Fondo Voluntario de Pensiones.</p>
-        <div class="stat-row">
-          <div class="stat"><div class="k">Valor final proyectado</div><div class="v" id="fvpFinal">—</div></div>
-          <div class="stat"><div class="k">Rentabilidad generada</div><div class="v" id="fvpRent">—</div></div>
+          <!-- Sub-escenario FVP opcional -->
+          <div class="subscene">
+            <h3 class="card-title">Si tu cliente invierte la provisión mensual en su FVP</h3>
+            <p class="card-desc" style="margin-bottom:0;">Escenario opcional: en vez de pagar las cuotas dispersas, tu cliente destina la provisión mensual del crédito único a su Fondo Voluntario de Pensiones.</p>
+            <div class="stat-row">
+              <div class="stat"><div class="k">Valor final proyectado</div><div class="v" id="fvpFinal">—</div></div>
+              <div class="stat"><div class="k">Rentabilidad generada</div><div class="v" id="fvpRent">—</div></div>
+            </div>
+          </div>
         </div>
-      </div>
+      </details>
 
       <details class="help-block">
         <summary><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>Cómo leer esta comparación</summary>
         <div class="help-body">
-          <div class="r"><b>Intereses totales:</b> lo que el cliente paga en intereses durante el plazo, sumando todas las deudas actuales vs. el crédito único.</div>
+          <div class="r"><b>Intereses totales:</b> lo que tu cliente paga en intereses durante el plazo, sumando todas las deudas actuales vs. el crédito único.</div>
           <div class="r"><b>Provisión mensual:</b> lo que tendría que apartar cada mes para el crédito único (Crédito Impulso paga capital e intereses al final del plazo).</div>
           <div class="r"><b>Diferencia:</b> es un dato, no una recomendación. Compárala con tu cliente y deja que decida.</div>
         </div>
@@ -500,13 +478,12 @@
 
       <!-- Disclaimer en capas -->
       <div class="disclaimer">
-        <p class="main">Esta simulación es una guía para tu conversación con el cliente — no es la última palabra sobre su situación crediticia.</p>
+        <p class="main">Esta simulación es una guía para tu conversación con tu cliente, no es la última palabra sobre su situación crediticia.</p>
         <p class="legal">Los cálculos se basan en la información ingresada y en la tasa Skandia vigente en la fecha indicada al pie de la página; asumen tasa fija. Esta información es de carácter informativo y no constituye asesoría financiera, tributaria o legal. Los valores reales pueden variar según las condiciones finales de aprobación y las políticas vigentes de Skandia.</p>
       </div>
 
-      <div class="btn-row split">
-        <button class="btn btn-secondary" type="button" onclick="goToStep(1)">Atrás</button>
-        <button class="btn btn-tertiary" type="button" onclick="alert('En la versión final: guardar o exportar el resultado para dejarlo con el cliente.')">
+      <div class="btn-row" style="justify-content:flex-end;">
+        <button class="btn btn-tertiary" type="button" onclick="exportResult()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Guardar / exportar
         </button>
@@ -514,12 +491,39 @@
     </div>
   </section>
 
-  <footer class="sim-footer" id="simFooter" style="display:none;">
+  <footer class="sim-footer" id="simFooter">
     <div class="vigencia" role="note">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Tasa Skandia vigente para la semana del 27 de julio de 2026 · se actualiza cada semana
     </div>
   </footer>
+
+  <!-- Texto legal completo (fuente: Mayo2026-Simulador de creditos.xlsx, validado por cumplimiento normativo) -->
+  <section class="legal-section">
+    <details class="help-block" id="legalTerms">
+      <summary><span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>Ver términos y condiciones completos</summary>
+      <div class="help-body">
+        <p class="legal-title">Ejemplo comparativo — condiciones de deuda actuales versus préstamo con Skandia</p>
+        <p>Antes de usar esta herramienta, ten en cuenta los siguientes aspectos:</p>
+        <ol>
+          <li>La herramienta tiene como único objetivo ilustrar, de manera comparativa, las condiciones financieras de las deudas actuales del usuario frente a la alternativa de consolidarlas en un crédito único con Skandia Créditos.</li>
+          <li>Los cálculos se realizan con base en la información ingresada por el usuario (monto, tasa y plazo), a partir de supuestos generales de tasas de interés y esquemas de pago.</li>
+          <li>Esta herramienta no determina con exactitud tasas, cuotas ni intereses, y no reemplaza la simulación oficial que realizan los sistemas de Skandia al momento de solicitar el crédito.</li>
+          <li>Los resultados presentados son solo ilustrativos: no constituyen asesoría financiera personalizada, ni recomendación de endeudamiento, inversión o decisión contractual.</li>
+          <li>Las condiciones finales de aprobación —monto, plazo, tasa y demás características del crédito— dependen de las políticas de Skandia y de la evaluación individual de cada cliente.</li>
+          <li>El simulador no contempla escenarios específicos, como variaciones en la tasa de interés, gastos adicionales de otros créditos, seguros obligatorios o comisiones que puedan aplicar en entidades externas.</li>
+          <li>Esta información no debe ser tu único fundamento para tomar decisiones de endeudamiento o inversión. Se recomienda consultar con un asesor financiero antes de decidir.</li>
+          <li>Skandia no asume responsabilidad alguna por decisiones tomadas con base en los resultados de esta herramienta, ni por errores de digitación o supuestos que no se ajusten a la realidad de cada usuario.</li>
+          <li>El uso de esta herramienta no genera relación contractual ni obliga a vincularse con los productos del Conglomerado Skandia.</li>
+          <li>Los porcentajes de interés y los beneficios proyectados en esta herramienta no garantizan ahorro, rentabilidad ni condiciones definitivas del crédito.</li>
+        </ol>
+        <p>Esta calculadora es propiedad exclusiva de Skandia Colombia. Se prohíbe su distribución no autorizada; su uso está reservado a la fuerza comercial, en los términos aquí previstos.</p>
+        <p>**El Conglomerado Financiero Skandia Colombia está conformado por las compañías: Skandia Holding de Colombia S.A.; Skandia Pensiones y Cesantías S.A.; Skandia Fiduciaria S.A.; Skandia Seguros de Vida S.A. y Skandia Valores S.A. Sociedad Comisionista de Bolsa.</p>
+        <p class="legal-title">Aceptación de términos</p>
+        <p style="margin-bottom:0;">Al utilizar esta herramienta, el usuario acepta expresamente los términos y condiciones aquí expuestos, y reconoce que comprende la naturaleza informativa de la misma, así como la limitación de responsabilidad del proveedor de la herramienta.</p>
+      </div>
+    </details>
+  </section>
 
 </div>
 
@@ -659,10 +663,9 @@ function recalc(){
   document.getElementById('tCuota').textContent = fmtCOP(sumCuota);
   document.getElementById('tInt').textContent = fmtCOP(sumInt);
 
-  // Validación paso 0
+  // Validación de datos mínimos
   const hasData = totalMonto>0;
   document.getElementById('emptyWarn').style.display = hasData ? 'none' : 'flex';
-  document.getElementById('next0').disabled = !hasData;
 
   // Escenario consolidado
   const eaSk = parseDecimal(document.getElementById('eaSk').value)/100 || 0;
@@ -718,7 +721,9 @@ function recalc(){
     diffCell.innerHTML = `${fmtCOP(Math.abs(beneficio))} <span style="font-weight:600; font-family:var(--font-body); font-size:12px;">${menos}</span>`;
     diffCell.className = beneficio>=0 ? 'good' : '';
   }
-  document.getElementById('plazoNote').textContent = `Plazo de comparación: ${fmtNum(plazoProm,0)} meses (promedio de las deudas actuales).`;
+  document.getElementById('plazoNote').textContent = hasData
+    ? `Plazo de comparación: ${fmtNum(plazoProm,0)} meses. Es el promedio de los plazos de las deudas que registraste arriba, no un valor fijo, para reflejar los ciclos de renovación reales de tu cliente.`
+    : 'Plazo de comparación: — meses.';
 
   // ---- Sub-escenario FVP ----
   const valorFinal = fvAnnuity(rentFvp/12, plazoProm, provision);
@@ -727,38 +732,13 @@ function recalc(){
   document.getElementById('fvpRent').textContent = fmtCOP(rentGen);
 }
 
-/* ---------- Stepper + navegación ---------- */
-const steps = ['Deudas','Escenario consolidado','Comparación'];
-let currentStep = 0;
-const checkSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
-
-function renderStepper(){
-  const el = document.getElementById('stepper');
-  el.innerHTML = steps.map((s,i)=>{
-    const state = i<currentStep ? 'done' : (i===currentStep ? 'active' : '');
-    return `<li class="step-item ${state}" ${i===currentStep?'aria-current="step"':''}>
-      <span class="step-marker"><span class="num">${i+1}</span>${checkSVG}</span>
-      <span class="step-label">${s}</span>
-    </li>`;
-  }).join('');
-}
-function goToStep(n){
-  if(n>0 && document.getElementById('next0').disabled){ return; } // no avanzar sin datos
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+n).classList.add('active');
-  currentStep = n;
-  renderStepper();
-  // El badge de vigencia solo aparece donde se nombra la tasa Skandia (Escenario consolidado y Comparación)
-  document.getElementById('simFooter').style.display = (n === 0) ? 'none' : 'flex';
-  if(n===2) recalc();
-  window.scrollTo({top:0, behavior:'smooth'});
-}
+/* ---------- Exportar (ver plan de mejoras Fase 4) ---------- */
+function exportResult(){ window.print(); }
 
 document.getElementById('eaSk').addEventListener('input', recalc);
 document.getElementById('rentFvp').addEventListener('input', recalc);
 
 renderRows();
-renderStepper();
 recalc();
 </script>
 </body>
