@@ -4,13 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Propuesta v1 — Simulador Retiro FVP/PAC | Skandia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap');
-
   :root{
     --sk-primary:#00c73d;
     --sk-primary-hover:#03a835;
     --sk-primary-pressed:#009a2f;
+    /* dataviz (paleta oficial de gráficas: Tokens/semantic-color.css --charts-c01/c03,
+       alias de Tokens/primitive-color.css --extras-c01/c03, SkCo.Fidu.DesignSystem.Lib.UX) */
+    --sk-chart-actual:#60a9a6; --sk-chart-credito:#a1dd70;
     --sk-primary-tint:#caf9cb;
     --sk-surface-0:#ffffff;
     --sk-surface-800:#404040;
@@ -39,7 +43,7 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:var(--font-body);background:var(--sk-n1);color:var(--sk-surface-800);-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 var(--sk-space-lg) 80px /* excepción: 80px, ningún token --sk-space-* se ajusta sin alterar el aire inferior de página/scroll */;}
 
   /* Foco visible consistente en todo elemento interactivo (teclado) */
   a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
@@ -49,42 +53,42 @@
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
   }
-  .header{display:flex;align-items:center;gap:10px;margin:24px 0 20px;}
-  .brand-mark{width:36px;height:36px;border-radius:9px;background:var(--sk-primary);display:flex;align-items:center;justify-content:center;font-family:var(--font-brand);font-weight:800;color:#fff;font-size:16px;flex:none;}
-  .brand-name{font-weight:800;letter-spacing:0.3px;font-size:15px;}
+  .header{display:flex;align-items:center;gap:var(--sk-space-sm);margin:var(--sk-space-lg) 0 var(--sk-space-lg);}
+  .brand{display:flex;flex-direction:column;gap:var(--sk-space-xs);}
+  .brand-logo{width:132px;height:auto;display:block;}
   .brand-sub{font-size:11px;color:var(--sk-n4);font-weight:600;}
 
-  h1{font-size:23px;font-weight:800;margin:0 0 4px;}
-  .subtitle{font-size:13.5px;color:var(--sk-n4);font-weight:500;max-width:680px;line-height:1.5;margin:0 0 22px;}
+  h1{font-size:22px;font-weight:800;margin:0 0 var(--sk-space-xs);}
+  .subtitle{font-size:14px;color:var(--sk-n4);font-weight:500;max-width:680px;line-height:1.5;margin:0 0 var(--sk-space-lg);}
 
   /* Cards */
-  .card{background:var(--sk-surface-0);border:1px solid var(--sk-n3);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 2px rgba(0,0,0,0.03);}
-  .card-title{font-size:14px;font-weight:800;margin-bottom:4px;}
-  .card-desc{font-size:12.5px;color:var(--sk-n4);margin-bottom:18px;font-weight:500;}
+  .card{background:var(--sk-surface-0);border:1px solid var(--sk-n3);border-radius:var(--radius);padding:var(--sk-space-lg);margin-bottom:var(--sk-space-md);box-shadow:0 1px 2px rgba(0,0,0,0.03);}
+  .card-title{font-size:14px;font-weight:800;margin-bottom:var(--sk-space-xs);}
+  .card-desc{font-size:13px;color:var(--sk-n4);margin-bottom:var(--sk-space-md);font-weight:500;}
 
   /* sk-radio (fallback visual, mismo API real: name, value, selectedValue) */
   .radio-card{
-    display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--sk-n3);border-radius:var(--sk-radius-md);
-    padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s var(--sk-ease), background .15s var(--sk-ease);
+    display:flex;gap:var(--sk-space-md);align-items:flex-start;border:1.5px solid var(--sk-n3);border-radius:var(--sk-radius-md);
+    padding:var(--sk-space-md);margin-bottom:var(--sk-space-sm);cursor:pointer;transition:border-color .15s var(--sk-ease), background .15s var(--sk-ease);
   }
   .radio-card:hover{border-color:var(--sk-primary);}
   .radio-card:focus-visible{outline:2px solid var(--sk-primary-pressed);outline-offset:2px;}
   .radio-card.selected{border-color:var(--sk-primary);background:var(--sk-primary-tint);}
-  .radio-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--sk-n4);flex:none;margin-top:2px;position:relative;}
+  .radio-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--sk-n4);flex:none;margin-top:var(--sk-space-xs);position:relative;}
   .radio-card.selected .radio-dot{border-color:var(--sk-primary);}
   .radio-card.selected .radio-dot::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--sk-primary);}
   .radio-title{font-weight:700;font-size:14px;}
-  .radio-sub{font-size:12.5px;color:var(--sk-n4);margin-top:2px;line-height:1.4;}
-  .support-note{font-size:11.5px;color:var(--sk-n4);margin-top:10px;font-style:italic;}
+  .radio-sub{font-size:13px;color:var(--sk-n4);margin-top:var(--sk-space-xs);line-height:1.4;}
+  .support-note{font-size:12px;color:var(--sk-n4);margin-top:var(--sk-space-sm);font-style:italic;}
 
   /* sk-input-number / sk-input-text / sk-select (fallback visual) */
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
-  .field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--sk-space-md);}
+  .field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px /* excepción: 6px, equidistante entre --sk-space-xs(4) y --sk-space-sm(8), ningún token se ajusta sin alterar el micro-espaciado entre etiqueta y campo */;}
   .field .unit-input{position:relative;}
-  .field .unit-input input{padding-right:32px;}
+  .field .unit-input input{padding-right:var(--sk-space-xl);}
   .field .unit-input span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sk-placeholder);font-weight:600;}
   input[type="text"], input[type="number"], select{
-    width:100%;border:1px solid var(--sk-n3);border-radius:4px;padding:12px 12px;
+    width:100%;border:1px solid var(--sk-n3);border-radius:4px;padding:var(--sk-space-md);
     font-family:var(--font-body);font-size:14px;line-height:1.5;color:var(--sk-surface-800);
     background:var(--sk-surface-0);transition:border-color .15s var(--sk-ease), border-radius .15s var(--sk-ease), box-shadow .15s var(--sk-ease);
   }
@@ -93,18 +97,18 @@
   /* Campos monetarios/numéricos = firma real de sk-input-number (borde transparente + sombra ambiental, foco #00c73d); select y texto = sk-input-text/sk-select */
   input.money, input[type="number"]{border-color:transparent;border-radius:var(--sk-radius-sm);box-shadow:0 0 4px rgba(68,68,68,0.15);}
   input.money:focus, input[type="number"]:focus{border-color:var(--sk-primary);border-radius:var(--sk-radius-sm);box-shadow:0 0 4px rgba(68,68,68,0.15), 0 0 0 3px rgba(0,199,61,0.18);}
-  .field .help{font-size:11px;color:var(--sk-n4);margin-top:5px;line-height:1.5;}
+  .field .help{font-size:11px;color:var(--sk-n4);margin-top:var(--sk-space-xs);line-height:1.5;}
   .field .help a{color:var(--sk-info-border);font-weight:700;text-decoration:none;}
   .field .help a:hover{text-decoration:underline;}
-  .split-note{font-size:11px;color:var(--sk-n4);margin-top:8px;font-weight:500;}
+  .split-note{font-size:11px;color:var(--sk-n4);margin-top:var(--sk-space-sm);font-weight:500;}
   .split-note.warn{
-    display:flex;align-items:flex-start;gap:8px;color:var(--sk-warning-ink);font-weight:700;
+    display:flex;align-items:flex-start;gap:var(--sk-space-sm);color:var(--sk-warning-ink);font-weight:700;
     background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:var(--sk-radius-sm);
-    padding:10px 12px;
+    padding:var(--sk-space-sm) var(--sk-space-md);
   }
 
   /* sk-button (skType primary/secondary/tertiary) */
-  .btn{font-family:var(--font-brand);font-weight:700;font-size:14px;line-height:1;border-radius:100px;padding:12px 22px;cursor:pointer;border:2px solid transparent;display:inline-flex;align-items:center;gap:8px;transition:background .2s,border-color .2s,color .2s,box-shadow .2s;}
+  .btn{font-family:var(--font-brand);font-weight:700;font-size:14px;line-height:1;border-radius:100px;padding:var(--sk-space-md) var(--sk-space-lg);cursor:pointer;border:2px solid transparent;display:inline-flex;align-items:center;gap:var(--sk-space-sm);transition:background .2s,border-color .2s,color .2s,box-shadow .2s;}
   .btn svg{width:16px;height:16px;}
   .btn-primary{background:var(--sk-primary);color:#fff;}
   .btn-primary:hover{background:var(--sk-primary-hover);}
@@ -112,105 +116,112 @@
   .btn-primary:disabled{background:var(--sk-n3);color:var(--sk-n4);cursor:not-allowed;}
   .btn-secondary{background:#fff;color:var(--sk-primary-pressed);border-color:var(--sk-primary);}
   .btn-secondary:hover{background:var(--sk-primary-tint);}
-  .btn-tertiary{background:none;color:var(--sk-primary-pressed);border-color:transparent;padding:10px 12px;}
+  .btn-tertiary{background:none;color:var(--sk-primary-pressed);border-color:transparent;padding:var(--sk-space-sm) var(--sk-space-md);}
   .btn-tertiary:hover{background:var(--sk-tertiary-hover);}
-  .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;}
+  .btn-row{display:flex;gap:var(--sk-space-sm);justify-content:flex-end;margin-top:var(--sk-space-lg);flex-wrap:wrap;}
   .btn-row.split{justify-content:space-between;}
 
   /* sk-alert (4 tipos reales: warning/error/info/success — radio 8px = valor real del componente) */
-  .sk-alert{border-radius:var(--sk-radius-sm);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:500;margin-bottom:16px;backdrop-filter:blur(4px);}
-  .sk-alert .ico{font-size:16px;line-height:1.3;}
+  .sk-alert{border-radius:var(--sk-radius-sm);padding:var(--sk-space-md);display:flex;gap:var(--sk-space-sm);align-items:flex-start;font-size:13px;font-weight:500;margin-bottom:var(--sk-space-md);backdrop-filter:blur(4px);}
+  .sk-alert .ico{font-size:18px;line-height:1.3;}
   .sk-alert-info{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);color:var(--sk-info-ink);}
   .sk-alert-warning{background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);color:var(--sk-warning-ink);}
   .sk-alert-success{background:var(--sk-success-bg);border:1px solid #3fae63;color:#1a5c33;}
-  .sk-alert-title{font-weight:800;margin-bottom:2px;}
+  .sk-alert-title{font-weight:800;margin-bottom:var(--sk-space-xs);}
 
   /* Resultado banner (sk-alert success — decisión de producto: diferenciarlo de la alerta info de capital/rendimientos, ver ajuste de agosto 2026) */
-  .result-banner{background:var(--sk-success-bg);border:1px solid #3fae63;border-radius:var(--sk-radius-sm);padding:20px 22px;margin-bottom:6px;}
-  .result-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--sk-success-ink);opacity:0.8;margin-bottom:6px;}
-  .result-title{font-size:17px;font-weight:800;color:var(--sk-success-ink);line-height:1.4;}
-  .result-sub{font-size:12.5px;color:var(--sk-success-ink);opacity:0.85;margin-top:6px;font-weight:500;}
+  .result-banner{background:var(--sk-success-bg);border:1px solid #3fae63;border-radius:var(--sk-radius-sm);padding:var(--sk-space-lg);margin-bottom:6px /* excepción: 6px, equidistante entre --sk-space-xs(4) y --sk-space-sm(8), ningún token se ajusta sin alterar el aire fino bajo el banner de resultado */;}
+  .result-tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--sk-success-ink);opacity:0.8;margin-bottom:6px /* excepción, ver nota en .result-banner */;}
+  .result-title{font-size:18px;font-weight:800;color:var(--sk-success-ink);line-height:1.4;}
+  .result-sub{font-size:13px;color:var(--sk-success-ink);opacity:0.85;margin-top:6px /* excepción, ver nota en .result-banner */;font-weight:500;}
 
-  /* Visualización comparativa (gráfica antes que tabla — ver plan de mejoras, Fase 3) */
-  .compare-viz{margin:4px 0 18px;}
-  .viz-row{margin-bottom:16px;}
-  .viz-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
-  .viz-title{font-family:var(--font-brand);font-size:12px;font-weight:700;color:var(--sk-surface-800);}
-  .viz-meta{font-size:12px;color:var(--sk-n4);font-variant-numeric:tabular-nums;}
-  .viz-meta b{color:var(--sk-surface-800);font-weight:700;}
-  .viz-bar{display:flex;height:34px;border-radius:var(--sk-radius-sm);overflow:hidden;background:var(--sk-surface-100);border:1px solid var(--sk-surface-200);}
-  .viz-seg{display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;font-size:11px;font-weight:700;padding:0 8px;min-width:2px;font-family:var(--font-brand);color:#fff;transition:width .2s var(--sk-ease);}
-  .viz-seg.hoy{background:var(--sk-surface-600);}
-  .viz-seg.credito{background:var(--sk-primary);}
-  .viz-caption{font-size:12px;color:var(--sk-n4);margin-top:2px;line-height:1.5;}
+  /* Variante neutral: cuando Crédito Impulso cuesta MÁS que la alternativa (s.ahorro < 0),
+     el banner no debe leerse como "éxito" (verde) — ver recalc() */
+  .result-banner--neutral{background:var(--sk-n1);border-color:var(--sk-n3);}
+  .result-banner--neutral .result-tag,.result-banner--neutral .result-title,.result-banner--neutral .result-sub{color:var(--sk-surface-800);opacity:1;}
+
+  /* Gráfica comparativa de columnas (costo total, hoy vs. Crédito Impulso — reemplaza la
+     barra de 2 segmentos anterior; colores en --sk-chart-actual/--sk-chart-credito) */
+  .compare-chart{margin:var(--sk-space-xs) 0 var(--sk-space-md);}
+  .chart-svg{width:100%;height:274px;display:block;overflow:visible;}
+  .chart-title{font-family:var(--font-brand);font-size:13px;font-weight:800;fill:var(--sk-surface-800);}
+  .chart-axis{stroke:var(--sk-surface-200);stroke-width:1;}
+  .chart-grid line{stroke:var(--sk-n2);stroke-width:1;}
+  .chart-grid text{font-family:var(--font-body);font-size:11px;fill:var(--sk-n4);}
+  .chart-bar{transition:height .2s var(--sk-ease), y .2s var(--sk-ease);}
+  .chart-bar-actual{fill:var(--sk-chart-actual);}
+  .chart-bar-credito{fill:var(--sk-chart-credito);}
+  .chart-value-label{font-family:var(--font-brand);font-size:11px;font-weight:800;fill:var(--sk-surface-800);font-variant-numeric:tabular-nums;}
+  .chart-cat-label{font-family:var(--font-brand);font-size:11px;font-weight:700;fill:var(--sk-n4);}
+  .chart-summary{margin-top:var(--sk-space-sm);}
   details.detalle-block .help-body{background:none;border:none;padding:0;}
 
-  table.line-table{width:100%;border-collapse:collapse;margin-top:14px;}
-  .line-table td{padding:9px 4px;font-size:13px;border-bottom:1px solid var(--sk-n2);}
+  table.line-table{width:100%;border-collapse:collapse;margin-top:var(--sk-space-md);}
+  .line-table td{padding:var(--sk-space-sm) var(--sk-space-xs);font-size:13px;border-bottom:1px solid var(--sk-n2);}
   .line-table td.lbl{color:var(--sk-n4);font-weight:500;}
   .line-table td.val{text-align:right;font-weight:700;color:var(--sk-surface-800);white-space:nowrap;font-variant-numeric:tabular-nums;}
   .line-table tr.subtotal td{background:var(--sk-n1);font-weight:800;border-top:1.5px solid var(--sk-n3);}
   .line-table tr.final td{background:var(--sk-primary-tint);font-weight:800;font-size:14px;color:var(--sk-primary-pressed);border-top:2px solid var(--sk-primary);}
-  .term-ico{cursor:pointer;color:var(--sk-info-border);font-weight:800;margin-left:4px;text-decoration:none;}
+  .term-ico{cursor:pointer;color:var(--sk-info-border);font-weight:800;margin-left:var(--sk-space-xs);text-decoration:none;}
 
   /* Ayuda inline (fallback <details>/<summary> — no existe sk-tooltip, ver wireframes sección 1) */
-  .help-block{margin-top:18px;}
-  .help-block summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--sk-surface-800);padding:4px 0;transition:color .15s var(--sk-ease);}
+  .help-block{margin-top:var(--sk-space-md);}
+  .help-block summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--sk-surface-800);padding:var(--sk-space-xs) 0;transition:color .15s var(--sk-ease);}
   .help-block[open] summary{color:var(--sk-primary-pressed);}
-  .help-body{background:var(--sk-n1);border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);padding:14px 16px;margin-top:6px;font-size:12.5px;line-height:1.6;}
-  .help-body .row{margin-bottom:8px;}
+  .help-body{background:var(--sk-n1);border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);padding:var(--sk-space-md);margin-top:6px /* excepción: 6px, equidistante entre --sk-space-xs(4) y --sk-space-sm(8), ningún token se ajusta sin alterar el aire fino bajo el summary */;font-size:13px;line-height:1.6;}
+  .help-body .row{margin-bottom:var(--sk-space-sm);}
   .help-body .row b{color:var(--sk-surface-800);}
-  .help-body p{margin:0 0 10px;}
+  .help-body p{margin:0 0 var(--sk-space-sm);}
   .help-body p.legal-title{font-weight:800;color:var(--sk-surface-800);}
-  .help-body ol{margin:0 0 10px;padding-left:20px;}
-  .help-body ol li{margin-bottom:8px;}
-  .legal-section{margin-top:24px;padding-top:20px;border-top:1px solid var(--sk-n3);}
-  .help-condensed{font-size:12.5px;color:var(--sk-n4);margin-top:2px;line-height:1.5;}
+  .help-body ol{margin:0 0 var(--sk-space-sm);padding-left:var(--sk-space-lg);}
+  .help-body ol li{margin-bottom:var(--sk-space-sm);}
+  .legal-section{margin-top:var(--sk-space-lg);padding-top:var(--sk-space-lg);border-top:1px solid var(--sk-n3);}
+  .help-condensed{font-size:13px;color:var(--sk-n4);margin-top:var(--sk-space-xs);line-height:1.5;}
   .help-condensed .ver-ejemplo{color:var(--sk-primary-pressed);font-weight:700;cursor:pointer;}
 
-  .vigencia-badge{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--sk-warning-ink);background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:var(--sk-radius-pill);padding:5px 12px;width:fit-content;max-width:100%;margin:0 auto var(--sk-space-md);text-align:center;}
+  .vigencia-badge{display:flex;align-items:center;gap:6px /* excepción: 6px, equidistante entre --sk-space-xs(4) y --sk-space-sm(8), ningún token se ajusta sin alterar el gap ícono-texto del badge */;font-size:11px;font-weight:700;color:var(--sk-warning-ink);background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:var(--sk-radius-pill);padding:var(--sk-space-xs) var(--sk-space-md);width:fit-content;max-width:100%;margin:0 auto var(--sk-space-md);text-align:center;}
 
   .disclaimer-block{margin-top:var(--sk-space-lg);}
-  .disclaimer-main{font-size:12.5px;color:var(--sk-surface-800);font-weight:600;line-height:1.6;margin-bottom:8px;}
-  .disclaimer-legal{font-size:10.5px;line-height:1.6;color:var(--sk-n4);font-weight:500;background:var(--sk-n1);border-radius:var(--sk-radius-sm);padding:12px 14px;}
+  .disclaimer-main{font-size:13px;color:var(--sk-surface-800);font-weight:600;line-height:1.6;margin-bottom:var(--sk-space-sm);}
+  .disclaimer-legal{font-size:11px;line-height:1.6;color:var(--sk-n4);font-weight:500;background:var(--sk-n1);border-radius:var(--sk-radius-sm);padding:var(--sk-space-md);}
 
   /* Voz de marca (Montserrat) en títulos, etiquetas y acciones; el resto hereda Open Sans */
-  h1, .brand-name, .card-title, .field label, .result-title, .result-tag,
+  h1, .card-title, .field label, .result-title, .result-tag,
   .vigencia-badge, .radio-title, .disclaimer-main{
     font-family:var(--font-brand);
   }
   /* Pill de audiencia explícita (jerarquía real, no subtítulo 11px) */
-  .audience-tag{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-brand);font-weight:700;font-size:11px;letter-spacing:0.4px;text-transform:uppercase;color:var(--sk-surface-800);background:var(--sk-surface-100);border:1px solid var(--sk-surface-200);border-radius:var(--sk-radius-pill);padding:6px 12px;}
+  .audience-tag{margin-left:auto;display:inline-flex;align-items:center;gap:6px /* excepción: 6px, equidistante entre --sk-space-xs(4) y --sk-space-sm(8), ningún token se ajusta sin alterar el gap ícono-texto del tag */;font-family:var(--font-brand);font-weight:700;font-size:11px;letter-spacing:0.4px;text-transform:uppercase;color:var(--sk-surface-800);background:var(--sk-surface-100);border:1px solid var(--sk-surface-200);border-radius:var(--sk-radius-pill);padding:6px var(--sk-space-md) /* 6px vertical: misma excepción */;}
   .audience-tag svg{width:14px;height:14px;}
   /* Chevron de ayuda inline sin depender de emoji */
-  .help-block summary{list-style:none;display:flex;align-items:center;gap:8px;}
+  .help-block summary{list-style:none;display:flex;align-items:center;gap:var(--sk-space-sm);}
   .help-block summary::-webkit-details-marker{display:none;}
   .help-block summary::before{content:'';width:7px;height:7px;border-right:2px solid var(--sk-n4);border-bottom:2px solid var(--sk-n4);transform:rotate(-45deg);transition:transform .15s var(--sk-ease);flex:none;}
   .help-block[open] summary::before{transform:rotate(45deg);border-color:var(--sk-primary-pressed);}
   /* Íconos SVG en avisos de validación y vigencia */
-  .split-note .wico{width:16px;height:16px;flex:none;margin-top:1px;}
+  .split-note .wico{width:16px;height:16px;flex:none;margin-top:1px /* excepción: 1px, ningún token --sk-space-* se ajusta sin desalinear verticalmente el ícono respecto al texto */;}
   .vigencia-badge svg{width:15px;height:15px;flex:none;}
   /* Footer de vigencia al pie de la página, fuera de las tarjetas */
-  .sim-footer{margin-top:28px;display:flex;justify-content:center;}
+  .sim-footer{margin-top:var(--sk-space-xl);display:flex;justify-content:center;}
   .sim-footer .vigencia-badge{margin:0;}
 
   /* sk-dialog (componente real del DS, ver SkCo.Fidu.DesignSystem.Lib.UX/src/app/components/sk-dialog): overlay modal + header/body/footer, replicado en HTML/CSS plano */
-  .sk-dialog-overlay{display:none;position:fixed;inset:0;background:rgba(33,37,41,.5);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+  .sk-dialog-overlay{display:none;position:fixed;inset:0;background:rgba(33,37,41,.5);z-index:1000;align-items:center;justify-content:center;padding:var(--sk-space-lg);}
   .sk-dialog-overlay.open{display:flex;}
   .sk-dialog-panel{background:var(--sk-surface-0);border-radius:var(--radius);border:1px solid var(--sk-n3);box-shadow:0 8px 24px rgba(0,0,0,.16);width:100%;max-width:400px;max-height:90vh;overflow-y:auto;}
-  .sk-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--sk-n2);}
-  .sk-dialog-header h3{font-family:var(--font-brand);font-size:15px;font-weight:800;color:var(--sk-surface-800);margin:0;}
-  .sk-dialog-close{background:none;border:none;cursor:pointer;color:var(--sk-n4);padding:4px;display:flex;border-radius:var(--sk-radius-sm);}
+  .sk-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:var(--sk-space-md);padding:var(--sk-space-md) var(--sk-space-lg);border-bottom:1px solid var(--sk-n2);}
+  .sk-dialog-header h3{font-family:var(--font-brand);font-size:14px;font-weight:800;color:var(--sk-surface-800);margin:0;}
+  .sk-dialog-close{background:none;border:none;cursor:pointer;color:var(--sk-n4);padding:var(--sk-space-xs);display:flex;border-radius:var(--sk-radius-sm);}
   .sk-dialog-close:hover{color:var(--sk-surface-800);background:var(--sk-n1);}
   .sk-dialog-close svg{width:18px;height:18px;}
-  .sk-dialog-body{padding:16px 20px;font-size:12.5px;line-height:1.6;color:var(--sk-surface-800);}
-  .sk-dialog-body .row{margin-bottom:8px;}
+  .sk-dialog-body{padding:var(--sk-space-md) var(--sk-space-lg);font-size:13px;line-height:1.6;color:var(--sk-surface-800);}
+  .sk-dialog-body .row{margin-bottom:var(--sk-space-sm);}
   .sk-dialog-body .row b{color:var(--sk-surface-800);}
-  .sk-dialog-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px 18px;}
+  .sk-dialog-footer{display:flex;justify-content:flex-end;gap:var(--sk-space-sm);padding:var(--sk-space-md) var(--sk-space-lg) var(--sk-space-md);}
 
   @media (max-width:600px){
-    h1{font-size:19px;}
-    .card{padding:16px;}
+    h1{font-size:18px;}
+    .card{padding:var(--sk-space-md);}
     .audience-tag{margin-left:0;}
   }
 
@@ -219,7 +230,7 @@
     .audience-tag, .subtitle, #captureSection, .btn-row{display:none !important;}
     details{display:block !important;}
     details > summary{display:none !important;}
-    .legal-section{border-top:none;margin-top:12px;}
+    .legal-section{border-top:none;margin-top:var(--sk-space-md);}
   }
 </style>
 </head>
@@ -228,9 +239,21 @@
 <div class="wrap">
 
   <header class="header">
-    <div class="brand-mark">Sk</div>
-    <div>
-      <div class="brand-name">SKANDIA</div>
+    <div class="brand">
+      <svg class="brand-logo" viewBox="0 0 280 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Skandia">
+        <g clip-path="url(#logoClip)">
+          <path d="M62.0001 34.4076C52.8491 31.9373 52.7944 27.3199 52.8491 24.5232C52.9124 20.0347 58.3408 15.8726 64.7474 15.8726C70.8261 15.8726 77.2327 18.5376 77.2988 25.9545H68.7318C68.6685 23.6645 66.718 23.2866 65.2796 23.2866C63.3205 23.2866 62.0116 24.1969 62.0778 25.5766C62.1411 26.4869 62.9408 27.4001 64.7589 27.8667L69.9371 29.2321C77.3247 31.2359 78.2395 36.1281 78.2395 38.0775C78.2395 44.5182 71.4388 47.5726 65.0322 47.5726C58.8241 47.5726 52.3514 43.8656 52.2881 37.1013H60.7832C60.8494 38.8589 62.797 40.6137 65.294 40.6137C67.3078 40.5478 69.0338 39.6376 69.0338 38.0775C69.0338 36.775 68.2485 36.0737 66.0276 35.4754L62.0001 34.4076Z" fill="#404040"/>
+          <path d="M92.2609 46.8974H83.2422V0H92.2609V24.8442L99.519 16.5198H111.089L98.4086 29.9195L113.635 46.8974H102.459L92.2609 34.8632V46.8974Z" fill="#404040"/>
+          <path d="M137.144 43.4505C135.179 46.3789 130.608 47.481 128.255 47.481C120.459 47.481 112.691 41.4324 112.691 31.6768C112.691 21.9212 120.459 15.8726 128.252 15.8726C130.211 15.8726 134.788 16.5195 137.141 19.9059V16.5195H146.16V46.897H137.144V43.4505ZM129.756 38.899C133.496 38.899 137.144 36.2311 137.144 31.6768C137.144 27.1224 133.482 24.4545 129.756 24.4545C125.965 24.4545 122.107 27.3171 122.107 31.6768C122.107 36.0365 125.965 38.899 129.756 38.899Z" fill="#404040"/>
+          <path d="M163.611 46.897H154.518V16.5195H163.611V20.945C165.242 17.8878 168.838 15.8726 172.434 15.8726C179.295 15.8726 183.613 20.0977 183.613 28.7541V46.8999H174.52V30.7006C174.52 26.6673 172.296 24.652 169.227 24.652C166.022 24.652 163.605 26.2121 163.605 30.8294L163.611 46.897Z" fill="#404040"/>
+          <path d="M213.601 46.8972V43.1272C212.099 45.9239 208.437 47.547 204.645 47.547C196.8 47.547 189.873 41.3696 189.873 31.8029C189.873 22.0473 196.8 15.8698 204.645 15.8698C208.437 15.8698 212.099 17.4299 213.601 20.2267V-0.00878906H222.622V46.8972H213.601ZM206.345 24.3917C202.488 24.3917 199.283 27.2543 199.283 31.6139C199.283 36.1024 202.488 38.9621 206.345 38.9621C210.137 38.9621 213.405 35.9679 213.405 31.6139C213.405 27.0596 210.074 24.3917 206.345 24.3917Z" fill="#404040"/>
+          <path d="M235.49 -0.00878906C238.56 -0.00878906 241.045 2.28126 241.045 5.25833C241.045 8.23539 238.56 10.5913 235.49 10.5913C232.421 10.5913 229.8 8.24684 229.8 5.25833C229.8 2.26981 232.418 -0.00878906 235.49 -0.00878906ZM239.998 46.8857H230.979V16.5196H239.998V46.8857Z" fill="#404040"/>
+          <path d="M270.981 43.4505C269.019 46.3789 264.445 47.481 262.092 47.481C254.31 47.481 246.531 41.4324 246.531 31.6768C246.531 21.9212 254.299 15.8726 262.092 15.8726C264.051 15.8726 268.628 16.5195 270.981 19.9059V16.5195H280V46.897H270.981V43.4505ZM263.593 38.899C267.333 38.899 270.981 36.2311 270.981 31.6768C270.981 27.1224 267.319 24.4545 263.593 24.4545C259.802 24.4545 255.944 27.3171 255.944 31.6768C255.944 36.0365 259.802 38.899 263.593 38.899Z" fill="#404040"/>
+          <path d="M1.21062 15.8641L31.3276 45.8323C31.7828 46.2844 32.3624 46.5921 32.9933 46.7166C33.6242 46.8411 34.2779 46.7767 34.8721 46.5317C35.4662 46.2866 35.974 45.8719 36.3313 45.3398C36.6887 44.8077 36.8796 44.1822 36.8798 43.5422V15.0855C36.8791 13.827 36.3763 12.6202 35.482 11.7303C34.5876 10.8404 33.3749 10.3401 32.1101 10.3394H3.51204C2.8689 10.3396 2.24027 10.5295 1.70555 10.8851C1.17083 11.2407 0.754015 11.746 0.507748 12.3372C0.261481 12.9284 0.196813 13.5789 0.321913 14.2067C0.447013 14.8344 0.756269 15.4112 1.21062 15.8641Z" fill="#00C73D"/>
+          <path d="M2.04213 45.1511C6.40045 49.4908 13.8571 46.4193 13.8571 40.2848C13.8571 38.4582 13.1278 36.7063 11.8298 35.4147C10.5318 34.1231 8.77124 33.3975 6.93553 33.3975C0.767714 33.3975 -2.31907 40.8172 2.04501 45.154" fill="#00C73D"/>
+        </g>
+        <defs><clipPath id="logoClip"><rect width="280" height="47.5472" fill="white"/></clipPath></defs>
+      </svg>
       <div class="brand-sub">Crédito Impulso</div>
     </div>
     <span class="audience-tag">
@@ -347,7 +370,7 @@
 
   <!-- RESULTADO (CAPA ASESOR) -->
   <div id="resultSection">
-    <div class="result-banner">
+    <div class="result-banner" id="resultBanner">
       <div class="result-tag">Resultado</div>
       <div class="result-title" id="resultTitleAsesor">—</div>
       <div class="result-sub">Revisa el detalle en el acordeón de abajo antes de compartirlo con tu cliente.</div>
@@ -356,23 +379,30 @@
     <div class="card">
       <div class="card-title" id="scenarioTitleAsesor">Detalle del escenario</div>
 
-      <!-- Gráfica comparativa primero (ver plan de mejoras Fase 3) -->
-      <div class="compare-viz">
-        <div class="viz-row">
-          <div class="viz-head">
-            <div class="viz-title" id="vizLabelActual">Costo hoy</div>
-            <div class="viz-meta" id="vizValActual">—</div>
-          </div>
-          <div class="viz-bar" aria-hidden="true"><div class="viz-seg hoy" id="vizSegActual"></div></div>
+      <!-- Gráfica comparativa de columnas: costo total, hoy vs. Crédito Impulso -->
+      <div class="compare-chart">
+        <svg class="chart-svg" viewBox="0 0 900 274" role="img" aria-labelledby="chartTitle chartSummary" preserveAspectRatio="xMidYMid meet">
+          <text id="chartTitle" x="0" y="16" text-anchor="start" class="chart-title">Comparativa de costo: hoy vs. Crédito Impulso</text>
+          <g class="chart-grid">
+            <line x1="70" y1="240" x2="850" y2="240"/><text id="gridLabel0" x="64" y="243" text-anchor="end">$0M</text>
+            <line x1="70" y1="192" x2="850" y2="192"/><text id="gridLabel1" x="64" y="195" text-anchor="end">—</text>
+            <line x1="70" y1="144" x2="850" y2="144"/><text id="gridLabel2" x="64" y="147" text-anchor="end">—</text>
+            <line x1="70" y1="96"  x2="850" y2="96"/><text id="gridLabel3" x="64" y="99" text-anchor="end">—</text>
+            <line x1="70" y1="48"  x2="850" y2="48"/><text id="gridLabel4" x="64" y="51" text-anchor="end">—</text>
+          </g>
+          <line class="chart-axis" x1="70" y1="48" x2="70" y2="240"/>
+          <line class="chart-axis" x1="70" y1="240" x2="850" y2="240"/>
+          <rect id="barActual" class="chart-bar chart-bar-actual" x="145" width="240" y="240" height="0" rx="4"/>
+          <text id="barActualValue" x="265" y="236" text-anchor="middle" class="chart-value-label">—</text>
+          <text id="barActualLabel" x="265" y="258" text-anchor="middle" class="chart-cat-label">Hoy</text>
+          <rect id="barCredito" class="chart-bar chart-bar-credito" x="535" width="240" y="240" height="0" rx="4"/>
+          <text id="barCreditoValue" x="655" y="236" text-anchor="middle" class="chart-value-label">—</text>
+          <text id="barCreditoLabel" x="655" y="258" text-anchor="middle" class="chart-cat-label">Crédito Impulso</text>
+        </svg>
+        <div class="sk-alert sk-alert-info chart-summary">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+          <div id="chartSummary">—</div>
         </div>
-        <div class="viz-row">
-          <div class="viz-head">
-            <div class="viz-title">Con Crédito Impulso</div>
-            <div class="viz-meta" id="vizValCredito">—</div>
-          </div>
-          <div class="viz-bar" aria-hidden="true"><div class="viz-seg credito" id="vizSegCredito">Crédito Impulso</div></div>
-        </div>
-        <div class="viz-caption">El ancho de cada barra es proporcional a su costo total en el plazo simulado.</div>
       </div>
 
       <details class="help-block detalle-block">
@@ -410,7 +440,7 @@
        retiro-fvp-pac-capa-cliente-referencia.html para cuando se construya la versión de usuario final. -->
 
   <footer class="sim-footer" id="simFooter">
-    <div class="vigencia-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Tasa Skandia y parámetros tributarios vigentes desde el 1 de enero de 2026</div>
+    <div class="vigencia-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="vigenciaBadgeText">Tasa Skandia y parámetros tributarios vigentes desde el 1 de enero de 2026</span></div>
   </footer>
 
   <!-- Texto legal completo (fuente: Mayo2026-Simulador de creditos.xlsx, validado por cumplimiento normativo) -->
@@ -459,7 +489,7 @@
       <div class="row"><b>Qué es:</b> Es la cuenta donde queda bloqueada la parte de tu FVP que respalda el crédito, mientras el crédito esté vigente.</div>
       <div class="row"><b>Ejemplo:</b> Si tomas $10M de Crédito Impulso, esa cuenta guarda el respaldo — tu FVP sigue siendo tuyo, solo queda comprometido como garantía.</div>
       <div class="row"><b>Por qué te sirve:</b> Te permite acceder al crédito sin retirar tu inversión ni perder su crecimiento.</div>
-      <div class="row"><b>Qué sigue:</b> Puedes ver cuánto queda bloqueado y cuánto sigue disponible en la sección de garantía.</div>
+      <div class="row"><b>Qué sigue:</b> Consulta con tu asesor cuánto queda bloqueado y cuánto sigue disponible como garantía.</div>
     </div>
     <div class="sk-dialog-footer">
       <button type="button" class="btn btn-primary" onclick="closeSkDialog('dialog-contingente')">Entendido</button>
@@ -481,6 +511,98 @@ const E13c = SMLMV, E14c = E13c * 25;
 
 const fmtCOP = n => isFinite(n) ? n.toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}) : '—';
 const MONEY_IDS = ['valorRetiro','salarioMensual','otrosIntereses','arrendamientos','honorarios'];
+
+/* ---------- Gráfica comparativa de columnas (paleta: Tokens/semantic-color.css --charts-c01/c03) ---------- */
+function niceMax(v){
+  if(!(v>0)) return 1;
+  const exp = Math.floor(Math.log10(v));
+  const base = Math.pow(10, exp);
+  const norm = v/base;
+  const n = norm<=1 ? 1 : (norm<=2 ? 2 : (norm<=5 ? 5 : 10));
+  return n*base;
+}
+function fmtAxis(n){ return isFinite(n) ? ('$'+Math.round(n/1e6).toLocaleString('es-CO')+'M') : '—'; }
+/* Ajusta el título de la gráfica al ancho disponible: si no cabe en una línea, lo
+   parte en 2 líneas (<tspan>) por palabra completa; si ni así cabe, trunca con elipsis
+   la 2da línea. El texto SVG no hace wrap solo, por eso se resuelve a mano. */
+function fitChartTitle(titleEl, fullText, maxWidth){
+  const measure = (text) => { titleEl.textContent = text; return titleEl.getComputedTextLength(); };
+  if(measure(fullText) <= maxWidth){
+    titleEl.textContent = fullText;
+    return;
+  }
+  const words = fullText.split(' ');
+  let line1 = words[0], i = 1;
+  for(; i<words.length; i++){
+    const candidate = line1 + ' ' + words[i];
+    if(measure(candidate) > maxWidth) break;
+    line1 = candidate;
+  }
+  let line2 = words.slice(i).join(' ');
+  if(line2 && measure(line2) > maxWidth){
+    let t = line2;
+    while(measure(t + '…') > maxWidth && t.length > 4){ t = t.slice(0, -1); }
+    line2 = t.replace(/[.,;:\s]+$/, '') + '…';
+  }
+  const ns = 'http://www.w3.org/2000/svg';
+  const x = titleEl.getAttribute('x') || 0;
+  titleEl.textContent = '';
+  const t1 = document.createElementNS(ns, 'tspan'); t1.setAttribute('x', x); t1.setAttribute('dy', '0'); t1.textContent = line1;
+  titleEl.appendChild(t1);
+  if(line2){
+    const t2 = document.createElementNS(ns, 'tspan'); t2.setAttribute('x', x); t2.setAttribute('dy', '15'); t2.textContent = line2;
+    titleEl.appendChild(t2);
+  }
+}
+function renderComparisonChart(valActual, valCredito, titleText){
+  /* Alto fijo en px reales (no escala con el ancho) para que el texto se mantenga
+     legible en mobile; el ancho del viewBox se recalcula al ancho real del contenedor
+     en cada render, así solo el layout horizontal (barras/cuadrícula) se estira. */
+  const svg = document.querySelector('.chart-svg');
+  const H = 274, LEFT = 56, RIGHT = 16, TOP = 48, BOTTOM = 240, PLOT_H = BOTTOM-TOP;
+  const W = Math.max(Math.round(svg.getBoundingClientRect().width) || 0, 260);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  if(titleText) fitChartTitle(document.getElementById('chartTitle'), titleText, W-8);
+
+  const plotRight = W - RIGHT;
+  const gridLines = svg.querySelectorAll('.chart-grid line');
+  gridLines.forEach(line => { line.setAttribute('x1', LEFT); line.setAttribute('x2', plotRight); });
+  for(let i=0;i<=4;i++){ document.getElementById('gridLabel'+i).setAttribute('x', LEFT-6); }
+  const axisLines = svg.querySelectorAll('.chart-axis');
+  axisLines[0].setAttribute('x1', LEFT); axisLines[0].setAttribute('x2', LEFT);
+  axisLines[0].setAttribute('y1', TOP);  axisLines[0].setAttribute('y2', BOTTOM);
+  axisLines[1].setAttribute('x1', LEFT); axisLines[1].setAttribute('x2', plotRight);
+  axisLines[1].setAttribute('y1', BOTTOM); axisLines[1].setAttribute('y2', BOTTOM);
+
+  const plotW = plotRight-LEFT, bandW = plotW/2;
+  const barW = Math.min(bandW*0.58, 240);
+  const gap = (bandW-barW)/2;
+  const xActual = LEFT+gap, centerActual = LEFT+bandW/2;
+  const xCredito = LEFT+bandW+gap, centerCredito = LEFT+bandW+bandW/2;
+  document.getElementById('barActual').setAttribute('x', xActual);
+  document.getElementById('barActual').setAttribute('width', barW);
+  document.getElementById('barActualValue').setAttribute('x', centerActual);
+  document.getElementById('barActualLabel').setAttribute('x', centerActual);
+  document.getElementById('barCredito').setAttribute('x', xCredito);
+  document.getElementById('barCredito').setAttribute('width', barW);
+  document.getElementById('barCreditoValue').setAttribute('x', centerCredito);
+  document.getElementById('barCreditoLabel').setAttribute('x', centerCredito);
+
+  const chartMax = niceMax(Math.max(valActual, valCredito, 1)*1.15);
+  for(let i=0;i<=4;i++){
+    document.getElementById('gridLabel'+i).textContent = fmtAxis(chartMax*i/4);
+  }
+  const setBar = (rectId, valueId, value) => {
+    const h = Math.max((value/chartMax)*PLOT_H, 0);
+    const y = BOTTOM - h;
+    const rect = document.getElementById(rectId);
+    rect.setAttribute('y', y); rect.setAttribute('height', h);
+    document.getElementById(valueId).setAttribute('y', Math.max(y-8, 14));
+    document.getElementById(valueId).textContent = fmtCOP(value);
+  };
+  setBar('barActual','barActualValue', valActual);
+  setBar('barCredito','barCreditoValue', valCredito);
+}
 
 function digitsOnly(str){ return (str||'').replace(/[^\d]/g,''); }
 function formatThousands(digits){ if(!digits) return ''; return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
@@ -648,20 +770,52 @@ function handleRadioKey(e, b){
 }
 function exportResult(){ window.print(); }
 
+let lastFocusedElement = null;
+
+function getFocusableEls(panel){
+  return Array.from(panel.querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+    .filter(el => el.offsetParent !== null || el === document.activeElement);
+}
 function handleSkDialogEscape(e){
   if(e.key==='Escape'){
     document.querySelectorAll('.sk-dialog-overlay.open').forEach(o=>closeSkDialog(o.id));
+    return;
+  }
+  if(e.key==='Tab'){
+    const overlay = document.querySelector('.sk-dialog-overlay.open');
+    if(!overlay) return;
+    const panel = overlay.querySelector('.sk-dialog-panel');
+    const focusable = getFocusableEls(panel);
+    if(focusable.length===0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length-1];
+    if(e.shiftKey && document.activeElement===first){
+      e.preventDefault();
+      last.focus();
+    } else if(!e.shiftKey && document.activeElement===last){
+      e.preventDefault();
+      first.focus();
+    }
   }
 }
 function openSkDialog(id){
-  document.getElementById(id).classList.add('open');
-  document.getElementById(id).setAttribute('aria-hidden','false');
+  lastFocusedElement = document.activeElement;
+  const overlay = document.getElementById(id);
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
   document.addEventListener('keydown', handleSkDialogEscape);
+  const panel = overlay.querySelector('.sk-dialog-panel');
+  const focusable = getFocusableEls(panel);
+  if(focusable.length>0) focusable[0].focus();
 }
 function closeSkDialog(id){
   document.getElementById(id).classList.remove('open');
   document.getElementById(id).setAttribute('aria-hidden','true');
   document.removeEventListener('keydown', handleSkDialogEscape);
+  if(lastFocusedElement){
+    lastFocusedElement.focus();
+    lastFocusedElement = null;
+  }
 }
 
 function setLabelRow(id, label, value){
@@ -707,17 +861,12 @@ function recalc(){
   const direccion = s.ahorro > 0 ? 'menos' : 'más';
   const tituloAsesor = `Tomar Crédito Impulso cuesta ${fmtCOP(diff)} ${direccion} que ${contra}, en este escenario.`;
   document.getElementById('resultTitleAsesor').textContent = tituloAsesor;
+  document.getElementById('resultBanner').className = s.ahorro >= 0 ? 'result-banner' : 'result-banner result-banner--neutral';
 
-  // Gráfica comparativa (ver plan de mejoras Fase 3)
-  const maxVal = Math.max(s.total, s.intereses, 1);
-  document.getElementById('vizLabelActual').textContent = `Costo de ${contraCorta} hoy`;
-  const segActual = document.getElementById('vizSegActual');
-  segActual.style.width = Math.max((s.total/maxVal*100), 2)+'%';
-  segActual.textContent = fmtCOP(s.total);
-  document.getElementById('vizValActual').innerHTML = `<b>${fmtCOP(s.total)}</b>`;
-  const segCredito = document.getElementById('vizSegCredito');
-  segCredito.style.width = Math.max((s.intereses/maxVal*100), 2)+'%';
-  document.getElementById('vizValCredito').innerHTML = `<b>${fmtCOP(s.intereses)}</b>`;
+  // Gráfica comparativa de columnas (costo total: hoy vs. Crédito Impulso)
+  document.getElementById('barActualLabel').textContent = branch==='pac' ? 'Consolidar PAC' : 'Retiro FVP';
+  renderComparisonChart(s.total, s.intereses, `Comparativa de costo: ${contraCorta} vs. Crédito Impulso`);
+  document.getElementById('chartSummary').innerHTML = `Costo de ${contraCorta} hoy: <b>${fmtCOP(s.total)}</b> · con Crédito Impulso: <b>${fmtCOP(s.intereses)}</b>.`;
 
   document.getElementById('resultTable').innerHTML =
     setLabelRow('r_ingreso', branch==='pac' ? 'Ingreso gravado (capital + rendimientos)' : 'Ingreso gravado', fmtCOP(s.ingreso)) +
@@ -736,7 +885,20 @@ function recalc(){
 
 MONEY_IDS.forEach(setupMoneyInput);
 ['pctCapital','pctRendimientos','tipoSalario','rentCliente','mesesRent','tasaSk','mesesSk'].forEach(id => document.getElementById(id).addEventListener('input', recalc));
+
+/* Re-layout de la gráfica al cambiar el ancho (resize/rotación) — el alto es fijo,
+   solo el ancho del viewBox y las posiciones horizontales se recalculan. */
+let resizeTimer;
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(recalc, 150); });
+
 recalc();
+
+// Badge de vigencia: muestra los valores reales de UVT/SMLMV (no solo la fecha),
+// para que coincida con lo que promete el glosario tributario. Se calcula desde JS
+// con fmtCOP() en vez de hardcodear el texto en el HTML, así el badge nunca se
+// desincroniza si alguna vez se actualizan las constantes UVT/SMLMV.
+document.getElementById('vigenciaBadgeText').textContent =
+  `UVT: ${fmtCOP(UVT)} · SMLMV: ${fmtCOP(SMLMV)} · vigentes desde el 1 de enero de 2026`;
 </script>
 </body>
 </html>
