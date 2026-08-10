@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invested 3.0 — Brief FPs v2.0 · UXplorers</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-primary-green-d04: #006e22;
+  --color-primary-green-d03: #007c26;
+  --color-primary-green-d02: #009a2f;
+  --color-primary-green-d01: #03a835;
+  --color-primary-green-00:  #00c73d;
+  --color-primary-green-l01: #1dd64c;
+  --color-primary-green-l04: #caf9cb;
+  --color-primary-green-l05: #f6fcf2;
+  --color-primary-grey-00:  #404040;
+  --color-primary-grey-l03: #666666;
+  --color-primary-grey-l05: #a5a5a5;
+  --color-neutral-00:  #ffffff;
+  --color-neutral-l02: #f6f6f6;
+  --color-neutral-l03: #e9e9e9;
+  --color-neutral-l04: #dddddd;
+  --color-feedback-warning-light: #fff3e0;
+  --color-feedback-warning-dark:  #ffae08;
+  --color-feedback-info-light:    #ebf4ff;
+  --color-feedback-info-dark:     #0099de;
+  --color-feedback-error-light:   #fff5f4;
+  --color-feedback-error-dark:    #e03430;
+  --color-bg-main:        #ffffff;
+  --color-bg-grey-light:  #f6f6f6;
+  --color-bg-brand-light: #f6fcf2;
+  --color-bg-brand:       #00c73d;
+  --color-stroke-grey-light: #dddddd;
+  --color-stroke-brand:      #00c73d;
+  --color-stroke-warning:    #ffae08;
+  --color-stroke-info:       #0099de;
+  --color-text-body-heading-1: #404040;
+  --color-text-body-heading-2: #666666;
+  --color-text-medium: #a5a5a5;
+  --space-1: 8px; --space-2: 16px; --space-3: 24px;
+  --space-4: 32px; --space-5: 40px; --space-6: 48px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: var(--color-text-body-heading-1);
+  background: var(--color-bg-grey-light);
+  min-height: 100vh;
+}
+
+/* ── NAV ── */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--color-primary-grey-00);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--space-4); height: 56px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08);
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-logo {
+  width: 28px; height: 28px; background: var(--color-primary-green-00);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; color: #000;
+}
+.nav-title { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
+.nav-sub { font-size: 11px; color: var(--color-text-medium); font-family: 'Montserrat', sans-serif; }
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab {
+  font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 600;
+  color: var(--color-text-medium); padding: 6px 16px; border-radius: 6px;
+  cursor: pointer; border: none; background: transparent; transition: all 0.15s; letter-spacing: 0.02em;
+}
+.nav-tab:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.nav-tab.active { background: var(--color-primary-green-00); color: #000; }
+.nav-badge {
+  font-size: 10px; font-weight: 700; background: var(--color-primary-green-00);
+  padding: 2px 8px; border-radius: 10px; color: #000;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ── LAYOUT ── */
+.page { display: none; padding-top: 56px; min-height: 100vh; }
+.page.active { display: block; }
+.page-hero { background: var(--color-primary-grey-00); padding: var(--space-5) var(--space-4) var(--space-4); }
+.hero-inner { max-width: 900px; margin: 0 auto; }
+.hero-eyebrow {
+  font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--color-primary-green-00); margin-bottom: 6px;
+}
+.hero-title { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 6px; }
+.hero-title span { color: var(--color-primary-green-00); }
+.hero-desc { font-size: 14px; color: var(--color-text-medium); line-height: 1.6; margin-bottom: var(--space-4); max-width: 600px; }
+.hero-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero-chip {
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600;
+  padding: 5px 14px; border-radius: 20px;
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+}
+.hero-chip.green { background: var(--color-primary-green-00); color: #000; }
+
+/* ── CONTENT ── */
+.content { max-width: 900px; margin: 0 auto; padding: var(--space-4); }
+
+/* ── SECTION BLOCK ── */
+.sec { background: var(--color-bg-main); border-radius: 12px; border: 1px solid var(--color-neutral-l03); margin-bottom: var(--space-3); overflow: hidden; }
+.sec-header {
+  padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--color-neutral-l03);
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; user-select: none; transition: background 0.15s;
+}
+.sec-header:hover { background: var(--color-bg-grey-light); }
+.sec-header-left { display: flex; align-items: center; gap: 12px; }
+.sec-num {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary-green-00);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; color: #000; flex-shrink: 0;
+}
+.sec-num.blue   { background: var(--color-feedback-info-light); color: #005fa3; }
+.sec-num.warn   { background: var(--color-feedback-warning-light); color: #a06000; }
+.sec-num.purple { background: #eeedfe; color: #3c3489; }
+.sec-num.grey   { background: var(--color-neutral-l02); color: #444; border: 1px solid var(--color-neutral-l03); }
+.sec-num.dark   { background: var(--color-primary-grey-00); color: #fff; }
+.sec-title { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700; color: var(--color-text-body-heading-1); }
+.sec-sub { font-size: 12px; color: var(--color-text-body-heading-2); margin-top: 1px; }
+.sec-right { display: flex; align-items: center; gap: 10px; }
+.sec-badge { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 12px; }
+.sb-green   { background: var(--color-primary-green-l04); color: var(--color-primary-green-d04); }
+.sb-blue    { background: var(--color-feedback-info-light); color: #005fa3; }
+.sb-warn    { background: var(--color-feedback-warning-light); color: #a06000; }
+.sb-purple  { background: #eeedfe; color: #3c3489; }
+.sb-grey    { background: var(--color-neutral-l02); color: #666; border: 1px solid var(--color-neutral-l03); }
+.chevron { font-size: 12px; color: var(--color-text-medium); transition: transform 0.2s; margin-left: 4px; }
+.chevron.open { transform: rotate(180deg); }
+.sec-body { padding: var(--space-3); display: none; }
+.sec-body.open { display: block; }
+
+/* ── INNER CONTENT ── */
+p { font-size: 14px; line-height: 1.7; color: var(--color-text-body-heading-1); }
+
+.highlight { border-radius: 8px; padding: 14px 18px; font-size: 14px; line-height: 1.6; margin-top: 12px; }
+.h-green  { background: var(--color-bg-brand-light); border-left: 3px solid var(--color-primary-green-00); }
+.h-info   { background: var(--color-feedback-info-light); border-left: 3px solid var(--color-feedback-info-dark); }
+.h-warn   { background: var(--color-feedback-warning-light); border-left: 3px solid var(--color-feedback-warning-dark); }
+.h-grey   { background: var(--color-bg-grey-light); border-left: 3px solid var(--color-neutral-l03); }
+.h-purple { background: #f5f4ff; border-left: 3px solid #7f77dd; }
+.h-label  { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+.h-green  .h-label { color: var(--color-primary-green-d02); }
+.h-info   .h-label { color: var(--color-feedback-info-dark); }
+.h-warn   .h-label { color: #c47e00; }
+.h-grey   .h-label { color: var(--color-text-body-heading-2); }
+.h-purple .h-label { color: #5c54cc; }
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tag { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
+.tg  { background: var(--color-primary-green-l04); color: var(--color-primary-green-d04); }
+.tb  { background: var(--color-feedback-info-light); color: #005fa3; }
+.tw  { background: var(--color-feedback-warning-light); color: #a06000; }
+.tgr { background: var(--color-neutral-l02); color: #666; border: 1px solid var(--color-neutral-l03); }
+.tp  { background: #eeedfe; color: #3c3489; }
+
+.divider { height: 1px; background: var(--color-neutral-l03); margin: var(--space-3) 0; }
+
+/* ── GRID ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); margin-top: 12px; }
+.col-card { border-radius: 8px; padding: 14px 16px; border: 1px solid var(--color-neutral-l03); }
+.col-title { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.ct-g { color: var(--color-primary-green-d02); }
+.ct-b { color: var(--color-feedback-info-dark); }
+.ct-w { color: #a06000; }
+.col-item { font-size: 13px; line-height: 1.5; padding: 5px 0; border-bottom: 1px solid var(--color-neutral-l03); display: flex; gap: 8px; align-items: flex-start; }
+.col-item:last-child { border-bottom: none; }
+.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.dg { background: var(--color-primary-green-00); }
+.db { background: var(--color-feedback-info-dark); }
+.dw { background: var(--color-feedback-warning-dark); }
+.dp { background: #7f77dd; }
+
+/* ── CHECKLIST ── */
+.check-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.check-item { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+.check-ico { width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary-green-l04); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.check-ico::after { content: ''; display: block; width: 7px; height: 4px; border-left: 2px solid var(--color-primary-green-d02); border-bottom: 2px solid var(--color-primary-green-d02); transform: rotate(-45deg) translateY(-1px); }
+
+/* ── HIPÓTESIS ── */
+.hip-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.hip { border-radius: 8px; padding: 12px 16px; border: 1px solid var(--color-neutral-l03); display: flex; gap: 12px; align-items: flex-start; }
+.hip-badge { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 12px; flex-shrink: 0; white-space: nowrap; margin-top: 1px; }
+.hb-c { background: #ffe0e0; color: #a32d2d; }
+.hb-a { background: var(--color-feedback-warning-light); color: #a06000; }
+.hb-p { background: #eeedfe; color: #3c3489; }
+.hip-nombre { font-size: 13px; font-weight: 600; color: var(--color-text-body-heading-1); margin-bottom: 2px; }
+.hip-momento { font-size: 12px; color: var(--color-text-body-heading-2); }
+
+/* ── TIMELINE ── */
+.timeline { display: flex; flex-direction: column; gap: 0; margin-top: 12px; }
+.tl-item { display: flex; gap: 0; }
+.tl-left { display: flex; flex-direction: column; align-items: center; width: 44px; flex-shrink: 0; }
+.tl-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; flex-shrink: 0; z-index: 1; }
+.td-dark   { background: var(--color-primary-grey-00); color: #fff; }
+.td-blue   { background: var(--color-feedback-info-light); color: #005fa3; }
+.td-warn   { background: var(--color-feedback-warning-light); color: #a06000; }
+.td-grey   { background: var(--color-neutral-l02); color: #666; border: 1px solid var(--color-neutral-l03); }
+.td-green  { background: var(--color-primary-green-00); color: #000; }
+.td-purple { background: #eeedfe; color: #3c3489; }
+.tl-line { width: 2px; flex: 1; min-height: 16px; background: var(--color-neutral-l03); margin: 2px 0; }
+.tl-item:last-child .tl-line { display: none; }
+.tl-body { padding: 4px 0 20px 14px; flex: 1; }
+.tl-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.tl-title { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700; }
+.tl-time { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 12px; background: var(--color-neutral-l02); border: 1px solid var(--color-neutral-l03); color: var(--color-text-body-heading-2); white-space: nowrap; }
+.tl-desc { font-size: 13px; line-height: 1.6; color: var(--color-text-body-heading-2); margin-bottom: 8px; }
+.tl-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: 11px; padding: 3px 10px; border-radius: 12px; font-family: 'Montserrat', sans-serif; font-weight: 600; }
+.pg  { background: var(--color-primary-green-l04); color: var(--color-primary-green-d04); }
+.pb  { background: var(--color-feedback-info-light); color: #005fa3; }
+.pw  { background: var(--color-feedback-warning-light); color: #a06000; }
+.pp  { background: #eeedfe; color: #3c3489; }
+.pgr { background: var(--color-neutral-l02); color: #666; border: 1px solid var(--color-neutral-l03); }
+
+/* ── ANCLA ── */
+.ancla { margin-bottom: 18px; }
+.ancla:last-child { margin-bottom: 0; }
+.ancla-num {
+  display: inline-flex; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 12px; margin-bottom: 7px;
+  background: var(--color-primary-grey-00); color: #fff; letter-spacing: 0.04em;
+}
+.ancla-pregunta { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; }
+.ancla-desc { font-size: 12px; color: var(--color-text-body-heading-2); line-height: 1.5; margin-bottom: 8px; font-style: italic; }
+.ancla-sondas { display: flex; flex-direction: column; gap: 5px; }
+.ancla-sonda { display: flex; gap: 8px; font-size: 12px; color: var(--color-text-body-heading-2); line-height: 1.5; }
+.ancla-sonda::before { content: '↳'; color: var(--color-neutral-l04); flex-shrink: 0; }
+.ancla-sonda.key { color: var(--color-primary-green-d03); font-weight: 600; }
+.ancla-sonda.key::before { color: var(--color-primary-green-00); }
+
+/* ── MOD BOX ── */
+.mod-box { background: var(--color-bg-grey-light); border-radius: 8px; padding: 14px 18px; font-size: 13px; line-height: 1.6; margin-bottom: 20px; border: 1px solid var(--color-neutral-l03); }
+.mod-title { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-body-heading-2); margin-bottom: 8px; }
+.mod-item { display: flex; gap: 8px; margin-bottom: 5px; font-size: 13px; line-height: 1.5; }
+.mod-item::before { content: '→'; font-weight: 700; flex-shrink: 0; }
+.mod-item.green::before { color: var(--color-primary-green-00); }
+.mod-item.warn::before  { color: var(--color-feedback-warning-dark); }
+.mod-item.blue::before  { color: var(--color-feedback-info-dark); }
+.mod-item.purple::before { color: #7f77dd; }
+
+/* ── PARADA (pantalla) ── */
+.parada {
+  border: 1.5px solid var(--color-neutral-l03);
+  border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+}
+.parada-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; background: var(--color-bg-grey-light);
+  border-bottom: 1px solid var(--color-neutral-l03);
+}
+.parada-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+.pn-green  { background: var(--color-primary-green-00); color: #000; }
+.pn-warn   { background: var(--color-feedback-warning-dark); color: #fff; }
+.pn-purple { background: #7f77dd; color: #fff; }
+.parada-title { font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; }
+.parada-chip { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 10px; margin-left: auto; }
+.parada-body { padding: 16px 18px; }
+.parada-encuadre { font-size: 13px; font-style: italic; color: var(--color-text-body-heading-2); margin-bottom: 12px; line-height: 1.5; border-left: 3px solid var(--color-neutral-l03); padding-left: 12px; }
+
+/* ── SEC LABEL ── */
+.sec-label {
+  font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-text-body-heading-2); margin: var(--space-3) 0 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-label::after { content: ''; flex: 1; height: 1px; background: var(--color-neutral-l03); }
+
+/* ── TIEMPO BAR ── */
+.tiempo-bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: var(--space-3); }
+.tb-item { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 12px; }
+.tb-sep { font-size: 12px; color: var(--color-text-medium); font-weight: 700; }
+
+/* ── TA LIST ── */
+.ta-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.ta-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.5; }
+.ta-num { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; margin-top: 1px; }
+.ta-g { background: var(--color-primary-green-l04); color: var(--color-primary-green-d04); }
+.ta-w { background: var(--color-feedback-warning-light); color: #a06000; }
+.ta-p { background: #eeedfe; color: #3c3489; }
+.sonda { display: flex; gap: 8px; margin-top: 4px; font-size: 12px; color: var(--color-text-body-heading-2); font-style: italic; line-height: 1.5; }
+.sonda::before { content: '↳'; color: var(--color-neutral-l04); flex-shrink: 0; }
+
+/* ── HP PILL ── */
+.hp-pill { display: inline-flex; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 12px; margin-top: 10px; margin-right: 4px; }
+.hpc { background: #ffe0e0; color: #a32d2d; }
+.hpa { background: var(--color-feedback-warning-light); color: #a06000; }
+.hpp { background: #eeedfe; color: #3c3489; }
+
+/* ── TIPO BADGE ── */
+.tipo-badge { display: inline-flex; padding: 5px 14px; border-radius: 20px; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700; margin-right: 6px; margin-top: 8px; }
+.te { background: var(--color-feedback-info-light); color: #005fa3; }
+.tv { background: var(--color-primary-green-l04); color: var(--color-primary-green-d04); }
+
+/* ── TABLA ── */
+.tbl-wrap { overflow-x: auto; margin-top: 12px; border: 1px solid var(--color-neutral-l03); border-radius: 8px; }
+table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 520px; }
+table.tbl th {
+  font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-body-heading-2);
+  text-align: left; padding: 9px 14px; background: var(--color-bg-grey-light);
+  border-bottom: 1px solid var(--color-neutral-l03); white-space: nowrap;
+}
+table.tbl td { padding: 11px 14px; border-bottom: 1px solid var(--color-neutral-l03); line-height: 1.55; vertical-align: top; }
+table.tbl tr:last-child td { border-bottom: none; }
+table.tbl td.dim { color: var(--color-text-medium); }
+table.tbl td.now { color: var(--color-primary-green-d03); font-weight: 600; background: var(--color-bg-brand-light); }
+table.tbl td.rowlbl { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; color: var(--color-text-body-heading-1); white-space: nowrap; }
+
+/* ── RECORRIDO ── */
+.recorrido {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 12px 14px; background: var(--color-bg-brand-light);
+  border: 1px solid var(--color-primary-green-l04); border-radius: 8px; margin-bottom: 14px;
+}
+.rec-label { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-primary-green-d02); width: 100%; margin-bottom: 2px; }
+.rec-step { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700; color: var(--color-primary-green-d04); background: #fff; border: 1px solid var(--color-primary-green-l04); padding: 5px 12px; border-radius: 16px; }
+.rec-step.stop { background: var(--color-primary-green-00); color: #000; border-color: var(--color-primary-green-00); }
+.rec-arrow { color: var(--color-primary-green-d01); font-weight: 700; font-size: 13px; }
+
+/* ── FOOTER ── */
+.page-footer { max-width: 900px; margin: 0 auto; padding: 0 var(--space-4) var(--space-5); text-align: center; }
+.footer-note { font-size: 11px; color: var(--color-text-medium); padding: 14px; background: var(--color-bg-main); border-radius: 8px; border: 1px solid var(--color-neutral-l03); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .two-col { grid-template-columns: 1fr; }
+  .nav-tabs { display: none; }
+  .hero-title { font-size: 22px; }
+  .top-nav { padding: 0 var(--space-2); }
+  .content { padding: var(--space-2); }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">I</div>
+    <div>
+      <div class="nav-title">Invested 3.0 — FPs</div>
+      <div class="nav-sub">UXplorers · Junio 2026</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('brief', event)">Brief de intención</button>
+    <button class="nav-tab" onclick="showPage('instrumento', event)">Instrumento de campo</button>
+  </div>
+  <div class="nav-badge">v2.0</div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     PÁGINA 1 — BRIEF DE INTENCIÓN
+══════════════════════════════════════════ -->
+<div id="page-brief" class="page active">
+
+  <div class="page-hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">UXplorers · Brief de investigación · v2.0</div>
+      <div class="hero-title">Invested 3.0 — <span>Percepción desde el canal FP</span></div>
+      <div class="hero-desc">Sprint mixto de investigación con Financial Planners: entender la relación FP–cliente–Invested y validar cómo la propuesta 3.0 cambia o refuerza esa conversación. En v2.0 la sesión baja a 45 min y el prototipo entra tarde: 71% del tiempo se dedica a la conversación real del canal.</div>
+      <div class="hero-meta">
+        <span class="hero-chip green">Entender + Validar</span>
+        <span class="hero-chip">Entrevistas 1:1 · Teams</span>
+        <span class="hero-chip">2 FPs · Piloto</span>
+        <span class="hero-chip">45 min por sesión</span>
+        <span class="hero-chip">Junio–Julio 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- 1. CONTEXTO -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num dark">1</div>
+          <div>
+            <div class="sec-title">Contexto</div>
+            <div class="sec-sub">Origen del sprint y antecedente crítico</div>
+          </div>
+        </div>
+        <div class="sec-right"><span class="chevron">▼</span></div>
+      </div>
+      <div class="sec-body open">
+        <p>Invested es el servicio de robo-advisor de Skandia: combina un modelo estadístico con criterio experto para recomendar una mezcla de fondos personalizada según el objetivo, horizonte y perfil de riesgo del cliente. El servicio opera de forma automatizada — los rebalanceos ocurren sin intervención del cliente — y está disponible para clientes Multifund.</p>
+        <p style="margin-top:12px;">El Financial Planner es el canal principal a través del cual los clientes conocen, activan y mantienen Invested. Sin embargo, el FP no opera el servicio directamente: su rol es presentarlo, resolver dudas y acompañar al cliente en los momentos en que el mercado genera incertidumbre. Eso lo pone en una posición delicada: debe defender un servicio automatizado que frecuentemente comunica por su cuenta, sin que el FP sepa qué le dijo al cliente ni cuándo.</p>
+        <div class="highlight h-warn" style="margin-top:14px;">
+          <div class="h-label">Tensión que origina este sprint</div>
+          Cuando un cliente recibe una notificación de rebalanceo o vive una caída de mercado, acude a su FP. Si el asesor no tiene contexto de lo que el servicio comunicó — o no tiene argumentos para responder — el resultado puede ser un retiro, una pérdida de confianza en el servicio, o ambos.
+        </div>
+        <div class="tag-row">
+          <span class="tag tgr">~7.000 clientes activos</span>
+          <span class="tag tgr">$488MM+ AUMs</span>
+          <span class="tag tgr">Canal FP · Principal punto de contacto</span>
+          <span class="tag tgr">Rebalanceo automático · Sin intervención del cliente</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. ANTECEDENTES -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num">2</div>
+          <div>
+            <div class="sec-title">Antecedentes</div>
+            <div class="sec-sub">Research previo y contexto acumulado</div>
+          </div>
+        </div>
+        <div class="sec-right"><span class="chevron">▼</span></div>
+      </div>
+      <div class="sec-body">
+        <p>Este sprint corre en paralelo con la investigación con clientes (Invested 3.0 — entrevistas 1:1 y Userbery). Son dos ángulos del mismo problema: ese sprint pregunta qué experimenta el cliente con el servicio; este pregunta qué experimenta el asesor cuando ese mismo cliente lo llama con dudas.</p>
+        <div class="highlight h-info" style="margin-top:14px;">
+          <div class="h-label">Acción requerida antes de comenzar</div>
+          Consultar Dovetail para verificar si existe investigación previa con FPs o retroalimentación del equipo comercial relacionada con Invested. Esa información debe revisarse antes de cerrar el instrumento.
+        </div>
+        <div class="highlight h-grey" style="margin-top:12px;">
+          <div class="h-label">Por qué existe una v2.0 del instrumento</div>
+          La v1.0 dedicaba 22 de 60 minutos a recorrer el prototipo en 3 paradas. El riesgo era claro: la evaluación pantalla por pantalla — que ya cubre el sprint de usuarios — se comía el dato que solo el canal puede dar. La v2.0 recorta la sesión a 45 min, reduce el prototipo a un recorrido rápido más una parada única y devuelve el tiempo a la conversación FP–cliente.
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PREGUNTA DE NEGOCIO -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num">3</div>
+          <div>
+            <div class="sec-title">Pregunta de negocio</div>
+            <div class="sec-sub">La pregunta que guía el sprint</div>
+          </div>
+        </div>
+        <div class="sec-right"><span class="chevron">▼</span></div>
+      </div>
+      <div class="sec-body">
+        <div class="highlight h-green">
+          <div class="h-label">Pregunta central</div>
+          ¿Qué percepción tienen los Financial Planners de Invested, cómo lo usan (o no) en su conversación comercial, y de qué manera la propuesta 3.0 cambia su capacidad de acompañar y retener al cliente?
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. OBJETIVO -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num">4</div>
+          <div>
+            <div class="sec-title">Objetivo de investigación</div>
+            <div class="sec-sub">Tipo mixto: Entender + Validar</div>
+          </div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-badge sb-blue">Entender</span>
+          <span class="sec-badge sb-green">Validar</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="sec-body">
+        <p><strong>Entender</strong> la percepción actual que los FPs tienen de Invested — cómo lo presentan, qué fricciones enfrentan cuando el cliente lo cuestiona y qué argumentos les faltan — <strong>y validar</strong> si la propuesta 3.0 les da nuevas herramientas para acompañar al cliente con mayor seguridad, o si genera nuevas dudas que requieren ser resueltas antes del lanzamiento.</p>
+        <div>
+          <span class="tipo-badge te">Entender</span>
+          <span class="tipo-badge tv">Validar</span>
+        </div>
+        <div class="highlight h-grey" style="margin-top:14px;">
+          <div class="h-label">Diferencia con el sprint de usuarios</div>
+          En el sprint de usuarios se evalúa comprensión, confianza y usabilidad. Aquí la pregunta es comercial: ¿este servicio me ayuda o me complica la vida como asesor? El FP no es el usuario final — es el canal que puede amplificar o sabotear la propuesta.
+        </div>
+        <div class="highlight h-green" style="margin-top:12px;">
+          <div class="h-label">Regla de oro de la v2.0</div>
+          El prototipo es <strong>estímulo de reacción, no objeto de evaluación</strong>. Validar pantalla por pantalla es trabajo del sprint de usuarios. Aquí solo interesa la reacción comercial que contrasta con lo que el FP ya dijo antes de verlo.
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. DISEÑO DEL SPRINT -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num">5</div>
+          <div>
+            <div class="sec-title">Diseño del sprint</div>
+            <div class="sec-sub">Participantes, flujo de sesión e hipótesis</div>
+          </div>
+        </div>
+        <div class="sec-right"><span class="chevron">▼</span></div>
+      </div>
+      <div class="sec-body">
+
+        <div class="sec-label">Perfil de participantes — piloto</div>
+        <p style="font-size:13px; color:var(--color-text-body-heading-2); margin-bottom:10px;">Este es un piloto de 2 sesiones con perfiles deliberadamente opuestos. El contraste entre un FP promotor y un FP detractor es la forma más eficiente de calibrar el rango completo de percepciones del canal antes de escalar el sprint.</p>
+        <div class="two-col">
+          <div class="col-card" style="border-left:3px solid var(--color-primary-green-00);">
+            <div class="col-title ct-g">FP Promotor</div>
+            <div class="col-item" style="font-size:13px;"><span class="dot dg"></span><span>Recomienda Invested activamente y tiene clientes en el servicio hoy.</span></div>
+            <div class="col-item" style="font-size:13px;"><span class="dot dg"></span><span>Ha gestionado conversaciones difíciles — rebalanceos, caídas de mercado — y ha logrado retener al cliente.</span></div>
+            <div class="col-item" style="font-size:13px;"><span class="dot dg"></span><span>Objetivo: entender qué argumentos usa, qué le funciona y qué sigue siendo difícil incluso para alguien convencido del servicio.</span></div>
+          </div>
+          <div class="col-card" style="border-left:3px solid var(--color-feedback-error-dark);">
+            <div class="col-title" style="color:var(--color-feedback-error-dark);">FP Detractor</div>
+            <div class="col-item" style="font-size:13px;"><span class="dot" style="background:var(--color-feedback-error-dark);"></span><span>No recomienda Invested o lo hace muy poco. Puede tener clientes que lo abandonaron o nunca lo activaron.</span></div>
+            <div class="col-item" style="font-size:13px;"><span class="dot" style="background:var(--color-feedback-error-dark);"></span><span>Su resistencia puede venir de experiencias negativas concretas, falta de confianza en el producto o percepción de que complica su relación con el cliente.</span></div>
+            <div class="col-item" style="font-size:13px;"><span class="dot" style="background:var(--color-feedback-error-dark);"></span><span>Objetivo: entender la raíz de su resistencia y evaluar si la propuesta 3.0 modifica su disposición a recomendarlo.</span></div>
+          </div>
+        </div>
+        <div class="highlight h-grey" style="margin-top:14px;">
+          <div class="h-label">Por qué este contraste</div>
+          El promotor revela qué hace que el canal funcione bien. El detractor revela dónde el canal se rompe. Juntos dan el rango completo del problema en solo dos sesiones — suficiente para calibrar el instrumento antes de escalar.
+        </div>
+        <div class="tag-row">
+          <span class="tag tg">Promotor · 1 FP</span>
+          <span class="tag" style="background:#ffe0e0;color:#a32d2d;">Detractor · 1 FP</span>
+          <span class="tag tgr">Total piloto: 2 sesiones</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-label">Flujo de la sesión — 45 min</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot td-dark">A</div><div class="tl-line"></div></div>
+            <div class="tl-body">
+              <div class="tl-header"><span class="tl-title">Apertura y encuadre</span><span class="tl-time">3 min</span></div>
+              <div class="tl-desc">Contexto neutro de la sesión. Consentimiento de grabación. Sin anticipar que se mostrará un prototipo.</div>
+              <div class="tl-pills"><span class="pill pgr">Teams · grabación habilitada</span><span class="pill pgr">Consentimiento verbal</span></div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot td-blue">1</div><div class="tl-line"></div></div>
+            <div class="tl-body">
+              <div class="tl-header"><span class="tl-title">Bloque 1 — El FP, su cartera y dónde cae Invested</span><span class="tl-time">14 min</span></div>
+              <div class="tl-desc">Arranca por el cliente, no por el producto. Quiénes son sus clientes, la última conversación real sobre Invested, con quién sí y con quién no lo recomienda, y su nivel de comodidad en escala 1–5.</div>
+              <div class="tl-pills"><span class="pill pb">Sin prototipo</span><span class="pill pgr">Escucha pura</span><span class="pill pgr">P1 · P2 · P3 · P4</span></div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot td-warn">2</div><div class="tl-line"></div></div>
+            <div class="tl-body">
+              <div class="tl-header"><span class="tl-title">Bloque 2 — La conversación difícil</span><span class="tl-time">13 min</span></div>
+              <div class="tl-desc">El corazón del sprint. Un solo caso concreto de mercado en caída o notificación de rebalanceo, con las dos voces registradas textualmente. Cierra con el argumento que hoy le falta — el benchmark contra el que se leerá el prototipo.</div>
+              <div class="tl-pills"><span class="pill pw">Momentos críticos</span><span class="pill pgr">Sin prototipo</span><span class="pill pgr">P5 · P6</span></div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot td-green">3</div><div class="tl-line"></div></div>
+            <div class="tl-body">
+              <div class="tl-header"><span class="tl-title">Bloque 3 — Reacción al prototipo</span><span class="tl-time">10 min</span></div>
+              <div class="tl-desc">Recorrido continuo de 3 min por activación, dashboard y detalle de producto, y una parada única de 7 min en Detalle de producto. Toda pregunta se formula sobre lo que haría un cliente concreto del FP, no sobre lo que al FP le parece.</div>
+              <div class="tl-pills"><span class="pill pg">Figma · pantalla compartida</span><span class="pill pg">Recorrido + 1 parada</span><span class="pill pgr">Lente comercial</span><span class="pill pgr">P7</span></div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot td-purple">4</div></div>
+            <div class="tl-body">
+              <div class="tl-header"><span class="tl-title">Bloque 4 — Contraste y cierre</span><span class="tl-time">5 min</span></div>
+              <div class="tl-desc">Se reabre la escala 1–5 del Bloque 1: ¿sigue siendo el mismo número después de ver la propuesta? Cierra con la única cosa que le pediría al equipo de producto.</div>
+              <div class="tl-pills"><span class="pill pp">Dato comparable</span><span class="pill pgr">Input directo a producto</span><span class="pill pgr">P8 · P9</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="highlight h-info" style="margin-top:4px;">
+          <div class="h-label">Reparto del tiempo</div>
+          32 de los 45 minutos (71%) corren sin material visual. El prototipo ocupa 10 min y aparece solo después de que el FP ya expuso su versión del problema.
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-label">Hipótesis a explorar</div>
+        <div class="hip-list">
+          <div class="hip"><span class="hip-badge hb-c">H06 · Crítica</span><div><div class="hip-nombre">Desalineación FP–Invested genera choque comunicacional</div><div class="hip-momento">P1, P2, P3 (Bloque 1) · P5 (Bloque 2) · P7 (parada única)</div></div></div>
+          <div class="hip"><span class="hip-badge hb-a">H07 · Alta</span><div><div class="hip-nombre">Si el FP tiene herramientas y lenguaje alineado, se convierte en amplificador del servicio</div><div class="hip-momento">P2, P3, P4 (Bloque 1) · P6 (Bloque 2) · P7 · P8, P9 (Bloque 4)</div></div></div>
+          <div class="hip"><span class="hip-badge hb-p">Nueva · Exploratoria</span><div><div class="hip-nombre">La propuesta 3.0 le da al FP argumentos que hoy no tiene para responder al cliente en volatilidad</div><div class="hip-momento">P6 (argumento faltante) · P7 (parada única) · P8 (contraste)</div></div></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-label">Herramientas</div>
+        <div class="tag-row">
+          <span class="tag tb">Microsoft Teams — entrevistas 1:1</span>
+          <span class="tag tg">Dovetail — análisis y síntesis</span>
+          <span class="tag tg">Figma — prototipo navegable proyectado</span>
+          <span class="tag tgr">Grabación Teams + notas paralelas</span>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-label">Requisitos mínimos</div>
+        <div class="check-list">
+          <div class="check-item"><div class="check-ico"></div><span>2 FPs identificados para el piloto: 1 promotor (con clientes activos en Invested) y 1 detractor (que no lo recomienda o lo ha descartado)</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>Consentimiento informado digital enviado y firmado antes de cada sesión Teams</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>Prototipo Figma listo y navegable en modo presentación, con el orden del recorrido rápido ya definido: activación → dashboard → detalle de producto</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>Moderador briefeado en el recorrido continuo de 3 min, la parada única en Detalle de producto y los tiempos de control (min 27 y min 40)</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>Consultar Dovetail por research previo con FPs o equipo comercial antes de iniciar</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. MEDICIÓN -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num">6</div>
+          <div>
+            <div class="sec-title">Medición del éxito</div>
+            <div class="sec-sub">Criterios para considerar el sprint cumplido</div>
+          </div>
+        </div>
+        <div class="sec-right"><span class="chevron">▼</span></div>
+      </div>
+      <div class="sec-body">
+        <div class="check-list">
+          <div class="check-item"><div class="check-ico"></div><span>Las 2 sesiones del piloto generan suficiente contraste entre promotor y detractor para calibrar el instrumento y decidir si el sprint escala</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>Se identifican al menos 3 momentos de choque comunicacional concretos con palabras literales del FP — y de su cliente</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>Cada sesión deja al menos un caso episódico completo del Bloque 2: qué dijo el cliente, qué respondió el FP, cómo terminó</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>La escala 1–5 queda registrada en dos momentos (P4 y P8) con la justificación del movimiento — o de su ausencia</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>El equipo puede definir qué herramientas o cambios en la propuesta 3.0 reducirían la desalineación del canal</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>La reacción al prototipo queda diferenciada por perfil: promotor vs. detractor — con evidencia de qué mueve o no mueve la posición del detractor</span></div>
+          <div class="check-item"><div class="check-ico"></div><span>Todos los hallazgos están en Dovetail con tags del sistema antes de la presentación a stakeholders</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. PRÓXIMOS PASOS -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num">7</div>
+          <div>
+            <div class="sec-title">Próximos pasos</div>
+            <div class="sec-sub">Acciones inmediatas y en paralelo</div>
+          </div>
+        </div>
+        <div class="sec-right"><span class="chevron">▼</span></div>
+      </div>
+      <div class="sec-body">
+        <div class="two-col">
+          <div class="col-card">
+            <div class="col-title ct-g">Inmediato</div>
+            <div class="col-item"><span class="dot dg"></span><span>Identificar 1 FP promotor y 1 FP detractor con cartera Multifund y agendar sesiones Teams de 45 min</span></div>
+            <div class="col-item"><span class="dot dg"></span><span>Consultar Dovetail por research previo con el canal comercial</span></div>
+            <div class="col-item"><span class="dot dg"></span><span>Preparar y enviar consentimiento informado digital</span></div>
+            <div class="col-item"><span class="dot dg"></span><span>Confirmar con el equipo de producto qué pantalla exacta se usa como Detalle de producto en la parada única</span></div>
+          </div>
+          <div class="col-card">
+            <div class="col-title ct-b">En paralelo</div>
+            <div class="col-item"><span class="dot db"></span><span>Verificar que el prototipo Figma está estable en modo presentación y que el recorrido de 3 min fluye sin saltos</span></div>
+            <div class="col-item"><span class="dot db"></span><span>Definir moderador responsable y briefearlo con el instrumento v2.0 y los tiempos de control</span></div>
+            <div class="col-item"><span class="dot db"></span><span>Coordinar con el equipo comercial el acceso a la lista de FPs</span></div>
+            <div class="col-item"><span class="dot db"></span><span>Alinear el análisis con el sprint de usuarios para triangular hallazgos</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+  <div class="page-footer">
+    <div class="footer-note">UXplorers · Invested 3.0 · Brief FPs v2.0 · Junio 2026 — Documento vivo. Actualizar con cierre del sprint.</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PÁGINA 2 — INSTRUMENTO DE CAMPO
+══════════════════════════════════════════ -->
+<div id="page-instrumento" class="page">
+
+  <div class="page-hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">UXplorers · Instrumento de campo · v2.0</div>
+      <div class="hero-title">El prototipo entra <span>tarde</span> y sale <span>rápido</span></div>
+      <div class="hero-desc">45 minutos, cuatro bloques, nueve preguntas. La conversación FP–cliente ocupa el 71% de la sesión; el prototipo entra al minuto 30 como estímulo de reacción, no como objeto de evaluación. Uso exclusivo del equipo moderador.</div>
+      <div class="hero-meta">
+        <span class="hero-chip">A · 3 min</span>
+        <span class="hero-chip green">B1 · 14 min</span>
+        <span class="hero-chip green">B2 · 13 min</span>
+        <span class="hero-chip">B3 · 10 min</span>
+        <span class="hero-chip">B4 · 5 min</span>
+        <span class="hero-chip">Total · 45 min</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── QUÉ CAMBIA ── -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num grey">Δ</div>
+          <div>
+            <div class="sec-title">Qué cambia respecto a v1.0</div>
+            <div class="sec-sub">Principio de diseño y estructura de la sesión</div>
+          </div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-badge sb-green">v2.0</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="sec-body open">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th></th><th>v1.0</th><th>v2.0</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="rowlbl">Duración</td>
+                <td class="dim">60 min</td>
+                <td class="now">45 min</td>
+              </tr>
+              <tr>
+                <td class="rowlbl">Tiempo sin prototipo</td>
+                <td class="dim">27 min (45%)</td>
+                <td class="now">32 min (71%)</td>
+              </tr>
+              <tr>
+                <td class="rowlbl">Tiempo con prototipo</td>
+                <td class="dim">22 min · 3 paradas · 8 preguntas</td>
+                <td class="now">10 min · 1 parada + recorrido rápido · 3 preguntas</td>
+              </tr>
+              <tr>
+                <td class="rowlbl">Preguntas núcleo</td>
+                <td class="dim">11</td>
+                <td class="now">7</td>
+              </tr>
+              <tr>
+                <td class="rowlbl">Foco</td>
+                <td class="dim">Reacción al prototipo desde el rol del asesor</td>
+                <td class="now">La relación FP–cliente–Invested; el prototipo como estímulo de reacción, no como objeto de evaluación</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="highlight h-green" style="margin-top:16px;">
+          <div class="h-label">Principio de diseño</div>
+          El prototipo entra tarde y sale rápido. Su función aquí no es validarse pantalla por pantalla — eso lo hace el sprint de usuarios — sino provocar una reacción comercial que contraste con lo que el FP ya dijo. Si el prototipo se come la sesión, perdemos el dato que solo el canal puede dar: cómo es realmente esa conversación con el cliente.
+        </div>
+
+        <div class="sec-label">Estructura — 45 min</div>
+        <div class="tiempo-bar">
+          <span class="tb-item" style="background:var(--color-neutral-l02);color:#666;border:1px solid var(--color-neutral-l03);">A · 3'</span>
+          <span class="tb-sep">→</span>
+          <span class="tb-item" style="background:var(--color-feedback-info-light);color:#005fa3;">B1 · 14'</span>
+          <span class="tb-sep">→</span>
+          <span class="tb-item" style="background:var(--color-feedback-warning-light);color:#a06000;">B2 · 13'</span>
+          <span class="tb-sep">→</span>
+          <span class="tb-item" style="background:var(--color-primary-green-l04);color:var(--color-primary-green-d04);">B3 · 10'</span>
+          <span class="tb-sep">→</span>
+          <span class="tb-item" style="background:#eeedfe;color:#3c3489;">B4 · 5'</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── APERTURA ── -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num dark">A</div>
+          <div>
+            <div class="sec-title">Apertura y encuadre</div>
+            <div class="sec-sub">Consentimiento · 3 min</div>
+          </div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-badge sb-grey">3 min</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="mod-box">
+          <div class="mod-title">Instrucciones para el moderador</div>
+          <div class="mod-item green">Confirmar grabación de Teams activa antes de empezar.</div>
+          <div class="mod-item green">Encuadre neutro: <strong>no anticipar que hay un prototipo.</strong></div>
+          <div class="mod-item warn">Nunca usar "evaluación" ni "test". El FP es un experto consultado, no un sujeto de prueba.</div>
+        </div>
+        <div class="parada" style="border-color: var(--color-neutral-l03);">
+          <div class="parada-header">
+            <div class="parada-num" style="background:var(--color-primary-grey-00); color:#fff;">A</div>
+            <div class="parada-title">Encuadre — leer textual al participante</div>
+          </div>
+          <div class="parada-body">
+            <div class="parada-encuadre">"Gracias por tu tiempo. Somos el equipo de investigación UX de Skandia. Hoy queremos entender cómo trabajas con tus clientes y dónde entra —o no entra— Invested en esa relación. Nos interesa tu experiencia real: lo que funciona, lo que no, y lo que te falta. No hay respuestas correctas y todo es confidencial. ¿Estás de acuerdo con que grabemos la sesión para uso interno del equipo?"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BLOQUE 1 ── -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num blue">1</div>
+          <div>
+            <div class="sec-title">Bloque 1 — El FP, su cartera y dónde cae Invested</div>
+            <div class="sec-sub">Sin material visual · Escucha pura · 14 min</div>
+          </div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-badge sb-blue">14 min</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="sec-body">
+
+        <div class="mod-box">
+          <div class="mod-title">Instrucciones para el moderador</div>
+          <div class="mod-item green">Empezar por el cliente, no por el producto. Si el FP entra en modo "pitch de Invested", devolverlo a casos concretos: <em>"¿y con un cliente tuyo en particular?"</em></div>
+          <div class="mod-item blue">Registrar <strong>textualmente</strong> el vocabulario con el que describe el servicio. Ese lenguaje es un hallazgo en sí mismo y va a diferir mucho entre promotor y detractor.</div>
+          <div class="mod-item warn">Con el detractor: nunca preguntar directo <em>"¿por qué no lo recomiendas?"</em>. Llegar ahí por la vía de los casos.</div>
+        </div>
+
+        <div class="ancla">
+          <div class="ancla-num">P1</div>
+          <div class="ancla-pregunta">Cuéntame de tus clientes. ¿Quiénes son, qué buscan cuando llegan a ti y qué esperan de tu acompañamiento?</div>
+          <div class="ancla-desc">Ancla la sesión en su realidad, no en el producto. Establece el marco donde Invested tendrá que caber.</div>
+          <div class="ancla-sondas">
+            <div class="ancla-sonda"><em>"¿Qué es lo que más te preguntan?"</em></div>
+            <div class="ancla-sonda"><em>"¿Qué te hace ganar o perder la confianza de un cliente?"</em></div>
+          </div>
+          <div><span class="hp-pill hpc">H06</span></div>
+        </div>
+
+        <div class="ancla" style="margin-top:18px;">
+          <div class="ancla-num">P2</div>
+          <div class="ancla-pregunta">Piensa en la última vez que le hablaste de Invested a un cliente. Cuéntame esa conversación: qué le dijiste, qué te respondió, en qué terminó.</div>
+          <div class="ancla-desc">Sustituye a la pregunta hipotética "¿cómo lo explicarías?" por un recuerdo episódico. Da lenguaje real, objeciones reales y desenlace real. Si el FP no recuerda ninguna, eso ya es el dato.</div>
+          <div class="ancla-sondas">
+            <div class="ancla-sonda"><em>"¿Qué fue lo primero que le dijiste?"</em></div>
+            <div class="ancla-sonda"><em>"¿Qué parte le costó más entender?"</em></div>
+            <div class="ancla-sonda"><em>"¿Hubo algo que preferiste no mencionar?"</em></div>
+          </div>
+          <div><span class="hp-pill hpc">H06</span><span class="hp-pill hpa">H07</span></div>
+        </div>
+
+        <div class="ancla" style="margin-top:18px;">
+          <div class="ancla-num">P3</div>
+          <div class="ancla-pregunta">¿Con qué cliente sí lo recomiendas y con cuál no? ¿Qué los diferencia?</div>
+          <div class="ancla-desc">Mapea el segmento que el FP asocia espontáneamente. El "no" revela barreras de confianza o percepción de inadecuación.</div>
+          <div class="ancla-sondas">
+            <div class="ancla-sonda"><em>"¿Lo has intentado con alguien de ese perfil y no funcionó? ¿Qué pasó?"</em></div>
+          </div>
+          <div><span class="hp-pill hpc">H06</span><span class="hp-pill hpa">H07</span></div>
+        </div>
+
+        <div class="ancla" style="margin-top:18px;">
+          <div class="ancla-num">P4</div>
+          <div class="ancla-pregunta">En una escala de 1 a 5, ¿qué tan cómodo te sientes hoy recomendando Invested? ¿Por qué ese número?</div>
+          <div class="ancla-desc">Calibra confianza antes de entrar a fricciones. El número importa menos que la razón. Sirve como línea base para el contraste del Bloque 4.</div>
+          <div class="ancla-sondas">
+            <div class="ancla-sonda"><em>"¿Qué tendría que pasar para que ese número suba un punto?"</em></div>
+          </div>
+          <div><span class="hp-pill hpa">H07</span></div>
+        </div>
+
+        <div class="highlight h-info" style="margin-top:16px;">
+          <div class="h-label">Anotar el número</div>
+          El valor de P4 se reabre textualmente en P8. Sin ese registro, el bloque de contraste pierde su dato más comparable entre perfiles y entre sesiones.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BLOQUE 2 ── -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num warn">2</div>
+          <div>
+            <div class="sec-title">Bloque 2 — La conversación difícil</div>
+            <div class="sec-sub">Sin material visual · El corazón del sprint · 13 min</div>
+          </div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-badge sb-warn">13 min</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="sec-body">
+
+        <div class="mod-box">
+          <div class="mod-title">Instrucciones para el moderador</div>
+          <div class="mod-item green">Pedir siempre <strong>caso concreto</strong>, nunca respuesta genérica.</div>
+          <div class="mod-item green">Dejar silencio después de cada pregunta. Las respuestas honestas vienen después de la pausa.</div>
+          <div class="mod-item warn">No validar en exceso con "claro" / "entiendo" — infla la respuesta hacia lo que el FP cree que queremos oír.</div>
+          <div class="mod-item blue">Registrar textualmente <strong>las dos voces</strong>: lo que dice el cliente y lo que responde el FP. Ese es el choque comunicacional.</div>
+        </div>
+
+        <div class="ancla">
+          <div class="ancla-num">P5</div>
+          <div class="ancla-pregunta">Cuando un cliente te busca porque el mercado cayó o porque le llegó una notificación de rebalanceo, ¿cómo es esa conversación? Llévame a un caso concreto.</div>
+          <div class="ancla-desc">Pregunta central de H06. Fusiona los dos escenarios críticos de v1.0 en una sola entrada, dejando que el FP elija el que más pesa en su memoria. Las repreguntas cubren lo que falte.</div>
+          <div class="ancla-sondas">
+            <div class="ancla-sonda"><em>"¿Qué te dijo exactamente? ¿Qué le respondiste?"</em></div>
+            <div class="ancla-sonda"><em>"¿Quedó tranquilo o quedó con más dudas?"</em></div>
+            <div class="ancla-sonda"><em>"¿Alguno terminó retirando? ¿Qué crees que lo llevó a esa decisión?"</em></div>
+            <div class="ancla-sonda key"><em>"¿Te enteraste de la notificación por el cliente o antes?"</em> — clave: mide la desalineación de información</div>
+          </div>
+          <div><span class="hp-pill hpc">H06</span></div>
+        </div>
+
+        <div class="ancla" style="margin-top:18px;">
+          <div class="ancla-num">P6</div>
+          <div class="ancla-pregunta">¿Qué argumento te hace falta hoy? Algo que no tienes y que te ayudaría a sostener esa conversación.</div>
+          <div class="ancla-desc">Proyectiva de cierre del bloque. Recoge el imaginario de necesidades <strong>antes</strong> de mostrar el prototipo — es el benchmark contra el cual se leerá la reacción del Bloque 3.</div>
+          <div class="ancla-sondas">
+            <div class="ancla-sonda"><em>"¿Sería algo para ti como asesor o algo que le darías al cliente directamente?"</em></div>
+            <div class="ancla-sonda"><em>"¿Existe en algún otro producto o plataforma que conozcas?"</em></div>
+          </div>
+          <div><span class="hp-pill hpa">H07</span><span class="hp-pill hpp">Nueva</span></div>
+        </div>
+
+        <div class="highlight h-warn" style="margin-top:16px;">
+          <div class="h-label">Transición al Bloque 3 — leer textual</div>
+          <em>"Ahora te voy a mostrar algo rápido. Es una versión de Invested en desarrollo, no es el producto final. Míralo desde tu rol como asesor y me dices qué piensas."</em><br>
+          No dar más contexto que ese.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BLOQUE 3 ── -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num">3</div>
+          <div>
+            <div class="sec-title">Bloque 3 — Reacción al prototipo</div>
+            <div class="sec-sub">Recorrido rápido + 1 parada · Lente comercial · 10 min</div>
+          </div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-badge sb-green">10 min</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="sec-body">
+
+        <div class="tiempo-bar">
+          <span class="tb-item" style="background:var(--color-neutral-l02);color:#666;border:1px solid var(--color-neutral-l03);">Recorrido continuo · min 0–3</span>
+          <span class="tb-sep">+</span>
+          <span class="tb-item" style="background:var(--color-primary-green-l04);color:var(--color-primary-green-d04);">Parada única · min 3–10</span>
+        </div>
+
+        <div class="recorrido">
+          <div class="rec-label">Recorrido continuo — min 0 a 3 · solo narrar, no preguntar</div>
+          <span class="rec-step">Activación</span>
+          <span class="rec-arrow">→</span>
+          <span class="rec-step">Dashboard</span>
+          <span class="rec-arrow">→</span>
+          <span class="rec-step stop">Detalle de producto · parada</span>
+        </div>
+
+        <div class="mod-box">
+          <div class="mod-title">Instrucciones para el moderador</div>
+          <div class="mod-item green">Compartir pantalla con Figma en modo presentación. <strong>Navegar tú.</strong> No entregar el control.</div>
+          <div class="mod-item green"><strong>Minuto 0–3: recorrido continuo.</strong> Pasar por activación → dashboard → detalle de producto sin detenerse a preguntar. Solo narrar qué es cada pantalla en una frase. Objetivo: que el FP tenga la propuesta completa en la cabeza.</div>
+          <div class="mod-item green"><strong>Minuto 3–10: parada única en el Detalle de producto.</strong> Es donde el cliente realmente vive el servicio día a día y donde se decide si llama, se tranquiliza o retira.</div>
+          <div class="mod-item blue"><strong>El FP no es usuario de esta pantalla: su cliente sí.</strong> Todas las preguntas se formulan sobre lo que haría o entendería un cliente suyo concreto, nunca sobre lo que el FP ve o le gusta. Si responde "a mí me parece…", devolverlo: <em>"¿y tu cliente qué haría con esto?"</em></div>
+          <div class="mod-item warn">Si el FP señala algo espontáneamente en el recorrido, dejarlo hablar y volver al recorrido. No abrir una parada nueva.</div>
+          <div class="mod-item warn"><strong>No defender el diseño.</strong> Si pregunta <em>"¿por qué lo hicieron así?"</em>, responder: <em>"Eso es justo lo que queremos saber — ¿qué esperarías tú?"</em></div>
+          <div class="mod-item purple">Con el detractor: atender cualquier señal de cambio de postura, aunque sea parcial. Es el hallazgo más valioso del piloto.</div>
+        </div>
+
+        <div class="sec-label">Parada única — Detalle de producto</div>
+        <div class="parada">
+          <div class="parada-header">
+            <div class="parada-num pn-green">P7</div>
+            <div class="parada-title">Detalle de producto — donde el cliente vive el servicio</div>
+            <span class="parada-chip" style="background:var(--color-primary-green-l04);color:var(--color-primary-green-d04);">7 min</span>
+          </div>
+          <div class="parada-body">
+            <div class="parada-encuadre">"Esta es la pantalla que ve tu cliente cuando entra a su Invested. Piensa en uno de tus clientes abriéndola solo, un día de mercado en rojo. ¿Qué entiende y qué hace después?"</div>
+            <div class="ancla-desc" style="margin-bottom:12px;">El rediseño es para el cliente, no para el asesor. La pregunta pone al FP a proyectar la reacción de alguien concreto de su cartera en lugar de opinar sobre el diseño. Lo que buscamos saber es si esta pantalla resuelve la llamada o la provoca.</div>
+            <div class="ta-list">
+              <div class="ta-item"><span class="ta-num ta-g">↳</span><div><em>"¿Te llamaría después de ver esto? ¿Con qué pregunta?"</em></div></div>
+              <div class="ta-item"><span class="ta-num ta-g">↳</span><div><em>"¿Qué le tendrías que explicar tú que la pantalla no le explica?"</em></div></div>
+              <div class="ta-item"><span class="ta-num ta-g">↳</span><div><em>"¿Hay algo aquí que lo haría retirarse… o quedarse?"</em></div></div>
+            </div>
+            <div><span class="hp-pill hpc">H06</span><span class="hp-pill hpa">H07</span><span class="hp-pill hpp">Nueva</span></div>
+          </div>
+        </div>
+
+        <div class="highlight h-grey">
+          <div class="h-label">Si sobra tiempo — solo si sobra</div>
+          Volver a la pantalla de activación y preguntar <em>"¿en qué punto crees que tu cliente se quedaría trabado o te llamaría?"</em>. No forzarlo.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BLOQUE 4 ── -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num purple">4</div>
+          <div>
+            <div class="sec-title">Bloque 4 — Contraste y cierre</div>
+            <div class="sec-sub">Dato comparable + input a producto · 5 min</div>
+          </div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-badge sb-purple">5 min</span>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="sec-body">
+
+        <div class="mod-box">
+          <div class="mod-title">Instrucciones para el moderador</div>
+          <div class="mod-item green"><strong>No resumir</strong> lo que el FP dijo antes. Que él construya el contraste solo — ese es el dato limpio.</div>
+          <div class="mod-item green">Anotar textualmente lo que pida en la última pregunta: es el input directo para producto.</div>
+        </div>
+
+        <div class="ancla">
+          <div class="ancla-num">P8</div>
+          <div class="ancla-pregunta">Al principio me diste un número del 1 al 5. Después de ver esto, ¿sigue siendo el mismo? ¿Por qué?</div>
+          <div class="ancla-desc">Cierra el bucle abierto en P4. Convierte una impresión difusa en un dato comparable entre perfiles y entre sesiones. Lo importante es la justificación del movimiento —o de la ausencia de movimiento.</div>
+          <div class="ancla-sondas">
+            <div class="ancla-sonda"><em>"¿Cambiaría algo en cómo se lo presentas a tus clientes?"</em></div>
+          </div>
+          <div><span class="hp-pill hpa">H07</span><span class="hp-pill hpp">Nueva</span></div>
+        </div>
+
+        <div class="ancla" style="margin-top:18px;">
+          <div class="ancla-num">P9</div>
+          <div class="ancla-pregunta">Si pudieras pedirle una sola cosa al equipo de producto para que Invested sea más fácil de recomendar y de defender, ¿cuál sería?</div>
+          <div class="ancla-desc">Cierre abierto, sin restricciones. Lo que sale primero es la necesidad más urgente del canal.</div>
+          <div class="ancla-sondas">
+            <div class="ancla-sonda"><em>"¿Para ti como asesor, para el cliente, o para los dos?"</em></div>
+          </div>
+          <div><span class="hp-pill hpa">H07</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NOTAS TRANSVERSALES ── -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num warn">!</div>
+          <div>
+            <div class="sec-title">Notas de moderación transversales</div>
+            <div class="sec-sub">Riesgos, señales y tiempos de control</div>
+          </div>
+        </div>
+        <div class="sec-right"><span class="chevron">▼</span></div>
+      </div>
+      <div class="sec-body">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>Riesgo</th><th>Señal</th><th>Qué hacer</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>El FP entra en modo comercial</td>
+                <td>Habla en tercera persona, usa lenguaje de brochure</td>
+                <td><em>"¿Y con un cliente tuyo en particular cómo fue?"</em></td>
+              </tr>
+              <tr>
+                <td>B2 se queda en lo genérico</td>
+                <td>Responde "depende del cliente"</td>
+                <td>Insistir una vez más por el caso concreto; si no aparece, anotarlo como hallazgo</td>
+              </tr>
+              <tr>
+                <td>El prototipo se desborda</td>
+                <td>B3 pasa de 10 min</td>
+                <td>Cortar y pasar a B4. B4 vale más que una parada extra</td>
+              </tr>
+              <tr>
+                <td>El detractor se cierra</td>
+                <td>Respuestas cortas, defensivas</td>
+                <td>Bajar a lo operativo: <em>"¿qué pasó la última vez que lo intentaste?"</em></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="highlight h-warn" style="margin-top:16px;">
+          <div class="h-label">Tiempos de control</div>
+          Al <strong>minuto 27</strong> se debe estar cerrando B2. Al <strong>minuto 40</strong>, entrando a B4.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRAZABILIDAD ── -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle(this)">
+        <div class="sec-header-left">
+          <div class="sec-num purple">H</div>
+          <div>
+            <div class="sec-title">Trazabilidad de hipótesis</div>
+            <div class="sec-sub">Qué pregunta alimenta cada hipótesis</div>
+          </div>
+        </div>
+        <div class="sec-right"><span class="chevron">▼</span></div>
+      </div>
+      <div class="sec-body">
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>Hipótesis</th><th>Preguntas</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="hip-badge hb-c">H06 · Crítica</span><div style="margin-top:6px;">Desalineación FP–Invested genera choque comunicacional</div></td>
+                <td>P1, P2, P3, P5, P7</td>
+              </tr>
+              <tr>
+                <td><span class="hip-badge hb-a">H07 · Alta</span><div style="margin-top:6px;">Con herramientas y lenguaje alineado, el FP se vuelve amplificador</div></td>
+                <td>P2, P3, P4, P6, P7, P8, P9</td>
+              </tr>
+              <tr>
+                <td><span class="hip-badge hb-p">Nueva · Exploratoria</span><div style="margin-top:6px;">La 3.0 le da argumentos que hoy no tiene en volatilidad</div></td>
+                <td>P6, P7, P8</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+  <div class="page-footer">
+    <div class="footer-note">UXplorers · Invested 3.0 · Instrumento FPs v2.0 · Junio 2026 — Uso exclusivo del equipo moderador. Documento vivo.</div>
+  </div>
+</div>
+
+<script>
+function showPage(id, e) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (e && e.target) e.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.chevron');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (chevron) chevron.classList.toggle('open', !isOpen);
+}
+
+document.querySelectorAll('.sec-body').forEach(body => {
+  if (!body.classList.contains('open')) body.style.display = 'none';
+});
+
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(m => {
+    if (m.type === 'attributes' && m.attributeName === 'class') {
+      const el = m.target;
+      el.style.display = el.classList.contains('open') ? 'block' : 'none';
+    }
+  });
+});
+document.querySelectorAll('.sec-body').forEach(body => {
+  observer.observe(body, { attributes: true });
+});
+</script>
+</body>
+</html>
