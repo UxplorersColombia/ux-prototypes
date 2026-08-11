@@ -3,23 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reglamento de Uso de Canales Digitales — Portal Clientes Skandia</title>
-<meta name="description" content="Prototipo de aceptación del Reglamento de Uso de los Canales Digitales de Skandia en el Portal de Clientes.">
+<title>Reglamento de Uso de Canales Digitales — Portal y App Skandia</title>
+<meta name="description" content="Prototipo de aceptación y consulta del Reglamento de Uso de los Canales Digitales de Skandia, en Portal de Clientes (escritorio) y Skandia App (móvil).">
 <!--
   Términos y condiciones · Portal y App — v1
-  Flujo: login → portal + modal del Reglamento → "Aceptar y continuar" (banner de
-  confirmación en el portal) o "Rechazar" (vuelve al login con aviso de cierre de sesión).
+  Switch superior: Versión escritorio / Versión móvil (cambiar de dispositivo reinicia el estado).
 
-  Reglas del modal (por defecto activas, se pueden desactivar por query string):
+  El modal del Reglamento tiene dos modos:
+    · aceptación  → se abre al iniciar sesión. Bloqueante: exige leer hasta el final
+                    y marcar la casilla. Salidas: "Aceptar y continuar" o "Rechazar".
+    · consulta    → se abre desde "Términos y condiciones" (Ayuda y soporte en escritorio,
+                    Canales de atención en móvil). Sin gate, sin casilla, se cierra con la X.
+
+  Reglas del modo aceptación (por defecto activas, se pueden desactivar por query string):
     ?scroll=0   no exige leer hasta el final
     ?check=0    no exige marcar la casilla
-    ?scroll=0&check=0  habilita "Aceptar" desde el inicio
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* ------------------------------------------------------------------ base */
+  /* ================================================================== base */
   *{ box-sizing: border-box; }
   body{
     margin: 0; background: #f7f7f7; color: #232323;
@@ -29,77 +33,89 @@
   h1, h2, h3{ font-family: Montserrat, sans-serif; font-weight: 700; }
   a{ color: #00c73d; text-decoration: none; }
   a:hover{ color: #03a835; }
+  button{ font-family: 'Open Sans', sans-serif; }
   [hidden]{ display: none !important; }
 
   @keyframes skFade{ from{ opacity: 0 } to{ opacity: 1 } }
   @keyframes skRise{ from{ opacity: 0; transform: translateY(12px) } to{ opacity: 1; transform: none } }
+  @keyframes skSheet{ from{ opacity: 0; transform: translateY(24px) } to{ opacity: 1; transform: none } }
 
   .sk-scroll::-webkit-scrollbar{ width: 8px; }
   .sk-scroll::-webkit-scrollbar-thumb{ background: #00c73d; border-radius: 8px; }
   .sk-scroll::-webkit-scrollbar-track{ background: #efefef; border-radius: 8px; }
 
-  /* --------------------------------------------------------------- botones */
+  .green{ color: #00c73d; }
+  .bold{ font-weight: 700; }
+
+  /* ============================================================ switch top */
+  .tabs{
+    height: 56px; background: #ffffff; border-bottom: 1px solid #dddddd;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    position: relative; z-index: 60;
+  }
+  .tab{
+    height: 36px; padding: 0 20px; border-radius: 100px;
+    font-weight: 700; font-size: 14px; cursor: pointer;
+    background: #ffffff; color: #404040; border: 1px solid #dddddd;
+    transition: background 150ms ease-out;
+  }
+  .tab:hover{ background: #f7f7f7; }
+  .tab--on{ background: #00c73d; color: #ffffff; border: none; }
+  .tab--on:hover{ background: #03a835; }
+
+  /* =============================================================== botones */
   .btn{
     height: 56px; border-radius: 100px; border: none;
-    font-family: 'Open Sans', sans-serif; font-weight: 700; font-size: 16px;
-    cursor: pointer; transition: background 150ms ease-out;
+    font-weight: 700; font-size: 16px; cursor: pointer;
+    transition: background 150ms ease-out;
   }
   .btn--primary{ background: #00c73d; color: #ffffff; }
   .btn--primary:hover{ background: #03a835; }
-  .btn--primary:disabled{
-    background: #e9e9e9; color: #666666; cursor: not-allowed; pointer-events: none;
-  }
-  .btn--outline{
-    background: #ffffff; color: #00c73d; border: 2px solid #00c73d;
-  }
+  .btn--primary:disabled{ background: #e9e9e9; color: #666666; cursor: not-allowed; pointer-events: none; }
+  .btn--outline{ background: #ffffff; color: #00c73d; border: 2px solid #00c73d; }
   .btn--outline:hover{ background: #f6fcf2; }
-  .btn:focus-visible{ outline: 3px solid #0c3d1a; outline-offset: 2px; }
-
-  /* --------------------------------------------------------------- avisos */
-  .notice{
-    display: flex; gap: 12px; align-items: flex-start;
-    border-radius: 8px; padding: 12px 16px;
-    font-size: 14px; line-height: 20px;
+  .btn--ghost{
+    height: 48px; border: none; background: transparent; color: #232323;
+    font-weight: 700; font-size: 16px; cursor: pointer; border-radius: 100px;
+    transition: background 150ms ease-out;
   }
+  .btn--ghost:hover{ background: #f7f7f7; }
+  button:focus-visible, a:focus-visible, input:focus-visible{ outline: 3px solid #0c3d1a; outline-offset: 2px; }
+
+  /* ================================================================ avisos */
+  .notice{ border-radius: 8px; padding: 12px 16px; font-size: 14px; line-height: 20px; }
   .notice--error{ background: #fdeceb; border: 1px solid #e4483b; color: #a3271c; }
-  .notice--success{
-    background: #eafbef; border: 1px solid #00c73d; color: #0c3d1a;
-    align-items: center; padding: 14px 20px; margin-top: 24px;
-  }
+  .notice--ok{ background: #eafbef; border: 1px solid #00c73d; color: #0c3d1a; padding: 14px 20px; }
 
-  /* ---------------------------------------------------------------- login */
-  .login{
+  /* ======================================================== login (desktop) */
+  .d-login{
     display: grid; grid-template-columns: minmax(360px, 620px) minmax(0, 1fr);
-    min-height: 100vh; background: #ffffff;
+    min-height: calc(100vh - 56px); background: #ffffff;
   }
-  .login__panel{
+  .d-login__panel{
     display: flex; flex-direction: column; justify-content: space-between;
     padding: 56px clamp(32px, 6vw, 88px) 40px; gap: 40px; min-width: 0;
   }
-  .login__logo{ width: 168px; height: auto; align-self: center; margin-top: 32px; }
-  .login__form{ display: flex; flex-direction: column; gap: 24px; }
-  .login__head{ display: flex; flex-direction: column; gap: 8px; text-align: center; }
-  .login__head h1{ font-size: 24px; line-height: 32px; margin: 0; }
-  .login__head p{ margin: 0; font-size: 16px; line-height: 24px; color: #404040; }
-  .login__fields{ display: flex; flex-direction: column; gap: 16px; }
+  .d-login__logo{ width: 168px; height: auto; align-self: center; margin-top: 32px; }
+  .d-login__form{ display: flex; flex-direction: column; gap: 24px; }
+  .d-login__head{ display: flex; flex-direction: column; gap: 8px; text-align: center; }
+  .d-login__head h1{ font-size: 24px; line-height: 32px; margin: 0; }
+  .d-login__head p{ margin: 0; font-size: 16px; line-height: 24px; color: #404040; }
+  .d-login__fields{ display: flex; flex-direction: column; gap: 16px; }
   .field{
     height: 56px; padding: 0 20px; border: 1px solid #dddddd; border-radius: 8px;
     font-family: 'Open Sans', sans-serif; font-size: 16px; color: #232323; outline: none;
   }
   .field:focus{ border-color: #00c73d; border-width: 2px; padding: 0 19px; }
-  .login__reset{ font-weight: 700; font-size: 16px; text-align: center; }
-  .login__submit{ margin-top: 8px; }
-  .login__legal{ margin: 0; text-align: center; font-size: 13px; line-height: 20px; color: #666666; }
-  .login__legal a{ font-weight: 700; }
-  .legacy{
-    border: 1px solid #dddddd; border-radius: 12px; padding: 16px 20px;
-    display: flex; flex-direction: column; gap: 4px;
-  }
+  .d-login__reset{ font-weight: 700; font-size: 16px; text-align: center; }
+  .d-login__submit{ margin-top: 8px; }
+  .d-login__legal{ margin: 0; text-align: center; font-size: 13px; line-height: 20px; color: #666666; }
+  .d-login__legal a{ font-weight: 700; }
+  .legacy{ border: 1px solid #dddddd; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; }
   .legacy__title{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 14px; }
   .legacy__text{ font-size: 14px; line-height: 20px; color: #404040; }
   .legacy__text a{ font-weight: 700; }
 
-  /* ----------------------------------------------------------------- hero */
   .hero{
     position: relative; background: #00c73d; overflow: hidden; min-width: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -111,7 +127,7 @@
   .hero__media{ position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; }
   .slot{
     width: 100%; height: 100%; border-radius: 24px;
-    background: rgba(255, 255, 255, .18); border: 2px dashed rgba(255, 255, 255, .6);
+    background: rgba(255,255,255,.18); border: 2px dashed rgba(255,255,255,.6);
     display: flex; align-items: center; justify-content: center;
     color: #ffffff; font-size: 14px; font-weight: 600; text-align: center; padding: 16px;
   }
@@ -119,9 +135,7 @@
     position: relative; display: flex; flex-direction: column; align-items: center;
     gap: 12px; text-align: center; text-wrap: pretty;
   }
-  .hero__copy h2{
-    font-size: clamp(22px, 2.6vw, 32px); line-height: 1.25; color: #ffffff; margin: 0;
-  }
+  .hero__copy h2{ font-size: clamp(22px, 2.6vw, 32px); line-height: 1.25; color: #ffffff; margin: 0; }
   .hero__copy p{ margin: 0; font-size: 18px; color: #0c3d1a; }
   .hero__cta{
     margin-top: 12px; border: 2px solid #0c3d1a; border-radius: 100px;
@@ -129,214 +143,865 @@
   }
   .hero__cta:hover{ background: #0c3d1a; color: #ffffff; }
 
-  /* ---------------------------------------------------------------- portal */
-  .portal{ min-height: 100vh; background: #f7f7f7; }
-  .topbar{
-    height: 64px; background: #ffffff; border-bottom: 1px solid #dddddd;
-    display: flex; align-items: center; justify-content: space-between; padding: 0 48px;
+  /* ======================================================= portal (desktop) */
+  .d-portal{
+    min-height: calc(100vh - 56px); background: #ffffff;
+    display: grid; grid-template-columns: 112px minmax(0, 1fr); position: relative;
   }
-  .topbar__logo{ width: 118px; height: auto; }
-  .topbar__user{ font-size: 14px; color: #404040; }
-  .portal__inner{ max-width: 1200px; margin: 0 auto; padding: 48px; }
-  .portal__inner h1{ font-size: 32px; line-height: 40px; margin: 0 0 8px; }
-  .portal__lead{ margin: 0; font-size: 16px; color: #404040; }
-  .products{
-    margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  .rail{ border-right: 1px solid #dddddd; padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .rail__burger{
+    width: 100%; height: 48px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: #232323;
+    border-radius: 8px; transition: background 150ms ease-out;
   }
-  .product{
-    background: #ffffff; border: 1px solid #dddddd; border-radius: 16px; padding: 24px;
-    display: flex; flex-direction: column; gap: 8px;
+  .rail__burger:hover{ background: #f7f7f7; }
+  .rail__item{
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    width: 100%; padding: 12px 0; border: none; background: transparent; cursor: pointer;
+    font-size: 12px; color: #404040;
   }
-  .product__label{ font-size: 14px; color: #666666; }
-  .product__value{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 24px; }
+  .rail__item--on{ color: #00c73d; }
+  .rail__icon{
+    width: 40px; height: 40px; border-radius: 100px;
+    display: flex; align-items: center; justify-content: center; background: transparent;
+  }
+  .rail__item--on .rail__icon{ background: #f6fcf2; }
+  .rail__foot{ margin-top: auto; }
 
-  /* ----------------------------------------------------------------- modal */
+  .d-head{
+    height: 80px; border-bottom: 1px solid #dddddd;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 40px;
+  }
+  .d-head__brand{ display: flex; align-items: center; gap: 12px; }
+  .d-head__brand img{ width: 104px; height: auto; }
+  .d-head__brand span{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 20px; }
+  .d-head__right{ display: flex; align-items: center; gap: 20px; }
+  .d-head__bell{
+    width: 44px; height: 44px; border-radius: 100px; background: #00c73d;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .d-head__quick{
+    height: 48px; padding: 0 24px; border: none; border-radius: 100px;
+    background: #00c73d; color: #ffffff; font-weight: 700; font-size: 16px;
+    cursor: pointer; transition: background 150ms ease-out;
+  }
+  .d-head__quick:hover{ background: #03a835; }
+  .d-head__user{ display: flex; align-items: center; gap: 10px; }
+  .d-head__avatar{
+    width: 44px; height: 44px; border-radius: 100px; border: 2px solid #00c73d;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: #232323;
+  }
+  .d-head__hello{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 16px; }
+
+  .d-main{ display: flex; flex-direction: column; min-width: 0; }
+  .d-body{ padding: 40px; display: flex; flex-direction: column; gap: 24px; max-width: 1200px; }
+  .d-body__head{ display: flex; flex-direction: column; gap: 6px; }
+  .d-body__head h1{ font-size: 32px; line-height: 40px; margin: 0; }
+  .d-body__head p{ margin: 0; font-size: 16px; color: #404040; }
+
+  .cats{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+  .cat{
+    background: #ffffff; border: 1px solid #dddddd; border-radius: 16px; padding: 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .cat--on{ border: 2px solid #00c73d; }
+  .cat__icon{
+    width: 40px; height: 40px; border-radius: 100px; background: #f7f7f7; color: #404040;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cat--on .cat__icon{ background: #f6fcf2; color: #00c73d; }
+  .cat__label{ font-size: 16px; color: #404040; }
+  .cat__value{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 20px; }
+  .cat__tag{
+    align-self: flex-start; background: #f6fcf2; color: #0c3d1a; border-radius: 4px;
+    padding: 4px 10px; font-size: 12px; font-weight: 700;
+  }
+
+  .promo{
+    background: #f7f7f7; border-radius: 16px; padding: 24px 32px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  }
+  .promo__copy{ display: flex; flex-direction: column; gap: 4px; }
+  .promo__title{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 20px; }
+  .promo__text{ font-size: 16px; color: #404040; }
+  .promo__chev{ color: #404040; }
+
+  .contracts{
+    background: #f7f7f7; border-radius: 16px; padding: 24px 32px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .contracts__title{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 20px; }
+  .contracts__group{ display: flex; flex-direction: column; gap: 8px; }
+  .contracts__fund{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 16px; color: #404040; }
+  .contract{
+    background: #ffffff; border-radius: 12px; padding: 20px 24px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .contract__name{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 18px; }
+  .contract__meta{ font-size: 14px; color: #404040; }
+  .contracts__cut{ align-self: center; font-size: 14px; color: #666666; }
+
+  /* ---------------------------------------------- panel de ayuda (desktop) */
+  .help{ position: absolute; inset: 0; z-index: 40; display: flex; animation: skFade 150ms ease-out; }
+  .help__scrim{ position: absolute; inset: 0; background: rgba(255,255,255,0.75); border: none; padding: 0; cursor: default; }
+  .help__rail{ position: relative; width: 112px; flex: none; border-right: 1px solid #dddddd; background: #ffffff; padding: 20px 12px; }
+  .help__close{
+    width: 100%; height: 48px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: #232323;
+    border-radius: 8px; transition: background 150ms ease-out;
+  }
+  .help__close:hover{ background: #f7f7f7; }
+  .help__panel{
+    position: relative; width: 360px; flex: none; background: #ffffff;
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12), 0 4px 8px -2px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; padding: 20px; gap: 8px;
+  }
+  .help__title{
+    background: #f7f7f7; border-radius: 8px; padding: 14px 20px;
+    font-family: Montserrat, sans-serif; font-weight: 700; font-size: 16px; color: #00c73d;
+  }
+  .help__link{
+    text-align: left; border: none; background: transparent; padding: 16px 20px;
+    font-size: 16px; color: #232323; cursor: pointer; border-radius: 8px;
+    transition: background 150ms ease-out;
+  }
+  .help__link:hover{ background: #f6fcf2; }
+  .help__foot{ margin-top: auto; display: flex; flex-direction: column; gap: 16px; }
+  .help__app{
+    border: 1px solid #00c73d; border-radius: 8px; padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-weight: 700; font-size: 16px;
+  }
+  .help__session{
+    background: #f7f7f7; border-radius: 8px; padding: 14px 20px;
+    font-size: 14px; line-height: 22px; color: #404040;
+  }
+
+  /* ======================================================= modal (desktop) */
   .overlay{
-    position: fixed; inset: 0; background: rgba(0, 0, 0, .4); z-index: 50;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 50;
     display: flex; align-items: center; justify-content: center; padding: 40px;
     animation: skFade 150ms ease-out;
   }
   .modal{
     width: 100%; max-width: 880px; max-height: 100%; background: #ffffff;
     border-radius: 16px; overflow: hidden;
-    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, .12), 0 4px 8px -2px rgba(0, 0, 0, .06);
-    display: flex; flex-direction: column;
-    animation: skRise 180ms ease-out;
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12), 0 4px 8px -2px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; animation: skRise 180ms ease-out;
   }
   .modal:focus{ outline: none; }
   .modal__head{ display: flex; align-items: flex-start; gap: 16px; padding: 24px 32px 16px; }
-  .modal__head svg{ flex: none; margin-top: 2px; }
-  .modal__head h2{ font-size: 20px; line-height: 28px; margin: 0; }
+  .modal__head > svg{ flex: none; margin-top: 2px; }
+  .modal__titles{ display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .modal__titles h2{ font-size: 20px; line-height: 28px; margin: 0; }
+  .modal__date{ font-size: 12px; line-height: 16px; color: #666666; }
+  .modal__x{
+    flex: none; width: 40px; height: 40px; border: none; border-radius: 100px;
+    background: transparent; cursor: pointer; color: #00c73d;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 150ms ease-out;
+  }
+  .modal__x:hover{ background: #f6fcf2; }
   .modal__body{
     position: relative; margin: 0 32px; border: 1px solid #dddddd; border-radius: 12px;
     overflow: hidden; flex: 1; min-height: 0;
   }
+  .modal__actions{ display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px 32px 28px; }
+  .modal__spacer{ height: 32px; }
+
+  /* ------------------------------------------------ documento (compartido) */
   .doc{
     height: 100%; max-height: 46vh; overflow-y: auto; padding: 28px 32px;
     display: flex; flex-direction: column; gap: 16px;
   }
-  .doc__intro{ margin: 0; font-size: 15px; line-height: 24px; color: #404040; }
+  .doc__intro{ margin: 0; font-size: 16px; line-height: 24px; color: #404040; }
   .doc__h1{
-    font-family: Montserrat, sans-serif; font-weight: 700; font-size: 16px; line-height: 24px;
-    margin: 20px 0 8px; color: #232323;
+    font-family: Montserrat, sans-serif; font-weight: 700; font-size: 18px; line-height: 26px;
+    margin: 24px 0 8px; color: #232323;
   }
   .doc__h2{
-    font-family: 'Open Sans', sans-serif; font-weight: 700; font-size: 15px; line-height: 22px;
-    margin: 14px 0 6px; color: #00874a;
+    font-family: 'Open Sans', sans-serif; font-weight: 700; font-size: 16px; line-height: 24px;
+    margin: 16px 0 8px; color: #232323;
   }
-  .doc__p{
-    margin: 0 0 12px; font-size: 15px; line-height: 24px; color: #404040; text-wrap: pretty;
-  }
+  .doc__p{ margin: 0 0 12px; font-size: 16px; line-height: 24px; color: #404040; text-wrap: pretty; }
   .doc__li{ display: flex; gap: 12px; margin: 0 0 10px; padding-left: 4px; }
-  .doc__bullet{ color: #00c73d; font-weight: 700; line-height: 24px; }
-  .doc__li span:last-child{ font-size: 15px; line-height: 24px; color: #404040; text-wrap: pretty; }
+  .doc__bullet{ color: #404040; font-weight: 700; line-height: 24px; }
+  .doc__li span:last-child{ font-size: 16px; line-height: 24px; color: #404040; text-wrap: pretty; }
+
   .consent{
     display: flex; align-items: flex-start; gap: 12px; cursor: pointer;
     margin-top: 12px; padding-top: 20px; border-top: 1px solid #dddddd;
   }
-  .consent input{
-    width: 20px; height: 20px; margin: 2px 0 0; accent-color: #00c73d; cursor: pointer; flex: none;
+  .consent__text{ font-size: 16px; line-height: 24px; font-weight: 700; color: #232323; }
+  .cbox-wrap{ position: relative; flex: none; width: 20px; height: 20px; margin-top: 2px; }
+  .cbox-input{ position: absolute; inset: 0; width: 20px; height: 20px; margin: 0; opacity: 0; cursor: pointer; }
+  .cbox{
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; pointer-events: none;
+    background: #ffffff; box-shadow: 0 0 6px rgba(61,75,92,0.15);
   }
-  .consent span{ font-size: 15px; line-height: 22px; font-weight: 700; color: #232323; }
+  .cbox svg{ opacity: 0; }
+  .cbox-input:checked + .cbox{ background: #00c73d; box-shadow: 0 0 8px rgba(68,68,68,0.15); }
+  .cbox-input:checked + .cbox svg{ opacity: 1; }
+  .cbox-input:focus-visible + .cbox{ outline: 3px solid #0c3d1a; outline-offset: 2px; }
+
   .hint{
     position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: max-content; max-width: calc(100% - 32px);
     background: #232323; color: #ffffff; border-radius: 100px; padding: 10px 20px;
     font-size: 14px; white-space: nowrap; pointer-events: none;
   }
-  .modal__actions{
-    display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px 32px 28px;
+
+  /* ================================================================= móvil */
+  .m-stage{
+    min-height: calc(100vh - 56px); background: #f7f7f7;
+    display: flex; align-items: center; justify-content: center; padding: 40px 24px;
+  }
+  .phone{
+    position: relative; width: 390px; height: 844px; flex: none;
+    background: #ffffff; border: 12px solid #1a1a1a; border-radius: 56px; overflow: hidden;
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12), 0 4px 8px -2px rgba(0,0,0,0.06);
+  }
+  .status{
+    position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 30;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 28px;
+    font-size: 15px; font-weight: 700; color: #232323;
+  }
+  .status__island{
+    position: absolute; left: 50%; top: 10px; transform: translateX(-50%);
+    width: 120px; height: 34px; border-radius: 100px; background: #1a1a1a;
+  }
+  .m-screen{ height: 100%; display: flex; flex-direction: column; }
+  .m-bar{ align-self: center; width: 134px; height: 5px; border-radius: 100px; background: #1a1a1a; flex: none; }
+
+  /* login móvil */
+  .m-login{ padding: 62px 28px 34px; background: #ffffff; }
+  .m-login__back{
+    width: 40px; height: 40px; flex: none; border: none; border-radius: 100px; background: #00c73d;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .m-login__logo{ width: 150px; height: auto; align-self: center; margin-top: 40px; }
+  .m-login__form{ flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+  .m-pass{ position: relative; }
+  .m-pass .field{ width: 100%; padding: 0 52px 0 20px; }
+  .m-pass .field:focus{ padding: 0 51px 0 19px; }
+  .m-pass__eye{ position: absolute; right: 18px; top: 17px; pointer-events: none; }
+  .m-login__reset{ font-weight: 700; font-size: 16px; text-align: center; }
+
+  /* home móvil */
+  .m-home{ background: #f7f7f7; }
+  .m-top{
+    background: #ffffff; border-radius: 0 0 20px 20px; padding: 60px 20px 16px; flex: none;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .m-top__btn{
+    width: 44px; height: 44px; border: none; border-radius: 12px; background: #f7f7f7; color: #00c73d;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .m-top__logo{ width: 120px; height: auto; }
+  .m-scroll{ flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .m-hello{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 24px; }
+  .m-hello span{ color: #8fe000; }
+  .m-card{
+    background: #ffffff; border-radius: 12px; padding: 20px;
+    display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .m-card--promo{ gap: 16px; }
+  .m-card__text{ font-size: 16px; line-height: 24px; color: #404040; }
+  .m-card__cta{
+    align-self: flex-start; height: 44px; padding: 0 24px; border: none; border-radius: 100px;
+    background: #00c73d; color: #ffffff; font-weight: 700; font-size: 15px; cursor: pointer;
+  }
+  .m-card__label{ font-size: 17px; color: #404040; }
+  .m-card__value{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 28px; color: #00c73d; }
+  .m-card__hint{ font-size: 14px; color: #666666; }
+  .m-nav{
+    background: #ffffff; border-radius: 20px 20px 0 0; padding: 12px 32px; flex: none;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .m-nav__item{ display: flex; flex-direction: column; align-items: center; gap: 4px; color: #666666; font-size: 15px; }
+  .m-nav__item--on{ color: #00c73d; font-weight: 700; }
+  .m-nav__plus{
+    width: 56px; height: 56px; border-radius: 12px; background: #00c73d; color: #ffffff;
+    display: flex; align-items: center; justify-content: center;
   }
 
-  /* ------------------------------------------------------------ responsive */
+  /* menú móvil */
+  .m-menu{ background: #f7f7f7; }
+  .m-menu__top{
+    background: #ffffff; border-radius: 0 0 20px 20px; padding: 60px 20px 28px; flex: none;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .m-menu__head{ display: flex; align-items: center; gap: 16px; }
+  .m-back{
+    width: 40px; height: 40px; flex: none; border: none; border-radius: 100px;
+    background: #00c73d; color: #ffffff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .m-menu__head span{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 28px; }
+  .m-menu__who{ display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .m-menu__avatar{
+    width: 108px; height: 108px; border-radius: 100px; background: #f6fcf2;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Montserrat, sans-serif; font-weight: 700; font-size: 34px; color: #8fe000;
+  }
+  .m-menu__name{ font-size: 20px; color: #404040; }
+  .m-menu__mail{ font-size: 15px; color: #666666; }
+  .m-row{
+    width: 100%; background: #ffffff; border: none; border-radius: 12px; padding: 18px 20px;
+    display: flex; align-items: center; gap: 16px; cursor: pointer;
+    font-size: 17px; color: #232323; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .m-row__icon{ color: #666666; flex: none; display: flex; }
+  .m-row__label{ flex: 1; text-align: left; }
+  .m-row__chev{ color: #00c73d; flex: none; display: flex; }
+  .m-menu__session{
+    background: #ffffff; border-radius: 12px; padding: 18px 20px; text-align: center;
+    font-size: 15px; line-height: 22px; color: #404040;
+  }
+  .m-menu__version{ text-align: center; font-weight: 700; font-size: 15px; color: #8fe000; }
+
+  /* soporte móvil */
+  .m-support{ background: #ffffff; }
+  .m-support__head{ padding: 60px 20px 12px; display: flex; align-items: center; gap: 12px; flex: none; }
+  .m-support__head span{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 22px; }
+  .m-support__back{
+    width: 40px; height: 40px; flex: none; border: none; background: transparent; color: #232323;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .m-support__list{ flex: 1; overflow-y: auto; padding: 12px 24px 24px; display: flex; flex-direction: column; gap: 20px; }
+  .m-block{ display: flex; flex-direction: column; gap: 8px; }
+  .m-block__label{ font-size: 14px; color: #666666; }
+  .m-block a{ font-weight: 700; font-size: 17px; text-decoration: underline; }
+  .m-block__terms{
+    align-self: flex-start; border: none; background: transparent; padding: 0;
+    font-weight: 700; font-size: 17px; color: #00c73d; text-decoration: underline; cursor: pointer;
+  }
+  .m-office{
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 2px solid #00c73d; padding-bottom: 8px;
+  }
+  .m-office__name{ flex: 1; font-size: 17px; color: #404040; }
+  .m-office__text{ font-size: 16px; line-height: 24px; color: #404040; }
+
+  /* bottom sheet móvil */
+  .sheet-overlay{
+    position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 40;
+    display: flex; align-items: flex-end; animation: skFade 150ms ease-out;
+  }
+  .sheet{
+    width: 100%; height: 92%; background: #ffffff; border-radius: 24px 24px 0 0;
+    display: flex; flex-direction: column; overflow: hidden; animation: skSheet 200ms ease-out;
+  }
+  .sheet:focus{ outline: none; }
+  .sheet__head{
+    position: relative; padding: 24px 24px 16px; border-bottom: 1px solid #dddddd;
+    display: flex; flex-direction: column; gap: 4px; flex: none;
+  }
+  .sheet__head h2{
+    font-family: Montserrat, sans-serif; font-weight: 700; font-size: 20px; line-height: 28px;
+    margin: 0; padding-right: 40px; text-wrap: pretty;
+  }
+  .sheet__date{ font-size: 12px; line-height: 16px; color: #666666; }
+  .sheet__x{
+    position: absolute; top: 18px; right: 18px; width: 40px; height: 40px;
+    border: none; border-radius: 100px; background: transparent; color: #00c73d; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sheet__body{ position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
+  .sheet__doc{
+    position: absolute; inset: 0; overflow-y: auto; padding: 20px 24px 24px;
+    display: flex; flex-direction: column; gap: 12px; max-height: none; height: auto;
+  }
+  .sheet__doc .doc__h1{ margin: 20px 0 8px; }
+  .sheet__doc .doc__h2{ margin: 14px 0 8px; }
+  .sheet__doc .doc__li{ gap: 10px; padding-left: 0; }
+  .sheet__hint{
+    background: #404040; padding: 10px 14px; font-size: 13px; line-height: 18px;
+  }
+  .sheet__actions{
+    border-top: 1px solid #dddddd; padding: 20px 24px 28px; flex: none;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+
+  /* ============================================================ responsive */
+  /* El diseño define escritorio y móvil como vistas propias; esto solo evita
+     que la vista de escritorio se rompa en ventanas angostas. */
+  @media (max-width: 1180px){
+    .cats{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
   @media (max-width: 900px){
-    .login{ grid-template-columns: 1fr; }
-    .login__panel{ padding: 40px 24px 32px; gap: 32px; }
-    .login__logo{ margin-top: 8px; }
+    .d-login{ grid-template-columns: 1fr; }
+    .d-login__panel{ padding: 40px 24px 32px; gap: 32px; }
+    .d-login__logo{ margin-top: 8px; }
     .hero{ padding: 40px 24px; gap: 24px; }
-    .topbar{ padding: 0 20px; }
-    .portal__inner{ padding: 32px 20px; }
-    .products{ grid-template-columns: 1fr; gap: 16px; }
+    .d-portal{ grid-template-columns: 72px minmax(0, 1fr); }
+    .rail{ padding: 16px 8px; }
+    .rail__item{ font-size: 10px; }
+    .d-head{ height: auto; flex-wrap: wrap; gap: 12px; padding: 16px 20px; }
+    .d-head__quick{ display: none; }
+    .d-body{ padding: 24px 20px; }
+    .d-body__head h1{ font-size: 24px; line-height: 32px; }
+    .cats{ grid-template-columns: 1fr; gap: 16px; }
+    .promo, .contracts{ padding: 20px; }
+    .help__panel{ width: 100%; }
     .overlay{ padding: 16px; }
     .modal__head{ padding: 20px 20px 12px; }
     .modal__body{ margin: 0 20px; }
     .doc{ max-height: 52vh; padding: 20px; }
     .modal__actions{ grid-template-columns: 1fr; gap: 12px; padding: 16px 20px 20px; }
-    .hint{ white-space: normal; text-align: left; max-width: calc(100% - 40px); }
+    .hint{ white-space: normal; text-align: left; }
+    .m-stage{ padding: 24px 12px; }
+  }
+  @media (max-width: 430px){
+    .phone{
+      width: 100%; height: 720px; border-width: 8px; border-radius: 40px;
+    }
   }
 </style>
 </head>
 <body>
 
-<!-- =============================================================== LOGIN -->
-<section class="login" id="screen-login">
-  <div class="login__panel">
-    <img class="login__logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMjgwIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTI5XzQyMikiPgo8cGF0aCBkPSJNNjIuMDAwMSAzNC40MDc2QzUyLjg0OTEgMzEuOTM3MyA1Mi43OTQ0IDI3LjMxOTkgNTIuODQ5MSAyNC41MjMyQzUyLjkxMjQgMjAuMDM0NyA1OC4zNDA4IDE1Ljg3MjYgNjQuNzQ3NCAxNS44NzI2QzcwLjgyNjEgMTUuODcyNiA3Ny4yMzI3IDE4LjUzNzYgNzcuMjk4OCAyNS45NTQ1SDY4LjczMThDNjguNjY4NSAyMy42NjQ1IDY2LjcxOCAyMy4yODY2IDY1LjI3OTYgMjMuMjg2NkM2My4zMjA1IDIzLjI4NjYgNjIuMDExNiAyNC4xOTY5IDYyLjA3NzggMjUuNTc2NkM2Mi4xNDExIDI2LjQ4NjkgNjIuOTQwOCAyNy40MDAxIDY0Ljc1ODkgMjcuODY2N0w2OS45MzcxIDI5LjIzMjFDNzcuMzI0NyAzMS4yMzU5IDc4LjIzOTUgMzYuMTI4MSA3OC4yMzk1IDM4LjA3NzVDNzguMjM5NSA0NC41MTgyIDcxLjQzODggNDcuNTcyNiA2NS4wMzIyIDQ3LjU3MjZDNTguODI0MSA0Ny41NzI2IDUyLjM1MTQgNDMuODY1NiA1Mi4yODgxIDM3LjEwMTNINjAuNzgzMkM2MC44NDk0IDM4Ljg1ODkgNjIuNzk3IDQwLjYxMzcgNjUuMjk0IDQwLjYxMzdDNjcuMzA3OCA0MC41NDc4IDY5LjAzMzggMzkuNjM3NiA2OS4wMzM4IDM4LjA3NzVDNjkuMDMzOCAzNi43NzUgNjguMjQ4NSAzNi4wNzM3IDY2LjAyNzYgMzUuNDc1NEw2Mi4wMDAxIDM0LjQwNzZaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik05Mi4yNjA5IDQ2Ljg5NzRIODMuMjQyMlYwSDkyLjI2MDlWMjQuODQ0Mkw5OS41MTkgMTYuNTE5OEgxMTEuMDg5TDk4LjQwODYgMjkuOTE5NUwxMTMuNjM1IDQ2Ljg5NzRIMTAyLjQ1OUw5Mi4yNjA5IDM0Ljg2MzJWNDYuODk3NFoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEzNy4xNDQgNDMuNDUwNUMxMzUuMTc5IDQ2LjM3ODkgMTMwLjYwOCA0Ny40ODEgMTI4LjI1NSA0Ny40ODFDMTIwLjQ1OSA0Ny40ODEgMTEyLjY5MSA0MS40MzI0IDExMi42OTEgMzEuNjc2OEMxMTIuNjkxIDIxLjkyMTIgMTIwLjQ1OSAxNS44NzI2IDEyOC4yNTIgMTUuODcyNkMxMzAuMjExIDE1Ljg3MjYgMTM0Ljc4OCAxNi41MTk1IDEzNy4xNDEgMTkuOTA1OVYxNi41MTk1SDE0Ni4xNlY0Ni44OTdIMTM3LjE0NFY0My40NTA1Wk0xMjkuNzU2IDM4Ljg5OUMxMzMuNDk2IDM4Ljg5OSAxMzcuMTQ0IDM2LjIzMTEgMTM3LjE0NCAzMS42NzY4QzEzNy4xNDQgMjcuMTIyNCAxMzMuNDgyIDI0LjQ1NDUgMTI5Ljc1NiAyNC40NTQ1QzEyNS45NjUgMjQuNDU0NSAxMjIuMTA3IDI3LjMxNzEgMTIyLjEwNyAzMS42NzY4QzEyMi4xMDcgMzYuMDM2NSAxMjUuOTY1IDM4Ljg5OSAxMjkuNzU2IDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTE2My42MTEgNDYuODk3SDE1NC41MThWMTYuNTE5NUgxNjMuNjExVjIwLjk0NUMxNjUuMjQyIDE3Ljg4NzggMTY4LjgzOCAxNS44NzI2IDE3Mi40MzQgMTUuODcyNkMxNzkuMjk1IDE1Ljg3MjYgMTgzLjYxMyAyMC4wOTc3IDE4My42MTMgMjguNzU0MVY0Ni44OTk5SDE3NC41MlYzMC43MDA2QzE3NC41MiAyNi42NjczIDE3Mi4yOTYgMjQuNjUyIDE2OS4yMjcgMjQuNjUyQzE2Ni4wMjIgMjQuNjUyIDE2My42MDUgMjYuMjEyMSAxNjMuNjA1IDMwLjgyOTRMMTYzLjYxMSA0Ni44OTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMTMuNjAxIDQ2Ljg5NzJWNDMuMTI3MkMyMTIuMDk5IDQ1LjkyMzkgMjA4LjQzNyA0Ny41NDcgMjA0LjY0NSA0Ny41NDdDMTk2LjggNDcuNTQ3IDE4OS44NzMgNDEuMzY5NiAxODkuODczIDMxLjgwMjlDMTg5Ljg3MyAyMi4wNDczIDE5Ni44IDE1Ljg2OTggMjA0LjY0NSAxNS44Njk4QzIwOC40MzcgMTUuODY5OCAyMTIuMDk5IDE3LjQyOTkgMjEzLjYwMSAyMC4yMjY3Vi0wLjAwODc4OTA2SDIyMi42MjJWNDYuODk3MkgyMTMuNjAxWk0yMDYuMzQ1IDI0LjM5MTdDMjAyLjQ4OCAyNC4zOTE3IDE5OS4yODMgMjcuMjU0MyAxOTkuMjgzIDMxLjYxMzlDMTk5LjI4MyAzNi4xMDI0IDIwMi40ODggMzguOTYyMSAyMDYuMzQ1IDM4Ljk2MjFDMjEwLjEzNyAzOC45NjIxIDIxMy40MDUgMzUuOTY3OSAyMTMuNDA1IDMxLjYxMzlDMjEzLjQwNSAyNy4wNTk2IDIxMC4wNzQgMjQuMzkxNyAyMDYuMzQ1IDI0LjM5MTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMzUuNDkgLTAuMDA4Nzg5MDZDMjM4LjU2IC0wLjAwODc4OTA2IDI0MS4wNDUgMi4yODEyNiAyNDEuMDQ1IDUuMjU4MzNDMjQxLjA0NSA4LjIzNTM5IDIzOC41NiAxMC41OTEzIDIzNS40OSAxMC41OTEzQzIzMi40MjEgMTAuNTkxMyAyMjkuOCA4LjI0Njg0IDIyOS44IDUuMjU4MzNDMjI5LjggMi4yNjk4MSAyMzIuNDE4IC0wLjAwODc4OTA2IDIzNS40OSAtMC4wMDg3ODkwNlpNMjM5Ljk5OCA0Ni44ODU3SDIzMC45NzlWMTYuNTE5NkgyMzkuOTk4VjQ2Ljg4NTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yNzAuOTgxIDQzLjQ1MDVDMjY5LjAxOSA0Ni4zNzg5IDI2NC40NDUgNDcuNDgxIDI2Mi4wOTIgNDcuNDgxQzI1NC4zMSA0Ny40ODEgMjQ2LjUzMSA0MS40MzI0IDI0Ni41MzEgMzEuNjc2OEMyNDYuNTMxIDIxLjkyMTIgMjU0LjI5OSAxNS44NzI2IDI2Mi4wOTIgMTUuODcyNkMyNjQuMDUxIDE1Ljg3MjYgMjY4LjYyOCAxNi41MTk1IDI3MC45ODEgMTkuOTA1OVYxNi41MTk1SDI4MFY0Ni44OTdIMjcwLjk4MVY0My40NTA1Wk0yNjMuNTkzIDM4Ljg5OUMyNjcuMzMzIDM4Ljg5OSAyNzAuOTgxIDM2LjIzMTEgMjcwLjk4MSAzMS42NzY4QzI3MC45ODEgMjcuMTIyNCAyNjcuMzE5IDI0LjQ1NDUgMjYzLjU5MyAyNC40NTQ1QzI1OS44MDIgMjQuNDU0NSAyNTUuOTQ0IDI3LjMxNzEgMjU1Ljk0NCAzMS42NzY4QzI1NS45NDQgMzYuMDM2NSAyNTkuODAyIDM4Ljg5OSAyNjMuNTkzIDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEuMjEwNjIgMTUuODY0MUwzMS4zMjc2IDQ1LjgzMjNDMzEuNzgyOCA0Ni4yODQ0IDMyLjM2MjQgNDYuNTkyMSAzMi45OTMzIDQ2LjcxNjZDMzMuNjI0MiA0Ni44NDExIDM0LjI3NzkgNDYuNzc2NyAzNC44NzIxIDQ2LjUzMTdDMzUuNDY2MiA0Ni4yODY2IDM1Ljk3NCA0NS44NzE5IDM2LjMzMTMgNDUuMzM5OEMzNi42ODg3IDQ0LjgwNzcgMzYuODc5NiA0NC4xODIyIDM2Ljg3OTggNDMuNTQyMlYxNS4wODU1QzM2Ljg3OTEgMTMuODI3IDM2LjM3NjMgMTIuNjIwMiAzNS40ODIgMTEuNzMwM0MzNC41ODc2IDEwLjg0MDQgMzMuMzc0OSAxMC4zNDAxIDMyLjExMDEgMTAuMzM5NEgzLjUxMjA0QzIuODY4OSAxMC4zMzk2IDIuMjQwMjcgMTAuNTI5NSAxLjcwNTU1IDEwLjg4NTFDMS4xNzA4MyAxMS4yNDA3IDAuNzU0MDE1IDExLjc0NiAwLjUwNzc0OCAxMi4zMzcyQzAuMjYxNDgxIDEyLjkyODQgMC4xOTY4MTMgMTMuNTc4OSAwLjMyMTkxMyAxNC4yMDY3QzAuNDQ3MDEzIDE0LjgzNDQgMC43NTYyNjkgMTUuNDExMiAxLjIxMDYyIDE1Ljg2NDFaIiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjxwYXRoIGQ9Ik0yLjA0MjEzIDQ1LjE1MTFDNi40MDA0NSA0OS40OTA4IDEzLjg1NzEgNDYuNDE5MyAxMy44NTcxIDQwLjI4NDhDMTMuODU3MSAzOC40NTgyIDEzLjEyNzggMzYuNzA2MyAxMS44Mjk4IDM1LjQxNDdDMTAuNTMxOCAzNC4xMjMxIDguNzcxMjQgMzMuMzk3NSA2LjkzNTUzIDMzLjM5NzVDMC43Njc3MTQgMzMuMzk3NSAtMi4zMTkwNyA0MC44MTcyIDIuMDQ1MDEgNDUuMTU0IiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI5XzQyMiI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iNDcuNTQ3MiIgZmlsbD0id2hpdGUiPjwvcmVjdD4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4=" alt="Skandia">
+<!-- ============================================================== SWITCH -->
+<div class="tabs">
+  <button class="tab tab--on" id="tab-desk" type="button">Versión escritorio</button>
+  <button class="tab" id="tab-mobile" type="button">Versión móvil</button>
+</div>
 
-    <div class="login__form">
-      <div class="login__head">
-        <h1>¡Hola!</h1>
-        <p>Te damos la bienvenida al Portal clientes de Skandia</p>
+<!-- ============================================================ ESCRITORIO -->
+<div id="device-desk">
+
+  <!-- login -->
+  <section class="d-login" id="d-login">
+    <div class="d-login__panel">
+      <img class="d-login__logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMjgwIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTI5XzQyMikiPgo8cGF0aCBkPSJNNjIuMDAwMSAzNC40MDc2QzUyLjg0OTEgMzEuOTM3MyA1Mi43OTQ0IDI3LjMxOTkgNTIuODQ5MSAyNC41MjMyQzUyLjkxMjQgMjAuMDM0NyA1OC4zNDA4IDE1Ljg3MjYgNjQuNzQ3NCAxNS44NzI2QzcwLjgyNjEgMTUuODcyNiA3Ny4yMzI3IDE4LjUzNzYgNzcuMjk4OCAyNS45NTQ1SDY4LjczMThDNjguNjY4NSAyMy42NjQ1IDY2LjcxOCAyMy4yODY2IDY1LjI3OTYgMjMuMjg2NkM2My4zMjA1IDIzLjI4NjYgNjIuMDExNiAyNC4xOTY5IDYyLjA3NzggMjUuNTc2NkM2Mi4xNDExIDI2LjQ4NjkgNjIuOTQwOCAyNy40MDAxIDY0Ljc1ODkgMjcuODY2N0w2OS45MzcxIDI5LjIzMjFDNzcuMzI0NyAzMS4yMzU5IDc4LjIzOTUgMzYuMTI4MSA3OC4yMzk1IDM4LjA3NzVDNzguMjM5NSA0NC41MTgyIDcxLjQzODggNDcuNTcyNiA2NS4wMzIyIDQ3LjU3MjZDNTguODI0MSA0Ny41NzI2IDUyLjM1MTQgNDMuODY1NiA1Mi4yODgxIDM3LjEwMTNINjAuNzgzMkM2MC44NDk0IDM4Ljg1ODkgNjIuNzk3IDQwLjYxMzcgNjUuMjk0IDQwLjYxMzdDNjcuMzA3OCA0MC41NDc4IDY5LjAzMzggMzkuNjM3NiA2OS4wMzM4IDM4LjA3NzVDNjkuMDMzOCAzNi43NzUgNjguMjQ4NSAzNi4wNzM3IDY2LjAyNzYgMzUuNDc1NEw2Mi4wMDAxIDM0LjQwNzZaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik05Mi4yNjA5IDQ2Ljg5NzRIODMuMjQyMlYwSDkyLjI2MDlWMjQuODQ0Mkw5OS41MTkgMTYuNTE5OEgxMTEuMDg5TDk4LjQwODYgMjkuOTE5NUwxMTMuNjM1IDQ2Ljg5NzRIMTAyLjQ1OUw5Mi4yNjA5IDM0Ljg2MzJWNDYuODk3NFoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEzNy4xNDQgNDMuNDUwNUMxMzUuMTc5IDQ2LjM3ODkgMTMwLjYwOCA0Ny40ODEgMTI4LjI1NSA0Ny40ODFDMTIwLjQ1OSA0Ny40ODEgMTEyLjY5MSA0MS40MzI0IDExMi42OTEgMzEuNjc2OEMxMTIuNjkxIDIxLjkyMTIgMTIwLjQ1OSAxNS44NzI2IDEyOC4yNTIgMTUuODcyNkMxMzAuMjExIDE1Ljg3MjYgMTM0Ljc4OCAxNi41MTk1IDEzNy4xNDEgMTkuOTA1OVYxNi41MTk1SDE0Ni4xNlY0Ni44OTdIMTM3LjE0NFY0My40NTA1Wk0xMjkuNzU2IDM4Ljg5OUMxMzMuNDk2IDM4Ljg5OSAxMzcuMTQ0IDM2LjIzMTEgMTM3LjE0NCAzMS42NzY4QzEzNy4xNDQgMjcuMTIyNCAxMzMuNDgyIDI0LjQ1NDUgMTI5Ljc1NiAyNC40NTQ1QzEyNS45NjUgMjQuNDU0NSAxMjIuMTA3IDI3LjMxNzEgMTIyLjEwNyAzMS42NzY4QzEyMi4xMDcgMzYuMDM2NSAxMjUuOTY1IDM4Ljg5OSAxMjkuNzU2IDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTE2My42MTEgNDYuODk3SDE1NC41MThWMTYuNTE5NUgxNjMuNjExVjIwLjk0NUMxNjUuMjQyIDE3Ljg4NzggMTY4LjgzOCAxNS44NzI2IDE3Mi40MzQgMTUuODcyNkMxNzkuMjk1IDE1Ljg3MjYgMTgzLjYxMyAyMC4wOTc3IDE4My42MTMgMjguNzU0MVY0Ni44OTk5SDE3NC41MlYzMC43MDA2QzE3NC41MiAyNi42NjczIDE3Mi4yOTYgMjQuNjUyIDE2OS4yMjcgMjQuNjUyQzE2Ni4wMjIgMjQuNjUyIDE2My42MDUgMjYuMjEyMSAxNjMuNjA1IDMwLjgyOTRMMTYzLjYxMSA0Ni44OTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMTMuNjAxIDQ2Ljg5NzJWNDMuMTI3MkMyMTIuMDk5IDQ1LjkyMzkgMjA4LjQzNyA0Ny41NDcgMjA0LjY0NSA0Ny41NDdDMTk2LjggNDcuNTQ3IDE4OS44NzMgNDEuMzY5NiAxODkuODczIDMxLjgwMjlDMTg5Ljg3MyAyMi4wNDczIDE5Ni44IDE1Ljg2OTggMjA0LjY0NSAxNS44Njk4QzIwOC40MzcgMTUuODY5OCAyMTIuMDk5IDE3LjQyOTkgMjEzLjYwMSAyMC4yMjY3Vi0wLjAwODc4OTA2SDIyMi42MjJWNDYuODk3MkgyMTMuNjAxWk0yMDYuMzQ1IDI0LjM5MTdDMjAyLjQ4OCAyNC4zOTE3IDE5OS4yODMgMjcuMjU0MyAxOTkuMjgzIDMxLjYxMzlDMTk5LjI4MyAzNi4xMDI0IDIwMi40ODggMzguOTYyMSAyMDYuMzQ1IDM4Ljk2MjFDMjEwLjEzNyAzOC45NjIxIDIxMy40MDUgMzUuOTY3OSAyMTMuNDA1IDMxLjYxMzlDMjEzLjQwNSAyNy4wNTk2IDIxMC4wNzQgMjQuMzkxNyAyMDYuMzQ1IDI0LjM5MTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMzUuNDkgLTAuMDA4Nzg5MDZDMjM4LjU2IC0wLjAwODc4OTA2IDI0MS4wNDUgMi4yODEyNiAyNDEuMDQ1IDUuMjU4MzNDMjQxLjA0NSA4LjIzNTM5IDIzOC41NiAxMC41OTEzIDIzNS40OSAxMC41OTEzQzIzMi40MjEgMTAuNTkxMyAyMjkuOCA4LjI0Njg0IDIyOS44IDUuMjU4MzNDMjI5LjggMi4yNjk4MSAyMzIuNDE4IC0wLjAwODc4OTA2IDIzNS40OSAtMC4wMDg3ODkwNlpNMjM5Ljk5OCA0Ni44ODU3SDIzMC45NzlWMTYuNTE5NkgyMzkuOTk4VjQ2Ljg4NTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yNzAuOTgxIDQzLjQ1MDVDMjY5LjAxOSA0Ni4zNzg5IDI2NC40NDUgNDcuNDgxIDI2Mi4wOTIgNDcuNDgxQzI1NC4zMSA0Ny40ODEgMjQ2LjUzMSA0MS40MzI0IDI0Ni41MzEgMzEuNjc2OEMyNDYuNTMxIDIxLjkyMTIgMjU0LjI5OSAxNS44NzI2IDI2Mi4wOTIgMTUuODcyNkMyNjQuMDUxIDE1Ljg3MjYgMjY4LjYyOCAxNi41MTk1IDI3MC45ODEgMTkuOTA1OVYxNi41MTk1SDI4MFY0Ni44OTdIMjcwLjk4MVY0My40NTA1Wk0yNjMuNTkzIDM4Ljg5OUMyNjcuMzMzIDM4Ljg5OSAyNzAuOTgxIDM2LjIzMTEgMjcwLjk4MSAzMS42NzY4QzI3MC45ODEgMjcuMTIyNCAyNjcuMzE5IDI0LjQ1NDUgMjYzLjU5MyAyNC40NTQ1QzI1OS44MDIgMjQuNDU0NSAyNTUuOTQ0IDI3LjMxNzEgMjU1Ljk0NCAzMS42NzY4QzI1NS45NDQgMzYuMDM2NSAyNTkuODAyIDM4Ljg5OSAyNjMuNTkzIDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEuMjEwNjIgMTUuODY0MUwzMS4zMjc2IDQ1LjgzMjNDMzEuNzgyOCA0Ni4yODQ0IDMyLjM2MjQgNDYuNTkyMSAzMi45OTMzIDQ2LjcxNjZDMzMuNjI0MiA0Ni44NDExIDM0LjI3NzkgNDYuNzc2NyAzNC44NzIxIDQ2LjUzMTdDMzUuNDY2MiA0Ni4yODY2IDM1Ljk3NCA0NS44NzE5IDM2LjMzMTMgNDUuMzM5OEMzNi42ODg3IDQ0LjgwNzcgMzYuODc5NiA0NC4xODIyIDM2Ljg3OTggNDMuNTQyMlYxNS4wODU1QzM2Ljg3OTEgMTMuODI3IDM2LjM3NjMgMTIuNjIwMiAzNS40ODIgMTEuNzMwM0MzNC41ODc2IDEwLjg0MDQgMzMuMzc0OSAxMC4zNDAxIDMyLjExMDEgMTAuMzM5NEgzLjUxMjA0QzIuODY4OSAxMC4zMzk2IDIuMjQwMjcgMTAuNTI5NSAxLjcwNTU1IDEwLjg4NTFDMS4xNzA4MyAxMS4yNDA3IDAuNzU0MDE1IDExLjc0NiAwLjUwNzc0OCAxMi4zMzcyQzAuMjYxNDgxIDEyLjkyODQgMC4xOTY4MTMgMTMuNTc4OSAwLjMyMTkxMyAxNC4yMDY3QzAuNDQ3MDEzIDE0LjgzNDQgMC43NTYyNjkgMTUuNDExMiAxLjIxMDYyIDE1Ljg2NDFaIiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjxwYXRoIGQ9Ik0yLjA0MjEzIDQ1LjE1MTFDNi40MDA0NSA0OS40OTA4IDEzLjg1NzEgNDYuNDE5MyAxMy44NTcxIDQwLjI4NDhDMTMuODU3MSAzOC40NTgyIDEzLjEyNzggMzYuNzA2MyAxMS44Mjk4IDM1LjQxNDdDMTAuNTMxOCAzNC4xMjMxIDguNzcxMjQgMzMuMzk3NSA2LjkzNTUzIDMzLjM5NzVDMC43Njc3MTQgMzMuMzk3NSAtMi4zMTkwNyA0MC44MTcyIDIuMDQ1MDEgNDUuMTU0IiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI5XzQyMiI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iNDcuNTQ3MiIgZmlsbD0id2hpdGUiPjwvcmVjdD4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4=" alt="Skandia">
+
+      <div class="d-login__form">
+        <div class="d-login__head">
+          <h1>¡Hola!</h1>
+          <p>Te damos la bienvenida al Portal clientes de Skandia</p>
+        </div>
+
+        <div class="notice notice--error" id="d-notice" role="status" hidden>
+          No aceptaste el Reglamento de Uso, por lo que cerramos tu sesión. Puedes ingresar de nuevo cuando quieras.
+        </div>
+
+        <div class="d-login__fields">
+          <input class="field" type="text" placeholder="Usuario" aria-label="Usuario">
+          <input class="field" type="password" placeholder="Contraseña" aria-label="Contraseña">
+        </div>
+
+        <a class="d-login__reset" href="#">Crear o recuperar contraseña</a>
+
+        <button class="btn btn--primary d-login__submit" id="d-btn-login" type="button">Iniciar sesión</button>
+
+        <p class="d-login__legal">Al ingresar aceptas el <a href="#">Reglamento de uso del Portal Clientes</a></p>
       </div>
 
-      <div class="notice notice--error" id="login-notice" role="status" hidden>
-        <span>No aceptaste el Reglamento de Uso, por lo que cerramos tu sesión. Puedes ingresar de nuevo cuando quieras.</span>
+      <div class="legacy">
+        <span class="legacy__title">Portal anterior</span>
+        <span class="legacy__text">Si prefieres la versión anterior, <a href="#">ingresa aquí.</a></span>
       </div>
-
-      <div class="login__fields">
-        <input class="field" type="text" placeholder="Usuario" aria-label="Usuario">
-        <input class="field" type="password" placeholder="Contraseña" aria-label="Contraseña">
-      </div>
-
-      <a class="login__reset" href="#">Crear o recuperar contraseña</a>
-
-      <button class="btn btn--primary login__submit" id="btn-login" type="button">Iniciar sesión</button>
-
-      <p class="login__legal">Al ingresar aceptas el <a href="#">Reglamento de uso del Portal Clientes</a></p>
     </div>
 
-    <div class="legacy">
-      <span class="legacy__title">Portal anterior</span>
-      <span class="legacy__text">Si prefieres la versión anterior, <a href="#">ingresa aquí.</a></span>
+    <aside class="hero">
+      <span class="hero__blob hero__blob--a"></span>
+      <span class="hero__blob hero__blob--b"></span>
+      <div class="hero__media">
+        <div class="slot">Imagen del carrusel</div>
+      </div>
+      <div class="hero__copy">
+        <h2>¿Cómo te impacta la reforma pensional?</h2>
+        <p>Te lo contamos directo y #SinFiltro</p>
+        <a class="hero__cta" href="#">Quiero saber más</a>
+      </div>
+    </aside>
+  </section>
+
+  <!-- portal -->
+  <section class="d-portal" id="d-portal" hidden>
+
+    <nav class="rail" aria-label="Navegación principal">
+      <button class="rail__burger" id="d-burger" type="button" aria-label="Abrir ayuda y soporte">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path></svg>
+      </button>
+
+      <button class="rail__item rail__item--on" type="button">
+        <span class="rail__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span>
+        Inicio
+      </button>
+      <button class="rail__item" type="button">
+        <span class="rail__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"></path><path d="M3 6h18"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 18H3"></path></svg></span>
+        Transacciones
+      </button>
+      <button class="rail__item" type="button">
+        <span class="rail__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12A9 9 0 1 1 12 3v9z"></path></svg></span>
+        Inversiones
+      </button>
+      <button class="rail__item" type="button">
+        <span class="rail__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>
+        Documentos
+      </button>
+      <button class="rail__item" id="d-rail-help" type="button">
+        <span class="rail__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.3"></path><path d="M12 17.5h.01"></path></svg></span>
+        Ayuda
+      </button>
+
+      <div class="rail__foot">
+        <button class="rail__item" type="button">
+          <span class="rail__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg></span>
+          Salir
+        </button>
+      </div>
+    </nav>
+
+    <div class="d-main">
+      <header class="d-head">
+        <div class="d-head__brand">
+          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMjgwIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTI5XzQyMikiPgo8cGF0aCBkPSJNNjIuMDAwMSAzNC40MDc2QzUyLjg0OTEgMzEuOTM3MyA1Mi43OTQ0IDI3LjMxOTkgNTIuODQ5MSAyNC41MjMyQzUyLjkxMjQgMjAuMDM0NyA1OC4zNDA4IDE1Ljg3MjYgNjQuNzQ3NCAxNS44NzI2QzcwLjgyNjEgMTUuODcyNiA3Ny4yMzI3IDE4LjUzNzYgNzcuMjk4OCAyNS45NTQ1SDY4LjczMThDNjguNjY4NSAyMy42NjQ1IDY2LjcxOCAyMy4yODY2IDY1LjI3OTYgMjMuMjg2NkM2My4zMjA1IDIzLjI4NjYgNjIuMDExNiAyNC4xOTY5IDYyLjA3NzggMjUuNTc2NkM2Mi4xNDExIDI2LjQ4NjkgNjIuOTQwOCAyNy40MDAxIDY0Ljc1ODkgMjcuODY2N0w2OS45MzcxIDI5LjIzMjFDNzcuMzI0NyAzMS4yMzU5IDc4LjIzOTUgMzYuMTI4MSA3OC4yMzk1IDM4LjA3NzVDNzguMjM5NSA0NC41MTgyIDcxLjQzODggNDcuNTcyNiA2NS4wMzIyIDQ3LjU3MjZDNTguODI0MSA0Ny41NzI2IDUyLjM1MTQgNDMuODY1NiA1Mi4yODgxIDM3LjEwMTNINjAuNzgzMkM2MC44NDk0IDM4Ljg1ODkgNjIuNzk3IDQwLjYxMzcgNjUuMjk0IDQwLjYxMzdDNjcuMzA3OCA0MC41NDc4IDY5LjAzMzggMzkuNjM3NiA2OS4wMzM4IDM4LjA3NzVDNjkuMDMzOCAzNi43NzUgNjguMjQ4NSAzNi4wNzM3IDY2LjAyNzYgMzUuNDc1NEw2Mi4wMDAxIDM0LjQwNzZaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik05Mi4yNjA5IDQ2Ljg5NzRIODMuMjQyMlYwSDkyLjI2MDlWMjQuODQ0Mkw5OS41MTkgMTYuNTE5OEgxMTEuMDg5TDk4LjQwODYgMjkuOTE5NUwxMTMuNjM1IDQ2Ljg5NzRIMTAyLjQ1OUw5Mi4yNjA5IDM0Ljg2MzJWNDYuODk3NFoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEzNy4xNDQgNDMuNDUwNUMxMzUuMTc5IDQ2LjM3ODkgMTMwLjYwOCA0Ny40ODEgMTI4LjI1NSA0Ny40ODFDMTIwLjQ1OSA0Ny40ODEgMTEyLjY5MSA0MS40MzI0IDExMi42OTEgMzEuNjc2OEMxMTIuNjkxIDIxLjkyMTIgMTIwLjQ1OSAxNS44NzI2IDEyOC4yNTIgMTUuODcyNkMxMzAuMjExIDE1Ljg3MjYgMTM0Ljc4OCAxNi41MTk1IDEzNy4xNDEgMTkuOTA1OVYxNi41MTk1SDE0Ni4xNlY0Ni44OTdIMTM3LjE0NFY0My40NTA1Wk0xMjkuNzU2IDM4Ljg5OUMxMzMuNDk2IDM4Ljg5OSAxMzcuMTQ0IDM2LjIzMTEgMTM3LjE0NCAzMS42NzY4QzEzNy4xNDQgMjcuMTIyNCAxMzMuNDgyIDI0LjQ1NDUgMTI5Ljc1NiAyNC40NTQ1QzEyNS45NjUgMjQuNDU0NSAxMjIuMTA3IDI3LjMxNzEgMTIyLjEwNyAzMS42NzY4QzEyMi4xMDcgMzYuMDM2NSAxMjUuOTY1IDM4Ljg5OSAxMjkuNzU2IDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTE2My42MTEgNDYuODk3SDE1NC41MThWMTYuNTE5NUgxNjMuNjExVjIwLjk0NUMxNjUuMjQyIDE3Ljg4NzggMTY4LjgzOCAxNS44NzI2IDE3Mi40MzQgMTUuODcyNkMxNzkuMjk1IDE1Ljg3MjYgMTgzLjYxMyAyMC4wOTc3IDE4My42MTMgMjguNzU0MVY0Ni44OTk5SDE3NC41MlYzMC43MDA2QzE3NC41MiAyNi42NjczIDE3Mi4yOTYgMjQuNjUyIDE2OS4yMjcgMjQuNjUyQzE2Ni4wMjIgMjQuNjUyIDE2My42MDUgMjYuMjEyMSAxNjMuNjA1IDMwLjgyOTRMMTYzLjYxMSA0Ni44OTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMTMuNjAxIDQ2Ljg5NzJWNDMuMTI3MkMyMTIuMDk5IDQ1LjkyMzkgMjA4LjQzNyA0Ny41NDcgMjA0LjY0NSA0Ny41NDdDMTk2LjggNDcuNTQ3IDE4OS44NzMgNDEuMzY5NiAxODkuODczIDMxLjgwMjlDMTg5Ljg3MyAyMi4wNDczIDE5Ni44IDE1Ljg2OTggMjA0LjY0NSAxNS44Njk4QzIwOC40MzcgMTUuODY5OCAyMTIuMDk5IDE3LjQyOTkgMjEzLjYwMSAyMC4yMjY3Vi0wLjAwODc4OTA2SDIyMi42MjJWNDYuODk3MkgyMTMuNjAxWk0yMDYuMzQ1IDI0LjM5MTdDMjAyLjQ4OCAyNC4zOTE3IDE5OS4yODMgMjcuMjU0MyAxOTkuMjgzIDMxLjYxMzlDMTk5LjI4MyAzNi4xMDI0IDIwMi40ODggMzguOTYyMSAyMDYuMzQ1IDM4Ljk2MjFDMjEwLjEzNyAzOC45NjIxIDIxMy40MDUgMzUuOTY3OSAyMTMuNDA1IDMxLjYxMzlDMjEzLjQwNSAyNy4wNTk2IDIxMC4wNzQgMjQuMzkxNyAyMDYuMzQ1IDI0LjM5MTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMzUuNDkgLTAuMDA4Nzg5MDZDMjM4LjU2IC0wLjAwODc4OTA2IDI0MS4wNDUgMi4yODEyNiAyNDEuMDQ1IDUuMjU4MzNDMjQxLjA0NSA4LjIzNTM5IDIzOC41NiAxMC41OTEzIDIzNS40OSAxMC41OTEzQzIzMi40MjEgMTAuNTkxMyAyMjkuOCA4LjI0Njg0IDIyOS44IDUuMjU4MzNDMjI5LjggMi4yNjk4MSAyMzIuNDE4IC0wLjAwODc4OTA2IDIzNS40OSAtMC4wMDg3ODkwNlpNMjM5Ljk5OCA0Ni44ODU3SDIzMC45NzlWMTYuNTE5NkgyMzkuOTk4VjQ2Ljg4NTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yNzAuOTgxIDQzLjQ1MDVDMjY5LjAxOSA0Ni4zNzg5IDI2NC40NDUgNDcuNDgxIDI2Mi4wOTIgNDcuNDgxQzI1NC4zMSA0Ny40ODEgMjQ2LjUzMSA0MS40MzI0IDI0Ni41MzEgMzEuNjc2OEMyNDYuNTMxIDIxLjkyMTIgMjU0LjI5OSAxNS44NzI2IDI2Mi4wOTIgMTUuODcyNkMyNjQuMDUxIDE1Ljg3MjYgMjY4LjYyOCAxNi41MTk1IDI3MC45ODEgMTkuOTA1OVYxNi41MTk1SDI4MFY0Ni44OTdIMjcwLjk4MVY0My40NTA1Wk0yNjMuNTkzIDM4Ljg5OUMyNjcuMzMzIDM4Ljg5OSAyNzAuOTgxIDM2LjIzMTEgMjcwLjk4MSAzMS42NzY4QzI3MC45ODEgMjcuMTIyNCAyNjcuMzE5IDI0LjQ1NDUgMjYzLjU5MyAyNC40NTQ1QzI1OS44MDIgMjQuNDU0NSAyNTUuOTQ0IDI3LjMxNzEgMjU1Ljk0NCAzMS42NzY4QzI1NS45NDQgMzYuMDM2NSAyNTkuODAyIDM4Ljg5OSAyNjMuNTkzIDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEuMjEwNjIgMTUuODY0MUwzMS4zMjc2IDQ1LjgzMjNDMzEuNzgyOCA0Ni4yODQ0IDMyLjM2MjQgNDYuNTkyMSAzMi45OTMzIDQ2LjcxNjZDMzMuNjI0MiA0Ni44NDExIDM0LjI3NzkgNDYuNzc2NyAzNC44NzIxIDQ2LjUzMTdDMzUuNDY2MiA0Ni4yODY2IDM1Ljk3NCA0NS44NzE5IDM2LjMzMTMgNDUuMzM5OEMzNi42ODg3IDQ0LjgwNzcgMzYuODc5NiA0NC4xODIyIDM2Ljg3OTggNDMuNTQyMlYxNS4wODU1QzM2Ljg3OTEgMTMuODI3IDM2LjM3NjMgMTIuNjIwMiAzNS40ODIgMTEuNzMwM0MzNC41ODc2IDEwLjg0MDQgMzMuMzc0OSAxMC4zNDAxIDMyLjExMDEgMTAuMzM5NEgzLjUxMjA0QzIuODY4OSAxMC4zMzk2IDIuMjQwMjcgMTAuNTI5NSAxLjcwNTU1IDEwLjg4NTFDMS4xNzA4MyAxMS4yNDA3IDAuNzU0MDE1IDExLjc0NiAwLjUwNzc0OCAxMi4zMzcyQzAuMjYxNDgxIDEyLjkyODQgMC4xOTY4MTMgMTMuNTc4OSAwLjMyMTkxMyAxNC4yMDY3QzAuNDQ3MDEzIDE0LjgzNDQgMC43NTYyNjkgMTUuNDExMiAxLjIxMDYyIDE1Ljg2NDFaIiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjxwYXRoIGQ9Ik0yLjA0MjEzIDQ1LjE1MTFDNi40MDA0NSA0OS40OTA4IDEzLjg1NzEgNDYuNDE5MyAxMy44NTcxIDQwLjI4NDhDMTMuODU3MSAzOC40NTgyIDEzLjEyNzggMzYuNzA2MyAxMS44Mjk4IDM1LjQxNDdDMTAuNTMxOCAzNC4xMjMxIDguNzcxMjQgMzMuMzk3NSA2LjkzNTUzIDMzLjM5NzVDMC43Njc3MTQgMzMuMzk3NSAtMi4zMTkwNyA0MC44MTcyIDIuMDQ1MDEgNDUuMTU0IiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI5XzQyMiI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iNDcuNTQ3MiIgZmlsbD0id2hpdGUiPjwvcmVjdD4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4=" alt="Skandia">
+          <span>Portal Clientes</span>
+        </div>
+        <div class="d-head__right">
+          <span class="d-head__bell">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+          </span>
+          <button class="d-head__quick" type="button">Acciones rápidas</button>
+          <div class="d-head__user">
+            <span class="d-head__avatar">VG</span>
+            <span class="d-head__hello">Hola, <span class="green">Valeria</span></span>
+          </div>
+        </div>
+      </header>
+
+      <div class="d-body">
+        <div class="d-body__head">
+          <h1>Lo que has logrado: <span class="green">$ 48.774.100,81 COP</span></h1>
+          <p>Selecciona la categoría para ver información de tus contratos.</p>
+        </div>
+
+        <div class="notice notice--ok" id="d-accepted" role="status" hidden>
+          Registramos tu aceptación del Reglamento de Uso de los Canales Digitales. Puedes consultarlo en Ayuda y soporte.
+        </div>
+
+        <div class="cats">
+          <div class="cat cat--on">
+            <span class="cat__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="m7 15 4-4 3 3 5-6"></path></svg></span>
+            <span class="cat__label">Ahorro e Inversión</span>
+            <span class="cat__value">$ 1.219.541,21</span>
+          </div>
+          <div class="cat">
+            <span class="cat__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11a5 5 0 0 1 5-5h6l4-2v4a5 5 0 0 1 1 3v3a3 3 0 0 1-3 3h-1v2H8v-2H7a3 3 0 0 1-3-3z"></path></svg></span>
+            <span class="cat__label">Pensiones y Cesantías</span>
+            <span class="cat__value">$ 47.554.559,6</span>
+          </div>
+          <div class="cat">
+            <span class="cat__tag">Protección</span>
+            <span class="cat__label"><span class="green bold">Protege</span> lo que más te importa hoy.</span>
+          </div>
+          <div class="cat">
+            <span class="cat__tag">Crédito</span>
+            <span class="cat__label">Descubre cómo solicitar un <span class="bold">crédito.</span></span>
+          </div>
+        </div>
+
+        <div class="promo">
+          <div class="promo__copy">
+            <span class="promo__title">Inversiones automatizadas gestionadas por expertos</span>
+            <span class="promo__text">Inversiones ajustadas con nuestra gestión experta, según tu perfil y objetivos.</span>
+          </div>
+          <span class="promo__chev"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+        </div>
+
+        <div class="contracts">
+          <span class="contracts__title">Contratos en Ahorro e Inversión ( 2 )</span>
+          <div class="contracts__group">
+            <span class="contracts__fund">Fondo Voluntario de Pensión Skandia Multifund</span>
+            <div class="contract">
+              <span class="contract__name">Potencializar mi inversión</span>
+              <span class="contract__meta">Saldo total <span class="green bold">$ 1.219.541,21</span> · Contrato 100006369833</span>
+            </div>
+          </div>
+          <div class="contracts__group">
+            <span class="contracts__fund">Fondo de Inversión Colectiva Skandia Efectivo</span>
+            <div class="contract">
+              <span class="contract__name">Cuota inicial casa</span>
+              <span class="contract__meta">Saldo total <span class="green bold">$ 0,00</span> · Contrato 301000420093</span>
+            </div>
+          </div>
+          <span class="contracts__cut">Saldos actualizados al <span class="bold" style="color:#232323">10 de agosto de 2026</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- panel de ayuda y soporte -->
+    <div class="help" id="d-help" hidden>
+      <button class="help__scrim" id="d-help-scrim" type="button" aria-label="Cerrar ayuda y soporte"></button>
+      <div class="help__rail">
+        <button class="help__close" id="d-help-close" type="button" aria-label="Cerrar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        </button>
+      </div>
+      <div class="help__panel">
+        <div class="help__title">Ayuda y soporte</div>
+        <button class="help__link" type="button">Contenido educativo</button>
+        <button class="help__link" type="button">Formulario de contacto</button>
+        <button class="help__link" id="d-open-terms" type="button">Términos y condiciones</button>
+        <div class="help__foot">
+          <div class="help__app">Descarga la app <span class="green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg></span></div>
+          <div class="help__session">Último login: 11/08/2026 - 09:52:56 AM<br>Dirección IP: 206.62.142.15<br>2026 Skandia</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- modal del reglamento -->
+  <div class="overlay" id="d-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="d-modal-title" tabindex="-1" id="d-modal-card">
+
+      <div class="modal__head">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        <div class="modal__titles">
+          <h2 id="d-modal-title">Reglamento de uso de los Canales Digitales de Skandia</h2>
+          <span class="modal__date">22 de julio de 2026</span>
+        </div>
+        <button class="modal__x" id="d-modal-x" type="button" aria-label="Cerrar" hidden>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <div class="doc sk-scroll" id="d-doc">
+          <p class="doc__intro">Le damos la bienvenida a los Canales Digitales de Skandia. Este Reglamento describe las condiciones de uso del Portal de Clientes y de la Skandia App, sus derechos y obligaciones como Cliente y los compromisos de Skandia. Le recomendamos leerlo con atención antes de aceptarlo; su texto estará siempre disponible para consulta y descarga.</p>
+          <div class="doc-blocks"></div>
+          <label class="consent" id="d-consent">
+            <span class="cbox-wrap">
+              <input class="cbox-input" type="checkbox" id="d-chk">
+              <span class="cbox"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.178 2.078a.833.833 0 0 1 0 1.179L5.511 9.923a.833.833 0 0 1-1.178 0L1 6.59a.833.833 0 0 1 1.178-1.179l2.744 2.745 6.078-6.078a.833.833 0 0 1 1.178 0Z" fill="#ffffff"/></svg></span>
+            </span>
+            <span class="consent__text">He leído y acepto el Reglamento de Uso de los Canales Digitales de Skandia.</span>
+          </label>
+        </div>
+
+        <div class="hint" id="d-hint">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>
+          Lee y desplázate hasta abajo para continuar
+        </div>
+      </div>
+
+      <div class="modal__actions" id="d-actions">
+        <button class="btn btn--outline" id="d-btn-reject" type="button">Rechazar</button>
+        <button class="btn btn--primary" id="d-btn-accept" type="button">Aceptar y continuar</button>
+      </div>
+      <div class="modal__spacer" id="d-spacer" hidden></div>
     </div>
   </div>
+</div>
 
-  <aside class="hero">
-    <span class="hero__blob hero__blob--a"></span>
-    <span class="hero__blob hero__blob--b"></span>
-    <div class="hero__media">
-      <div class="slot">Imagen del carrusel</div>
-    </div>
-    <div class="hero__copy">
-      <h2>¿Cómo te impacta la reforma pensional?</h2>
-      <p>Te lo contamos directo y #SinFiltro</p>
-      <a class="hero__cta" href="#">Quiero saber más</a>
-    </div>
-  </aside>
-</section>
+<!-- ================================================================= MÓVIL -->
+<div id="device-mobile" hidden>
+  <div class="m-stage">
+    <div class="phone">
 
-<!-- ============================================================== PORTAL -->
-<section class="portal" id="screen-portal" hidden>
-  <header class="topbar">
-    <img class="topbar__logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMjgwIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTI5XzQyMikiPgo8cGF0aCBkPSJNNjIuMDAwMSAzNC40MDc2QzUyLjg0OTEgMzEuOTM3MyA1Mi43OTQ0IDI3LjMxOTkgNTIuODQ5MSAyNC41MjMyQzUyLjkxMjQgMjAuMDM0NyA1OC4zNDA4IDE1Ljg3MjYgNjQuNzQ3NCAxNS44NzI2QzcwLjgyNjEgMTUuODcyNiA3Ny4yMzI3IDE4LjUzNzYgNzcuMjk4OCAyNS45NTQ1SDY4LjczMThDNjguNjY4NSAyMy42NjQ1IDY2LjcxOCAyMy4yODY2IDY1LjI3OTYgMjMuMjg2NkM2My4zMjA1IDIzLjI4NjYgNjIuMDExNiAyNC4xOTY5IDYyLjA3NzggMjUuNTc2NkM2Mi4xNDExIDI2LjQ4NjkgNjIuOTQwOCAyNy40MDAxIDY0Ljc1ODkgMjcuODY2N0w2OS45MzcxIDI5LjIzMjFDNzcuMzI0NyAzMS4yMzU5IDc4LjIzOTUgMzYuMTI4MSA3OC4yMzk1IDM4LjA3NzVDNzguMjM5NSA0NC41MTgyIDcxLjQzODggNDcuNTcyNiA2NS4wMzIyIDQ3LjU3MjZDNTguODI0MSA0Ny41NzI2IDUyLjM1MTQgNDMuODY1NiA1Mi4yODgxIDM3LjEwMTNINjAuNzgzMkM2MC44NDk0IDM4Ljg1ODkgNjIuNzk3IDQwLjYxMzcgNjUuMjk0IDQwLjYxMzdDNjcuMzA3OCA0MC41NDc4IDY5LjAzMzggMzkuNjM3NiA2OS4wMzM4IDM4LjA3NzVDNjkuMDMzOCAzNi43NzUgNjguMjQ4NSAzNi4wNzM3IDY2LjAyNzYgMzUuNDc1NEw2Mi4wMDAxIDM0LjQwNzZaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik05Mi4yNjA5IDQ2Ljg5NzRIODMuMjQyMlYwSDkyLjI2MDlWMjQuODQ0Mkw5OS41MTkgMTYuNTE5OEgxMTEuMDg5TDk4LjQwODYgMjkuOTE5NUwxMTMuNjM1IDQ2Ljg5NzRIMTAyLjQ1OUw5Mi4yNjA5IDM0Ljg2MzJWNDYuODk3NFoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEzNy4xNDQgNDMuNDUwNUMxMzUuMTc5IDQ2LjM3ODkgMTMwLjYwOCA0Ny40ODEgMTI4LjI1NSA0Ny40ODFDMTIwLjQ1OSA0Ny40ODEgMTEyLjY5MSA0MS40MzI0IDExMi42OTEgMzEuNjc2OEMxMTIuNjkxIDIxLjkyMTIgMTIwLjQ1OSAxNS44NzI2IDEyOC4yNTIgMTUuODcyNkMxMzAuMjExIDE1Ljg3MjYgMTM0Ljc4OCAxNi41MTk1IDEzNy4xNDEgMTkuOTA1OVYxNi41MTk1SDE0Ni4xNlY0Ni44OTdIMTM3LjE0NFY0My40NTA1Wk0xMjkuNzU2IDM4Ljg5OUMxMzMuNDk2IDM4Ljg5OSAxMzcuMTQ0IDM2LjIzMTEgMTM3LjE0NCAzMS42NzY4QzEzNy4xNDQgMjcuMTIyNCAxMzMuNDgyIDI0LjQ1NDUgMTI5Ljc1NiAyNC40NTQ1QzEyNS45NjUgMjQuNDU0NSAxMjIuMTA3IDI3LjMxNzEgMTIyLjEwNyAzMS42NzY4QzEyMi4xMDcgMzYuMDM2NSAxMjUuOTY1IDM4Ljg5OSAxMjkuNzU2IDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTE2My42MTEgNDYuODk3SDE1NC41MThWMTYuNTE5NUgxNjMuNjExVjIwLjk0NUMxNjUuMjQyIDE3Ljg4NzggMTY4LjgzOCAxNS44NzI2IDE3Mi40MzQgMTUuODcyNkMxNzkuMjk1IDE1Ljg3MjYgMTgzLjYxMyAyMC4wOTc3IDE4My42MTMgMjguNzU0MVY0Ni44OTk5SDE3NC41MlYzMC43MDA2QzE3NC41MiAyNi42NjczIDE3Mi4yOTYgMjQuNjUyIDE2OS4yMjcgMjQuNjUyQzE2Ni4wMjIgMjQuNjUyIDE2My42MDUgMjYuMjEyMSAxNjMuNjA1IDMwLjgyOTRMMTYzLjYxMSA0Ni44OTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMTMuNjAxIDQ2Ljg5NzJWNDMuMTI3MkMyMTIuMDk5IDQ1LjkyMzkgMjA4LjQzNyA0Ny41NDcgMjA0LjY0NSA0Ny41NDdDMTk2LjggNDcuNTQ3IDE4OS44NzMgNDEuMzY5NiAxODkuODczIDMxLjgwMjlDMTg5Ljg3MyAyMi4wNDczIDE5Ni44IDE1Ljg2OTggMjA0LjY0NSAxNS44Njk4QzIwOC40MzcgMTUuODY5OCAyMTIuMDk5IDE3LjQyOTkgMjEzLjYwMSAyMC4yMjY3Vi0wLjAwODc4OTA2SDIyMi42MjJWNDYuODk3MkgyMTMuNjAxWk0yMDYuMzQ1IDI0LjM5MTdDMjAyLjQ4OCAyNC4zOTE3IDE5OS4yODMgMjcuMjU0MyAxOTkuMjgzIDMxLjYxMzlDMTk5LjI4MyAzNi4xMDI0IDIwMi40ODggMzguOTYyMSAyMDYuMzQ1IDM4Ljk2MjFDMjEwLjEzNyAzOC45NjIxIDIxMy40MDUgMzUuOTY3OSAyMTMuNDA1IDMxLjYxMzlDMjEzLjQwNSAyNy4wNTk2IDIxMC4wNzQgMjQuMzkxNyAyMDYuMzQ1IDI0LjM5MTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMzUuNDkgLTAuMDA4Nzg5MDZDMjM4LjU2IC0wLjAwODc4OTA2IDI0MS4wNDUgMi4yODEyNiAyNDEuMDQ1IDUuMjU4MzNDMjQxLjA0NSA4LjIzNTM5IDIzOC41NiAxMC41OTEzIDIzNS40OSAxMC41OTEzQzIzMi40MjEgMTAuNTkxMyAyMjkuOCA4LjI0Njg0IDIyOS44IDUuMjU4MzNDMjI5LjggMi4yNjk4MSAyMzIuNDE4IC0wLjAwODc4OTA2IDIzNS40OSAtMC4wMDg3ODkwNlpNMjM5Ljk5OCA0Ni44ODU3SDIzMC45NzlWMTYuNTE5NkgyMzkuOTk4VjQ2Ljg4NTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yNzAuOTgxIDQzLjQ1MDVDMjY5LjAxOSA0Ni4zNzg5IDI2NC40NDUgNDcuNDgxIDI2Mi4wOTIgNDcuNDgxQzI1NC4zMSA0Ny40ODEgMjQ2LjUzMSA0MS40MzI0IDI0Ni41MzEgMzEuNjc2OEMyNDYuNTMxIDIxLjkyMTIgMjU0LjI5OSAxNS44NzI2IDI2Mi4wOTIgMTUuODcyNkMyNjQuMDUxIDE1Ljg3MjYgMjY4LjYyOCAxNi41MTk1IDI3MC45ODEgMTkuOTA1OVYxNi41MTk1SDI4MFY0Ni44OTdIMjcwLjk4MVY0My40NTA1Wk0yNjMuNTkzIDM4Ljg5OUMyNjcuMzMzIDM4Ljg5OSAyNzAuOTgxIDM2LjIzMTEgMjcwLjk4MSAzMS42NzY4QzI3MC45ODEgMjcuMTIyNCAyNjcuMzE5IDI0LjQ1NDUgMjYzLjU5MyAyNC40NTQ1QzI1OS44MDIgMjQuNDU0NSAyNTUuOTQ0IDI3LjMxNzEgMjU1Ljk0NCAzMS42NzY4QzI1NS45NDQgMzYuMDM2NSAyNTkuODAyIDM4Ljg5OSAyNjMuNTkzIDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEuMjEwNjIgMTUuODY0MUwzMS4zMjc2IDQ1LjgzMjNDMzEuNzgyOCA0Ni4yODQ0IDMyLjM2MjQgNDYuNTkyMSAzMi45OTMzIDQ2LjcxNjZDMzMuNjI0MiA0Ni44NDExIDM0LjI3NzkgNDYuNzc2NyAzNC44NzIxIDQ2LjUzMTdDMzUuNDY2MiA0Ni4yODY2IDM1Ljk3NCA0NS44NzE5IDM2LjMzMTMgNDUuMzM5OEMzNi42ODg3IDQ0LjgwNzcgMzYuODc5NiA0NC4xODIyIDM2Ljg3OTggNDMuNTQyMlYxNS4wODU1QzM2Ljg3OTEgMTMuODI3IDM2LjM3NjMgMTIuNjIwMiAzNS40ODIgMTEuNzMwM0MzNC41ODc2IDEwLjg0MDQgMzMuMzc0OSAxMC4zNDAxIDMyLjExMDEgMTAuMzM5NEgzLjUxMjA0QzIuODY4OSAxMC4zMzk2IDIuMjQwMjcgMTAuNTI5NSAxLjcwNTU1IDEwLjg4NTFDMS4xNzA4MyAxMS4yNDA3IDAuNzU0MDE1IDExLjc0NiAwLjUwNzc0OCAxMi4zMzcyQzAuMjYxNDgxIDEyLjkyODQgMC4xOTY4MTMgMTMuNTc4OSAwLjMyMTkxMyAxNC4yMDY3QzAuNDQ3MDEzIDE0LjgzNDQgMC43NTYyNjkgMTUuNDExMiAxLjIxMDYyIDE1Ljg2NDFaIiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjxwYXRoIGQ9Ik0yLjA0MjEzIDQ1LjE1MTFDNi40MDA0NSA0OS40OTA4IDEzLjg1NzEgNDYuNDE5MyAxMy44NTcxIDQwLjI4NDhDMTMuODU3MSAzOC40NTgyIDEzLjEyNzggMzYuNzA2MyAxMS44Mjk4IDM1LjQxNDdDMTAuNTMxOCAzNC4xMjMxIDguNzcxMjQgMzMuMzk3NSA2LjkzNTUzIDMzLjM5NzVDMC43Njc3MTQgMzMuMzk3NSAtMi4zMTkwNyA0MC44MTcyIDIuMDQ1MDEgNDUuMTU0IiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI5XzQyMiI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iNDcuNTQ3MiIgZmlsbD0id2hpdGUiPjwvcmVjdD4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4=" alt="Skandia">
-    <span class="topbar__user">Camila Restrepo</span>
-  </header>
-
-  <div class="portal__inner">
-    <h1>Hola, Camila</h1>
-    <p class="portal__lead">Este es tu resumen de portafolio.</p>
-
-    <div class="notice notice--success" id="portal-accepted" role="status" hidden>
-      <span>Registramos tu aceptación del Reglamento de Uso de los Canales Digitales. Puedes consultarlo y descargarlo cuando quieras.</span>
-    </div>
-
-    <div class="products">
-      <div class="product">
-        <span class="product__label">Fondo de pensiones voluntario</span>
-        <span class="product__value">$ 128.450.000</span>
-      </div>
-      <div class="product">
-        <span class="product__label">Cesantías</span>
-        <span class="product__value">$ 14.220.000</span>
-      </div>
-      <div class="product">
-        <span class="product__label">Fiduciaria</span>
-        <span class="product__value">$ 42.900.000</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- =============================================================== MODAL -->
-<div class="overlay" id="modal" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1" id="modal-card">
-
-    <div class="modal__head">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-      <h2 id="modal-title">Reglamento de uso de los Canales Digitales de Skandia</h2>
-    </div>
-
-    <div class="modal__body">
-      <div class="doc sk-scroll" id="doc">
-        <p class="doc__intro">Le damos la bienvenida a los Canales Digitales de Skandia. Este Reglamento describe las condiciones de uso del Portal de Clientes y de la Skandia App, sus derechos y obligaciones como Cliente y los compromisos de Skandia. Le recomendamos leerlo con atención antes de aceptarlo; su texto estará siempre disponible para consulta y descarga.</p>
-
-        <div id="doc-blocks"></div>
-
-        <label class="consent">
-          <input type="checkbox" id="chk-accept">
-          <span>He leído y acepto el Reglamento de Uso de los Canales Digitales de Skandia.</span>
-        </label>
+      <div class="status">
+        <span>9:41</span>
+        <span class="status__island"></span>
+        <svg width="66" height="14" viewBox="0 0 66 14" fill="#232323" aria-hidden="true"><rect x="0" y="6" width="3" height="6" rx="1"></rect><rect x="5" y="4" width="3" height="8" rx="1"></rect><rect x="10" y="2" width="3" height="10" rx="1"></rect><rect x="15" y="0" width="3" height="12" rx="1"></rect><path d="M28 3.4a8 8 0 0 1 10 0l-1.3 1.5a6 6 0 0 0-7.4 0zM30.2 6.6a4.6 4.6 0 0 1 5.6 0L33 9.8z"></path><rect x="46" y="1.5" width="18" height="10" rx="3" fill="none" stroke="#232323" stroke-width="1.4"></rect><rect x="47.6" y="3.2" width="14" height="6.6" rx="1.6"></rect><rect x="65" y="5" width="1.2" height="4" rx="0.6"></rect></svg>
       </div>
 
-      <div class="hint" id="scroll-hint">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>
-        Lee y desplázate hasta abajo para continuar
-      </div>
-    </div>
+      <!-- login móvil -->
+      <div class="m-screen m-login" id="m-login">
+        <button class="m-login__back" type="button" aria-label="Atrás">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <img class="m-login__logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMjgwIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTI5XzQyMikiPgo8cGF0aCBkPSJNNjIuMDAwMSAzNC40MDc2QzUyLjg0OTEgMzEuOTM3MyA1Mi43OTQ0IDI3LjMxOTkgNTIuODQ5MSAyNC41MjMyQzUyLjkxMjQgMjAuMDM0NyA1OC4zNDA4IDE1Ljg3MjYgNjQuNzQ3NCAxNS44NzI2QzcwLjgyNjEgMTUuODcyNiA3Ny4yMzI3IDE4LjUzNzYgNzcuMjk4OCAyNS45NTQ1SDY4LjczMThDNjguNjY4NSAyMy42NjQ1IDY2LjcxOCAyMy4yODY2IDY1LjI3OTYgMjMuMjg2NkM2My4zMjA1IDIzLjI4NjYgNjIuMDExNiAyNC4xOTY5IDYyLjA3NzggMjUuNTc2NkM2Mi4xNDExIDI2LjQ4NjkgNjIuOTQwOCAyNy40MDAxIDY0Ljc1ODkgMjcuODY2N0w2OS45MzcxIDI5LjIzMjFDNzcuMzI0NyAzMS4yMzU5IDc4LjIzOTUgMzYuMTI4MSA3OC4yMzk1IDM4LjA3NzVDNzguMjM5NSA0NC41MTgyIDcxLjQzODggNDcuNTcyNiA2NS4wMzIyIDQ3LjU3MjZDNTguODI0MSA0Ny41NzI2IDUyLjM1MTQgNDMuODY1NiA1Mi4yODgxIDM3LjEwMTNINjAuNzgzMkM2MC44NDk0IDM4Ljg1ODkgNjIuNzk3IDQwLjYxMzcgNjUuMjk0IDQwLjYxMzdDNjcuMzA3OCA0MC41NDc4IDY5LjAzMzggMzkuNjM3NiA2OS4wMzM4IDM4LjA3NzVDNjkuMDMzOCAzNi43NzUgNjguMjQ4NSAzNi4wNzM3IDY2LjAyNzYgMzUuNDc1NEw2Mi4wMDAxIDM0LjQwNzZaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik05Mi4yNjA5IDQ2Ljg5NzRIODMuMjQyMlYwSDkyLjI2MDlWMjQuODQ0Mkw5OS41MTkgMTYuNTE5OEgxMTEuMDg5TDk4LjQwODYgMjkuOTE5NUwxMTMuNjM1IDQ2Ljg5NzRIMTAyLjQ1OUw5Mi4yNjA5IDM0Ljg2MzJWNDYuODk3NFoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEzNy4xNDQgNDMuNDUwNUMxMzUuMTc5IDQ2LjM3ODkgMTMwLjYwOCA0Ny40ODEgMTI4LjI1NSA0Ny40ODFDMTIwLjQ1OSA0Ny40ODEgMTEyLjY5MSA0MS40MzI0IDExMi42OTEgMzEuNjc2OEMxMTIuNjkxIDIxLjkyMTIgMTIwLjQ1OSAxNS44NzI2IDEyOC4yNTIgMTUuODcyNkMxMzAuMjExIDE1Ljg3MjYgMTM0Ljc4OCAxNi41MTk1IDEzNy4xNDEgMTkuOTA1OVYxNi41MTk1SDE0Ni4xNlY0Ni44OTdIMTM3LjE0NFY0My40NTA1Wk0xMjkuNzU2IDM4Ljg5OUMxMzMuNDk2IDM4Ljg5OSAxMzcuMTQ0IDM2LjIzMTEgMTM3LjE0NCAzMS42NzY4QzEzNy4xNDQgMjcuMTIyNCAxMzMuNDgyIDI0LjQ1NDUgMTI5Ljc1NiAyNC40NTQ1QzEyNS45NjUgMjQuNDU0NSAxMjIuMTA3IDI3LjMxNzEgMTIyLjEwNyAzMS42NzY4QzEyMi4xMDcgMzYuMDM2NSAxMjUuOTY1IDM4Ljg5OSAxMjkuNzU2IDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTE2My42MTEgNDYuODk3SDE1NC41MThWMTYuNTE5NUgxNjMuNjExVjIwLjk0NUMxNjUuMjQyIDE3Ljg4NzggMTY4LjgzOCAxNS44NzI2IDE3Mi40MzQgMTUuODcyNkMxNzkuMjk1IDE1Ljg3MjYgMTgzLjYxMyAyMC4wOTc3IDE4My42MTMgMjguNzU0MVY0Ni44OTk5SDE3NC41MlYzMC43MDA2QzE3NC41MiAyNi42NjczIDE3Mi4yOTYgMjQuNjUyIDE2OS4yMjcgMjQuNjUyQzE2Ni4wMjIgMjQuNjUyIDE2My42MDUgMjYuMjEyMSAxNjMuNjA1IDMwLjgyOTRMMTYzLjYxMSA0Ni44OTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMTMuNjAxIDQ2Ljg5NzJWNDMuMTI3MkMyMTIuMDk5IDQ1LjkyMzkgMjA4LjQzNyA0Ny41NDcgMjA0LjY0NSA0Ny41NDdDMTk2LjggNDcuNTQ3IDE4OS44NzMgNDEuMzY5NiAxODkuODczIDMxLjgwMjlDMTg5Ljg3MyAyMi4wNDczIDE5Ni44IDE1Ljg2OTggMjA0LjY0NSAxNS44Njk4QzIwOC40MzcgMTUuODY5OCAyMTIuMDk5IDE3LjQyOTkgMjEzLjYwMSAyMC4yMjY3Vi0wLjAwODc4OTA2SDIyMi42MjJWNDYuODk3MkgyMTMuNjAxWk0yMDYuMzQ1IDI0LjM5MTdDMjAyLjQ4OCAyNC4zOTE3IDE5OS4yODMgMjcuMjU0MyAxOTkuMjgzIDMxLjYxMzlDMTk5LjI4MyAzNi4xMDI0IDIwMi40ODggMzguOTYyMSAyMDYuMzQ1IDM4Ljk2MjFDMjEwLjEzNyAzOC45NjIxIDIxMy40MDUgMzUuOTY3OSAyMTMuNDA1IDMxLjYxMzlDMjEzLjQwNSAyNy4wNTk2IDIxMC4wNzQgMjQuMzkxNyAyMDYuMzQ1IDI0LjM5MTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMzUuNDkgLTAuMDA4Nzg5MDZDMjM4LjU2IC0wLjAwODc4OTA2IDI0MS4wNDUgMi4yODEyNiAyNDEuMDQ1IDUuMjU4MzNDMjQxLjA0NSA4LjIzNTM5IDIzOC41NiAxMC41OTEzIDIzNS40OSAxMC41OTEzQzIzMi40MjEgMTAuNTkxMyAyMjkuOCA4LjI0Njg0IDIyOS44IDUuMjU4MzNDMjI5LjggMi4yNjk4MSAyMzIuNDE4IC0wLjAwODc4OTA2IDIzNS40OSAtMC4wMDg3ODkwNlpNMjM5Ljk5OCA0Ni44ODU3SDIzMC45NzlWMTYuNTE5NkgyMzkuOTk4VjQ2Ljg4NTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yNzAuOTgxIDQzLjQ1MDVDMjY5LjAxOSA0Ni4zNzg5IDI2NC40NDUgNDcuNDgxIDI2Mi4wOTIgNDcuNDgxQzI1NC4zMSA0Ny40ODEgMjQ2LjUzMSA0MS40MzI0IDI0Ni41MzEgMzEuNjc2OEMyNDYuNTMxIDIxLjkyMTIgMjU0LjI5OSAxNS44NzI2IDI2Mi4wOTIgMTUuODcyNkMyNjQuMDUxIDE1Ljg3MjYgMjY4LjYyOCAxNi41MTk1IDI3MC45ODEgMTkuOTA1OVYxNi41MTk1SDI4MFY0Ni44OTdIMjcwLjk4MVY0My40NTA1Wk0yNjMuNTkzIDM4Ljg5OUMyNjcuMzMzIDM4Ljg5OSAyNzAuOTgxIDM2LjIzMTEgMjcwLjk4MSAzMS42NzY4QzI3MC45ODEgMjcuMTIyNCAyNjcuMzE5IDI0LjQ1NDUgMjYzLjU5MyAyNC40NTQ1QzI1OS44MDIgMjQuNDU0NSAyNTUuOTQ0IDI3LjMxNzEgMjU1Ljk0NCAzMS42NzY4QzI1NS45NDQgMzYuMDM2NSAyNTkuODAyIDM4Ljg5OSAyNjMuNTkzIDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEuMjEwNjIgMTUuODY0MUwzMS4zMjc2IDQ1LjgzMjNDMzEuNzgyOCA0Ni4yODQ0IDMyLjM2MjQgNDYuNTkyMSAzMi45OTMzIDQ2LjcxNjZDMzMuNjI0MiA0Ni44NDExIDM0LjI3NzkgNDYuNzc2NyAzNC44NzIxIDQ2LjUzMTdDMzUuNDY2MiA0Ni4yODY2IDM1Ljk3NCA0NS44NzE5IDM2LjMzMTMgNDUuMzM5OEMzNi42ODg3IDQ0LjgwNzcgMzYuODc5NiA0NC4xODIyIDM2Ljg3OTggNDMuNTQyMlYxNS4wODU1QzM2Ljg3OTEgMTMuODI3IDM2LjM3NjMgMTIuNjIwMiAzNS40ODIgMTEuNzMwM0MzNC41ODc2IDEwLjg0MDQgMzMuMzc0OSAxMC4zNDAxIDMyLjExMDEgMTAuMzM5NEgzLjUxMjA0QzIuODY4OSAxMC4zMzk2IDIuMjQwMjcgMTAuNTI5NSAxLjcwNTU1IDEwLjg4NTFDMS4xNzA4MyAxMS4yNDA3IDAuNzU0MDE1IDExLjc0NiAwLjUwNzc0OCAxMi4zMzcyQzAuMjYxNDgxIDEyLjkyODQgMC4xOTY4MTMgMTMuNTc4OSAwLjMyMTkxMyAxNC4yMDY3QzAuNDQ3MDEzIDE0LjgzNDQgMC43NTYyNjkgMTUuNDExMiAxLjIxMDYyIDE1Ljg2NDFaIiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjxwYXRoIGQ9Ik0yLjA0MjEzIDQ1LjE1MTFDNi40MDA0NSA0OS40OTA4IDEzLjg1NzEgNDYuNDE5MyAxMy44NTcxIDQwLjI4NDhDMTMuODU3MSAzOC40NTgyIDEzLjEyNzggMzYuNzA2MyAxMS44Mjk4IDM1LjQxNDdDMTAuNTMxOCAzNC4xMjMxIDguNzcxMjQgMzMuMzk3NSA2LjkzNTUzIDMzLjM5NzVDMC43Njc3MTQgMzMuMzk3NSAtMi4zMTkwNyA0MC44MTcyIDIuMDQ1MDEgNDUuMTU0IiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI5XzQyMiI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iNDcuNTQ3MiIgZmlsbD0id2hpdGUiPjwvcmVjdD4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4=" alt="Skandia">
 
-    <div class="modal__actions">
-      <button class="btn btn--outline" id="btn-reject" type="button">Rechazar</button>
-      <button class="btn btn--primary" id="btn-accept" type="button">Aceptar y continuar</button>
+        <div class="m-login__form">
+          <div class="notice notice--error" id="m-notice" role="status" hidden>
+            No aceptaste el Reglamento de Uso, por lo que cerramos tu sesión. Puedes ingresar de nuevo cuando quieras.
+          </div>
+          <input class="field" type="text" placeholder="Usuario" aria-label="Usuario">
+          <div class="m-pass">
+            <input class="field" type="password" placeholder="Contraseña" aria-label="Contraseña">
+            <svg class="m-pass__eye" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </div>
+          <a class="m-login__reset" href="#">Crear o recuperar contraseña</a>
+          <button class="btn btn--primary" id="m-btn-login" type="button" style="margin-top:8px">Iniciar sesión</button>
+        </div>
+
+        <span class="m-bar"></span>
+      </div>
+
+      <!-- home móvil -->
+      <div class="m-screen m-home" id="m-home" hidden>
+        <div class="m-top">
+          <button class="m-top__btn" id="m-burger" type="button" aria-label="Abrir menú">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path></svg>
+          </button>
+          <img class="m-top__logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMjgwIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTI5XzQyMikiPgo8cGF0aCBkPSJNNjIuMDAwMSAzNC40MDc2QzUyLjg0OTEgMzEuOTM3MyA1Mi43OTQ0IDI3LjMxOTkgNTIuODQ5MSAyNC41MjMyQzUyLjkxMjQgMjAuMDM0NyA1OC4zNDA4IDE1Ljg3MjYgNjQuNzQ3NCAxNS44NzI2QzcwLjgyNjEgMTUuODcyNiA3Ny4yMzI3IDE4LjUzNzYgNzcuMjk4OCAyNS45NTQ1SDY4LjczMThDNjguNjY4NSAyMy42NjQ1IDY2LjcxOCAyMy4yODY2IDY1LjI3OTYgMjMuMjg2NkM2My4zMjA1IDIzLjI4NjYgNjIuMDExNiAyNC4xOTY5IDYyLjA3NzggMjUuNTc2NkM2Mi4xNDExIDI2LjQ4NjkgNjIuOTQwOCAyNy40MDAxIDY0Ljc1ODkgMjcuODY2N0w2OS45MzcxIDI5LjIzMjFDNzcuMzI0NyAzMS4yMzU5IDc4LjIzOTUgMzYuMTI4MSA3OC4yMzk1IDM4LjA3NzVDNzguMjM5NSA0NC41MTgyIDcxLjQzODggNDcuNTcyNiA2NS4wMzIyIDQ3LjU3MjZDNTguODI0MSA0Ny41NzI2IDUyLjM1MTQgNDMuODY1NiA1Mi4yODgxIDM3LjEwMTNINjAuNzgzMkM2MC44NDk0IDM4Ljg1ODkgNjIuNzk3IDQwLjYxMzcgNjUuMjk0IDQwLjYxMzdDNjcuMzA3OCA0MC41NDc4IDY5LjAzMzggMzkuNjM3NiA2OS4wMzM4IDM4LjA3NzVDNjkuMDMzOCAzNi43NzUgNjguMjQ4NSAzNi4wNzM3IDY2LjAyNzYgMzUuNDc1NEw2Mi4wMDAxIDM0LjQwNzZaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik05Mi4yNjA5IDQ2Ljg5NzRIODMuMjQyMlYwSDkyLjI2MDlWMjQuODQ0Mkw5OS41MTkgMTYuNTE5OEgxMTEuMDg5TDk4LjQwODYgMjkuOTE5NUwxMTMuNjM1IDQ2Ljg5NzRIMTAyLjQ1OUw5Mi4yNjA5IDM0Ljg2MzJWNDYuODk3NFoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEzNy4xNDQgNDMuNDUwNUMxMzUuMTc5IDQ2LjM3ODkgMTMwLjYwOCA0Ny40ODEgMTI4LjI1NSA0Ny40ODFDMTIwLjQ1OSA0Ny40ODEgMTEyLjY5MSA0MS40MzI0IDExMi42OTEgMzEuNjc2OEMxMTIuNjkxIDIxLjkyMTIgMTIwLjQ1OSAxNS44NzI2IDEyOC4yNTIgMTUuODcyNkMxMzAuMjExIDE1Ljg3MjYgMTM0Ljc4OCAxNi41MTk1IDEzNy4xNDEgMTkuOTA1OVYxNi41MTk1SDE0Ni4xNlY0Ni44OTdIMTM3LjE0NFY0My40NTA1Wk0xMjkuNzU2IDM4Ljg5OUMxMzMuNDk2IDM4Ljg5OSAxMzcuMTQ0IDM2LjIzMTEgMTM3LjE0NCAzMS42NzY4QzEzNy4xNDQgMjcuMTIyNCAxMzMuNDgyIDI0LjQ1NDUgMTI5Ljc1NiAyNC40NTQ1QzEyNS45NjUgMjQuNDU0NSAxMjIuMTA3IDI3LjMxNzEgMTIyLjEwNyAzMS42NzY4QzEyMi4xMDcgMzYuMDM2NSAxMjUuOTY1IDM4Ljg5OSAxMjkuNzU2IDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTE2My42MTEgNDYuODk3SDE1NC41MThWMTYuNTE5NUgxNjMuNjExVjIwLjk0NUMxNjUuMjQyIDE3Ljg4NzggMTY4LjgzOCAxNS44NzI2IDE3Mi40MzQgMTUuODcyNkMxNzkuMjk1IDE1Ljg3MjYgMTgzLjYxMyAyMC4wOTc3IDE4My42MTMgMjguNzU0MVY0Ni44OTk5SDE3NC41MlYzMC43MDA2QzE3NC41MiAyNi42NjczIDE3Mi4yOTYgMjQuNjUyIDE2OS4yMjcgMjQuNjUyQzE2Ni4wMjIgMjQuNjUyIDE2My42MDUgMjYuMjEyMSAxNjMuNjA1IDMwLjgyOTRMMTYzLjYxMSA0Ni44OTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMTMuNjAxIDQ2Ljg5NzJWNDMuMTI3MkMyMTIuMDk5IDQ1LjkyMzkgMjA4LjQzNyA0Ny41NDcgMjA0LjY0NSA0Ny41NDdDMTk2LjggNDcuNTQ3IDE4OS44NzMgNDEuMzY5NiAxODkuODczIDMxLjgwMjlDMTg5Ljg3MyAyMi4wNDczIDE5Ni44IDE1Ljg2OTggMjA0LjY0NSAxNS44Njk4QzIwOC40MzcgMTUuODY5OCAyMTIuMDk5IDE3LjQyOTkgMjEzLjYwMSAyMC4yMjY3Vi0wLjAwODc4OTA2SDIyMi42MjJWNDYuODk3MkgyMTMuNjAxWk0yMDYuMzQ1IDI0LjM5MTdDMjAyLjQ4OCAyNC4zOTE3IDE5OS4yODMgMjcuMjU0MyAxOTkuMjgzIDMxLjYxMzlDMTk5LjI4MyAzNi4xMDI0IDIwMi40ODggMzguOTYyMSAyMDYuMzQ1IDM4Ljk2MjFDMjEwLjEzNyAzOC45NjIxIDIxMy40MDUgMzUuOTY3OSAyMTMuNDA1IDMxLjYxMzlDMjEzLjQwNSAyNy4wNTk2IDIxMC4wNzQgMjQuMzkxNyAyMDYuMzQ1IDI0LjM5MTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMzUuNDkgLTAuMDA4Nzg5MDZDMjM4LjU2IC0wLjAwODc4OTA2IDI0MS4wNDUgMi4yODEyNiAyNDEuMDQ1IDUuMjU4MzNDMjQxLjA0NSA4LjIzNTM5IDIzOC41NiAxMC41OTEzIDIzNS40OSAxMC41OTEzQzIzMi40MjEgMTAuNTkxMyAyMjkuOCA4LjI0Njg0IDIyOS44IDUuMjU4MzNDMjI5LjggMi4yNjk4MSAyMzIuNDE4IC0wLjAwODc4OTA2IDIzNS40OSAtMC4wMDg3ODkwNlpNMjM5Ljk5OCA0Ni44ODU3SDIzMC45NzlWMTYuNTE5NkgyMzkuOTk4VjQ2Ljg4NTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yNzAuOTgxIDQzLjQ1MDVDMjY5LjAxOSA0Ni4zNzg5IDI2NC40NDUgNDcuNDgxIDI2Mi4wOTIgNDcuNDgxQzI1NC4zMSA0Ny40ODEgMjQ2LjUzMSA0MS40MzI0IDI0Ni41MzEgMzEuNjc2OEMyNDYuNTMxIDIxLjkyMTIgMjU0LjI5OSAxNS44NzI2IDI2Mi4wOTIgMTUuODcyNkMyNjQuMDUxIDE1Ljg3MjYgMjY4LjYyOCAxNi41MTk1IDI3MC45ODEgMTkuOTA1OVYxNi41MTk1SDI4MFY0Ni44OTdIMjcwLjk4MVY0My40NTA1Wk0yNjMuNTkzIDM4Ljg5OUMyNjcuMzMzIDM4Ljg5OSAyNzAuOTgxIDM2LjIzMTEgMjcwLjk4MSAzMS42NzY4QzI3MC45ODEgMjcuMTIyNCAyNjcuMzE5IDI0LjQ1NDUgMjYzLjU5MyAyNC40NTQ1QzI1OS44MDIgMjQuNDU0NSAyNTUuOTQ0IDI3LjMxNzEgMjU1Ljk0NCAzMS42NzY4QzI1NS45NDQgMzYuMDM2NSAyNTkuODAyIDM4Ljg5OSAyNjMuNTkzIDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEuMjEwNjIgMTUuODY0MUwzMS4zMjc2IDQ1LjgzMjNDMzEuNzgyOCA0Ni4yODQ0IDMyLjM2MjQgNDYuNTkyMSAzMi45OTMzIDQ2LjcxNjZDMzMuNjI0MiA0Ni44NDExIDM0LjI3NzkgNDYuNzc2NyAzNC44NzIxIDQ2LjUzMTdDMzUuNDY2MiA0Ni4yODY2IDM1Ljk3NCA0NS44NzE5IDM2LjMzMTMgNDUuMzM5OEMzNi42ODg3IDQ0LjgwNzcgMzYuODc5NiA0NC4xODIyIDM2Ljg3OTggNDMuNTQyMlYxNS4wODU1QzM2Ljg3OTEgMTMuODI3IDM2LjM3NjMgMTIuNjIwMiAzNS40ODIgMTEuNzMwM0MzNC41ODc2IDEwLjg0MDQgMzMuMzc0OSAxMC4zNDAxIDMyLjExMDEgMTAuMzM5NEgzLjUxMjA0QzIuODY4OSAxMC4zMzk2IDIuMjQwMjcgMTAuNTI5NSAxLjcwNTU1IDEwLjg4NTFDMS4xNzA4MyAxMS4yNDA3IDAuNzU0MDE1IDExLjc0NiAwLjUwNzc0OCAxMi4zMzcyQzAuMjYxNDgxIDEyLjkyODQgMC4xOTY4MTMgMTMuNTc4OSAwLjMyMTkxMyAxNC4yMDY3QzAuNDQ3MDEzIDE0LjgzNDQgMC43NTYyNjkgMTUuNDExMiAxLjIxMDYyIDE1Ljg2NDFaIiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjxwYXRoIGQ9Ik0yLjA0MjEzIDQ1LjE1MTFDNi40MDA0NSA0OS40OTA4IDEzLjg1NzEgNDYuNDE5MyAxMy44NTcxIDQwLjI4NDhDMTMuODU3MSAzOC40NTgyIDEzLjEyNzggMzYuNzA2MyAxMS44Mjk4IDM1LjQxNDdDMTAuNTMxOCAzNC4xMjMxIDguNzcxMjQgMzMuMzk3NSA2LjkzNTUzIDMzLjM5NzVDMC43Njc3MTQgMzMuMzk3NSAtMi4zMTkwNyA0MC44MTcyIDIuMDQ1MDEgNDUuMTU0IiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI5XzQyMiI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iNDcuNTQ3MiIgZmlsbD0id2hpdGUiPjwvcmVjdD4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4=" alt="Skandia">
+          <span class="m-top__btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg></span>
+        </div>
+
+        <div class="m-scroll">
+          <span class="m-hello">¡Hola <span>Valeria!</span></span>
+
+          <div class="notice notice--ok" id="m-accepted" role="status" hidden style="padding:14px 16px">
+            Registramos tu aceptación del Reglamento de Uso de los Canales Digitales.
+          </div>
+
+          <div class="m-card m-card--promo">
+            <span class="m-card__text">Descubre tu nuevo Portal Skandia: más fácil, más rápido y diseñado para ti.</span>
+            <button class="m-card__cta" type="button">Ingresa aquí</button>
+          </div>
+          <div class="m-card">
+            <span class="m-card__label">Ahorro e Inversión</span>
+            <span class="m-card__value">$ 1.219.541</span>
+            <span class="m-card__hint">Total del capital + rendimientos</span>
+          </div>
+          <div class="m-card">
+            <span class="m-card__label">Pensión Obligatoria y Cesantías</span>
+            <span class="m-card__value">$ 47.554.559</span>
+            <span class="m-card__hint">Total del capital + rendimientos</span>
+          </div>
+        </div>
+
+        <div class="m-nav">
+          <span class="m-nav__item m-nav__item--on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>Home</span>
+          <span class="m-nav__plus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
+          <span class="m-nav__item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>Productos</span>
+        </div>
+        <span class="m-bar" style="margin-bottom:10px"></span>
+      </div>
+
+      <!-- menú móvil -->
+      <div class="m-screen m-menu" id="m-menu" hidden>
+        <div class="m-menu__top">
+          <div class="m-menu__head">
+            <button class="m-back" id="m-menu-back" type="button" aria-label="Volver">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+            </button>
+            <span>Menú</span>
+          </div>
+          <div class="m-menu__who">
+            <span class="m-menu__avatar">VG</span>
+            <span class="m-menu__name">Valeria Garzón Triana</span>
+            <span class="m-menu__mail">valeria.garzont@gmail.com</span>
+          </div>
+        </div>
+
+        <div class="m-scroll" style="gap:12px">
+          <button class="m-row" type="button">
+            <span class="m-row__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M3 20a6 6 0 0 1 9-5"></path><circle cx="17.5" cy="16.5" r="2.5"></circle></svg></span>
+            <span class="m-row__label">Mis datos</span>
+            <span class="m-row__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+          </button>
+          <button class="m-row" type="button">
+            <span class="m-row__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>
+            <span class="m-row__label">Servicios</span>
+            <span class="m-row__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+          </button>
+          <button class="m-row" type="button">
+            <span class="m-row__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.4-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 3a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.4l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4z"></path></svg></span>
+            <span class="m-row__label">Configuración</span>
+            <span class="m-row__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+          </button>
+          <button class="m-row" id="m-open-support" type="button">
+            <span class="m-row__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.3"></path><path d="M12 17.5h.01"></path></svg></span>
+            <span class="m-row__label">Soporte y ayuda</span>
+            <span class="m-row__chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+          </button>
+          <div class="m-menu__session">Tu último acceso fue: 11/08/2026 10:15 a.m.<br>IP: 206.62.142.15</div>
+          <span class="m-menu__version">Versión 7.1.6</span>
+        </div>
+        <span class="m-bar" style="margin-bottom:14px"></span>
+      </div>
+
+      <!-- canales de atención móvil -->
+      <div class="m-screen m-support" id="m-support" hidden>
+        <div class="m-support__head">
+          <button class="m-support__back" id="m-support-back" type="button" aria-label="Volver">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+          </button>
+          <span>Canales de atención</span>
+        </div>
+        <div class="m-support__list">
+          <div class="m-block">
+            <span class="m-block__label">Atención por nuestro chat</span>
+            <a href="#">Sami WhatsApp</a>
+          </div>
+          <div class="m-block">
+            <span class="m-block__label">PBX</span>
+            <a href="#">+57 (601) 658 4000</a>
+            <a href="#">+57 (601) 484 1300</a>
+          </div>
+          <div class="m-block">
+            <span class="m-block__label">Línea nacional gratuita</span>
+            <a href="#">+57 01 8000 517 526</a>
+          </div>
+          <div class="m-block">
+            <span class="m-block__label">Correo electrónico</span>
+            <a href="#">cliente@skandia.com.co</a>
+          </div>
+          <div class="m-block">
+            <span class="m-block__label">Petición, queja, reclamo, denuncia o sugerencia</span>
+            <a href="#">Radica tu solicitud</a>
+          </div>
+          <div class="m-block">
+            <span class="m-block__label">Documentos legales</span>
+            <button class="m-block__terms" id="m-open-terms" type="button">Términos y condiciones</button>
+          </div>
+          <div class="m-block">
+            <span class="m-block__label">Oficinas</span>
+            <div class="m-office">
+              <span style="color:#666666;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
+              <span class="m-office__name">Bogotá</span>
+              <span style="color:#404040;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+            </div>
+            <span class="m-office__text"><span class="bold">Avenida 19 No 109A-30</span><br>Lunes a viernes de 8:00 a.m. a 7:00 p.m. Jornada continua.</span>
+          </div>
+        </div>
+        <span class="m-bar" style="margin-bottom:14px"></span>
+      </div>
+
+      <!-- bottom sheet del reglamento -->
+      <div class="sheet-overlay" id="m-modal" hidden>
+        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="m-modal-title" tabindex="-1" id="m-modal-card">
+
+          <div class="sheet__head">
+            <h2 id="m-modal-title">Hemos actualizado el reglamento de uso de los Canales Digitales de Skandia</h2>
+            <span class="sheet__date">22 de julio de 2026</span>
+            <button class="sheet__x" id="m-modal-x" type="button" aria-label="Cerrar" hidden>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            </button>
+          </div>
+
+          <div class="sheet__body">
+            <div class="doc sheet__doc sk-scroll" id="m-doc">
+              <p class="doc__intro">Le damos la bienvenida a los Canales Digitales de Skandia. Este Reglamento describe las condiciones de uso del Portal de Clientes y de la Skandia App, sus derechos y obligaciones como Cliente y los compromisos de Skandia. Le recomendamos leerlo con atención antes de aceptarlo; su texto estará siempre disponible para consulta y descarga.</p>
+              <div class="doc-blocks"></div>
+              <label class="consent" id="m-consent">
+                <span class="cbox-wrap">
+                  <input class="cbox-input" type="checkbox" id="m-chk">
+                  <span class="cbox"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.178 2.078a.833.833 0 0 1 0 1.179L5.511 9.923a.833.833 0 0 1-1.178 0L1 6.59a.833.833 0 0 1 1.178-1.179l2.744 2.745 6.078-6.078a.833.833 0 0 1 1.178 0Z" fill="#ffffff"/></svg></span>
+                </span>
+                <span class="consent__text">He leído y acepto el Reglamento de Uso de los Canales Digitales de Skandia.</span>
+              </label>
+            </div>
+
+            <div class="hint sheet__hint" id="m-hint">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>
+              Lee y desplázate para continuar
+            </div>
+          </div>
+
+          <div class="sheet__actions" id="m-actions">
+            <button class="btn btn--primary" id="m-btn-accept" type="button">Aceptar y continuar</button>
+            <button class="btn--ghost" id="m-btn-reject" type="button">Rechazar</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -502,31 +1167,62 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
 - Integración: este Reglamento se integra con los reglamentos, contratos y acuerdos de los productos y servicios del Cliente, con la Política de Tratamiento de Datos Personales y con el aviso de cookies de Skandia.
 `;
 
-  // Reglas del modal (props del diseño original, sobreescribibles por query string)
+  const TITLE_ACCEPT = 'Hemos actualizado el reglamento de uso de los Canales Digitales de Skandia';
+  const TITLE_READ   = 'Reglamento de uso de los Canales Digitales de Skandia';
+
+  // Reglas del modo aceptación (props del diseño, sobreescribibles por query string)
   const params = new URLSearchParams(location.search);
   const REQUIRE_SCROLL_TO_END = params.get('scroll') !== '0';
   const REQUIRE_CHECKBOX      = params.get('check')  !== '0';
 
+  const $ = function (id) { return document.getElementById(id); };
+
   const el = {
-    login:     document.getElementById('screen-login'),
-    portal:    document.getElementById('screen-portal'),
-    notice:    document.getElementById('login-notice'),
-    acceptedB: document.getElementById('portal-accepted'),
-    modal:     document.getElementById('modal'),
-    card:      document.getElementById('modal-card'),
-    doc:       document.getElementById('doc'),
-    blocks:    document.getElementById('doc-blocks'),
-    hint:      document.getElementById('scroll-hint'),
-    chk:       document.getElementById('chk-accept'),
-    btnLogin:  document.getElementById('btn-login'),
-    btnAccept: document.getElementById('btn-accept'),
-    btnReject: document.getElementById('btn-reject')
+    tabDesk: $('tab-desk'), tabMobile: $('tab-mobile'),
+    desk: $('device-desk'), mobile: $('device-mobile'),
+
+    // escritorio
+    dLogin: $('d-login'), dPortal: $('d-portal'), dNotice: $('d-notice'), dAccepted: $('d-accepted'),
+    dHelp: $('d-help'), dModal: $('d-modal'), dModalCard: $('d-modal-card'), dModalTitle: $('d-modal-title'),
+    dModalX: $('d-modal-x'), dDoc: $('d-doc'), dConsent: $('d-consent'), dHint: $('d-hint'),
+    dActions: $('d-actions'), dSpacer: $('d-spacer'), dChk: $('d-chk'), dAccept: $('d-btn-accept'),
+
+    // móvil
+    mLogin: $('m-login'), mHome: $('m-home'), mMenu: $('m-menu'), mSupport: $('m-support'),
+    mNotice: $('m-notice'), mAccepted: $('m-accepted'),
+    mModal: $('m-modal'), mModalCard: $('m-modal-card'), mModalTitle: $('m-modal-title'),
+    mModalX: $('m-modal-x'), mDoc: $('m-doc'), mConsent: $('m-consent'), mHint: $('m-hint'),
+    mActions: $('m-actions'), mChk: $('m-chk'), mAccept: $('m-btn-accept')
   };
 
-  const state = { screen: 'login', modalOpen: false, accepted: false, atBottom: false, notice: false };
+  const state = {
+    device: 'desk',      // 'desk' | 'mobile'
+    screen: 'login',     // 'login' | 'portal'
+    mView: 'home',       // 'home' | 'menu' | 'support'
+    modalOpen: false,
+    mode: 'accept',      // 'accept' | 'read'
+    helpOpen: false,
+    accepted: false,
+    atBottom: false,
+    notice: false
+  };
 
-  // ----------------------------------------------------- render del documento
-  function renderDoc() {
+  function reset(device) {
+    state.device = device || state.device;
+    state.screen = 'login';
+    state.mView = 'home';
+    state.modalOpen = false;
+    state.mode = 'accept';
+    state.helpOpen = false;
+    state.accepted = false;
+    state.atBottom = false;
+    state.notice = false;
+    el.dChk.checked = false;
+    el.mChk.checked = false;
+  }
+
+  // ------------------------------------------------- render del documento
+  function buildBlocks() {
     const frag = document.createDocumentFragment();
 
     DOC.trim().split('\n').filter(Boolean).forEach(function (line) {
@@ -558,68 +1254,165 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
       frag.appendChild(node);
     });
 
-    el.blocks.appendChild(frag);
+    return frag;
   }
 
-  // ------------------------------------------------------------------ estado
+  function renderDoc() {
+    // El mismo texto alimenta el modal de escritorio y el bottom sheet móvil.
+    const targets = document.querySelectorAll('.doc-blocks');
+    for (let i = 0; i < targets.length; i++) {
+      targets[i].appendChild(buildBlocks());
+    }
+  }
+
+  // ---------------------------------------------------------------- estado
+  function isRead() { return state.mode === 'read'; }
+
   function blocked() {
+    if (isRead()) return false;
     return (REQUIRE_SCROLL_TO_END && !state.atBottom) || (REQUIRE_CHECKBOX && !state.accepted);
   }
 
+  function showHint() {
+    return !isRead() && REQUIRE_SCROLL_TO_END && !state.atBottom;
+  }
+
+  // Contenedor scrolleable del modal activo (solo uno está montado a la vez).
+  function activeDoc() {
+    return state.device === 'desk' ? el.dDoc : el.mDoc;
+  }
+
   function render() {
-    el.login.hidden  = state.screen !== 'login';
-    el.portal.hidden = state.screen !== 'portal';
-    el.notice.hidden = !state.notice;
-    el.acceptedB.hidden = !state.accepted;
-    el.modal.hidden  = !state.modalOpen;
-    el.hint.hidden   = !(REQUIRE_SCROLL_TO_END && !state.atBottom);
-    el.btnAccept.disabled = blocked();
+    const desk = state.device === 'desk';
+    const read = isRead();
+
+    el.tabDesk.classList.toggle('tab--on', desk);
+    el.tabMobile.classList.toggle('tab--on', !desk);
+    el.desk.hidden = !desk;
+    el.mobile.hidden = desk;
+
+    // escritorio
+    el.dLogin.hidden = state.screen !== 'login';
+    el.dPortal.hidden = state.screen !== 'portal';
+    el.dNotice.hidden = !state.notice;
+    el.dAccepted.hidden = !state.accepted;
+    el.dHelp.hidden = !state.helpOpen;
+    el.dModal.hidden = !state.modalOpen;
+    // El título del modal de escritorio es fijo; solo el sheet móvil cambia de copy.
+    el.dModalX.hidden = !read;
+    el.dConsent.hidden = read;
+    el.dActions.hidden = read;
+    el.dSpacer.hidden = !read;
+    el.dHint.hidden = !showHint();
+    el.dAccept.disabled = blocked();
+
+    // móvil
+    el.mLogin.hidden = state.screen !== 'login';
+    el.mHome.hidden = !(state.screen === 'portal' && state.mView === 'home');
+    el.mMenu.hidden = !(state.screen === 'portal' && state.mView === 'menu');
+    el.mSupport.hidden = !(state.screen === 'portal' && state.mView === 'support');
+    el.mNotice.hidden = !state.notice;
+    el.mAccepted.hidden = !state.accepted;
+    el.mModal.hidden = !state.modalOpen;
+    el.mModalTitle.textContent = read ? TITLE_READ : TITLE_ACCEPT;
+    el.mModalX.hidden = !read;
+    el.mConsent.hidden = read;
+    el.mActions.hidden = read;
+    el.mHint.hidden = !showHint();
+    el.mAccept.disabled = blocked();
   }
 
   function checkBottom() {
-    const d = el.doc;
+    const d = activeDoc();
     if (d.scrollTop + d.clientHeight >= d.scrollHeight - 24) {
       state.atBottom = true;
       render();
     }
   }
 
-  // ---------------------------------------------------------------- acciones
-  el.btnLogin.addEventListener('click', function () {
+  // -------------------------------------------------------------- acciones
+  function openAcceptModal() {
     state.screen = 'portal';
+    state.mView = 'home';
+    state.mode = 'accept';
     state.modalOpen = true;
     state.notice = false;
     state.accepted = false;
     state.atBottom = false;
-    el.chk.checked = false;
+    el.dChk.checked = false;
+    el.mChk.checked = false;
     render();
-    el.doc.scrollTop = 0;
-    el.card.focus();
+    const d = activeDoc();
+    d.scrollTop = 0;
+    (state.device === 'desk' ? el.dModalCard : el.mModalCard).focus();
     // Si el texto entra completo sin scroll, la regla de lectura ya está cumplida.
     setTimeout(checkBottom, 60);
-  });
+  }
 
-  el.doc.addEventListener('scroll', checkBottom);
-
-  el.chk.addEventListener('change', function (e) {
-    state.accepted = e.target.checked;
+  function openTerms() {
+    state.helpOpen = false;
+    state.modalOpen = true;
+    state.mode = 'read';
+    state.atBottom = true;
     render();
-  });
+    const d = activeDoc();
+    d.scrollTop = 0;
+    (state.device === 'desk' ? el.dModalCard : el.mModalCard).focus();
+  }
 
-  el.btnAccept.addEventListener('click', function () {
+  function closeModal() {
     state.modalOpen = false;
+    state.mode = 'accept';
     render();
-  });
+  }
 
-  el.btnReject.addEventListener('click', function () {
+  function onReject() {
     state.screen = 'login';
+    state.mView = 'home';
+    state.mode = 'accept';
     state.modalOpen = false;
     state.notice = true;
     state.accepted = false;
     state.atBottom = false;
-    el.chk.checked = false;
+    el.dChk.checked = false;
+    el.mChk.checked = false;
     render();
-  });
+  }
+
+  function onToggle(e) {
+    state.accepted = e.target.checked;
+    render();
+  }
+
+  // switch de dispositivo
+  el.tabDesk.addEventListener('click', function () { reset('desk'); render(); });
+  el.tabMobile.addEventListener('click', function () { reset('mobile'); render(); });
+
+  // escritorio
+  $('d-btn-login').addEventListener('click', openAcceptModal);
+  $('d-burger').addEventListener('click', function () { state.helpOpen = true; render(); });
+  $('d-rail-help').addEventListener('click', function () { state.helpOpen = true; render(); });
+  $('d-help-close').addEventListener('click', function () { state.helpOpen = false; render(); });
+  $('d-help-scrim').addEventListener('click', function () { state.helpOpen = false; render(); });
+  $('d-open-terms').addEventListener('click', openTerms);
+  $('d-modal-x').addEventListener('click', closeModal);
+  $('d-btn-accept').addEventListener('click', function () { state.modalOpen = false; render(); });
+  $('d-btn-reject').addEventListener('click', onReject);
+  el.dChk.addEventListener('change', onToggle);
+  el.dDoc.addEventListener('scroll', checkBottom);
+
+  // móvil
+  $('m-btn-login').addEventListener('click', openAcceptModal);
+  $('m-burger').addEventListener('click', function () { state.mView = 'menu'; render(); });
+  $('m-menu-back').addEventListener('click', function () { state.mView = 'home'; render(); });
+  $('m-open-support').addEventListener('click', function () { state.mView = 'support'; render(); });
+  $('m-support-back').addEventListener('click', function () { state.mView = 'menu'; render(); });
+  $('m-open-terms').addEventListener('click', openTerms);
+  $('m-modal-x').addEventListener('click', closeModal);
+  $('m-btn-accept').addEventListener('click', function () { state.modalOpen = false; render(); });
+  $('m-btn-reject').addEventListener('click', onReject);
+  el.mChk.addEventListener('change', onToggle);
+  el.mDoc.addEventListener('scroll', checkBottom);
 
   renderDoc();
   render();
