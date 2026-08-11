@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reglamento de Uso de Canales Digitales — Portal Clientes Skandia</title>
+<meta name="description" content="Prototipo de aceptación del Reglamento de Uso de los Canales Digitales de Skandia en el Portal de Clientes.">
+<!--
+  Términos y condiciones · Portal y App — v1
+  Flujo: login → portal + modal del Reglamento → "Aceptar y continuar" (banner de
+  confirmación en el portal) o "Rechazar" (vuelve al login con aviso de cierre de sesión).
+
+  Reglas del modal (por defecto activas, se pueden desactivar por query string):
+    ?scroll=0   no exige leer hasta el final
+    ?check=0    no exige marcar la casilla
+    ?scroll=0&check=0  habilita "Aceptar" desde el inicio
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ------------------------------------------------------------------ base */
+  *{ box-sizing: border-box; }
+  body{
+    margin: 0; background: #f7f7f7; color: #232323;
+    font-family: 'Open Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3{ font-family: Montserrat, sans-serif; font-weight: 700; }
+  a{ color: #00c73d; text-decoration: none; }
+  a:hover{ color: #03a835; }
+  [hidden]{ display: none !important; }
+
+  @keyframes skFade{ from{ opacity: 0 } to{ opacity: 1 } }
+  @keyframes skRise{ from{ opacity: 0; transform: translateY(12px) } to{ opacity: 1; transform: none } }
+
+  .sk-scroll::-webkit-scrollbar{ width: 8px; }
+  .sk-scroll::-webkit-scrollbar-thumb{ background: #00c73d; border-radius: 8px; }
+  .sk-scroll::-webkit-scrollbar-track{ background: #efefef; border-radius: 8px; }
+
+  /* --------------------------------------------------------------- botones */
+  .btn{
+    height: 56px; border-radius: 100px; border: none;
+    font-family: 'Open Sans', sans-serif; font-weight: 700; font-size: 16px;
+    cursor: pointer; transition: background 150ms ease-out;
+  }
+  .btn--primary{ background: #00c73d; color: #ffffff; }
+  .btn--primary:hover{ background: #03a835; }
+  .btn--primary:disabled{
+    background: #e9e9e9; color: #666666; cursor: not-allowed; pointer-events: none;
+  }
+  .btn--outline{
+    background: #ffffff; color: #00c73d; border: 2px solid #00c73d;
+  }
+  .btn--outline:hover{ background: #f6fcf2; }
+  .btn:focus-visible{ outline: 3px solid #0c3d1a; outline-offset: 2px; }
+
+  /* --------------------------------------------------------------- avisos */
+  .notice{
+    display: flex; gap: 12px; align-items: flex-start;
+    border-radius: 8px; padding: 12px 16px;
+    font-size: 14px; line-height: 20px;
+  }
+  .notice--error{ background: #fdeceb; border: 1px solid #e4483b; color: #a3271c; }
+  .notice--success{
+    background: #eafbef; border: 1px solid #00c73d; color: #0c3d1a;
+    align-items: center; padding: 14px 20px; margin-top: 24px;
+  }
+
+  /* ---------------------------------------------------------------- login */
+  .login{
+    display: grid; grid-template-columns: minmax(360px, 620px) minmax(0, 1fr);
+    min-height: 100vh; background: #ffffff;
+  }
+  .login__panel{
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 56px clamp(32px, 6vw, 88px) 40px; gap: 40px; min-width: 0;
+  }
+  .login__logo{ width: 168px; height: auto; align-self: center; margin-top: 32px; }
+  .login__form{ display: flex; flex-direction: column; gap: 24px; }
+  .login__head{ display: flex; flex-direction: column; gap: 8px; text-align: center; }
+  .login__head h1{ font-size: 24px; line-height: 32px; margin: 0; }
+  .login__head p{ margin: 0; font-size: 16px; line-height: 24px; color: #404040; }
+  .login__fields{ display: flex; flex-direction: column; gap: 16px; }
+  .field{
+    height: 56px; padding: 0 20px; border: 1px solid #dddddd; border-radius: 8px;
+    font-family: 'Open Sans', sans-serif; font-size: 16px; color: #232323; outline: none;
+  }
+  .field:focus{ border-color: #00c73d; border-width: 2px; padding: 0 19px; }
+  .login__reset{ font-weight: 700; font-size: 16px; text-align: center; }
+  .login__submit{ margin-top: 8px; }
+  .login__legal{ margin: 0; text-align: center; font-size: 13px; line-height: 20px; color: #666666; }
+  .login__legal a{ font-weight: 700; }
+  .legacy{
+    border: 1px solid #dddddd; border-radius: 12px; padding: 16px 20px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .legacy__title{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 14px; }
+  .legacy__text{ font-size: 14px; line-height: 20px; color: #404040; }
+  .legacy__text a{ font-weight: 700; }
+
+  /* ----------------------------------------------------------------- hero */
+  .hero{
+    position: relative; background: #00c73d; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 32px; padding: clamp(24px, 5vw, 64px);
+  }
+  .hero__blob{ position: absolute; background: #8fe000; }
+  .hero__blob--a{ top: -80px; right: -60px; width: 380px; height: 380px; border-radius: 48px; opacity: .35; }
+  .hero__blob--b{ bottom: -120px; left: -80px; width: 420px; height: 420px; border-radius: 64px; opacity: .3; }
+  .hero__media{ position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; }
+  .slot{
+    width: 100%; height: 100%; border-radius: 24px;
+    background: rgba(255, 255, 255, .18); border: 2px dashed rgba(255, 255, 255, .6);
+    display: flex; align-items: center; justify-content: center;
+    color: #ffffff; font-size: 14px; font-weight: 600; text-align: center; padding: 16px;
+  }
+  .hero__copy{
+    position: relative; display: flex; flex-direction: column; align-items: center;
+    gap: 12px; text-align: center; text-wrap: pretty;
+  }
+  .hero__copy h2{
+    font-size: clamp(22px, 2.6vw, 32px); line-height: 1.25; color: #ffffff; margin: 0;
+  }
+  .hero__copy p{ margin: 0; font-size: 18px; color: #0c3d1a; }
+  .hero__cta{
+    margin-top: 12px; border: 2px solid #0c3d1a; border-radius: 100px;
+    padding: 14px 40px; font-weight: 700; font-size: 16px; color: #0c3d1a;
+  }
+  .hero__cta:hover{ background: #0c3d1a; color: #ffffff; }
+
+  /* ---------------------------------------------------------------- portal */
+  .portal{ min-height: 100vh; background: #f7f7f7; }
+  .topbar{
+    height: 64px; background: #ffffff; border-bottom: 1px solid #dddddd;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 48px;
+  }
+  .topbar__logo{ width: 118px; height: auto; }
+  .topbar__user{ font-size: 14px; color: #404040; }
+  .portal__inner{ max-width: 1200px; margin: 0 auto; padding: 48px; }
+  .portal__inner h1{ font-size: 32px; line-height: 40px; margin: 0 0 8px; }
+  .portal__lead{ margin: 0; font-size: 16px; color: #404040; }
+  .products{
+    margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  }
+  .product{
+    background: #ffffff; border: 1px solid #dddddd; border-radius: 16px; padding: 24px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .product__label{ font-size: 14px; color: #666666; }
+  .product__value{ font-family: Montserrat, sans-serif; font-weight: 700; font-size: 24px; }
+
+  /* ----------------------------------------------------------------- modal */
+  .overlay{
+    position: fixed; inset: 0; background: rgba(0, 0, 0, .4); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 40px;
+    animation: skFade 150ms ease-out;
+  }
+  .modal{
+    width: 100%; max-width: 880px; max-height: 100%; background: #ffffff;
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, .12), 0 4px 8px -2px rgba(0, 0, 0, .06);
+    display: flex; flex-direction: column;
+    animation: skRise 180ms ease-out;
+  }
+  .modal:focus{ outline: none; }
+  .modal__head{ display: flex; align-items: flex-start; gap: 16px; padding: 24px 32px 16px; }
+  .modal__head svg{ flex: none; margin-top: 2px; }
+  .modal__head h2{ font-size: 20px; line-height: 28px; margin: 0; }
+  .modal__body{
+    position: relative; margin: 0 32px; border: 1px solid #dddddd; border-radius: 12px;
+    overflow: hidden; flex: 1; min-height: 0;
+  }
+  .doc{
+    height: 100%; max-height: 46vh; overflow-y: auto; padding: 28px 32px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .doc__intro{ margin: 0; font-size: 15px; line-height: 24px; color: #404040; }
+  .doc__h1{
+    font-family: Montserrat, sans-serif; font-weight: 700; font-size: 16px; line-height: 24px;
+    margin: 20px 0 8px; color: #232323;
+  }
+  .doc__h2{
+    font-family: 'Open Sans', sans-serif; font-weight: 700; font-size: 15px; line-height: 22px;
+    margin: 14px 0 6px; color: #00874a;
+  }
+  .doc__p{
+    margin: 0 0 12px; font-size: 15px; line-height: 24px; color: #404040; text-wrap: pretty;
+  }
+  .doc__li{ display: flex; gap: 12px; margin: 0 0 10px; padding-left: 4px; }
+  .doc__bullet{ color: #00c73d; font-weight: 700; line-height: 24px; }
+  .doc__li span:last-child{ font-size: 15px; line-height: 24px; color: #404040; text-wrap: pretty; }
+  .consent{
+    display: flex; align-items: flex-start; gap: 12px; cursor: pointer;
+    margin-top: 12px; padding-top: 20px; border-top: 1px solid #dddddd;
+  }
+  .consent input{
+    width: 20px; height: 20px; margin: 2px 0 0; accent-color: #00c73d; cursor: pointer; flex: none;
+  }
+  .consent span{ font-size: 15px; line-height: 22px; font-weight: 700; color: #232323; }
+  .hint{
+    position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 10px;
+    background: #232323; color: #ffffff; border-radius: 100px; padding: 10px 20px;
+    font-size: 14px; white-space: nowrap; pointer-events: none;
+  }
+  .modal__actions{
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px 32px 28px;
+  }
+
+  /* ------------------------------------------------------------ responsive */
+  @media (max-width: 900px){
+    .login{ grid-template-columns: 1fr; }
+    .login__panel{ padding: 40px 24px 32px; gap: 32px; }
+    .login__logo{ margin-top: 8px; }
+    .hero{ padding: 40px 24px; gap: 24px; }
+    .topbar{ padding: 0 20px; }
+    .portal__inner{ padding: 32px 20px; }
+    .products{ grid-template-columns: 1fr; gap: 16px; }
+    .overlay{ padding: 16px; }
+    .modal__head{ padding: 20px 20px 12px; }
+    .modal__body{ margin: 0 20px; }
+    .doc{ max-height: 52vh; padding: 20px; }
+    .modal__actions{ grid-template-columns: 1fr; gap: 12px; padding: 16px 20px 20px; }
+    .hint{ white-space: normal; text-align: left; max-width: calc(100% - 40px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- =============================================================== LOGIN -->
+<section class="login" id="screen-login">
+  <div class="login__panel">
+    <img class="login__logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMjgwIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTI5XzQyMikiPgo8cGF0aCBkPSJNNjIuMDAwMSAzNC40MDc2QzUyLjg0OTEgMzEuOTM3MyA1Mi43OTQ0IDI3LjMxOTkgNTIuODQ5MSAyNC41MjMyQzUyLjkxMjQgMjAuMDM0NyA1OC4zNDA4IDE1Ljg3MjYgNjQuNzQ3NCAxNS44NzI2QzcwLjgyNjEgMTUuODcyNiA3Ny4yMzI3IDE4LjUzNzYgNzcuMjk4OCAyNS45NTQ1SDY4LjczMThDNjguNjY4NSAyMy42NjQ1IDY2LjcxOCAyMy4yODY2IDY1LjI3OTYgMjMuMjg2NkM2My4zMjA1IDIzLjI4NjYgNjIuMDExNiAyNC4xOTY5IDYyLjA3NzggMjUuNTc2NkM2Mi4xNDExIDI2LjQ4NjkgNjIuOTQwOCAyNy40MDAxIDY0Ljc1ODkgMjcuODY2N0w2OS45MzcxIDI5LjIzMjFDNzcuMzI0NyAzMS4yMzU5IDc4LjIzOTUgMzYuMTI4MSA3OC4yMzk1IDM4LjA3NzVDNzguMjM5NSA0NC41MTgyIDcxLjQzODggNDcuNTcyNiA2NS4wMzIyIDQ3LjU3MjZDNTguODI0MSA0Ny41NzI2IDUyLjM1MTQgNDMuODY1NiA1Mi4yODgxIDM3LjEwMTNINjAuNzgzMkM2MC44NDk0IDM4Ljg1ODkgNjIuNzk3IDQwLjYxMzcgNjUuMjk0IDQwLjYxMzdDNjcuMzA3OCA0MC41NDc4IDY5LjAzMzggMzkuNjM3NiA2OS4wMzM4IDM4LjA3NzVDNjkuMDMzOCAzNi43NzUgNjguMjQ4NSAzNi4wNzM3IDY2LjAyNzYgMzUuNDc1NEw2Mi4wMDAxIDM0LjQwNzZaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik05Mi4yNjA5IDQ2Ljg5NzRIODMuMjQyMlYwSDkyLjI2MDlWMjQuODQ0Mkw5OS41MTkgMTYuNTE5OEgxMTEuMDg5TDk4LjQwODYgMjkuOTE5NUwxMTMuNjM1IDQ2Ljg5NzRIMTAyLjQ1OUw5Mi4yNjA5IDM0Ljg2MzJWNDYuODk3NFoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEzNy4xNDQgNDMuNDUwNUMxMzUuMTc5IDQ2LjM3ODkgMTMwLjYwOCA0Ny40ODEgMTI4LjI1NSA0Ny40ODFDMTIwLjQ1OSA0Ny40ODEgMTEyLjY5MSA0MS40MzI0IDExMi42OTEgMzEuNjc2OEMxMTIuNjkxIDIxLjkyMTIgMTIwLjQ1OSAxNS44NzI2IDEyOC4yNTIgMTUuODcyNkMxMzAuMjExIDE1Ljg3MjYgMTM0Ljc4OCAxNi41MTk1IDEzNy4xNDEgMTkuOTA1OVYxNi41MTk1SDE0Ni4xNlY0Ni44OTdIMTM3LjE0NFY0My40NTA1Wk0xMjkuNzU2IDM4Ljg5OUMxMzMuNDk2IDM4Ljg5OSAxMzcuMTQ0IDM2LjIzMTEgMTM3LjE0NCAzMS42NzY4QzEzNy4xNDQgMjcuMTIyNCAxMzMuNDgyIDI0LjQ1NDUgMTI5Ljc1NiAyNC40NTQ1QzEyNS45NjUgMjQuNDU0NSAxMjIuMTA3IDI3LjMxNzEgMTIyLjEwNyAzMS42NzY4QzEyMi4xMDcgMzYuMDM2NSAxMjUuOTY1IDM4Ljg5OSAxMjkuNzU2IDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTE2My42MTEgNDYuODk3SDE1NC41MThWMTYuNTE5NUgxNjMuNjExVjIwLjk0NUMxNjUuMjQyIDE3Ljg4NzggMTY4LjgzOCAxNS44NzI2IDE3Mi40MzQgMTUuODcyNkMxNzkuMjk1IDE1Ljg3MjYgMTgzLjYxMyAyMC4wOTc3IDE4My42MTMgMjguNzU0MVY0Ni44OTk5SDE3NC41MlYzMC43MDA2QzE3NC41MiAyNi42NjczIDE3Mi4yOTYgMjQuNjUyIDE2OS4yMjcgMjQuNjUyQzE2Ni4wMjIgMjQuNjUyIDE2My42MDUgMjYuMjEyMSAxNjMuNjA1IDMwLjgyOTRMMTYzLjYxMSA0Ni44OTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMTMuNjAxIDQ2Ljg5NzJWNDMuMTI3MkMyMTIuMDk5IDQ1LjkyMzkgMjA4LjQzNyA0Ny41NDcgMjA0LjY0NSA0Ny41NDdDMTk2LjggNDcuNTQ3IDE4OS44NzMgNDEuMzY5NiAxODkuODczIDMxLjgwMjlDMTg5Ljg3MyAyMi4wNDczIDE5Ni44IDE1Ljg2OTggMjA0LjY0NSAxNS44Njk4QzIwOC40MzcgMTUuODY5OCAyMTIuMDk5IDE3LjQyOTkgMjEzLjYwMSAyMC4yMjY3Vi0wLjAwODc4OTA2SDIyMi42MjJWNDYuODk3MkgyMTMuNjAxWk0yMDYuMzQ1IDI0LjM5MTdDMjAyLjQ4OCAyNC4zOTE3IDE5OS4yODMgMjcuMjU0MyAxOTkuMjgzIDMxLjYxMzlDMTk5LjI4MyAzNi4xMDI0IDIwMi40ODggMzguOTYyMSAyMDYuMzQ1IDM4Ljk2MjFDMjEwLjEzNyAzOC45NjIxIDIxMy40MDUgMzUuOTY3OSAyMTMuNDA1IDMxLjYxMzlDMjEzLjQwNSAyNy4wNTk2IDIxMC4wNzQgMjQuMzkxNyAyMDYuMzQ1IDI0LjM5MTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMzUuNDkgLTAuMDA4Nzg5MDZDMjM4LjU2IC0wLjAwODc4OTA2IDI0MS4wNDUgMi4yODEyNiAyNDEuMDQ1IDUuMjU4MzNDMjQxLjA0NSA4LjIzNTM5IDIzOC41NiAxMC41OTEzIDIzNS40OSAxMC41OTEzQzIzMi40MjEgMTAuNTkxMyAyMjkuOCA4LjI0Njg0IDIyOS44IDUuMjU4MzNDMjI5LjggMi4yNjk4MSAyMzIuNDE4IC0wLjAwODc4OTA2IDIzNS40OSAtMC4wMDg3ODkwNlpNMjM5Ljk5OCA0Ni44ODU3SDIzMC45NzlWMTYuNTE5NkgyMzkuOTk4VjQ2Ljg4NTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yNzAuOTgxIDQzLjQ1MDVDMjY5LjAxOSA0Ni4zNzg5IDI2NC40NDUgNDcuNDgxIDI2Mi4wOTIgNDcuNDgxQzI1NC4zMSA0Ny40ODEgMjQ2LjUzMSA0MS40MzI0IDI0Ni41MzEgMzEuNjc2OEMyNDYuNTMxIDIxLjkyMTIgMjU0LjI5OSAxNS44NzI2IDI2Mi4wOTIgMTUuODcyNkMyNjQuMDUxIDE1Ljg3MjYgMjY4LjYyOCAxNi41MTk1IDI3MC45ODEgMTkuOTA1OVYxNi41MTk1SDI4MFY0Ni44OTdIMjcwLjk4MVY0My40NTA1Wk0yNjMuNTkzIDM4Ljg5OUMyNjcuMzMzIDM4Ljg5OSAyNzAuOTgxIDM2LjIzMTEgMjcwLjk4MSAzMS42NzY4QzI3MC45ODEgMjcuMTIyNCAyNjcuMzE5IDI0LjQ1NDUgMjYzLjU5MyAyNC40NTQ1QzI1OS44MDIgMjQuNDU0NSAyNTUuOTQ0IDI3LjMxNzEgMjU1Ljk0NCAzMS42NzY4QzI1NS45NDQgMzYuMDM2NSAyNTkuODAyIDM4Ljg5OSAyNjMuNTkzIDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEuMjEwNjIgMTUuODY0MUwzMS4zMjc2IDQ1LjgzMjNDMzEuNzgyOCA0Ni4yODQ0IDMyLjM2MjQgNDYuNTkyMSAzMi45OTMzIDQ2LjcxNjZDMzMuNjI0MiA0Ni44NDExIDM0LjI3NzkgNDYuNzc2NyAzNC44NzIxIDQ2LjUzMTdDMzUuNDY2MiA0Ni4yODY2IDM1Ljk3NCA0NS44NzE5IDM2LjMzMTMgNDUuMzM5OEMzNi42ODg3IDQ0LjgwNzcgMzYuODc5NiA0NC4xODIyIDM2Ljg3OTggNDMuNTQyMlYxNS4wODU1QzM2Ljg3OTEgMTMuODI3IDM2LjM3NjMgMTIuNjIwMiAzNS40ODIgMTEuNzMwM0MzNC41ODc2IDEwLjg0MDQgMzMuMzc0OSAxMC4zNDAxIDMyLjExMDEgMTAuMzM5NEgzLjUxMjA0QzIuODY4OSAxMC4zMzk2IDIuMjQwMjcgMTAuNTI5NSAxLjcwNTU1IDEwLjg4NTFDMS4xNzA4MyAxMS4yNDA3IDAuNzU0MDE1IDExLjc0NiAwLjUwNzc0OCAxMi4zMzcyQzAuMjYxNDgxIDEyLjkyODQgMC4xOTY4MTMgMTMuNTc4OSAwLjMyMTkxMyAxNC4yMDY3QzAuNDQ3MDEzIDE0LjgzNDQgMC43NTYyNjkgMTUuNDExMiAxLjIxMDYyIDE1Ljg2NDFaIiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjxwYXRoIGQ9Ik0yLjA0MjEzIDQ1LjE1MTFDNi40MDA0NSA0OS40OTA4IDEzLjg1NzEgNDYuNDE5MyAxMy44NTcxIDQwLjI4NDhDMTMuODU3MSAzOC40NTgyIDEzLjEyNzggMzYuNzA2MyAxMS44Mjk4IDM1LjQxNDdDMTAuNTMxOCAzNC4xMjMxIDguNzcxMjQgMzMuMzk3NSA2LjkzNTUzIDMzLjM5NzVDMC43Njc3MTQgMzMuMzk3NSAtMi4zMTkwNyA0MC44MTcyIDIuMDQ1MDEgNDUuMTU0IiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI5XzQyMiI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iNDcuNTQ3MiIgZmlsbD0id2hpdGUiPjwvcmVjdD4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4=" alt="Skandia">
+
+    <div class="login__form">
+      <div class="login__head">
+        <h1>¡Hola!</h1>
+        <p>Te damos la bienvenida al Portal clientes de Skandia</p>
+      </div>
+
+      <div class="notice notice--error" id="login-notice" role="status" hidden>
+        <span>No aceptaste el Reglamento de Uso, por lo que cerramos tu sesión. Puedes ingresar de nuevo cuando quieras.</span>
+      </div>
+
+      <div class="login__fields">
+        <input class="field" type="text" placeholder="Usuario" aria-label="Usuario">
+        <input class="field" type="password" placeholder="Contraseña" aria-label="Contraseña">
+      </div>
+
+      <a class="login__reset" href="#">Crear o recuperar contraseña</a>
+
+      <button class="btn btn--primary login__submit" id="btn-login" type="button">Iniciar sesión</button>
+
+      <p class="login__legal">Al ingresar aceptas el <a href="#">Reglamento de uso del Portal Clientes</a></p>
+    </div>
+
+    <div class="legacy">
+      <span class="legacy__title">Portal anterior</span>
+      <span class="legacy__text">Si prefieres la versión anterior, <a href="#">ingresa aquí.</a></span>
+    </div>
+  </div>
+
+  <aside class="hero">
+    <span class="hero__blob hero__blob--a"></span>
+    <span class="hero__blob hero__blob--b"></span>
+    <div class="hero__media">
+      <div class="slot">Imagen del carrusel</div>
+    </div>
+    <div class="hero__copy">
+      <h2>¿Cómo te impacta la reforma pensional?</h2>
+      <p>Te lo contamos directo y #SinFiltro</p>
+      <a class="hero__cta" href="#">Quiero saber más</a>
+    </div>
+  </aside>
+</section>
+
+<!-- ============================================================== PORTAL -->
+<section class="portal" id="screen-portal" hidden>
+  <header class="topbar">
+    <img class="topbar__logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ4IiB2aWV3Qm94PSIwIDAgMjgwIDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTI5XzQyMikiPgo8cGF0aCBkPSJNNjIuMDAwMSAzNC40MDc2QzUyLjg0OTEgMzEuOTM3MyA1Mi43OTQ0IDI3LjMxOTkgNTIuODQ5MSAyNC41MjMyQzUyLjkxMjQgMjAuMDM0NyA1OC4zNDA4IDE1Ljg3MjYgNjQuNzQ3NCAxNS44NzI2QzcwLjgyNjEgMTUuODcyNiA3Ny4yMzI3IDE4LjUzNzYgNzcuMjk4OCAyNS45NTQ1SDY4LjczMThDNjguNjY4NSAyMy42NjQ1IDY2LjcxOCAyMy4yODY2IDY1LjI3OTYgMjMuMjg2NkM2My4zMjA1IDIzLjI4NjYgNjIuMDExNiAyNC4xOTY5IDYyLjA3NzggMjUuNTc2NkM2Mi4xNDExIDI2LjQ4NjkgNjIuOTQwOCAyNy40MDAxIDY0Ljc1ODkgMjcuODY2N0w2OS45MzcxIDI5LjIzMjFDNzcuMzI0NyAzMS4yMzU5IDc4LjIzOTUgMzYuMTI4MSA3OC4yMzk1IDM4LjA3NzVDNzguMjM5NSA0NC41MTgyIDcxLjQzODggNDcuNTcyNiA2NS4wMzIyIDQ3LjU3MjZDNTguODI0MSA0Ny41NzI2IDUyLjM1MTQgNDMuODY1NiA1Mi4yODgxIDM3LjEwMTNINjAuNzgzMkM2MC44NDk0IDM4Ljg1ODkgNjIuNzk3IDQwLjYxMzcgNjUuMjk0IDQwLjYxMzdDNjcuMzA3OCA0MC41NDc4IDY5LjAzMzggMzkuNjM3NiA2OS4wMzM4IDM4LjA3NzVDNjkuMDMzOCAzNi43NzUgNjguMjQ4NSAzNi4wNzM3IDY2LjAyNzYgMzUuNDc1NEw2Mi4wMDAxIDM0LjQwNzZaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik05Mi4yNjA5IDQ2Ljg5NzRIODMuMjQyMlYwSDkyLjI2MDlWMjQuODQ0Mkw5OS41MTkgMTYuNTE5OEgxMTEuMDg5TDk4LjQwODYgMjkuOTE5NUwxMTMuNjM1IDQ2Ljg5NzRIMTAyLjQ1OUw5Mi4yNjA5IDM0Ljg2MzJWNDYuODk3NFoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEzNy4xNDQgNDMuNDUwNUMxMzUuMTc5IDQ2LjM3ODkgMTMwLjYwOCA0Ny40ODEgMTI4LjI1NSA0Ny40ODFDMTIwLjQ1OSA0Ny40ODEgMTEyLjY5MSA0MS40MzI0IDExMi42OTEgMzEuNjc2OEMxMTIuNjkxIDIxLjkyMTIgMTIwLjQ1OSAxNS44NzI2IDEyOC4yNTIgMTUuODcyNkMxMzAuMjExIDE1Ljg3MjYgMTM0Ljc4OCAxNi41MTk1IDEzNy4xNDEgMTkuOTA1OVYxNi41MTk1SDE0Ni4xNlY0Ni44OTdIMTM3LjE0NFY0My40NTA1Wk0xMjkuNzU2IDM4Ljg5OUMxMzMuNDk2IDM4Ljg5OSAxMzcuMTQ0IDM2LjIzMTEgMTM3LjE0NCAzMS42NzY4QzEzNy4xNDQgMjcuMTIyNCAxMzMuNDgyIDI0LjQ1NDUgMTI5Ljc1NiAyNC40NTQ1QzEyNS45NjUgMjQuNDU0NSAxMjIuMTA3IDI3LjMxNzEgMTIyLjEwNyAzMS42NzY4QzEyMi4xMDcgMzYuMDM2NSAxMjUuOTY1IDM4Ljg5OSAxMjkuNzU2IDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTE2My42MTEgNDYuODk3SDE1NC41MThWMTYuNTE5NUgxNjMuNjExVjIwLjk0NUMxNjUuMjQyIDE3Ljg4NzggMTY4LjgzOCAxNS44NzI2IDE3Mi40MzQgMTUuODcyNkMxNzkuMjk1IDE1Ljg3MjYgMTgzLjYxMyAyMC4wOTc3IDE4My42MTMgMjguNzU0MVY0Ni44OTk5SDE3NC41MlYzMC43MDA2QzE3NC41MiAyNi42NjczIDE3Mi4yOTYgMjQuNjUyIDE2OS4yMjcgMjQuNjUyQzE2Ni4wMjIgMjQuNjUyIDE2My42MDUgMjYuMjEyMSAxNjMuNjA1IDMwLjgyOTRMMTYzLjYxMSA0Ni44OTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMTMuNjAxIDQ2Ljg5NzJWNDMuMTI3MkMyMTIuMDk5IDQ1LjkyMzkgMjA4LjQzNyA0Ny41NDcgMjA0LjY0NSA0Ny41NDdDMTk2LjggNDcuNTQ3IDE4OS44NzMgNDEuMzY5NiAxODkuODczIDMxLjgwMjlDMTg5Ljg3MyAyMi4wNDczIDE5Ni44IDE1Ljg2OTggMjA0LjY0NSAxNS44Njk4QzIwOC40MzcgMTUuODY5OCAyMTIuMDk5IDE3LjQyOTkgMjEzLjYwMSAyMC4yMjY3Vi0wLjAwODc4OTA2SDIyMi42MjJWNDYuODk3MkgyMTMuNjAxWk0yMDYuMzQ1IDI0LjM5MTdDMjAyLjQ4OCAyNC4zOTE3IDE5OS4yODMgMjcuMjU0MyAxOTkuMjgzIDMxLjYxMzlDMTk5LjI4MyAzNi4xMDI0IDIwMi40ODggMzguOTYyMSAyMDYuMzQ1IDM4Ljk2MjFDMjEwLjEzNyAzOC45NjIxIDIxMy40MDUgMzUuOTY3OSAyMTMuNDA1IDMxLjYxMzlDMjEzLjQwNSAyNy4wNTk2IDIxMC4wNzQgMjQuMzkxNyAyMDYuMzQ1IDI0LjM5MTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yMzUuNDkgLTAuMDA4Nzg5MDZDMjM4LjU2IC0wLjAwODc4OTA2IDI0MS4wNDUgMi4yODEyNiAyNDEuMDQ1IDUuMjU4MzNDMjQxLjA0NSA4LjIzNTM5IDIzOC41NiAxMC41OTEzIDIzNS40OSAxMC41OTEzQzIzMi40MjEgMTAuNTkxMyAyMjkuOCA4LjI0Njg0IDIyOS44IDUuMjU4MzNDMjI5LjggMi4yNjk4MSAyMzIuNDE4IC0wLjAwODc4OTA2IDIzNS40OSAtMC4wMDg3ODkwNlpNMjM5Ljk5OCA0Ni44ODU3SDIzMC45NzlWMTYuNTE5NkgyMzkuOTk4VjQ2Ljg4NTdaIiBmaWxsPSIjNDA0MDQwIj48L3BhdGg+CjxwYXRoIGQ9Ik0yNzAuOTgxIDQzLjQ1MDVDMjY5LjAxOSA0Ni4zNzg5IDI2NC40NDUgNDcuNDgxIDI2Mi4wOTIgNDcuNDgxQzI1NC4zMSA0Ny40ODEgMjQ2LjUzMSA0MS40MzI0IDI0Ni41MzEgMzEuNjc2OEMyNDYuNTMxIDIxLjkyMTIgMjU0LjI5OSAxNS44NzI2IDI2Mi4wOTIgMTUuODcyNkMyNjQuMDUxIDE1Ljg3MjYgMjY4LjYyOCAxNi41MTk1IDI3MC45ODEgMTkuOTA1OVYxNi41MTk1SDI4MFY0Ni44OTdIMjcwLjk4MVY0My40NTA1Wk0yNjMuNTkzIDM4Ljg5OUMyNjcuMzMzIDM4Ljg5OSAyNzAuOTgxIDM2LjIzMTEgMjcwLjk4MSAzMS42NzY4QzI3MC45ODEgMjcuMTIyNCAyNjcuMzE5IDI0LjQ1NDUgMjYzLjU5MyAyNC40NTQ1QzI1OS44MDIgMjQuNDU0NSAyNTUuOTQ0IDI3LjMxNzEgMjU1Ljk0NCAzMS42NzY4QzI1NS45NDQgMzYuMDM2NSAyNTkuODAyIDM4Ljg5OSAyNjMuNTkzIDM4Ljg5OVoiIGZpbGw9IiM0MDQwNDAiPjwvcGF0aD4KPHBhdGggZD0iTTEuMjEwNjIgMTUuODY0MUwzMS4zMjc2IDQ1LjgzMjNDMzEuNzgyOCA0Ni4yODQ0IDMyLjM2MjQgNDYuNTkyMSAzMi45OTMzIDQ2LjcxNjZDMzMuNjI0MiA0Ni44NDExIDM0LjI3NzkgNDYuNzc2NyAzNC44NzIxIDQ2LjUzMTdDMzUuNDY2MiA0Ni4yODY2IDM1Ljk3NCA0NS44NzE5IDM2LjMzMTMgNDUuMzM5OEMzNi42ODg3IDQ0LjgwNzcgMzYuODc5NiA0NC4xODIyIDM2Ljg3OTggNDMuNTQyMlYxNS4wODU1QzM2Ljg3OTEgMTMuODI3IDM2LjM3NjMgMTIuNjIwMiAzNS40ODIgMTEuNzMwM0MzNC41ODc2IDEwLjg0MDQgMzMuMzc0OSAxMC4zNDAxIDMyLjExMDEgMTAuMzM5NEgzLjUxMjA0QzIuODY4OSAxMC4zMzk2IDIuMjQwMjcgMTAuNTI5NSAxLjcwNTU1IDEwLjg4NTFDMS4xNzA4MyAxMS4yNDA3IDAuNzU0MDE1IDExLjc0NiAwLjUwNzc0OCAxMi4zMzcyQzAuMjYxNDgxIDEyLjkyODQgMC4xOTY4MTMgMTMuNTc4OSAwLjMyMTkxMyAxNC4yMDY3QzAuNDQ3MDEzIDE0LjgzNDQgMC43NTYyNjkgMTUuNDExMiAxLjIxMDYyIDE1Ljg2NDFaIiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjxwYXRoIGQ9Ik0yLjA0MjEzIDQ1LjE1MTFDNi40MDA0NSA0OS40OTA4IDEzLjg1NzEgNDYuNDE5MyAxMy44NTcxIDQwLjI4NDhDMTMuODU3MSAzOC40NTgyIDEzLjEyNzggMzYuNzA2MyAxMS44Mjk4IDM1LjQxNDdDMTAuNTMxOCAzNC4xMjMxIDguNzcxMjQgMzMuMzk3NSA2LjkzNTUzIDMzLjM5NzVDMC43Njc3MTQgMzMuMzk3NSAtMi4zMTkwNyA0MC44MTcyIDIuMDQ1MDEgNDUuMTU0IiBmaWxsPSIjMDBDNzNEIj48L3BhdGg+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI5XzQyMiI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iNDcuNTQ3MiIgZmlsbD0id2hpdGUiPjwvcmVjdD4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4=" alt="Skandia">
+    <span class="topbar__user">Camila Restrepo</span>
+  </header>
+
+  <div class="portal__inner">
+    <h1>Hola, Camila</h1>
+    <p class="portal__lead">Este es tu resumen de portafolio.</p>
+
+    <div class="notice notice--success" id="portal-accepted" role="status" hidden>
+      <span>Registramos tu aceptación del Reglamento de Uso de los Canales Digitales. Puedes consultarlo y descargarlo cuando quieras.</span>
+    </div>
+
+    <div class="products">
+      <div class="product">
+        <span class="product__label">Fondo de pensiones voluntario</span>
+        <span class="product__value">$ 128.450.000</span>
+      </div>
+      <div class="product">
+        <span class="product__label">Cesantías</span>
+        <span class="product__value">$ 14.220.000</span>
+      </div>
+      <div class="product">
+        <span class="product__label">Fiduciaria</span>
+        <span class="product__value">$ 42.900.000</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================== MODAL -->
+<div class="overlay" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1" id="modal-card">
+
+    <div class="modal__head">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#232323" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+      <h2 id="modal-title">Reglamento de uso de los Canales Digitales de Skandia</h2>
+    </div>
+
+    <div class="modal__body">
+      <div class="doc sk-scroll" id="doc">
+        <p class="doc__intro">Le damos la bienvenida a los Canales Digitales de Skandia. Este Reglamento describe las condiciones de uso del Portal de Clientes y de la Skandia App, sus derechos y obligaciones como Cliente y los compromisos de Skandia. Le recomendamos leerlo con atención antes de aceptarlo; su texto estará siempre disponible para consulta y descarga.</p>
+
+        <div id="doc-blocks"></div>
+
+        <label class="consent">
+          <input type="checkbox" id="chk-accept">
+          <span>He leído y acepto el Reglamento de Uso de los Canales Digitales de Skandia.</span>
+        </label>
+      </div>
+
+      <div class="hint" id="scroll-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>
+        Lee y desplázate hasta abajo para continuar
+      </div>
+    </div>
+
+    <div class="modal__actions">
+      <button class="btn btn--outline" id="btn-reject" type="button">Rechazar</button>
+      <button class="btn btn--primary" id="btn-accept" type="button">Aceptar y continuar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // Texto del Reglamento. Marcado mínimo por línea:
+  //   "# "  título de sección   ·   "## "  subtítulo   ·   "- "  viñeta   ·   resto: párrafo
+  const DOC = `
+# 1. Objeto y alcance
+El presente Reglamento de Uso (el "Reglamento") establece las condiciones que rigen el acceso y la utilización del Portal de Clientes y de la aplicación móvil Skandia App (en adelante y en conjunto, los "Canales Digitales"), puestos a disposición de sus clientes por Skandia Holding de Colombia S.A., Skandia Administradora de Fondos de Pensiones y Cesantías S.A., Skandia Seguros de Vida S.A., Skandia Valores S.A. y Skandia Fiduciaria S.A., entidades vigiladas por la Superintendencia Financiera de Colombia, en adelante denominadas en su conjunto "Skandia".
+A través de los Canales Digitales, el Cliente puede consultar información, realizar las operaciones habilitadas y acceder a los productos y servicios de las entidades de Skandia, en las condiciones previstas en este Reglamento, en los reglamentos, contratos o acuerdos propios de cada producto o servicio y en la normatividad colombiana aplicable.
+Este Reglamento complementa, y en ningún caso sustituye ni modifica, los reglamentos, contratos y acuerdos que regulan cada producto o servicio. En caso de diferencia entre este Reglamento y el contrato o reglamento particular de un producto, prevalecerá este último en todo lo relativo a las condiciones propias de dicho producto.
+# 2. Definiciones
+Para efectos de este Reglamento, los siguientes términos tendrán el significado que se indica a continuación, sea que se usen en singular o en plural:
+- Canales Digitales: el Portal de Clientes (sitio web transaccional de Skandia) y la aplicación móvil Skandia App, disponible para dispositivos con sistema operativo Android o iOS.
+- Cliente: la persona natural o jurídica vinculada a uno o más productos o servicios de las entidades de Skandia, a quien se le han asignado o que ha creado Credenciales para acceder a los Canales Digitales. Cuando el Cliente sea persona jurídica, actuará a través de su representante legal o de las personas debidamente autorizadas.
+- Credenciales: el usuario, la clave o contraseña y los demás factores de autenticación (tales como claves dinámicas, códigos de un solo uso –OTP–, segunda clave o autenticación biométrica) que permiten identificar al Cliente en los Canales Digitales.
+- Operaciones: las consultas y transacciones que el Cliente puede realizar a través de los Canales Digitales, según las funcionalidades habilitadas por Skandia para cada producto o servicio.
+- Firma Electrónica: los métodos que, conforme a la Ley 527 de 1999 y sus normas reglamentarias, permiten identificar al Cliente y vincularlo con el contenido de un mensaje de datos, tales como claves, códigos, datos biométricos u otros mecanismos que Skandia habilite.
+- Sitio Web: la página oficial de Skandia en Colombia, www.skandia.com.co.
+# 3. Aceptación del Reglamento
+El texto completo de este Reglamento se pone a disposición del Cliente de manera previa a su aceptación y permanece publicado en el Sitio Web y en los Canales Digitales para su consulta, impresión y descarga en cualquier momento.
+El Cliente acepta este Reglamento de manera expresa e inequívoca a través del mecanismo dispuesto para el efecto en el respectivo Canal Digital (por ejemplo, la marcación de la casilla o el botón de aceptación) al momento de su registro, de la activación del servicio o de la primera utilización posterior a su publicación. Skandia conservará prueba de dicha aceptación conforme a la ley.
+El acceso posterior a los Canales Digitales mediante las Credenciales del Cliente ratifica la aceptación de este Reglamento y de las condiciones vigentes al momento de cada uso, sin perjuicio de lo previsto en la sección de modificaciones.
+La autorización para el tratamiento de datos personales es un acto independiente de la aceptación de este Reglamento y se rige por lo previsto en la respectiva sección. La aceptación de este Reglamento no sustituye dicha autorización ni la autorización de datos condiciona derechos distintos de los relacionados con el tratamiento de la información personal.
+# 4. Requisitos para el uso de los Canales Digitales
+Para acceder y utilizar los Canales Digitales, el Cliente debe:
+- Estar vinculado a algún producto o servicio de las entidades de Skandia y contar con Credenciales asignadas por Skandia o creadas por el Cliente a través de los mecanismos dispuestos para ello.
+- Ser mayor de edad y plenamente capaz o, tratándose de personas jurídicas u otros supuestos de representación, actuar a través de representante legal o apoderado debidamente facultado.
+- Disponer, a su propio costo, de un dispositivo compatible (computador, smartphone o tableta con sistema operativo Android o iOS soportado y actualizado), de conexión a internet y de los demás medios necesarios para acceder a los Canales Digitales.
+- Mantener su dispositivo en condiciones razonables de seguridad, incluyendo sistema operativo actualizado y herramientas de protección contra software malicioso.
+- Mantener actualizada la Skandia App e instalar las nuevas versiones que Skandia publique en las tiendas oficiales.
+## Versiones soportadas
+Por razones de seguridad u obsolescencia tecnológica, Skandia podrá exigir la actualización de la App o descontinuar el soporte de versiones antiguas de la aplicación o de determinados sistemas operativos, informándolo previamente a través de los Canales Digitales, del Sitio Web u otros medios electrónicos. En tal caso, el Cliente conservará el acceso a través de los demás canales de atención de Skandia.
+## Permisos del dispositivo
+Para el funcionamiento de determinadas funcionalidades, la App puede solicitar permisos del dispositivo, tales como el acceso a la cámara (por ejemplo, para la captura de documentos), las notificaciones push o los mecanismos biométricos del equipo. El otorgamiento de estos permisos es decisión del Cliente, quien puede administrarlos en cualquier momento desde la configuración de su dispositivo; su no otorgamiento puede limitar algunas funcionalidades, sin perjuicio del uso de los demás canales de atención.
+Skandia no será responsable por la imposibilidad de usar los Canales Digitales derivada de limitaciones, fallas o configuraciones de los equipos, redes o servicios de conectividad del Cliente o de sus proveedores.
+# 5. Servicios y operaciones disponibles
+Los Canales Digitales permiten al Cliente, según las funcionalidades que Skandia habilite para cada producto o servicio y para cada canal:
+- Consultar información de sus productos, incluyendo saldos, movimientos, extractos y certificados.
+- Realizar las transacciones habilitadas, tales como solicitudes de productos o servicios, declaraciones de aceptación, cambios de portafolio, aportes, transferencias e inversiones virtuales, actualización de datos y bloqueos.
+- Presentar solicitudes de vinculación a productos de Skandia mediante Firma Electrónica, en las condiciones establecidas para cada producto.
+Skandia informará al Cliente, a través de los propios Canales Digitales o del Sitio Web, las funcionalidades disponibles, sus condiciones de uso y las nuevas funciones o mejoras que incorpore. Los tiempos de respuesta y de ejecución pueden variar según el producto o servicio, de acuerdo con las especificaciones aplicables a cada uno.
+Las Operaciones se regulan por los convenios particulares celebrados entre Skandia y el Cliente, por el reglamento o contrato del respectivo producto o servicio y, en su defecto, por las normas colombianas que resulten aplicables.
+# 6. Naturaleza de la información publicada en los Canales Digitales
+La información sobre productos, saldos, movimientos, valoraciones y rentabilidades que se muestra en los Canales Digitales tiene carácter informativo y se presenta con corte a la última fecha de valoración o actualización disponible, por lo que puede diferir de los valores definitivos que resulten de los procesos de valoración, verificación y cierre propios de cada producto o servicio.
+Las rentabilidades y comportamientos históricos que se presenten no constituyen garantía ni promesa de resultados futuros. Los contenidos, herramientas, simuladores y materiales educativos o informativos disponibles en los Canales Digitales tienen fines ilustrativos y de educación financiera, y no constituyen asesoría, recomendación profesional ni oferta, salvo en los casos y a través de los mecanismos en que Skandia lo indique expresamente y conforme a la regulación aplicable.
+# 7. Asesoría en inversiones
+Cuando Skandia ponga a disposición del Cliente herramientas tecnológicas de asesoría en inversiones (tales como asesores automatizados u otras soluciones digitales que emitan recomendaciones profesionales para la realización de operaciones sobre productos de inversión) a través de los Canales Digitales, su uso se sujetará a un reglamento de uso propio y específico, que el Cliente deberá conocer y aceptar de manera previa y expresa antes de utilizarlas.
+Dicho reglamento específico regulará las condiciones, el alcance, las limitaciones, las advertencias y las responsabilidades propias de la actividad de asesoría en inversiones, conforme al régimen aplicable, en particular el Decreto 661 de 2018 y las instrucciones de la Superintendencia Financiera de Colombia. En caso de diferencia entre este Reglamento y el reglamento específico de las herramientas de asesoría en inversiones, prevalecerá este último en todo lo relativo a dicha actividad.
+En consecuencia, salvo que el Cliente acepte y utilice las herramientas de asesoría en inversiones en los términos de su reglamento específico, la información y los contenidos disponibles en los Canales Digitales conservan el carácter meramente informativo previsto en la sección anterior y no constituyen asesoría, recomendación profesional ni oferta.
+# 8. Autenticación, Credenciales y Firma Electrónica
+Las Credenciales son personales, confidenciales e intransferibles. Constituyen el mecanismo de identificación del Cliente en sus relaciones con Skandia a través de los Canales Digitales, por lo que el Cliente se obliga a mantenerlas en absoluta reserva y a no cederlas, prestarlas ni permitir su uso por terceros.
+Skandia podrá exigir, para determinadas Operaciones o de manera general, factores adicionales de autenticación, tales como una segunda clave, códigos de un solo uso (OTP), autenticación biométrica u otros mecanismos de seguridad que determine, y podrá ajustarlos cuando lo estime necesario para la protección del Cliente y del servicio.
+## Autenticación biométrica
+En los dispositivos que lo permitan, el Cliente podrá activar el ingreso a la Skandia App mediante huella dactilar o reconocimiento facial. El Cliente reconoce y acepta que: (i) la información biométrica es capturada, almacenada y gestionada exclusivamente por el sistema operativo de su dispositivo, sin que Skandia tenga acceso ni control sobre ella; y (ii) cualquier persona cuya huella o rostro esté registrado en el dispositivo podrá acceder a la App mediante este mecanismo. El Cliente puede desactivar esta opción en cualquier momento desde la configuración de su dispositivo o de la App.
+## Personalización de condiciones de uso
+El Cliente podrá personalizar, a través de las opciones que Skandia habilite, las condiciones de uso de los Canales Digitales, tales como los montos máximos, el número de operaciones o las operaciones habilitadas, así como definir rangos de direcciones IP autorizadas para operar en el Portal de Clientes. Si el Cliente hace uso de esta última opción, las transacciones originadas desde direcciones no registradas no serán procesadas.
+## Controles de sesión
+Como medidas de seguridad, las sesiones en los Canales Digitales se cierran automáticamente después de un periodo de inactividad, y el acceso puede bloquearse temporalmente ante intentos fallidos y sucesivos de autenticación. En estos casos, el Cliente podrá restablecer su acceso a través de los mecanismos dispuestos para ello.
+## Firma Electrónica
+El uso de las Credenciales y de los demás mecanismos de Firma Electrónica habilitados por Skandia permite atribuir al Cliente las Operaciones, solicitudes y aceptaciones realizadas a través de los Canales Digitales, en los términos de la Ley 527 de 1999 y sus normas reglamentarias.
+# 9. Valor probatorio de los registros electrónicos
+El Cliente reconoce y acepta que los mensajes de datos y registros electrónicos generados con ocasión del acceso a los Canales Digitales y de la realización de Operaciones, (incluyendo los registros de aceptación de este Reglamento, las órdenes e instrucciones impartidas, las solicitudes de vinculación y los registros derivados del uso del usuario, la clave y la Firma Electrónica) tienen plena validez y fuerza probatoria, en los términos de la Ley 527 de 1999 y de las normas que la modifiquen o complementen.
+Lo anterior no implica inversión de la carga de la prueba en perjuicio del Cliente ni limita su derecho a controvertir las operaciones que desconozca a través de los canales de atención de Skandia y de las autoridades competentes.
+# 10. Obligaciones del Cliente
+Además de las obligaciones previstas en los reglamentos, contratos o acuerdos de cada producto o servicio, el Cliente se compromete a:
+- Custodiar sus Credenciales, mantenerlas en reserva y abstenerse de compartirlas o de permitir que terceros las conozcan o utilicen su cuenta.
+- Usar los Canales Digitales de manera responsable, diligente y conforme a la ley, absteniéndose de realizar actividades ilegales o que puedan afectar su funcionamiento, su seguridad o la imagen y reputación de Skandia.
+- Suministrar información veraz, completa y actualizada, y mantener actualizados sus datos de contacto (en particular, correo electrónico y número de celular) registrados ante Skandia.
+- Seguir las recomendaciones de seguridad publicadas por Skandia y adoptar medidas razonables de protección de sus dispositivos, incluyendo programas de protección contra malware y spyware.
+- Reportar de manera inmediata a Skandia, a través de sus canales de atención, cualquier sospecha de acceso no autorizado, violación de la confidencialidad de sus Credenciales, fraude, pérdida, extravío o hurto del dispositivo desde el cual accede, o cualquier hecho que afecte o pueda afectar la seguridad del servicio.
+- Utilizar los contenidos de los Canales Digitales únicamente para los fines propios de su relación con Skandia, absteniéndose de reproducirlos, copiarlos, distribuirlos, transformarlos o modificarlos, salvo la impresión, copia o descarga del material relacionado con sus propios productos o servicios.
+- Abstenerse de acceder a los Canales Digitales mediante mecanismos automatizados (tales como bots, scraping o extracción masiva de datos), de realizar ingeniería inversa sobre estos y de entregar sus Credenciales a terceros, incluidos agregadores de información o aplicaciones no autorizadas por Skandia. El intercambio de información con terceros en el marco de las finanzas abiertas solo procederá a través de los mecanismos que Skandia habilite conforme a la regulación aplicable, con la autorización del Cliente y sin que este deba compartir sus claves.
+- No suprimir, eludir ni manipular los avisos de derechos de autor ni los mecanismos de seguridad incorporados a los Canales Digitales, y guardar reserva razonable sobre su forma de operación y funcionalidades.
+- Cumplir las leyes aplicables cuando acceda a los Canales Digitales desde Colombia o desde el exterior.
+# 11. Compromisos de Skandia
+Skandia, en su condición de conglomerado integrado por entidades vigiladas por la Superintendencia Financiera de Colombia, se compromete a:
+- Prestar los servicios de los Canales Digitales con los estándares de seguridad y calidad exigidos por la regulación aplicable, incluyendo mecanismos de autenticación, cifrado y monitoreo, orientados a la prevención del fraude.
+- Suministrar al Cliente información clara, veraz, suficiente y oportuna sobre los productos y servicios ofrecidos a través de los Canales Digitales, sus condiciones, costos y restricciones, antes y durante la relación contractual.
+- Notificar al Cliente las transacciones realizadas a través de los Canales Digitales, mediante mensaje al correo electrónico y/o al número de celular registrados, u otros mecanismos que habilite.
+- Informar al Cliente, por los medios dispuestos para el efecto, los incidentes de ciberseguridad que comprometan la confidencialidad o integridad de su información, así como las medidas adoptadas para su gestión, conforme a las instrucciones de la Superintendencia Financiera de Colombia.
+- Procurar la accesibilidad de los Canales Digitales, avanzando en la adopción de estándares de accesibilidad digital que faciliten su uso por personas con discapacidad, y mantener a su disposición canales alternativos de atención.
+- Poner a disposición del Cliente canales de soporte y atención para resolver inquietudes, atender reportes de seguridad y tramitar quejas o reclamos.
+- Informar oportunamente las condiciones de disponibilidad del servicio, los mantenimientos programados y los canales alternativos de atención.
+# 12. Procesamiento de operaciones, costos, horarios de corte y límites
+Skandia procesará las Operaciones en el momento en que el Cliente las instruya a través de los Canales Digitales mediante sus Credenciales, siempre que sean legal y contractualmente posibles y que se cumplan las condiciones propias del respectivo producto o servicio.
+- Costos de las Operaciones: antes de confirmar una operación monetaria, el respectivo Canal Digital informará al Cliente el costo de la operación, cuando aplique, y le permitirá desistir de ella antes de su confirmación. Las tarifas vigentes estarán disponibles para consulta en el Sitio Web y en los canales de atención.
+- Horarios de corte: las Operaciones están sujetas a los horarios de corte que Skandia aplique de acuerdo con la ley y con los reglamentos, contratos o acuerdos de cada producto. Dichos horarios estarán disponibles para consulta del Cliente en los Canales Digitales o en el Sitio Web y determinan el día en que se entienden realizadas las Operaciones.
+- Verificación: las Operaciones realizadas con la información suministrada durante el día están sometidas a verificación posterior por parte de Skandia. El Cliente autoriza los ajustes, débitos o créditos que Skandia efectúe en sus productos como resultado justificado de dicha verificación, los cuales le serán informados.
+- Operaciones programadas: cuando la funcionalidad esté disponible, el Cliente podrá programar Operaciones para fechas futuras, que Skandia ejecutará en la fecha programada, salvo las limitaciones y restricciones previamente establecidas o la imposibilidad legal o contractual de ejecutarlas.
+- Límites: por razones de seguridad, Skandia podrá establecer límites a los montos y al número de Operaciones que pueden realizarse a través de los Canales Digitales, los cuales podrán ser consultados por el Cliente, sin perjuicio de la personalización prevista en la sección 8.
+- Reversión de pagos: cuando el Cliente realice pagos o aportes a través de los Canales Digitales utilizando tarjeta de crédito, débito u otro instrumento de pago electrónico, podrá solicitar la reversión del pago en los eventos y condiciones previstos en el artículo 51 de la Ley 1480 de 2011 y sus normas reglamentarias.
+En todo caso, las transacciones se harán efectivas dentro de los términos y plazos establecidos en los reglamentos, contratos o acuerdos de los respectivos productos o servicios, o dentro de los plazos menores que Skandia haya dispuesto internamente. La reducción de plazos por parte de Skandia no implica renuncia a aplicar los plazos previstos en dichos reglamentos, contratos o acuerdos.
+# 13. Disponibilidad del servicio, mantenimientos y suspensiones
+Skandia procurará que los Canales Digitales y sus funcionalidades estén disponibles las veinticuatro (24) horas del día, todos los días, sin perjuicio de las limitaciones y restricciones aplicables a Operaciones específicas y de las interrupciones derivadas de mantenimientos, actualizaciones, incidentes técnicos o de seguridad, o fallas en servicios de terceros (tales como telecomunicaciones o energía).
+- Mantenimientos y mejoras: Skandia anunciará previamente, a través del Sitio Web, de los propios Canales Digitales u otros medios electrónicos, las suspensiones o limitaciones del servicio por mantenimiento de equipos o mejoras de las plataformas, indicando los canales alternativos de atención a disposición del Cliente.
+- Eventos no previsibles: cuando no sea posible dar aviso previo, Skandia difundirá la información pertinente por los mismos medios tan pronto como sea posible.
+- Evolución del servicio: Skandia podrá adicionar, modificar, suspender o retirar funcionalidades o servicios ofrecidos a través de los Canales Digitales, informándolo al Cliente por los medios indicados. La suspensión o el retiro de funcionalidades del canal no afecta la titularidad de los productos del Cliente ni su derecho a operar por los demás canales de atención de Skandia.
+# 14. Bloqueo, suspensión y cancelación del acceso
+Skandia podrá denegar la celebración de Operaciones y bloquear, suspender temporal o definitivamente, o cancelar total o parcialmente el acceso del Cliente a los Canales Digitales, en los siguientes eventos:
+- Cuando se presenten irregularidades en el uso de cualquiera de los servicios o se detecten indicios de fraude, suplantación o uso no autorizado.
+- Como medida de seguridad razonable para la protección de Skandia o del propio Cliente.
+- Por incumplimiento del Cliente de las disposiciones de este Reglamento o de los contratos y reglamentos de sus productos.
+- Por orden de autoridad competente o en cumplimiento de la ley y de los sistemas de administración de riesgos de Skandia.
+Salvo restricción legal o razones de seguridad que lo impidan, Skandia informará al Cliente la medida adoptada y los canales a través de los cuales puede obtener información o solicitar el restablecimiento del servicio. El bloqueo o la cancelación del acceso a los Canales Digitales no afecta la titularidad de los productos del Cliente ni su atención a través de los demás canales de Skandia.
+## Bloqueo a solicitud del Cliente
+El Cliente podrá, en cualquier momento y a través de las opciones dispuestas en los propios Canales Digitales o de las líneas de atención disponibles las veinticuatro (24) horas, bloquear sus Credenciales o el acceso a los Canales Digitales ante sospecha de fraude, pérdida, extravío o hurto de su dispositivo, o cualquier otra situación de riesgo, y solicitar posteriormente su restablecimiento por los mecanismos previstos para ello.
+Asimismo, el Cliente podrá solicitar en cualquier momento, a través de los canales de atención, la desactivación de su acceso a los Canales Digitales, sin que ello genere costo o penalidad alguna y sin perjuicio de las obligaciones derivadas de sus productos o servicios.
+# 15. Responsabilidad
+Skandia responde por los perjuicios que cause al Cliente por el incumplimiento de sus obligaciones legales y contractuales, en los términos de la ley. Nada de lo previsto en este Reglamento limita o desconoce los derechos irrenunciables del Cliente en su condición de consumidor financiero.
+Sin perjuicio de lo anterior, Skandia no será responsable por los daños o perjuicios derivados de:
+- Eventos de fuerza mayor, caso fortuito, causa extraña o hecho de un tercero que imposibiliten, demoren, desvíen o alteren la realización de las Operaciones, incluyendo fallas en redes de telecomunicaciones, servicios de energía o del operador móvil, ajenas al control de Skandia.
+- La imposibilidad, demora o deficiencia en la transmisión de datos u Operaciones por problemas técnicos, mantenimientos o suspensiones del servicio, siempre que Skandia haya dado el aviso previo o posterior en los términos de la sección 13.
+- Hechos atribuibles al Cliente, tales como la falta de diligencia en la custodia de sus Credenciales, errores en la digitación de datos o instrucciones, omisiones o insuficiencia de información en formularios y solicitudes, falta o insuficiencia de recursos en sus productos, o desactualización de sus datos de contacto.
+- La pérdida, extravío o hurto del dispositivo móvil del Cliente que permita el acceso de terceros a los Canales Digitales, respecto de los hechos ocurridos antes de que el Cliente efectúe el reporte previsto en la sección 10.
+- El mal funcionamiento, la configuración insegura o la infección con software malicioso de los equipos, redes o conexiones del Cliente.
+# 16. Tratamiento de datos personales
+Skandia, en su condición de responsable del tratamiento, trata los datos personales del Cliente conforme a la Ley Estatutaria 1581 de 2012, sus decretos reglamentarios, las instrucciones de las autoridades competentes y la Política de Tratamiento de Datos Personales de Skandia, disponible para consulta permanente en el Sitio Web.
+La autorización para el tratamiento de datos personales es previa, expresa e informada, se otorga a través de los mecanismos que Skandia disponga para el efecto y constituye un acto independiente de la aceptación de este Reglamento. El Cliente puede revocar su autorización y ejercer sus derechos a conocer, actualizar, rectificar y suprimir sus datos, en los términos de la ley, a través de los canales indicados en la Política de Tratamiento, sin perjuicio de los datos cuyo tratamiento sea necesario para el cumplimiento de deberes legales o contractuales.
+Con ocasión del uso de los Canales Digitales, Skandia puede tratar, entre otros, datos de identificación y contacto, información transaccional y de productos, y datos técnicos del dispositivo y de la conexión (tales como identificadores del equipo y dirección IP), con fines de prestación del servicio, seguridad, autenticación, prevención y gestión del fraude, y cumplimiento regulatorio.
+Los datos biométricos utilizados para el ingreso a la App mediante huella o reconocimiento facial son gestionados exclusivamente por el sistema operativo del dispositivo del Cliente y no son recolectados, almacenados ni tratados por Skandia.
+Cuando la vinculación digital, la Firma Electrónica u otros procesos requieran la verificación de la identidad del Cliente mediante datos biométricos capturados por Skandia o por terceros designados por esta (por ejemplo, validación facial o dactilar contra bases de datos oficiales), dicho tratamiento se realizará previa autorización explícita del Cliente, quien será informado de que, por tratarse de datos sensibles, no está obligado a suministrarlos, todo ello conforme a la Ley 1581 de 2012 y a los requerimientos de seguridad de la Superintendencia Financiera de Colombia.
+El uso del Portal de Clientes y del Sitio Web puede implicar la utilización de cookies y tecnologías similares, conforme al aviso o política de cookies disponible en el Sitio Web, en el cual el Cliente puede conocer su finalidad y administrar sus preferencias.
+Skandia implementa medidas técnicas, humanas y administrativas razonables para proteger la información del Cliente y evitar su pérdida, uso indebido, alteración o acceso no autorizado, y limita el acceso a dicha información al personal autorizado.
+# 17. Plataformas tecnológicas de terceros
+Para la prestación del servicio, Skandia puede utilizar su propia plataforma tecnológica o la de terceros designados por Skandia que cumplan adecuados estándares de seguridad. Dichos terceros actúan por cuenta de Skandia, bajo acuerdos que incluyen deberes de confidencialidad, seguridad de la información y tratamiento de datos personales conforme a la ley, y acceden únicamente a la información necesaria para la ejecución de las Operaciones, con fines estrictamente operativos y transaccionales.
+# 18. Enlaces a sitios y aplicaciones de terceros
+Los Canales Digitales pueden contener enlaces a sitios, redes sociales o servicios de terceros (tales como Facebook, Instagram, X o WhatsApp). Skandia no controla ni es responsable de la seguridad, la privacidad, la naturaleza o el contenido de la información que dichos terceros manejan, ni de la administración que le dan a esta. La existencia de estos enlaces no constituye una recomendación de Skandia sobre tales sitios o servicios ni sobre la calidad de su información, y su uso es responsabilidad exclusiva del Cliente.
+# 19. Propiedad intelectual
+Todo el software, el código, las marcas, los signos distintivos y los contenidos de los Canales Digitales y del Sitio Web (incluyendo textos, imágenes, videos y gráficos) son de propiedad de Skandia o de terceros que le han otorgado las licencias o autorizaciones correspondientes, y están protegidos por las normas nacionales y los tratados internacionales sobre propiedad intelectual.
+El Cliente puede acceder a estos contenidos para los fines propios de su relación con Skandia, incluyendo la impresión, copia y descarga del material relacionado con sus productos o servicios. Cualquier otra reproducción, distribución, transformación, descompilación o uso no autorizado está prohibido y puede dar lugar a las sanciones civiles y penales previstas en la ley.
+# 20. Notificaciones, comunicaciones y preferencias de contacto
+Skandia notificará al Cliente las transacciones realizadas a través de los Canales Digitales mediante mensaje al correo electrónico y/o mensaje de texto al número de celular registrados por el Cliente, u otros mecanismos que habilite, como notificaciones dentro de la App.
+Es responsabilidad del Cliente registrar y mantener actualizados sus datos de contacto. Si dichos datos no han sido registrados o lo han sido de manera errónea, el Cliente reconoce que las notificaciones pueden no serle entregadas, sin perjuicio de que la información de sus Operaciones estará disponible para consulta en los Canales Digitales y de su derecho a solicitarla por los canales de atención.
+## Preferencias de comunicación
+El Cliente podrá administrar, mediante las opciones que Skandia habilite, sus preferencias sobre notificaciones push, correo electrónico y mensajes de texto, así como los canales y horarios de contacto para comunicaciones de carácter comercial, en los términos de la Ley 2300 de 2023. Las notificaciones de seguridad y las relativas a las Operaciones del Cliente no son susceptibles de desactivación, por ser inherentes a la prestación segura del servicio.
+## Comunicaciones y documentos electrónicos
+El Cliente acepta que los extractos, certificados y demás comunicaciones relacionadas con sus productos y servicios le sean puestos a disposición o enviados por medios electrónicos, incluyendo los Canales Digitales y el correo electrónico registrado, sin perjuicio de su derecho a solicitar en cualquier momento, por los canales de atención, el cambio de esta preferencia o la expedición de documentos físicos en las condiciones aplicables.
+# 21. Modificaciones al Reglamento
+Skandia podrá modificar, adicionar o actualizar este Reglamento en cualquier momento. Las modificaciones serán informadas al Cliente con una antelación no menor a 5 días calendario a su entrada en vigencia, mediante aviso publicado en los Canales Digitales y/o en el Sitio Web, o a través de otros medios electrónicos, y el texto actualizado estará disponible para consulta y descarga.
+Si el Cliente no está de acuerdo con las modificaciones, podrá dejar de utilizar los Canales Digitales y solicitar la desactivación de su acceso, sin costo ni penalidad, antes de su entrada en vigencia. El uso de los Canales Digitales con posterioridad a la entrada en vigencia de las modificaciones constituye su aceptación.
+Las modificaciones que obedezcan a exigencias legales o de las autoridades, o a medidas urgentes de seguridad, podrán aplicarse de manera inmediata, informándolo al Cliente por los medios antes indicados.
+# 22. Atención al consumidor financiero
+Skandia cuenta con un Sistema de Atención al Consumidor Financiero (SAC) orientado a la debida protección y atención respetuosa del Cliente. Para presentar peticiones, quejas, reclamos, sugerencias o reportes de seguridad, el Cliente puede acudir a los canales de atención de Skandia indicados en el Sitio Web.
+El Cliente también puede acudir al Defensor del Consumidor Financiero, institución autónoma e independiente orientada a la protección de los consumidores financieros, y a la Superintendencia Financiera de Colombia, en los términos de la Ley 1328 de 2009 y demás normas aplicables.
+# 23. Recomendaciones de seguridad
+Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
+- No compartir sus Credenciales con ninguna persona. Skandia nunca le solicitará sus claves completas, códigos OTP ni datos de seguridad a través de correo electrónico, mensajes de texto, llamadas o redes sociales.
+- Descargar la Skandia App únicamente desde las tiendas oficiales (App Store y Google Play) y verificar que la dirección del Portal de Clientes corresponda al Sitio Web oficial de Skandia antes de ingresar sus Credenciales.
+- Evitar el acceso desde equipos públicos o redes de internet abiertas y cerrar la sesión al finalizar cada uso.
+- Mantener actualizados el sistema operativo, el navegador y las herramientas de seguridad de sus dispositivos.
+- Desconfiar de mensajes o enlaces que soliciten información personal o financiera (phishing y smishing) y reportarlos a los canales de atención de Skandia.
+- Cambiar periódicamente su clave y hacerlo de inmediato ante cualquier sospecha de que ha sido conocida por terceros.
+# 24. Disposiciones finales
+- Vigencia: este Reglamento rige a partir de su publicación y tiene vigencia indefinida, sin perjuicio de las modificaciones que se realicen conforme a la sección 21.
+- Ley aplicable: este Reglamento se rige por las leyes de la República de Colombia. Las controversias que se deriven de su aplicación se someterán a las autoridades y mecanismos previstos en la ley, sin perjuicio de los mecanismos de protección del consumidor financiero.
+- Divisibilidad: si alguna disposición de este Reglamento fuere declarada nula, ineficaz o inaplicable, las demás conservarán su plena validez y efecto.
+- Prevalencia de la versión electrónica: en caso de discrepancia entre versiones impresas de este Reglamento y la versión electrónica publicada en el Sitio Web y en los Canales Digitales, prevalecerá esta última.
+- Integración: este Reglamento se integra con los reglamentos, contratos y acuerdos de los productos y servicios del Cliente, con la Política de Tratamiento de Datos Personales y con el aviso de cookies de Skandia.
+`;
+
+  // Reglas del modal (props del diseño original, sobreescribibles por query string)
+  const params = new URLSearchParams(location.search);
+  const REQUIRE_SCROLL_TO_END = params.get('scroll') !== '0';
+  const REQUIRE_CHECKBOX      = params.get('check')  !== '0';
+
+  const el = {
+    login:     document.getElementById('screen-login'),
+    portal:    document.getElementById('screen-portal'),
+    notice:    document.getElementById('login-notice'),
+    acceptedB: document.getElementById('portal-accepted'),
+    modal:     document.getElementById('modal'),
+    card:      document.getElementById('modal-card'),
+    doc:       document.getElementById('doc'),
+    blocks:    document.getElementById('doc-blocks'),
+    hint:      document.getElementById('scroll-hint'),
+    chk:       document.getElementById('chk-accept'),
+    btnLogin:  document.getElementById('btn-login'),
+    btnAccept: document.getElementById('btn-accept'),
+    btnReject: document.getElementById('btn-reject')
+  };
+
+  const state = { screen: 'login', modalOpen: false, accepted: false, atBottom: false, notice: false };
+
+  // ----------------------------------------------------- render del documento
+  function renderDoc() {
+    const frag = document.createDocumentFragment();
+
+    DOC.trim().split('\n').filter(Boolean).forEach(function (line) {
+      let node;
+      if (line.startsWith('## ')) {
+        node = document.createElement('h4');
+        node.className = 'doc__h2';
+        node.textContent = line.slice(3);
+      } else if (line.startsWith('# ')) {
+        node = document.createElement('h3');
+        node.className = 'doc__h1';
+        node.textContent = line.slice(2);
+      } else if (line.startsWith('- ')) {
+        node = document.createElement('div');
+        node.className = 'doc__li';
+        const bullet = document.createElement('span');
+        bullet.className = 'doc__bullet';
+        bullet.setAttribute('aria-hidden', 'true');
+        bullet.textContent = '•';
+        const text = document.createElement('span');
+        text.textContent = line.slice(2);
+        node.appendChild(bullet);
+        node.appendChild(text);
+      } else {
+        node = document.createElement('p');
+        node.className = 'doc__p';
+        node.textContent = line;
+      }
+      frag.appendChild(node);
+    });
+
+    el.blocks.appendChild(frag);
+  }
+
+  // ------------------------------------------------------------------ estado
+  function blocked() {
+    return (REQUIRE_SCROLL_TO_END && !state.atBottom) || (REQUIRE_CHECKBOX && !state.accepted);
+  }
+
+  function render() {
+    el.login.hidden  = state.screen !== 'login';
+    el.portal.hidden = state.screen !== 'portal';
+    el.notice.hidden = !state.notice;
+    el.acceptedB.hidden = !state.accepted;
+    el.modal.hidden  = !state.modalOpen;
+    el.hint.hidden   = !(REQUIRE_SCROLL_TO_END && !state.atBottom);
+    el.btnAccept.disabled = blocked();
+  }
+
+  function checkBottom() {
+    const d = el.doc;
+    if (d.scrollTop + d.clientHeight >= d.scrollHeight - 24) {
+      state.atBottom = true;
+      render();
+    }
+  }
+
+  // ---------------------------------------------------------------- acciones
+  el.btnLogin.addEventListener('click', function () {
+    state.screen = 'portal';
+    state.modalOpen = true;
+    state.notice = false;
+    state.accepted = false;
+    state.atBottom = false;
+    el.chk.checked = false;
+    render();
+    el.doc.scrollTop = 0;
+    el.card.focus();
+    // Si el texto entra completo sin scroll, la regla de lectura ya está cumplida.
+    setTimeout(checkBottom, 60);
+  });
+
+  el.doc.addEventListener('scroll', checkBottom);
+
+  el.chk.addEventListener('change', function (e) {
+    state.accepted = e.target.checked;
+    render();
+  });
+
+  el.btnAccept.addEventListener('click', function () {
+    state.modalOpen = false;
+    render();
+  });
+
+  el.btnReject.addEventListener('click', function () {
+    state.screen = 'login';
+    state.modalOpen = false;
+    state.notice = true;
+    state.accepted = false;
+    state.atBottom = false;
+    el.chk.checked = false;
+    render();
+  });
+
+  renderDoc();
+  render();
+})();
+</script>
+</body>
+</html>
