@@ -13,7 +13,8 @@
     · aceptación  → se abre al iniciar sesión. Bloqueante: exige leer hasta el final
                     y marcar la casilla. Salidas: "Aceptar y continuar" o "Rechazar".
     · consulta    → se abre desde "Términos y condiciones" (Ayuda y soporte en escritorio,
-                    Canales de atención en móvil). Sin gate, sin casilla, se cierra con la X.
+                    Canales de atención en móvil). Sin gate y sin casilla: se cierra con el
+                    botón "Entendido" o con la X del encabezado.
 
   Reglas del modo aceptación (por defecto activas, se pueden desactivar por query string):
     ?scroll=0   no exige leer hasta el final
@@ -308,7 +309,9 @@
     overflow: hidden; flex: 1; min-height: 0;
   }
   .modal__actions{ display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px 32px 28px; }
-  .modal__spacer{ height: 32px; }
+  /* Modo consulta: un solo botón, alineado y del mismo ancho que "Aceptar y continuar". */
+  .modal__actions--read{ display: flex; justify-content: flex-end; }
+  .modal__actions--read .btn{ width: calc(50% - 12px); }
 
   /* ------------------------------------------------ documento (compartido) */
   .doc{
@@ -552,6 +555,7 @@
     .modal__body{ margin: 0 20px; }
     .doc{ max-height: 52vh; padding: 20px; }
     .modal__actions{ grid-template-columns: 1fr; gap: 12px; padding: 16px 20px 20px; }
+    .modal__actions--read .btn{ width: 100%; }
     .hint{ white-space: normal; text-align: left; }
     .m-stage{ padding: 24px 12px; }
   }
@@ -794,7 +798,9 @@
         <button class="btn btn--outline" id="d-btn-reject" type="button">Rechazar</button>
         <button class="btn btn--primary" id="d-btn-accept" type="button">Aceptar y continuar</button>
       </div>
-      <div class="modal__spacer" id="d-spacer" hidden></div>
+      <div class="modal__actions modal__actions--read" id="d-actions-read" hidden>
+        <button class="btn btn--primary" id="d-btn-ok" type="button">Entendido</button>
+      </div>
     </div>
   </div>
 </div>
@@ -999,6 +1005,9 @@
             <button class="btn btn--primary" id="m-btn-accept" type="button">Aceptar y continuar</button>
             <button class="btn--ghost" id="m-btn-reject" type="button">Rechazar</button>
           </div>
+          <div class="sheet__actions" id="m-actions-read" hidden>
+            <button class="btn btn--primary" id="m-btn-ok" type="button">Entendido</button>
+          </div>
         </div>
       </div>
 
@@ -1185,14 +1194,14 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     dLogin: $('d-login'), dPortal: $('d-portal'), dNotice: $('d-notice'), dAccepted: $('d-accepted'),
     dHelp: $('d-help'), dModal: $('d-modal'), dModalCard: $('d-modal-card'), dModalTitle: $('d-modal-title'),
     dModalX: $('d-modal-x'), dDoc: $('d-doc'), dConsent: $('d-consent'), dHint: $('d-hint'),
-    dActions: $('d-actions'), dSpacer: $('d-spacer'), dChk: $('d-chk'), dAccept: $('d-btn-accept'),
+    dActions: $('d-actions'), dActionsRead: $('d-actions-read'), dChk: $('d-chk'), dAccept: $('d-btn-accept'),
 
     // móvil
     mLogin: $('m-login'), mHome: $('m-home'), mMenu: $('m-menu'), mSupport: $('m-support'),
     mNotice: $('m-notice'), mAccepted: $('m-accepted'),
     mModal: $('m-modal'), mModalCard: $('m-modal-card'), mModalTitle: $('m-modal-title'),
     mModalX: $('m-modal-x'), mDoc: $('m-doc'), mConsent: $('m-consent'), mHint: $('m-hint'),
-    mActions: $('m-actions'), mChk: $('m-chk'), mAccept: $('m-btn-accept')
+    mActions: $('m-actions'), mActionsRead: $('m-actions-read'), mChk: $('m-chk'), mAccept: $('m-btn-accept')
   };
 
   const state = {
@@ -1302,7 +1311,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     el.dModalX.hidden = !read;
     el.dConsent.hidden = read;
     el.dActions.hidden = read;
-    el.dSpacer.hidden = !read;
+    el.dActionsRead.hidden = !read;
     el.dHint.hidden = !showHint();
     el.dAccept.disabled = blocked();
 
@@ -1318,6 +1327,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     el.mModalX.hidden = !read;
     el.mConsent.hidden = read;
     el.mActions.hidden = read;
+    el.mActionsRead.hidden = !read;
     el.mHint.hidden = !showHint();
     el.mAccept.disabled = blocked();
   }
@@ -1396,6 +1406,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
   $('d-help-scrim').addEventListener('click', function () { state.helpOpen = false; render(); });
   $('d-open-terms').addEventListener('click', openTerms);
   $('d-modal-x').addEventListener('click', closeModal);
+  $('d-btn-ok').addEventListener('click', closeModal);
   $('d-btn-accept').addEventListener('click', function () { state.modalOpen = false; render(); });
   $('d-btn-reject').addEventListener('click', onReject);
   el.dChk.addEventListener('change', onToggle);
@@ -1409,6 +1420,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
   $('m-support-back').addEventListener('click', function () { state.mView = 'menu'; render(); });
   $('m-open-terms').addEventListener('click', openTerms);
   $('m-modal-x').addEventListener('click', closeModal);
+  $('m-btn-ok').addEventListener('click', closeModal);
   $('m-btn-accept').addEventListener('click', function () { state.modalOpen = false; render(); });
   $('m-btn-reject').addEventListener('click', onReject);
   el.mChk.addEventListener('change', onToggle);
