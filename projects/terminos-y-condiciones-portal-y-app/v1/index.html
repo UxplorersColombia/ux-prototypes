@@ -11,7 +11,7 @@
 
   El modal del Reglamento tiene dos modos:
     · aceptación  → se abre al iniciar sesión. Bloqueante: exige leer hasta el final
-                    y marcar la casilla. Salidas: "Aceptar y continuar" o "Rechazar".
+                    y marcar la casilla. Salidas: "Aceptar" o "Rechazar".
     · consulta    → se abre desde "Términos y condiciones" (Ayuda y soporte en escritorio,
                     Canales de atención en móvil). Sin gate y sin casilla: se cierra con el
                     botón "Entendido" o con la X del encabezado.
@@ -116,7 +116,7 @@
      área con scroll, para que siempre esté visible junto a la acción que falló.
      Tokens tomados del componente de banner de error del design system. */
   .alert{
-    display: flex; align-items: flex-start; gap: 14px;
+    display: flex; align-items: center; gap: 14px;
     background: #fff5f4; border: 1px solid #e03430; border-radius: 8px;
     padding: 12px 16px; color: #404040;
     backdrop-filter: blur(4px);
@@ -850,7 +850,7 @@
         </span>
         <span class="alert__copy">
           <span class="alert__title">No pudimos guardar tu aceptación</span>
-          <span class="alert__text">Tuvimos un problema con nuestro servicio y tu confirmación no quedó registrada. Vuelve a intentarlo. Si el problema continúa, comunícate con nuestras líneas de atención.</span>
+          <span class="alert__text">Tuvimos un problema con nuestro servicio. Vuelve a intentarlo.</span>
         </span>
       </div>
 
@@ -1070,14 +1070,14 @@
             </span>
             <span class="alert__copy">
               <span class="alert__title">No pudimos guardar tu aceptación</span>
-              <span class="alert__text">Tuvimos un problema con nuestro servicio y tu confirmación no quedó registrada. Vuelve a intentarlo o comunícate con nuestras líneas de atención.</span>
+              <span class="alert__text">Tuvimos un problema con nuestro servicio. Vuelve a intentarlo.</span>
             </span>
           </div>
 
           <div class="sheet__actions" id="m-actions">
             <button class="btn btn--primary" id="m-btn-accept" type="button">
               <span class="spin" id="m-spin" aria-hidden="true" hidden></span>
-              <span id="m-accept-label">Aceptar y continuar</span>
+              <span id="m-accept-label">Aceptar</span>
             </button>
             <button class="btn--ghost" id="m-btn-reject" type="button">Rechazar</button>
           </div>
@@ -1284,8 +1284,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     simfail: $('simfail'), simfailChk: $('simfail-chk')
   };
 
-  const LABEL_DESK   = 'Aceptar';
-  const LABEL_MOBILE = 'Aceptar y continuar';
+  const LABEL_ACCEPT = 'Aceptar';
   const LABEL_SAVING = 'Guardando…';
   const LABEL_RETRY  = 'Reintentar';
   const SAVE_MS = 900;   // latencia simulada del guardado
@@ -1374,10 +1373,10 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     return (REQUIRE_SCROLL_TO_END && !state.atBottom) || (REQUIRE_CHECKBOX && !state.accepted);
   }
 
-  function acceptLabel(device) {
+  function acceptLabel() {
     if (state.saving) return LABEL_SAVING;
     if (state.error) return LABEL_RETRY;
-    return device === 'desk' ? LABEL_DESK : LABEL_MOBILE;
+    return LABEL_ACCEPT;
   }
 
   function showHint() {
@@ -1415,7 +1414,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     el.dReject.disabled = state.saving;
     el.dError.hidden = !(state.error && !read);
     el.dSpin.hidden = !state.saving;
-    el.dLabel.textContent = acceptLabel('desk');
+    el.dLabel.textContent = acceptLabel();
 
     // móvil
     el.mLogin.hidden = state.screen !== 'login';
@@ -1435,7 +1434,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     el.mReject.disabled = state.saving;
     el.mError.hidden = !(state.error && !read);
     el.mSpin.hidden = !state.saving;
-    el.mLabel.textContent = acceptLabel('mobile');
+    el.mLabel.textContent = acceptLabel();
 
     // control de prototipo
     el.simfailChk.checked = state.failNext;
