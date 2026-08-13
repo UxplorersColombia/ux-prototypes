@@ -19,13 +19,15 @@ Actívate cuando el diseñador diga algo como:
 
 Pregunta **uno a uno** si no los tienes. No hagas todas las preguntas juntas.
 
-| Dato | Ejemplo |
-|------|---------|
-| Nombre del prototipo | "Onboarding Digital" |
-| Autor | "Laura Torres" |
-| Proyecto o iniciativa | "Fondo de pensiones voluntario" |
-| Descripción breve | "Flujo de vinculación para usuarios nuevos" |
-| Status | por defecto: **en revisión** |
+| Dato | Ejemplo | Límite |
+|------|---------|--------|
+| Nombre del prototipo | "Onboarding Digital" | 60 caracteres |
+| Autor | "Laura Torres" | — |
+| Proyecto o iniciativa | "Fondo de pensiones voluntario" | — |
+| Descripción breve | "Flujo de vinculación para usuarios nuevos" | 180 caracteres |
+| Status | por defecto: **en revisión** | — |
+
+Si el nombre o la descripción exceden el límite, pide al diseñador que lo resuma antes de crear el `meta.json` — no lo trunques tú. El límite existe para que todas las tarjetas del catálogo se vean parejas (título ≈ 2 líneas, descripción ≈ 4 líneas dentro de la tarjeta).
 
 **Status válidos:** `en revisión` · `en iteración` · `aprobado` · `handoff` · `archivado`
 

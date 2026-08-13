@@ -54,6 +54,17 @@ function esc(str) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// Recorta a maxLen caracteres en el último espacio disponible (para no cortar
+// una palabra a la mitad) y agrega "…". Respaldo visual para meta.json
+// creados antes de que existiera un límite de caracteres en el Paso 1.
+function truncate(str, maxLen) {
+  const s = String(str || '');
+  if (s.length <= maxLen) return s;
+  const cut = s.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + '…';
+}
+
 // "2026-06-02" → "2 jun 2026"
 const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 function fmtDate(iso) {
@@ -103,7 +114,7 @@ function buildCards(projects) {
   <div class="card-header">
     <div class="card-title-block">
       <span class="badge ${badgeClass}">${status}</span>
-      <h2 id="${cardId}">${esc(p.meta.name || p.slug)}</h2>
+      <h2 id="${cardId}">${esc(truncate(p.meta.name || p.slug, 60))}</h2>
     </div>
     <div class="author-avatar" aria-hidden="true">${initStr}</div>
   </div>
@@ -112,7 +123,7 @@ function buildCards(projects) {
     <div class="meta-row"><span class="meta-key">Proyecto</span><span class="meta-val">${esc(p.meta.project || '–')}</span></div>
     <div class="meta-row"><span class="meta-key">Actualizado</span><span class="meta-val">${fmtDate(p.meta.updated_at)}</span></div>
   </div>
-  <p class="card-desc">${esc(p.meta.description || '')}</p>
+  <p class="card-desc">${esc(truncate(p.meta.description || '', 180))}</p>
   <div class="card-divider"></div>
   <div class="versions">${links}</div>
 </article>`;
