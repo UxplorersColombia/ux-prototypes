@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benchmark — Host telefónico con IA · Skandia UX Conversacional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & tokens (Skandia DS · sk-components-angular, sk-tokens.scss) ─
+       Tier 3 (--sk-color-*, --sk-font-*, --sk-radius-sm/lg, --sk-gradient-brand)
+       son el contrato público que expone sk-tokens.scss — mismos nombres y
+       valores literales que la librería. El resto (--sk-primary-l0N,
+       --sk-neutral-l0N, --sk-primarygrey-*, --sk-feedback-*-light,
+       --sk-extras-c0N) son primitivos internos de styles/internal/_ramp.scss:
+       no forman parte de SkColorPalette, pero este informe necesita más pasos
+       de gris/tinte de los que expone el contrato Tier 3, así que se usan
+       verbatim en vez de inventar hex nuevos. Alias cortos (--green-500,
+       --surface-100, etc.) evitan reescribir cada regla del documento. */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* ── Tier 3 — contrato público sk-tokens.scss ── */
+      --sk-color-primary:        #00c73d;
+      --sk-color-primary-hover:  #03a835;
+      --sk-color-primary-active: #009a2f;
+      --sk-color-accent:         #16d727;
+      --sk-color-bg:             #ffffff;
+      --sk-color-surface:        #ffffff;
+      --sk-color-text:           #404040;
+      --sk-color-text-muted:     #666666;
+      --sk-color-text-inverse:   #ffffff;
+      --sk-color-border:         #dddddd;
+      --sk-color-border-hover:   #00c73d;
+      --sk-color-border-focus:   #16d727;
+      --sk-color-warning:        #ffae08;
+      --sk-color-error:          #e03430;
+      --sk-color-info:           #0099de;
+      --sk-color-disabled:       #f7f7f7;
+      --sk-color-disabled-text:  #a5a5a5;
+      --sk-color-placeholder:    #a5a5a5;
+      --sk-color-success-light:  #ecfdf3;
+      --sk-color-success-medium: #87f491;
+      --sk-color-secondary-hover-bg: #caf9cb;
+      --sk-color-tertiary-hover-bg:  #f6fcf2;
+      --sk-color-link: #0099de;
+
+      --sk-font-title:          'Montserrat', sans-serif;
+      --sk-font-body:           'Open Sans', system-ui, sans-serif;
+      --sk-font-weight-regular: 400;
+      --sk-font-weight-medium:  500;
+      --sk-font-weight-bold:    700;
+
+      --sk-radius-sm:   4px;
+      --sk-radius-md:   8px;   /* repo-owned — cards */
+      --sk-radius-lg:   16px;
+      --sk-radius-full: 999px;
+
+      --sk-gradient-brand: linear-gradient(135deg, #00c73d, #8fe000);
+
+      /* ── Primitivos internos (_ramp.scss) reutilizados por el informe ── */
+      --sk-primary-l04: #caf9cb;
+      --sk-primary-l05: #f6fcf2;
+      --sk-neutral-l01: #fafafa;
+      --sk-neutral-l02: #f7f7f7;
+      --sk-neutral-l03: #e9e9e9;
+      --sk-neutral-l04: #dddddd;
+      --sk-neutral-l05: #c5c5c5;
+      --sk-primarygrey-l02: #565656;
+      --sk-primarygrey-l03: #666666;
+      --sk-primarygrey-l04: #878787;
+      --sk-primarygrey-d01: #363636;
+      --sk-primarygrey-d04: #232323;
+      --sk-feedback-warning-light: #fff3e0;
+      --sk-feedback-error-light:   #fff5f4;
+      --sk-feedback-info-light:    #ebf4ff;
+      --sk-extras-c01: #a1dd70;
+      --sk-extras-c02: #a4d7e1;
+      --sk-extras-c03: #60a9a6;
+      --sk-extras-c04: #ff9460;
+      --sk-extras-c05: #8ba2c1;
+      --sk-extras-c06: #f67e7d;
+      --sk-extras-c07: #dddfd0;
+
+      /* ── Alias locales del informe → tokens sk (naming corto de uso interno) ── */
+      --green-500: var(--sk-color-primary);
+      --green-600: var(--sk-color-primary-hover);
+      --green-700: var(--sk-color-primary-active);
+      --green-50:  var(--sk-primary-l05);
+      --green-100: var(--sk-primary-l04);
+      --lime-500:  #8fe000; /* sk-secondarygreencomplementary 00 */
+      --yellow-400: var(--sk-color-warning);
+      --yellow-50:  var(--sk-feedback-warning-light);
+      --red-500:    var(--sk-color-error);
+      --red-50:     var(--sk-feedback-error-light);
+      --blue-500:   var(--sk-color-info);
+      --blue-50:    var(--sk-feedback-info-light);
+
+      --surface-0:   var(--sk-color-surface);
+      --surface-50:  var(--sk-neutral-l01);
+      --surface-100: var(--sk-neutral-l02);
+      --surface-200: var(--sk-neutral-l03);
+      --surface-300: var(--sk-neutral-l04);
+      --surface-400: var(--sk-neutral-l05);
+      --surface-600: var(--sk-primarygrey-l04);
+      --surface-700: var(--sk-primarygrey-l02);
+      --surface-800: var(--sk-primarygrey-d01);
+      --surface-900: var(--sk-primarygrey-d04);
+
+      --text-primary:   var(--sk-color-text);
+      --text-secondary: var(--sk-primarygrey-l03);
+      --text-muted:     var(--sk-primarygrey-l04);
+      --border:         var(--sk-color-border);
+
+      --font-body:  var(--sk-font-body);
+      --font-head:  var(--sk-font-title);
+
+      --radius-sm:  var(--sk-radius-sm);
+      --radius-md:  var(--sk-radius-md);
+      --radius-xl:  var(--sk-radius-lg);
+      --radius-pill: var(--sk-radius-full);
+
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+      --gradient-brand: var(--sk-gradient-brand);
+
+      /* Paleta de gráficas del DS Skandia (extras c01…c07) */
+      --chart-1: var(--sk-extras-c01);
+      --chart-2: var(--sk-extras-c02);
+      --chart-3: var(--sk-extras-c03);
+      --chart-4: var(--sk-extras-c04);
+      --chart-5: var(--sk-extras-c05);
+      --chart-6: var(--sk-extras-c06);
+      --chart-7: var(--sk-extras-c07);
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--surface-50);
+      line-height: 1.6;
+      padding: 0 20px 80px;
+    }
+
+    .page { max-width: 920px; margin: 0 auto; }
+
+    mark {
+      background: var(--green-100);
+      color: inherit;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    a { color: var(--blue-500); }
+
+    /* ─── Barra de progreso de lectura ──────────────────────── */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--gradient-brand);
+      z-index: 60;
+      transition: width 0.1s linear;
+    }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .doc-header {
+      background: var(--surface-900);
+      border-radius: var(--radius-xl);
+      padding: 40px 48px;
+      margin: 40px 0 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-header::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: var(--gradient-brand);
+    }
+
+    .doc-header::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(0,199,61,0.07);
+      pointer-events: none;
+    }
+
+    .header-eyebrow {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-500);
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-family: var(--font-head);
+      font-size: 27px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      max-width: 680px;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 28px;
+      max-width: 620px;
+    }
+
+    .header-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: var(--sk-font-weight-bold);
+      color: rgba(255,255,255,0.72);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-pill);
+      padding: 4px 12px;
+    }
+
+    .meta-chip .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-500);
+    }
+
+    .meta-chip.warn .dot { background: var(--yellow-400); }
+
+    /* ─── Toolbar sticky: búsqueda + controles ──────────────── */
+    .toolbar {
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-wrap {
+      flex: 1 1 240px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      width: 14px; height: 14px;
+      stroke: var(--text-muted);
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--surface-100);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-pill);
+      padding: 8px 36px 8px 34px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    #searchInput:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(0,199,61,0.15);
+      background: var(--surface-0);
+    }
+
+    #searchClear {
+      position: absolute;
+      right: 8px;
+      border: none;
+      background: var(--surface-300);
+      color: var(--surface-700);
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+    }
+
+    .search-count {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .toolbar-btn {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-pill);
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .toolbar-btn:hover { background: var(--green-100); }
+    .toolbar-btn:active { transform: scale(0.97); }
+
+    /* ─── TOC ───────────────────────────────────────────────── */
+    .toc {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+    }
+
+    .toc-title {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 32px;
+    }
+
+    .toc-list li a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.15s;
+      border-radius: var(--radius-sm);
+    }
+
+    .toc-list li a:hover, .toc-list li a.active { color: var(--green-600); font-weight: var(--sk-font-weight-bold); }
+
+    .toc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-500);
+      min-width: 18px;
+    }
+
+    /* ─── Section ───────────────────────────────────────────── */
+    .section {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 32px 36px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      scroll-margin-top: 80px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--surface-100);
+    }
+
+    .section-number {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-500);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      min-width: 32px;
+      text-align: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .section p + p { margin-top: 10px; }
+    .section h3 {
+      font-family: var(--font-head);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .section h4 {
+      font-family: var(--font-head);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+    .section > ul, .section > ol { padding-left: 20px; margin-top: 8px; }
+    .section > ul li, .section > ol li { margin-bottom: 6px; font-size: 13.5px; color: var(--text-secondary); }
+    .section > ul li::marker { color: var(--green-500); }
+    .section > ol li::marker { color: var(--green-500); font-weight: 700; }
+    .section-note { font-size: 12.5px; color: var(--text-muted); margin-top: 10px; }
+
+    /* ─── Callout (cómo leer / estado / alcance) ───────────────────────── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      background: var(--blue-50);
+      border: 1px solid #cfe7f8;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    .callout .icon { flex-shrink: 0; font-size: 15px; }
+
+    .callout-warn { background: var(--yellow-50); border-color: #ffe2b0; }
+    .callout-success { background: var(--green-50); border-color: var(--green-100); }
+    .callout-danger { background: var(--red-50); border-color: #ffd2d0; }
+
+    /* ─── Cards de hallazgos principales ───────────────────── */
+    .norm-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .norm-card {
+      border: 1px solid var(--surface-200);
+      border-top: 3px solid var(--green-500);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: var(--surface-0);
+    }
+
+    .norm-card h4 {
+      font-family: var(--font-head);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-top: 0;
+      color: var(--text-primary);
+    }
+
+    .norm-card p { font-size: 12.5px; color: var(--text-secondary); }
+
+    /* ─── Acordeones (hallazgos / referentes / insights) ────── */
+    details.acc {
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      background: var(--surface-0);
+      overflow: hidden;
+      transition: box-shadow 0.15s;
+    }
+
+    details.acc[open] { box-shadow: var(--shadow-sm); border-color: var(--green-100); }
+
+    details.acc summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    details.acc summary::-webkit-details-marker { display: none; }
+    details.acc summary:hover { background: var(--green-50); }
+
+    .acc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--surface-0);
+      background: var(--green-500);
+      border-radius: var(--radius-sm);
+      padding: 3px 7px;
+      flex-shrink: 0;
+    }
+
+    .acc-num--theme { background: var(--surface-800); }
+    .acc-num--tier-b { background: var(--blue-500); }
+    .acc-num--tier-c { background: var(--surface-700); }
+
+    .acc-title {
+      font-family: var(--font-head);
+      font-size: 13.5px;
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .acc-evidence {
+      flex-shrink: 0;
+    }
+
+    .acc-chevron {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      stroke: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    details.acc[open] .acc-chevron { transform: rotate(180deg); }
+
+    .acc-body {
+      padding: 4px 18px 18px 18px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      border-top: 1px dashed var(--surface-200);
+    }
+
+    .acc-body > *:first-child { margin-top: 12px; }
+    .acc-body p + p, .acc-body p + ul, .acc-body ul + p, .acc-body ul + h5, .acc-body p + h5, .acc-body div.chart + h5, .acc-body h5 + p, .acc-body h5 + ul { margin-top: 10px; }
+
+    .acc-body ul, .acc-body ol { padding-left: 20px; }
+    .acc-body li { margin-bottom: 6px; }
+    .acc-body li::marker { color: var(--green-500); }
+
+    .acc-body h5 {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .acc-body h5::before {
+      content: '';
+      display: block;
+      width: 3px; height: 13px;
+      background: var(--green-500);
+      border-radius: 2px;
+    }
+
+    .acc-body strong { color: var(--text-primary); }
+
+    /* ─── Citas ─────────────────────────────── */
+    blockquote {
+      border-left: 3px solid var(--green-500);
+      background: var(--green-50);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 10px 16px;
+      margin: 10px 0;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    blockquote .src {
+      display: block;
+      font-style: normal;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    blockquote.scope {
+      border-left-color: var(--yellow-400);
+      background: var(--yellow-50);
+      font-style: normal;
+      font-size: 13.5px;
+      color: var(--text-primary);
+    }
+
+    /* ─── Tablas ────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    thead tr { background: var(--surface-100); border-bottom: 2px solid var(--border); }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    tbody tr { border-bottom: 1px solid var(--surface-100); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-50); }
+
+    td { padding: 10px 14px; vertical-align: top; }
+    td strong { font-weight: 700; }
+
+    table.table-matrix th:not(:first-child), table.table-matrix td:not(:first-child) { text-align: center; white-space: nowrap; }
+    table.table-matrix td:first-child { min-width: 190px; }
+    .score { font-family: var(--font-head); font-size: 13px; }
+    .score-3 { font-weight: var(--sk-font-weight-bold); color: var(--sk-color-primary-hover); }
+    .score-2 { font-weight: var(--sk-font-weight-medium); color: var(--text-primary); }
+    .score-1 { color: var(--text-muted); }
+    .score-0 { font-weight: var(--sk-font-weight-bold); color: var(--red-500); }
+    .score-sd { color: var(--sk-color-disabled-text); font-style: italic; font-size: 12px; font-family: var(--font-body); }
+
+    /* ─── sk-tag (réplica fiel: 4 estados semánticos × 2 estilos, ver
+       docs/componentes/sk-tag.md — colores, radius 4px y padding 2px 10px
+       idénticos a la lib; tamaño "small" 12px por densidad de tabla) ─── */
+    .badge, .sk-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-body);
+      font-weight: var(--sk-font-weight-bold);
+      font-size: 12px;
+      line-height: 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      padding: 2px 10px;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .sk-tag--success.sk-tag--fill   { background: var(--sk-color-accent); color: var(--sk-color-text); }
+    .sk-tag--success.sk-tag--stroke,
+    .badge-ok       { background: var(--sk-color-success-light); border-color: var(--sk-color-accent); color: var(--green-700); }
+    .sk-tag--warning.sk-tag--fill   { background: var(--sk-color-warning); color: var(--sk-color-text); }
+    .sk-tag--warning.sk-tag--stroke,
+    .badge-partial, .badge-medium { background: var(--yellow-50); border-color: var(--sk-color-warning); color: #8a5800; }
+    .sk-tag--info.sk-tag--fill,
+    .badge-explore  { background: var(--sk-color-info); color: var(--sk-color-text-inverse); }
+    .sk-tag--info.sk-tag--stroke   { background: var(--blue-50); border-color: var(--sk-color-info); color: #0b6693; }
+    .sk-tag--error.sk-tag--fill,
+    .badge-critical { background: var(--sk-color-error); color: var(--sk-color-text-inverse); }
+    .sk-tag--error.sk-tag--stroke,
+    .badge-no, .badge-high { background: var(--red-50); border-color: var(--sk-color-error); color: #b3241f; }
+    /* Neutro — fuera de los 4 estados del DS (success/warning/info/error);
+       reutiliza --sk-color-disabled(-text) del contrato Tier 3 para "s/d" /
+       baja prioridad, en vez de inventar un gris nuevo. */
+    .sk-tag--neutral,
+    .badge-low, .badge-sd { background: var(--sk-color-disabled); border-color: var(--border); color: var(--sk-color-disabled-text); }
+
+    .link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: var(--sk-font-weight-bold);
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-pill);
+      padding: 2px 10px;
+      text-decoration: none;
+      white-space: nowrap;
+      margin: 1px 2px 1px 0;
+      transition: background 0.15s;
+    }
+
+    .link-pill:hover { background: var(--green-100); }
+
+    /* ─── Stats grid ────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 14px 0 6px;
+    }
+
+    .stat-card {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .stat-value {
+      font-family: var(--font-head);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green-600);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* ─── Listas numeradas de recomendaciones/oportunidades ─── */
+    .imp-list { list-style: none; counter-reset: imp; }
+
+    .imp-list li {
+      counter-increment: imp;
+      display: flex;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      background: var(--surface-0);
+    }
+
+    .imp-list li::before {
+      content: counter(imp, decimal-leading-zero);
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green-500);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .imp-list li strong { color: var(--text-primary); }
+    .imp-list li .badge { flex-shrink: 0; }
+    .imp-list li .imp-text { flex: 1; }
+
+    /* ─── Checklist / preguntas de verificación ──────────────── */
+    .check-list { list-style: none; }
+    .check-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--surface-100);
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+    .check-list li:last-child { border-bottom: none; }
+    .check-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+    /* ─── Tarjeta de descarga Markdown ──────────────────────── */
+    .download-card {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      background: var(--surface-900);
+      border-radius: var(--radius-xl);
+      padding: 18px 22px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--gradient-brand);
+    }
+
+    .download-icon { font-size: 22px; flex-shrink: 0; }
+
+    .download-text { flex: 1 1 320px; }
+
+    .download-text h3 {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .download-text p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.5;
+    }
+
+    .download-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn-download {
+      font-family: var(--font-head);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      transition: transform 0.1s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-download:hover { transform: translateY(-1px); text-decoration: none; }
+
+    .btn-download--primary { background: var(--green-500); color: #053d15; }
+    .btn-download--primary:hover { background: var(--lime-500); }
+
+    .btn-download--ghost {
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .btn-download--ghost:hover { border-color: var(--green-500); color: var(--green-500); }
+
+    /* ─── Insight cards (Observación/Interpretación/Implicación/Oportunidad) ─── */
+    .insight-label { color: var(--green-600); }
+
+    /* ─── Footer & back-to-top ──────────────────────────────── */
+    .doc-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 24px 0 0;
+    }
+
+    #backTop {
+      position: fixed;
+      right: 24px; bottom: 24px;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface-800);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.15s;
+      z-index: 55;
+    }
+
+    #backTop.visible { opacity: 1; pointer-events: auto; }
+    #backTop:hover { transform: translateY(-2px); background: var(--green-600); }
+
+    .no-results {
+      display: none;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 12px;
+      border: 1px dashed var(--surface-300);
+      border-radius: var(--radius-md);
+      margin-top: 10px;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      .doc-header { padding: 28px 24px; }
+      .section { padding: 24px 20px; }
+      .toc-list { grid-template-columns: 1fr; }
+      .norm-cards { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media print {
+      .toolbar, #backTop, .progress-bar { display: none; }
+      details.acc { border: none; }
+      details.acc summary { padding-left: 0; }
+      body { background: #fff; padding: 0; }
+      .section { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="page">
+
+    <!-- ═══ Header ═══ -->
+    <header class="doc-header">
+      <div class="header-eyebrow">UX Conversacional · Host telefónico SAMI · Etapa 1</div>
+      <h1 class="header-title">Benchmark — Host telefónico con IA para la línea de servicio de Skandia</h1>
+      <p class="header-subtitle">Qué están haciendo bien los referentes de agentes de voz del mercado, traducido en decisiones de diseño y configuración aplicables sobre Genesys — sin evaluación de proveedores ni dimensión económica.</p>
+      <div class="header-meta">
+        <span class="meta-chip"><span class="dot"></span>11 de agosto de 2026 · versión 2</span>
+        <span class="meta-chip"><span class="dot"></span>Javier Alemán · Equipo UX Conversacional</span>
+        <span class="meta-chip"><span class="dot"></span>Metodología: UOC Design Toolkit (benchmarking)</span>
+        <span class="meta-chip"><span class="dot"></span>Tipo de proyecto: IDENTIFICAR</span>
+        <span class="meta-chip warn"><span class="dot"></span>17 referentes + Genesys · sin dimensión económica</span>
+      </div>
+    </header>
+
+    <!-- ═══ Toolbar ═══ -->
+    <div class="toolbar" role="search">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar en el informe… (ej: barge-in, latencia, Genesys, handoff)" aria-label="Buscar en el informe">
+        <button id="searchClear" aria-label="Limpiar búsqueda">✕</button>
+      </div>
+      <span class="search-count" id="searchCount"></span>
+      <button class="toolbar-btn" id="expandAll">Expandir todo</button>
+      <button class="toolbar-btn" id="collapseAll">Contraer todo</button>
+    </div>
+
+    <!-- ═══ TOC ═══ -->
+    <nav class="toc" aria-label="Tabla de contenido">
+      <div class="toc-title">Contenido</div>
+      <ul class="toc-list">
+        <li><a href="#s0"><span class="toc-num">00</span>Alcance y ficha del benchmark</a></li>
+        <li><a href="#s1"><span class="toc-num">01</span>Resumen ejecutivo</a></li>
+        <li><a href="#s2"><span class="toc-num">02</span>Nota de enfoque</a></li>
+        <li><a href="#s3"><span class="toc-num">03</span>Fase 1 · Preparación</a></li>
+        <li><a href="#s4"><span class="toc-num">04</span>Tier A · Regional hispanohablante</a></li>
+        <li><a href="#s5"><span class="toc-num">05</span>Tier B · Enterprise regulado</a></li>
+        <li><a href="#s6"><span class="toc-num">06</span>Tier C · Infraestructura</a></li>
+        <li><a href="#s7"><span class="toc-num">07</span>Nuestro punto de partida · Genesys</a></li>
+        <li><a href="#s8"><span class="toc-num">08</span>Fase 3 · Matrices de valoración</a></li>
+        <li><a href="#s9"><span class="toc-num">09</span>Resumen global</a></li>
+        <li><a href="#s10"><span class="toc-num">10</span>Buenas prácticas → Genesys</a></li>
+        <li><a href="#s11"><span class="toc-num">11</span>Antipatrones a evitar</a></li>
+        <li><a href="#s12"><span class="toc-num">12</span>Insights</a></li>
+        <li><a href="#s13"><span class="toc-num">13</span>Mapa de oportunidades</a></li>
+        <li><a href="#s14"><span class="toc-num">14</span>Preguntas de verificación técnica</a></li>
+        <li><a href="#s15"><span class="toc-num">15</span>Limitaciones y siguiente paso</a></li>
+        <li><a href="#s16"><span class="toc-num">16</span>Fuentes</a></li>
+        <li><a href="#s17"><span class="toc-num">17</span>Preguntas abiertas</a></li>
+      </ul>
+    </nav>
+
+    <!-- ═══ Descarga Markdown (humanos + IA) ═══ -->
+    <aside class="download-card">
+      <span class="download-icon">🤖</span>
+      <div class="download-text">
+        <h3>Benchmark en formato Markdown</h3>
+        <p>Versión de texto plano del benchmark completo, pensada para <strong>consulta rápida</strong> y para <strong>alimentar herramientas de inteligencia artificial</strong> (asistentes, agentes, NotebookLM…) como contexto del proyecto Host telefónico SAMI.</p>
+      </div>
+      <div class="download-actions">
+        <a class="btn-download btn-download--primary" href="assets/benchmark-host-telefonico-sami.md" download>⬇ Descargar .md</a>
+        <a class="btn-download btn-download--ghost" href="assets/benchmark-host-telefonico-sami.md" target="_blank" rel="noopener">Ver en línea ↗</a>
+      </div>
+    </aside>
+
+    <!-- ═══ 00 Alcance y ficha ═══ -->
+    <section class="section" id="s0">
+      <div class="section-header">
+        <div class="section-number">00</div>
+        <div>
+          <h2 class="section-title">Alcance y ficha del benchmark</h2>
+          <p class="section-desc">Qué evalúa este documento y qué queda deliberadamente fuera</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            <tr><td><strong>Proyecto</strong></td><td>Host telefónico SAMI (evolución de Génesis)</td></tr>
+            <tr><td><strong>Etapa</strong></td><td>1 — Benchmark de concepto</td></tr>
+            <tr><td><strong>Fecha</strong></td><td>11 de agosto de 2026 · versión 2</td></tr>
+            <tr><td><strong>Responsable</strong></td><td>Javier Alemán · Equipo UX Conversacional</td></tr>
+            <tr><td><strong>Insumo base</strong></td><td>Sami_telefonico_resumen_transcripcion.md — kick-off del 10 de agosto de 2026</td></tr>
+            <tr><td><strong>Metodología</strong></td><td><a href="https://design-toolkit.recursos.uoc.edu/es/guia/benchmarking/" target="_blank" rel="noopener">Guía de benchmarking · UOC Design Toolkit</a> (3 fases)</td></tr>
+            <tr><td><strong>Tipo de proyecto (playbook Skandia)</strong></td><td>IDENTIFICAR — benchmarking / análisis competitivo</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <blockquote class="scope">
+        <strong>Alcance de este benchmark.</strong> Skandia ya cuenta con <strong>Genesys</strong> como plataforma de contact center. Este documento <strong>no evalúa proveedores ni contempla dimensión económica</strong>: no hay precios, tarifas, modelos de costo ni recomendaciones de compra. El objetivo es identificar <strong>qué están haciendo bien los referentes del mercado</strong> y traducirlo en decisiones de diseño y configuración aplicables sobre Genesys.
+      </blockquote>
+    </section>
+
+    <!-- ═══ 01 Resumen ejecutivo ═══ -->
+    <section class="section" id="s1">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <div>
+          <h2 class="section-title">Resumen ejecutivo</h2>
+          <p class="section-desc">10 conclusiones aplicables, de lectura directa</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value">17</div><div class="stat-label">referentes analizados + Genesys</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">tiers de mercado + nuestro punto de partida</div></div>
+        <div class="stat-card"><div class="stat-value">13</div><div class="stat-label">criterios de diseño y capacidad</div></div>
+        <div class="stat-card"><div class="stat-value">46</div><div class="stat-label">buenas prácticas con aterrizaje en Genesys</div></div>
+      </div>
+
+      <h3>Hallazgos principales</h3>
+
+      <details class="acc" open>
+        <summary><span class="acc-num">1</span><span class="acc-title">El "qué" está resuelto en todo el mercado; la diferencia está en el "cómo se configura".</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Las 17 plataformas revisadas ofrecen capacidades equivalentes (STT + agente + TTS, conocimiento, acciones, handoff). Lo que las separa es la disciplina de configuración: estructura del prompt, política de interrupciones, gobernanza de versiones y testing previo. Ahí es donde el equipo de UX Conversacional decide, y donde Genesys nos da o nos limita las palancas.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">2</span><span class="acc-title">Hallazgo crítico a verificar: en Genesys Virtual Agent, la búsqueda en base de conocimiento está documentada como "solo canales digitales".</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Si esto sigue vigente, el plan del kick-off de reutilizar el entrenamiento escrito de SAMI como base de conocimiento del host <strong>no funciona igual en voz que en chat</strong>. Es la pregunta técnica más importante del proyecto y hay que resolverla antes de diseñar flujos.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">3</span><span class="acc-title">"Que sea capaz de accionar, no solo informar" es el criterio que separa un host de un IVR disfrazado.</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El antipatrón mejor documentado del sector es el agente que solo lee datos y nunca escribe en el sistema de registro. En Genesys el mecanismo son los <strong>AI Guides de AI Studio</strong> conectados al flujo de Virtual Agent.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">4</span><span class="acc-title">La latencia tiene números y deben entrar como requisito de la troncal de prueba.</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Por encima de ~800 ms el usuario nota pausas; por encima de ~1.500 ms la conversación se siente rota; el umbral práctico para español natural es <strong>&lt;1.200 ms</strong>; ceder el turno ante una interrupción debe tomar <strong>&lt;150 ms</strong>. En Genesys, el <code>Max Speech Timeout</code> cambia según el motor ASR configurado (Nuance 22 s, Google 5 min, Azure 10 min), así que saber cuál está activo importa.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">5</span><span class="acc-title">El español no se resuelve traduciendo.</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Los referentes regionales tratan el acento como producto — voces colombianas nativas, comprensión de modismos locales, <em>"no traduce: conversa como local"</em>. Las plataformas globales líderes en calidad de voz tienen el español como idioma secundario. Para una línea colombiana esto es criterio de diseño, no detalle.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">6</span><span class="acc-title">"Contención" es una métrica de vanidad en un negocio vigilado.</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Un host que resuelve 100 consultas fáciles y enruta la única disputa regulada se ve excelente en el tablero y es un riesgo. La métrica correcta es resolución correcta en llamadas difíciles, con trazabilidad reproducible.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">7</span><span class="acc-title">Los roles de agente diferenciados son el modelo mental que nos falta.</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El mercado no vende "un bot": vende recepcionista, soporte, cobranzas. Skandia debería definir <code>host de recepción</code>, <code>soporte FP</code> y <code>concierge Wealth</code> como agentes distintos —con alcance, voz, umbrales de confianza y criterio de escalamiento propios— en lugar de un flujo único que intenta ser todo.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">8</span><span class="acc-title">El handoff y los caminos infelices se diseñan primero.</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>La recomendación explícita del sector es bloquear todo lo que mueva dinero o escriba en un sistema, y diseñar el escalamiento antes del flujo feliz. Genesys ya trae el mecanismo: <code>Conversation summary generation</code> y <code>wrap-up codes</code> disponibles para el agente humano. Para los clientes Wealth que Julián decidió que no se autogestionan, el handoff <strong>es</strong> el producto.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">9</span><span class="acc-title">El barge-in de Genesys es un ajuste global, exactamente el antipatrón que documenta la industria.</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p><code>Settings &gt; User Input &gt; General &gt; Voice Barge-In</code> se activa "para todas las acciones <code>Ask for</code> del bot flow". La buena práctica del sector es política por tipo de mensaje. Hay una palanca de diseño para lograrlo: <strong>el barge-in no aplica en acciones <code>Communicate</code></strong>, solo donde el bot espera respuesta. Es decir, la política se implementa eligiendo el tipo de bloque, no el ajuste.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">10</span><span class="acc-title">Tres defaults de Genesys hay que revisar antes del piloto.</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p><code>Voice No Input Timeout</code> en 7 segundos es mucho silencio en una llamada de servicio. <code>Intent Classification Hinting</code> viene deshabilitado y mejora la precisión del ASR gratis. Y el barge-in se dispara con <strong>cualquier</strong> locución o tono DTMF sin necesidad de que coincida con nada — riesgo alto de interrupciones falsas por ruido en llamadas desde la calle.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ═══ 02 Nota de enfoque ═══ -->
+    <section class="section" id="s2">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <div>
+          <h2 class="section-title">Nota de enfoque</h2>
+          <p class="section-desc">Dos reencuadres respecto a la versión inicial del plan</p>
+        </div>
+      </div>
+
+      <h3>No se evalúa la experiencia telefónica de empresas</h3>
+      <p>El plan original contemplaba analizar las líneas de Celsia, Iberia, Bancolombia, Revolut y Porvenir. Se descartó como eje principal porque el diseño conversacional de una línea telefónica no se publica: Celsia anuncia que Luz I.A. atiende el 01 8000 112 115 y reconoce acentos, pero no publica su árbol de decisión, política de interrupciones ni criterios de escalamiento. Sin llamar, esa matriz habría quedado en <code>s/d</code> en todo lo útil. Queda como <strong>ronda de campo recomendada</strong> al cierre.</p>
+
+      <h3>No se evalúa ni compara la dimensión económica</h3>
+      <p>Skandia ya opera sobre Genesys. Los referentes se analizan como <strong>fuentes de práctica</strong>, no como opciones. Cuando un referente aparece con una capacidad interesante, la pregunta no es "¿lo contratamos?" sino "¿cómo logramos ese comportamiento en Genesys?".</p>
+    </section>
+
+    <!-- ═══ 03 Fase 1 · Preparación ═══ -->
+    <section class="section" id="s3">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <div>
+          <h2 class="section-title">Fase 1 · Preparación</h2>
+          <p class="section-desc">Objetivo, preguntas guía, selección de referentes y criterios de análisis</p>
+        </div>
+      </div>
+
+      <h3>Objetivo del benchmark</h3>
+      <p>Identificar qué están haciendo bien las plataformas de agentes de voz telefónicos, y traducirlo en decisiones concretas de diseño y configuración para el host de Skandia sobre Genesys, antes de que el equipo empiece a modelar flujos conversacionales.</p>
+
+      <h3>Preguntas que debe responder</h3>
+      <ol>
+        <li>¿Cómo se estructura la configuración de un agente de voz en las plataformas más maduras, y qué de eso debe decidir Content Design en lugar de ingeniería?</li>
+        <li>¿Qué requisitos no funcionales (latencia, interrupciones, silencios) definen la calidad percibida de una llamada, y con qué números?</li>
+        <li>¿Qué exige el sector financiero regulado a un agente de voz que las plataformas genéricas no traen de fábrica?</li>
+        <li>¿Cómo se resuelve el español colombiano de forma que no suene traducido?</li>
+        <li>¿Qué marco de testing y gobernanza usan antes de exponer un agente a clientes reales?</li>
+        <li>¿Dónde aterriza cada una de esas prácticas en la configuración de Genesys?</li>
+      </ol>
+
+      <h3>Selección de referentes</h3>
+      <p><strong>Criterio de inclusión:</strong> plataformas que venden o habilitan agentes de voz telefónicos configurables, con documentación pública suficiente para evaluar criterios de diseño. Tres tiers, porque compiten en categorías distintas y compararlos en una sola tabla sería engañoso.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tier</th><th>Qué es</th><th>Referentes</th><th>Qué aprendemos de ellos</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>A · Regional hispanohablante</strong></td>
+              <td>Foco Latam, español regional como producto</td>
+              <td>Dapta.ai, Cari AI, Fonema AI, LIWA Tech, Mentora Colombia</td>
+              <td>Cómo se trata el acento y el modismo local como requisito de diseño; estructura de prompt; modelo de handoff; realidad operativa colombiana y marco legal.</td>
+            </tr>
+            <tr>
+              <td><strong>B · Internacional enterprise regulado</strong></td>
+              <td>Bancos, aseguradoras, contact centers de alto volumen</td>
+              <td>Parloa, PolyAI, Cognigy, Kore.ai, Sierra, Decagon, Replicant</td>
+              <td>El techo de madurez en gobernanza, autenticación, auditoría y ciclo de vida — el estándar al que debería aspirar una vigilada.</td>
+            </tr>
+            <tr>
+              <td><strong>C · Internacional de infraestructura</strong></td>
+              <td>Capa técnica sobre la que se construyen las demás</td>
+              <td>Vapi, Retell AI, Bland AI, Synthflow, Telnyx</td>
+              <td>Datos duros y medidos de latencia y turn-taking; marcos de testing y simulación pre-producción.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Referencia obligada aparte: Genesys.</strong> No es un referente a comparar sino <strong>nuestro punto de partida</strong>. Se analiza en sección propia (04), mapeando la superficie de configuración real contra las prácticas encontradas en los tres tiers.</p>
+
+      <h4>Excluidos y por qué</h4>
+      <ul>
+        <li><strong>Aivo Voice</strong> (Argentina): adquirida por Engageware, sitio redirige, estado del producto no verificable.</li>
+        <li><strong>Botmaker, Zenvia, Auronix, Yalo</strong> (Latam): omnicanalidad chat-first, voz secundaria sin detalle público de configuración.</li>
+        <li><strong>Five9, Amazon Connect, Google Gemini Enterprise for CX</strong>: son CCaaS completos, la categoría de Genesys. No aportan práctica que no esté mejor documentada en los tres tiers.</li>
+        <li><strong>ElevenLabs</strong>: motor de voz (TTS), no plataforma de agentes. Aparece como componente dentro de otras.</li>
+        <li><strong>NetVoice, Audara, Beex, Dacartec</strong>: material público comercial sin sustancia técnica evaluable.</li>
+      </ul>
+
+      <h3>Criterios de análisis</h3>
+      <p>Trece criterios, todos de diseño y capacidad. Cada uno trazable a una necesidad expresada en el kick-off. No se incluye ningún criterio económico ni de modelo de contratación.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Criterio</th><th>Trazabilidad al kick-off</th><th>Qué evalúa</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><strong>Español regional y acento colombiano</strong></td><td><em>"soy Sami, cuéntame cómo te puedo ayudar hoy"</em></td><td>Voces nativas vs. traducidas; comprensión de modismos locales.</td></tr>
+            <tr><td>2</td><td><strong>Latencia</strong></td><td><em>"que no genere fricción"</em></td><td>Tiempo de respuesta declarado o medido.</td></tr>
+            <tr><td>3</td><td><strong>Interrupciones y turn-taking</strong></td><td>Conversación telefónica real</td><td>Barge-in, backchannels, manejo de silencios.</td></tr>
+            <tr><td>4</td><td><strong>Base de conocimiento</strong></td><td><em>"usar el mismo entrenamiento que tiene hoy en día el escrito"</em></td><td>Ingesta de contenido existente; reutilización de los prompts de SAMI.</td></tr>
+            <tr><td>5</td><td><strong>Capacidad de acción</strong></td><td><em>"que sea capaz de accionar, que no sea solo información"</em></td><td>Escribir en sistemas, no solo leer.</td></tr>
+            <tr><td>6</td><td><strong>Omnicanalidad con contexto</strong></td><td><em>"quieres que continuemos por WhatsApp"</em></td><td>Continuidad a WhatsApp, correo, SMS sin que el cliente repita.</td></tr>
+            <tr><td>7</td><td><strong>Handoff con contexto</strong></td><td><em>"te voy a dejar con uno de mis compañeros"</em></td><td>Transferencia con transcripción, resumen e intención interpretada.</td></tr>
+            <tr><td>8</td><td><strong>Integración con telefonía e IVR</strong></td><td><em>"cómo tomar ese IVR que hoy en día existe"</em></td><td>Convivencia con el IVR actual, troncal de prueba.</td></tr>
+            <tr><td>9</td><td><strong>Estructura de configuración del agente</strong></td><td><em>"darle personalidad al bot"</em></td><td>Cómo se define persona, alcance, plantillas y roles.</td></tr>
+            <tr><td>10</td><td><strong>Gobernanza</strong></td><td><em>"esto no va a ir de una vez"</em></td><td>Versionado, guardrails, trazabilidad.</td></tr>
+            <tr><td>11</td><td><strong>Testing y simulación pre-producción</strong></td><td><em>"Integración técnica"</em></td><td>Simulaciones, red teaming, regresión.</td></tr>
+            <tr><td>12</td><td><strong>Analítica y observabilidad</strong></td><td>Necesidad de medir el piloto</td><td>Qué se puede ver y medir por llamada.</td></tr>
+            <tr><td>13</td><td><strong>Seguridad y cumplimiento</strong></td><td>Skandia es entidad vigilada</td><td>Autenticación, auditoría, certificaciones, Ley 1581.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="icon">📏</span>
+        <span><strong>Escala de valoración:</strong> <span class="badge badge-ok">3</span> fuerte y documentado · <span class="badge badge-medium">2</span> presente · <span class="badge badge-low">1</span> débil o condicionado · <span class="badge badge-critical">0</span> ausente · <span class="badge badge-sd">s/d</span> sin dato público suficiente.<br><br><strong>Nivel de evidencia por referente:</strong> <span class="sk-tag sk-tag--success sk-tag--stroke">D</span> documentación oficial de producto · <span class="sk-tag sk-tag--warning sk-tag--stroke">P</span> prensa o material comercial del proveedor · <span class="sk-tag sk-tag--info sk-tag--stroke">T</span> prueba de terceros con llamadas reales.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 04 Tier A ═══ -->
+    <section class="section" id="s4">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <div>
+          <h2 class="section-title">Fase 2 · Tier A — Regional hispanohablante</h2>
+          <p class="section-desc">Dapta.ai, Cari AI, Fonema AI, LIWA Tech, Mentora Colombia</p>
+        </div>
+      </div>
+
+      <details class="acc" open>
+        <summary><span class="acc-num">A1</span><span class="acc-title"><a href="http://dapta.ai" target="_blank" rel="noopener" onclick="event.stopPropagation()">Dapta.ai</a> — la mejor documentación de configuración del benchmark</span><span class="acc-evidence sk-tag sk-tag--success sk-tag--stroke">D</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Plataforma de agentes de voz y texto, con sitio y soporte en español, enfocada en pymes. Nivel de evidencia: <strong>D</strong> — es el único referente del tier con documentación técnica pública (<code>docs.dapta.ai</code>), y por eso es el más útil, no por su producto.</p>
+          <h5>Lo que hace bien y nos sirve</h5>
+          <ul>
+            <li><strong>Catálogo de roles de agente en lugar de "un bot".</strong> Agentes con oficio definido: <code>AI Receptionist</code> (maneja llamadas, informa, agenda, actualiza CRM), <code>AI Customer Support</code>, <code>AI Lead Qualifier</code>, <code>AI Sales Follow Up</code>, <code>AI Onboarding Specialist</code>, <code>AI Collections Specialist</code>, <code>AI HR Candidate Screener</code>, <code>Build Your Own</code>. El <code>AI Receptionist</code> es, funcionalmente, el host que Skandia quiere.</li>
+            <li><strong>Estructura de prompt documentada y opinada — siete secciones:</strong> <code>Header</code> · <code>PERSONA</code> · <code>OBJECTIVE</code> · <code>CONTEXT</code> · <code>CONSTRAINTS</code> · <code>CONVERSATION FLOW</code> · <code>VARIABLES</code>. Dentro de <code>CONTEXT</code> sugiere subsecciones <em>Company Background, Key Services, Common Customer Scenarios, FAQs</em>, con una razón explícita: aligera el flujo conversacional y hace las llamadas más fluidas.</li>
+            <li><strong>Reglas de escritura para voz, no para pantalla.</strong> Prohíbe instrucciones técnicas en el diálogo (<code>[wait]</code>, <code>[pause]</code>); solo se escriben las palabras que el agente va a pronunciar. Condicionales explícitos: <code>If [condition]: - "línea de diálogo"</code>.</li>
+            <li><strong>Regla de latencia lingüística.</strong> El prompt se escribe <strong>en el idioma de la llamada</strong>, para evitar la latencia que introduce la traducción interna.</li>
+            <li><strong>Manejo de respuestas tipificado</strong>, con plantillas para respuestas positivas, objeciones y —lo más valioso— <strong>respuestas poco claras</strong>: <em>"Just to make sure I understand correctly, you're saying…"</em>. Es el caso más frecuente en voz y el que menos se diseña.</li>
+            <li><strong>Constraints como capa de seguridad.</strong> Ejemplos de su documentación: no cotizar sin verificar región, nunca prometer tiempos de entrega específicos, duración máxima de llamada de 10 minutos, y <strong>verificar identidad antes de compartir detalles de cuenta</strong>.</li>
+            <li><strong>Variables dinámicas</strong> con sintaxis <code>{{contact_name}}</code>, <code>{{current_time}}</code> (en formato hablado).</li>
+            <li>Capacidades: RAG sobre documentos propios, transferencia a humano, analytics en tiempo real, canales de voz, SMS, WhatsApp y chat web, integraciones con CRM.</li>
+          </ul>
+          <h5>Debilidades / advertencias</h5>
+          <ul>
+            <li>Construido para <strong>ventas y pymes</strong>, no para servicio en entidad vigilada. Sin evidencia pública de SOC 2, ISO 27001 o PCI DSS, ni de autenticación fuerte del llamante.</li>
+            <li>Sus métricas estrella son de conversión comercial y <strong>no aplican al caso de Skandia</strong>, que es servicio.</li>
+            <li>No detalla criterios de transferencia a humano; solo menciona <em>"clear exit points for each conversation path"</em>.</li>
+          </ul>
+          <h5>Qué nos traemos</h5>
+          <p>La estructura de prompt de siete secciones, las reglas de escritura para voz, el bloque de respuestas poco claras, los constraints como capa de seguridad, y el modelo de roles diferenciados.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">A2</span><span class="acc-title"><a href="https://cariai.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Cari AI</a> — el referente regional más cercano a nuestro caso</span><span class="acc-evidence sk-tag sk-tag--warning sk-tag--stroke">P</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Agentes de IA para llamadas entrantes y salientes, con experiencia declarada en Colombia, México y Perú. Nivel de evidencia: <strong>P</strong>.</p>
+          <h5>Lo que hace bien y nos sirve</h5>
+          <ul>
+            <li><strong>Posicionamiento explícito contra el IVR</strong>, en los mismos términos del kick-off: <em>"Un IVR obliga al cliente a navegar menús numéricos ('Marque 1 para ventas'). Nuestros voicebots usan NLU para entender la intención en lenguaje natural y resolver directamente."</em></li>
+            <li><strong>Español Latam como producto, no como traducción:</strong> <em>"Entiende modismos de Colombia, México, Perú y más. No traduce: conversa como local."</em></li>
+            <li><strong>El mejor modelo de handoff del benchmark:</strong> <em>"Cuando el caso escala, el agente humano recibe la transcripción y el contexto en vivo, con copiloto IA de apoyo."</em> Tres cosas a la vez — transcripción, contexto interpretado y copiloto para el humano. Conecta directo con la <em>Guía operativa Monitor Copiloto Skandia</em> que ya existe, y con <code>Agent Copilot</code> de Genesys.</li>
+            <li><strong>Acciones reales sobre negocio financiero:</strong> aprobación de microcréditos (caso Bancamía), consultas de saldo, agendamiento con confirmación y reprogramación, registro automático de interacciones.</li>
+            <li><strong>Analítica por llamada con cuatro dimensiones:</strong> motivo, resolución, sentimiento y duración. Es el tablero mínimo que debería tener el host.</li>
+            <li><strong>Credenciales de sector financiero:</strong> clientes declarados incluyen Santander, Zurich, Credibanco, Compartamos Banco, Bancamía, Nueva EPS. Casos: CrediBank <em>"pasamos de atender 4.000 comercios a más de 42.000, sin aumentar el equipo"</em>; Comex <em>"crecimos 56% en inscritos y cerramos el año con 97% de satisfacción"</em> <em>(cifras declaradas por el proveedor)</em>.</li>
+            <li><strong>Cumplimiento:</strong> AWS, ISO 27001, ISO 9001, HIPAA, RGPD.</li>
+            <li><strong>Integraciones con el mundo contact center real:</strong> Avaya, <strong>Genesys</strong>, Enghouse, Glía, además de Salesforce, Zendesk, ServiceNow, Oracle y BI.</li>
+          </ul>
+          <h5>Debilidades</h5>
+          <p>No publica latencia ni detalle de configuración del agente; la documentación técnica no es pública.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El modelo de handoff triple (transcripción + contexto + copiloto), las cuatro dimensiones de analítica por llamada, y el argumento de "conversa como local" como requisito de voz.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">A3</span><span class="acc-title"><a href="https://www.fonema.ai" target="_blank" rel="noopener" onclick="event.stopPropagation()">Fonema AI</a> — el especialista en español regional</span><span class="acc-evidence sk-tag sk-tag--warning sk-tag--stroke">P</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Plataforma de agentes de voz construida específicamente para mercados hispanohablantes. Nivel de evidencia: <strong>P</strong> — autopublicado y con sesgo comercial evidente: su comparativa concluye que ellos son la mejor opción.</p>
+          <h5>Lo que hace bien y nos sirve</h5>
+          <ul>
+            <li><strong>+200 voces regionales nativas</strong> con acentos mexicano, <strong>colombiano</strong>, argentino y chileno. Es el único referente que trata el acento como catálogo y no como configuración.</li>
+            <li><strong>Umbral de latencia declarado específicamente para español natural: &lt;1.200 ms.</strong> Es la cifra más útil del benchmark porque está dada para español, no para inglés.</li>
+            <li><strong>Diagnóstico del problema del español en plataformas globales:</strong> las herramientas genéricas multilingües <em>"suenan robóticas"</em> o usan pronunciación castellana inadecuada para Latam.</li>
+            <li><strong>Criterio de flujos regionales:</strong> los flujos latinoamericanos <em>"requieren más que traducción"</em> — incluyendo verificaciones de identidad locales (CURP/RFC en México; el equivalente colombiano sería cédula).</li>
+            <li><strong>Recomendación de validación:</strong> probar con usuarios reales del país objetivo, y medir latencia en infraestructura real, no en demos controladas.</li>
+          </ul>
+          <h5>Debilidades</h5>
+          <p>Sin evidencia de certificaciones para sector regulado; la comparativa es material de marketing propio.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El umbral de &lt;1.200 ms como requisito para español, el acento colombiano como criterio de diseño, y la regla de medir latencia en infraestructura real.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">A4</span><span class="acc-title"><a href="https://liwaempresas.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">LIWA Tech</a> — el proveedor colombiano con clientes verificables</span><span class="acc-evidence sk-tag sk-tag--warning sk-tag--stroke">P</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Automatización con IA de chat (WhatsApp, Instagram, Facebook, TikTok, Messenger) y voz (línea telefónica), operando en Colombia. Nivel de evidencia: <strong>P</strong>.</p>
+          <h5>Lo que hace bien y nos sirve</h5>
+          <ul>
+            <li><strong>Un solo cerebro para chat y voz.</strong> Es el mismo argumento que valida reutilizar el entrenamiento de SAMI: un agente que atiende ambos canales, no dos stacks separados.</li>
+            <li><strong>Integración con telefonía real colombiana:</strong> PBX en la nube y <strong>troncales SIP</strong> — lo que Danillo necesita para la troncal de prueba.</li>
+            <li><strong>Acciones concretas:</strong> consulta estados de órdenes, crea tickets automáticos, registra compromisos, y <strong>envía enlaces de pago por WhatsApp</strong>. Es el patrón exacto de "te envío el tutorial por WhatsApp" del kick-off.</li>
+            <li><strong>Validación de identidad por voz</strong> como capacidad listada.</li>
+            <li><strong>Proceso de implementación en cuatro pasos</strong> que sirve de plantilla: demo que analiza el proceso de llamadas → entrenamiento del agente (guion, respuestas, flujos) → conexión a PBX → <strong>monitoreo en tiempo real con optimización mensual continua</strong>. El cuarto paso es el que más se olvida.</li>
+            <li>Integraciones CRM amplias: Salesforce, HubSpot, Dynamics 365, Zoho, Pipedrive, Kommo, Zendesk, Bitrix24, Google Calendar, WhatsApp Business, APIs REST.</li>
+          </ul>
+          <h5>Debilidades</h5>
+          <ul>
+            <li>La promesa de <strong>"24 horas de implementación"</strong> es incompatible con un caso financiero regulado. Señal de que el producto está calibrado para casos simples.</li>
+            <li>No especifica adaptaciones lingüísticas regionales pese a operar en Colombia.</li>
+            <li>Métricas declaradas sin atribución a clientes específicos.</li>
+            <li>Ningún cliente del sector financiero vigilado en la lista.</li>
+          </ul>
+          <h5>Qué nos traemos</h5>
+          <p>El proceso de implementación de cuatro pasos con optimización mensual continua, el patrón de acción "enviar tutorial o enlace por WhatsApp", y la confirmación de que troncal SIP + PBX es el camino técnico estándar en Colombia.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">A5</span><span class="acc-title"><a href="https://mentoracolombia.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Mentora Colombia</a> — la realidad operativa local</span><span class="acc-evidence sk-tag sk-tag--warning sk-tag--stroke">P</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Integrador colombiano de voicebots. Nivel de evidencia: <strong>P</strong>, pero con el material más honesto del tier.</p>
+          <h5>Lo que hace bien y nos sirve</h5>
+          <ul>
+            <li><strong>Revela el stack real del mercado colombiano:</strong> plataformas <strong>Vapi, Bland o Retell</strong> con voces de <strong>ElevenLabs</strong>. Confirma que el tier C no es teórico: es lo que hay debajo de los proveedores locales.</li>
+            <li><strong>Umbral de latencia operativo:</strong> por debajo de 1 segundo entre la respuesta del usuario y la del bot; por encima <em>"suena robótico"</em>.</li>
+            <li><strong>Requisito legal explícito:</strong> grabación de llamadas conforme a <strong>Ley 1581 de 2012</strong>, con aviso de grabación obligatorio. Es el único referente que nombra la norma colombiana.</li>
+            <li><strong>Honestidad sobre límites</strong>, poco común en material comercial: no resuelve negociación compleja, reclamos delicados ni ventas consultivas; en conversaciones largas se nota la diferencia porque el bot es <em>"demasiado paciente/consistente"</em>; requiere datos de contacto ordenados para funcionar.</li>
+            <li><strong>Tiempos realistas:</strong> recepcionista IA simple 2–4 semanas; call center multicanal más, incluyendo pruebas operacionales.</li>
+            <li><strong>Checklist de validación</strong> aplicable a nuestra propia implementación: escuchar demo en vivo en español colombiano · verificar transferencia a humano <strong>con contexto</strong> · validar integración real (no solo contestador) · considerar si el cliente escribe más de lo que llama.</li>
+          </ul>
+          <h5>Debilidades</h5>
+          <p>Es integrador, no plataforma; su valor es la transparencia, no la tecnología.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El umbral de 1 segundo, el requisito de Ley 1581, los tiempos realistas de implementación, y la lista honesta de lo que un voicebot <strong>no</strong> debe intentar.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ═══ 05 Tier B ═══ -->
+    <section class="section" id="s5">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <div>
+          <h2 class="section-title">Fase 2 · Tier B — Internacional enterprise regulado</h2>
+          <p class="section-desc">Parloa, PolyAI, Cognigy, Kore.ai, Sierra, Decagon, Replicant</p>
+        </div>
+      </div>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--tier-b">B1</span><span class="acc-title"><a href="https://www.parloa.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Parloa</a> — el estándar de gobernanza para vigiladas</span><span class="acc-evidence sk-tag sk-tag--warning sk-tag--stroke">P/T</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Plataforma voice-first en producción desde 2018, usada por bancos, aseguradoras y grandes organizaciones de servicio en sectores regulados. Nivel de evidencia: <strong>P/T</strong>.</p>
+          <h5>Lo que hace bien y nos sirve</h5>
+          <ul>
+            <li><strong>Ciclo de vida formalizado en cuatro fases: <code>Define</code> → <code>Test</code> → <code>Scale</code> → <code>Optimize</code>.</strong> Vale adoptarlo como vocabulario del proyecto.</li>
+            <li><strong>Gobernanza integrada:</strong> versionado de agentes, guardrails de LLM, pruebas pre-lanzamiento y trazabilidad completa. Nada de esto es opcional para una entidad vigilada.</li>
+            <li><strong>Telefonía propia de grado carrier</strong>, sin dependencia de terceros — cada salto de proveedor agrega latencia y un punto de falla.</li>
+            <li><strong>Certificaciones completas:</strong> ISO 27001, SOC 2, PCI DSS, HIPAA, DORA, GDPR. 140+ idiomas, 100+ países.</li>
+            <li><strong>Diagnóstico útil:</strong> <em>"la latencia es el principal determinante de la calidad percibida porque las conversaciones telefónicas dependen del turn-taking natural"</em>.</li>
+          </ul>
+          <h5>Debilidades</h5>
+          <p>Orientado a Fortune 500, sin evidencia de especialización en español colombiano.</p>
+          <h5>Qué nos traemos</h5>
+          <p>Las cuatro fases como estructura del proyecto, y la lista de gobernanza (versionado + guardrails + pruebas pre-lanzamiento + trazabilidad) como requisito mínimo antes de tocar producción.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--tier-b">B2</span><span class="acc-title"><a href="https://poly.ai" target="_blank" rel="noopener" onclick="event.stopPropagation()">PolyAI</a> — el techo de calidad conversacional</span><span class="acc-evidence sk-tag sk-tag--success sk-tag--stroke">D/P</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p><em>"The Agentic Dialog Platform"</em>. Agentes de voz para contact centers inbound de alto volumen. Nivel de evidencia: <strong>D/P</strong>.</p>
+          <h5>Lo que hace bien y nos sirve</h5>
+          <ul>
+            <li><strong>Dos caminos de construcción sobre el mismo runtime:</strong> <code>Poly Agent Builder</code> para equipos no técnicos y <code>ADK (Agent Development Kit)</code> para desarrolladores. <strong>Es el patrón organizacional que Skandia necesita</strong>: permite que Content Design y UX Conversacional sean dueños del diálogo sin depender de ingeniería para cada ajuste, mientras Danillo mantiene control del runtime. En Genesys el equivalente es Architect + AI Studio, y hay que definir quién opera cada uno.</li>
+            <li><strong>Modelos propios especializados:</strong> <code>Dialog-RSN-1</code> con benchmarks publicados, y <code>Raven</code>, entrenado con más de mil millones de conversaciones empresariales de atención al cliente.</li>
+            <li><strong>Reconocimiento de habla libre</strong> para llamadas no guionadas y multi-tema — la capacidad que hace posible el <em>"cuéntame cómo te puedo ayudar hoy"</em> sin menú.</li>
+            <li><strong>Manejo de interrupciones</strong> citado como diferenciador, con 45 idiomas.</li>
+            <li><strong>Catálogo de capacidades que es casi el alcance del host de Skandia:</strong> <code>Account management</code> · <code>Authentication</code> · <code>Call routing</code> · <code>Billing &amp; payments</code> · <code>Booking &amp; reservations</code> · <code>Order management</code> · <code>Troubleshooting</code> · <code>FAQ</code>.</li>
+            <li><strong><code>Analyst Agents</code>:</strong> permiten preguntar en lenguaje natural sobre las interacciones y obtener respuestas al instante, con <em>"full visibility into every agent decision"</em>.</li>
+            <li><strong>Guardrails de compliance, marca y experiencia</strong>, con consistencia de marca en cada conversación, canal e idioma.</li>
+            <li><strong>Credenciales financieras reales:</strong> UniCredit, Quicken, Zagrebačka banka, Simplyhealth. Probado <em>"on the hardest conversations in the world, including fraud, outage, triage, multilingual disputes"</em>.</li>
+            <li>SOC 2, HIPAA, GDPR, PCI DSS por defecto. SLA 99,9%.</li>
+          </ul>
+          <h5>Debilidades</h5>
+          <p>El inglés es primario y el español no aparece como especialización; las comparativas de terceros lo ubican más fuerte en travel/hospitality que en banca latinoamericana.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El patrón de doble camino builder/SDK como modelo de gobierno del proyecto, el catálogo de capacidades como checklist de alcance, y la idea de guardrails de <strong>marca</strong> además de compliance.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--tier-b">B3</span><span class="acc-title"><a href="https://www.cognigy.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Cognigy</a> — orquestación y auditabilidad, con conexión directa a Genesys</span><span class="acc-evidence sk-tag sk-tag--info sk-tag--stroke">T</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Plataforma de IA conversacional para contact centers, adquirida por NICE en 2025. Nivel de evidencia: <strong>T</strong>.</p>
+          <h5>Lo relevante</h5>
+          <p>Orquesta workflows complejos multi-paso e integra profundo con CRM, ERP y CCaaS. Elección común en industrias reguladas que necesitan <strong>gobernanza, auditabilidad y orquestación multicanal</strong>. Builder visual, <code>AIOps Center</code>, y soporte <em>bring-your-own-model</em> con múltiples LLM.</p>
+          <p><strong>Lo más relevante para Skandia:</strong> <strong>tiene una solución específica para el ecosistema Genesys.</strong> Es la vía documentada si alguna capacidad que necesitamos no existe nativamente en Genesys.</p>
+          <h5>Debilidades reportadas por terceros</h5>
+          <p>Dudas post-adquisición sobre integración con CCaaS de tercera generación, trazabilidad limitada, conflictos de edición concurrente. La resolución real depende de cómo se configure la integración con el core.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El principio de <em>bring-your-own-model</em>, la advertencia de que la trazabilidad hay que verificarla y no asumirla, y la existencia de una ruta de extensión sobre Genesys.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--tier-b">B4</span><span class="acc-title"><a href="http://Kore.ai" target="_blank" rel="noopener" onclick="event.stopPropagation()">Kore.ai</a> — plantillas bancarias y agent assist</span><span class="acc-evidence sk-tag sk-tag--info sk-tag--stroke">T</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Plataforma empresarial multicanal con builder visual drag-and-drop para usuarios no técnicos. Nivel de evidencia: <strong>T</strong>.</p>
+          <h5>Lo relevante</h5>
+          <ul>
+            <li><strong>Plantillas preconstruidas para banca</strong> — punto de partida en lugar de página en blanco.</li>
+            <li><strong>Opción on-premises</strong>, relevante para requisitos de residencia de datos de una vigilada.</li>
+            <li><strong>Módulo <code>agent assist</code></strong> con guía en tiempo real al agente humano durante la llamada. Es el puente natural con el Monitor Copiloto de Skandia y con <code>Agent Copilot</code> de Genesys: el mismo conocimiento sirviendo al bot y al humano.</li>
+          </ul>
+          <h5>Debilidades</h5>
+          <p>Las configuraciones avanzadas requieren ingeniería pese al builder visual.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El principio de que el mismo conocimiento debe alimentar al host y al asesor humano.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--tier-b">B5</span><span class="acc-title"><a href="https://sierra.ai" target="_blank" rel="noopener" onclick="event.stopPropagation()">Sierra</a> — simulaciones y una lección sobre incentivos</span><span class="acc-evidence sk-tag sk-tag--info sk-tag--stroke">T</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Plataforma con modelo de resolución por conversación. Nivel de evidencia: <strong>T</strong>.</p>
+          <h5>Lo relevante</h5>
+          <p><code>Voice Sims</code> para stress-testing del agente antes de exponerlo, multi-modelo, y <code>AgentSDK</code> para workflows personalizados.</p>
+          <p><strong>El hallazgo más valioso es su crítica.</strong> El análisis del sector financiero advierte que su modelo <em>"gravita hacia las llamadas fáciles y evita las difíciles"</em>, que son justamente las de riesgo regulatorio. Voz introducida solo en 2025, integraciones telefónicas limitadas, y requiere <em>"daily fine-tuning"</em> según terceros.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El concepto de simulaciones de stress-testing, y la alerta de que <strong>ninguna métrica del host debe premiar resolver lo fácil y esquivar lo difícil</strong>.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--tier-b">B6</span><span class="acc-title"><a href="https://decagon.ai" target="_blank" rel="noopener" onclick="event.stopPropagation()">Decagon</a> — configuración en lenguaje llano</span><span class="acc-evidence sk-tag sk-tag--info sk-tag--stroke">T</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Plataforma de agentes de soporte, con voz desde 2025. Nivel de evidencia: <strong>T</strong>.</p>
+          <h5>Lo relevante</h5>
+          <ul>
+            <li><strong><code>Agent Operating Procedures (AOPs)</code>: procedimientos de operación del agente escritos sin código, en lenguaje llano.</strong> Es lo más cercano a lo que UX Conversacional debería producir para el host: no un prompt técnico ni un diagrama de flujo, sino un procedimiento operativo legible por cualquiera.</li>
+            <li><code>Trace View</code> para observabilidad, <code>Duet</code> copilot, <code>Watchtower</code> analytics. Sandbox rápido.</li>
+          </ul>
+          <h5>Debilidades</h5>
+          <p>No está construido para contact centers regulados ni para volumen de voz; <em>"daily fine-tuning"</em> reportado; no se ve la plataforma hasta cerrar el proceso comercial.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El formato de <strong>AOP en lenguaje llano</strong> como entregable de diseño conversacional del host.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--tier-b">B7</span><span class="acc-title"><a href="https://www.replicant.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Replicant</a> — resolver, no desviar</span><span class="acc-evidence sk-tag sk-tag--info sk-tag--stroke">T</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Qué es</h5>
+          <p>Plataforma de voz enfocada en <em>"end-to-end issue resolution rather than deflection or routing"</em>, con voz, SMS y chat integrados. Nivel de evidencia: <strong>T</strong>.</p>
+          <h5>Lo relevante</h5>
+          <p>Su posicionamiento es la tesis del kick-off en una frase. La diferencia entre desviar y resolver es exactamente la diferencia entre el IVR actual y el host que Skandia quiere.</p>
+          <h5>Qué nos traemos</h5>
+          <p>El encuadre: el objetivo del host no es contener llamadas, es <strong>resolver tipos completos de llamada</strong>.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ═══ 06 Tier C ═══ -->
+    <section class="section" id="s6">
+      <div class="section-header">
+        <div class="section-number">06</div>
+        <div>
+          <h2 class="section-title">Fase 2 · Tier C — Internacional de infraestructura</h2>
+          <p class="section-desc">La capa técnica sobre la que se construyen las demás — datos duros de latencia y testing</p>
+        </div>
+      </div>
+
+      <p>Este tier aporta los datos duros. Las cifras vienen de una comparativa que probó cada plataforma durante un mes con tres flujos idénticos: calificación de leads, ticket entrante, y <strong>una secuencia de interrupción fuera de guion</strong>.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Plataforma</th><th>Latencia</th><th>Fortaleza aprovechable</th><th>Advertencia</th></tr></thead>
+          <tbody>
+            <tr><td><strong><a href="https://www.retellai.com/es" target="_blank" rel="noopener">Retell AI</a></strong></td><td><strong>~600 ms</strong> (la más rápida medida)</td><td><strong>Su <code>simulation testing</code> detectó dos edge cases antes de exponer el agente a un llamante real.</strong> Es la práctica, no la herramienta, lo que nos sirve.</td><td>Voces en español de terceros, sin biblioteca de acentos Latam.</td></tr>
+            <tr><td><strong><a href="https://vapi.ai" target="_blank" rel="noopener">Vapi</a></strong></td><td>800 ms round-trip según su FAQ, "sub-500 ms" en su homepage</td><td>Control total: intercambia libremente LLM, STT y TTS. 1.000+ sesiones concurrentes.</td><td><strong>La discrepancia entre su homepage y su FAQ es en sí una lección: la latencia se verifica con pruebas propias, no con la cifra publicada.</strong></td></tr>
+            <tr><td><strong><a href="https://www.bland.ai" target="_blank" rel="noopener">Bland AI</a></strong></td><td>Sin picos mid-call reportados</td><td><strong>LLM, STT y TTS self-hosted: los datos de la llamada no salen de su infraestructura.</strong> Modelo a considerar para requisitos de residencia de datos.</td><td>Curva de aprendizaje empinada en <code>Conversational Pathways</code>.</td></tr>
+            <tr><td><strong><a href="https://synthflow.ai" target="_blank" rel="noopener">Synthflow</a></strong></td><td>Infra sub-100 ms</td><td>Agente en vivo en menos de una hora sin escribir código.</td><td>Voces en español sin regionalizar.</td></tr>
+            <tr><td><strong><a href="https://telnyx.com" target="_blank" rel="noopener">Telnyx</a></strong></td><td><span class="score score-sd">s/d</span></td><td>Asistente básico en vivo en menos de cinco minutos. Operador de telefonía real.</td><td>Servicios de telefonía y LLM se configuran por separado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>La capa de QA es un hallazgo en sí mismo.</strong> Existe una categoría completa de herramientas dedicadas solo a probar agentes de voz (Cekura, Hamming). Su existencia dice algo: <strong>el testing de agentes de voz es una disciplina propia</strong>, no una tarea al final del proyecto. Prácticas que aportan:</p>
+      <ul>
+        <li><strong>Miles de llamadas simuladas antes del go-live.</strong></li>
+        <li><strong>Red teaming adversarial</strong> antes de exponer a usuarios reales.</li>
+        <li><strong>Tracking de latencia que identifica dónde se origina cada demora</strong> tras cambiar proveedor, modelo o prompt.</li>
+        <li><strong>Regression testing automático (CI/CD)</strong> ante cualquier cambio de prompt o configuración.</li>
+        <li><strong>Evaluación con puntaje por precisión e intents perdidos.</strong></li>
+      </ul>
+    </section>
+
+    <!-- ═══ 07 Genesys ═══ -->
+    <section class="section" id="s7">
+      <div class="section-header">
+        <div class="section-number">07</div>
+        <div>
+          <h2 class="section-title">Tier D · Nuestro punto de partida · Genesys</h2>
+          <p class="section-desc">Superficie de configuración documentada de Genesys Cloud CX para bots de voz — el marco donde aterrizan las buenas prácticas del benchmark</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="icon">ℹ️</span>
+        <span>Luego de analizar los referentes, hay que saber qué palancas tenemos. Esta sección mapea la superficie de configuración documentada de Genesys Cloud CX para bots de voz.</span>
+      </div>
+
+      <h3>Arquitectura de bots</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Componente</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Architect</strong></td><td>Herramienta donde se construyen los flujos. Los bot flows se integran a flujos de llamada, chat y mensaje.</td></tr>
+            <tr><td><strong>Genesys Dialog Engine Bot Flows</strong></td><td>Motor base de bots. Trabaja con <code>intents</code>, <code>slots</code>, <code>utterances</code>, <code>confirmations</code> y aprendizaje.</td></tr>
+            <tr><td><strong>Genesys Virtual Agent</strong></td><td>Capa de IA generativa sobre un bot flow de voz o digital. Se habilita en Architect.</td></tr>
+            <tr><td><strong>Genesys Copilot</strong></td><td>Generación asistida de intents y utterances.</td></tr>
+            <tr><td><strong>AI Studio / AI Guides</strong></td><td>Donde se crean y publican las guías que el Virtual Agent ejecuta. <strong>Es el mecanismo de acción.</strong></td></tr>
+            <tr><td><strong>Herramientas de análisis</strong></td><td><code>Communication Sequence Builder</code>, <code>Flow Insights</code>, análisis de salud de intents, <code>Virtual Agent Performance Dashboard</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Qué añade Virtual Agent sobre un bot flow normal</h3>
+      <ul>
+        <li>Generación automática de intents y utterances.</li>
+        <li><code>AI Powered slot types</code> y <code>Free form slot capture</code> para captura flexible de información.</li>
+        <li><strong><code>Knowledge base content search</code></strong> — búsqueda y destacado de respuestas desde artículos de base de conocimiento. <strong>Documentado como disponible solo en canales digitales.</strong></li>
+        <li><code>Conversation summary generation</code> — resumen automático de la conversación con el bot.</li>
+        <li><code>Wrap-up code generation</code> — códigos de cierre aplicados automáticamente.</li>
+        <li>Conexión con <code>AI Guides</code> de AI Studio para ejecutar acciones.</li>
+      </ul>
+
+      <h3>Conocimiento</h3>
+      <p>Dos caminos: el <strong>knowledge workbench</strong> (bases de conocimiento vinculadas a bot flows estándar) y la configuración de conocimiento para flujos con Virtual Agent. Tres tipos de contenido:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tipo</th><th>Comportamiento</th></tr></thead>
+          <tbody>
+            <tr><td><code>Standard</code></td><td>Devuelve el artículo completo que coincide.</td></tr>
+            <tr><td><code>Highlight</code></td><td>Extrae la respuesta puntual dentro del artículo.</td></tr>
+            <tr><td><code>Generative</code></td><td>Respuesta generada por LLM a partir de múltiples fuentes.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Para el host telefónico, <code>Highlight</code> es conceptualmente el más adecuado —una llamada no tolera que le lean un artículo completo— pero eso depende de resolver primero si la búsqueda de conocimiento opera en voz.</p>
+
+      <h3>Superficie de configuración de un bot flow de voz</h3>
+      <p>Ruta: <code>Settings &gt; User Input</code></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Bloque</th><th>Ajustes</th><th>Notas relevantes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>General</strong></td><td><code>Voice Barge-In</code> · <code>Automatic Quick Reply Buttons</code></td><td>Barge-in <strong>global</strong>: al activarlo se activa para todas las acciones <code>Ask for</code>. Habilitado por defecto en flujos nuevos, deshabilitado en existentes.</td></tr>
+            <tr><td><strong>No Match Detected</strong></td><td><code>Maximum Number of No Match Retries</code> · <code>No Match Apology</code></td><td>Al exceder: dispara <code>No Intent path</code> o <code>Recognition Failure Event</code>.</td></tr>
+            <tr><td><strong>No Input Detected</strong></td><td><code>Maximum Number of No Input Retries</code> · <strong><code>Voice No Input Timeout</code></strong> · <code>No Input Apology</code></td><td><strong>Timeout por defecto: 7 segundos.</strong> Al exceder: <code>Max No Inputs path</code>, <code>No Intent path</code> o <code>Recognition Failure Event</code>.</td></tr>
+            <tr><td><strong>Confirmation Errors</strong></td><td><code>Maximum number of Confirmation Rejections</code> · <code>Confirmation Rejection Apology</code> · <code>No Match Confirmation Apology</code> · <code>No Input Confirmation Apology</code></td><td>Cuatro mensajes distintos de disculpa — cuatro oportunidades de tono de marca que normalmente quedan en el default.</td></tr>
+            <tr><td><strong>Confidence Thresholds</strong></td><td><code>Normal Low</code> · <code>Normal High</code> · <code>Confirmation</code></td><td><code>Normal Low</code>: mínimo para no caer en No Match. <code>Normal High</code>: máximo por encima del cual no se pide confirmación. <strong>Es la palanca de "cuándo confirmar antes de actuar".</strong></td></tr>
+            <tr><td><strong>Speech Recognition Parameters</strong></td><td><code>Speech Detection Sensitivity</code> (0–1, default 0.5, solo Nuance) · <code>Max Speech Timeout</code> (configurable 0–30 s)</td><td>Límite del motor según proveedor: Nuance 22 s · Google Cloud STT 5 min · Microsoft Azure 10 min.</td></tr>
+            <tr><td><strong>Automatic Speech Recognition</strong></td><td><code>Intent Classification Hinting</code></td><td><strong>Deshabilitado por defecto</strong> en flujos nuevos. Envía pistas contextuales al motor ASR.</td></tr>
+            <tr><td><strong>DTMF Settings</strong></td><td><code>Inter-Digit Timeout</code> (default 3 s) · <code>Terminating Character</code> (solo <code>#</code>)</td><td>Relevante para captura de cédula.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Cómo funciona el barge-in en Genesys — y su implicación de diseño</h3>
+      <p>Esto merece detalle porque es donde más se puede ganar o perder.</p>
+      <ul>
+        <li><strong>Es global.</strong> <em>"When you enable this global setting, you enable it for all 'Ask for' actions in the bot flow."</em></li>
+        <li><strong>Solo aplica donde el bot espera respuesta</strong> (por ejemplo <code>Ask for Intent</code>). <em>"A user cannot interrupt at points in the conversation when the bot does not expect an answer, such as in a Communicate action."</em></li>
+        <li><strong>En flujos de voz/chat/mensaje</strong> hay una casilla aparte: <code>Enable Barge-in</code> en el <code>Audio Sequence Editor</code>, esquina inferior izquierda. Habilitada por defecto excepto en música de espera.</li>
+        <li><strong>Se dispara sin validación:</strong> la locución o el tono DTMF <em>"no tiene que coincidir con nada"</em> para activar el barge-in.</li>
+        <li><strong>Limitación importante:</strong> al activarse, aborta la reproducción en curso <strong>y descarta el audio que esté en cola</strong>.</li>
+      </ul>
+
+      <h4>Las tres consecuencias de diseño</h4>
+      <ol>
+        <li><strong>La política por tipo de mensaje se implementa eligiendo el tipo de bloque.</strong> Contenido no interrumpible (el aviso de grabación de Ley 1581, una divulgación legal) va en acciones <code>Communicate</code>. Contenido interrumpible va en acciones <code>Ask for</code>. No es un ajuste, es una decisión de arquitectura del flujo.</li>
+        <li><strong>Riesgo de interrupciones falsas.</strong> Como cualquier sonido dispara el barge-in, una llamada desde la calle o con TV de fondo va a cortar al bot constantemente. Mitigación: ajustar <code>Speech Detection Sensitivity</code> y medir la tasa de interrupciones falsas desde el sandbox.</li>
+        <li><strong>No encolar información crítica detrás de audio interrumpible.</strong> Si el saludo se parte en varias reproducciones, una interrupción se lleva las siguientes. Todo lo esencial va en el primer bloque.</li>
+      </ol>
+
+      <h3>Idiomas</h3>
+      <p><code>Agent Copilot</code> soporta español entre 14 idiomas. La documentación de Virtual Agent remite al listado general de idiomas soportados de Genesys Cloud sin detallar variantes regionales — <strong>queda como punto a verificar: si existe voz con acento colombiano o solo español neutro.</strong></p>
+
+      <h3>Extensibilidad</h3>
+      <p>Genesys permite integrar motores de terceros —Google Dialogflow CX, Amazon Lex, y Cognigy, que tiene solución específica para el ecosistema Genesys— y orquestar múltiples proveedores y modelos optimizando por latencia y precisión. Es la vía si una capacidad puntual del benchmark no existe nativamente.</p>
+      <p>Los <code>AI Agents</code> con mayor autonomía se anunciaron en septiembre de 2025, con disponibilidad plena declarada para el trimestre noviembre 2025 – enero 2026. <strong>Vale confirmar con Danillo qué versión y qué capacidades tiene habilitadas Skandia hoy.</strong></p>
+    </section>
+
+    <!-- ═══ 08 Matrices ═══ -->
+    <section class="section" id="s8">
+      <div class="section-header">
+        <div class="section-number">08</div>
+        <div>
+          <h2 class="section-title">Fase 3 · Matrices de valoración</h2>
+          <p class="section-desc">Los 13 criterios aplicados a cada referente por tier. Escala 0-3 · <span class="score score-sd">s/d</span> = sin dato público suficiente, nunca puntaje inventado</p>
+        </div>
+      </div>
+
+      <h3>Matriz A — Tier regional hispanohablante</h3>
+      <div class="table-wrap">
+        <table class="table-matrix">
+          <thead><tr><th>#</th><th>Criterio</th><th>Dapta.ai</th><th>Cari AI</th><th>Fonema AI</th><th>LIWA Tech</th><th>Mentora</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Español regional / acento CO</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td></tr>
+            <tr><td>2</td><td>Latencia</td><td class="score score-2">2</td><td class="score score-sd">s/d</td><td class="score score-2">2</td><td class="score score-sd">s/d</td><td class="score score-2">2</td></tr>
+            <tr><td>3</td><td>Interrupciones / turn-taking</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>4</td><td>Base de conocimiento</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-sd">s/d</td><td class="score score-2">2</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>5</td><td>Capacidad de acción</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-2">2</td></tr>
+            <tr><td>6</td><td>Omnicanalidad con contexto</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-2">2</td></tr>
+            <tr><td>7</td><td>Handoff con contexto</td><td class="score score-1">1</td><td class="score score-3">3</td><td class="score score-sd">s/d</td><td class="score score-2">2</td><td class="score score-2">2</td></tr>
+            <tr><td>8</td><td>Integración telefonía / IVR</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-sd">s/d</td><td class="score score-3">3</td><td class="score score-2">2</td></tr>
+            <tr><td>9</td><td>Estructura de configuración</td><td class="score score-3">3</td><td class="score score-1">1</td><td class="score score-sd">s/d</td><td class="score score-1">1</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>10</td><td>Gobernanza</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-sd">s/d</td><td class="score score-1">1</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>11</td><td>Testing pre-producción</td><td class="score score-1">1</td><td class="score score-sd">s/d</td><td class="score score-1">1</td><td class="score score-sd">s/d</td><td class="score score-2">2</td></tr>
+            <tr><td>12</td><td>Analítica y observabilidad</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-sd">s/d</td><td class="score score-2">2</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>13</td><td>Seguridad y cumplimiento</td><td class="score score-0">0</td><td class="score score-3">3</td><td class="score score-sd">s/d</td><td class="score score-1">1</td><td class="score score-2">2</td></tr>
+            <tr><td colspan="2"><strong>Evidencia</strong></td><td>D</td><td>P</td><td>P</td><td>P</td><td>P</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Matriz B — Tier internacional enterprise regulado</h3>
+      <div class="table-wrap">
+        <table class="table-matrix">
+          <thead><tr><th>#</th><th>Criterio</th><th>Parloa</th><th>PolyAI</th><th>Cognigy</th><th>Kore.ai</th><th>Sierra</th><th>Decagon</th><th>Replicant</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Español regional / acento CO</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>2</td><td>Latencia</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>3</td><td>Interrupciones / turn-taking</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>4</td><td>Base de conocimiento</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-2">2</td></tr>
+            <tr><td>5</td><td>Capacidad de acción</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-3">3</td></tr>
+            <tr><td>6</td><td>Omnicanalidad con contexto</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-3">3</td></tr>
+            <tr><td>7</td><td>Handoff con contexto</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-sd">s/d</td><td class="score score-2">2</td><td class="score score-2">2</td></tr>
+            <tr><td>8</td><td>Integración telefonía / IVR</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-2">2</td></tr>
+            <tr><td>9</td><td>Estructura de configuración</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>10</td><td>Gobernanza</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>11</td><td>Testing pre-producción</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-sd">s/d</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>12</td><td>Analítica y observabilidad</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>13</td><td>Seguridad y cumplimiento</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-sd">s/d</td></tr>
+            <tr><td colspan="2"><strong>Evidencia</strong></td><td>P/T</td><td>D/P</td><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Matriz C — Tier internacional de infraestructura</h3>
+      <p class="section-note">Solo se listan los criterios donde el tier publica dato (1, 2, 3, 4, 5, 8, 9, 11, 13) — el resto queda fuera de la matriz, no en <span class="score score-sd">s/d</span>, porque estos proveedores de infraestructura no compiten en esas dimensiones.</p>
+      <div class="table-wrap">
+        <table class="table-matrix">
+          <thead><tr><th>#</th><th>Criterio</th><th>Retell AI</th><th>Vapi</th><th>Bland AI</th><th>Synthflow</th><th>Telnyx</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Español regional / acento CO</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>2</td><td>Latencia</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>3</td><td>Interrupciones / turn-taking</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-sd">s/d</td></tr>
+            <tr><td>4</td><td>Base de conocimiento</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-1">1</td></tr>
+            <tr><td>5</td><td>Capacidad de acción</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-2">2</td></tr>
+            <tr><td>8</td><td>Integración telefonía / IVR</td><td class="score score-2">2</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-1">1</td><td class="score score-3">3</td></tr>
+            <tr><td>9</td><td>Estructura de configuración</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-3">3</td><td class="score score-1">1</td></tr>
+            <tr><td>11</td><td>Testing pre-producción</td><td class="score score-3">3</td><td class="score score-2">2</td><td class="score score-1">1</td><td class="score score-2">2</td><td class="score score-1">1</td></tr>
+            <tr><td>13</td><td>Seguridad y cumplimiento</td><td class="score score-1">1</td><td class="score score-1">1</td><td class="score score-2">2</td><td class="score score-1">1</td><td class="score score-1">1</td></tr>
+            <tr><td colspan="2"><strong>Evidencia</strong></td><td>T</td><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ 09 Resumen global ═══ -->
+    <section class="section" id="s9">
+      <div class="section-header">
+        <div class="section-number">09</div>
+        <div>
+          <h2 class="section-title">Resumen global</h2>
+          <p class="section-desc">Patrones transversales a las tres matrices</p>
+        </div>
+      </div>
+
+      <p><strong>El "qué" está comoditizado; el "cómo se configura" no.</strong> Las tres matrices convergen en las mismas capacidades (criterios 4, 5 y 6 están en <span class="score score-3">3</span> casi en todas partes). La dispersión real está en los criterios 9, 10 y 11 — configuración, gobernanza y testing. <strong>Son exactamente los tres criterios donde el equipo de UX Conversacional de Skandia tiene control total, independiente del proveedor.</strong></p>
+
+      <p><strong>El criterio 3 es el gran punto ciego del mercado.</strong> Casi todos los referentes del tier A y varios del B quedan en <span class="score score-sd">s/d</span> en interrupciones y turn-taking, pese a que es lo que más determina si una llamada se siente natural. Solo Parloa y PolyAI lo tratan explícitamente; la literatura técnica especializada es la única fuente que lo desarrolla. <strong>Genesys sí expone los ajustes</strong> —barge-in, timeouts, sensibilidad de detección, umbrales de confianza— lo que nos pone en mejor posición que la mayoría del mercado, siempre que decidamos activamente esos valores en lugar de heredar los defaults.</p>
+
+      <p><strong>Ningún referente resuelve simultáneamente español colombiano y cumplimiento para vigiladas.</strong> El tier A tiene el idioma (Cari AI y Fonema en <span class="score score-3">3</span>) y el tier B tiene la gobernanza (Parloa, PolyAI, Kore.ai en <span class="score score-3">3</span>), y se invierten en el otro criterio. La excepción parcial es <strong>Cari AI</strong>: <span class="score score-3">3</span> en español regional, <span class="score score-3">3</span> en cumplimiento (ISO 27001/9001, HIPAA, RGPD) y clientes financieros reales en la región — además de integración declarada con Genesys.</p>
+
+      <p><strong>La analítica se está volviendo conversacional.</strong> PolyAI con <code>Analyst Agents</code>, Decagon con <code>Watchtower</code>, Cari AI con sus cuatro dimensiones por llamada. Genesys tiene su contraparte en <code>Flow Insights</code>, análisis de salud de intents y <code>Virtual Agent Performance Dashboard</code>. La práctica a copiar es medir por llamada motivo, resolución, sentimiento y duración desde el día uno del sandbox.</p>
+    </section>
+
+    <!-- ═══ 10 Buenas prácticas ═══ -->
+    <section class="section" id="s10">
+      <div class="section-header">
+        <div class="section-number">10</div>
+        <div>
+          <h2 class="section-title">Buenas prácticas: qué nos traemos y dónde aterriza en Genesys</h2>
+          <p class="section-desc">46 prácticas agrupadas, cada una con su punto de aterrizaje concreto en la configuración de Genesys</p>
+        </div>
+      </div>
+
+      <h3>Diseño conversacional</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Práctica</th><th>Fuente</th><th>Dónde aterriza en Genesys</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Estructura de prompt en 7 secciones: Persona · Objetivo · Contexto · Constraints · Flujo · Variables</td><td>Dapta</td><td>Plantilla base del equipo. Cada rol de agente es un prompt con la misma estructura y distinto contenido.</td></tr>
+            <tr><td>2</td><td>Escribir el prompt <strong>en español</strong>, no traducido</td><td>Dapta</td><td>Ya lo cumplimos por defecto.</td></tr>
+            <tr><td>3</td><td>Solo diálogo pronunciable; nunca instrucciones tipo <code>[pausa]</code> en el guion</td><td>Dapta</td><td>Regla de estilo para el equipo de contenido en Architect.</td></tr>
+            <tr><td>4</td><td>Bloque explícito de <strong>respuestas poco claras</strong></td><td>Dapta</td><td><code>No Match Apology</code> + <code>Maximum Number of No Match Retries</code>. Los cuatro mensajes de disculpa de Genesys son cuatro oportunidades de tono de marca.</td></tr>
+            <tr><td>5</td><td>Constraints como capa de seguridad: verificar identidad antes de revelar datos</td><td>Dapta</td><td><code>Confidence Thresholds</code> + diseño del flujo de autenticación antes de cualquier <code>Ask for</code> que exponga datos.</td></tr>
+            <tr><td>6</td><td>Diseñar <strong>primero</strong> los caminos infelices y el handoff; bloquear todo lo que mueva dinero o escriba en un sistema</td><td>Literatura de diseño conversacional</td><td><code>No Intent path</code>, <code>Max No Inputs path</code>, <code>Recognition Failure Event</code>. Diseñarlos antes del flujo feliz, no después.</td></tr>
+            <tr><td>7</td><td><strong>AOP en lenguaje llano</strong> como entregable de diseño</td><td>Decagon</td><td>Formato de lo que UX Conversacional entrega a Danillo, antes de que se construya en Architect.</td></tr>
+            <tr><td>8</td><td>Roles de agente diferenciados en lugar de un bot único</td><td>Dapta, PolyAI</td><td>Bot flows separados para <code>host de recepción</code>, <code>soporte FP</code> y <code>concierge Wealth</code>, con umbrales y personalidad propios.</td></tr>
+            <tr><td>9</td><td>Guardrails de <strong>marca</strong>, además de compliance y experiencia</td><td>PolyAI</td><td>Conectar con la guía de comunicación omnicanal y los arquetipos Skandia al definir los mensajes de disculpa y confirmación.</td></tr>
+            <tr><td>10</td><td>Resolver tipos completos de llamada, no desviar</td><td>Replicant</td><td>Criterio de alcance: elegir un caso del top 4 y resolverlo end-to-end antes de abrir el siguiente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Requisitos no funcionales — para la troncal de prueba</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Requisito</th><th>Cifra</th><th>Dónde se verifica o configura</th></tr></thead>
+          <tbody>
+            <tr><td>11</td><td>Latencia objetivo para español natural</td><td><strong>&lt; 1.200 ms</strong></td><td>Medición en la troncal de prueba.</td></tr>
+            <tr><td>12</td><td>Umbral de deterioro perceptible</td><td>~800 ms se nota · &gt; 1.500 ms se siente roto</td><td>Criterio de aceptación del sandbox.</td></tr>
+            <tr><td>13</td><td>Referencia alcanzable en el mercado</td><td>~600 ms</td><td>Vara de comparación, no meta inicial.</td></tr>
+            <tr><td>14</td><td>Ceder el turno ante interrupción</td><td><strong>&lt; 150 ms</strong></td><td>A medir; no es un ajuste expuesto.</td></tr>
+            <tr><td>15</td><td>Brecha natural de turno humano</td><td>~200 ms</td><td>Referencia de diseño.</td></tr>
+            <tr><td>16</td><td>Silencio antes de reintentar</td><td>Revisar el default</td><td><strong><code>Voice No Input Timeout</code> = 7 s por defecto.</strong> Demasiado para una llamada de servicio.</td></tr>
+            <tr><td>17</td><td>Duración máxima de locución del usuario</td><td>Configurable 0–30 s</td><td><code>Max Speech Timeout</code>. Límite del motor: Nuance 22 s · Google 5 min · Azure 10 min.</td></tr>
+            <tr><td>18</td><td>Precisión del ASR</td><td>Ganancia gratis</td><td><strong><code>Intent Classification Hinting</code> viene deshabilitado.</strong> Activarlo y medir.</td></tr>
+            <tr><td>19</td><td>Sensibilidad a ruido</td><td>0–1, default 0.5</td><td><code>Speech Detection Sensitivity</code>. Ajustar contra la tasa de interrupciones falsas.</td></tr>
+            <tr><td>20</td><td>Captura de cédula</td><td>Default 3 s</td><td><code>Inter-Digit Timeout</code> y <code>Terminating Character</code> (<code>#</code>).</td></tr>
+            <tr><td>21</td><td>Arquitectura</td><td>Streaming y solapamiento, no serial</td><td>Verificar con Danillo cómo se comporta el pipeline actual.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Política de interrupciones — la práctica más accionable</h3>
+      <p>Barge-in no es un interruptor: es una <strong>política por tipo de mensaje</strong>. En Genesys el ajuste es global, así que <strong>la política se implementa eligiendo el tipo de bloque</strong> — <code>Communicate</code> para lo no interrumpible, <code>Ask for</code> para lo interrumpible.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Momento de la llamada</th><th>Política deseada</th><th>Cómo se logra en Genesys</th></tr></thead>
+          <tbody>
+            <tr><td>Saludo inicial</td><td>Interrumpible tras un breve <em>grace period</em></td><td><code>Ask for Intent</code> con barge-in activo. El usuario ya sabe para qué llamó.</td></tr>
+            <tr><td>Aviso de grabación (Ley 1581)</td><td><strong>No interrumpible</strong></td><td>Acción <code>Communicate</code> — el barge-in no aplica ahí. Requiere prueba de entrega.</td></tr>
+            <tr><td>Divulgación legal o condiciones</td><td><strong>No interrumpible</strong></td><td>Acción <code>Communicate</code>.</td></tr>
+            <tr><td>Captura de cédula o número de cuenta</td><td><strong>Endpointing paciente</strong></td><td>Subir <code>Voice No Input Timeout</code> y <code>Max Speech Timeout</code> para ese paso; ajustar <code>Inter-Digit Timeout</code>. La gente pausa mientras lee números.</td></tr>
+            <tr><td>Consulta abierta de soporte</td><td>Interrupción permitida</td><td><code>Ask for Intent</code>. Ajustar <code>Normal Low</code> / <code>Normal High</code> para no confirmar de más.</td></tr>
+            <tr><td>Espera mientras se consulta un sistema</td><td>Interrumpible y cancelable</td><td>Debe poder pedir un humano en medio de la espera.</td></tr>
+            <tr><td>Transferencia</td><td><strong>Siempre permitir intención de escalamiento</strong></td><td>Seguridad por encima del audio en curso.</td></tr>
+            <tr><td>Menú u opciones (si se conserva alguno)</td><td>DTMF + voz con validación</td><td><code>Terminating Character</code> y umbrales de confianza.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Métricas de turn-taking a instrumentar desde el sandbox:</strong> tasa de interrupciones falsas · tasa de interrupciones no atendidas · éxito al reanudar tras interrupción falsa · repetición del usuario (dice lo mismo dos veces) · silencio muerto tras interrupción · completitud de la tarea después de una interrupción.</p>
+
+      <div class="callout callout-warn">
+        <span class="icon">⚠️</span>
+        <span><strong>Dos advertencias específicas de Genesys:</strong> el barge-in se dispara con cualquier sonido o tono sin validar coincidencia, lo que en llamadas ruidosas produce cortes constantes; y al activarse <strong>descarta el audio en cola</strong>, así que nada esencial debe ir encolado detrás de un bloque interrumpible.</span>
+      </div>
+
+      <h3>Gobernanza y despliegue</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Práctica</th><th>Fuente</th></tr></thead>
+          <tbody>
+            <tr><td>22</td><td>Ciclo <code>Define → Test → Scale → Optimize</code> como estructura del proyecto</td><td>Parloa</td></tr>
+            <tr><td>23</td><td>Despliegue por etapas: sandbox → piloto acotado → producción</td><td>Práctica general del sector</td></tr>
+            <tr><td>24</td><td>Miles de llamadas simuladas + red teaming adversarial antes del go-live</td><td>Cekura, Sierra (<code>Voice Sims</code>)</td></tr>
+            <tr><td>25</td><td>Regression testing automático ante cada cambio de prompt o configuración</td><td>Cekura</td></tr>
+            <tr><td>26</td><td>Versionado de agentes, guardrails y trazabilidad reproducible por llamada</td><td>Parloa</td></tr>
+            <tr><td>27</td><td>Empezar con un solo caso de uso acotado, conectado a sistemas reales, no a datos falsos</td><td>Guía de banca</td></tr>
+            <tr><td>28</td><td>Modelar volumen de pico, no promedio</td><td>Guía de banca</td></tr>
+            <tr><td>29</td><td>Optimización mensual continua como parte de la operación, no como proyecto cerrado</td><td>LIWA Tech</td></tr>
+            <tr><td>30</td><td>Revisar 20 llamadas de producción después de cada cambio, con plan de reversión</td><td>Runbook de interrupciones</td></tr>
+            <tr><td>31</td><td>Doble camino de construcción: builder para diseño, SDK para ingeniería</td><td>PolyAI → Architect + AI Studio en nuestro caso</td></tr>
+            <tr><td>32</td><td>Verificar la trazabilidad, no asumirla</td><td>Cognigy (advertencia de terceros)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Sector financiero regulado</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Requisito</th><th>Detalle</th></tr></thead>
+          <tbody>
+            <tr><td>33</td><td><strong>Autenticar antes de revelar</strong></td><td>Verificación por conocimiento, OTP, biometría de voz, o escalamiento humano en casos sensibles.</td></tr>
+            <tr><td>34</td><td><strong>Grounding obligatorio</strong></td><td>Toda respuesta hablada debe trazar a dato verificado de un sistema de registro en tiempo real. Cero respuestas generadas desde el entrenamiento. Relevante al elegir entre conocimiento <code>Standard</code>, <code>Highlight</code> y <code>Generative</code>.</td></tr>
+            <tr><td>35</td><td><strong>Leer y escribir</strong>, no solo leer</td><td>El antipatrón es el "IVR disfrazado". En Genesys, los <code>AI Guides</code> de AI Studio.</td></tr>
+            <tr><td>36</td><td><strong>Motor unificado entre canales</strong></td><td>Antipatrón: stacks separados de voz y chat, cliente repitiendo. Sustenta reutilizar el entrenamiento de SAMI.</td></tr>
+            <tr><td>37</td><td><strong>Auditoría reproducible por llamada</strong></td><td>Antipatrón: <em>"confía en nosotros, usualmente funciona"</em>.</td></tr>
+            <tr><td>38</td><td><strong>Guardrails preventivos</strong></td><td>Límites de monto, divulgaciones obligatorias, simulaciones adversariales pre-lanzamiento.</td></tr>
+            <tr><td>39</td><td><strong>Ley 1581 de 2012</strong></td><td>Aviso de grabación obligatorio, en bloque <code>Communicate</code> no interrumpible.</td></tr>
+            <tr><td>40</td><td><strong>La contención es métrica de vanidad</strong></td><td>Medir resolución correcta en llamadas difíciles, no volumen de llamadas fáciles contenidas.</td></tr>
+            <tr><td>41</td><td><strong>Ninguna métrica debe premiar lo fácil</strong></td><td>Lección del modelo de Sierra: los incentivos mal puestos desvían las llamadas de riesgo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Español colombiano</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Práctica</th><th>Fuente</th></tr></thead>
+          <tbody>
+            <tr><td>42</td><td>Voz con acento colombiano nativo, no español neutro traducido</td><td>Fonema AI</td></tr>
+            <tr><td>43</td><td>Comprensión de modismos locales: <em>"no traduce, conversa como local"</em></td><td>Cari AI</td></tr>
+            <tr><td>44</td><td>Probar con usuarios reales del país antes de dar por bueno el resultado</td><td>Fonema AI</td></tr>
+            <tr><td>45</td><td>Escuchar la voz en vivo en español colombiano como paso de validación</td><td>Mentora</td></tr>
+            <tr><td>46</td><td>Medir latencia en infraestructura real, no en demo</td><td>Fonema AI, y la discrepancia homepage/FAQ de Vapi</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ 11 Antipatrones ═══ -->
+    <section class="section" id="s11">
+      <div class="section-header">
+        <div class="section-number">11</div>
+        <div>
+          <h2 class="section-title">Antipatrones a evitar</h2>
+          <p class="section-desc">12 comportamientos documentados que hay que diseñar activamente en contra</p>
+        </div>
+      </div>
+      <ol>
+        <li><strong>IVR disfrazado</strong> — agente que solo lee datos y nunca escribe en el sistema.</li>
+        <li><strong>Contención como métrica de éxito</strong> — 100 llamadas fáciles resueltas y la disputa regulada enrutada.</li>
+        <li><strong>Barge-in booleano</strong> — activarlo global sin política por tipo de mensaje. <strong>Es el default de Genesys; hay que trabajarlo desde la arquitectura del flujo.</strong></li>
+        <li><strong>Heredar los defaults</strong> — 7 segundos de silencio, hinting desactivado, sensibilidad en 0.5 sin medir.</li>
+        <li><strong>Encolar información crítica detrás de audio interrumpible</strong> — el barge-in de Genesys descarta la cola.</li>
+        <li><strong>Stacks separados de voz y chat</strong> — sin memoria compartida, cliente repitiendo.</li>
+        <li><strong>Auditoría opaca</strong> — sin poder reconstruir por qué el agente decidió lo que decidió.</li>
+        <li><strong>Optimizar el "vibe" de la demo, no el comportamiento de producción.</strong></li>
+        <li><strong>Priorizar latencia sobre corrección</strong> en casos complejos.</li>
+        <li><strong>Mezclar timeouts de silencio con manejo de interrupciones</strong> — son fallas distintas y se diagnostican distinto.</li>
+        <li><strong>Creer la latencia publicada</strong> — se verifica midiendo.</li>
+        <li><strong>Intentar que el bot negocie</strong> — negociación compleja, reclamos delicados y asesoría consultiva no son casos de bot.</li>
+      </ol>
+    </section>
+
+    <!-- ═══ 12 Insights ═══ -->
+    <section class="section" id="s12">
+      <div class="section-header">
+        <div class="section-number">12</div>
+        <div>
+          <h2 class="section-title">Insights</h2>
+          <p class="section-desc">Formato del playbook Skandia: Observación → Interpretación → Implicación → Oportunidad</p>
+        </div>
+      </div>
+
+      <details class="acc acc-static" open>
+        <summary><span class="acc-num acc-num--theme">1</span><span class="acc-title">El valor del equipo no está en la herramienta, y eso es una buena noticia</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Observación</h5>
+          <p>Las 17 plataformas revisadas ofrecen capacidades equivalentes. La dispersión está en configuración, gobernanza y testing.</p>
+          <h5>Interpretación</h5>
+          <p>La tecnología se comoditizó. Lo que diferencia un host excelente de uno mediocre es la calidad del prompt, la política de turnos y el rigor del testing — todo decisión de diseño.</p>
+          <h5>Implicación para Skandia</h5>
+          <p>Tener Genesys ya resuelto deja de ser una limitación y pasa a ser el escenario ideal: no hay que gastar tiempo eligiendo, se puede gastar en diseñar bien. La frase de Julián — <em>"nadie se va a diseñar más como ustedes"</em> — está bien calibrada.</p>
+          <h5>Oportunidad</h5>
+          <p>Producir un AOP en lenguaje llano por rol de agente, con la estructura de prompt de 7 secciones, y volverlo el activo reutilizable del programa Génesis.</p>
+        </div>
+      </details>
+
+      <details class="acc acc-static">
+        <summary><span class="acc-num acc-num--theme">2</span><span class="acc-title">La búsqueda de conocimiento en voz es el riesgo técnico número uno del proyecto</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Observación</h5>
+          <p>La documentación de Genesys Virtual Agent describe <code>Knowledge base content search</code> como disponible <strong>solo en canales digitales</strong>.</p>
+          <h5>Interpretación</h5>
+          <p>El plan del kick-off —reutilizar el entrenamiento escrito de SAMI como base de conocimiento del host telefónico— asume que lo que funciona en chat funciona en voz. La documentación sugiere que no es automático.</p>
+          <h5>Implicación</h5>
+          <p>Si se confirma, hay que resolverlo antes de diseñar flujos: o se replantea cómo llega el conocimiento a voz, o se recurre a extensión (Dialogflow CX, Amazon Lex, Cognigy para Genesys), o se acota el alcance inicial a intents con respuesta estructurada en lugar de búsqueda libre.</p>
+          <h5>Oportunidad</h5>
+          <p>Llevarlo como primera pregunta al seguimiento del jueves. Es más barato resolverlo ahora que después de haber modelado los flujos.</p>
+        </div>
+      </details>
+
+      <details class="acc acc-static">
+        <summary><span class="acc-num acc-num--theme">3</span><span class="acc-title">El turn-taking es el punto ciego del mercado, y Genesys nos da las palancas</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Observación</h5>
+          <p>El criterio de interrupciones quedó en <span class="score score-sd">s/d</span> para la mayoría de los referentes, pese a que la literatura técnica lo identifica como el principal determinante de naturalidad. Genesys, en cambio, expone barge-in, timeouts, sensibilidad de detección y umbrales de confianza.</p>
+          <h5>Interpretación</h5>
+          <p>Casi nadie diseña la política de turnos; la deja en el default. Es la razón por la que la mayoría de los voicebots suenan a máquina aunque la voz sea buena.</p>
+          <h5>Implicación</h5>
+          <p>Una política de interrupciones diseñada por tipo de mensaje pondría al host por encima del estándar local sin necesidad de tecnología adicional. La restricción de que el barge-in sea global es sorteable eligiendo el tipo de bloque.</p>
+          <h5>Oportunidad</h5>
+          <p>Llevar la tabla de política de interrupciones al seguimiento del jueves como decisión de diseño, e instrumentar las seis métricas de turn-taking desde el sandbox.</p>
+        </div>
+      </details>
+
+      <details class="acc acc-static">
+        <summary><span class="acc-num acc-num--theme">4</span><span class="acc-title">La proactividad tiene un prerrequisito que el kick-off ya identificó</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Observación</h5>
+          <p>Ningún referente resuelve la proactividad tipo Revolut ("sabemos que estás bloqueado, ya te mandé el código") de fábrica. Depende de la profundidad de integración con sistemas de registro.</p>
+          <h5>Interpretación</h5>
+          <p><em>"Para llegar allá primero hay que hacer que la arquitectura nos lo llame"</em> — coincide con el diagnóstico del sector: la proactividad no es función del bot, es función de la integración.</p>
+          <h5>Implicación</h5>
+          <p>La proactividad es etapa 2. La etapa 1 es que el agente pueda <strong>escribir</strong> en los sistemas, no solo leer.</p>
+          <h5>Oportunidad</h5>
+          <p>Medir el éxito del piloto por número de acciones ejecutadas end-to-end, no por consultas respondidas.</p>
+        </div>
+      </details>
+
+      <details class="acc acc-static">
+        <summary><span class="acc-num acc-num--theme">5</span><span class="acc-title">Los defaults de Genesys están calibrados para un IVR, no para un host</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5>Observación</h5>
+          <p><code>Voice No Input Timeout</code> en 7 segundos, <code>Intent Classification Hinting</code> deshabilitado, barge-in global que se dispara con cualquier ruido y descarta el audio en cola.</p>
+          <h5>Interpretación</h5>
+          <p>Los valores por defecto son razonables para un flujo de menú donde el usuario escucha y marca. Para una conversación abierta donde el usuario habla, interrumpe y corrige, cada uno de esos defaults trabaja en contra de la naturalidad.</p>
+          <h5>Implicación</h5>
+          <p>Una parte importante de la calidad del host se decide en una pantalla de ajustes que nadie suele revisar. No es diseño conversacional en el sentido tradicional, pero determina el resultado tanto como el guion.</p>
+          <h5>Oportunidad</h5>
+          <p>Hacer una <strong>revisión explícita de defaults</strong> como primer entregable técnico conjunto entre UX Conversacional y Danillo, con valores propuestos y justificación por cada ajuste.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ═══ 13 Mapa de oportunidades ═══ -->
+    <section class="section" id="s13">
+      <div class="section-header">
+        <div class="section-number">13</div>
+        <div>
+          <h2 class="section-title">Mapa de oportunidades</h2>
+          <p class="section-desc">16 oportunidades priorizadas por impacto, esfuerzo y momento</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Oportunidad</th><th>Impacto</th><th>Esfuerzo</th><th>Momento</th></tr></thead>
+          <tbody>
+            <tr><td>Verificar si la búsqueda de conocimiento opera en voz</td><td><span class="badge badge-critical">Crítico</span></td><td><span class="badge badge-ok">Bajo</span></td><td>Ahora — bloquea el diseño</td></tr>
+            <tr><td>Revisión explícita de defaults de Genesys con valores propuestos</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-ok">Bajo</span></td><td>Ahora</td></tr>
+            <tr><td>Política de interrupciones por tipo de bloque (<code>Communicate</code> vs. <code>Ask for</code>)</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-ok">Bajo</span></td><td>Ahora — decisión de diseño</td></tr>
+            <tr><td>Plantilla de prompt de 7 secciones + AOP por rol de agente</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-ok">Bajo</span></td><td>Ahora — es el entregable del equipo</td></tr>
+            <tr><td>Requisitos de latencia como criterio de aceptación de la troncal</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-ok">Bajo</span></td><td>Antes de la troncal</td></tr>
+            <tr><td>Diseñar handoff y caminos infelices antes del flujo feliz</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-medium">Medio</span></td><td>Ahora</td></tr>
+            <tr><td>Redactar los cuatro mensajes de disculpa con tono de marca</td><td><span class="badge badge-medium">Medio</span></td><td><span class="badge badge-ok">Bajo</span></td><td>Etapa de contenido</td></tr>
+            <tr><td>Suite de simulaciones + red teaming antes del piloto</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-medium">Medio</span></td><td>Antes del piloto</td></tr>
+            <tr><td>Roles diferenciados: host de recepción / soporte FP / concierge Wealth</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-medium">Medio</span></td><td>Etapa de diseño</td></tr>
+            <tr><td>Un solo caso del top 4 resuelto end-to-end</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-medium">Medio</span></td><td>Piloto</td></tr>
+            <tr><td>Tablero por llamada: motivo, resolución, sentimiento, duración</td><td><span class="badge badge-medium">Medio</span></td><td><span class="badge badge-medium">Medio</span></td><td>Desde el sandbox</td></tr>
+            <tr><td>Auditoría reproducible por llamada + guardrails preventivos</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-high">Alto</span></td><td>Antes de producción</td></tr>
+            <tr><td>Capacidad de escritura vía AI Guides</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-high">Alto</span></td><td>Depende de Danillo</td></tr>
+            <tr><td>Voz con acento colombiano</td><td><span class="badge badge-medium">Medio</span></td><td><span class="badge badge-sd">s/d</span></td><td>A verificar</td></tr>
+            <tr><td>Personalización por segmento comportamental</td><td><span class="badge badge-medium">Medio</span></td><td><span class="badge badge-high">Alto</span></td><td>Etapa 2</td></tr>
+            <tr><td>Proactividad tipo Revolut</td><td><span class="badge badge-high">Alto</span></td><td><span class="badge badge-critical">Muy alto</span></td><td>Etapa 2+</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ 14 Preguntas de verificación técnica ═══ -->
+    <section class="section" id="s14">
+      <div class="section-header">
+        <div class="section-number">14</div>
+        <div>
+          <h2 class="section-title">Preguntas de verificación para el equipo técnico</h2>
+          <p class="section-desc">No son preguntas para un proveedor: son las que hay que resolver sobre nuestra propia implementación</p>
+        </div>
+      </div>
+
+      <h3>Sobre conocimiento</h3>
+      <ol>
+        <li>¿La búsqueda en base de conocimiento del Virtual Agent opera en el canal de voz, o está limitada a digital?</li>
+        <li>Si está limitada: ¿replanteamos cómo llega el conocimiento de SAMI a voz, extendemos con un motor de terceros, o acotamos el alcance a intents estructurados?</li>
+        <li>¿Qué tipo de contenido usamos — <code>Standard</code>, <code>Highlight</code> o <code>Generative</code>— y cómo garantizamos que la respuesta trace a un dato verificado?</li>
+      </ol>
+
+      <h3>Sobre configuración</h3>
+      <ol start="4">
+        <li>¿Qué motor de ASR está configurado hoy? Define el <code>Max Speech Timeout</code> real (Nuance 22 s vs. Google 5 min).</li>
+        <li>¿Qué valores tienen hoy <code>Voice No Input Timeout</code>, <code>Speech Detection Sensitivity</code>, <code>Intent Classification Hinting</code> y los tres <code>Confidence Thresholds</code>?</li>
+        <li>¿Existe voz con acento colombiano disponible, o solo español neutro?</li>
+        <li>¿Qué versión de <code>AI Agents</code> y <code>Virtual Agent</code> tiene habilitada Skandia?</li>
+      </ol>
+
+      <h3>Sobre acción y handoff</h3>
+      <ol start="8">
+        <li>¿Qué sistemas puede <strong>escribir</strong> el agente vía AI Guides, y cuáles solo leer? Define si el host es un host o un IVR con mejor voz.</li>
+        <li>¿Qué pasa cuando una integración falla en medio de la llamada?</li>
+        <li>¿El resumen de conversación y los wrap-up codes llegan efectivamente al asesor humano, y en qué formato?</li>
+      </ol>
+
+      <h3>Sobre gobernanza</h3>
+      <ol start="11">
+        <li>¿Hay versionado de bot flows y podemos reconstruir por qué el bot decidió lo que decidió en una llamada específica?</li>
+        <li>¿Podemos correr llamadas simuladas masivas en la troncal de prueba antes del piloto?</li>
+        <li>¿Quién es dueño del prompt y del flujo en el día a día: diseño (Architect / AI Studio) o ingeniería?</li>
+      </ol>
+    </section>
+
+    <!-- ═══ 15 Limitaciones y siguiente paso ═══ -->
+    <section class="section" id="s15">
+      <div class="section-header">
+        <div class="section-number">15</div>
+        <div>
+          <h2 class="section-title">Limitaciones y siguiente paso</h2>
+          <p class="section-desc">Qué no cubre este benchmark, y cómo cerrarlo</p>
+        </div>
+      </div>
+
+      <h3>Limitaciones de este benchmark</h3>
+      <ul>
+        <li><strong>El eje de experiencia quedó fuera.</strong> No se evaluó ninguna línea telefónica real. Las prácticas de este documento vienen de quienes construyen la tecnología, no de quienes la operan de cara al cliente — y hay diferencia entre lo que una plataforma permite y lo que una empresa efectivamente configuró.</li>
+        <li><strong>Sesgo de fuente comercial.</strong> Buena parte del material es autopublicado. Las comparativas de Parloa favorecen a Parloa y las de Fonema concluyen que Fonema es la mejor opción para español. Se marcaron como declaradas todas las cifras de proveedor y se privilegió la única comparativa con llamadas reales de terceros.</li>
+        <li><strong>La información de Genesys viene de su centro de recursos público</strong>, no de la instancia de Skandia. Los defaults, límites y disponibilidad de features pueden diferir según versión, licenciamiento y configuración actual. Todo lo de esa sección requiere validación con Danillo — está formulado como preguntas de verificación, no como afirmaciones sobre nuestro entorno.</li>
+        <li><strong><code>s/d</code> es un resultado, no un vacío.</strong> Que la mayoría de los referentes no publique nada sobre manejo de interrupciones es en sí un hallazgo.</li>
+        <li><strong>Sin dimensión económica por decisión de alcance.</strong> No se compararon precios, modelos de costo ni condiciones comerciales. Si en algún momento se evalúa extender Genesys con un motor de terceros, esa comparación es un ejercicio aparte.</li>
+      </ul>
+
+      <h3>Siguiente paso recomendado</h3>
+      <p>Una <strong>ronda de campo corta</strong> que cierre el eje que este documento dejó abierto: llamar a 3 líneas reales con la matriz de criterios y la tabla de política de interrupciones en mano.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Objetivo</th><th>Línea</th><th>Qué observar</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Celsia — Luz I.A.</strong></td><td>01 8000 112 115</td><td>El único voicebot de voz confirmado en producción en Colombia. Recepción, manejo de acento, comportamiento ante interrupciones, capacidad de acción, escalamiento.</td></tr>
+            <tr><td><strong>Iberia</strong></td><td>Referencia del kick-off</td><td>Calidad de recepción e identificación del llamante.</td></tr>
+            <tr><td><strong>Un par del sector</strong> — Porvenir, Protección o Bancolombia</td><td>—</td><td>Piso competitivo real en pensiones y banca colombiana.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Dos llamadas por línea, una consulta simple del top 4 y una fuera de guion con interrupción deliberada, con la rúbrica ya definida: dos horas de trabajo que convierten este benchmark en evidencia de primera mano.</p>
+    </section>
+
+    <!-- ═══ 16 Fuentes ═══ -->
+    <section class="section" id="s16">
+      <div class="section-header">
+        <div class="section-number">16</div>
+        <div>
+          <h2 class="section-title">Fuentes</h2>
+          <p class="section-desc">30 referencias, agrupadas por categoría</p>
+        </div>
+      </div>
+
+      <h4>Metodología</h4>
+      <ol>
+        <li><a href="https://design-toolkit.recursos.uoc.edu/es/guia/benchmarking/" target="_blank" rel="noopener">Benchmarking — UOC Design Toolkit</a></li>
+        <li>Playbook Research Skandia — tipo de proyecto IDENTIFICAR, estructura de insight y comunicación de resultados</li>
+      </ol>
+
+      <h4>Genesys — nuestro punto de partida</h4>
+      <ol start="3">
+        <li><a href="https://help.genesys.cloud/articles/about-genesys-dialog-engine-bot-flows/" target="_blank" rel="noopener">About Genesys Dialog Engine Bot Flows</a></li>
+        <li><a href="https://help.genesys.cloud/articles/about-genesys-virtual-agent/" target="_blank" rel="noopener">About Genesys Virtual Agent</a></li>
+        <li><a href="https://help.genesys.cloud/articles/set-up-user-input-for-a-bot-flow/" target="_blank" rel="noopener">Set up user input for a bot flow</a></li>
+        <li><a href="https://help.genesys.cloud/articles/about-barge-in-options/" target="_blank" rel="noopener">Barge-in options</a></li>
+        <li><a href="https://help.genesys.cloud/articles/add-knowledge-to-your-bot-flow/" target="_blank" rel="noopener">Add knowledge to your bot flow</a></li>
+        <li><a href="https://help.genesys.cloud/articles/about-architect/" target="_blank" rel="noopener">About Architect</a></li>
+        <li><a href="https://www.genesys.com/capabilities/virtual-agents" target="_blank" rel="noopener">Genesys — Virtual Agents capabilities</a></li>
+        <li><a href="https://www.genesys.com/capabilities/copilots" target="_blank" rel="noopener">Genesys — AI Copilot Agents</a></li>
+        <li><a href="https://www.genesys.com/company/newsroom/announcements/genesys-launches-ai-agents-with-greater-autonomy-to-drive-enterprise-wide-customer-experience-orchestration" target="_blank" rel="noopener">Genesys launches AI Agents with greater autonomy</a></li>
+        <li><a href="https://www.cognigy.com/solutions/cognigy-for-genesys" target="_blank" rel="noopener">Cognigy for Genesys</a></li>
+      </ol>
+
+      <h4>Tier A · Regional</h4>
+      <ol start="13">
+        <li><a href="https://dapta.ai/es/" target="_blank" rel="noopener">Dapta AI — sitio oficial (es)</a></li>
+        <li><a href="https://docs.dapta.ai/ai-voice-agents/how-to-set-up-your-ai-voice-agent" target="_blank" rel="noopener">Dapta Docs — How to set up your AI Voice Agent</a></li>
+        <li><a href="https://docs.dapta.ai/ai-voice-agents/how-to-set-up-your-ai-voice-agent/prompt-guide" target="_blank" rel="noopener">Dapta Docs — Prompt Guide</a></li>
+        <li><a href="https://cariai.com/content/voicebots-atencion-al-cliente/" target="_blank" rel="noopener">Cari AI — Voicebots para atención al cliente con IA en LATAM</a></li>
+        <li><a href="https://www.fonema.ai/en/guides/best-ai-voice-agents-spanish-2026" target="_blank" rel="noopener">Fonema AI — Best AI Voice Agents for Spanish-Speaking Companies 2026</a></li>
+        <li><a href="https://liwaempresas.com/agentes-ia-telefonicos/" target="_blank" rel="noopener">LIWA Tech — Agentes IA Telefónicos</a></li>
+        <li><a href="https://mentoracolombia.com/voicebots-colombia-agentes-ia-telefonicos-precios-2026/" target="_blank" rel="noopener">Mentora Colombia — Voicebots en Colombia 2026</a></li>
+      </ol>
+
+      <h4>Tier B · Enterprise regulado</h4>
+      <ol start="20">
+        <li><a href="https://www.parloa.com/knowledge-hub/best-voice-ai-companies-customer-support/" target="_blank" rel="noopener">Parloa — 12 Best Voice AI Companies for Customer Support</a></li>
+        <li><a href="https://poly.ai/" target="_blank" rel="noopener">PolyAI — sitio oficial</a></li>
+        <li><a href="https://www.lorikeetcx.ai/articles/best-voice-ai-financial-services-integration-2026" target="_blank" rel="noopener">Lorikeet — Best Voice AI Platforms That Integrate With Financial Services Systems (2026)</a></li>
+        <li><a href="https://www.retellai.com/blog/best-voice-ai-agents-for-banking" target="_blank" rel="noopener">Retell AI — 7 Best Voice AI Agents for Banking in 2026</a></li>
+      </ol>
+
+      <h4>Tier C · Infraestructura y testing</h4>
+      <ol start="24">
+        <li><a href="https://www.cekura.ai/blogs/best-ai-voice-agent-platforms" target="_blank" rel="noopener">Cekura — 8 Best AI Voice Agent Platforms in 2026 (Tested on Real Calls)</a></li>
+        <li><a href="https://hamming.ai/resources/voice-agent-interruption-handling-runbook" target="_blank" rel="noopener">Hamming AI — Voice Agent Interruption Handling: Barge-In, Backchannels, and Turn Detection</a></li>
+        <li><a href="https://qubittool.com/blog/voice-conversation-ai-agent-latency-architecture" target="_blank" rel="noopener">QubitTool — Voice AI Engineering 2026: Low-Latency Agent Design</a></li>
+        <li><a href="https://decagon.ai/glossary/what-is-voice-agent-barge-in" target="_blank" rel="noopener">Decagon — What is voice agent barge-in?</a></li>
+        <li><a href="https://www.voiceflow.com/blog/conversation-design" target="_blank" rel="noopener">Voiceflow — Conversational AI Design: A Practitioner's Guide 2026</a></li>
+      </ol>
+
+      <h4>Referentes de experiencia (para la ronda de campo)</h4>
+      <ol start="29">
+        <li><a href="https://www.celsia.com/es/blog-celsia/conoce-a-luz-i-a-nuestra-asistente-virtual-de-voz/" target="_blank" rel="noopener">Celsia — Conoce a Luz I.A., nuestra asistente virtual de voz</a></li>
+        <li><a href="https://www.bancolombia.com/centro-de-ayuda/canales/tabot" target="_blank" rel="noopener">Bancolombia — Tabot, asistente virtual</a></li>
+      </ol>
+    </section>
+
+    <!-- ═══ 17 Preguntas abiertas ═══ -->
+    <section class="section" id="s17">
+      <div class="section-header">
+        <div class="section-number">17</div>
+        <div>
+          <h2 class="section-title">Preguntas abiertas para el seguimiento</h2>
+          <p class="section-desc">Para llevar a la reunión del jueves 4:30 PM</p>
+        </div>
+      </div>
+      <ol>
+        <li><strong>¿La búsqueda de conocimiento del Virtual Agent funciona en voz?</strong> Es el riesgo técnico número uno y condiciona todo el diseño de flujos.</li>
+        <li><strong>¿Cuál es la configuración actual de los defaults?</strong> Timeouts, sensibilidad, hinting y umbrales de confianza definen la naturalidad del host antes de escribir una sola línea de guion.</li>
+        <li><strong>¿Existe voz con acento colombiano en nuestra instancia?</strong></li>
+        <li><strong>¿Qué sistemas puede escribir el agente, no solo leer?</strong> Define si el host es un host o un IVR con mejor voz.</li>
+        <li><strong>¿Quién será dueño del prompt y del flujo en el día a día?</strong> El patrón builder/SDK requiere definirlo antes de construir.</li>
+        <li><strong>¿Cómo se relaciona la PoC que hizo Danillo con Genesys?</strong> Si la prueba de concepto se hizo por fuera, hay que decidir si se porta o si sirvió solo para validar el concepto.</li>
+        <li><strong>¿Qué caso del top 4 elegimos para resolver end-to-end primero?</strong> La recomendación del sector es empezar acotado; información de retiros es el #1.</li>
+        <li><strong>¿Hay apetito para la ronda de campo?</strong> Dos horas de llamadas cerrarían el eje de experiencia que este documento dejó pendiente.</li>
+      </ol>
+
+      <footer class="doc-footer">
+        <strong>Benchmark — Host telefónico con IA para la línea de servicio de Skandia</strong><br>
+        Elaborado por Javier Alemán · Equipo UX Conversacional (#UXplorers) · Host telefónico SAMI · versión 2 · 11 de agosto de 2026.
+      </footer>
+    </section>
+
+    <button id="backTop" aria-label="Volver arriba">↑</button>
+
+  </div>
+
+  <script>
+    // ── Barra de progreso de lectura ──
+    const progressBar = document.getElementById('progressBar');
+    const backTop = document.getElementById('backTop');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+      progressBar.style.width = pct + '%';
+      backTop.classList.toggle('visible', h.scrollTop > 600);
+    }, { passive: true });
+
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ── Expandir / contraer todo ──
+    const allAccs = [...document.querySelectorAll('details.acc')];
+    document.getElementById('expandAll').addEventListener('click', () => allAccs.forEach(d => d.open = true));
+    document.getElementById('collapseAll').addEventListener('click', () => allAccs.forEach(d => d.open = false));
+
+    // ── Búsqueda global ──
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    const searchCount = document.getElementById('searchCount');
+    const searchScopes = allAccs;
+
+    function clearHighlights(root) {
+      root.querySelectorAll('mark').forEach(m => {
+        m.replaceWith(document.createTextNode(m.textContent));
+      });
+      root.normalize?.();
+    }
+
+    function highlight(root, term) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: n => n.parentElement.closest('script,style,summary svg') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+      });
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      const re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      nodes.forEach(node => {
+        if (!re.test(node.textContent)) return;
+        const frag = document.createDocumentFragment();
+        node.textContent.split(re).forEach((part, i) => {
+          if (i % 2 === 1) {
+            const mark = document.createElement('mark');
+            mark.textContent = part;
+            frag.appendChild(mark);
+          } else if (part) {
+            frag.appendChild(document.createTextNode(part));
+          }
+        });
+        node.replaceWith(frag);
+      });
+    }
+
+    let searchTimer;
+    function runSearch() {
+      const term = searchInput.value.trim().toLowerCase();
+      searchClear.style.display = term ? 'block' : 'none';
+
+      searchScopes.forEach(el => { clearHighlights(el); el.style.display = ''; });
+
+      if (term.length < 2) {
+        searchCount.textContent = '';
+        return;
+      }
+
+      let hits = 0;
+      allAccs.forEach(d => {
+        const match = d.textContent.toLowerCase().includes(term);
+        d.style.display = match ? '' : 'none';
+        if (match) { d.open = true; highlight(d, term); hits++; }
+      });
+
+      searchCount.textContent = hits + ' resultado' + (hits === 1 ? '' : 's');
+    }
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(runSearch, 180);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      runSearch();
+      searchInput.focus();
+    });
+
+    // ── TOC activo según scroll ──
+    const tocLinks = [...document.querySelectorAll('.toc-list a')];
+    const sections = tocLinks.map(a => document.querySelector(a.getAttribute('href')));
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => s && obs.observe(s));
+  </script>
+</body>
+</html>
