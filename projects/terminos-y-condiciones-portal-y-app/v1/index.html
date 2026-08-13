@@ -16,9 +16,15 @@
                     Canales de atención en móvil). Sin gate y sin casilla: se cierra con el
                     botón "Entendido" o con la X del encabezado.
 
+  Flujo de error: si el guardado de la aceptación falla, el modal NO se cierra. Aparece un
+  mensaje inline en el pie —fuera del área con scroll, pegado al botón que falló— la casilla
+  sigue marcada, se conserva la posición de lectura y el botón pasa a "Reintentar".
+  Se activa con el control "Fallar el próximo guardado" del switch superior, o con ?fail=1.
+
   Reglas del modo aceptación (por defecto activas, se pueden desactivar por query string):
     ?scroll=0   no exige leer hasta el final
     ?check=0    no exige marcar la casilla
+    ?fail=1     el primer guardado falla
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,6 +46,7 @@
   @keyframes skFade{ from{ opacity: 0 } to{ opacity: 1 } }
   @keyframes skRise{ from{ opacity: 0; transform: translateY(12px) } to{ opacity: 1; transform: none } }
   @keyframes skSheet{ from{ opacity: 0; transform: translateY(24px) } to{ opacity: 1; transform: none } }
+  @keyframes skSpin{ to{ transform: rotate(360deg) } }
 
   .sk-scroll::-webkit-scrollbar{ width: 8px; }
   .sk-scroll::-webkit-scrollbar-thumb{ background: #00c73d; border-radius: 8px; }
@@ -50,10 +57,21 @@
 
   /* ============================================================ switch top */
   .tabs{
-    height: 56px; background: #ffffff; border-bottom: 1px solid #dddddd;
+    min-height: 56px; background: #ffffff; border-bottom: 1px solid #dddddd;
     display: flex; align-items: center; justify-content: center; gap: 8px;
     position: relative; z-index: 60;
   }
+  /* Control de prototipo: fuerza el fallo del próximo guardado. */
+  .simfail{
+    position: absolute; right: 16px; display: flex; align-items: center; gap: 8px;
+    height: 36px; padding: 0 14px; border-radius: 100px;
+    border: 1px solid #dddddd; background: #ffffff;
+    font-size: 13px; color: #404040; cursor: pointer;
+    transition: background 150ms ease-out, border-color 150ms ease-out;
+  }
+  .simfail:hover{ background: #f7f7f7; }
+  .simfail input{ width: 16px; height: 16px; margin: 0; accent-color: #e4483b; cursor: pointer; }
+  .simfail--on{ border-color: #e4483b; background: #fdeceb; color: #a3271c; }
   .tab{
     height: 36px; padding: 0 20px; border-radius: 100px;
     font-weight: 700; font-size: 14px; cursor: pointer;
@@ -68,7 +86,13 @@
   .btn{
     height: 56px; border-radius: 100px; border: none;
     font-weight: 700; font-size: 16px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
     transition: background 150ms ease-out;
+  }
+  .spin{
+    width: 16px; height: 16px; flex: none; border-radius: 100px;
+    border: 2px solid currentColor; border-right-color: transparent; opacity: .75;
+    animation: skSpin 700ms linear infinite;
   }
   .btn--primary{ background: #00c73d; color: #ffffff; }
   .btn--primary:hover{ background: #03a835; }
@@ -87,6 +111,20 @@
   .notice{ border-radius: 8px; padding: 12px 16px; font-size: 14px; line-height: 20px; }
   .notice--error{ background: #fdeceb; border: 1px solid #e4483b; color: #a3271c; }
   .notice--ok{ background: #eafbef; border: 1px solid #00c73d; color: #0c3d1a; padding: 14px 20px; }
+
+  /* Error de guardado: vive dentro del modal, encima de los botones — fuera del
+     área con scroll, para que siempre esté visible junto a la acción que falló. */
+  .alert{
+    display: flex; align-items: flex-start; gap: 12px;
+    background: #fdeceb; border: 1px solid #e4483b; border-radius: 8px;
+    padding: 14px 16px; color: #a3271c; animation: skFade 150ms ease-out;
+  }
+  .alert__icon{ flex: none; display: flex; margin-top: 1px; }
+  .alert__copy{ display: flex; flex-direction: column; gap: 2px; }
+  .alert__title{ font-weight: 700; font-size: 15px; line-height: 22px; }
+  .alert__text{ font-size: 14px; line-height: 20px; text-wrap: pretty; }
+  .alert--desk{ margin: 16px 32px 0; }
+  .alert--sheet{ margin: 16px 24px 0; }
 
   /* ======================================================== login (desktop) */
   .d-login{
@@ -535,6 +573,11 @@
   @media (max-width: 1180px){
     .cats{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
+  @media (max-width: 860px){
+    /* El control de simulación deja de ser absoluto y baja a una segunda línea. */
+    .tabs{ flex-wrap: wrap; padding: 10px 16px; gap: 8px; }
+    .simfail{ position: static; order: 3; flex-basis: 100%; justify-content: center; }
+  }
   @media (max-width: 900px){
     .d-login{ grid-template-columns: 1fr; }
     .d-login__panel{ padding: 40px 24px 32px; gap: 32px; }
@@ -572,6 +615,10 @@
 <div class="tabs">
   <button class="tab tab--on" id="tab-desk" type="button">Versión escritorio</button>
   <button class="tab" id="tab-mobile" type="button">Versión móvil</button>
+  <label class="simfail" id="simfail">
+    <input type="checkbox" id="simfail-chk">
+    Fallar el próximo guardado
+  </label>
 </div>
 
 <!-- ============================================================ ESCRITORIO -->
@@ -794,9 +841,22 @@
         </div>
       </div>
 
+      <div class="alert alert--desk" id="d-error" role="alert" hidden>
+        <span class="alert__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e4483b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+        </span>
+        <span class="alert__copy">
+          <span class="alert__title">No pudimos guardar tu aceptación</span>
+          <span class="alert__text">Tuvimos un problema con nuestro servicio y tu confirmación no quedó registrada. Vuelve a intentarlo. Si el problema continúa, comunícate con nuestras líneas de atención.</span>
+        </span>
+      </div>
+
       <div class="modal__actions" id="d-actions">
         <button class="btn btn--outline" id="d-btn-reject" type="button">Rechazar</button>
-        <button class="btn btn--primary" id="d-btn-accept" type="button">Aceptar</button>
+        <button class="btn btn--primary" id="d-btn-accept" type="button">
+          <span class="spin" id="d-spin" aria-hidden="true" hidden></span>
+          <span id="d-accept-label">Aceptar</span>
+        </button>
       </div>
       <div class="modal__actions modal__actions--read" id="d-actions-read" hidden>
         <button class="btn btn--primary" id="d-btn-ok" type="button">Entendido</button>
@@ -1001,8 +1061,21 @@
             </div>
           </div>
 
+          <div class="alert alert--sheet" id="m-error" role="alert" hidden>
+            <span class="alert__icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e4483b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+            </span>
+            <span class="alert__copy">
+              <span class="alert__title">No pudimos guardar tu aceptación</span>
+              <span class="alert__text">Tuvimos un problema con nuestro servicio y tu confirmación no quedó registrada. Vuelve a intentarlo o comunícate con nuestras líneas de atención.</span>
+            </span>
+          </div>
+
           <div class="sheet__actions" id="m-actions">
-            <button class="btn btn--primary" id="m-btn-accept" type="button">Aceptar y continuar</button>
+            <button class="btn btn--primary" id="m-btn-accept" type="button">
+              <span class="spin" id="m-spin" aria-hidden="true" hidden></span>
+              <span id="m-accept-label">Aceptar y continuar</span>
+            </button>
             <button class="btn--ghost" id="m-btn-reject" type="button">Rechazar</button>
           </div>
           <div class="sheet__actions" id="m-actions-read" hidden>
@@ -1195,14 +1268,24 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     dHelp: $('d-help'), dModal: $('d-modal'), dModalCard: $('d-modal-card'), dModalTitle: $('d-modal-title'),
     dModalX: $('d-modal-x'), dDoc: $('d-doc'), dConsent: $('d-consent'), dHint: $('d-hint'),
     dActions: $('d-actions'), dActionsRead: $('d-actions-read'), dChk: $('d-chk'), dAccept: $('d-btn-accept'),
+    dReject: $('d-btn-reject'), dError: $('d-error'), dSpin: $('d-spin'), dLabel: $('d-accept-label'),
 
     // móvil
     mLogin: $('m-login'), mHome: $('m-home'), mMenu: $('m-menu'), mSupport: $('m-support'),
     mNotice: $('m-notice'), mAccepted: $('m-accepted'),
     mModal: $('m-modal'), mModalCard: $('m-modal-card'), mModalTitle: $('m-modal-title'),
     mModalX: $('m-modal-x'), mDoc: $('m-doc'), mConsent: $('m-consent'), mHint: $('m-hint'),
-    mActions: $('m-actions'), mActionsRead: $('m-actions-read'), mChk: $('m-chk'), mAccept: $('m-btn-accept')
+    mActions: $('m-actions'), mActionsRead: $('m-actions-read'), mChk: $('m-chk'), mAccept: $('m-btn-accept'),
+    mReject: $('m-btn-reject'), mError: $('m-error'), mSpin: $('m-spin'), mLabel: $('m-accept-label'),
+
+    simfail: $('simfail'), simfailChk: $('simfail-chk')
   };
+
+  const LABEL_DESK   = 'Aceptar';
+  const LABEL_MOBILE = 'Aceptar y continuar';
+  const LABEL_SAVING = 'Guardando…';
+  const LABEL_RETRY  = 'Reintentar';
+  const SAVE_MS = 900;   // latencia simulada del guardado
 
   const state = {
     device: 'desk',      // 'desk' | 'mobile'
@@ -1213,7 +1296,10 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     helpOpen: false,
     accepted: false,
     atBottom: false,
-    notice: false
+    notice: false,
+    saving: false,       // guardando la aceptación
+    error: false,        // el guardado falló y hay que reintentar
+    failNext: params.get('fail') === '1'   // el próximo guardado va a fallar
   };
 
   function reset(device) {
@@ -1226,6 +1312,8 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     state.accepted = false;
     state.atBottom = false;
     state.notice = false;
+    state.saving = false;
+    state.error = false;
     el.dChk.checked = false;
     el.mChk.checked = false;
   }
@@ -1279,7 +1367,14 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
 
   function blocked() {
     if (isRead()) return false;
+    if (state.saving) return true;
     return (REQUIRE_SCROLL_TO_END && !state.atBottom) || (REQUIRE_CHECKBOX && !state.accepted);
+  }
+
+  function acceptLabel(device) {
+    if (state.saving) return LABEL_SAVING;
+    if (state.error) return LABEL_RETRY;
+    return device === 'desk' ? LABEL_DESK : LABEL_MOBILE;
   }
 
   function showHint() {
@@ -1314,6 +1409,10 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     el.dActionsRead.hidden = !read;
     el.dHint.hidden = !showHint();
     el.dAccept.disabled = blocked();
+    el.dReject.disabled = state.saving;
+    el.dError.hidden = !(state.error && !read);
+    el.dSpin.hidden = !state.saving;
+    el.dLabel.textContent = acceptLabel('desk');
 
     // móvil
     el.mLogin.hidden = state.screen !== 'login';
@@ -1330,6 +1429,14 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     el.mActionsRead.hidden = !read;
     el.mHint.hidden = !showHint();
     el.mAccept.disabled = blocked();
+    el.mReject.disabled = state.saving;
+    el.mError.hidden = !(state.error && !read);
+    el.mSpin.hidden = !state.saving;
+    el.mLabel.textContent = acceptLabel('mobile');
+
+    // control de prototipo
+    el.simfailChk.checked = state.failNext;
+    el.simfail.classList.toggle('simfail--on', state.failNext);
   }
 
   function checkBottom() {
@@ -1349,6 +1456,8 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     state.notice = false;
     state.accepted = false;
     state.atBottom = false;
+    state.saving = false;
+    state.error = false;
     el.dChk.checked = false;
     el.mChk.checked = false;
     render();
@@ -1357,6 +1466,28 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     (state.device === 'desk' ? el.dModalCard : el.mModalCard).focus();
     // Si el texto entra completo sin scroll, la regla de lectura ya está cumplida.
     setTimeout(checkBottom, 60);
+  }
+
+  // Guarda la aceptación. Si el servicio falla, el modal NO se cierra: se mantiene
+  // la casilla marcada y la posición de lectura, y el botón pasa a "Reintentar".
+  function save() {
+    if (blocked()) return;
+    state.saving = true;
+    state.error = false;
+    render();
+
+    setTimeout(function () {
+      state.saving = false;
+      if (state.failNext) {
+        state.failNext = false;   // el reintento sí pasa; vuelve a marcarlo para fallar otra vez
+        state.error = true;
+        render();   // el mensaje vive en el pie del modal, siempre visible: no hay que desplazar nada
+      } else {
+        state.error = false;
+        state.modalOpen = false;
+        render();
+      }
+    }, SAVE_MS);
   }
 
   function openTerms() {
@@ -1373,6 +1504,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
   function closeModal() {
     state.modalOpen = false;
     state.mode = 'accept';
+    state.error = false;
     render();
   }
 
@@ -1384,6 +1516,8 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
     state.notice = true;
     state.accepted = false;
     state.atBottom = false;
+    state.saving = false;
+    state.error = false;
     el.dChk.checked = false;
     el.mChk.checked = false;
     render();
@@ -1398,6 +1532,12 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
   el.tabDesk.addEventListener('click', function () { reset('desk'); render(); });
   el.tabMobile.addEventListener('click', function () { reset('mobile'); render(); });
 
+  // control de prototipo: fuerza el fallo del próximo guardado
+  el.simfailChk.addEventListener('change', function (e) {
+    state.failNext = e.target.checked;
+    render();
+  });
+
   // escritorio
   $('d-btn-login').addEventListener('click', openAcceptModal);
   $('d-burger').addEventListener('click', function () { state.helpOpen = true; render(); });
@@ -1407,7 +1547,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
   $('d-open-terms').addEventListener('click', openTerms);
   $('d-modal-x').addEventListener('click', closeModal);
   $('d-btn-ok').addEventListener('click', closeModal);
-  $('d-btn-accept').addEventListener('click', function () { state.modalOpen = false; render(); });
+  $('d-btn-accept').addEventListener('click', save);
   $('d-btn-reject').addEventListener('click', onReject);
   el.dChk.addEventListener('change', onToggle);
   el.dDoc.addEventListener('scroll', checkBottom);
@@ -1421,7 +1561,7 @@ Para el uso seguro de los Canales Digitales, Skandia recomienda al Cliente:
   $('m-open-terms').addEventListener('click', openTerms);
   $('m-modal-x').addEventListener('click', closeModal);
   $('m-btn-ok').addEventListener('click', closeModal);
-  $('m-btn-accept').addEventListener('click', function () { state.modalOpen = false; render(); });
+  $('m-btn-accept').addEventListener('click', save);
   $('m-btn-reject').addEventListener('click', onReject);
   el.mChk.addEventListener('change', onToggle);
   el.mDoc.addEventListener('scroll', checkBottom);
