@@ -1366,7 +1366,7 @@ class Component extends DCLogic {
     calificacion:  ['tipo','datos','siniestro','cuenta','eps','adjuntos','tyc','otp'],
     subsidio:      ['tipo','datos','siniestro','cuenta','eps','adjuntos','tyc','otp'],
     excedentes:    ['tipo','datos','excedentes','adjuntos','tyc','otp'],
-    gpm:           ['tipo','descarga','adjuntos','adjuntosBenef','tyc','otp'],
+    gpm:           ['tipo','descarga','beneficiarios','adjuntos','adjuntosBenef','tyc','otp'],
     familiar:      ['tipo','descarga','adjuntos','adjuntosBenef','tyc','otp'],
   };
   LABELS = { tipo:'Tipo', cuenta:'Pago', datos:'Datos', siniestro:'Siniestro', nobono:'No bono', modalidad:'Modalidad', eps:'EPS', excedentes:'Excedentes', descarga:'Formato', asesorias:'Asesorías', beneficiarios:'Beneficiarios', adjuntos:'Adjuntos', adjuntosBenef:'Adj. benef.', tyc:'Autorización', otp:'Envío' };
@@ -1396,8 +1396,8 @@ class Component extends DCLogic {
     if (this.state.type === 'subsidio' && this.state.subsidioModo === 'prorroga') {
       return ['tipo', 'adjuntos', 'tyc', 'otp'];
     }
-    // GPM/familiar: siempre conservan adjuntosBenef (sin captura de datos de beneficiarios)
-    const isFisico = this.state.type === 'gpm' || this.state.type === 'familiar';
+    // Familiar: siempre conserva adjuntosBenef (sin captura de datos de beneficiarios)
+    const isFisico = this.state.type === 'familiar';
     if (!isFisico) {
       if (!f.includes('beneficiarios')) f = f.filter(k => k !== 'adjuntosBenef');
       // adjuntosBenef solo si realmente agregó beneficiarios
@@ -1542,6 +1542,17 @@ class Component extends DCLogic {
       isLoading: ds === 'loading', isError: ds === 'error', isNotError: ds !== 'error',
       file: d.file || 'documento.pdf', pct: 40, titleColor: d.blue ? '#0099de' : '#404040',
     }));
+  }
+
+  // El selector guarda la etiqueta ("01 Cónyuge"); benefDocsFor espera la clave interna.
+  parentescoKey(p) {
+    const v = (p || '').toLowerCase();
+    if (v.includes('cónyuge') || v.includes('conyuge')) return 'conyuge';
+    if (v.includes('compañero') || v.includes('companero')) return 'companero';
+    if (v.includes('padre')) return 'padres';
+    if (v.includes('hermano')) return 'hermano';
+    if (v.includes('hijo')) return 'hijos';
+    return 'hijos';
   }
 
   // Documentos de beneficiario según parentesco (p) y tipo de solicitud (t).
@@ -1818,7 +1829,7 @@ class Component extends DCLogic {
     };
     const numericLabelsBen = ['Número de documento', 'Teléfono fijo', 'Número celular', 'Edad'];
     // [label, ph, isSelect, isEmail, fullWidth, required]
-    const bbf = [
+    const bbfFull = [
       ['Nombre completo del beneficiario', 'Nombres y apellidos', false, false, true, true],
       ['Tipo de documento', 'Selecciona', true, false, false, true],
       ['Número de documento', 'Número', false, false, false, true],
@@ -1835,6 +1846,12 @@ class Component extends DCLogic {
       ['Correo electrónico', 'nombre@correo.com', false, true, false, true],
       ['Condición de invalidez', 'Selecciona', true, false, false, true],
     ];
+    // GPM: el módulo de beneficiarios solo captura nombre y parentesco
+    const bbfGpm = [
+      ['Nombre completo del beneficiario', 'Nombres y apellidos', false, false, true, true],
+      ['Parentesco', 'Selecciona', true, false, true, true],
+    ];
+    const bbf = s.type === 'gpm' ? bbfGpm : bbfFull;
     const onBenEmailInput = (e) => {
       const v = e.target.value;
       const invalid = v.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -1947,7 +1964,9 @@ class Component extends DCLogic {
       return field;
     });
     const benFechaOk = /^\d{2}\/\d{2}\/\d{4}$/.test(s.benFechaNac) && !s.benFechaNacErr;
-    const benefFormValid = !!s.benNombre && !!s.benTipoDoc && !!s.benNumDoc && benFechaOk && !!s.benEdad && !!s.benLugarNac && !!s.benParentesco && !!s.benGenero && !!s.benInvalidez && !!s.benDir && !!s.benDepRes && !!s.benLugarRes && !!s.benCelular && !!s.benEmail && !s.benEmailErr;
+    const benefFormValid = s.type === 'gpm'
+      ? (!!s.benNombre && !!s.benParentesco)
+      : !!s.benNombre && !!s.benTipoDoc && !!s.benNumDoc && benFechaOk && !!s.benEdad && !!s.benLugarNac && !!s.benParentesco && !!s.benGenero && !!s.benInvalidez && !!s.benDir && !!s.benDepRes && !!s.benLugarRes && !!s.benCelular && !!s.benEmail && !s.benEmailErr;
 
     // modalidades
     const mods = [
@@ -2102,7 +2121,7 @@ class Component extends DCLogic {
     const hijoCondDefs = [['hijoInvalido', 'Hijo en condición de invalidez'], ['hijoEstudios', 'Hijo entre 18 y 25 años (estudiante)'], ['hijoCustodia', 'Custodia a cargo de un tercero'], ['hijoUnico', 'Hijos como únicos beneficiarios']];
     const hijoConds = hijoCondDefs.map(([k, label]) => ({ label, checked: s[k], bd: s[k] ? '#00c73d' : '#c5c5c5', bg: s[k] ? '#00c73d' : '#fff', onClick: () => this.set(k, !s[k]) }));
     const currentBenef = s.benefList[s.benefDocIdx];
-    const benefDocsP = currentBenef ? currentBenef.parentesco : s.benefParentesco;
+    const benefDocsP = this.parentescoKey(currentBenef ? currentBenef.parentesco : s.benefParentesco);
     const benefDocsList = this.benefDocsFor(benefDocsP, s.type, { hijoInvalido: s.hijoInvalido, hijoUnico: s.hijoUnico });
     const benefDocsDynamic = benefDocsList.map(t => ({
       title: t,
@@ -2429,14 +2448,14 @@ class Component extends DCLogic {
         const tycHasExcedentes = f.includes('excedentes');
         // "Destino" solo aplica si el flujo tiene paso de cuenta (p.ej. prórroga de subsidio no lo tiene)
         const tycShowDest = f.includes('cuenta');
-        const tycIsFisico = ['gpm', 'familiar'].includes(s.type);
+        const tycIsFisico = s.type === 'familiar';
         const tycShowBenef = f.includes('beneficiarios') || tycIsFisico;
         let tycExcedDest = '—';
         if (s.excedGiroTipo === 'banco') tycExcedDest = s.excedEntidad ? `${s.excedBanco ? s.excedBanco + ' | ' : ''}No. ${s.excedEntidad} | ${s.excedTipo === 'corriente' ? 'C. Corriente' : 'C. Ahorros'}` : 'Entidad financiera';
         else if (s.excedGiroTipo === 'skandia') tycExcedDest = s.excedTransfCual || 'Producto Skandia';
         const tycBenefRows = tycIsFisico
           ? [{ label: 'Beneficiario', value: parentescoLabel || '—' }]
-          : s.benefList.map((b, i) => ({ label: `Beneficiario pensión ${i + 1}`, value: `${b.nombre} | C.C. ${b.numDoc}` }));
+          : s.benefList.map((b, i) => ({ label: `Beneficiario pensión ${i + 1}`, value: b.numDoc ? `${b.nombre} | C.C. ${b.numDoc}` : `${b.nombre} | ${b.parentesco || '—'}` }));
         const tycNoBenef = tycShowBenef && !tycIsFisico && tycBenefRows.length === 0;
         const mkA = (k) => { const v = s[k]; return this.sw(v, () => this.set(k, !v)); };
         // El toggle del resumen enciende/apaga en bloque las 4 aceptaciones del modal
@@ -2485,8 +2504,8 @@ class Component extends DCLogic {
       // adjuntos
       docsAfiliado: docsA, docCountText: loaded + '/' + docsA.length + ' documentos cargados',
       showBenefDocs, docsBeneficiario: benefDocsDynamic,
-      benefDocsFisico: s.type === 'gpm' || s.type === 'familiar',
-      benefDocsNav: !(s.type === 'gpm' || s.type === 'familiar'),
+      benefDocsFisico: s.type === 'familiar',
+      benefDocsNav: s.type !== 'familiar',
       parentescoChips,
       benefDocName: s.benefList[s.benefDocIdx]?.nombre || '',
       benefDocTotal: s.benefList.length,
