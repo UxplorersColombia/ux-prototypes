@@ -39,9 +39,12 @@ function getProjects() {
         return null;
       }
       const versions = fs.readdirSync(dir, { withFileTypes: true })
-        .filter(d => d.isDirectory() && /^v\d+$/.test(d.name))
+        .filter(d => d.isDirectory() && /^[vp]\d+$/.test(d.name))
         .map(d => d.name)
-        .sort((a, b) => parseInt(a.slice(1)) - parseInt(b.slice(1)));
+        // vN = versiones, pN = prototipos. Se listan las v primero, cada grupo por numero.
+        .sort((a, b) => a[0] === b[0]
+          ? parseInt(a.slice(1)) - parseInt(b.slice(1))
+          : (a[0] === 'v' ? -1 : 1));
       return { slug: e.name, meta, versions };
     })
     .filter(Boolean)
@@ -104,7 +107,7 @@ function buildCards(projects) {
     const projectName = esc(p.meta.name || p.slug);
     const links = p.versions.length
       ? p.versions.map(v =>
-          `<a href="../projects/${esc(p.slug)}/${v}/" class="ver-link" target="_blank" rel="noopener" aria-label="Abrir ${projectName} versión ${v}">${v}${ARROW_SVG}</a>`
+          `<a href="../projects/${esc(p.slug)}/${v}/" class="ver-link" target="_blank" rel="noopener" aria-label="Abrir ${projectName} ${v[0] === 'p' ? 'prototipo' : 'versión'} ${v.slice(1)}">${v}${ARROW_SVG}</a>`
         ).join('')
       : '<span class="no-ver">Sin versiones aún</span>';
     // Fix #9: sin decimales flotantes en animation-delay
