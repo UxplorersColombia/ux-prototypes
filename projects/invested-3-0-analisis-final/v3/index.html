@@ -1,0 +1,2306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invested 3.0 — Informe final de investigación · Skandia UX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & tokens (Skandia DS) ───────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* Primitivos Skandia */
+      --green-500: #00c73d;
+      --green-600: #03a835;
+      --green-700: #009a2f;
+      --green-50:  #f6fcf2;
+      --green-100: #caf9cb;
+      --lime-500:  #8fe000;
+      --yellow-400: #ffae08;
+      --yellow-50:  #fff3e0;
+      --red-500:    #e03430;
+      --red-50:     #fff5f4;
+      --blue-500:   #0099de;
+      --blue-50:    #ebf4ff;
+
+      --surface-0:   #ffffff;
+      --surface-50:  #fafafa;
+      --surface-100: #f7f7f7;
+      --surface-200: #e9e9e9;
+      --surface-300: #dddddd;
+      --surface-400: #c5c5c5;
+      --surface-600: #878787;
+      --surface-700: #565656;
+      --surface-800: #404040;
+      --surface-900: #232323;
+
+      --text-primary:   #404040;
+      --text-secondary: #666666;
+      --text-muted:     #878787;
+      --border:         #dddddd;
+
+      --font-body:  'Open Sans', system-ui, sans-serif;
+      --font-head:  'Montserrat', system-ui, sans-serif;
+
+      --radius-sm:  4px;
+      --radius-md:  8px;
+      --radius-lg:  12px;
+      --radius-xl:  16px;
+      --radius-pill: 100px;
+
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+      --gradient-brand: linear-gradient(135deg, #00c73d, #8fe000);
+
+      /* Paleta de gráficas del DS Skandia (charts-c01…c07) */
+      --chart-1: #a1dd70;
+      --chart-2: #a4d7e1;
+      --chart-3: #60a9a6;
+      --chart-4: #ff9460;
+      --chart-5: #8ba2c1;
+      --chart-6: #f67e7d;
+      --chart-7: #dddfd0;
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--surface-50);
+      line-height: 1.6;
+      padding: 0 20px 80px;
+    }
+
+    .page { max-width: 880px; margin: 0 auto; }
+
+    mark {
+      background: var(--green-100);
+      color: inherit;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    /* ─── Barra de progreso de lectura ──────────────────────── */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--gradient-brand);
+      z-index: 60;
+      transition: width 0.1s linear;
+    }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .doc-header {
+      background: var(--surface-900);
+      border-radius: var(--radius-xl);
+      padding: 40px 48px;
+      margin: 40px 0 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-header::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: var(--gradient-brand);
+    }
+
+    .doc-header::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(0,199,61,0.07);
+      pointer-events: none;
+    }
+
+    .header-eyebrow {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-500);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .version-tag {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: #053d15;
+      background: var(--green-500);
+      border-radius: var(--radius-sm);
+      padding: 2px 7px;
+    }
+
+    .header-title {
+      font-family: var(--font-head);
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.25;
+      max-width: 640px;
+      position: relative;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.72);
+      margin-top: 10px;
+      max-width: 620px;
+      line-height: 1.55;
+      position: relative;
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      position: relative;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: var(--radius-pill);
+      padding: 5px 12px;
+    }
+
+    .meta-chip .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green-500);
+      flex-shrink: 0;
+    }
+
+    .meta-chip.new .dot { background: var(--blue-500); }
+    .meta-chip.warn .dot { background: var(--yellow-400); }
+
+    /* ─── Toolbar sticky: búsqueda + controles ──────────────── */
+    .toolbar {
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-wrap {
+      flex: 1 1 240px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      width: 14px; height: 14px;
+      stroke: var(--text-muted);
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--surface-100);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-pill);
+      padding: 8px 36px 8px 34px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    #searchInput:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(0,199,61,0.15);
+      background: var(--surface-0);
+    }
+
+    #searchClear {
+      position: absolute;
+      right: 8px;
+      border: none;
+      background: var(--surface-300);
+      color: var(--surface-700);
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+    }
+
+    .search-count {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .toolbar-btn {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-pill);
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .toolbar-btn:hover { background: var(--green-100); }
+    .toolbar-btn:active { transform: scale(0.97); }
+
+    .toolbar-btn--filter { color: #0b6693; background: var(--blue-50); border-color: #cfe7f8; }
+    .toolbar-btn--filter:hover { background: #dbeafd; }
+    .toolbar-btn--filter[aria-pressed="true"] { background: var(--blue-500); color: #fff; border-color: var(--blue-500); }
+
+    /* ─── TOC ───────────────────────────────────────────────── */
+    .toc {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+
+    .toc-title {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 32px;
+    }
+
+    .toc-list li a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.15s;
+      border-radius: var(--radius-sm);
+    }
+
+    .toc-list li a:hover, .toc-list li a.active { color: var(--green-600); font-weight: 600; }
+
+    .toc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green-500);
+      min-width: 18px;
+    }
+
+    /* ─── Qué cambió frente a la v2 ──────────────────────────── */
+    .whatsnew {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue-500);
+      border-radius: var(--radius-lg);
+      padding: 22px 26px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .whatsnew-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .whatsnew h3 {
+      font-family: var(--font-head);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .whatsnew-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
+
+    .whatsnew-list { list-style: none; display: grid; gap: 8px; }
+
+    .whatsnew-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 9px 12px;
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+    }
+
+    .whatsnew-list li strong { color: var(--text-primary); }
+    .whatsnew-list .wn-tag { flex-shrink: 0; }
+    .whatsnew-list a { color: var(--green-700); font-weight: 600; text-decoration: none; }
+    .whatsnew-list a:hover { text-decoration: underline; }
+
+    /* ─── Fuentes (1 2 3 4) ─────────────────────────────────── */
+    .src-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .src-cite {
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 0.92em;
+      white-space: nowrap;
+    }
+    .src-tag--1 { background: var(--chart-1); color: #1d5c0a; }
+    .src-tag--2 { background: var(--chart-2); color: #0b4a5c; }
+    .src-tag--3 { background: var(--chart-6); color: #7a1613; }
+    .src-tag--4 { background: var(--chart-5); color: #1c2e4a; }
+
+    .src-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+    .src-row:last-child { margin-bottom: 0; }
+    .src-row .src-label { font-family: var(--font-head); font-size: 11px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; min-width: 118px; padding-top: 2px; }
+    .src-row .src-text { font-size: 13px; color: var(--text-secondary); }
+
+    .src-legend {
+      display: flex; flex-wrap: wrap; gap: 6px 18px;
+      font-size: 11.5px; color: var(--text-muted);
+      margin-top: 10px;
+    }
+    .src-legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+    /* ─── Section ───────────────────────────────────────────── */
+    .section {
+      background: var(--surface-0);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      scroll-margin-top: 80px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--surface-100);
+    }
+
+    .section-number {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-500);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      min-width: 32px;
+      text-align: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .section p + p { margin-top: 10px; }
+    .section h3 {
+      font-family: var(--font-head);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .section h4 {
+      font-family: var(--font-head);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+    .section > ul, .section > ol { padding-left: 20px; margin-top: 8px; }
+    .section > ul li, .section > ol li { margin-bottom: 6px; font-size: 13.5px; color: var(--text-secondary); }
+    .section > ul li::marker { color: var(--green-500); }
+    .section > ol li::marker { color: var(--green-500); font-weight: 700; }
+
+    /* ─── Callout ───────────────────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      background: var(--blue-50);
+      border: 1px solid #cfe7f8;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    .callout .icon { flex-shrink: 0; font-size: 15px; }
+
+    .callout-warn { background: var(--yellow-50); border-color: #ffe2b0; }
+    .callout-success { background: var(--green-50); border-color: var(--green-100); }
+    .callout-danger { background: var(--red-50); border-color: #ffd2d0; }
+
+    /* ─── Cards ─────────────────────────────────────────────── */
+    .norm-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .norm-card {
+      border: 1px solid var(--surface-200);
+      border-top: 3px solid var(--green-500);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: var(--surface-0);
+    }
+
+    .norm-card h4 {
+      font-family: var(--font-head);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+
+    .norm-card p { font-size: 12.5px; color: var(--text-secondary); }
+    .norm-card p + p { margin-top: 6px; }
+    .norm-card .who { font-size: 11.5px; color: var(--text-muted); }
+    .norm-card--danger { border-top-color: var(--red-500); }
+    .norm-card--warn { border-top-color: var(--yellow-400); }
+    .norm-card--dark { border-top-color: var(--surface-900); }
+
+    /* ─── Acordeones ────────────────────────────────────────── */
+    details.acc {
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      background: var(--surface-0);
+      overflow: hidden;
+      transition: box-shadow 0.15s;
+    }
+
+    details.acc[open] { box-shadow: var(--shadow-sm); border-color: var(--green-100); }
+
+    details.acc summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    details.acc summary::-webkit-details-marker { display: none; }
+    details.acc summary:hover { background: var(--green-50); }
+
+    .acc-num {
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--surface-0);
+      background: var(--green-500);
+      border-radius: var(--radius-sm);
+      padding: 3px 7px;
+      flex-shrink: 0;
+    }
+
+    .acc-num--theme { background: var(--surface-800); }
+    .acc-num--verdict-ok { background: var(--green-600); }
+    .acc-num--verdict-partial { background: var(--yellow-400); color: #5a3d00; }
+    .acc-num--verdict-no { background: var(--red-500); }
+
+    .acc-title {
+      font-family: var(--font-head);
+      font-size: 13.5px;
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .acc-flag {
+      font-family: var(--font-head);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: var(--radius-pill);
+      padding: 2px 9px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .acc-flag--new { background: var(--blue-50); color: #0b6693; border: 1px solid #cfe7f8; }
+    .acc-flag--changed { background: var(--yellow-50); color: #8a5800; border: 1px solid #ffe2b0; }
+
+    .acc-chevron {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      stroke: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    details.acc[open] .acc-chevron { transform: rotate(180deg); }
+
+    .acc-body {
+      padding: 4px 18px 18px 18px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      border-top: 1px dashed var(--surface-200);
+    }
+
+    .acc-body > *:first-child { margin-top: 12px; }
+    .acc-body p + p, .acc-body p + ul, .acc-body ul + p, .acc-body ul + h5, .acc-body p + h5, .acc-body div.chart + h5, .acc-body h5 + p, .acc-body div.table-wrap + h5, .acc-body div.callout + h5 { margin-top: 10px; }
+
+    .acc-body ul { padding-left: 20px; }
+    .acc-body li { margin-bottom: 6px; }
+    .acc-body li::marker { color: var(--green-500); }
+
+    .acc-body h5 {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .acc-body h5::before {
+      content: '';
+      display: block;
+      width: 3px; height: 13px;
+      background: var(--green-500);
+      border-radius: 2px;
+    }
+
+    .acc-body h5.h5-new::before { background: var(--blue-500); }
+    .acc-body h5.h5-warn::before { background: var(--red-500); }
+
+    .acc-body strong { color: var(--text-primary); }
+
+    /* ─── Citas ─────────────────────────────────────────────── */
+    blockquote {
+      border-left: 3px solid var(--green-500);
+      background: var(--green-50);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 10px 16px;
+      margin: 10px 0;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    blockquote.q-neg { border-left-color: var(--red-500); background: var(--red-50); }
+    blockquote.q-neutral { border-left-color: var(--surface-400); background: var(--surface-50); }
+
+    blockquote .src {
+      display: block;
+      font-style: normal;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ─── Tablas ────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    thead tr { background: var(--surface-100); border-bottom: 2px solid var(--border); }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-family: var(--font-head);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    tbody tr { border-bottom: 1px solid var(--surface-100); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-50); }
+
+    td { padding: 10px 14px; vertical-align: top; }
+    td strong { font-weight: 700; }
+    td small { color: var(--text-muted); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: var(--font-head);
+      border-radius: var(--radius-pill);
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+    .badge-ok { background: var(--green-50); color: var(--green-700); border: 1px solid var(--green-100); }
+    .badge-partial { background: var(--yellow-50); color: #8a5800; border: 1px solid #ffe2b0; }
+    .badge-no { background: var(--red-50); color: #b3241f; border: 1px solid #ffd2d0; }
+    .badge-high { background: var(--red-50); color: #b3241f; border: 1px solid #ffd2d0; }
+    .badge-medium { background: var(--yellow-50); color: #8a5800; border: 1px solid #ffe2b0; }
+    .badge-low { background: var(--surface-100); color: var(--text-secondary); border: 1px solid var(--surface-200); }
+    .badge-explore { background: var(--blue-50); color: #0b6693; border: 1px solid #cfe7f8; }
+    .badge-new { background: var(--blue-500); color: #fff; border: 1px solid var(--blue-500); }
+    .badge-changed { background: var(--surface-800); color: #fff; border: 1px solid var(--surface-800); }
+
+    .link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green-700);
+      background: var(--green-50);
+      border: 1px solid var(--green-100);
+      border-radius: var(--radius-pill);
+      padding: 2px 10px;
+      text-decoration: none;
+      white-space: nowrap;
+      margin: 1px 2px 1px 0;
+      transition: background 0.15s;
+    }
+
+    .link-pill:hover { background: var(--green-100); }
+
+    /* ─── Stats grid ────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 14px 0 6px;
+    }
+
+    .stat-card {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .stat-value {
+      font-family: var(--font-head);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green-600);
+      line-height: 1.2;
+    }
+
+    .stat-card--accent { border-color: #cfe7f8; background: var(--blue-50); }
+    .stat-card--accent .stat-value { color: #0b6693; }
+
+    .stat-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* ─── Recomendaciones ───────────────────────────────────── */
+    .imp-list { list-style: none; counter-reset: imp; }
+
+    .imp-list li {
+      counter-increment: imp;
+      display: flex;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      background: var(--surface-0);
+    }
+
+    .imp-list li::before {
+      content: counter(imp, decimal-leading-zero);
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green-500);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .imp-list li strong { color: var(--text-primary); }
+    .imp-list li .badge { flex-shrink: 0; align-self: flex-start; }
+    .imp-list li .imp-text { flex: 1; }
+    .imp-list li.is-new { border-color: #cfe7f8; background: var(--blue-50); }
+    .imp-list li.is-new::before { color: var(--blue-500); }
+    .imp-list li.is-corrected { border-color: #ffe2b0; background: var(--yellow-50); }
+    .imp-list li.is-corrected::before { color: #b37400; }
+
+    .imp-list--start { counter-reset: imp 13; }
+
+    /* ─── Nivel 0 (bloqueante) ──────────────────────────────── */
+    .level0-wrap { display: grid; gap: 10px; margin-top: 16px; }
+    .level0-card {
+      display: flex; gap: 12px;
+      background: var(--surface-900);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .level0-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background: var(--red-500); }
+    .level0-card .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .level0-card .level0-id {
+      font-family: var(--font-head); font-size: 10px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--lime-500);
+      display: block; margin-bottom: 4px;
+    }
+    .level0-card p { font-size: 13px; color: rgba(255,255,255,0.82); line-height: 1.55; }
+    .level0-card strong { color: #ffffff; }
+
+    /* ─── Checklist ─────────────────────────────────────────── */
+    .check-list { list-style: none; }
+    .check-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--surface-100);
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+    .check-list li:last-child { border-bottom: none; }
+    .check-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+    /* ─── Gráficas ──────────────────────────────────────────── */
+    .chart {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-200);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin: 14px 0;
+    }
+
+    .chart--highlight { background: var(--red-50); border-color: #ffd2d0; }
+
+    .chart-title {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .chart-note {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 150px 1fr 62px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .bar-row:last-child { margin-bottom: 0; }
+
+    .bar-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: right;
+      line-height: 1.3;
+    }
+
+    .bar-track {
+      background: var(--surface-200);
+      border-radius: var(--radius-pill);
+      height: 14px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: var(--radius-pill);
+      background: var(--chart-1);
+      transition: width 0.9s cubic-bezier(0.25, 0.8, 0.3, 1);
+    }
+
+    details[open] .bar-fill, .acc-static .bar-fill { width: var(--w); }
+
+    .bar-value {
+      font-family: var(--font-head);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      margin-bottom: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .legend-swatch {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 560px) {
+      .bar-row { grid-template-columns: 96px 1fr 56px; }
+      .bar-label { font-size: 11px; }
+    }
+
+    /* ─── Descarga Markdown ─────────────────────────────────── */
+    .download-card {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      background: var(--surface-900);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--gradient-brand);
+    }
+
+    .download-icon { font-size: 22px; flex-shrink: 0; }
+
+    .download-text { flex: 1 1 320px; }
+
+    .download-text h3 {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .download-text p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.5;
+    }
+
+    .download-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn-download {
+      font-family: var(--font-head);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      transition: transform 0.1s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-download:hover { transform: translateY(-1px); text-decoration: none; }
+
+    .btn-download--primary { background: var(--green-500); color: #053d15; }
+    .btn-download--primary:hover { background: var(--lime-500); }
+
+    .btn-download--ghost {
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .btn-download--ghost:hover { border-color: var(--green-500); color: var(--green-500); }
+
+    /* ─── Footer & back-to-top ──────────────────────────────── */
+    .doc-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 24px 0 0;
+    }
+
+    #backTop {
+      position: fixed;
+      right: 24px; bottom: 24px;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface-800);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.15s;
+      z-index: 55;
+    }
+
+    #backTop.visible { opacity: 1; pointer-events: auto; }
+    #backTop:hover { transform: translateY(-2px); background: var(--green-600); }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      .doc-header { padding: 28px 24px; }
+      .section { padding: 24px 20px; }
+      .whatsnew { padding: 18px 20px; }
+      .toc-list { grid-template-columns: 1fr; }
+      .norm-cards { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .src-row .src-label { min-width: 90px; }
+    }
+
+    @media print {
+      .toolbar, #backTop, .progress-bar { display: none; }
+      details.acc { border: none; }
+      details.acc summary { padding-left: 0; }
+      body { background: #fff; padding: 0; }
+      .section { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="page">
+
+    <!-- ═══ Header ═══ -->
+    <header class="doc-header">
+      <div class="header-eyebrow">UX Research · #UXplorers · Invested 3.0 <span class="version-tag">v3.0</span></div>
+      <h1 class="header-title">Invested 3.0 — Informe final de investigación</h1>
+      <p class="header-subtitle">Informe consolidado de las cuatro fuentes de evidencia: prueba remota, ronda principal de clientes, mini-sprint con detractores y ronda de Financial Planners. Reemplaza a todas las versiones anteriores como referencia para el caso de negocio.</p>
+      <div class="header-meta">
+        <span class="meta-chip"><span class="dot"></span>Cierre: agosto 2026</span>
+        <span class="meta-chip new"><span class="dot"></span>4 fuentes de evidencia</span>
+        <span class="meta-chip"><span class="dot"></span>11 entrevistas 1:1</span>
+        <span class="meta-chip"><span class="dot"></span>Useberry: 53 respuestas · 30 completas</span>
+        <span class="meta-chip new"><span class="dot"></span>Voz del canal comercial · cerrada</span>
+      </div>
+    </header>
+
+    <!-- ═══ Toolbar ═══ -->
+    <div class="toolbar" role="search">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar en el informe… (ej: rebalanceo, referente, salida, sobre-diversificación)" aria-label="Buscar en el informe">
+        <button id="searchClear" aria-label="Limpiar búsqueda">✕</button>
+      </div>
+      <span class="search-count" id="searchCount"></span>
+      <button class="toolbar-btn toolbar-btn--filter" id="onlyNew" aria-pressed="false">Solo lo nuevo de esta ronda</button>
+      <button class="toolbar-btn" id="expandAll">Expandir todo</button>
+      <button class="toolbar-btn" id="collapseAll">Contraer todo</button>
+    </div>
+
+    <!-- ═══ TOC ═══ -->
+    <nav class="toc" aria-label="Tabla de contenido">
+      <div class="toc-title">Contenido</div>
+      <ul class="toc-list">
+        <li><a href="#s0"><span class="toc-num">00</span>Cómo leer este informe</a></li>
+        <li><a href="#s1"><span class="toc-num">01</span>Resumen ejecutivo</a></li>
+        <li><a href="#s2"><span class="toc-num">02</span>Metodología</a></li>
+        <li><a href="#s3"><span class="toc-num">03</span>Antecedentes</a></li>
+        <li><a href="#s4"><span class="toc-num">04</span>Análisis por hipótesis</a></li>
+        <li><a href="#s5"><span class="toc-num">05</span>Hallazgos transversales</a></li>
+        <li><a href="#s6"><span class="toc-num">06</span>Convergencias y divergencias</a></li>
+        <li><a href="#s7"><span class="toc-num">07</span>Segmentación por perfil</a></li>
+        <li><a href="#s8"><span class="toc-num">08</span>Veredictos de cierre</a></li>
+        <li><a href="#s9"><span class="toc-num">09</span>Recomendaciones priorizadas</a></li>
+        <li><a href="#s10"><span class="toc-num">10</span>Verificación de criterios de éxito</a></li>
+        <li><a href="#s11"><span class="toc-num">11</span>Anexos</a></li>
+      </ul>
+    </nav>
+
+    <!-- ═══ Qué cambió frente a la v2 ═══ -->
+    <aside class="whatsnew">
+      <div class="whatsnew-head">
+        <h3>Qué cambió desde la versión que vieron los stakeholders en julio</h3>
+        <span class="badge badge-new">v3.0</span>
+      </div>
+      <p class="whatsnew-sub">La v2 (agosto) cerró con dos salvedades: faltaba la voz del cliente disgustado y la del canal comercial. Las dos están cerradas. El botón <strong>"Solo lo nuevo de esta ronda"</strong> filtra el informe a los bloques que aporta específicamente la ronda de Financial Planners — pero el resto del informe está reescrito para dar peso parejo a las cuatro fuentes, no solo a esta ronda.</p>
+      <ul class="whatsnew-list">
+        <li><span class="badge badge-new wn-tag">Nuevo</span><span><strong>Se cerró la última salvedad de muestra:</strong> 3 entrevistas con Financial Planners (11–18 de agosto). → <a href="#s2">Metodología</a></span></li>
+        <li><span class="badge badge-changed wn-tag">Confirma</span><span><strong>El canal hace la misma comparación que el cliente, antes de la venta.</strong> Los tres asesores califican su comodidad recomendando Invested en 2, "2-3" y 3 sobre 5. → <a href="#s1">Resumen</a> · <a href="#s5">5.7</a></span></li>
+        <li><span class="badge badge-no wn-tag">⛔ Bloqueante</span><span><strong>El desempeño comparado deja de ser un supuesto y pasa a ser una condición previa.</strong> Nivel 0 de recomendaciones — no lo ejecuta el equipo de experiencia. → <a href="#s9">Recomendaciones</a></span></li>
+        <li><span class="badge badge-changed wn-tag">Corrige</span><span><strong>La proyección basada en históricos se contraindica.</strong> Un dato mal construido es peor que su ausencia. → <a href="#s4">H1</a></span></li>
+        <li><span class="badge badge-changed wn-tag">Corrige</span><span><strong>La salvaguarda del desbloqueo progresivo no opera:</strong> la encuesta de perfilación se manipula por rutina. → <a href="#s4">H3</a></span></li>
+        <li><span class="badge badge-medium wn-tag">Info</span><span><strong>Los veredictos de las 5 hipótesis no cambiaron de signo.</strong> Todo lo de julio y agosto se sostiene y sale reforzado. → <a href="#s8">Veredictos</a></span></li>
+      </ul>
+    </aside>
+
+    <!-- ═══ Descarga Markdown ═══ -->
+    <aside class="download-card">
+      <span class="download-icon">🤖</span>
+      <div class="download-text">
+        <h3>Informe en formato Markdown</h3>
+        <p>Versión de texto plano del informe final, pensada para <strong>consulta rápida</strong> y para <strong>alimentar herramientas de inteligencia artificial</strong> (asistentes, agentes, NotebookLM…) como contexto del proyecto Invested 3.0.</p>
+      </div>
+      <div class="download-actions">
+        <a class="btn-download btn-download--primary" href="assets/analisis-invested-3-unificado-v3.md" download>⬇ Descargar .md</a>
+        <a class="btn-download btn-download--ghost" href="assets/analisis-invested-3-unificado-v3.md" target="_blank" rel="noopener">Ver en línea ↗</a>
+      </div>
+    </aside>
+    <!-- ═══ 00 Cómo leer este informe ═══ -->
+    <section class="section" id="s0">
+      <div class="section-header">
+        <div class="section-number">00</div>
+        <div>
+          <h2 class="section-title">Cómo leer este informe</h2>
+          <p class="section-desc">Las cuatro fuentes de evidencia y el glosario de términos usados a lo largo del análisis</p>
+        </div>
+      </div>
+
+      <h3>Las cuatro fuentes de evidencia</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fuente</th><th>Cuándo</th><th>Alcance</th><th>Qué responde bien</th><th>Qué <em>no</em> puede responder</th></tr></thead>
+          <tbody>
+            <tr><td><span class="src-tag src-tag--1">1</span> <strong>Prueba remota</strong> (Useberry)</td><td>Julio 2026</td><td>53 respuestas · 30 completas</td><td>¿Funciona el flujo? ¿Dónde se abandona? ¿Qué proporción entiende algo?</td><td>El porqué; se probó un prototipo, no el servicio real</td></tr>
+            <tr><td><span class="src-tag src-tag--2">2</span> <strong>Ronda 1 · clientes</strong></td><td>Julio 2026</td><td>5 entrevistas (4 activos + 1 inactivo amistoso)</td><td>¿Cómo vive el servicio quien lo usa hoy? ¿Qué espera, y con qué palabras?</td><td>Cuánta gente vive lo mismo; y la voz de quien se fue molesto</td></tr>
+            <tr><td><span class="src-tag src-tag--3">3</span> <strong>Mini-sprint · detractores</strong></td><td>5 de agosto 2026</td><td>3 entrevistas (Bloque 1B)</td><td>¿Cómo y por qué se decide salir? ¿Contra qué se compara?</td><td>Cuánta gente se va así; el detractor de baja alfabetización financiera</td></tr>
+            <tr><td><span class="src-tag src-tag--4">4</span> <strong>Ronda 3 · asesores (FP's)</strong></td><td>11–18 de agosto 2026</td><td>3 entrevistas</td><td>¿Por qué se recomienda o no el producto? ¿Qué pasa antes de la venta?</td><td><strong>Lo que siente el cliente</strong>: un asesor reportando a sus clientes es testimonio indirecto</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:10px; font-size:12.5px; color:var(--text-muted);">Cada evidencia va atribuida a su fuente con estos símbolos y, en las entrevistas, con nombre propio. Los porcentajes provienen <strong>siempre</strong> de la prueba remota; las entrevistas nunca se reportan en porcentaje.</p>
+
+      <h3>Glosario</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Término</th><th>Qué significa</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Useberry</strong></td><td>Plataforma de pruebas remotas: enviamos el prototipo a la comunidad de testers y cada persona lo navega sola, sin moderador, respondiendo tareas y preguntas.</td></tr>
+            <tr><td><strong>Dovetail</strong></td><td>Repositorio donde guardamos y analizamos las entrevistas y hallazgos de investigación.</td></tr>
+            <tr><td><strong>Prototipo</strong></td><td>Versión navegable (no real) del nuevo Invested, usada en las tres rondas de entrevistas y en la prueba remota.</td></tr>
+            <tr><td><strong>SEQ</strong> (<em>Single Ease Question</em>)</td><td>"Pregunta única de facilidad": al terminar cada tarea, la persona califica qué tan fácil le resultó.</td></tr>
+            <tr><td><strong>H1 a H5</strong></td><td>Las 5 hipótesis definidas en el brief, que aquí se confirman, se refutan o quedan parciales.</td></tr>
+            <tr><td><strong>Mezcla</strong></td><td>Nombre que hoy recibe la combinación de portafolios que Invested arma para cada persona. (Como se verá, el nombre es en sí mismo un hallazgo.)</td></tr>
+            <tr><td><strong>Gamificación</strong></td><td>Usar dinámicas de juego —niveles, logros, recompensas— dentro de un servicio para motivar su uso.</td></tr>
+            <tr><td><strong>Rebalanceo</strong></td><td>Ajuste que hacen los expertos a la combinación de portafolios cuando cambia el mercado.</td></tr>
+            <tr><td><strong>Cliente inactivo</strong></td><td>Persona que activó Invested alguna vez y luego lo desactivó.</td></tr>
+            <tr><td><strong>Detractor</strong></td><td>Cliente insatisfecho. Puede haberse ido ya (<em>desertor consumado</em>) o seguir dentro evaluando salir (<em>detractor en riesgo</em>).</td></tr>
+            <tr><td><strong>Referente de comparación</strong></td><td>El producto contra el cual se mide si Invested vale la pena: el Fondo Liquidez de la propia Skandia, un CAT, un fondo individual, un competidor.</td></tr>
+            <tr><td><strong>Financial Planner (FP)</strong> <span class="badge badge-new">Nuevo</span></td><td>Asesor comercial de Skandia. Es quien recomienda —o no— Invested al cliente.</td></tr>
+            <tr><td><strong>Portal Contigo</strong> <span class="badge badge-new">Nuevo</span></td><td>Portal que usan los asesores para gestionar y analizar las carteras de sus clientes. Distinto del portal de clientes.</td></tr>
+            <tr><td><strong>Contrato autogestionado</strong> <span class="badge badge-new">Nuevo</span></td><td>Contrato donde asesor y cliente arman la estrategia manualmente, sin Invested. Es hoy la alternativa que compite con Invested dentro de la propia Skandia.</td></tr>
+            <tr><td><strong>CAT</strong></td><td>Producto de tasa fija de Skandia. Referente frecuente en el momento de la venta.</td></tr>
+            <tr><td><strong>Tester</strong></td><td>Persona de la comunidad de pruebas de Skandia que participa en las pruebas remotas.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-success">
+        <span class="icon">✅</span>
+        <span><strong>Estado: informe final.</strong> Consolida las cuatro fuentes de evidencia y reemplaza a las versiones anteriores. La investigación se levantó en cuatro momentos que responden preguntas distintas y se complementan: ninguno es concluyente por sí solo; las cinco hipótesis del brief se cierran con la lectura conjunta.</span>
+      </div>
+    </section>
+    <!-- ═══ 01 Resumen ejecutivo ═══ -->
+    <section class="section" id="s1">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <div>
+          <h2 class="section-title">Resumen ejecutivo</h2>
+          <p class="section-desc">Pregunta central: ¿de qué manera podemos demostrar que Invested genera valor para el cliente más allá de las rentabilidades?</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value">53</div><div class="stat-label"><span class="src-tag src-tag--1" style="width:16px;height:16px;font-size:9px;">1</span> respuestas en Useberry · 30 completas</div></div>
+        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label"><span class="src-tag src-tag--2" style="width:16px;height:16px;font-size:9px;">2</span> entrevistas ronda 1 · clientes</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label"><span class="src-tag src-tag--3" style="width:16px;height:16px;font-size:9px;">3</span> entrevistas con detractores</div></div>
+        <div class="stat-card stat-card--accent"><div class="stat-value">3</div><div class="stat-label"><span class="src-tag src-tag--4" style="width:16px;height:16px;font-size:9px;">4</span> entrevistas con asesores (FP's)</div></div>
+      </div>
+
+      <div class="callout callout-success" style="margin-top:18px;">
+        <span class="icon">🎯</span>
+        <span><strong>La respuesta, después de todo el campo:</strong> sí se puede demostrar valor más allá de la rentabilidad, y el rediseño acierta en casi todo lo que se propuso. Pero ese valor adicional funciona como <strong>amplificador</strong> de un desempeño aceptable, no como <strong>sustituto</strong> de uno malo. El servicio tiene un piso de rentabilidad comparada por debajo del cual ninguna cantidad de acompañamiento, educación o notificaciones sostiene la relación — ni con el cliente que ya está dentro, ni con el asesor que decide si lo ofrece.</span>
+      </div>
+
+      <h3>Hallazgos principales</h3>
+
+      <details class="acc" open>
+        <summary><span class="acc-num">1</span><span class="acc-title">La activación rediseñada funciona: la fricción ya no está en el flujo, está en la información que falta</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Las cuatro fuentes coinciden.</p>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--1">1</span> Remota</span><span class="src-text">El 91% completó la activación y el 81% la calificó "muy fácil".</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--2">2</span> Ronda 1</span><span class="src-text">La puntuaron 5/5 — <em>"facilísimo, muy intuitivo"</em>.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--3">3</span> Detractores</span><span class="src-text">La calificaron 9, 9 y "muy fácil" pese a su insatisfacción con el servicio.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--4">4</span> Asesores</span><span class="src-text">La validaron al recorrerla: <em>"está muy amigable… permite llevar un paso al otro súper fácil"</em> (Alejandra).</span></div>
+          <p style="margin-top:10px;">Que un mismo flujo reciba nota alta de un usuario satisfecho, de uno que se fue molesto y de un profesional escéptico es la señal más limpia del informe.</p>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary><span class="acc-num">2</span><span class="acc-title">Lo que falta es la información que sostiene la decisión: rentabilidad esperada, proyección y rentabilidad propia</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Es el vacío más repetido de toda la investigación, y cada fuente lo formula en su propio lenguaje.</p>
+          <blockquote>"Esperaba encontrar tasas promedio" · "Me faltó que me indicara la tasa de rendimiento esperada" · "Ahorrando el monto que me sale no gana intereses y esto desmotiva el ahorro"<span class="src">Testers · prueba remota <span class="src-cite" style="color:#1d5c0a;">[1]</span></span></blockquote>
+          <blockquote>"La figurita de yo viejita: a partir de acá, renta mensual de tanto… uno dice, vale la pena."<span class="src">María Angélica Hurtado · ronda 1 <span class="src-cite" style="color:#0b4a5c;">[2]</span></span></blockquote>
+          <p>Humberto lo pide con especificación técnica —período variable "desde el momento de la activación" y desglose por fondo— y advierte que tampoco existe en el portal actual <span class="src-cite" style="color:#7a1613;">[3]</span>. Juan Felipe cierra el círculo desde el canal <span class="src-cite" style="color:#1c2e4a;">[4]</span>.</p>
+          <p><strong>Cuatro confirmaciones independientes</strong> hacen de la rentabilidad propia con período variable el requisito mejor sustentado del informe.</p>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary><span class="acc-num">3</span><span class="acc-title">La comunicación proactiva en caídas es la palanca más sólida — y ya conocemos su techo y sus fugas</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El 94% encontró y entendió la notificación con facilidad <span class="src-cite" style="color:#1d5c0a;">[1]</span>, y la respuesta dominante es esperar, no retirar.</p>
+          <blockquote>"Me tranquilizó: dice qué pasó, si es normal, que ya están analizando y me avisarán."<span class="src">María Angélica Hurtado <span class="src-cite" style="color:#0b4a5c;">[2]</span></span></blockquote>
+          <p>Los detractores reaccionan bien incluso desde el disgusto <span class="src-cite" style="color:#7a1613;">[3]</span>, y los tres asesores hacen hoy, a mano, exactamente lo que la notificación busca producir <span class="src-cite" style="color:#1c2e4a;">[4]</span>.</p>
+          <p>Sus tres límites: <strong>techo</strong> —evita el retiro impulsivo, no la salida razonada por desempeño <span class="src-cite" style="color:#7a1613;">[3]</span>—; <strong>fuga hacia el cliente</strong> —la campanita vive en la aplicación y quien se desenganchó no entra <span class="src-cite" style="color:#7a1613;">[3]</span>—; y <strong>fuga hacia el canal</strong> —el asesor no está en el circuito, y dos de tres no saben si el correo de rebalanceo llega a su cliente <span class="src-cite" style="color:#1c2e4a;">[4]</span>.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">4</span><span class="acc-title">"Mezcla" no se entiende, y la perfilación no se ve</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Al menos cuatro testers rechazan o no entienden el término <span class="src-cite" style="color:#1d5c0a;">[1]</span>; Paola creyó que "activos fijos" eran sus ingresos y María Angélica no decodifica "RV" <span class="src-cite" style="color:#0b4a5c;">[2]</span>; Humberto buscó dónde revisar su perfil y no lo encontró <span class="src-cite" style="color:#7a1613;">[3]</span>.</p>
+          <p>Y el canal lo lleva al extremo: <strong>dos de los tres asesores no logran nombrar su propio perfil de riesgo.</strong></p>
+          <blockquote class="q-neg">"Son 7 nombres… discreto, audaz. Para mí deberían ser números."<span class="src">Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p>Si el profesional no puede nombrarlos, el cliente no tiene ninguna posibilidad. La pantalla que declara "tu perfil de inversionista está vigente" sin decir cuál es acumula cuatro impactos independientes.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">5</span><span class="acc-title">La gamificación motiva, pero no sustituye la rentabilidad — y hay una línea que no se debe cruzar</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El 86% encuentra motivador el desbloqueo y el 88% valora ver logros <span class="src-cite" style="color:#1d5c0a;">[1]</span>, pero nadie la compra como sustituto.</p>
+          <blockquote class="q-neg">"A la hora del té lo importante es que la plata esté moviéndose bien."<span class="src">Juan Daniel Fajardo <span class="src-cite" style="color:#0b4a5c;">[2]</span></span></blockquote>
+          <blockquote class="q-neg">"Para mí eso es indiferente."<span class="src">Julián Pinzón <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <p>Sobre la mecánica de <em>aprender para desbloquear más riesgo</em> se acumulan tres objeciones independientes: <strong>idoneidad</strong> —María Eugenia <span class="src-cite" style="color:#7a1613;">[3]</span> y Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span> llegan por separado al mismo argumento—; <strong>mensaje</strong> —<em>"¿cómo así, entonces yo tenía que perder plata para poder ser de otro perfil?"</em>, Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span>—; y <strong>público</strong> —a quién atrae el mecanismo <span class="src-cite" style="color:#1c2e4a;">[4]</span>.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">6</span><span class="acc-title">Lo que predice la reacción al desbloqueo no es la edad ni el conocimiento: es tener un proceso de decisión propio</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>La ronda 1 lo mostró primero, con nombre: los novatos lo reciben como andamiaje y los conocedores como restricción injustificada <span class="src-cite" style="color:#0b4a5c;">[2]</span>. Los detractores, todos con criterio construido, lo rechazaron los tres <span class="src-cite" style="color:#7a1613;">[3]</span>. Los asesores —el caso extremo de criterio propio— lo rechazan o lo acotan a otros <span class="src-cite" style="color:#1c2e4a;">[4]</span>.</p>
+          <p><strong>Ninguno de ellos pidió que le enseñaran; todos pidieron que les explicaran las decisiones que se toman con el dinero.</strong> Pedagogía no es lo mismo que rendición de cuentas.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">7</span><span class="acc-title">La educación construye tolerancia a la volatilidad, no tolerancia al bajo desempeño sostenido</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Para María Angélica la educación es el criterio de confianza con el que decide <span class="src-cite" style="color:#0b4a5c;">[2]</span>, y ese valor es real. Pero los tres detractores la valoran en abstracto y <strong>ninguno afirma que habría cambiado su salida</strong> <span class="src-cite" style="color:#7a1613;">[3]</span>.</p>
+          <blockquote class="q-neg">"Todo realmente lo que uno quiere al final son resultados."<span class="src">Julián Pinzón <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <p>El único caso donde una explicación sí retuvo fue humana, en conversación y con un compromiso verificable detrás — no una cápsula <span class="src-cite" style="color:#7a1613;">[3]</span>. Los asesores añaden que la pedagogía es también su territorio: <em>"para eso estamos un poquito nosotros"</em> <span class="src-cite" style="color:#1c2e4a;">[4]</span>.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">8</span><span class="acc-title">El rebalanceo es la caja negra más grande del servicio — y es el momento en que el servicio sí está trabajando</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Tres testers pidieron explicación de los rebalanceos ya hechos <span class="src-cite" style="color:#1d5c0a;">[1]</span>; los usuarios de la ronda 1 y los Financial Planners de 2025 venían pidiendo lo mismo.</p>
+          <blockquote class="q-neg">"Vamos a rebalancear, vamos a rebalancear… pero no que me diga: ahora pasamos del 2,3% de acciones Colombia al 2,5%. Que te cuenten."<span class="src">Humberto Cañón <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <p>Es la prueba de vida del servicio, y hoy se comunica de una forma que la desperdicia. <strong>Con una advertencia previa que aporta el canal:</strong> antes de rediseñar la pieza hay que saber cuál se envía y a quién <span class="src-cite" style="color:#1c2e4a;">[4]</span>.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">9</span><span class="acc-title">Quien se va, se va porque comparó y perdió — y el referente que gana suele ser otro producto de Skandia</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Los tres detractores llegaron a la salida por la misma ruta <span class="src-cite" style="color:#7a1613;">[3]</span>.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Participante</th><th>Rentabilidad de Invested</th><th>Referente contra el que comparó</th></tr></thead>
+              <tbody>
+                <tr><td><strong>María Eugenia Cataño</strong></td><td>3,55% E.A. desde 2015<br><small>3,20% E.A. en el corte que revisó · perfil <strong>agresivo</strong></small></td><td>Índices de renta fija, MSCI, inflación, y los portafolios de Protección</td></tr>
+                <tr><td><strong>Humberto Cañón</strong></td><td>3,72% E.A. desde 2021<br><small>perfil <strong>agresivo global</strong></small></td><td>El <strong>Fondo Liquidez de la propia Skandia</strong>: 5,93% E.A., riesgo casi nulo</td></tr>
+                <tr><td><strong>Julián Pinzón</strong></td><td>Pérdidas sostenidas durante ~1 año en dos portafolios</td><td>El CAT de Skandia y el fondo Impacto, ambos de la casa</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="chart chart--highlight" role="img" aria-label="Rentabilidad efectiva anual: Invested 3,72 por ciento frente al Fondo Liquidez de Skandia 5,93 por ciento">
+            <div class="chart-title">El caso más duro: perfil agresivo contra el fondo de menor riesgo de la casa</div>
+            <div class="chart-note">Rentabilidad efectiva anual · Humberto Cañón, desde febrero de 2021</div>
+            <div class="bar-row">
+              <span class="bar-label">Invested<br><small>perfil agresivo global</small></span>
+              <span class="bar-track"><span class="bar-fill" style="--w:62%; background: var(--chart-6);"></span></span>
+              <span class="bar-value">3,72%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Fondo Liquidez Skandia<br><small>riesgo casi nulo</small></span>
+              <span class="bar-track"><span class="bar-fill" style="--w:99%; background: var(--chart-3);"></span></span>
+              <span class="bar-value">5,93%</span>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc" data-new open>
+        <summary><span class="acc-num acc-num--verdict-no">10</span><span class="acc-title">El canal hace la misma comparación antes de la venta, y por eso el producto no se está ofreciendo</span><span class="acc-flag acc-flag--new">Nuevo · ronda FP's</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>A los tres asesores se les preguntó, de forma consistente, qué tan cómodos se sienten recomendando Invested de 1 a 5:</p>
+          <div class="chart" role="img" aria-label="Comodidad recomendando Invested: Juan Felipe 2, Alejandra 2 a 3, Juan José 3 sobre 5">
+            <div class="chart-title">Comodidad recomendando Invested (1 a 5)</div>
+            <div class="chart-note">Ronda de asesores · agosto 2026 <span class="src-cite" style="color:#1c2e4a;">[4]</span> — tres respuestas individuales, no una métrica</div>
+            <div class="bar-row"><span class="bar-label">Juan Felipe</span><span class="bar-track"><span class="bar-fill" style="--w:40%; background: var(--chart-6);"></span></span><span class="bar-value">2 / 5</span></div>
+            <div class="bar-row"><span class="bar-label">Alejandra</span><span class="bar-track"><span class="bar-fill" style="--w:50%; background: var(--chart-4);"></span></span><span class="bar-value">"2-3" / 5</span></div>
+            <div class="bar-row"><span class="bar-label">Juan José</span><span class="bar-track"><span class="bar-fill" style="--w:60%; background: var(--chart-4);"></span></span><span class="bar-value">3 / 5</span></div>
+          </div>
+          <p>Juan José mantuvo el 3 después de recorrer el prototipo completo. Sus referentes son los mismos de la casa: los fondos individuales, Wealth, Ideas de Inversión, Liquidez Colombia, el CAT. Juan José llegó a la sesión con la comparación ya hecha en Portal Contigo.</p>
+          <p><strong>Los detractores nos enseñaron cómo se pierde un cliente; los asesores, por qué muchos nunca entran.</strong></p>
+        </div>
+      </details>
+
+      <details class="acc" data-new open>
+        <summary><span class="acc-num acc-num--verdict-no">11</span><span class="acc-title">Cliente, canal y research previo nombran el mismo mecanismo: la sobre-diversificación aplana los extremos del perfil</span><span class="acc-flag acc-flag--new">Nuevo · ronda FP's</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <blockquote class="q-neg">"Una mesa de dinero metiendo mi plata dentro de las mesas de dinero de Skandia" sin beneficio visible.<span class="src">Humberto Cañón <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <blockquote class="q-neg">"Veo 15 portafolios dentro de una misma estrategia… eso no tiene ningún sentido"; los perfiles más arriesgados "tienen un 40, un 50% en renta fija".<span class="src">Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <blockquote class="q-neg">"La más arriesgada de Invested no necesariamente es la más arriesgada."<span class="src">Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p>Es además lo que los Financial Planners ya habían dejado en Dovetail en 2025. Cuatro fuentes convergen en un diagnóstico <strong>falsable con los datos que la organización ya tiene</strong>.</p>
+        </div>
+      </details>
+
+      <details class="acc" data-new open>
+        <summary><span class="acc-num acc-num--verdict-no">12</span><span class="acc-title">Dos barreras que ninguna pantalla resuelve, y que solo el canal podía mostrarnos</span><span class="acc-flag acc-flag--new">Nuevo · ronda FP's</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p><strong>La primera: Invested es todo-o-nada dentro del contrato.</strong> No se puede tener una parte en Invested y otra en un CAT o en liquidez; los tres asesores lo levantaron sin que se les preguntara <span class="src-cite" style="color:#1c2e4a;">[4]</span>, y explica retroactivamente por qué Julián tuvo que salirse por completo para diversificar <span class="src-cite" style="color:#7a1613;">[3]</span>.</p>
+          <p><strong>La segunda: la encuesta de perfilación se manipula por rutina.</strong></p>
+          <blockquote class="q-neg">"Me toca repetir las respuestas 3 veces hasta que por fin salga la que queremos."<span class="src">Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p>Lo cual invalida la salvaguarda sobre la que se apoyaba la recomendación de desbloqueo progresivo.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">13</span><span class="acc-title">El asesor humano es la red de seguridad transversal — y su ausencia también se siente</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Ante una duda o una caída, la reacción es "hablo con mi asesor" en las once entrevistas y en ~15 respuestas del test <span class="src-cite" style="color:#1d5c0a;">[1]</span><span class="src-cite" style="color:#0b4a5c;">[2]</span><span class="src-cite" style="color:#7a1613;">[3]</span><span class="src-cite" style="color:#1c2e4a;">[4]</span>. Paola solo pudo actualizar su portafolio porque <em>"el asesor me guió paso a paso… tenía que mandarme pantallazos"</em> <span class="src-cite" style="color:#0b4a5c;">[2]</span>, y Julián nunca activó Invested por sí mismo <span class="src-cite" style="color:#7a1613;">[3]</span> — lo que ancla el objetivo del rediseño en un problema real.</p>
+          <p>Pero María Eugenia describe el otro lado: <em>"el asesor dejó de mirarnos hace muchos días, no nos volvió a citar a una reunión de portafolio"</em> <span class="src-cite" style="color:#7a1613;">[3]</span>. Y nadie gestionó ninguna de las tres salidas.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num">14</span><span class="acc-title">La marca sobrevive al producto: hay ventana, y tiene precio declarado</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Los tres detractores siguen siendo clientes de Skandia y separan con nitidez la marca del servicio <span class="src-cite" style="color:#7a1613;">[3]</span>. Los tres asesores dicen lo mismo en positivo y nombran la condición exacta para cambiar de opinión <span class="src-cite" style="color:#1c2e4a;">[4]</span>:</p>
+          <blockquote>"La idea de Invested es brutal… debería ser nuestra principal opción", y hoy tiene "el 5% de la cartera… y eso debería ser el 80%, el 70%".<span class="src">Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <blockquote>"Si el desempeño yo viera la diferencia, diría que vale 5."<span class="src">Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p><strong>Es una posición de retirada, no de hostilidad.</strong></p>
+        </div>
+      </details>
+
+      <h3>Recomendaciones clave <small style="font-weight:400;color:var(--text-muted);">(detalle en la sección 09)</small></h3>
+      <ul>
+        <li><strong>Escalar el desempeño comparado, la sobre-diversificación y la arquitectura del contrato</strong> como decisiones de producto previas al lanzamiento. Son las tres únicas cuyo incumplimiento invalida a las demás.</li>
+        <li><strong>Añadir proyección de crecimiento y rentabilidad esperada</strong> en "Ver mi mezcla", con simulador meta–plazo–cuota — con rangos prospectivos por perfil, <strong>no</strong> extrapolados de históricos.</li>
+        <li><strong>Mostrar la rentabilidad propia acumulada desde el primer aporte</strong>, con selector de período y desglose por portafolio.</li>
+        <li><strong>Completar la notificación de caída y sacarla de la aplicación</strong>; sumar al asesor como destinatario.</li>
+        <li><strong>Convertir el aviso de rebalanceo en una explicación de estrategia</strong> — auditando antes qué pieza se envía y a quién.</li>
+        <li><strong>Renombrar o explicar "mezcla"</strong>, eliminar siglas, sustituir los nombres de perfil por una escala numérica y mostrar cuál es el mío.</li>
+        <li><strong>Desbloqueo progresivo con puerta de salida, nunca atado al cambio de perfil de riesgo</strong> — con agencia explícita en lugar de un candado ya abierto.</li>
+        <li><strong>Mostrar el desempeño contra un referente</strong> dentro del propio material de Invested.</li>
+        <li><strong>Crear un protocolo de salida gestionada.</strong></li>
+      </ul>
+    </section>
+    <!-- ═══ 02 Metodología ═══ -->
+    <section class="section" id="s2">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <div>
+          <h2 class="section-title">Metodología</h2>
+          <p class="section-desc">Cuatro fuentes, once entrevistas, una jerarquía de evidencia explícita</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fuente</th><th>Planeado</th><th>Ejecutado</th><th>Instrumento</th></tr></thead>
+          <tbody>
+            <tr><td><span class="src-tag src-tag--1">1</span> Prueba remota (sin moderador)</td><td>30–50 testers</td><td><strong>53 respuestas · 30 completas (57%)</strong> · 18 min 28 s promedio</td><td>Parte 2: encuadre + 3 tareas + concepto + cierre</td></tr>
+            <tr><td><span class="src-tag src-tag--2">2</span> Ronda 1 · clientes (Teams, 45 min)</td><td>9–12 (4–6 activos, 5–6 inactivos)</td><td><strong>5 realizadas</strong>: 4 activos + 1 inactivo "amistoso"</td><td>Parte 1 del instrumento v3.0</td></tr>
+            <tr><td><span class="src-tag src-tag--3">3</span> Mini-sprint · detractores (Teams)</td><td>2–3</td><td><strong>3 realizadas</strong> ✅</td><td>Parte 1B (Bloque Detractor), v3.1</td></tr>
+            <tr><td><span class="src-tag src-tag--4">4</span> Ronda 3 · asesores (Teams, 25–36 min)</td><td>—</td><td><strong>3 realizadas</strong> ✅</td><td><span class="badge badge-medium">Sin bloque documentado</span></td></tr>
+            <tr><td colspan="2"><strong>Total cualitativo</strong></td><td colspan="2"><strong>11 entrevistas</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="src-tag src-tag--2">2</span> Ronda 1 · clientes (julio 2026)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Participante</th><th>Perfil</th><th>Relación con Invested</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Camilo Zuzunaga</strong></td><td>26, ingeniero civil. Conocimiento financiero alto</td><td>Activo. Activó acompañado de su asesora</td></tr>
+            <tr><td><strong>María Angélica Hurtado</strong></td><td>38, enfermera. <strong>Conocimiento financiero bajo</strong> — la voz de quien empieza</td><td>Activa</td></tr>
+            <tr><td><strong>Juan Daniel Fajardo</strong></td><td>25, docente e ingeniero biomédico. Conocimiento medio-alto</td><td>Activo</td></tr>
+            <tr><td><strong>Paola Andrea Rodríguez</strong></td><td>26, diseñadora</td><td>Activa. Actualizó su portafolio solo con guía del asesor por pantallazos</td></tr>
+            <tr><td><strong>Sebastián Piedrahita</strong></td><td>26, médico general, Rionegro–Antioquia</td><td><strong>Inactivo — deserción "amistosa"</strong>: prefiere la gestión manual con su asesor. Sin disgusto</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="src-tag src-tag--3">3</span> Mini-sprint · detractores (5 de agosto de 2026)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Participante</th><th>Perfil</th><th>Vínculo</th><th>Situación</th></tr></thead>
+          <tbody>
+            <tr><td><strong>María Eugenia Cataño López de Mesa</strong></td><td>Pensionada. <strong>30 años de carrera en bolsa de valores</strong>. Abrió la oficina de la fiduciaria Skandia en Medellín. Perfil agresivo</td><td>Desde 2015. Descubrió el desempeño real el 13 de noviembre de 2025; canceló el 25</td><td><span class="badge badge-high">Desertora consumada — hostil</span></td></tr>
+            <tr><td><strong>Humberto Cañón</strong></td><td>56 años. VP de planeación y logística; especialización en finanzas. Cerca de <strong>$1.200 millones</strong> en fondos voluntarios de Skandia</td><td>Entró el 1 de febrero de 2021 con $100 millones</td><td><span class="badge badge-medium">Detractor en riesgo — sigue dentro</span></td></tr>
+            <tr><td><strong>Julián Pinzón</strong></td><td>43 años. Ingeniero de sistemas; vendió su empresa y hoy invierte de tiempo completo. Diplomado en bolsa</td><td>Dos portafolios durante ~1 año</td><td><span class="badge badge-high">Desertor consumado.</span> Migró a CAT e Impacto</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="src-tag src-tag--4">4</span> Ronda 3 · asesores (11 al 18 de agosto de 2026)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Participante</th><th>Fecha</th><th>Perfil y cartera</th><th>A quién le ofrece Invested</th><th>Comodidad (1–5)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Juan José</strong></td><td>11 ago</td><td>Asesor veterano. Cartera heterogénea, muchos clientes de PAC institucional. Analiza desempeños en Portal Contigo</td><td>Al ahorrador periódico; perfiles del intermedio hacia arriba</td><td><strong>3</strong> (inicialmente "3 o 2,5"). Sin cambio tras ver el prototipo</td></tr>
+            <tr><td><strong>Juan Felipe</strong></td><td>14 ago</td><td>Asesor de agencia. Mayoría en Multifond autogestionado; negocios puntuales más que aporte periódico</td><td>A quien aporta montos pequeños y no justifica gestión manual</td><td><strong>2</strong></td></tr>
+            <tr><td><strong>Alejandra</strong></td><td>18 ago</td><td>Asesora; ella y su esposo trabajan con Skandia. Usa Portal Contigo para entender posiciones</td><td>A clientes nuevos e inexpertos, conservadores con curiosidad</td><td><strong>"un 2, 3"</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><span class="src-tag src-tag--1">1</span> Muestra de la prueba remota</h3>
+      <p>35 de 40 correos únicos identificados. Edades entre 26 y 61 años (mediana ≈ 37), con representación de mayores de 50 — relevante porque el propósito "retiro" les habla distinto. Mayoría clientes Skandia (FPOB el producto más común; ~8 con MFUND/FIC/CAT); dos declaran <em>"no sé exactamente qué productos tengo"</em>, dato en sí mismo. <strong>El 100% se declara cómoda con herramientas digitales</strong>, y <strong>el 72% no había usado Invested antes</strong> — la muestra remota lee mayormente como <em>prospecto interno</em>.</p>
+
+      <h3>Jerarquía de evidencia</h3>
+      <div class="norm-cards">
+        <div class="norm-card norm-card--dark">
+          <h4>1 · Solo Useberry tiene porcentajes</h4>
+          <p>El 91%, 81%, 88%, 86%, 94%, 90% vienen de las 53 respuestas de julio y no se recalcularon en ninguna ronda posterior. Las entrevistas se reportan con nombre propio o conteo explícito.</p>
+        </div>
+        <div class="norm-card norm-card--dark">
+          <h4>2 · Voz del cliente ≠ voz del canal</h4>
+          <p>Cuando un asesor reporta lo que dicen sus clientes es <strong>testimonio indirecto</strong>: evidencia de lo que el asesor cree, no confirmación de un hallazgo de cliente. Va marcado como tal en el texto.</p>
+        </div>
+      </div>
+
+      <h3>⚠️ Limitaciones vigentes</h3>
+      <ul class="check-list">
+        <li><span class="check-icon">🔸</span><strong>Muestra pequeña en las tres rondas cualitativas.</strong> Cinco, tres y tres entrevistas prueban que algo existe y muestran cómo funciona; no dicen a cuánta gente le pasa.</li>
+        <li><span class="check-icon">🔸</span><strong>Las tres calificaciones de comodidad de los asesores no son una métrica</strong>, sino tres respuestas individuales a una pregunta consistente del moderador.</li>
+        <li><span class="check-icon">🔸</span><strong>La ronda de asesores no tiene bloque de instrumento documentado.</strong> Las tres sesiones siguieron de facto la misma estructura sin registrarla en el repositorio del sprint. Salvedad de trazabilidad, no de calidad del dato.</li>
+        <li><span class="check-icon">🔸</span><strong>Sesgo digital en la prueba remota.</strong> El 100% de la muestra identificada se declara cómoda con herramientas digitales: no representa al usuario digitalmente incómodo.</li>
+        <li><span class="check-icon">🔸</span><strong>Sesgo hacia alta alfabetización financiera</strong> en el segmento detractor. Falta la voz del <strong>detractor neófito</strong> — la única brecha de evidencia abierta.</li>
+        <li><span class="check-icon">🔸</span><strong>Humberto sigue con el servicio activo</strong>: su testimonio es el de la decisión en curso, no el de la salida consumada.</li>
+        <li><span class="check-icon">🔸</span><strong>Tres asesores no describen al canal.</strong> Juan Felipe reporta lo que oye en su agencia: sugiere que el patrón excede la muestra, no lo demuestra.</li>
+        <li><span class="check-icon">🔸</span>El SEQ se configuró de 0 a 5 en Useberry (el instrumento preveía 1–7): no comparable con referentes de industria.</li>
+        <li><span class="check-icon">🔸</span>3 testers reportaron errores técnicos del prototipo que pudieron inflar el abandono de la Tarea 2 (15%).</li>
+      </ul>
+    </section>
+
+    <!-- ═══ 03 Antecedentes ═══ -->
+    <section class="section" id="s3">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <div>
+          <h2 class="section-title">Antecedentes</h2>
+          <p class="section-desc">Investigación previa en Dovetail — lo que ya se sabía antes de este sprint</p>
+        </div>
+      </div>
+      <ul>
+        <li><strong>CX-SAC (2025), clientes que salieron:</strong> <em>"Yo a Invested no volvería ni loco. Ya me tuvieron un año en pérdida"</em> · <em>"Éramos completamente neófitos… Invested era una computadora en la que meten un dato y ya"</em>. Patrón registrado entonces: entrada sin comprensión + pérdidas sin explicación + silencio = deserción.</li>
+        <li><strong>Gestión de portafolios con Financial Planners (2025):</strong> Invested "demasiado diversificado", "reacciona tarde" en las caídas, portafolios difíciles de entender.</li>
+        <li><strong>Monitor para Financial Planners (2025):</strong> <em>"A veces esa gestión tan buena parece que fuera invisible… acaso les llega un correo y no le ponen atención."</em> — el hallazgo semilla de esta investigación.</li>
+        <li><strong>Gestión de portafolios con clientes (2025):</strong> proceso de inversión tedioso (~10 min), interfaz poco ágil, rebalanceos que no finalizan por restricciones de horario.</li>
+      </ul>
+      <div class="callout callout-warn">
+        <span class="icon">🔄</span>
+        <span><strong>Qué corrige esta investigación.</strong> El patrón de CX-SAC atribuía la causa al eslabón equivocado: el cliente no se va porque no le explicaron, se va porque hizo la cuenta. El detonante primario es el <strong>desempeño comparado</strong>; el silencio es el agravante que convierte una pérdida en agravio.</span>
+      </div>
+      <div class="callout">
+        <span class="icon">🔁</span>
+        <span><strong>Qué confirma.</strong> Las tres quejas de los FP's de 2025 reaparecen textualmente un año después, ahora con una consecuencia comercial que en 2025 no se había registrado: el asesor no está llevando clientes al producto. La observación de Humberto como cliente —"una mesa de dinero metiendo mi plata dentro de las mesas de dinero de Skandia"— es la misma que la de Juan Felipe como asesor, dicha desde los dos lados del mostrador.</span>
+      </div>
+    </section>
+    <!-- ═══ 04 Análisis por hipótesis ═══ -->
+    <section class="section" id="s4">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <div>
+          <h2 class="section-title">Análisis por hipótesis</h2>
+          <p class="section-desc">Las 5 hipótesis del brief · cada una abre con lo que aporta cada una de las cuatro fuentes, y sigue con la lectura conjunta</p>
+        </div>
+      </div>
+
+      <!-- H1 -->
+      <details class="acc">
+        <summary><span class="acc-num acc-num--verdict-ok">H1</span><span class="acc-title">"La forma de mostrar rentabilidades frena la activación" — ✅ Confirmada</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p><em>El rediseño resuelve el flujo; el vacío de información sigue abierto y ya está documentado con evidencia suficiente.</em></p>
+
+          <h5 class="h5-new">Qué aporta cada fuente</h5>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--1">1</span> Remota</span><span class="src-text">El flujo funciona: 91% de éxito (41 de 45), 81% "muy fácil". Pero el vacío informativo es el más repetido: <em>"esperaba encontrar tasas promedio"</em>, <em>"puse 200 millones y no fue claro cuál es esa proyección"</em>. El aporte sugerido ($555.556) no es modificable ni simulable.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--2">2</span> Ronda 1</span><span class="src-text">Activación 5/5 unánime. Paola: <em>"faltaría ver cómo va a crecer tu dinero"</em>; María Angélica pide la proyección en términos de vida. Sebastián aporta el primer caso de rentabilidad propia.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--3">3</span> Detractores</span><span class="src-text">Califican la activación 9, 9 y "muy fácil". Humberto especifica el requisito —selector de período "desde el momento de la activación", rentabilidad por fondo— y señala que el portal actual tampoco lo tiene. María Eugenia suma la comisión.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--4">4</span> Asesores</span><span class="src-text">Cuarta confirmación independiente, con especificación completa (Juan Felipe). Y una objeción al <em>cómo</em>: la proyección extrapolada de históricos "le va a terminar jugando en contra del cliente". Juan José detecta dos defectos de consistencia en el prototipo.</span></div>
+
+          <div class="chart" role="img" aria-label="Activación: 91 por ciento de éxito de tarea, 81 por ciento calificó muy fácil">
+            <div class="chart-title">Facilidad de activación — prueba remota</div>
+            <div class="chart-note">Tarea 1 · Useberry, 45 respuestas <span class="src-cite" style="color:#1d5c0a;">[1]</span></div>
+            <div class="bar-row"><span class="bar-label">Éxito de tarea</span><span class="bar-track"><span class="bar-fill" style="--w:91%; background: var(--chart-1);"></span></span><span class="bar-value">91%</span></div>
+            <div class="bar-row"><span class="bar-label">Calificó "muy fácil"</span><span class="bar-track"><span class="bar-fill" style="--w:81%; background: var(--chart-2);"></span></span><span class="bar-value">81%</span></div>
+          </div>
+
+          <blockquote class="q-neg">"Un cliente arriesgado al 7%, y un CAT me está pagando el 13%… no va a tener mucho sentido."<span class="src">Juan Felipe · ronda de asesores <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+
+          <h5>Interpretación</h5>
+          <p>El rediseño eliminó la fricción del flujo, pero al omitir la rentabilidad esperada, la personalizada y el costo, deja la decisión a ciegas. Las cuatro fuentes convergen en el mismo requisito, y la última añade su condición: <strong>el dato mal construido es peor que su ausencia.</strong> Si la proyección extrapola un histórico pobre, el propio producto entrega al cliente el argumento para no activarlo.</p>
+
+          <h5>Oportunidad</h5>
+          <p>Un paso "Ver mi mezcla" con proyección de capital basada en <strong>rangos prospectivos por perfil</strong>, composición por portafolio además de por tipo de activo, y simulador de tres entradas (meta, plazo, cuota). En el detalle del contrato: selector de período variable con opción "desde mi primer aporte", rentabilidad por portafolio y comisión visible.</p>
+        </div>
+      </details>
+
+      <!-- H2 -->
+      <details class="acc">
+        <summary><span class="acc-num acc-num--verdict-partial">H2</span><span class="acc-title">"Una propuesta educativa genera mayor permanencia" — 🟡 Parcial, con frontera acotada</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5 class="h5-new">Qué aporta cada fuente</h5>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--1">1</span> Remota</span><span class="src-text">88% califica alto la utilidad de logros/aprendizajes. 68% usaría más el servicio; 30% neutral. Los contenidos más pedidos amortiguan la volatilidad.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--2">2</span> Ronda 1</span><span class="src-text">María Angélica: la educación es su criterio de confianza. Paola: le daría criterio para validar. Camilo (conocedor): las cápsulas son superficiales, "con ver el desempeño ya es suficiente". Juan Daniel: útil, "pero lo importante es que la plata se mueva".</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--3">3</span> Detractores</span><span class="src-text">La frontera dura: los tres la valoran en abstracto y ninguno afirma que habría cambiado su salida. El único caso donde retuvo fue humano, no una cápsula.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--4">4</span> Asesores</span><span class="src-text">Acotan por curiosidad y edad (Alejandra: "me parece para jóvenes"). Y un conflicto de rol: Juan Felipe reivindica la pedagogía como valor propio — "para eso estamos un poquito nosotros".</span></div>
+
+          <div class="chart" role="img" aria-label="Educación: 88 por ciento valora ver logros y aprendizajes, 68 por ciento usaría más el servicio">
+            <div class="chart-title">Percepción de la sección de logros y aprendizaje</div>
+            <div class="chart-note">Prueba remota <span class="src-cite" style="color:#1d5c0a;">[1]</span></div>
+            <div class="bar-row"><span class="bar-label">Valora ver logros/aprendizajes</span><span class="bar-track"><span class="bar-fill" style="--w:88%; background: var(--chart-1);"></span></span><span class="bar-value">88%</span></div>
+            <div class="bar-row"><span class="bar-label">Usaría más el servicio</span><span class="bar-track"><span class="bar-fill" style="--w:68%; background: var(--chart-3);"></span></span><span class="bar-value">68%</span></div>
+          </div>
+
+          <blockquote class="q-neg">"Independientemente de que le puedan mostrar a un cliente como yo cómo funciona el tema de las caídas… todo realmente lo que uno quiere al final son resultados."<span class="src">Julián Pinzón <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <blockquote>"Esa formación libera de la preocupación de hacer las cosas bien… nada más rico que un cliente conocedor."<span class="src">María Eugenia Cataño <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+
+          <h5>Interpretación</h5>
+          <p>La educación construye <strong>tolerancia a la volatilidad</strong>: la capacidad de sostener una caída sin retirar. No construye <strong>tolerancia al bajo desempeño sostenido</strong>, que es un juicio económico, no una carencia de comprensión. Los detractores no se fueron por no entender — se fueron precisamente porque entendieron.</p>
+
+          <h5>Implicación</h5>
+          <p>La educación conserva todo su valor para el perfil que empieza. Pero <strong>no puede figurar en el caso de negocio como palanca de retención frente al cliente insatisfecho por desempeño.</strong> Y debe diseñarse de forma que el asesor la reconozca como munición propia, no como sustituto.</p>
+        </div>
+      </details>
+
+      <!-- H3 -->
+      <details class="acc" data-new>
+        <summary><span class="acc-num acc-num--verdict-no">H3</span><span class="acc-title">"La gamificación puede sustituir la rentabilidad" — ❌ Refutada como sustituto · ✅ complemento · ⛔ restricción reforzada</span><span class="acc-flag acc-flag--changed">Salvaguarda rota</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5 class="h5-new">Qué aporta cada fuente</h5>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--1">1</span> Remota</span><span class="src-text">Como motivador funciona: 43% muy motivador + 43% algo motivador; 3% frustrante. Como sustituto, no.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--2">2</span> Ronda 1</span><span class="src-text">Nace el eje que ordena la hipótesis: novatos lo reciben como andamiaje, conocedores como restricción injustificada. Juan Daniel: "a la hora del té lo importante es que la plata esté moviéndose bien".</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--3">3</span> Detractores</span><span class="src-text">Lo confirman en los términos más duros. Humberto separa las dos cosas que vienen unidas. ⛔ María Eugenia levanta la restricción de idoneidad desde 30 años de oficio.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--4">4</span> Asesores</span><span class="src-text">Tercera voz independiente sobre idoneidad (Juan José). Dos objeciones nuevas: el mensaje perverso y el público que atrae el mecanismo. Y el hallazgo que rompe la salvaguarda: la encuesta de perfilación se manipula por rutina.</span></div>
+
+          <div class="chart" role="img" aria-label="Desbloqueo de mezclas por nivel: 43 por ciento muy motivador, 43 por ciento algo motivador, 3 por ciento frustrante">
+            <div class="chart-title">Reacción al desbloqueo de mezclas por nivel</div>
+            <div class="chart-note">Prueba remota <span class="src-cite" style="color:#1d5c0a;">[1]</span></div>
+            <div class="bar-row"><span class="bar-label">Muy motivador</span><span class="bar-track"><span class="bar-fill" style="--w:43%; background: var(--chart-1);"></span></span><span class="bar-value">43%</span></div>
+            <div class="bar-row"><span class="bar-label">Algo motivador</span><span class="bar-track"><span class="bar-fill" style="--w:43%; background: var(--chart-2);"></span></span><span class="bar-value">43%</span></div>
+            <div class="bar-row"><span class="bar-label">Frustrante</span><span class="bar-track"><span class="bar-fill" style="--w:3%; background: var(--chart-6);"></span></span><span class="bar-value">3%</span></div>
+          </div>
+
+          <blockquote class="q-neg">"Los perfiles de riesgo van amarrados a la personalidad… es peligrosísimo el cliente que en los buenos momentos se siente agresivo, y cuando el mercado vuelve a su realidad se acuerda que es conservador."<span class="src">María Eugenia Cataño · 30 años en bolsa de valores <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <blockquote class="q-neg">"Si lo pongo como algo aspiracional… puede estar cambiando de perfil de riesgo y se va alejando de lo que es su realidad. Y cuando haya una caída, ahí es donde se lleva una sorpresa."<span class="src">Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <blockquote class="q-neg">"El cliente se va a sentir incómodo: ¿cómo así, entonces yo tenía que perder plata para poder ser de otro perfil?"<span class="src">Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <blockquote class="q-neg">"Me toca repetir las respuestas 3 veces hasta que por fin ya eligió la que queremos."<span class="src">Juan José, sobre la encuesta de perfilación <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+
+          <h5>Interpretación</h5>
+          <p>La gamificación no compite con la rentabilidad: opera un nivel abajo. La mecánica de <em>aprender para desbloquear más riesgo</em> acumula tres objeciones independientes —idoneidad, mensaje y público— y <strong>el candado que se proponía como alternativa está abierto</strong>: la encuesta de perfilación, sobre la que julio hacía descansar la protección, se manipula de forma rutinaria.</p>
+
+          <h5>Implicación</h5>
+          <p>El desbloqueo progresivo se mantiene como andamiaje para explorar mezclas dentro del perfil establecido, desacoplado del cambio de perfil de riesgo. Pero la protección no puede delegarse en la encuesta: hay que dar <strong>agencia explícita</strong> y auditar la repetición de la encuesta antes de una activación.</p>
+        </div>
+      </details>
+
+      <!-- H4 -->
+      <details class="acc">
+        <summary><span class="acc-num acc-num--verdict-ok">H4</span><span class="acc-title">"La comunicación proactiva en volatilidad reduce retiros" — ✅ Confirmada</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p><em>El hallazgo más sólido de la investigación, hoy con techo y con dos fugas de canal identificadas.</em></p>
+
+          <h5 class="h5-new">Qué aporta cada fuente</h5>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--1">1</span> Remota</span><span class="src-text">94% calificó fácil encontrar y entender la notificación; respuesta dominante: esperar. Canales: WhatsApp ~19, correo ~18, SMS 4; nadie pidió llamada.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--2">2</span> Ronda 1</span><span class="src-text">El mensaje produce el efecto emocional buscado. Aquí se construye la anatomía completa del mensaje que este informe recomienda, y la regla de dosis (sobre-notificar produce la ansiedad del "junkie de eToro").</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--3">3</span> Detractores</span><span class="src-text">Reaccionan bien incluso desde la insatisfacción. Aportan los dos límites: 🔻 el techo y 🔻 la fuga hacia el cliente (la campanita vive en la app). Julián aporta el contrafactual directo.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--4">4</span> Asesores</span><span class="src-text">Confirmación conductual: los tres ejecutan hoy, a mano, lo que la notificación busca producir. Juan Felipe aporta la técnica del encuadre en la venta. Y 🔻 la segunda fuga: el asesor no está en el circuito, y dos de tres no saben si el correo de rebalanceo llega al cliente.</span></div>
+
+          <blockquote>"Esto me parece una machera, porque eso te desliga de tener que estar haciendo ese seguimiento atento."<span class="src">María Eugenia Cataño <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <blockquote class="q-neg">"Una caída se puede soportar… pero con la repetición mes a mes en el año sí va a generar desconfianza y uno cambiar de portafolio."<span class="src">Julián Pinzón <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <blockquote class="q-neg">"Esa campanita sí es muy chévere, pero eso me implica abrir la cuenta… si no abrí la cuenta no veo la campanita."<span class="src">María Eugenia Cataño <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+
+          <div class="chart" role="img" aria-label="Canales preferidos: WhatsApp 19, correo 18, mensajes de texto 4 de 32 respuestas">
+            <div class="chart-title">Canales preferidos para recibir avisos</div>
+            <div class="chart-note">Prueba remota · 32 respuestas <span class="src-cite" style="color:#1d5c0a;">[1]</span> — el mini-sprint sube el SMS para el perfil desenganchado <span class="src-cite" style="color:#7a1613;">[3]</span></div>
+            <div class="bar-row"><span class="bar-label">WhatsApp</span><span class="bar-track"><span class="bar-fill" style="--w:100%; background: var(--chart-1);"></span></span><span class="bar-value">~19</span></div>
+            <div class="bar-row"><span class="bar-label">Correo</span><span class="bar-track"><span class="bar-fill" style="--w:95%; background: var(--chart-2);"></span></span><span class="bar-value">~18</span></div>
+            <div class="bar-row"><span class="bar-label">Mensaje de texto (SMS)</span><span class="bar-track"><span class="bar-fill" style="--w:21%; background: var(--chart-4);"></span></span><span class="bar-value">4</span></div>
+          </div>
+
+          <p>El canal ilustra el techo mejor que nadie: <strong>los mismos asesores que contienen bien a sus clientes en las caídas son los que califican su comodidad recomendando el producto en 2 y 3.</strong> Contener funciona; no gana el argumento.</p>
+
+          <h5>Oportunidad</h5>
+          <p>Anatomía completa del mensaje: qué pasó y cuánto, por qué, qué se está haciendo, cuándo se decide, aviso de cierre y botón "hablar con mi asesor". Entrega <strong>fuera de la aplicación</strong> —correo y WhatsApp, con SMS para el perfil desenganchado— y la campanita como refuerzo. <strong>Con el asesor como destinatario paralelo.</strong></p>
+        </div>
+      </details>
+
+      <!-- H5 -->
+      <details class="acc" data-new>
+        <summary><span class="acc-num acc-num--verdict-partial">H5</span><span class="acc-title">"La diferenciación entre mezclas es clave para percibir valor" — 🟡 Parcial · seis bloqueos</span><span class="acc-flag acc-flag--changed">2 bloqueos nuevos</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <h5 class="h5-new">Qué aporta cada fuente</h5>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--1">1</span> Remota</span><span class="src-text">90% entiende cómo va su inversión. Pero el lenguaje falla: al menos 4 testers rechazan "mezcla". La perfilación no se registra. Tres piden agencia.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--2">2</span> Ronda 1</span><span class="src-text">Paola creyó que "activos fijos" eran sus ingresos; María Angélica no decodifica "RV". La explicación tiene que ser real, no tautológica. Camilo pide stop-loss (×3).</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--3">3</span> Detractores</span><span class="src-text">Validan la composición cuando la leen (María Eugenia, sin ayuda). Humberto confirma la perfilación invisible. Añaden el cuarto bloqueo: la opacidad del rebalanceo.</span></div>
+          <div class="src-row"><span class="src-label"><span class="src-tag src-tag--4">4</span> Asesores</span><span class="src-text">El lenguaje falla incluso con profesionales: dos de tres no nombran su propio perfil. Dos bloqueos nuevos: composición sin portafolios, y el cliente puede no saber que está en Invested.</span></div>
+
+          <blockquote class="q-neg">"Son 7 nombres… discreto, audaz. Para mí deberían ser números: el 1 el más conservador, el 7 el más arriesgado."<span class="src">Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <blockquote class="q-neg">"Vamos a rebalancear, vamos a rebalancear… pero no que me diga: ahora pasamos del 2,3% de acciones Colombia al 2,5%. Que te cuenten."<span class="src">Humberto Cañón <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+
+          <h5>Interpretación — seis bloqueos</h5>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Bloqueo</th><th>Fuentes</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Lenguaje: "mezcla", siglas, nombres de perfil impronunciables</td><td><span class="src-cite" style="color:#1d5c0a;">[1]</span><span class="src-cite" style="color:#0b4a5c;">[2]</span><span class="src-cite" style="color:#7a1613;">[3]</span><span class="src-cite" style="color:#1c2e4a;">[4]</span></td></tr>
+                <tr><td>2</td><td>Perfilación invisible</td><td><span class="src-cite" style="color:#1d5c0a;">[1]</span><span class="src-cite" style="color:#7a1613;">[3]</span><span class="src-cite" style="color:#1c2e4a;">[4]</span></td></tr>
+                <tr><td>3</td><td>Falta de agencia</td><td><span class="src-cite" style="color:#1d5c0a;">[1]</span><span class="src-cite" style="color:#0b4a5c;">[2]</span><span class="src-cite" style="color:#7a1613;">[3]</span></td></tr>
+                <tr><td>4</td><td>Opacidad del rebalanceo</td><td><span class="src-cite" style="color:#1d5c0a;">[1]</span><span class="src-cite" style="color:#7a1613;">[3]</span><span class="src-cite" style="color:#1c2e4a;">[4]</span></td></tr>
+                <tr><td><span class="badge badge-new">5</span></td><td>Composición sin portafolios</td><td><span class="src-cite" style="color:#1c2e4a;">[4]</span></td></tr>
+                <tr><td><span class="badge badge-new">6</span></td><td>Reconocimiento del servicio</td><td><span class="src-cite" style="color:#1c2e4a;">[4]</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Los cinco primeros presuponen que el cliente sabe qué está mirando; el sexto pone esa premisa en duda, y por eso es el más grave.</p>
+
+          <h5>Oportunidad</h5>
+          <p>Renombrar o glosar "mezcla"; eliminar siglas; <strong>sustituir los nombres de perfil por una escala numérica</strong> y mostrar cuál es el vigente; composición por portafolio además de por tipo de activo; comparador de mezclas; y rediseñar la comunicación de rebalanceo tras auditar qué se envía.</p>
+        </div>
+      </details>
+    </section>
+    <!-- ═══ 05 Hallazgos transversales ═══ -->
+    <section class="section" id="s5">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <div>
+          <h2 class="section-title">Hallazgos transversales</h2>
+          <p class="section-desc">Fuera de las hipótesis del brief · 16 subsecciones aportadas por las cuatro fuentes</p>
+        </div>
+      </div>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.1</span><span class="acc-title">Momentos de quiebre en el flujo de activación — 16 identificados</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El brief pedía identificar al menos tres.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Momento</th><th>Fuente</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td><strong>Entrada: la tarjeta de Invested compite con el contrato "Potenciar mi inversión".</strong></td><td><span class="src-tag src-tag--1">1</span> ×2</td></tr>
+                <tr><td>2</td><td><strong>Paso 1: el propósito no se identifica a la primera y "Ver mi mezcla" desconcierta.</strong></td><td><span class="src-tag src-tag--1">1</span></td></tr>
+                <tr><td>3</td><td><strong>Paso 2: la mezcla aparece sin proyección, sin rentabilidad esperada, sin perfilación visible y con siglas.</strong></td><td><span class="src-tag src-tag--1">1</span> <span class="src-tag src-tag--2">2</span></td></tr>
+                <tr><td>4</td><td><strong>Paso 3: el aporte sugerido no se puede modificar y las aclaraciones legales angustian a quien empieza.</strong></td><td><span class="src-tag src-tag--1">1</span> <span class="src-tag src-tag--2">2</span></td></tr>
+                <tr><td>5</td><td><strong>El logotipo con las letras "ED" tachadas confunde.</strong></td><td><span class="src-tag src-tag--1">1</span> ×2</td></tr>
+                <tr><td>6</td><td><strong>"Conocer y activar" es ambiguo:</strong> no se sabe si informa o ejecuta.</td><td><span class="src-tag src-tag--3">3</span></td></tr>
+                <tr><td>7</td><td><strong>No hay camino visible para revisar o cambiar el perfil de inversionista</strong> dentro del flujo.</td><td><span class="src-tag src-tag--3">3</span> <span class="src-tag src-tag--4">4</span></td></tr>
+                <tr><td>8</td><td><strong>La meta y el plazo configurados no quedan visibles después.</strong> María Eugenia los buscó en "Movimientos".</td><td><span class="src-tag src-tag--3">3</span></td></tr>
+                <tr><td>9</td><td><strong>La sección "Detalles" no se entiende por su nombre</strong> — y al abrirla contenía justo lo que se buscaba.</td><td><span class="src-tag src-tag--3">3</span></td></tr>
+                <tr><td><span class="badge badge-new">10</span></td><td><strong>"Tu perfil de inversionista está vigente" no dice cuál es.</strong> <em>"No sé qué significa que esté vigente… pero ¿cuál es?"</em> (Juan José); <em>"sería bueno que te apareciera el perfil"</em> (Juan Felipe).</td><td><span class="src-tag src-tag--4">4</span> ×2</td></tr>
+                <tr><td><span class="badge badge-new">11</span></td><td><strong>Inconsistencia numérica entre pantallas:</strong> 8% de rentabilidad esperada en el simulador, 7,5% en "Ver mi mezcla".</td><td><span class="src-tag src-tag--4">4</span></td></tr>
+                <tr><td><span class="badge badge-new">12</span></td><td><strong>La proyección supera la meta configurada y no lo explica.</strong> Meta $500M → proyección $1.227M.</td><td><span class="src-tag src-tag--4">4</span></td></tr>
+                <tr><td><span class="badge badge-new">13</span></td><td><strong>La composición se muestra por tipo de activo y no por portafolio.</strong></td><td><span class="src-tag src-tag--4">4</span></td></tr>
+                <tr><td><span class="badge badge-new">14</span></td><td><strong>La torta de composición usa cinco verdes casi idénticos.</strong></td><td><span class="src-tag src-tag--4">4</span></td></tr>
+                <tr><td><span class="badge badge-new">15</span></td><td><strong>La pantalla de entrada no orienta la primera acción:</strong> <em>"¿Qué hago aquí?"</em></td><td><span class="src-tag src-tag--4">4</span></td></tr>
+                <tr><td><span class="badge badge-new">16</span></td><td><strong>La pantalla de composición es donde muere la venta.</strong> <em>"Ahí es donde se me retroceden muchos clientes… entonces quedémonos en liquidez o vámonos por un CAT."</em> (Alejandra)</td><td><span class="src-tag src-tag--4">4</span> ×2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.2</span><span class="acc-title">Encontrar "Logros y aprendizaje" cuesta trabajo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Solo el 37% encontró la sección "muy fácil" <span class="src-cite" style="color:#1d5c0a;">[1]</span>; al 31% le costó; dos nunca llegaron. María Angélica intentó entrar por el lugar equivocado <span class="src-cite" style="color:#0b4a5c;">[2]</span>. Vive dentro de "Objetivo", con lógica para quien la encuentra, pero el camino no es evidente. En las dos rondas posteriores, <strong>los seis entrevistados necesitaron indicación explícita del moderador</strong> <span class="src-cite" style="color:#7a1613;">[3]</span><span class="src-cite" style="color:#1c2e4a;">[4]</span>.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.3</span><span class="acc-title">El asesor humano es la red de seguridad transversal</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Ante una duda o una caída, la reacción es "hablo con mi asesor" en las once entrevistas y en ~15 respuestas del test remoto.</p>
+          <ul>
+            <li><strong>El asesor es la puerta de entrada real.</strong> Paola solo pudo actualizar su portafolio con guía por pantallazos <span class="src-cite" style="color:#0b4a5c;">[2]</span>; Julián nunca activó Invested por sí mismo <span class="src-cite" style="color:#7a1613;">[3]</span>.</li>
+            <li><strong>El chatbot no lo sustituye para todos.</strong> Rechazo explícito en el perfil que empieza <span class="src-cite" style="color:#0b4a5c;">[2]</span>, aunque tres testers jóvenes sí lo piden <span class="src-cite" style="color:#1d5c0a;">[1]</span>.</li>
+            <li><strong>Su ausencia es parte de la historia de salida.</strong> María Eugenia: <em>"el asesor dejó de mirarnos hace muchos días"</em> <span class="src-cite" style="color:#7a1613;">[3]</span>. En contraste, elogia al equipo de apoyo sin reservas.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.4</span><span class="acc-title">Ideas espontáneas de los usuarios que se repiten</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <ul>
+            <li><strong>Rentabilidad propia desde el primer aporte</strong>, con período variable — <span class="badge badge-ok">✅ 4 confirmaciones</span> Sebastián <span class="src-cite" style="color:#0b4a5c;">[2]</span>, Humberto <span class="src-cite" style="color:#7a1613;">[3]</span>, María Eugenia <span class="src-cite" style="color:#7a1613;">[3]</span>, Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></li>
+            <li><strong>Explicar los rebalanceos ya hechos</strong>: qué cambió, cuánto y por qué — <span class="src-cite" style="color:#1d5c0a;">[1]</span> (×3), <span class="src-cite" style="color:#7a1613;">[3]</span>, <span class="src-cite" style="color:#1c2e4a;">[4]</span>, y los FP's en 2025</li>
+            <li><strong>Gráfica de desempeño en curvas</strong> en lugar de barras — <span class="src-cite" style="color:#1d5c0a;">[1]</span> (×2), Juan Daniel <span class="src-cite" style="color:#0b4a5c;">[2]</span>, Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></li>
+            <li><strong>Poder cambiar los porcentajes de la mezcla</strong> — <span class="src-cite" style="color:#1d5c0a;">[1]</span> (×3), Juan Daniel <span class="src-cite" style="color:#0b4a5c;">[2]</span></li>
+            <li><strong>Límite de pérdida configurable</strong> (<em>stop-loss</em>) — Camilo <span class="src-cite" style="color:#0b4a5c;">[2]</span> (×3)</li>
+            <li><strong>Mensajes de motivación accionables</strong>: <em>"si incrementas tu cuota en $100.000, el tiempo para tu meta se reduce a X años"</em> — <span class="src-cite" style="color:#1d5c0a;">[1]</span></li>
+            <li><strong>Rentabilidad desglosada por portafolio</strong> — Humberto <span class="src-cite" style="color:#7a1613;">[3]</span>, Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></li>
+            <li><strong>Comisión visible</strong> junto a la rentabilidad — María Eugenia <span class="src-cite" style="color:#7a1613;">[3]</span></li>
+            <li><strong>Documentos y certificados a la mano</strong>; botones aportar/retirar visibles — <span class="src-cite" style="color:#0b4a5c;">[2]</span></li>
+            <li><strong>Aportes automáticos programados</strong> — <span class="src-cite" style="color:#1d5c0a;">[1]</span></li>
+            <li><span class="badge badge-new">Nuevo</span> <strong>Recordatorio de aporte mensual por SMS</strong> — María Eugenia <span class="src-cite" style="color:#7a1613;">[3]</span></li>
+            <li><span class="badge badge-new">Nuevo</span> <strong>Acceso rápido tipo aplicación bancaria</strong> — María Eugenia <span class="src-cite" style="color:#7a1613;">[3]</span></li>
+            <li><span class="badge badge-new">Nuevo</span> <strong>Bajar la jerarquía de la cuenta contingente</strong> — María Eugenia <span class="src-cite" style="color:#7a1613;">[3]</span></li>
+            <li><span class="badge badge-new">Nuevo</span> <strong>Escala numérica de riesgo (1 a 7 o 1 a 10)</strong> — Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></li>
+            <li><span class="badge badge-new">Nuevo</span> <strong>Elegir la mezcla del listado tras la perfilación</strong>, sin repetir la encuesta — Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span></li>
+            <li><span class="badge badge-new">Nuevo</span> <strong>Asignación parcial de Invested dentro de un mismo contrato</strong> — los tres asesores <span class="src-cite" style="color:#1c2e4a;">[4]</span></li>
+            <li><span class="badge badge-new">Nuevo</span> <strong>Paleta con más contraste en la composición</strong> — Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></li>
+            <li>La opción visible de <strong>desactivar genera confianza, no fuga</strong> — <span class="src-cite" style="color:#1d5c0a;">[1]</span> (×2), María Eugenia <span class="src-cite" style="color:#7a1613;">[3]</span></li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.5</span><span class="acc-title">Comportamiento de la prueba remota</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>De 53 sesiones, 30 completaron el recorrido (57%). Caídas mayores: 4 personas en la Tarea 1 y 6 en la Tarea 2, donde se reportaron los 3 errores técnicos del prototipo. El abandono de la Tarea 2 (15%) debe interpretarse con cautela.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.6</span><span class="acc-title">Tipología de clientes: el mapa completo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>La investigación arranca con un solo tipo documentado y termina con cuatro.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tipo</th><th>Evidencia</th><th>Cómo se relaciona</th><th>Qué necesita</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Desertor neófito</strong></td><td><span class="badge badge-medium">Indirecta</span> CX-SAC 2025</td><td>Entra sin comprender, sufre pérdidas sin explicación, sale molesto y en silencio</td><td>Comprensión y acompañamiento. <strong>Único perfil donde la educación puede ser palanca de retención</strong></td></tr>
+                <tr><td><strong>Desertor amistoso</strong></td><td><span class="badge badge-low">1 entrevista</span> Sebastián <span class="src-cite" style="color:#0b4a5c;">[2]</span></td><td>Compara la gestión automática con el criterio de su asesor y elige al asesor</td><td>Una propuesta que compita con un criterio humano que ya le funciona. Reactivable</td></tr>
+                <tr><td><strong>Detractor sofisticado</strong></td><td><span class="badge badge-ok">3 entrevistas</span> <span class="src-cite" style="color:#7a1613;">[3]</span></td><td>Mide contra un referente concreto y se va cuando pierde la comparación</td><td><strong>Desempeño competitivo y transparencia.</strong> No reactivable con comunicación</td></tr>
+                <tr><td><strong>El cliente que nunca entró</strong> <span class="badge badge-new">Nuevo</span></td><td><span class="badge badge-ok">3 entrevistas</span> <span class="src-cite" style="color:#1c2e4a;">[4]</span></td><td>No se va: <strong>nunca llega</strong> — el asesor no abre la conversación, o el cliente se devuelve</td><td>Que el canal tenga argumento y que el producto conviva con el resto del catálogo. <strong>Volumen que la investigación no había mirado</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.7</span><span class="acc-title">Quien se va compara contra un referente — y suele ser un producto de la casa</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Humberto lo hizo con dos decimales contra el Fondo Liquidez de Skandia <span class="src-cite" style="color:#7a1613;">[3]</span>; Julián migró al CAT y al fondo Impacto, ambos de la casa <span class="src-cite" style="color:#7a1613;">[3]</span>; María Eugenia comparó contra índices de mercado y contra Protección <span class="src-cite" style="color:#7a1613;">[3]</span>.</p>
+          <p><strong>Y el canal hace la misma comparación antes de la venta</strong> <span class="src-cite" style="color:#1c2e4a;">[4]</span>, con los mismos referentes internos. Juan José no lo dijo: lo mostró, compartiendo pantalla del Portal Contigo.</p>
+          <div class="norm-cards">
+            <div class="norm-card norm-card--danger"><h4>Compite dentro de casa</h4><p>Invested no compite contra el mercado en la cabeza del cliente: compite contra el resto del catálogo de Skandia — en la cabeza del cliente y en la del asesor.</p></div>
+            <div class="norm-card norm-card--warn"><h4>No ocurre solo a la salida</h4><p>Ocurre antes, en la cabeza de quien vende, y decide si la conversación llega a existir.</p></div>
+            <div class="norm-card"><h4>Si no comparamos, comparan ellos</h4><p>Sin contexto de plazo, riesgo ni composición. Y el asesor ya construyó la suya.</p></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc" data-new open>
+        <summary><span class="acc-num" style="background: var(--blue-500);">5.8</span><span class="acc-title">El rebalanceo: la única comunicación regular, y no sabemos qué dice</span><span class="acc-flag acc-flag--new">Nuevo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <blockquote class="q-neg">"Básicamente lo único que recibo de Invested son rebalanceos… no que me diga: ahora pasamos del 2,3% de acciones Colombia al 2,5%. No necesito que sea una cosa de 3 páginas. Que te cuenten."<span class="src">Humberto Cañón <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <p>En la prueba remota, tres testers pidieron exactamente eso <span class="src-cite" style="color:#1d5c0a;">[1]</span>.</p>
+          <p><strong>Pero el canal introduce una duda previa.</strong> Juan Felipe describe esa comunicación en términos entusiastas y con la razón incluida <span class="src-cite" style="color:#1c2e4a;">[4]</span> — es decir, describe justamente lo que Humberto dice no recibir. Y los otros dos asesores no saben si le llega al cliente.</p>
+          <div class="callout callout-warn">
+            <span class="icon">💡</span>
+            <span><strong>La contradicción es en realidad un hallazgo mejor:</strong> la organización no tiene claridad interna sobre qué comunica a quién. Es la pieza de mayor retorno por esfuerzo del informe, con un paso previo obligatorio: auditar qué se envía y a quién.</span>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc" data-new open>
+        <summary><span class="acc-num" style="background: var(--blue-500);">5.9</span><span class="acc-title">La perfilación no es la salvaguarda que suponíamos</span><span class="acc-flag acc-flag--new">Nuevo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <blockquote class="q-neg">"A veces… me toca llevar al cliente a que responda de X forma para llegar al portafolio Invested que yo quiero que llegue. Porque si él responde las preguntas por su cuenta, puede quedar en un Invested que no aguanta."<span class="src">Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p>La manipulación no nace de mala fe: nace de que el asesor no confía en que el resultado de la encuesta produzca una mezcla adecuada — consecuencia directa de la sobre-diversificación (5.11).</p>
+          <div class="callout callout-danger">
+            <span class="icon">⛔</span>
+            <span>El informe de julio cerraba la recomendación de desbloqueo con "el perfil de riesgo sigue dependiendo únicamente de la encuesta de perfilación". <strong>Esa salvaguarda no opera hoy.</strong></span>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc" data-new>
+        <summary><span class="acc-num" style="background: var(--blue-500);">5.10</span><span class="acc-title">La gestión invisible: ni cliente ni asesor tienen certeza de que Invested esté ahí</span><span class="acc-flag acc-flag--new">Nuevo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <blockquote class="q-neg">"Yo no sé si ellos captan que al estar en Invested están con una gestión doblemente activa… él responde el cuestionario inicial, le dicen 'estoy aquí', pero sabe que está ya en una serie de fondos, no que está en algo puntual como Invested."<span class="src">Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p>Es la formulación más nítida del hallazgo semilla de esta investigación — "a veces esa gestión tan buena parece que fuera invisible" (Monitor FP's 2025). La pregunta central asume que el cliente sabe que tiene Invested. Si no lo sabe, no hay valor percibido que atribuirle.</p>
+        </div>
+      </details>
+
+      <details class="acc" data-new open>
+        <summary><span class="acc-num" style="background: var(--blue-500);">5.11</span><span class="acc-title">La sobre-diversificación: el mecanismo que nombran cliente, canal y research previo</span><span class="acc-flag acc-flag--new">Nuevo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Cuatro fuentes convergen en el mismo diagnóstico técnico, y ninguna atribuye el desempeño al mercado ni a la mesa de inversiones: FP's 2025, Humberto <span class="src-cite" style="color:#7a1613;">[3]</span>, Juan José <span class="src-cite" style="color:#1c2e4a;">[4]</span>, Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span>, Alejandra <span class="src-cite" style="color:#1c2e4a;">[4]</span> (reporte indirecto de sus clientes).</p>
+          <blockquote class="q-neg">"Veo 15 portafolios de inversión dentro de una misma estrategia… eso no tiene ningún sentido"; "los niveles más arriesgados tienen un 40, un 50% en renta fija. No debería pasar."<span class="src">Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p><strong>Diagnóstico falsable con los datos de composición y desempeño que la organización ya tiene.</strong> Escala fuera del alcance del rediseño.</p>
+        </div>
+      </details>
+
+      <details class="acc" data-new open>
+        <summary><span class="acc-num" style="background: var(--blue-500);">5.12</span><span class="acc-title">Invested es todo-o-nada dentro del contrato</span><span class="acc-flag acc-flag--new">Nuevo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Único tema que los tres asesores levantaron de forma espontánea, con el mismo remedio propuesto.</p>
+          <blockquote class="q-neg">"Crear un contrato nuevo de un cliente ya existente es muy largo… no es un clic como inclusive la competencia lo tiene."<span class="src">Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p><strong>El cliente nunca ve esta fricción: la absorbe el asesor, y el asesor la evita no ofreciendo el producto.</strong> Ilumina retroactivamente el caso de Julián <span class="src-cite" style="color:#7a1613;">[3]</span>: para migrar al CAT e Impacto tuvo que salirse por completo.</p>
+        </div>
+      </details>
+
+      <details class="acc" data-new>
+        <summary><span class="acc-num" style="background: var(--blue-500);">5.13</span><span class="acc-title">Invested compite dentro de la casa también por autoridad</span><span class="acc-flag acc-flag--new">Nuevo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <blockquote class="q-neg">"Tú coges un cliente moderado y tiene una recomendación de Invested, una de Ideas y una de Wealth. ¿A quién le hago caso?"<span class="src">Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span></span></blockquote>
+          <p>Cuando tres áreas de la misma casa emiten recomendaciones distintas para el mismo perfil, ninguna tiene autoridad plena, y el asesor arbitra con su propio criterio — que es exactamente lo que Invested venía a sustituir.</p>
+        </div>
+      </details>
+
+      <details class="acc" data-new open>
+        <summary><span class="acc-num" style="background: var(--blue-500);">5.14</span><span class="acc-title">Nadie gestiona la salida</span><span class="acc-flag acc-flag--new">Nuevo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <blockquote class="q-neg">"A mí nunca me llamaron a decirme usted por qué se va."<span class="src">María Eugenia Cataño <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <p>Julián ya había respondido encuestas negativas sin seguimiento. Los tres agradecieron la conversación de forma espontánea al cierre.</p>
+          <div class="callout callout-warn">
+            <span class="icon">💡</span>
+            <span>Hoy la desactivación es un evento silencioso en ambas direcciones. Ninguna palanca del rediseño lo cubre, y es la más barata de todas: <strong>una conversación</strong>.</span>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.15</span><span class="acc-title">La marca sobrevive al producto</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Los tres detractores siguen siendo clientes de Skandia <span class="src-cite" style="color:#7a1613;">[3]</span>. Los tres asesores dicen lo mismo en positivo y nombran la condición exacta <span class="src-cite" style="color:#1c2e4a;">[4]</span>. <strong>Hay ventana de recuperación, y es más ancha de lo que sugeriría el nivel de disgusto. Pero se sostiene sobre la marca, no sobre Invested — y el crédito de confianza ya se gastó una vez.</strong></p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--theme">5.16</span><span class="acc-title">El costo importa tanto como el rendimiento</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <blockquote class="q-neg">"A mí Skandia fue mi primer trabajo, pero es muy caro… en los malos momentos yo comparaba los portafolios de Protección con los de Skandia, y decía: no se me justifica."<span class="src">María Eugenia Cataño <span class="src-cite" style="color:#7a1613;">[3]</span></span></blockquote>
+          <p>Factor que la investigación no había registrado y que pesa en la ecuación de valor.</p>
+        </div>
+      </details>
+    </section>
+    <!-- ═══ 06 Convergencias y divergencias ═══ -->
+    <section class="section" id="s6">
+      <div class="section-header">
+        <div class="section-number">06</div>
+        <div>
+          <h2 class="section-title">Convergencias y divergencias entre las cuatro fuentes</h2>
+          <p class="section-desc">Dónde coinciden, dónde parecen separarse y qué aporta cada una que las demás no pueden</p>
+        </div>
+      </div>
+
+      <h3>6.1 · Dónde coinciden las cuatro</h3>
+      <p>Los hallazgos más robustos del informe, porque sobreviven a métodos, momentos y perfiles distintos.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hallazgo</th><th><span class="src-tag src-tag--1">1</span></th><th><span class="src-tag src-tag--2">2</span></th><th><span class="src-tag src-tag--3">3</span></th><th><span class="src-tag src-tag--4">4</span></th></tr></thead>
+          <tbody>
+            <tr><td>La activación rediseñada funciona</td><td><span class="badge badge-ok">91%</span></td><td><span class="badge badge-ok">5/5</span></td><td><span class="badge badge-ok">9, 9, fácil</span></td><td><span class="badge badge-ok">✅</span></td></tr>
+            <tr><td>Falta rentabilidad esperada y proyección</td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td></tr>
+            <tr><td>Rentabilidad propia con período variable es requisito</td><td><span class="badge badge-low">—</span></td><td><span class="badge badge-ok">Sebastián</span></td><td><span class="badge badge-ok">✅ ×2</span></td><td><span class="badge badge-ok">✅</span></td></tr>
+            <tr><td>"Mezcla" y siglas no se entienden</td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td></tr>
+            <tr><td>Perfilación no visible en el flujo</td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-low">—</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅ ×2</span></td></tr>
+            <tr><td>Notificación de caída tranquiliza y evita retiro impulsivo</td><td><span class="badge badge-ok">94%</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">Conductual</span></td></tr>
+            <tr><td>La gamificación no sustituye la rentabilidad</td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td></tr>
+            <tr><td>El rebalanceo debe explicarse, no solo avisarse</td><td><span class="badge badge-ok">✅ ×3</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td></tr>
+            <tr><td>El asesor humano es la red de seguridad</td><td><span class="badge badge-ok">~15</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td></tr>
+            <tr><td>"Logros y aprendizaje" cuesta encontrarlo</td><td><span class="badge badge-ok">31%</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td><td><span class="badge badge-ok">✅</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6.2 · Dónde se separan — y cómo se resuelve</h3>
+      <p>Ninguna divergencia queda sin explicación. Todas resultan ser segmentación o problema de entrega, no contradicción de fondo.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tema</th><th>Quién dice qué</th><th>Lectura</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Desbloqueo progresivo</strong></td><td><span class="src-cite" style="color:#1d5c0a;">[1]</span> y los novatos de <span class="src-cite" style="color:#0b4a5c;">[2]</span> lo encuentran motivador; <span class="src-cite" style="color:#7a1613;">[3]</span> y <span class="src-cite" style="color:#1c2e4a;">[4]</span> son indiferentes o lo rechazan</td><td><strong>Es segmentación, no contradicción.</strong> La variable es tener ya un proceso de decisión propio</td></tr>
+            <tr><td><strong>Comunicación de rebalanceo</strong></td><td>Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span> la elogia; Humberto <span class="src-cite" style="color:#7a1613;">[3]</span> la llama ritual vacío</td><td><strong>Describen piezas distintas.</strong> Dos de tres asesores no saben cuál recibe el cliente (5.8)</td></tr>
+            <tr><td><strong>Educación</strong></td><td>Valor máximo en María Angélica <span class="src-cite" style="color:#0b4a5c;">[2]</span>; efecto retentivo nulo en <span class="src-cite" style="color:#7a1613;">[3]</span></td><td><strong>Frontera de perfil</strong>, no desacuerdo</td></tr>
+            <tr><td><strong>Proyección de rentabilidad</strong></td><td><span class="src-cite" style="color:#1d5c0a;">[1]</span> y <span class="src-cite" style="color:#0b4a5c;">[2]</span> la piden con insistencia; Juan Felipe <span class="src-cite" style="color:#1c2e4a;">[4]</span> advierte que mal construida juega en contra</td><td><strong>Se complementan:</strong> <span class="src-cite" style="color:#1d5c0a;">[1]</span><span class="src-cite" style="color:#0b4a5c;">[2]</span> definen el requisito, <span class="src-cite" style="color:#1c2e4a;">[4]</span> define su condición</td></tr>
+            <tr><td><strong>Canal SMS</strong></td><td><span class="src-cite" style="color:#1d5c0a;">[1]</span> lo deja en último lugar (4 de 32); María Eugenia <span class="src-cite" style="color:#7a1613;">[3]</span> lo pide explícitamente</td><td>La medición se hizo sobre testers <strong>enganchados</strong>; subestima al perfil desenganchado</td></tr>
+            <tr><td><strong>Chatbot</strong></td><td>Tres testers jóvenes <span class="src-cite" style="color:#1d5c0a;">[1]</span> lo piden; María Angélica <span class="src-cite" style="color:#0b4a5c;">[2]</span> lo rechaza</td><td>Segmentación por alfabetización digital y financiera</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6.3 · Qué ve cada fuente que las demás no pueden ver</h3>
+      <div class="norm-cards">
+        <div class="norm-card" style="border-top-color: var(--chart-1);"><h4><span class="src-tag src-tag--1">1</span> Prueba remota</h4><p><strong>Escala y comportamiento sin moderador.</strong> Dónde se abandona de verdad, cuánto cuesta encontrar algo. Única fuente con cifras.</p></div>
+        <div class="norm-card" style="border-top-color: var(--chart-2);"><h4><span class="src-tag src-tag--2">2</span> Ronda 1 · clientes</h4><p><strong>El porqué de quien usa el servicio hoy.</strong> Único lugar donde la baja alfabetización financiera tiene voz completa. Muestra el journey real.</p></div>
+        <div class="norm-card" style="border-top-color: var(--chart-6);"><h4><span class="src-tag src-tag--3">3</span> Detractores</h4><p><strong>El desenlace.</strong> Cómo se construye la decisión de salir, y qué <em>no</em> funciona como retención — porque observó una retención fallida.</p></div>
+        <div class="norm-card" style="border-top-color: var(--chart-5);"><h4><span class="src-tag src-tag--4">4</span> Asesores</h4><p><strong>La visión de cartera y lo que pasa antes de la venta.</strong> La fricción operativa que el cliente nunca ve, y si reconoce el servicio que tiene.</p></div>
+      </div>
+    </section>
+
+    <!-- ═══ 07 Segmentación ═══ -->
+    <section class="section" id="s7">
+      <div class="section-header">
+        <div class="section-number">07</div>
+        <div>
+          <h2 class="section-title">Segmentación por perfil</h2>
+          <p class="section-desc">Quién respondió qué, y a quién le ofrece Invested cada asesor</p>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>Muestra remota <span class="src-cite" style="color:#1d5c0a;">[1]</span>:</strong> 35 de 40 correos identificados. Edad entre 26 y 61 años, con representación de mayores de 50. El 100% se declara cómoda con herramientas digitales — <strong>no representa al usuario digitalmente incómodo</strong>. El 72% no había usado Invested antes.</li>
+        <li><strong>La variable que ordena la tensión de H3 y H5 no es la edad: es tener un proceso de decisión propio.</strong> En la muestra remota los perfiles inversores piden agencia y datos técnicos, mientras los ahorradores piden explicación y acompañamiento <span class="src-cite" style="color:#1d5c0a;">[1]</span>. La ronda 1 lo confirma con nombre: María Angélica pide el ABC, Camilo pide stop-loss <span class="src-cite" style="color:#0b4a5c;">[2]</span>. Las dos rondas de agosto lo llevan al extremo: detractores y asesores, todos con criterio construido, rechazaron el desbloqueo <span class="src-cite" style="color:#7a1613;">[3]</span><span class="src-cite" style="color:#1c2e4a;">[4]</span>. <strong>Pedagogía no es lo mismo que rendición de cuentas.</strong></li>
+      </ul>
+
+      <h3>El eje del segmento que se va</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Detractor sofisticado</th><th>Detractor neófito</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Evidencia</strong></td><td>3 entrevistas, agosto 2026 <span class="src-cite" style="color:#7a1613;">[3]</span></td><td>CX-SAC 2025, sin entrevista directa</td></tr>
+            <tr><td><strong>Por qué se va</strong></td><td>Hizo la cuenta y perdió</td><td>No entendió y se sintió solo</td></tr>
+            <tr><td><strong>Qué pide</strong></td><td>Datos, transparencia, comparación honesta</td><td>Explicación, cercanía, acompañamiento</td></tr>
+            <tr><td><strong>Qué lo retiene</strong></td><td>Desempeño competitivo — y rendición de cuentas</td><td>Comprensión y presencia</td></tr>
+            <tr><td><strong>Qué <em>no</em> funciona</strong></td><td>Educación básica, gamificación</td><td>Datos crudos sin contexto</td></tr>
+            <tr><td><strong>Estado</strong></td><td><span class="badge badge-ok">✅ Cubierto</span></td><td><span class="badge badge-medium">⚠️ Brecha abierta</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>A quién le ofrece Invested cada asesor <span class="src-cite" style="color:#1c2e4a;">[4]</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>A quién sí</th><th>A quién no</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Juan José</strong></td><td>Ahorrador periódico; perfiles del intermedio hacia arriba</td><td>Quien busca una estrategia puntual o un CAT</td></tr>
+            <tr><td><strong>Juan Felipe</strong></td><td>Quien aporta montos pequeños y no justifica gestión manual</td><td>Cliente conocedor, autogestionado, o CAT / Bitcoin / apuestas puntuales</td></tr>
+            <tr><td><strong>Alejandra</strong></td><td>Cliente nuevo e inexperto, conservador con curiosidad</td><td>Quien ya conoce el mercado e invierte por su cuenta</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-danger">
+        <span class="icon">🔍</span>
+        <span><strong>La lectura conjunta es incómoda.</strong> Los tres reservan Invested para el cliente de menor saldo y menor criterio — exactamente el <strong>detractor neófito</strong> que sigue sin voz directa en esta investigación, y el perfil que peor terminó en CX-SAC 2025. Eleva la prioridad de la recomendación 27.</span>
+      </div>
+    </section>
+    <!-- ═══ 08 Veredictos de cierre ═══ -->
+    <section class="section" id="s8">
+      <div class="section-header">
+        <div class="section-number">08</div>
+        <div>
+          <h2 class="section-title">Veredictos de cierre</h2>
+          <p class="section-desc">Estado final de las 5 hipótesis · con la columna de cómo se construyó, para que sea auditable</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hipótesis</th><th>Prioridad</th><th>Veredicto final</th><th>Cómo se construyó</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>H1</strong> · La forma de mostrar rentabilidades frena la activación</td>
+              <td><span class="badge badge-high">Crítica</span></td>
+              <td><span class="badge badge-ok">✅ Confirmada</span> El rediseño resuelve el flujo; falta proyección bien construida, rentabilidad propia con período variable y por portafolio, composición por portafolio y comisión visible</td>
+              <td>Las cuatro fuentes convergen en el vacío. La rentabilidad propia acumula <strong>4 confirmaciones independientes</strong> <span class="src-cite" style="color:#0b4a5c;">[2]</span><span class="src-cite" style="color:#7a1613;">[3]</span><span class="src-cite" style="color:#7a1613;">[3]</span><span class="src-cite" style="color:#1c2e4a;">[4]</span>. La única corrección viene de <span class="src-cite" style="color:#1c2e4a;">[4]</span>: la proyección no puede extrapolar históricos</td>
+            </tr>
+            <tr>
+              <td><strong>H2</strong> · Educación → permanencia</td>
+              <td><span class="badge badge-high">Crítica</span></td>
+              <td><span class="badge badge-partial">🟡 Parcial, con frontera</span> Construye tolerancia a la volatilidad, no al bajo desempeño sostenido. Palanca de retención <strong>solo para el perfil que empieza</strong></td>
+              <td><span class="src-cite" style="color:#1d5c0a;">[1]</span><span class="src-cite" style="color:#0b4a5c;">[2]</span> establecen su valor y su público; <span class="src-cite" style="color:#7a1613;">[3]</span> fija el límite duro; <span class="src-cite" style="color:#1c2e4a;">[4]</span> afina la frontera por curiosidad y señala el conflicto de rol con el canal</td>
+            </tr>
+            <tr>
+              <td><strong>H3</strong> · La gamificación sustituye la rentabilidad</td>
+              <td><span class="badge badge-high">Crítica</span></td>
+              <td><span class="badge badge-no">❌ Refutada</span> como sustituto · <span class="badge badge-ok">✅ complemento</span> · <span class="badge badge-no">⛔ prohibido atarla al perfil de riesgo</span></td>
+              <td><span class="src-cite" style="color:#1d5c0a;">[1]</span> mide el atractivo; <span class="src-cite" style="color:#0b4a5c;">[2]</span> descubre el eje del proceso de decisión propio; <span class="src-cite" style="color:#7a1613;">[3]</span> aporta la restricción de idoneidad; <span class="src-cite" style="color:#1c2e4a;">[4]</span> la corrobora y añade dos objeciones — <strong>y muestra que la salvaguarda de julio no opera</strong></td>
+            </tr>
+            <tr>
+              <td><strong>H4</strong> · Comunicación proactiva en caídas reduce retiros</td>
+              <td><span class="badge badge-medium">Alta</span></td>
+              <td><span class="badge badge-ok">✅ Confirmada</span> El hallazgo más sólido, con reacción positiva en las once entrevistas y confirmación conductual en el canal. Con <strong>techo</strong> y <strong>dos fugas de canal</strong></td>
+              <td><span class="src-cite" style="color:#1d5c0a;">[1]</span> mide; <span class="src-cite" style="color:#0b4a5c;">[2]</span> construye la anatomía del mensaje y la regla de dosis; <span class="src-cite" style="color:#7a1613;">[3]</span> aporta el contrafactual, el techo y la fuga hacia el cliente; <span class="src-cite" style="color:#1c2e4a;">[4]</span> confirma la conducta y aporta la fuga hacia el asesor</td>
+            </tr>
+            <tr>
+              <td><strong>H5</strong> · Diferenciación de mezclas → valor percibido</td>
+              <td><span class="badge badge-medium">Alta</span></td>
+              <td><span class="badge badge-partial">🟡 Parcial</span> Vehículo correcto; bloqueado en <strong>seis</strong> puntos: lenguaje, perfilación invisible, falta de agencia, opacidad del rebalanceo, composición sin portafolios y reconocimiento del servicio</td>
+              <td><span class="src-cite" style="color:#1d5c0a;">[1]</span><span class="src-cite" style="color:#0b4a5c;">[2]</span> identifican los tres primeros bloqueos; <span class="src-cite" style="color:#7a1613;">[3]</span> añade la opacidad del rebalanceo; <span class="src-cite" style="color:#1c2e4a;">[4]</span> añade los dos últimos y muestra que el lenguaje falla incluso con profesionales</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <!-- ═══ 09 Recomendaciones ═══ -->
+    <section class="section" id="s9">
+      <div class="section-header">
+        <div class="section-number">09</div>
+        <div>
+          <h2 class="section-title">Recomendaciones priorizadas</h2>
+          <p class="section-desc">3 de Nivel 0 (bloqueantes) + 13 tácticas + 14 estratégicas</p>
+        </div>
+      </div>
+
+      <h3>Nivel 0 — condición de posibilidad</h3>
+      <p style="font-size:12.5px; color:var(--text-muted);">No las ejecuta el equipo de experiencia. Van primero porque el cumplimiento de las demás no produce adopción si estas no se resuelven.</p>
+      <div class="level0-wrap">
+        <div class="level0-card">
+          <span class="icon">🚫</span>
+          <div>
+            <span class="level0-id">R0.1 · Crítica · producto</span>
+            <p><strong>Escalar el desempeño comparado como decisión previa al lanzamiento.</strong> Cliente detractor <span class="src-cite" style="color:#7a1613;">[3]</span> y canal <span class="src-cite" style="color:#1c2e4a;">[4]</span> llegan por separado a la misma conclusión: Invested pierde la comparación contra alternativas de la propia casa. Tres asesores califican su comodidad recomendándolo en 2, "2-3" y 3.</p>
+          </div>
+        </div>
+        <div class="level0-card">
+          <span class="icon">🚫</span>
+          <div>
+            <span class="level0-id">R0.2 · Crítica · producto</span>
+            <p><strong>Revisar el número de portafolios por mezcla y la coherencia de los extremos del perfil.</strong> Evidencia convergente: los FP's de 2025, Humberto <span class="src-cite" style="color:#7a1613;">[3]</span> y los tres asesores <span class="src-cite" style="color:#1c2e4a;">[4]</span>. Diagnóstico específico y falsable, verificable contra los datos de composición existentes (5.11).</p>
+          </div>
+        </div>
+        <div class="level0-card">
+          <span class="icon">🚫</span>
+          <div>
+            <span class="level0-id">R0.3 · Alta · producto y operaciones</span>
+            <p><strong>Permitir asignación parcial de Invested dentro de un mismo contrato</strong>, y creación de contrato en un clic para cliente ya vinculado. Los tres asesores lo levantaron sin que se les preguntara, con el mismo remedio <span class="src-cite" style="color:#1c2e4a;">[4]</span> (5.12).</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Tácticas — ajustes al prototipo antes del lanzamiento</h3>
+      <ol class="imp-list">
+        <li class="is-corrected"><span class="badge badge-high">Alta · H1</span><span class="imp-text">Proyección de crecimiento en "Ver mi mezcla" y simulador meta–plazo–cuota con aporte mensual editable — <strong>con rangos de rentabilidad esperada prospectivos y diferenciados por perfil, no extrapolados de históricos</strong> <span class="src-cite" style="color:#1c2e4a;">[4]</span>. Corregir los dos defectos de consistencia detectados: la proyección que supera la meta sin explicarlo, y la rentabilidad esperada que cambia entre pantallas (8% → 7,5%).</span></li>
+        <li><span class="badge badge-high">Alta · H1</span><span class="imp-text">Rentabilidad propia acumulada <strong>desde el primer aporte</strong>, con selector de período variable y desglose por portafolio, en curva de saldo y no en barras. <em>Cuatro confirmaciones independientes: Sebastián Piedrahita, Humberto Cañón, María Eugenia Cataño y Juan Felipe.</em></span></li>
+        <li><span class="badge badge-high">Alta · H4</span><span class="imp-text">Sacar la notificación de caída <strong>fuera de la aplicación</strong>: correo y WhatsApp como canales primarios y SMS para el perfil desenganchado, campanita como refuerzo. Completar la anatomía del mensaje. <strong>Sumar al asesor como destinatario paralelo</strong>, con la lista de sus clientes afectados.</span></li>
+        <li class="is-new"><span class="badge badge-high">Alta · H5 🆕</span><span class="imp-text"><strong>Rediseñar el correo de rebalanceo</strong> para que explique la lectura de mercado detrás del ajuste. Cambio de mayor retorno por esfuerzo. <strong>Paso previo obligatorio: auditar qué pieza se envía hoy y a quién</strong> — dos de tres asesores no lo saben.</span></li>
+        <li><span class="badge badge-high">Alta · H5</span><span class="imp-text">Sustituir o explicar "mezcla" y eliminar las siglas RV y RF; <strong>sustituir los nombres de perfil por una escala numérica con descriptor</strong>; mostrar cuál es el perfil vigente en la pantalla que hoy solo declara que lo está.</span></li>
+        <li class="is-new"><span class="badge badge-high">Alta · H5 🆕</span><span class="imp-text">Mostrar la composición <strong>por portafolio además de por tipo de activo</strong>.</span></li>
+        <li><span class="badge badge-high">Alta · quiebre #1</span><span class="imp-text">Rediseñar la jerarquía de entrada: un solo camino evidente hacia la activación desde el contrato. Y resolver la desorientación de la primera pantalla.</span></li>
+        <li><span class="badge badge-medium">Media</span><span class="imp-text">Mantener meta y plazo visibles después de la activación, en el detalle del contrato.</span></li>
+        <li><span class="badge badge-medium">Media</span><span class="imp-text">Facilitar el acceso a "Logros y aprendizaje" desde el nivel superior del detalle; escala de niveles visible.</span></li>
+        <li><span class="badge badge-medium">Media</span><span class="imp-text">Historial de rebalanceos explicado; gráfica de desempeño en curvas en lugar de barras.</span></li>
+        <li><span class="badge badge-medium">Media</span><span class="imp-text">Comisión de administración delegada visible junto a la rentabilidad; bajar la jerarquía visual de la cuenta contingente.</span></li>
+        <li class="is-new"><span class="badge badge-medium">Media 🆕</span><span class="imp-text">Corregir la paleta de la composición: "tenemos 5 protagonistas con el mismo color".</span></li>
+        <li><span class="badge badge-low">Baja</span><span class="imp-text">Renombrar "Detalles" y "Conocer y activar"; reevaluar las letras "ED" tachadas del logotipo; carpeta de documentos y certificados; aportes automáticos; recordatorio de aporte mensual por SMS.</span></li>
+      </ol>
+
+      <h3>Estratégicas</h3>
+      <ol class="imp-list imp-list--start">
+        <li class="is-corrected"><span class="badge badge-medium">H3/H5 · reescrita</span><span class="imp-text">Desbloqueo progresivo como camino sugerido <strong>con puerta de salida</strong>, desacoplado del cambio de perfil de riesgo ⛔. Pero la protección no puede delegarse en la encuesta: <strong>a)</strong> agencia explícita — mostrar la mezcla recomendada junto al listado completo tras la perfilación; <strong>b)</strong> gobierno — medir cuántas veces se repite la encuesta antes de una activación.</span></li>
+        <li class="is-new"><span class="badge badge-medium">H3 🆕</span><span class="imp-text">Reformular el hito "superaste una caída sin retirar" para que no premie la pérdida: <em>"¿cómo así, entonces yo tenía que perder plata para poder ser de otro perfil?"</em></span></li>
+        <li><span class="badge badge-medium">H2 · reformulada</span><span class="imp-text">Educación por niveles, anclada a eventos del contrato, dirigida al perfil que empieza. No debe figurar como palanca de retención frente al cliente insatisfecho por desempeño. Diseñarla para que el asesor la reconozca como munición propia.</span></li>
+        <li><span class="badge badge-medium">H4</span><span class="imp-text">Política de comunicación por dosis, con preferencias de canal configurables. Contactar solo cuando hay algo que saber o decidir.</span></li>
+        <li class="is-new"><span class="badge badge-high">Alta 🆕</span><span class="imp-text"><strong>Protocolo de salida gestionada.</strong> Que la desactivación dispare una conversación —llamada del asesor o del equipo de servicio dentro de las 72 horas— con pregunta abierta y sin guion comercial. La recomendación más barata del informe.</span></li>
+        <li class="is-new"><span class="badge badge-high">Alta 🆕</span><span class="imp-text"><strong>Mostrar el desempeño contra un referente</strong> en el material de Invested, con contexto de plazo, riesgo y composición. Doblemente confirmada: el cliente lo construye por su cuenta <span class="src-cite" style="color:#7a1613;">[3]</span>, y el asesor ya lo construye a mano en Portal Contigo <span class="src-cite" style="color:#1c2e4a;">[4]</span>. Condiciona R0.1 y R0.2 como prerrequisito.</span></li>
+        <li class="is-new"><span class="badge badge-high">Alta 🆕</span><span class="imp-text"><strong>Habilitar al canal.</strong> Kit de argumentación con la comparación honesta ya construida, y acceso desde Portal Contigo a la misma vista de rentabilidad que verá el cliente. <strong>Condicionada a R0.1.</strong></span></li>
+        <li class="is-new"><span class="badge badge-high">Alta 🆕</span><span class="imp-text"><strong>Reescribir la promesa de valor del servicio.</strong> "Gestión experta… rebalanceada por expertos" no la sostiene quien tiene que repetirla: "es una gestión, insisto, como pasiva" (Juan José). O el producto sube al nivel de la promesa, o la promesa se ajusta a lo que entrega.</span></li>
+        <li class="is-new"><span class="badge badge-medium">Media 🆕</span><span class="imp-text"><strong>Unificar o jerarquizar las recomendaciones internas.</strong> Invested, Ideas de Inversión y Wealth emiten recomendaciones distintas para el mismo perfil. No requiere nueva investigación para decidirse.</span></li>
+        <li class="is-new"><span class="badge badge-medium">Media 🆕</span><span class="imp-text"><strong>Medir la adopción del canal como indicador de producto.</strong> Porcentaje de la cartera de cada asesor en Invested, antes y después del lanzamiento.</span></li>
+        <li class="is-new"><span class="badge badge-medium">Media 🆕</span><span class="imp-text"><strong>Medir el reconocimiento del servicio.</strong> Qué proporción de clientes activos sabe nombrar Invested como el servicio que tiene.</span></li>
+        <li class="is-corrected"><span class="badge badge-medium">⚠️ H1 · corregida</span><span class="imp-text"><strong>Campaña de reactivación con rentabilidad personal: válida solo para el perfil amistoso.</strong> El mini-sprint la contraindica para el perfil sofisticado: refuerza el argumento de salida en lugar de contrarrestarlo. Segmentar antes de ejecutar.</span></li>
+        <li><span class="badge badge-explore">Explorar</span><span class="imp-text">Límite de pérdida personal (<em>stop-loss</em>) para el segmento con experiencia — aparece espontáneamente y con insistencia (Camilo ×3).</span></li>
+        <li class="is-new"><span class="badge badge-explore">Explorar ⬆️</span><span class="imp-text"><strong>Sprint de detractor neófito.</strong> 3–4 entrevistas con clientes de baja alfabetización financiera que desactivaron. Sube de prioridad: es el perfil al que los tres asesores dirigen Invested hoy, y la única brecha de evidencia abierta.</span></li>
+      </ol>
+    </section>
+    <!-- ═══ 10 Verificación ═══ -->
+    <section class="section" id="s10">
+      <div class="section-header">
+        <div class="section-number">10</div>
+        <div>
+          <h2 class="section-title">Verificación de criterios de éxito del brief</h2>
+          <p class="section-desc">Checklist de cierre del informe final</p>
+        </div>
+      </div>
+      <ul class="check-list">
+        <li><span class="check-icon">✅</span><strong>Las 5 hipótesis tienen evidencia y veredicto final</strong>, construido con las cuatro fuentes.</li>
+        <li><span class="check-icon">✅</span>Al menos 3 momentos de quiebre en el flujo de activación — <strong>16 identificados</strong>, aportados por las cuatro fuentes.</li>
+        <li><span class="check-icon">✅</span>El equipo puede priorizar ajustes sin ambigüedad: 3 recomendaciones de Nivel 0 y 27 priorizadas en la sección 09.</li>
+        <li><span class="check-icon">✅</span><strong>Muestra cualitativa: cerrada en cobertura de perfiles.</strong> 11 entrevistas frente a las 9–12 planeadas, con activos, un desertor amistoso, tres detractores y tres asesores.</li>
+        <li><span class="check-icon">✅</span>Hallazgos etiquetados en Dovetail antes de la presentación a stakeholders (165 highlights entre los dos proyectos de agosto, más la ronda de julio).</li>
+        <li><span class="check-icon">🟡</span><strong>Brecha residual documentada:</strong> falta la voz del detractor neófito (recomendación 27).</li>
+        <li><span class="check-icon">⚠️</span><strong>Salvedad metodológica:</strong> la ronda de asesores no tiene bloque de instrumento documentado (sección 02).</li>
+        <li><span class="check-icon">⚠️</span><strong>Alcance excedido:</strong> la investigación entrega tres hallazgos de producto —desempeño comparado, sobre-diversificación y arquitectura del contrato— fuera del alcance de un sprint de experiencia, que deben escalarse a las áreas correspondientes.</li>
+      </ul>
+    </section>
+
+    <!-- ═══ 11 Anexos ═══ -->
+    <section class="section" id="s11">
+      <div class="section-header">
+        <div class="section-number">11</div>
+        <div>
+          <h2 class="section-title">Anexos</h2>
+          <p class="section-desc">Material de soporte completo de toda la investigación</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Anexo</th><th>Qué contiene</th><th>Enlace</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong><span class="src-tag src-tag--4">4</span> Ronda de Financial Planners (Dovetail)</strong> <span class="badge badge-new">Nuevo</span></td>
+              <td>Proyecto <em>Invested 3.0 FP´s</em> — 3 entrevistas del 11 al 18 de agosto de 2026, 77 highlights etiquetados.</td>
+              <td>
+                <a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/6hbg2lSgDEqiKJlQVKUWpR" target="_blank" rel="noopener">Proyecto ↗</a>
+                <a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/data/hWvcAJksUXbt2Y4vhF7jS" target="_blank" rel="noopener">Juan José ↗</a>
+                <a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/data/3YAGJ0KF0YIou6Lz45CuEp" target="_blank" rel="noopener">Juan Felipe ↗</a>
+                <a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/data/4RIOpeIJJlogl4zIII729t" target="_blank" rel="noopener">Alejandra ↗</a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong><span class="src-tag src-tag--3">3</span> Mini-sprint de detractores (Dovetail)</strong></td>
+              <td>Proyecto <em>Invest-ed 3.0 Detractores</em> — 3 entrevistas del 5 de agosto de 2026, 88 highlights etiquetados.</td>
+              <td>
+                <a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/projects/6ioeZqeCcYEyQ3vkBEdsKY" target="_blank" rel="noopener">Proyecto ↗</a>
+                <a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/data/VQDvDJE6d2YFshJtV2l7f" target="_blank" rel="noopener">María Eugenia ↗</a>
+                <a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/data/12dC6TosAath6wTIAJxgIK" target="_blank" rel="noopener">Humberto ↗</a>
+                <a class="link-pill" href="https://uxplorers-skandiacol-xfdn.dovetail.com/data/2LI4zYN61lPpEPlAHyL0c5" target="_blank" rel="noopener">Julián ↗</a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong><span class="src-tag src-tag--1">1</span> Informe completo de la prueba remota (Useberry)</strong></td>
+              <td>Resultados detallados por bloque de <em>InvestED 2.0 – Prueba de usabilidad por tareas</em> (53 respuestas · 30 completas).</td>
+              <td><a class="link-pill" href="https://app.useberry.com/sharing-results/ttIkT0LkY4JbVT/?segmentID=30022375-da37-46d1-a394-a7ec64bf5498" target="_blank" rel="noopener">Ver informe ↗</a></td>
+            </tr>
+            <tr>
+              <td><strong>Prototipo testeado</strong></td>
+              <td>Versión navegable del nuevo Invested usada en las 11 entrevistas y en la prueba remota.</td>
+              <td><a class="link-pill" href="https://shine-style-workbench.lovable.app" target="_blank" rel="noopener">Abrir prototipo ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <span class="icon">📝</span>
+        <span><strong>Nota sobre las citas.</strong> Todas son textuales de las transcripciones en Dovetail y de las respuestas abiertas de Useberry. Se normalizan los artefactos de la transcripción automática: "Scandia" / "Scania" → <strong>Skandia</strong>; "Investing" / "Inveset" / "investor" → <strong>Invested</strong>; "CAD" / "Cut" → <strong>CAT</strong>. Las transcripciones de la ronda de asesores rotulan a los hablantes como "Participant 1/2/3"; la atribución por nombre se hizo con las menciones directas dentro de cada sesión.</span>
+      </div>
+    </section>
+
+    <footer class="doc-footer">
+      <strong>Fuentes</strong><br>
+      Entrevistas ronda 1 (Dovetail · <em>Entrevistas Invest-ed 2.0</em>): Camilo Zuzunaga, María Angélica Hurtado, Juan Daniel Fajardo, Paola Andrea Rodríguez, Sebastián Piedrahita — julio de 2026.<br>
+      Entrevistas mini-sprint (Dovetail · <em>Invest-ed 3.0 Detractores</em>): María Eugenia Cataño López de Mesa, Humberto Cañón, Julián Pinzón — 5 de agosto de 2026.<br>
+      Entrevistas de canal (Dovetail · <em>Invested 3.0 FP´s</em>): Juan José, Juan Felipe, Alejandra — 11 al 18 de agosto de 2026.<br>
+      Prueba remota (Useberry): <em>InvestED 2.0 – Prueba de usabilidad por tareas</em> — 53 respuestas al 15 de julio de 2026.<br>
+      Investigación previa (Dovetail): CX-SAC · Gestión de portafolios con Financial Planners · Gestión de portafolios con clientes · Monitor para Financial Planners · Taller Invested.<br>
+      Instrumento de campo: instrumento-invested-3.md v3.1 — Parte 1, Parte 1B y Parte 2. Sin bloque para asesores.<br><br>
+      Elaborado por el equipo UX (#UXplorers) · Invested 3.0 · Informe final consolidado v3.0 · 19 de agosto de 2026.
+    </footer>
+  </div>
+
+  <button id="backTop" aria-label="Volver arriba">↑</button>
+
+  <script>
+    // ── Barra de progreso de lectura ──
+    const progressBar = document.getElementById('progressBar');
+    const backTop = document.getElementById('backTop');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+      progressBar.style.width = pct + '%';
+      backTop.classList.toggle('visible', h.scrollTop > 600);
+    }, { passive: true });
+
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ── Expandir / contraer todo ──
+    const allAccs = [...document.querySelectorAll('details.acc')];
+    document.getElementById('expandAll').addEventListener('click', () => allAccs.forEach(d => d.open = true));
+    document.getElementById('collapseAll').addEventListener('click', () => allAccs.forEach(d => d.open = false));
+
+    // ── Filtro "Solo lo nuevo de esta ronda" ──
+    const onlyNewBtn = document.getElementById('onlyNew');
+    let onlyNew = false;
+    onlyNewBtn.addEventListener('click', () => {
+      onlyNew = !onlyNew;
+      onlyNewBtn.setAttribute('aria-pressed', String(onlyNew));
+      onlyNewBtn.textContent = onlyNew ? 'Ver todo' : 'Solo lo nuevo de esta ronda';
+      if (onlyNew) { searchInput.value = ''; runSearch(); }
+      allAccs.forEach(d => {
+        const isNew = d.hasAttribute('data-new');
+        d.style.display = (!onlyNew || isNew) ? '' : 'none';
+        if (onlyNew && isNew) d.open = true;
+      });
+    });
+
+    // ── Búsqueda global ──
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    const searchCount = document.getElementById('searchCount');
+
+    function clearHighlights(root) {
+      root.querySelectorAll('mark').forEach(m => {
+        m.replaceWith(document.createTextNode(m.textContent));
+      });
+      root.normalize?.();
+    }
+
+    function highlight(root, term) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: n => n.parentElement.closest('script,style,summary svg') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+      });
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      const re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      nodes.forEach(node => {
+        if (!re.test(node.textContent)) return;
+        const frag = document.createDocumentFragment();
+        node.textContent.split(re).forEach((part, i) => {
+          if (i % 2 === 1) {
+            const mark = document.createElement('mark');
+            mark.textContent = part;
+            frag.appendChild(mark);
+          } else if (part) {
+            frag.appendChild(document.createTextNode(part));
+          }
+        });
+        node.replaceWith(frag);
+      });
+    }
+
+    let searchTimer;
+    function runSearch() {
+      const term = searchInput.value.trim().toLowerCase();
+      searchClear.style.display = term ? 'block' : 'none';
+
+      allAccs.forEach(el => { clearHighlights(el); });
+
+      if (term.length < 2) {
+        searchCount.textContent = '';
+        allAccs.forEach(d => { d.style.display = (!onlyNew || d.hasAttribute('data-new')) ? '' : 'none'; });
+        return;
+      }
+
+      if (onlyNew) {
+        onlyNew = false;
+        onlyNewBtn.setAttribute('aria-pressed', 'false');
+        onlyNewBtn.textContent = 'Solo lo nuevo de esta ronda';
+      }
+
+      let hits = 0;
+      allAccs.forEach(d => {
+        const match = d.textContent.toLowerCase().includes(term);
+        d.style.display = match ? '' : 'none';
+        if (match) { d.open = true; highlight(d, term); hits++; }
+      });
+
+      searchCount.textContent = hits + ' resultado' + (hits === 1 ? '' : 's');
+    }
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(runSearch, 180);
+    });
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      runSearch();
+      searchInput.focus();
+    });
+
+    // ── TOC activo según scroll ──
+    const tocLinks = [...document.querySelectorAll('.toc-list a')];
+    const sections = tocLinks.map(a => document.querySelector(a.getAttribute('href')));
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => s && obs.observe(s));
+  </script>
+</body>
+</html>
