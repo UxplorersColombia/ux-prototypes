@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selector de portal · Actual / Nuevo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; background: #ffffff; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: #007cc2; text-decoration: none; }
+  a:hover { color: #005c91; text-decoration: underline; }
+  body { font-family: 'Open Sans', sans-serif; color: #232323; }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: #f7f7f7;
+  }
+
+  .device-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 100px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .device-toggle button {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: #ffffff;
+    color: #404040;
+  }
+  .device-toggle button.is-active {
+    background: #00c73d;
+    color: #ffffff;
+  }
+
+  .frame-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .frame {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    width: 100%;
+    box-shadow: none;
+    transition: width 150ms ease-out;
+  }
+  .frame.is-mobile {
+    width: 390px;
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12), 0 4px 8px -2px rgba(0,0,0,0.06);
+  }
+
+  /* --- Selector view --- */
+  .view-selector {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .view-selector .bg-shot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
+  .view-selector .scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(35,35,35,0.55);
+  }
+
+  .modal {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12), 0 4px 8px -2px rgba(0,0,0,0.06);
+    padding: 24px;
+  }
+  .modal-close-row { display: flex; justify-content: flex-end; }
+  .modal-close {
+    width: 32px; height: 32px;
+    margin: -4px -4px 0 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #00c73d;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { color: #03a835; }
+  .modal-close svg { width: 32px; height: 32px; fill: currentColor; }
+
+  .modal-header { display: flex; flex-direction: column; gap: 8px; }
+  .modal-header h2 {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 28px;
+    color: #232323;
+  }
+  .modal-header p { margin: 0; font-size: 14px; line-height: 20px; color: #666666; }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .option-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .option-card.actual { border: 1px solid #dddddd; background: #ffffff; }
+  .option-card.nuevo { border: 1px solid #00c73d; background: #f6fcf2; }
+
+  .badge {
+    align-self: flex-start;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+  .badge.actual { color: #666666; background: #f7f7f7; border: 1px solid #dddddd; }
+  .badge.nuevo { color: #04651b; background: #caf9cb; border: 1px solid #00c73d; }
+
+  .option-thumb {
+    height: 104px;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .option-thumb.actual { background: #f7f7f7; }
+  .option-thumb.nuevo { background: #ffffff; }
+  .option-thumb img { width: 100%; display: block; object-fit: cover; object-position: top left; }
+
+  .option-card h3 {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 22px;
+    color: #232323;
+  }
+  .option-card p { margin: 0; font-size: 14px; line-height: 20px; color: #666666; }
+
+  .option-card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .option-card li {
+    display: flex; gap: 8px; align-items: flex-start;
+    font-size: 14px; line-height: 20px; color: #404040;
+  }
+  .option-card li svg {
+    width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0;
+    fill: none; stroke: #00c73d; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .btn-entrar {
+    margin-top: auto;
+    width: 100%;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 100px;
+    padding: 10px 20px;
+    transition: background 150ms ease-out;
+  }
+  .btn-entrar.actual {
+    font-weight: 700;
+    border: 1px solid #00c73d;
+    background: #ffffff;
+    color: #00c73d;
+  }
+  .btn-entrar.actual:hover { background: #f6fcf2; color: #03a835; }
+  .btn-entrar.nuevo {
+    font-weight: 600;
+    border: none;
+    padding: 11px 20px;
+    background: #00c73d;
+    color: #ffffff;
+  }
+  .btn-entrar.nuevo:hover { background: #03a835; }
+
+  /* --- Login views --- */
+  .view-login {
+    position: absolute;
+    inset: 0;
+    overflow: auto;
+    background: #ffffff;
+  }
+  .view-login img { display: block; width: 100%; height: auto; }
+
+  .btn-volver {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px 10px 14px;
+    border-radius: 100px;
+    border: 1px solid #dddddd;
+    background: #ffffff;
+    color: #232323;
+    cursor: pointer;
+    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.08);
+    transition: background 150ms ease-out;
+  }
+  .btn-volver:hover { background: #f6fcf2; border-color: #00c73d; }
+  .btn-volver svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="device-toggle">
+    <button type="button" id="btn-escritorio" class="is-active">Escritorio</button>
+    <button type="button" id="btn-movil">Móvil</button>
+  </div>
+
+  <div class="frame-wrap">
+    <div class="frame" id="frame">
+
+      <!-- Selector -->
+      <div class="view-selector" id="view-selector">
+        <img class="bg-shot" src="assets/shot-actual.png" alt="">
+        <div class="scrim"></div>
+
+        <div class="modal">
+          <div class="modal-close-row">
+            <button type="button" class="modal-close" aria-label="Cerrar">
+              <svg viewBox="0 0 32 32"><path d="M22.5527 21.1133C22.9395 21.543 22.9395 22.1875 22.5527 22.5742C22.123 23.0039 21.4785 23.0039 21.0918 22.5742L16.0215 17.4609L10.9082 22.5742C10.4785 23.0039 9.83398 23.0039 9.44727 22.5742C9.01758 22.1875 9.01758 21.543 9.44727 21.1133L14.5605 16L9.44727 10.8867C9.01758 10.457 9.01758 9.8125 9.44727 9.42578C9.83398 8.99609 10.4785 8.99609 10.8652 9.42578L16.0215 14.582L21.1348 9.46875C21.5215 9.03906 22.166 9.03906 22.5527 9.46875C22.9824 9.85547 22.9824 10.5 22.5527 10.9297L17.4395 16L22.5527 21.1133Z"></path></svg>
+            </button>
+          </div>
+
+          <div class="modal-header">
+            <h2>¿Por dónde quieres entrar?</h2>
+            <p>Tu clave es la misma en los dos y puedes cambiar de portal cuando quieras.</p>
+          </div>
+
+          <div class="options-grid" id="options-grid">
+
+            <div class="option-card actual" id="card-actual">
+              <span class="badge actual">Actual</span>
+              <div class="option-thumb actual" data-thumb>
+                <img src="assets/shot-actual.png" alt="Vista del portal actual">
+              </div>
+              <h3>Portal actual</h3>
+              <p>El que ya conoces, sin cambios.</p>
+              <ul>
+                <li>
+                  <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg>
+                  La navegación de siempre
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg>
+                  Todos tus productos y documentos
+                </li>
+              </ul>
+              <button type="button" class="btn-entrar actual" id="btn-ir-actual">Entrar al actual</button>
+            </div>
+
+            <div class="option-card nuevo" id="card-nuevo">
+              <span class="badge nuevo">Nuevo</span>
+              <div class="option-thumb nuevo" data-thumb>
+                <img src="assets/shot-nuevo.png" alt="Vista del nuevo portal">
+              </div>
+              <h3>Nuevo portal</h3>
+              <p>Los mismos productos, con una forma más simple de gestionarlos.</p>
+              <ul>
+                <li>
+                  <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg>
+                  Aportes en menos pasos
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg>
+                  Pensado para el celular
+                </li>
+              </ul>
+              <button type="button" class="btn-entrar nuevo" id="btn-ir-nuevo">Entrar al nuevo</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Login actual -->
+      <div class="view-login" id="view-actual" hidden>
+        <img src="assets/login-actual.png" alt="Ingreso al portal actual">
+      </div>
+
+      <!-- Login nuevo -->
+      <div class="view-login" id="view-nuevo" hidden>
+        <img src="assets/login-nuevo.png" alt="Ingreso al nuevo portal">
+      </div>
+
+      <!-- Volver al selector -->
+      <button type="button" class="btn-volver" id="btn-volver" hidden>
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>
+        Volver al selector
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var state = { vista: 'selector', dispositivo: 'Escritorio' };
+
+    var els = {
+      frame: document.getElementById('frame'),
+      btnEscritorio: document.getElementById('btn-escritorio'),
+      btnMovil: document.getElementById('btn-movil'),
+      viewSelector: document.getElementById('view-selector'),
+      viewActual: document.getElementById('view-actual'),
+      viewNuevo: document.getElementById('view-nuevo'),
+      btnVolver: document.getElementById('btn-volver'),
+      btnIrActual: document.getElementById('btn-ir-actual'),
+      btnIrNuevo: document.getElementById('btn-ir-nuevo'),
+      cardActual: document.getElementById('card-actual'),
+      cardNuevo: document.getElementById('card-nuevo'),
+      thumbs: document.querySelectorAll('[data-thumb]')
+    };
+
+    function render() {
+      var movil = state.dispositivo === 'Móvil';
+
+      // Device toggle
+      els.btnEscritorio.classList.toggle('is-active', !movil);
+      els.btnMovil.classList.toggle('is-active', movil);
+
+      // Frame width / shadow
+      els.frame.classList.toggle('is-mobile', movil);
+
+      // Card order: en móvil, "Nuevo" va primero
+      els.cardActual.style.order = movil ? 2 : 1;
+      els.cardNuevo.style.order = movil ? 1 : 2;
+
+      // Capturas solo en escritorio
+      els.thumbs.forEach(function (t) { t.hidden = movil; });
+
+      // Vista
+      els.viewSelector.hidden = state.vista !== 'selector';
+      els.viewActual.hidden = state.vista !== 'actual';
+      els.viewNuevo.hidden = state.vista !== 'nuevo';
+      els.btnVolver.hidden = state.vista === 'selector';
+    }
+
+    els.btnEscritorio.addEventListener('click', function () {
+      state.dispositivo = 'Escritorio';
+      render();
+    });
+    els.btnMovil.addEventListener('click', function () {
+      state.dispositivo = 'Móvil';
+      render();
+    });
+    els.btnIrActual.addEventListener('click', function () {
+      state.vista = 'actual';
+      render();
+    });
+    els.btnIrNuevo.addEventListener('click', function () {
+      state.vista = 'nuevo';
+      render();
+    });
+    els.btnVolver.addEventListener('click', function () {
+      state.vista = 'selector';
+      render();
+    });
+
+    render();
+  })();
+</script>
+
+</body>
+</html>
