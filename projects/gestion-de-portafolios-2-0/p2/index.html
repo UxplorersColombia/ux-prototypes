@@ -325,7 +325,11 @@ img{display:block}
 /* Las dos tarjetas reparten su alto igual: el bloque de lista es el elástico
    y absorbe lo que sobre, así ninguna de las dos deja aire muerto abajo. */
 .col-actual{flex:0 0 340px!important;min-width:0;display:flex;flex-direction:column}
-.col-actual .plist.pf{flex:1 1 auto;max-height:none;min-height:0}
+/* flex-basis 0 es la clave: la lista NO aporta alto intrínseco, así que
+   Actual no fuerza su propio alto (con base auto pedía 826 por sus 6 filas).
+   Nueva marca el alto de la pareja y esta lista recibe lo que queda, con
+   scroll si el contenido no cabe. Es lo que evita el aire muerto en Nueva. */
+.col-actual .plist.pf{flex:1 1 0;max-height:none;min-height:0}
 .col-nueva {flex:1 1 auto!important;min-width:0}
 
 /* Actual · encabezado apilado: a 292 px de contenido el título y
@@ -344,15 +348,20 @@ img{display:block}
    Gana a .plist.r{max-height:none} por ir después en la hoja. */
 .plist.pf{max-height:270px;overflow-y:auto;padding-right:10px}
 
-/* Simetría entre las dos tarjetas. En Actual el donut va ENCIMA de la lista
-   (220+270) y en Nueva va AL LADO, así que Nueva sobraba ~122 px de aire
-   abajo. En vez de dejarlo vacío lo absorbe su lista, que además es la que
-   tendrá muchos más portafolios en producción.
+/* Simetría entre las dos tarjetas: el bloque ELÁSTICO de cada una es su
+   lista de portafolios, así ninguna deja aire muerto abajo. Nueva marca el
+   alto (donut+lista+tendencia son bloques fijos) y la lista de Actual se
+   ajusta a lo que quede, con scroll si hace falta.
    Nota: no se puede igualar el alto de las DOS listas y a la vez que ninguna
    tarjeta sobre — la geometría no lo permite (una apila el donut y la otra
-   no). Se elige llenar el espacio con contenido. */
+   lo pone al lado). */
 .col-nueva{display:flex;flex-direction:column}
-.nv-fila{flex:1 1 auto;min-height:0}
+/* La fila NO se estira: si lo hace, crece por encima de la lista (capada en
+   263) y deja un hueco vacío entre la lista y la tendencia —33 px medidos—.
+   Al no estirarse, Nueva queda a su alto natural y pasa a marcar el de la
+   pareja; la lista de Composición actual, que sí es elástica, se ajusta y
+   entra en scroll. */
+.nv-fila{flex:0 0 auto;min-height:0}
 /* La lista y la gráfica de tendencia comparten el alto de la tarjeta: lo que
    toma una lo pierde la otra. Medido con 20 portafolios y la gráfica puesta:
      tope 520 → 10 filas, pantalla 1584
@@ -405,8 +414,11 @@ img{display:block}
 .vs-cta img{width:14px;height:14px}
 
 /* MEJORA 9 · la tendencia dentro de la tarjeta, a ancho completo */
-.nv-graf{margin-top:14px;flex:0 0 auto}
-.nv-graf .cmp-plot{margin-top:10px}
+/* Espacios apretados a propósito: donut, lista y tendencia forman UN bloque.
+   Separarlos más los hacía leer como tres cosas sueltas. */
+.nv-graf{margin-top:8px;flex:0 0 auto}
+.nv-graf .cmp-plot{margin-top:6px}
+.nv-graf .cmp-nota{margin-top:6px}
 
 .ov{position:absolute;inset:0;z-index:40;display:none;background:rgba(255,255,255,.72);
   backdrop-filter:blur(3px)}
@@ -805,7 +817,7 @@ body{padding-bottom:88px}
                   aria-label="Empezar una mezcla nueva en blanco">+</button>
         </div>
 
-        <div class="nv-fila" style="display:flex;gap:16px;margin-top:12px;align-items:stretch">
+        <div class="nv-fila" style="display:flex;gap:12px;margin-top:8px;align-items:stretch">
           <!-- MEJORA 6 · El VS vive bajo el donut, al mismo ancho: aprovecha
                el espacio muerto entre el donut (220) y la lista (312) en vez
                de alargar la tarjeta. -->
