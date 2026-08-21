@@ -261,6 +261,151 @@ img{display:block}
 .link:hover{text-decoration:underline}
 
 /* ── Overlays / modales ──────────────────────────────────── */
+/* ── MEJORA 7 · Comparador de rentabilidad ──────────────────
+   Trae al momento de decidir la información que hoy vive en el
+   dashboard (Tu desempeño). Colores POR BANDA, igual que los
+   donuts: dentro de una misma banda las curvas se distinguen
+   por trazo, no por color, para no romper la gramática de 1b. */
+.cmp-head{display:flex;align-items:flex-start;gap:16px}
+.cmp-per{position:relative;flex:0 0 auto}
+.cmp-per select{appearance:none;font:600 13px/20px var(--os);color:var(--grey);
+  background:#fff;border:1px solid var(--n05);border-radius:8px;
+  padding:7px 34px 7px 12px;cursor:pointer}
+.cmp-per img{position:absolute;right:11px;top:11px;width:14px;height:14px;
+  pointer-events:none}
+.cmp-nota{margin-top:10px;font:400 11px/17px var(--os);color:var(--grey-l03);
+  background:#FCFCFC;border-radius:8px;padding:8px 10px}
+.cmp-nota b{font-weight:700;color:var(--grey)}
+.cmp-plot{position:relative;margin-top:18px}
+.cmp-plot svg{display:block;overflow:visible}
+.cmp-esq{position:relative}
+.cmp-esq svg{display:block;opacity:.85}
+.cmp-esq-txt{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  text-align:center;max-width:340px;background:rgba(255,255,255,.92);
+  border-radius:12px;padding:14px 18px;
+  font:400 12px/18px var(--os);color:var(--grey-l03)}
+.cmp-esq-txt b{display:block;font:700 14px/20px var(--mont);color:var(--grey);
+  margin-bottom:4px}
+.cmp-foot{display:flex;gap:12px;margin-top:20px}
+.cmp-kpi{flex:1;background:#FCFCFC;border-radius:10px;padding:12px 14px}
+.cmp-kpi .k{font:400 12px/18px var(--os);color:var(--grey-l03)}
+.cmp-kpi .v{font:700 20px/28px var(--mt);color:var(--grey);margin-top:2px}
+.cmp-kpi .v.up{color:#0E9F3C} .cmp-kpi .v.dn{color:var(--err-d)}
+/* Advertencia obligatoria (CE 014/2025 + D.1239/2024). Acá queda la capa
+   humana; el texto normativo completo —no garantía, obligaciones de medio,
+   "no constituye recomendación"— ya vive en el popup ov-renta, que se abre
+   desde la ⓘ de Rendimiento 12m en la franja gris. No se duplica.
+   OJO: "Vigilado SFC" y la entidad (Skandia AFP — ACCAI S.A.) ya no están
+   en ninguna parte del prototipo. Su sitio es un pie permanente. */
+.cmp-legal{margin-top:16px;background:var(--info-l);border-radius:10px;
+  padding:12px 14px}
+.cmp-legal p{font:400 12px/19px var(--os);color:var(--grey-l02);margin:0}
+.cmp-legal b{font-weight:700;color:var(--grey)}
+.cmp-tip{position:absolute;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--grey);color:#fff;border-radius:8px;padding:8px 10px;
+  font:400 11px/17px var(--os);white-space:nowrap;z-index:5;
+  transform:translate(-50%,-100%)}
+.cmp-tip.on{opacity:1}
+.cmp-tip b{font-weight:700}
+
+/* ── MEJORA 8 · Jerarquía asimétrica de la pantalla 2 ───────
+   Las dos tarjetas medían lo mismo (621 px) pero no pesan lo
+   mismo: la izquierda es referencia de solo lectura y la
+   derecha es TODO el trabajo. Se reparte 340 / 902.
+
+   Dos consecuencias:
+   · Actual es una columna de referencia: donut y lista, sin
+     controles. Su lista lleva el mismo alto fijo con scroll
+     que la de Nueva (.plist.pf).
+   · El VS deja de estar apilado bajo el donut (220 de ancho,
+     123 de alto) y pasa a franja horizontal (~60 de alto),
+     con dos celdas: contraste perfil↔mezcla y rendimiento.
+   La lista de portafolios se mantiene en UNA columna: se probó
+   en dos y se descartó — se lee peor como lista.            */
+/* Las dos tarjetas reparten su alto igual: el bloque de lista es el elástico
+   y absorbe lo que sobre, así ninguna de las dos deja aire muerto abajo. */
+.col-actual{flex:0 0 340px!important;min-width:0;display:flex;flex-direction:column}
+.col-actual .plist.pf{flex:1 1 auto;max-height:none;min-height:0}
+.col-nueva {flex:1 1 auto!important;min-width:0}
+
+/* Actual · encabezado apilado: a 292 px de contenido el título y
+   el selector no caben en una línea. */
+.ac-head{display:flex;flex-direction:column;gap:8px}
+.ac-head .gsel{width:100%;height:38px;flex:0 0 auto}
+/* .gsel trae flex:0 0 204px, pensado para un contenedor en FILA (204 = ancho).
+   Acá el contenedor es en COLUMNA, así que flex-basis pasaría a gobernar el
+   ALTO y el select se estiraría a 204 px. Se neutraliza con flex:0 0 auto. */
+.ac-head .gsel select{width:100%}
+.ac-donut{display:flex;justify-content:center;margin-top:16px}
+
+/* Las dos listas de portafolios se comportan IGUAL: alto fijo con scroll.
+   En producción hay muchos más portafolios que los 6 del prototipo, así que
+   la lista nunca debe crecer con el contenido — lo que crece es el scroll.
+   Gana a .plist.r{max-height:none} por ir después en la hoja. */
+.plist.pf{max-height:270px;overflow-y:auto;padding-right:10px}
+
+/* Simetría entre las dos tarjetas. En Actual el donut va ENCIMA de la lista
+   (220+270) y en Nueva va AL LADO, así que Nueva sobraba ~122 px de aire
+   abajo. En vez de dejarlo vacío lo absorbe su lista, que además es la que
+   tendrá muchos más portafolios en producción.
+   Nota: no se puede igualar el alto de las DOS listas y a la vez que ninguna
+   tarjeta sobre — la geometría no lo permite (una apila el donut y la otra
+   no). Se elige llenar el espacio con contenido. */
+.col-nueva{display:flex;flex-direction:column}
+.nv-fila{flex:1 1 auto;min-height:0}
+/* La lista y la gráfica de tendencia comparten el alto de la tarjeta: lo que
+   toma una lo pierde la otra. Medido con 20 portafolios y la gráfica puesta:
+     tope 520 → 10 filas, pantalla 1584
+     tope 400 →  8 filas, pantalla 1464
+     tope 320 →  6 filas, pantalla 1384   ← elegido
+     tope 260 →  5 filas, pantalla 1324
+     tope 220 →  4 filas, pantalla 1284 (el donut pasa a marcar el alto)
+   320 mantiene la lista usable con 20 portafolios sin que la página se
+   dispare. El tope además frena el crecimiento: sin él, 60 portafolios
+   estiraban la lista a 3.217 px. */
+.col-nueva .plist.pf{max-height:320px;min-height:0}
+
+/* Franja de Actual. Mismo lenguaje visual que la de Nueva para que el ojo
+   compare de una: riesgo contra riesgo, rendimiento contra rendimiento.
+   Sin ella solo se veía la cifra de la mezcla nueva —la más favorable—,
+   que es justo el sesgo que la CE 014/2025 pide vigilar. */
+.ac-vs{display:flex;margin-top:14px;padding:10px 0;border-radius:10px;
+  background:#FAFBFA;border:1px solid var(--n03)}
+.ac-vs .vc{flex:1;min-width:0;padding:0 12px;display:flex;
+  flex-direction:column;justify-content:center;gap:3px}
+.ac-vs .vc + .vc{border-left:1px solid var(--line)}
+.ac-vs .vs-k{font:400 10px/14px var(--os);color:var(--grey-l05);
+  text-transform:uppercase;letter-spacing:.02em}
+.ac-vs .vs-v{display:inline-flex;align-items:center;gap:4px;
+  font:700 12px/18px var(--mont);color:var(--grey)}
+.ac-vs .rend{font:700 18px/22px var(--mont);color:var(--grey)}
+
+/* VS horizontal: 4 celdas separadas por divisores */
+.vs.vs-h{display:flex;align-items:stretch;gap:0;margin-top:14px;
+  padding:10px 4px;width:auto}   /* anula el width:220px de .vs */
+.vs-h .vc{flex:1;min-width:0;padding:0 14px;display:flex;
+  flex-direction:column;justify-content:center;gap:3px}
+.vs-h .vc + .vc{border-left:1px solid var(--line)}
+.vs-h .vc.wide{flex:1.5}
+.vs-h .vs-k{font:400 10px/14px var(--os);color:var(--grey-l05);
+  text-transform:uppercase;letter-spacing:.02em}
+.vs-h .vs-duo{margin:0;gap:8px;justify-content:flex-start}
+.vs-h .vs-estado{margin-top:0}
+.vs-h .vs-renta{margin-top:0;padding-top:0;border-top:0}
+.vs-h .vs-renta b{font:700 18px/22px var(--mont);margin-top:0}
+.vs-h .vs-rtop{gap:6px}
+/* CTA del comparador. Reutiliza .btn.ghost (blanco con borde verde) para
+   que lea como acción secundaria y no compita con el Continuar primario;
+   solo se ajusta el tamaño para caber en la franja de 62 px. */
+.vs-h .vc.cta{flex:0 0 auto;justify-content:center;padding:0 4px 0 14px}
+.vs-cta{height:34px;padding:0 16px;font:700 13px/18px var(--mont);gap:8px;
+  white-space:nowrap}
+.vs-cta img{width:14px;height:14px}
+
+/* MEJORA 9 · la tendencia dentro de la tarjeta, a ancho completo */
+.nv-graf{margin-top:14px;flex:0 0 auto}
+.nv-graf .cmp-plot{margin-top:10px}
+
 .ov{position:absolute;inset:0;z-index:40;display:none;background:rgba(255,255,255,.72);
   backdrop-filter:blur(3px)}
 .ov.on{display:block}
@@ -359,10 +504,6 @@ body{padding-bottom:88px}
 .lg-item b{font-weight:700}
 .lg-item.off{opacity:.38}
 
-.prow .meta{display:flex;align-items:center;gap:8px;margin-top:1px;min-height:16px}
-.chip-new.sm{display:inline-block;margin-left:6px;padding:1px 7px;font-size:11px;line-height:16px;
-  vertical-align:1px}
-.prow .meta .amt{font:400 12px/16px var(--os);color:var(--n05);white-space:nowrap}
 .prow.fuera{background:var(--info-l);box-shadow:inset 3px 0 0 var(--info-d)}
 
 /* Alerta de error / desviación */
@@ -620,10 +761,10 @@ body{padding-bottom:88px}
     </div>
 
     <div class="grid2">
-      <!-- Composición actual -->
-      <div class="card" style="padding:24px">
-        <div style="display:flex;align-items:center;gap:16px;height:38px">
-          <div class="h4m" style="flex:1">Composición actual</div>
+      <!-- Composición actual · MEJORA 8 · columna de referencia (340 px) -->
+      <div class="card col-actual" style="padding:24px">
+        <div class="ac-head">
+          <div class="h4m">Composición actual</div>
           <div class="gsel">
             <select id="tipoGestion" onchange="onTipo(this.value)">
               <option value="total" selected>Gestión total</option>
@@ -633,21 +774,20 @@ body{padding-bottom:88px}
             <img class="cv" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDaGV2cm9uLWRvd24iPgo8cGF0aCBpZD0iQ2hldnJvbi1kb3duXzIiIGQ9Ik0xMi44ODY3IDYuMjYxMjlMOC40MTAxNiAxMC41NTA0QzguMjY5NTMgMTAuNjY3NSA4LjEyODkxIDEwLjcxNDQgOC4wMTE3MiAxMC43MTQ0QzcuODcxMDkgMTAuNzE0NCA3LjczMDQ3IDEwLjY2NzUgNy42MTMyOCAxMC41NzM4TDMuMTEzMjggNi4yNjEyOUMyLjg3ODkxIDYuMDUwMzUgMi44Nzg5MSA1LjY3NTM1IDMuMDg5ODQgNS40NjQ0MUMzLjMwMDc4IDUuMjMwMDQgMy42NzU3OCA1LjIzMDA0IDMuODg2NzIgNS40NDA5OEw4LjAxMTcyIDkuMzc4NDhMMTIuMTEzMyA1LjQ0MDk4QzEyLjMyNDIgNS4yMzAwNCAxMi42OTkyIDUuMjMwMDQgMTIuOTEwMiA1LjQ2NDQxQzEzLjEyMTEgNS42NzUzNSAxMy4xMjExIDYuMDUwMzUgMTIuODg2NyA2LjI2MTI5WiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt="">
           </div>
         </div>
-        <div style="display:flex;gap:16px;margin-top:16px">
-          <div class="donut" id="donutActual"></div>
-          <div class="plist" id="listActual"></div>
-        </div>
+        <div class="ac-donut"><div class="donut" id="donutActual"></div></div>
+        <!-- Resumen por banda: la misma lectura que usan el VS y el popup
+             de desviación. El detalle por portafolio va abajo, a un clic. -->
+        <div class="plist pf" id="listActual"></div>
+        <div class="ac-vs" id="vsActual"></div>
         <div class="cap" style="margin-top:16px">Con la <b>gestión total</b> se cambiará el 100 % de tu inversión actual. <a class="link" onclick="openOv('ov-total')">Saber más</a></div>
       </div>
-
       <!-- Nueva composición -->
-      <div class="card" style="padding:24px">
+      <div class="card col-nueva" style="padding:24px">
         <div style="display:flex;align-items:flex-start;gap:16px">
           <div style="flex:1;min-width:0">
             <div class="h4m">Nueva composición</div>
             <div class="cap">Disponible:&nbsp; <b id="dispTxt">$16.445.008</b></div>
           </div>
-          <button class="tool" onclick="openOv('ov-rent')"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjUiIHZpZXdCb3g9IjAgMCAxMiAxMC41IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iQ2hhcnQtbGluZS11cCIgZD0iTTEuMTI1IDguODEyNUMxLjEyNSA5LjE0MDYyIDEuMzU5MzggOS4zNzUgMS42ODc1IDkuMzc1SDExLjQzNzVDMTEuNzQyMiA5LjM3NSAxMiA5LjYzMjgxIDEyIDkuOTM3NUMxMiAxMC4yNjU2IDExLjc0MjIgMTAuNSAxMS40Mzc1IDEwLjVIMS42ODc1QzAuNzUgMTAuNSAwIDkuNzUgMCA4LjgxMjVWMC41NjI1QzAgMC4yNTc4MTIgMC4yMzQzNzUgMCAwLjU2MjUgMEMwLjg2NzE4OCAwIDEuMTI1IDAuMjU3ODEyIDEuMTI1IDAuNTYyNVY4LjgxMjVaTTguMDYyNSAyLjI1SDEwLjY4NzVDMTAuOTkyMiAyLjI1IDExLjI1IDIuNTA3ODEgMTEuMjUgMi44MTI1VjUuNDM3NUMxMS4yNSA1Ljc2NTYyIDEwLjk5MjIgNiAxMC42ODc1IDZDMTAuMzU5NCA2IDEwLjEyNSA1Ljc2NTYyIDEwLjEyNSA1LjQzNzVWNC4xNzE4OEw3LjUgNi43NzM0NEM3LjI4OTA2IDcuMDA3ODEgNi45Mzc1IDcuMDA3ODEgNi43MjY1NiA2Ljc3MzQ0TDQuODUxNTYgNC45MjE4OEwzLjM3NSA2LjM5ODQ0QzMuMTY0MDYgNi42MzI4MSAyLjgxMjUgNi42MzI4MSAyLjYwMTU2IDYuMzk4NDRDMi4zNjcxOSA2LjE4NzUgMi4zNjcxOSA1LjgzNTk0IDIuNjAxNTYgNS42MDE1Nkw0LjQ3NjU2IDMuNzI2NTZDNC42ODc1IDMuNTE1NjIgNS4wMzkwNiAzLjUxNTYyIDUuMjUgMy43MjY1Nkw3LjEyNSA1LjYwMTU2TDkuMzI4MTIgMy4zNzVIOC4wNjI1QzcuNzM0MzggMy4zNzUgNy41IDMuMTQwNjIgNy41IDIuODEyNUM3LjUgMi41MDc4MSA3LjczNDM4IDIuMjUgOC4wNjI1IDIuMjVaIiBmaWxsPSIjNDA0MDQwIi8+Cjwvc3ZnPgo=" alt="Rentabilidad"></button>
           <button class="tool" onclick="toast('Buscador de portafolios — no incluido en v1')"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjExLjk4ODMiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMS45ODgzIDEyIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0ibWFnbmlmeWluZy1nbGFzcyIgZD0iTTExLjgxMjUgMTEuMDM5MUMxMi4wNDY5IDExLjI3MzQgMTIuMDQ2OSAxMS42MjUgMTEuODEyNSAxMS44MzU5QzExLjcxODggMTEuOTUzMSAxMS41NzgxIDEyIDExLjQzNzUgMTJDMTEuMjczNCAxMiAxMS4xMzI4IDExLjk1MzEgMTEuMDE1NiAxMS44MzU5TDcuODc1IDguNjk1MzFDNy4wMzEyNSA5LjM3NSA1Ljk3NjU2IDkuNzUgNC44NTE1NiA5Ljc1QzIuMTc5NjkgOS43NSAwIDcuNTcwMzEgMCA0Ljg3NUMwIDIuMjAzMTIgMi4xNTYyNSAwIDQuODUxNTYgMEM3LjUyMzQ0IDAgOS43MjY1NiAyLjIwMzEyIDkuNzI2NTYgNC44NzVDOS43MjY1NiA2LjAyMzQ0IDkuMzUxNTYgNy4wNzgxMiA4LjY3MTg4IDcuODk4NDRMMTEuODEyNSAxMS4wMzkxWk0xLjEyNSA0Ljg3NUMxLjEyNSA2Ljk2MDk0IDIuNzg5MDYgOC42MjUgNC44NzUgOC42MjVDNi45Mzc1IDguNjI1IDguNjI1IDYuOTYwOTQgOC42MjUgNC44NzVDOC42MjUgMi44MTI1IDYuOTM3NSAxLjEyNSA0Ljg3NSAxLjEyNUMyLjc4OTA2IDEuMTI1IDEuMTI1IDIuODEyNSAxLjEyNSA0Ljg3NVoiIGZpbGw9IiM0MDQwNDAiLz4KPC9zdmc+Cg==" alt="Buscar"></button>
           <button class="tool" onclick="toast('Filtros — no incluidos en v1')"><span>Filtrar</span><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjUiIHZpZXdCb3g9IjAgMCAxMiAxMC41IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iZmlsdGVyIiBkPSJNMCAwLjk4NDM3NUMwIDAuNDQ1MzEyIDAuNDIxODc1IDAgMC45NjA5MzggMEgxMS4wMTU2QzExLjU1NDcgMCAxMiAwLjQ0NTMxMiAxMiAwLjk4NDM3NUMxMiAxLjIxODc1IDExLjkwNjIgMS40Mjk2OSAxMS43NjU2IDEuNTkzNzVMNy44NzUgNi4zOTg0NFY5Ljc1QzcuODc1IDEwLjE3MTkgNy41MjM0NCAxMC41IDcuMTAxNTYgMTAuNUM2LjkzNzUgMTAuNSA2Ljc3MzQ0IDEwLjQ1MzEgNi42MzI4MSAxMC4zMzU5TDQuNDc2NTYgOC42MjVDNC4yNDIxOSA4LjQzNzUgNC4xMjUgOC4xNzk2OSA0LjEyNSA3Ljg5ODQ0VjYuMzk4NDRMMC4yMTA5MzggMS41OTM3NUMwLjA3MDMxMjUgMS40Mjk2OSAwIDEuMjE4NzUgMCAwLjk4NDM3NVpNMS4yNjU2MiAxLjEyNUw1LjEwOTM4IDUuODM1OTRDNS4yMDMxMiA1Ljk1MzEyIDUuMjUgNi4wNzAzMSA1LjI1IDYuMTg3NVY3LjgwNDY5TDYuNzUgOVY2LjE4NzVDNi43NSA2LjA3MDMxIDYuNzczNDQgNS45NTMxMiA2Ljg2NzE5IDUuODM1OTRMMTAuNzEwOSAxLjEyNUgxLjI2NTYyWiIgZmlsbD0iIzAwQzczRCIvPgo8L3N2Zz4K" alt=""></button>
         </div>
@@ -663,16 +803,19 @@ body{padding-bottom:88px}
                   aria-label="Empezar una mezcla nueva en blanco">+</button>
         </div>
 
-        <div style="display:flex;gap:16px;margin-top:12px;align-items:stretch">
+        <div class="nv-fila" style="display:flex;gap:16px;margin-top:12px;align-items:stretch">
           <!-- MEJORA 6 · El VS vive bajo el donut, al mismo ancho: aprovecha
                el espacio muerto entre el donut (220) y la lista (312) en vez
                de alargar la tarjeta. -->
           <div class="col-donut">
             <div class="donut" id="donutNueva"></div>
-            <div class="vs" id="vsBlock"></div>
           </div>
-          <div class="plist r" id="listNueva"></div>
+          <div class="plist r pf" id="listNueva"></div>
         </div>
+        <!-- MEJORA 9 · la tendencia, a ancho completo, igual que en el modal -->
+        <div class="nv-graf" id="grafNueva"></div>
+        <!-- MEJORA 8 · el VS pasa de columna de 220 a franja horizontal -->
+        <div class="vs vs-h" id="vsBlock"></div>
 
         <div class="alert warn" id="alerta100" style="margin-top:12px">
           <div class="ic"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIyLjAyOTIiIGhlaWdodD0iMTkuMjUiIHZpZXdCb3g9IjAgMCAyMi4wMjkyIDE5LjI1IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iVHJpYW5nbGUtZXhjbGFtYXRpb24iIGQ9Ik0yMS43ODc5IDE2LjU0M0MyMi40NzU0IDE3Ljc0NjEgMjEuNjE2IDE5LjI1IDIwLjE5OCAxOS4yNUgxLjg1MDM4QzAuNDMyNDA2IDE5LjI1IC0wLjQyNjk2OSAxNy43NDYxIDAuMjE3NTYzIDE2LjU0M0w5LjQxMjg4IDAuOTAyMzQ0QzkuNzk5NTkgMC4zMDA3ODEgMTAuNDAxMiAwIDExLjA0NTcgMEMxMS42NDczIDAgMTIuMjQ4OCAwLjMwMDc4MSAxMi42MzU1IDAuOTAyMzQ0TDIxLjc4NzkgMTYuNTQzWk0yLjI4MDA2IDE3LjE4NzVIMTkuNzY4M0wxMS4wMDI3IDIuMjc3MzRMMi4yODAwNiAxNy4xODc1Wk0xMS4wNDU3IDEzLjE0ODRDMTEuNzc2MiAxMy4xNDg0IDEyLjM3NzcgMTMuNzUgMTIuMzc3NyAxNC40ODA1QzEyLjM3NzcgMTUuMjEwOSAxMS43NzYyIDE1LjgxMjUgMTEuMDQ1NyAxNS44MTI1QzEwLjI3MjMgMTUuODEyNSA5LjY3MDY5IDE1LjIxMDkgOS42NzA2OSAxNC40ODA1QzkuNjcwNjkgMTMuNzUgMTAuMjcyMyAxMy4xNDg0IDExLjA0NTcgMTMuMTQ4NFpNMTAuMDE0NCA2LjUzMTI1QzEwLjAxNDQgNS45NzI2NiAxMC40NDQxIDUuNSAxMS4wNDU3IDUuNUMxMS42MDQzIDUuNSAxMi4wNzY5IDUuOTcyNjYgMTIuMDc2OSA2LjUzMTI1VjEwLjY1NjJDMTIuMDc2OSAxMS4yNTc4IDExLjYwNDMgMTEuNjg3NSAxMS4wNDU3IDExLjY4NzVDMTAuNDQ0MSAxMS42ODc1IDEwLjAxNDQgMTEuMjU3OCAxMC4wMTQ0IDEwLjY1NjJWNi41MzEyNVoiIGZpbGw9IiM0MDQwNDAiLz4KPC9zdmc+Cg==" alt=""></div>
@@ -849,13 +992,36 @@ body{padding-bottom:88px}
   </div>
 
   <!-- Popup Rentabilidad histórica por portafolio (fuera de alcance) -->
+  <!-- MEJORA 7 · Comparador de rentabilidad.
+       El botón que lo abre ya existía en el header de Nueva composición. -->
   <div class="ov" id="ov-rent">
-    <div class="box" style="width:640px;padding:32px;text-align:center">
+    <div class="box" style="width:940px;padding:28px 32px 30px">
       <button class="mx" onclick="closeOv('ov-rent')"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjEzLjc1IiBoZWlnaHQ9IjEzLjc5MyIgdmlld0JveD0iMCAwIDEzLjc1IDEzLjc5MyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlhtYXJrIiBkPSJNMTMuNDI3NyAxMi4wMDk4QzEzLjgxNDUgMTIuNDM5NSAxMy44MTQ1IDEzLjA4NCAxMy40Mjc3IDEzLjQ3MDdDMTIuOTk4IDEzLjkwMDQgMTIuMzUzNSAxMy45MDA0IDExLjk2NjggMTMuNDcwN0w2Ljg5NjQ4IDguMzU3NDJMMS43ODMyIDEzLjQ3MDdDMS4zNTM1MiAxMy45MDA0IDAuNzA4OTg0IDEzLjkwMDQgMC4zMjIyNjYgMTMuNDcwN0MtMC4xMDc0MjIgMTMuMDg0IC0wLjEwNzQyMiAxMi40Mzk1IDAuMzIyMjY2IDEyLjAwOThMNS40MzU1NSA2Ljg5NjQ4TDAuMzIyMjY2IDEuNzgzMkMtMC4xMDc0MjIgMS4zNTM1MiAtMC4xMDc0MjIgMC43MDg5ODQgMC4zMjIyNjYgMC4zMjIyNjZDMC43MDg5ODQgLTAuMTA3NDIyIDEuMzUzNTIgLTAuMTA3NDIyIDEuNzQwMjMgMC4zMjIyNjZMNi44OTY0OCA1LjQ3ODUyTDEyLjAwOTggMC4zNjUyMzRDMTIuMzk2NSAtMC4wNjQ0NTMxIDEzLjA0MSAtMC4wNjQ0NTMxIDEzLjQyNzcgMC4zNjUyMzRDMTMuODU3NCAwLjc1MTk1MyAxMy44NTc0IDEuMzk2NDggMTMuNDI3NyAxLjgyNjE3TDguMzE0NDUgNi44OTY0OEwxMy40Mjc3IDEyLjAwOThaIiBmaWxsPSIjMDBDNzNEIi8+Cjwvc3ZnPgo=" alt="Cerrar"></button>
-      <div class="ic-round info"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJjaXJjbGUtZXhjbGFtYXRpb24iIGQ9Ik0xMiAwQzE4LjYwOTQgMCAyNCA1LjM5MDYyIDI0IDEyQzI0IDE4LjY1NjIgMTguNjA5NCAyNCAxMiAyNEM1LjM0Mzc1IDI0IDAgMTguNjU2MiAwIDEyQzAgNS4zOTA2MiA1LjM0Mzc1IDAgMTIgMFpNMTIgMjEuNzVDMTcuMzQzOCAyMS43NSAyMS43NSAxNy4zOTA2IDIxLjc1IDEyQzIxLjc1IDYuNjU2MjUgMTcuMzQzOCAyLjI1IDEyIDIuMjVDNi42MDkzOCAyLjI1IDIuMjUgNi42NTYyNSAyLjI1IDEyQzIuMjUgMTcuMzkwNiA2LjYwOTM4IDIxLjc1IDEyIDIxLjc1Wk0xMiAxNC4yNUMxMS4zNDM4IDE0LjI1IDEwLjg3NSAxMy43ODEyIDEwLjg3NSAxMy4xMjVWNy4xMjVDMTAuODc1IDYuNTE1NjIgMTEuMzQzOCA2IDEyIDZDMTIuNjA5NCA2IDEzLjEyNSA2LjUxNTYyIDEzLjEyNSA3LjEyNVYxMy4xMjVDMTMuMTI1IDEzLjc4MTIgMTIuNjA5NCAxNC4yNSAxMiAxNC4yNVpNMTIgMTUuODQzOEMxMi43OTY5IDE1Ljg0MzggMTMuNDUzMSAxNi41IDEzLjQ1MzEgMTcuMjk2OUMxMy40NTMxIDE4LjA5MzggMTIuNzk2OSAxOC43NSAxMiAxOC43NUMxMS4xNTYyIDE4Ljc1IDEwLjUgMTguMDkzOCAxMC41IDE3LjI5NjlDMTAuNSAxNi41IDExLjE1NjIgMTUuODQzOCAxMiAxNS44NDM4WiIgZmlsbD0iIzVDRDVGRiIvPgo8L3N2Zz4K" alt=""></div>
-      <div class="h3" style="margin-top:16px">Comparador de rentabilidad</div>
-      <div class="lbl" style="margin-top:12px">La gráfica comparativa existe en el Figma (<b>PopUp Rentabilidad</b>) pero no entra en el alcance del flujo core de esta v1.</div>
-      <button class="btn primary" style="width:100%;margin-top:20px" onclick="closeOv('ov-rent')">Entiendo</button>
+      <div class="cmp-head">
+        <div style="flex:1;min-width:0">
+          <div class="h3">Comparador de rentabilidad</div>
+          <div class="cap">Variación acumulada de la mezcla que estás armando, frente a la que ya tienes.</div>
+        </div>
+        <div class="cmp-per">
+          <select id="cmpPer" onchange="cmpPeriodo(this.value)" aria-label="Periodo">
+            <option value="1M">Último mes</option>
+            <option value="3M">Últimos 3 meses</option>
+            <option value="6M">Últimos 6 meses</option>
+            <option value="12M" selected>Últimos 12 meses</option>
+            <option value="3A">Últimos 3 años</option>
+            <option value="5A">Desde el inicio</option>
+          </select>
+          <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDaGV2cm9uLWRvd24iPgo8cGF0aCBpZD0iQ2hldnJvbi1kb3duXzIiIGQ9Ik0xMi44ODY3IDYuMjYxMjlMOC40MTAxNiAxMC41NTA0QzguMjY5NTMgMTAuNjY3NSA4LjEyODkxIDEwLjcxNDQgOC4wMTE3MiAxMC43MTQ0QzcuODcxMDkgMTAuNzE0NCA3LjczMDQ3IDEwLjY2NzUgNy42MTMyOCAxMC41NzM4TDMuMTEzMjggNi4yNjEyOUMyLjg3ODkxIDYuMDUwMzUgMi44Nzg5MSA1LjY3NTM1IDMuMDg5ODQgNS40NjQ0MUMzLjMwMDc4IDUuMjMwMDQgMy42NzU3OCA1LjIzMDA0IDMuODg2NzIgNS40NDA5OEw4LjAxMTcyIDkuMzc4NDhMMTIuMTEzMyA1LjQ0MDk4QzEyLjMyNDIgNS4yMzAwNCAxMi42OTkyIDUuMjMwMDQgMTIuOTEwMiA1LjQ2NDQxQzEzLjEyMTEgNS42NzUzNSAxMy4xMjExIDYuMDUwMzUgMTIuODg2NyA2LjI2MTI5WiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt="">
+        </div>
+      </div>
+      <div id="cmpBody"></div>
+      <div class="cmp-legal">
+        <p><b>Esto es información, no una recomendación.</b> Lo que ves es cómo se
+           comportaron estos portafolios en el pasado; no es una promesa de lo que
+           harán después. Tú tomas la decisión y Skandia la ejecuta.</p>
+      </div>
+      <button class="btn primary" style="width:100%;margin-top:20px"
+              onclick="closeOv('ov-rent')">Entiendo</button>
     </div>
   </div>
 </section>
@@ -1091,8 +1257,8 @@ const PERFIL_EQUIV = {Prudente:'conservador', Observador:'moderado', Arriesgado:
    La regla real la define Inversiones.                                */
 const UMBRAL_BANDA = 10;
 
-function perfilMezcla(){
-  const b = bandas(state.nueva), t = total();
+function perfilMezcla(rows = state.nueva){
+  const b = bandas(rows), t = rows.reduce((a,r) => a + r.pct, 0);
   if (!t) return null;
   for (const k of ORDEN_BANDA)               // de mayor a menor riesgo
     if (b[k] / t * 100 >= UMBRAL_BANDA) return k;
@@ -1102,9 +1268,18 @@ function perfilMezcla(){
 /* ⚠ DATOS PLACEHOLDER de rentabilidad (% E.A. de los últimos 12 meses).
    Los reales salen de Inversiones / Databricks.                       */
 const RENTA = {
+  // Conservadores
   'FPV Especial Vista': 6.2, 'FPV PRO': 7.1, 'FPV Strategist Liquidez Col': 5.8,
-  'FPV Strategist Moderado': 9.4, 'FPV Bonos Colombia Plus': 8.7,
-  'FPV Strategist Conservador': 6.5, 'FPV Acciones Emergentes': 14.2,
+  'FPV Strategist Liquidez USA': 4.9, 'FPV Strategist Conservador': 6.5,
+  'FVP Especial CAT 6 meses - C': 8.1, 'FVP Especial CAT 12 meses - C': 8.9,
+  // Moderados
+  'FPV Strategist Moderado': 9.4, 'FPV Strategist Balanceado': 10.2,
+  'FPV Strategist Renta Fija Global': 7.6, 'FPV Bonos Colombia Plus': 8.7,
+  'FPV Especial Inmobiliario': 9.8,
+  // Agresivos
+  'FPV Acciones Emergentes': 14.2, 'FPV Strategist Acciones Colombia': 12.7,
+  'FPV Strategist Acciones Global': 16.4, 'FPV Acciones Nuevas Tecnologías': 19.5,
+  'FPV Strategist Agresivo': 13.8, 'FPV Especial Activos Alternativos': 11.3,
   'Bitcoin': 22.6, 'Ethereum': 18.3
 };
 
@@ -1131,13 +1306,58 @@ const ACTUAL = [
 
 // Nueva composición · Figma 38051:114878–114883
 const NUEVA = [
-  {n:'FPV Acciones Emergentes',     pct:0, kind:'simple',   nuevo:false, riesgo:'agresivo'},
-  {n:'Bitcoin',                     pct:0, kind:'simple',   nuevo:true,  riesgo:'agresivo'},
-  {n:'FPV PRO',                     pct:0, kind:'simple',   nuevo:false, riesgo:'conservador'},
-  {n:'FPV Strategist Liquidez Col', pct:0, kind:'simple',   nuevo:false, riesgo:'conservador'},
-  {n:'FPV Bonos Colombia Plus',     pct:0, kind:'complejo', nuevo:false, riesgo:'moderado'},
-  {n:'Ethereum',                    pct:0, kind:'complejo', nuevo:true,  riesgo:'agresivo'}
+  // Conservadores
+  {n:'FPV Especial Vista',             pct:0, kind:'simple',   nuevo:false, riesgo:'conservador'},
+  {n:'FPV PRO',                        pct:0, kind:'simple',   nuevo:false, riesgo:'conservador'},
+  {n:'FPV Strategist Liquidez Col',    pct:0, kind:'simple',   nuevo:false, riesgo:'conservador'},
+  {n:'FPV Strategist Liquidez USA',    pct:0, kind:'simple',   nuevo:false, riesgo:'conservador'},
+  {n:'FPV Strategist Conservador',     pct:0, kind:'complejo', nuevo:false, riesgo:'conservador'},
+  {n:'FVP Especial CAT 6 meses - C',   pct:0, kind:'simple',   nuevo:false, riesgo:'conservador'},
+  {n:'FVP Especial CAT 12 meses - C',  pct:0, kind:'simple',   nuevo:false, riesgo:'conservador'},
+  // Moderados
+  {n:'FPV Strategist Moderado',        pct:0, kind:'simple',   nuevo:false, riesgo:'moderado'},
+  {n:'FPV Strategist Balanceado',      pct:0, kind:'simple',   nuevo:false, riesgo:'moderado'},
+  {n:'FPV Strategist Renta Fija Global', pct:0, kind:'simple', nuevo:false, riesgo:'moderado'},
+  {n:'FPV Bonos Colombia Plus',        pct:0, kind:'complejo', nuevo:false, riesgo:'moderado'},
+  {n:'FPV Especial Inmobiliario',      pct:0, kind:'complejo', nuevo:true,  riesgo:'moderado'},
+  // Agresivos
+  {n:'FPV Acciones Emergentes',        pct:0, kind:'simple',   nuevo:false, riesgo:'agresivo'},
+  {n:'FPV Strategist Acciones Colombia', pct:0, kind:'simple', nuevo:false, riesgo:'agresivo'},
+  {n:'FPV Strategist Acciones Global', pct:0, kind:'simple',   nuevo:false, riesgo:'agresivo'},
+  {n:'FPV Acciones Nuevas Tecnologías', pct:0, kind:'simple',  nuevo:true,  riesgo:'agresivo'},
+  {n:'FPV Strategist Agresivo',        pct:0, kind:'simple',   nuevo:false, riesgo:'agresivo'},
+  {n:'FPV Especial Activos Alternativos', pct:0, kind:'complejo', nuevo:false, riesgo:'agresivo'},
+  {n:'Bitcoin',                        pct:0, kind:'simple',   nuevo:true,  riesgo:'agresivo'},
+  {n:'Ethereum',                       pct:0, kind:'complejo', nuevo:true,  riesgo:'agresivo'}
 ];
+
+/* ═══════════════════════════════════════════════════════════
+   Paleta de IDENTIDAD por portafolio
+   El color identifica al portafolio, no a su banda de riesgo: es lo que
+   permite reconocer su curva en la gráfica sin leer el nombre. Con 8
+   portafolios agresivos, colorear por banda dejaba 8 curvas naranjas
+   indistinguibles.
+   El riesgo no se pierde: lo comunica el ÍCONO (escudo / balanza / cohete),
+   presente en cada fila y en cada chip, más las franjas "Riesgo actual" y
+   "Tu perfil → tu mezcla". Esto revisa la MEJORA 1b, que coloreaba por
+   banda: el anillo y la lista siguen contando la misma historia entre sí,
+   pero ahora la historia es la identidad.
+   El mapa va por NOMBRE para que un portafolio tenga el mismo color en
+   Composición actual y en Nueva composición.
+   ═══════════════════════════════════════════════════════════ */
+/* Tonos fuertes primero —son los que más se usan— y claros después. Medido
+   en ΔE (CIELAB): el par más parecido de toda la paleta está a 13,8 y entre
+   los 10 primeros a 18,3; ninguno cae a menos de 17,9 del gris #A5A5A5 con
+   que se dibuja "Tu composición actual". Una primera versión mezclaba dos
+   verdes a ΔE 5,3, indistinguibles a ojo. */
+const PALETA = ['#4E79A7','#F28E2B','#59A14F','#E15759','#B07AA1',
+                '#499894','#B6992D','#D37295','#9D7660','#6B4C9A',
+                '#A0CBE8','#FFBE7D','#8CD17D','#FF9D9A','#D4A6C8',
+                '#86BCB6','#F1CE63','#FABFD2','#D7B5A6','#B3A2D9'];
+const COLOR = {};
+[...ACTUAL, ...NUEVA].forEach(r => {
+  if (!(r.n in COLOR)) COLOR[r.n] = PALETA[Object.keys(COLOR).length % PALETA.length];
+});
 
 /* MEJORA · Contratos ordenados por saldo disponible (desc) y el
    deshabilitado con RAZÓN explícita. En el Figma el default era el
@@ -1321,19 +1541,36 @@ function donut(el, segs, center, opts = {}){
 
 /* ── Render columna izquierda (solo lectura) ──────────────── */
 function renderActual(){
-  // MEJORA 1b · el donut se colorea por BANDA DE RIESGO, no por portafolio:
-  // así el anillo y la leyenda cuentan la misma historia.
+  // El donut se colorea por PORTAFOLIO (ver PALETA): su color es el mismo
+  // que el punto de su fila y el de su curva en la gráfica.
   donut(document.getElementById('donutActual'),
-        ACTUAL.map(r => ({pct:r.pct, color:BANDA[r.riesgo].color})), {big:'', sub:''});
+        ACTUAL.map(r => ({pct:r.pct, color:COLOR[r.n]})), {big:'', sub:''});
   document.getElementById('donutActual').querySelector('.lbl-c').style.display = 'none';
+
+  /* Franja de la composición actual: su banda de riesgo y su rendimiento,
+     calculados con las MISMAS funciones que usa la mezcla nueva para que
+     las dos cifras sean comparables de verdad. */
+  const pa = perfilMezcla(ACTUAL), ra = rentaPonderada(ACTUAL);
+  document.getElementById('vsActual').innerHTML = `
+    <div class="vc">
+      <span class="vs-k">Riesgo actual</span>
+      <span class="vs-v">${pa ? riesgoIcon(pa) + BANDA[pa].label : '—'}</span>
+    </div>
+    <div class="vc">
+      <span class="vs-k">Rendimiento 12m</span>
+      <span class="rend">${ra === null ? '—' : ra.toFixed(1).replace('.', ',') + '% E.A.'}</span>
+    </div>`;
+
+  // Los portafolios, con su scroll (ver .plist.pf)
   document.getElementById('listActual').innerHTML = ACTUAL.map(r => `
     <div class="prow">
-      <div class="dot" style="background:${BANDA[r.riesgo].color}"></div>
+      <div class="dot" style="background:${COLOR[r.n]}"></div>
       ${riesgoIcon(r.riesgo)}
       <div class="pct">${r.pct}%</div>
       <div class="txt"><div class="n">${r.n}</div><div class="a">${money(r.amt)}</div></div>
     </div>`).join('');
 }
+
 
 /* ── Render columna derecha (editable) ────────────────────── */
 function renderNueva(){
@@ -1342,30 +1579,29 @@ function renderNueva(){
   // Los seleccionados suben al tope, igual que en los frames del Figma
   const rows = [...state.nueva].sort((a,b) => (b.pct > 0) - (a.pct > 0));
   const segs = state.nueva.filter(r => r.pct > 0)
-                          .map(r => ({pct:r.pct, color:BANDA[r.riesgo].color}));
+                          .map(r => ({pct:r.pct, color:COLOR[r.n]}));
 
   donut(document.getElementById('donutNueva'), segs,
         {big:t + '%', sub:'Faltan ' + falta + '%'}, {absolute:true});
 
   document.getElementById('listNueva').innerHTML = rows.map(r => {
     const i = state.nueva.indexOf(r), has = r.pct > 0;
-    // MEJORA 1b · marca la fila que empuja la mezcla fuera del perfil
+    // Marca la fila que empuja la mezcla fuera del perfil (fondo azul
+    // informativo; el color del punto es identidad, no riesgo)
     const fuera = has && r.pct > TOLERANCIA[PERFIL][r.riesgo] &&
                   TOLERANCIA[PERFIL][r.riesgo] !== undefined;
     return `
     <div class="prow r ${has ? '' : 'muted'} ${fuera ? 'fuera' : ''}" data-row="${i}">
       <div class="dot ${has ? '' : 'off'}"
-           style="${has ? 'background:' + BANDA[r.riesgo].color : ''}"></div>
+           style="${has ? 'background:' + COLOR[r.n] : ''}"></div>
       ${riesgoIcon(r.riesgo)}
-      <div class="txt">
-        <div class="n">${r.n}${r.nuevo ? '<span class="chip-new sm">Nuevo</span>' : ''}</div>
-        <div class="meta">
-          <span class="amt">${has ? money(DISPONIBLE * r.pct / 100) : ''}</span>
-        </div></div>
+      ${r.nuevo ? '<div class="chip-new">Nuevo</div>' : ''}
+      <div class="txt"><div class="n">${r.n}</div></div>
       <div class="pctbox ${has ? 'has' : ''}">
         <input type="text" inputmode="numeric" maxlength="3" value="${r.pct}" data-i="${i}"
                aria-label="Porcentaje para ${r.n}">
         <span class="sym">%</span>
+        <span class="amt">${has ? money(DISPONIBLE * r.pct / 100) : ''}</span>
       </div>
       <div class="pdf" style="visibility:${has ? 'visible' : 'hidden'}">
         <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2LjUiIGhlaWdodD0iMjIiIHZpZXdCb3g9IjAgMCAxNi41IDIyIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iZmlsZS1wZGYiIGQ9Ik03LjkwNjI1IDguOTM3NUM3LjkwNjI1IDkuNzUzOTEgNy42OTE0MSAxMC43NDIyIDcuNjA1NDcgMTEuMTI4OUM3LjIxODc1IDkuOTY4NzUgNy4yMTg3NSA5LjA2NjQxIDcuMjE4NzUgOC45Mzc1QzcuMjE4NzUgOC43NjU2MiA3LjM0NzY2IDguNTkzNzUgNy41NjI1IDguNTkzNzVDNy43MzQzOCA4LjU5Mzc1IDcuOTA2MjUgOC43NjU2MiA3LjkwNjI1IDguOTM3NVpNMTEgMEwxNi41IDUuNUgxMVYwWk0zLjQzNzUgMTguMTc1OEMzLjQzNzUgMTguMDg5OCAzLjQzNzUgMTguMDAzOSAzLjUyMzQ0IDE3LjkxOEMzLjk1MzEyIDE3LjQ0NTMgNC41MTE3MiAxNy4wNTg2IDUuMTU2MjUgMTYuNzE0OEM0LjY0MDYyIDE3LjUzMTIgNC4yNTM5MSAxOC4xMzI4IDQuMDM5MDYgMTguNDMzNkMzLjg2NzE5IDE4LjY5MTQgMy40Mzc1IDE4LjYwNTUgMy40Mzc1IDE4LjE3NThaTTkuNjI1IDUuNUM5LjYyNSA2LjI3MzQ0IDEwLjIyNjYgNi44NzUgMTEgNi44NzVIMTYuNVYxOS45Mzc1QzE2LjUgMjEuMDk3NyAxNS41NTQ3IDIyIDE0LjQzNzUgMjJIMi4wNjI1QzAuOTAyMzQ0IDIyIDAgMjEuMDk3NyAwIDE5LjkzNzVWMi4wNjI1QzAgMC45NDUzMTIgMC45MDIzNDQgMCAyLjA2MjUgMEg5LjYyNVY1LjVaTTEyLjU0NjkgMTMuNDA2MkgxMi4zMzJDMTIuMjAzMSAxMy40NDkyIDExLjMwMDggMTMuNDkyMiAxMC4wMTE3IDEzLjcwN0M5LjQ5NjA5IDEzLjIzNDQgOS4wNjY0MSAxMi42NzU4IDguNzIyNjYgMTIuMDc0MkM4LjgwODU5IDExLjk0NTMgOC44NTE1NiAxMS43NzM0IDguODk0NTMgMTEuNjQ0NUM4LjkzNzUgMTEuMzQzOCA5LjI4MTI1IDEwLjAxMTcgOS4yODEyNSA4LjkzNzVDOS4yODEyNSA3Ljk5MjE5IDguNTA3ODEgNy4yMTg3NSA3LjU2MjUgNy4yMTg3NUM2LjU3NDIyIDcuMjE4NzUgNS44NDM3NSA3Ljk5MjE5IDUuODQzNzUgOC45Mzc1QzUuODQzNzUgOC45ODA0NyA1Ljg0Mzc1IDEwLjQ0MTQgNi41MzEyNSAxMi4xNjAyQzYuMTg3NSAxMy4xNDg0IDUuNzE0ODQgMTQuMTM2NyA1LjI0MjE5IDE1LjEyNUM0LjEyNSAxNS42NDA2IDMuMjIyNjYgMTYuMjg1MiAyLjUzNTE2IDE2Ljk3MjdDMi4xOTE0MSAxNy4zMTY0IDIuMDYyNSAxNy43NDYxIDIuMDYyNSAxOC4yNjE3QzIuMDYyNSAxOS4yMDcgMi43OTI5NyAxOS45Mzc1IDMuNzM4MjggMTkuOTM3NUM0LjI5Njg4IDE5LjkzNzUgNC44MTI1IDE5LjY3OTcgNS4xNTYyNSAxOS4yNUM1LjU0Mjk3IDE4LjczNDQgNi4xMDE1NiAxNy44NzUgNi43MDMxMiAxNi43MTQ4QzcuNTE5NTMgMTYuNDE0MSA4LjQ2NDg0IDE2LjExMzMgOS40OTYwOSAxNS44OTg0QzEwLjE4MzYgMTYuNDE0MSAxMC45NTcgMTYuODAwOCAxMS44MTY0IDE3LjEwMTZDMTIuMDc0MiAxNy4xODc1IDEyLjI4OTEgMTcuMTg3NSAxMi41NDY5IDE3LjE4NzVDMTMuNjIxMSAxNy4xODc1IDE0LjQzNzUgMTYuMzcxMSAxNC40Mzc1IDE1LjI5NjlDMTQuNDM3NSAxNC4yNjU2IDEzLjU3ODEgMTMuNDA2MiAxMi41NDY5IDEzLjQwNjJaTTYuNzAzMTIgMTUuMjUzOUM3LjA0Njg4IDE0LjU2NjQgNy4zOTA2MiAxMy43OTMgNy42OTE0MSAxMi45NzY2QzguMDM1MTYgMTMuNTM1MiA4LjQ2NDg0IDE0LjA5MzggOC45ODA0NyAxNC42MDk0QzguMjUgMTQuNzgxMiA3LjQ3NjU2IDE0Ljk5NjEgNi43MDMxMiAxNS4yNTM5Wk0xMi41NDY5IDE1LjgxMjVDMTIuNDYwOSAxNS44MTI1IDEyLjM3NSAxNS44MTI1IDEyLjI0NjEgMTUuNzY5NUMxMS42NDQ1IDE1LjU1NDcgMTEuMDg1OSAxNS4yOTY5IDEwLjYxMzMgMTQuOTk2MUMxMS42NDQ1IDE0LjgyNDIgMTIuMzMyIDE0LjgyNDIgMTIuMzc1IDE0Ljc4MTJIMTIuNTQ2OUMxMi44MDQ3IDE0Ljc4MTIgMTMuMDYyNSAxNS4wMzkxIDEzLjA2MjUgMTUuMzM5OEMxMy4wNjI1IDE1LjU5NzcgMTIuODQ3NyAxNS44MTI1IDEyLjU0NjkgMTUuODEyNVoiIGZpbGw9IiMwMEM3M0QiLz4KPC9zdmc+Cg==" alt="Prospecto"></div>
@@ -1375,6 +1611,7 @@ function renderNueva(){
   renderVs();
   renderMezclas();
 
+  renderGraf();
   document.querySelectorAll('#listNueva input').forEach(inp => {
     // Seleccionar todo al enfocar: evita que el "0" inicial se quede como prefijo
     inp.addEventListener('focus', e => e.target.select());
@@ -1403,18 +1640,20 @@ function liveUpdate(i){
     row.classList.toggle('muted', !has);
     const dot = row.querySelector('.dot');
     dot.classList.toggle('off', !has);
-    dot.style.background = has ? r.color : '';
+    dot.style.background = has ? COLOR[r.n] : '';
     row.querySelector('.pctbox').classList.toggle('has', has);
-    row.querySelector('.meta .amt').textContent = has ? money(DISPONIBLE * r.pct / 100) : '';
+    // el monto vive dentro de .pctbox, no en una segunda línea
+    row.querySelector('.pctbox .amt').textContent = has ? money(DISPONIBLE * r.pct / 100) : '';
     row.querySelector('.pdf').style.visibility = has ? 'visible' : 'hidden';
     const tope = TOLERANCIA[PERFIL][r.riesgo];
     row.classList.toggle('fuera', has && tope !== undefined && r.pct > tope);
   }
   const t = total();
   donut(document.getElementById('donutNueva'),
-        state.nueva.filter(x => x.pct > 0).map(x => ({pct:x.pct, color:BANDA[x.riesgo].color})),
+        state.nueva.filter(x => x.pct > 0).map(x => ({pct:x.pct, color:COLOR[x.n]})),
         {big:t + '%', sub:'Faltan ' + (100 - t) + '%'}, {absolute:true});
   renderVs();
+  renderGraf();
   renderMezclas();
   syncCont();
 }
@@ -1440,29 +1679,41 @@ function renderVs(){
      es Conservador— y comparten el lenguaje de iconos. Conflacionarlas
      (llamar "Conservador" al perfil del cliente) confunde las dos cosas
      que la norma pide justamente distinguir.                              */
-  /* Formato compacto: pares etiqueta/valor apilados, para caber en 220 px.
-     El desglose por banda no se repite acá — el donut de arriba ya está
-     coloreado por banda y la leyenda vive en la tarjeta izquierda.        */
+  /* MEJORA 8 · franja horizontal. Antes esto vivía apilado en una columna
+     de 220 px y el comentario decía "formato compacto para caber"; al
+     mover el bloque bajo la tarjeta completa esa restricción desaparece
+     los datos respiran en celdas separadas por divisores. Quedaron dos:
+     el contraste perfil↔mezcla y el rendimiento. "Ajuste al perfil" y
+     "Asignado" salieron por redundantes — el estado de desviación ya lo
+     dice la flecha azul del contraste (y el enlace Ver sigue ahí), y el
+     total asignado vive en el centro del donut con su "Faltan X%".
+     El desglose por banda sigue sin repetirse acá: el donut ya está
+     coloreado por banda y la leyenda vive en la tarjeta izquierda.   */
   box.innerHTML = `
-    <div class="vs-cab"><span>Tu perfil</span><span>Tu mezcla</span></div>
-    <div class="vs-duo">
-      <span class="vs-v">${iconoPerfil}${PERFIL}</span>
-      <span class="vs-fl ${d.hay ? 'dif' : ''}">→</span>
-      <span class="vs-v">${iconoMezcla}${pm ? BANDA[pm].label : '—'}</span>
+    <div class="vc wide">
+      <span class="vs-k">Tu perfil → tu mezcla</span>
+      <div class="vs-duo">
+        <span class="vs-v">${iconoPerfil}${PERFIL}</span>
+        <span class="vs-fl ${d.hay ? 'dif' : ''}">→</span>
+        <span class="vs-v">${iconoMezcla}${pm ? BANDA[pm].label : '—'}</span>
+      </div>
     </div>
-    ${!t ? '<div class="vs-estado neutro">Asigna porcentajes para ver el riesgo</div>'
-      : d.hay
-        ? `<div class="vs-estado out">Más riesgo que tu perfil
-             <button class="vs-link" onclick="openOv('ov-desvio')">Ver</button></div>`
-        : `<div class="vs-estado ok">Dentro de tu perfil</div>`}
-    <div class="vs-renta">
+    <div class="vc">
       <div class="vs-rtop">
         <span class="vs-k">Rendimiento 12m</span>
         <button class="vs-info" onclick="openOv('ov-renta')"
                 title="Cómo se calcula y por qué no garantiza rentabilidades futuras"
                 aria-label="Cómo se calcula este rendimiento">i</button>
       </div>
-      <b>${renta === null ? '—' : renta.toFixed(1).replace('.', ',') + '% E.A.'}</b>
+      <div class="vs-renta">
+        <b>${renta === null ? '—' : renta.toFixed(1).replace('.', ',') + '% E.A.'}</b>
+      </div>
+    </div>
+    <div class="vc cta">
+      <button class="btn ghost vs-cta" onclick="openOv('ov-rent')"
+              aria-label="Ver las gráficas de rentabilidad de los portafolios">
+        <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjUiIHZpZXdCb3g9IjAgMCAxMiAxMC41IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iQ2hhcnQtbGluZS11cCIgZD0iTTEuMTI1IDguODEyNUMxLjEyNSA5LjE0MDYyIDEuMzU5MzggOS4zNzUgMS42ODc1IDkuMzc1SDExLjQzNzVDMTEuNzQyMiA5LjM3NSAxMiA5LjYzMjgxIDEyIDkuOTM3NUMxMiAxMC4yNjU2IDExLjc0MjIgMTAuNSAxMS40Mzc1IDEwLjVIMS42ODc1QzAuNzUgMTAuNSAwIDkuNzUgMCA4LjgxMjVWMC41NjI1QzAgMC4yNTc4MTIgMC4yMzQzNzUgMCAwLjU2MjUgMEMwLjg2NzE4OCAwIDEuMTI1IDAuMjU3ODEyIDEuMTI1IDAuNTYyNVY4LjgxMjVaTTguMDYyNSAyLjI1SDEwLjY4NzVDMTAuOTkyMiAyLjI1IDExLjI1IDIuNTA3ODEgMTEuMjUgMi44MTI1VjUuNDM3NUMxMS4yNSA1Ljc2NTYyIDEwLjk5MjIgNiAxMC42ODc1IDZDMTAuMzU5NCA2IDEwLjEyNSA1Ljc2NTYyIDEwLjEyNSA1LjQzNzVWNC4xNzE4OEw3LjUgNi43NzM0NEM3LjI4OTA2IDcuMDA3ODEgNi45Mzc1IDcuMDA3ODEgNi43MjY1NiA2Ljc3MzQ0TDQuODUxNTYgNC45MjE4OEwzLjM3NSA2LjM5ODQ0QzMuMTY0MDYgNi42MzI4MSAyLjgxMjUgNi42MzI4MSAyLjYwMTU2IDYuMzk4NDRDMi4zNjcxOSA2LjE4NzUgMi4zNjcxOSA1LjgzNTk0IDIuNjAxNTYgNS42MDE1Nkw0LjQ3NjU2IDMuNzI2NTZDNC42ODc1IDMuNTE1NjIgNS4wMzkwNiAzLjUxNTYyIDUuMjUgMy43MjY1Nkw3LjEyNSA1LjYwMTU2TDkuMzI4MTIgMy4zNzVIOC4wNjI1QzcuNzM0MzggMy4zNzUgNy41IDMuMTQwNjIgNy41IDIuODEyNUM3LjUgMi41MDc4MSA3LjczNDM4IDIuMjUgOC4wNjI1IDIuMjVaIiBmaWxsPSIjNDA0MDQwIi8+Cjwvc3ZnPgo=" alt="">Ver gráficas
+      </button>
     </div>`;
 
   if (!d.hay) state.desviacionAceptada = false;
@@ -1859,8 +2110,335 @@ function go(id){
     b.classList.toggle('on', b.dataset.sc === id));
   if (id === 'sc-resumen') renderResumen();
   window.scrollTo(0,0);
+  /* FIX · Cada .screen tiene min-height:950 y su .content va posicionado,
+     así que la pantalla NUNCA crece con el contenido: lo que sobra desborda
+     invisible y #stageWrap{overflow:hidden} lo recorta. fit() es quien mide
+     el contenido y ajusta el alto, y no se estaba llamando al cambiar de
+     pantalla: la 2 pedía 1175 px y se quedaba con los 950 de la 1, así que
+     se perdían 225 px por abajo. */
+  fit();
+  /* MEJORA 9 · el mini se dimensiona con el espacio libre bajo el donut, y
+     al arrancar renderNueva() corre con la pantalla en display:none (altura
+     0), así que se auto-oculta. Hay que redibujarlo cuando ya es visible. */
+  if (id === 'sc-gestion') renderGraf();
 }
+/* ═══════════════════════════════════════════════════════════
+   MEJORA 7 · Comparador de rentabilidad
+   El Figma dejaba un "PopUp Rentabilidad" sin resolver y el
+   dashboard de contratos ya tenía la gráfica de tendencia. Acá
+   se unen: la curva se calcula sobre LA MEZCLA QUE ESTÁS
+   ARMANDO y se contrasta con la que ya tienes.
+
+   Tres decisiones que no son estéticas:
+
+   1 · El drift de cada curva sale de RENTA — el MISMO dato que
+       alimenta "Tu mezcla" en el bloque VS. Si la gráfica dijera
+       una cosa y el número otra, el comparador restaría confianza
+       en vez de sumarla. La ventana de 12 meses está anclada:
+       ahí la curva da exactamente el % E.A. de RENTA.
+
+   2 · El periodo por defecto es 12 meses, no el más favorable.
+       La CE 014/2025 (num. 5) obliga a monitorear la herramienta
+       buscando "sesgos en la lógica y manipulación de tendencias":
+       abrir en la ventana que mejor se ve sería exactamente eso.
+
+   3 · Rentabilidades pasadas ≠ garantía, y esto es información,
+       NO recomendación profesional. El flujo es de solo ejecución
+       y la advertencia es obligatoria, no cortesía.
+   ═══════════════════════════════════════════════════════════ */
+
+// Volatilidad diaria por banda. Es lo único que diferencia la
+// TEXTURA de las curvas; el rendimiento lo pone RENTA.
+const VOL = {conservador:0.0018, moderado:0.0042, agresivo:0.0115};
+
+const CMP_DIAS = 1826;                  // 5 años + 1: la ventana más larga
+const CMP_HOY  = new Date(2026, 7, 20); // fecha fija ⇒ prototipo reproducible
+const CMP_ANCLA = CMP_DIAS - 1 - 365;   // día donde arranca la ventana 12M
+
+const CMP_PERIODOS = [
+  {k:'1M',  label:'Último mes',            dias:30},
+  {k:'3M',  label:'Últimos 3 meses',       dias:90},
+  {k:'6M',  label:'Últimos 6 meses',       dias:180},
+  {k:'12M', label:'Últimos 12 meses',      dias:365},
+  {k:'3A',  label:'Últimos 3 años',        dias:1095},
+  {k:'5A',  label:'Desde el inicio',       dias:CMP_DIAS - 1}
+];
+
+let cmpEstado = {periodo:'12M'};
+
+/* PRNG determinista: la misma mezcla dibuja siempre la misma curva,
+   así el prototipo se puede llevar a test sin sorpresas. */
+function cmpRng(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function cmpSeed(txt){
+  let h = 2166136261;
+  for (let i = 0; i < txt.length; i++) h = Math.imul(h ^ txt.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+
+const cmpCache = {};
+/* Serie de valor de unidad, base 1 en el día 0.
+   El ruido se ancla en 0 en los días 0, CMP_ANCLA y último: así la
+   ventana de 12 meses reproduce exactamente el % E.A. de RENTA y la
+   curva sigue viéndose orgánica en el resto del recorrido.        */
+function cmpSerie(nombre){
+  if (cmpCache[nombre]) return cmpCache[nombre];
+  const rEA   = (RENTA[nombre] || 0) / 100;
+  const fila  = ACTUAL.concat(NUEVA).find(r => r.n === nombre);
+  const vol   = VOL[(fila && fila.riesgo) || 'moderado'];
+  const drift = Math.log(1 + rEA) / 365;
+  const rnd   = cmpRng(cmpSeed(nombre));
+
+  // camino de ruido acumulado
+  const ruido = [0];
+  for (let i = 1; i < CMP_DIAS; i++){
+    const z = (rnd() + rnd() + rnd() - 1.5) * 2;   // ~gaussiano
+    ruido.push(ruido[i-1] + z * vol);
+  }
+  // anclaje por tramos: el ruido vale 0 en 0, CMP_ANCLA y el último día
+  const fin = CMP_DIAS - 1;
+  const detrend = (a, b) => {
+    const ra = ruido[a], rb = ruido[b];
+    for (let i = a; i <= b; i++)
+      ruido[i] = ruido[i] - (ra + (rb - ra) * ((i - a) / (b - a)));
+  };
+  detrend(0, CMP_ANCLA);
+  detrend(CMP_ANCLA, fin);
+
+  const out = [];
+  for (let i = 0; i < CMP_DIAS; i++) out.push(Math.exp(drift * i + ruido[i]));
+  return (cmpCache[nombre] = out);
+}
+
+/* Serie de una mezcla: se compra en t0 con los pesos dados y se sostiene. */
+function cmpMezcla(rows){
+  const t = rows.reduce((s,r) => s + r.pct, 0);
+  if (!t) return null;
+  const series = rows.map(r => ({w:r.pct / t, s:cmpSerie(r.n)}));
+  const out = [];
+  for (let i = 0; i < CMP_DIAS; i++)
+    out.push(series.reduce((acc,x) => acc + x.w * x.s[i], 0));
+  return out;
+}
+
+const cmpFmt = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1).replace('.', ',') + ' %';
+function cmpFecha(idx){
+  const d = new Date(CMP_HOY);
+  d.setDate(d.getDate() - (CMP_DIAS - 1 - idx));
+  const M = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return d.getDate() + ' ' + M[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2);
+}
+
+/* Qué curvas se dibujan: la mezcla nueva, la actual, y cada portafolio
+   con porcentaje asignado. Dentro de una misma banda de riesgo se
+   diferencian por trazo (guiones), nunca por un color distinto. */
+/* Con un catálogo de 20 portafolios, una mezcla amplia dibujaba 22 curvas
+   superpiladas y estiraba el modal a 988 px (no cabe en 950). Se muestran
+   las MAX_SERIES de mayor peso y se dice cuántas quedan fuera: un tope
+   silencioso se leería como "esto es todo". */
+const MAX_SERIES = 6;
+
+function cmpCurvas(){
+  const todos = state.nueva.filter(r => r.pct > 0).sort((a,b) => b.pct - a.pct);
+  const elegidos = todos.slice(0, MAX_SERIES);
+  const omitidos = todos.length - elegidos.length;
+  const out = [];
+  out.omitidos = omitidos;
+  out.pesoOmitido = todos.slice(MAX_SERIES).reduce((a,r) => a + r.pct, 0);
+  const mezcla = cmpMezcla(todos);   // la mezcla usa TODOS, no solo los dibujados
+  if (mezcla) out.push({id:'nueva', nombre:'Tu mezcla nueva', serie:mezcla,
+                        color:'#0E9F3C', w:3, dash:'', key:true});
+  out.push({id:'actual', nombre:'Tu composición actual', serie:cmpMezcla(ACTUAL),
+            color:'var(--grey-l05)', hex:'#A5A5A5', w:2, dash:'6 5', key:true});
+
+  /* Con color por portafolio ya no hay que diferenciar por trazo: cada curva
+     tiene el color de su punto en la lista. Todas continuas. */
+  elegidos.forEach(r => {
+    out.push({id:r.n, nombre:r.n, serie:cmpSerie(r.n), riesgo:r.riesgo,
+              color:COLOR[r.n], hex:COLOR[r.n], w:1.8, dash:''});
+  });
+  return out;
+}
+
+
+/* Una sola función dibuja la tendencia; el modal y el bloque inline solo
+   difieren en tamaño y en si llevan la fila de KPIs. Así no pueden mostrar
+   cifras distintas. */
+function pintarTendencia(box, opts = {}){
+  if (!box) return;
+  const W = opts.W || 840, H = opts.H || 300, conKpis = opts.kpis !== false;
+  const per = CMP_PERIODOS.find(p => p.k === cmpEstado.periodo);
+  const fin = CMP_DIAS - 1, ini = Math.max(0, fin - per.dias);
+  const curvas = cmpCurvas();
+
+  /* Vacío: esqueleto de la propia gráfica, no un párrafo. Deja ver QUÉ va a
+     aparecer ahí —ejes, rejilla, una curva insinuada— para que el espacio se
+     lea como "acá va algo" y no como un hueco. */
+  if (!curvas.some(c => c.id === 'nueva')) {
+    const W0 = opts.W || 840, H0 = opts.H || 300;
+    const PL0 = 62, PR0 = 8, PT0 = 8, PB0 = 30;
+    let esq = '';
+    for (let k = 0; k <= 4; k++){
+      const yy = PT0 + k / 4 * (H0 - PT0 - PB0);
+      esq += `<line x1="${PL0}" y1="${yy}" x2="${W0-PR0}" y2="${yy}"
+        stroke="var(--line)" stroke-width="1"/>
+        <rect x="${PL0-46}" y="${yy-5}" width="34" height="9" rx="4" fill="var(--n03)"/>`;
+    }
+    for (let k = 0; k <= 4; k++)
+      esq += `<rect x="${PL0 + k/4*(W0-PL0-PR0) - 20}" y="${H0-18}"
+        width="40" height="9" rx="4" fill="var(--n03)"/>`;
+    // curva insinuada: sube, corrige y vuelve a subir
+    const px = (t) => PL0 + t * (W0 - PL0 - PR0);
+    const py = (t) => PT0 + (1 - t) * (H0 - PT0 - PB0);
+    esq += `<path d="M${px(0)} ${py(.18)} C${px(.2)} ${py(.52)}, ${px(.32)} ${py(.34)}, ${px(.46)} ${py(.58)}
+      S${px(.7)} ${py(.44)}, ${px(1)} ${py(.82)}" fill="none" stroke="var(--n03)"
+      stroke-width="3" stroke-linecap="round" stroke-dasharray="7 6"/>`;
+    box.innerHTML = `
+      <div class="cmp-esq">
+        <svg width="${W0}" height="${H0}" viewBox="0 0 ${W0} ${H0}">${esq}</svg>
+        <div class="cmp-esq-txt">
+          <b>Empieza a asignar porcentajes</b>
+          Acá verás cómo se han comportado los portafolios que elijas y tu
+          mezcla completa, frente a la composición que ya tienes.
+        </div>
+      </div>`;
+    return;
+  }
+
+  const visibles = curvas;   // ya no hay interruptor por serie
+  const varia = c => (c.serie[fin] / c.serie[ini] - 1) * 100;
+
+  // Escala Y sobre lo VISIBLE, con 6% de aire arriba y abajo
+  let lo = 0, hi = 0;
+  visibles.forEach(c => {
+    for (let i = ini; i <= fin; i++){
+      const v = (c.serie[i] / c.serie[ini] - 1) * 100;
+      if (v < lo) lo = v; if (v > hi) hi = v;
+    }
+  });
+  if (hi - lo < 1) { hi += 0.5; lo -= 0.5; }
+  const air = (hi - lo) * 0.06; hi += air; lo -= air;
+
+  const PL = 62, PR = 8, PT = 8, PB = 30;
+  const x = i => PL + (i - ini) / (fin - ini) * (W - PL - PR);
+  const y = v => PT + (hi - v) / (hi - lo) * (H - PT - PB);
+
+  // Rejilla: 5 líneas, la de 0% marcada porque es la frontera ganar/perder
+  let grid = '';
+  for (let k = 0; k <= 4; k++){
+    const v = lo + (hi - lo) * k / 4, yy = y(v);
+    grid += `<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}"
+      stroke="var(--line)" stroke-width="1"/>
+      <text x="${PL-12}" y="${yy+4}" text-anchor="end"
+        font="400 12px var(--os)" fill="var(--grey-l05)"
+        style="font:400 12px var(--os)">${cmpFmt(v)}</text>`;
+  }
+  if (lo < 0 && hi > 0)
+    grid += `<line x1="${PL}" y1="${y(0)}" x2="${W-PR}" y2="${y(0)}"
+      stroke="var(--n05)" stroke-width="1"/>`;
+
+  // Eje X: 5 marcas de fecha
+  let ejex = '';
+  for (let k = 0; k <= 4; k++){
+    const i = Math.round(ini + (fin - ini) * k / 4);
+    const anchor = k === 0 ? 'start' : k === 4 ? 'end' : 'middle';
+    ejex += `<text x="${x(i)}" y="${H-8}" text-anchor="${anchor}"
+      fill="var(--grey-l05)" style="font:400 12px var(--os)">${cmpFecha(i)}</text>`;
+  }
+
+  // Trazos. Se submuestrea para no emitir 1.826 puntos por curva.
+  const paso = Math.max(1, Math.floor((fin - ini) / 340));
+  let paths = '';
+  visibles.forEach(c => {
+    let d = '';
+    for (let i = ini; i <= fin; i += paso)
+      d += (d ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y((c.serie[i]/c.serie[ini]-1)*100).toFixed(1);
+    d += 'L' + x(fin).toFixed(1) + ' ' + y(varia(c)).toFixed(1);
+    paths += `<path d="${d}" fill="none" stroke="${c.color}" stroke-width="${c.w}"
+      stroke-linejoin="round" stroke-linecap="round"
+      ${c.dash ? `stroke-dasharray="${c.dash}"` : ''}/>`;
+  });
+
+  /* Sin fila de chips. Los portafolios se reconocen por el color de su punto
+     en la lista, y las dos series agregadas van rotuladas al final de su
+     propia línea (ver `rotulos`): identifica sin gastar una fila. */
+
+  /* Rótulo pegado al final de cada línea agregada. Va con halo blanco para
+     que se lea aunque cruce la rejilla, y desplazado en Y para no chocar
+     entre sí cuando las dos curvas terminan cerca. */
+  let rotulos = '';
+  visibles.filter(c => c.key).forEach(c => {
+    const yv = y(varia(c));
+    const otra = visibles.filter(k => k.key && k !== c)[0];
+    const choca = otra && Math.abs(y(varia(otra)) - yv) < 16;
+    const dy = choca ? (varia(c) >= varia(otra) ? -7 : 13) : 4;
+    const txt = c.id === 'nueva' ? 'Tu mezcla' : 'Actual';
+    rotulos += `<text x="${W - PR - 4}" y="${yv + dy}" text-anchor="end"
+      style="font:700 11px var(--os)" fill="${c.hex || c.color}"
+      stroke="#fff" stroke-width="3" paint-order="stroke">${txt}</text>`;
+  });
+
+  const nueva = curvas.find(c => c.id === 'nueva'), actual = curvas.find(c => c.id === 'actual');
+  const dif = varia(nueva) - varia(actual);
+  const rp = rentaPonderada(state.nueva);
+
+  const cuantos = curvas.length - 2;   // sin contar mezcla y actual
+  const pista = cuantos > 0
+    ? `Cada portafolio se dibuja con el color de su punto en la lista;
+       <b>Tu mezcla</b> va en verde y <b>Actual</b> en gris punteado.`
+    : '';
+  const nota = (curvas.omitidos > 0 || pista)
+    ? `<div class="cmp-nota">${pista}${curvas.omitidos > 0
+        ? ` Se dibujan los <b>${MAX_SERIES}</b> de mayor peso; otros
+            <b>${curvas.omitidos}</b> (${curvas.pesoOmitido}% de tu mezcla) no
+            aparecen, pero sí están contados en <b>Tu mezcla nueva</b>.` : ''}</div>`
+    : '';
+  box.innerHTML = `
+    ${nota}
+    <div class="cmp-plot">
+      <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+        ${grid}${ejex}${paths}${rotulos}
+      </svg>
+      <div class="cmp-tip" id="cmpTip"></div>
+    </div>
+    ${!conKpis ? '' : `<div class="cmp-foot">
+      <div class="cmp-kpi"><div class="k">Tu mezcla nueva · ${per.label.toLowerCase()}</div>
+        <div class="v ${varia(nueva)>=0?'up':'dn'}">${cmpFmt(varia(nueva))}</div></div>
+      <div class="cmp-kpi"><div class="k">Tu composición actual</div>
+        <div class="v ${varia(actual)>=0?'up':'dn'}">${cmpFmt(varia(actual))}</div></div>
+      <div class="cmp-kpi"><div class="k">Diferencia</div>
+        <div class="v ${dif>=0?'up':'dn'}">${cmpFmt(dif)}</div></div>
+      ${rp!==null ? `<div class="cmp-kpi"><div class="k">Rentabilidad ponderada (% E.A.)</div>
+        <div class="v">${rp.toFixed(1).replace('.',',')} %</div></div>` : ''}
+    </div>`}`;
+}
+
+function renderCmp(){ pintarTendencia(document.getElementById('cmpBody'), {W:840, H:300, kpis:true}); }
+
+/* MEJORA 9 · la misma gráfica, a ancho completo, dentro de la tarjeta.
+   Sin la fila de KPIs (la franja gris ya da el rendimiento) y más baja,
+   para que quepa reasignando el alto del bloque donut+lista, no sumando. */
+function renderGraf(){ pintarTendencia(document.getElementById('grafNueva'), {W:854, H:190, kpis:false}); }
+
+/* Los chips y el periodo afectan a las dos vistas a la vez. */
+function refrescarTendencias(){ renderGraf(); renderCmp(); }
+
+function cmpPeriodo(k){
+  cmpEstado.periodo = k;
+  const p = CMP_PERIODOS.find(p => p.k === k);
+  log('comparador_periodo', p ? p.label : k);
+  refrescarTendencias();
+}
+
 function openOv(id){
+  // MEJORA 7 · el comparador se calcula al abrir: refleja la mezcla de ESE momento
+  if (id === 'ov-rent') { renderCmp(); log('comparador_abierto', 'periodo=' + cmpEstado.periodo); }
   document.getElementById(id).classList.add('on');
   if (id === 'ov-onb') renderOnb();
   if (id === 'ov-desvio'){
@@ -1992,7 +2570,12 @@ function fit(){
   document.getElementById('stageWrap').style.height = (h * s) + 'px';
 }
 window.addEventListener('resize', fit);
-new ResizeObserver(fit).observe(document.getElementById('stage'));
+/* FIX · Observar #stage no basta: al tener min-height fijo nunca cambia de
+   tamaño, así que el observer jamás disparaba. Se observa el .content de
+   cada pantalla, que sí crece y encoge con la interacción. */
+const _obs = new ResizeObserver(fit);
+_obs.observe(document.getElementById('stage'));
+document.querySelectorAll('.screen .content').forEach(c => _obs.observe(c));
 
 /* ── Arranque ─────────────────────────────────────────────── */
 renderActual(); renderNueva(); renderContratos(); renderOnb();
