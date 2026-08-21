@@ -434,6 +434,14 @@ img{display:block}
   justify-content:center;margin:0 auto}
 .ic-round img{width:24px;height:24px}
 .ic-round.info{background:var(--info-l)}
+.ic-round.warn{background:var(--warn-l)}
+/* El botón que asume riesgo NO puede vestirse como el "continuar" de todo el
+   flujo: en las pruebas con Financial Explorers los cuatro perfiles dijeron
+   que con el verde sólido le daban clic por reflejo. Acá el primario pasa a
+   ser "Ajustar la mezcla" —el camino seguro— y asumir el riesgo queda como
+   contorno de advertencia: se puede, pero hay que quererlo. */
+.btn.riesgo{background:#fff;border:1.5px solid var(--warn-d);color:#8A5A00}
+.btn.riesgo:hover{background:var(--warn-l)}
 .ic-round.err{background:var(--err-l)}
 .ic-round.ok{background:var(--ok-l)}
 
@@ -522,6 +530,15 @@ body{padding-bottom:88px}
 
 /* Alerta de error / desviación */
 .alert.err{background:var(--err-l);border-color:var(--err-d)}
+/* Nota operativa: el mismo formato de alerta pero sin color de alarma, para
+   que no compita con la desviación de perfil (los 4 perfiles del panel las
+   leyeron como igual de importantes y no lo son). */
+.alert.nota{background:#FCFCFC;border-color:var(--n03)}
+.alert.nota p{color:var(--grey-l03)}
+/* Desviación de perfil en el resumen: es la advertencia que sí debe pesar. */
+.alert.fuerte{border-width:2px;padding:12px}
+.alert.fuerte p{font:400 13px/21px var(--os)}
+.alert.fuerte b{font-weight:700}
 .lnk-alert{font:700 12px/20px var(--os);color:var(--grey-l03);text-decoration:underline;
   white-space:nowrap;flex:0 0 auto}
 .lnk-alert:hover{color:var(--grey)}
@@ -863,7 +880,7 @@ body{padding-bottom:88px}
   <div class="ov" id="ov-total">
     <div class="box" style="width:466px;padding:32px 24px;text-align:center">
       <button class="mx" onclick="closeOv('ov-total')"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjEzLjc1IiBoZWlnaHQ9IjEzLjc5MyIgdmlld0JveD0iMCAwIDEzLjc1IDEzLjc5MyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlhtYXJrIiBkPSJNMTMuNDI3NyAxMi4wMDk4QzEzLjgxNDUgMTIuNDM5NSAxMy44MTQ1IDEzLjA4NCAxMy40Mjc3IDEzLjQ3MDdDMTIuOTk4IDEzLjkwMDQgMTIuMzUzNSAxMy45MDA0IDExLjk2NjggMTMuNDcwN0w2Ljg5NjQ4IDguMzU3NDJMMS43ODMyIDEzLjQ3MDdDMS4zNTM1MiAxMy45MDA0IDAuNzA4OTg0IDEzLjkwMDQgMC4zMjIyNjYgMTMuNDcwN0MtMC4xMDc0MjIgMTMuMDg0IC0wLjEwNzQyMiAxMi40Mzk1IDAuMzIyMjY2IDEyLjAwOThMNS40MzU1NSA2Ljg5NjQ4TDAuMzIyMjY2IDEuNzgzMkMtMC4xMDc0MjIgMS4zNTM1MiAtMC4xMDc0MjIgMC43MDg5ODQgMC4zMjIyNjYgMC4zMjIyNjZDMC43MDg5ODQgLTAuMTA3NDIyIDEuMzUzNTIgLTAuMTA3NDIyIDEuNzQwMjMgMC4zMjIyNjZMNi44OTY0OCA1LjQ3ODUyTDEyLjAwOTggMC4zNjUyMzRDMTIuMzk2NSAtMC4wNjQ0NTMxIDEzLjA0MSAtMC4wNjQ0NTMxIDEzLjQyNzcgMC4zNjUyMzRDMTMuODU3NCAwLjc1MTk1MyAxMy44NTc0IDEuMzk2NDggMTMuNDI3NyAxLjgyNjE3TDguMzE0NDUgNi44OTY0OEwxMy40Mjc3IDEyLjAwOThaIiBmaWxsPSIjMDBDNzNEIi8+Cjwvc3ZnPgo=" alt="Cerrar"></button>
-      <div class="ic-round info"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJjaXJjbGUtZXhjbGFtYXRpb24iIGQ9Ik0xMiAwQzE4LjYwOTQgMCAyNCA1LjM5MDYyIDI0IDEyQzI0IDE4LjY1NjIgMTguNjA5NCAyNCAxMiAyNEM1LjM0Mzc1IDI0IDAgMTguNjU2MiAwIDEyQzAgNS4zOTA2MiA1LjM0Mzc1IDAgMTIgMFpNMTIgMjEuNzVDMTcuMzQzOCAyMS43NSAyMS43NSAxNy4zOTA2IDIxLjc1IDEyQzIxLjc1IDYuNjU2MjUgMTcuMzQzOCAyLjI1IDEyIDIuMjVDNi42MDkzOCAyLjI1IDIuMjUgNi42NTYyNSAyLjI1IDEyQzIuMjUgMTcuMzkwNiA2LjYwOTM4IDIxLjc1IDEyIDIxLjc1Wk0xMiAxNC4yNUMxMS4zNDM4IDE0LjI1IDEwLjg3NSAxMy43ODEyIDEwLjg3NSAxMy4xMjVWNy4xMjVDMTAuODc1IDYuNTE1NjIgMTEuMzQzOCA2IDEyIDZDMTIuNjA5NCA2IDEzLjEyNSA2LjUxNTYyIDEzLjEyNSA3LjEyNVYxMy4xMjVDMTMuMTI1IDEzLjc4MTIgMTIuNjA5NCAxNC4yNSAxMiAxNC4yNVpNMTIgMTUuODQzOEMxMi43OTY5IDE1Ljg0MzggMTMuNDUzMSAxNi41IDEzLjQ1MzEgMTcuMjk2OUMxMy40NTMxIDE4LjA5MzggMTIuNzk2OSAxOC43NSAxMiAxOC43NUMxMS4xNTYyIDE4Ljc1IDEwLjUgMTguMDkzOCAxMC41IDE3LjI5NjlDMTAuNSAxNi41IDExLjE1NjIgMTUuODQzOCAxMiAxNS44NDM4WiIgZmlsbD0iIzVDRDVGRiIvPgo8L3N2Zz4K" alt=""></div>
+      <div class="ic-round info"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIyLjAyOTIiIGhlaWdodD0iMTkuMjUiIHZpZXdCb3g9IjAgMCAyMi4wMjkyIDE5LjI1IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iVHJpYW5nbGUtZXhjbGFtYXRpb24iIGQ9Ik0yMS43ODc5IDE2LjU0M0MyMi40NzU0IDE3Ljc0NjEgMjEuNjE2IDE5LjI1IDIwLjE5OCAxOS4yNUgxLjg1MDM4QzAuNDMyNDA2IDE5LjI1IC0wLjQyNjk2OSAxNy43NDYxIDAuMjE3NTYzIDE2LjU0M0w5LjQxMjg4IDAuOTAyMzQ0QzkuNzk5NTkgMC4zMDA3ODEgMTAuNDAxMiAwIDExLjA0NTcgMEMxMS42NDczIDAgMTIuMjQ4OCAwLjMwMDc4MSAxMi42MzU1IDAuOTAyMzQ0TDIxLjc4NzkgMTYuNTQzWk0yLjI4MDA2IDE3LjE4NzVIMTkuNzY4M0wxMS4wMDI3IDIuMjc3MzRMMi4yODAwNiAxNy4xODc1Wk0xMS4wNDU3IDEzLjE0ODRDMTEuNzc2MiAxMy4xNDg0IDEyLjM3NzcgMTMuNzUgMTIuMzc3NyAxNC40ODA1QzEyLjM3NzcgMTUuMjEwOSAxMS43NzYyIDE1LjgxMjUgMTEuMDQ1NyAxNS44MTI1QzEwLjI3MjMgMTUuODEyNSA5LjY3MDY5IDE1LjIxMDkgOS42NzA2OSAxNC40ODA1QzkuNjcwNjkgMTMuNzUgMTAuMjcyMyAxMy4xNDg0IDExLjA0NTcgMTMuMTQ4NFpNMTAuMDE0NCA2LjUzMTI1QzEwLjAxNDQgNS45NzI2NiAxMC40NDQxIDUuNSAxMS4wNDU3IDUuNUMxMS42MDQzIDUuNSAxMi4wNzY5IDUuOTcyNjYgMTIuMDc2OSA2LjUzMTI1VjEwLjY1NjJDMTIuMDc2OSAxMS4yNTc4IDExLjYwNDMgMTEuNjg3NSAxMS4wNDU3IDExLjY4NzVDMTAuNDQ0MSAxMS42ODc1IDEwLjAxNDQgMTEuMjU3OCAxMC4wMTQ0IDEwLjY1NjJWNi41MzEyNVoiIGZpbGw9IiM0MDQwNDAiLz4KPC9zdmc+Cg==" alt=""></div>
       <div class="h3" style="margin-top:16px">¿Qué es la gestión total?</div>
       <div class="lbl" style="margin-top:16px;text-align:left">
         Con esta opción si puedes <b>cambiar el 100 % de tu inversión actual</b>, es decir, todos los portafolios y todos los porcentajes asociados.<br>
@@ -947,7 +964,7 @@ body{padding-bottom:88px}
        Fricción intencional: exige acción explícita, no viene preseleccionada. -->
   <div class="ov" id="ov-desvio">
     <div class="box" style="width:640px;padding:32px;text-align:center">
-      <div class="ic-round info"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJjaXJjbGUtZXhjbGFtYXRpb24iIGQ9Ik0xMiAwQzE4LjYwOTQgMCAyNCA1LjM5MDYyIDI0IDEyQzI0IDE4LjY1NjIgMTguNjA5NCAyNCAxMiAyNEM1LjM0Mzc1IDI0IDAgMTguNjU2MiAwIDEyQzAgNS4zOTA2MiA1LjM0Mzc1IDAgMTIgMFpNMTIgMjEuNzVDMTcuMzQzOCAyMS43NSAyMS43NSAxNy4zOTA2IDIxLjc1IDEyQzIxLjc1IDYuNjU2MjUgMTcuMzQzOCAyLjI1IDEyIDIuMjVDNi42MDkzOCAyLjI1IDIuMjUgNi42NTYyNSAyLjI1IDEyQzIuMjUgMTcuMzkwNiA2LjYwOTM4IDIxLjc1IDEyIDIxLjc1Wk0xMiAxNC4yNUMxMS4zNDM4IDE0LjI1IDEwLjg3NSAxMy43ODEyIDEwLjg3NSAxMy4xMjVWNy4xMjVDMTAuODc1IDYuNTE1NjIgMTEuMzQzOCA2IDEyIDZDMTIuNjA5NCA2IDEzLjEyNSA2LjUxNTYyIDEzLjEyNSA3LjEyNVYxMy4xMjVDMTMuMTI1IDEzLjc4MTIgMTIuNjA5NCAxNC4yNSAxMiAxNC4yNVpNMTIgMTUuODQzOEMxMi43OTY5IDE1Ljg0MzggMTMuNDUzMSAxNi41IDEzLjQ1MzEgMTcuMjk2OUMxMy40NTMxIDE4LjA5MzggMTIuNzk2OSAxOC43NSAxMiAxOC43NUMxMS4xNTYyIDE4Ljc1IDEwLjUgMTguMDkzOCAxMC41IDE3LjI5NjlDMTAuNSAxNi41IDExLjE1NjIgMTUuODQzOCAxMiAxNS44NDM4WiIgZmlsbD0iIzVDRDVGRiIvPgo8L3N2Zz4K" alt=""></div>
+      <div class="ic-round warn"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIyLjAyOTIiIGhlaWdodD0iMTkuMjUiIHZpZXdCb3g9IjAgMCAyMi4wMjkyIDE5LjI1IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iVHJpYW5nbGUtZXhjbGFtYXRpb24iIGQ9Ik0yMS43ODc5IDE2LjU0M0MyMi40NzU0IDE3Ljc0NjEgMjEuNjE2IDE5LjI1IDIwLjE5OCAxOS4yNUgxLjg1MDM4QzAuNDMyNDA2IDE5LjI1IC0wLjQyNjk2OSAxNy43NDYxIDAuMjE3NTYzIDE2LjU0M0w5LjQxMjg4IDAuOTAyMzQ0QzkuNzk5NTkgMC4zMDA3ODEgMTAuNDAxMiAwIDExLjA0NTcgMEMxMS42NDczIDAgMTIuMjQ4OCAwLjMwMDc4MSAxMi42MzU1IDAuOTAyMzQ0TDIxLjc4NzkgMTYuNTQzWk0yLjI4MDA2IDE3LjE4NzVIMTkuNzY4M0wxMS4wMDI3IDIuMjc3MzRMMi4yODAwNiAxNy4xODc1Wk0xMS4wNDU3IDEzLjE0ODRDMTEuNzc2MiAxMy4xNDg0IDEyLjM3NzcgMTMuNzUgMTIuMzc3NyAxNC40ODA1QzEyLjM3NzcgMTUuMjEwOSAxMS43NzYyIDE1LjgxMjUgMTEuMDQ1NyAxNS44MTI1QzEwLjI3MjMgMTUuODEyNSA5LjY3MDY5IDE1LjIxMDkgOS42NzA2OSAxNC40ODA1QzkuNjcwNjkgMTMuNzUgMTAuMjcyMyAxMy4xNDg0IDExLjA0NTcgMTMuMTQ4NFpNMTAuMDE0NCA2LjUzMTI1QzEwLjAxNDQgNS45NzI2NiAxMC40NDQxIDUuNSAxMS4wNDU3IDUuNUMxMS42MDQzIDUuNSAxMi4wNzY5IDUuOTcyNjYgMTIuMDc2OSA2LjUzMTI1VjEwLjY1NjJDMTIuMDc2OSAxMS4yNTc4IDExLjYwNDMgMTEuNjg3NSAxMS4wNDU3IDExLjY4NzVDMTAuNDQ0MSAxMS42ODc1IDEwLjAxNDQgMTEuMjU3OCAxMC4wMTQ0IDEwLjY1NjJWNi41MzEyNVoiIGZpbGw9IiM0MDQwNDAiLz4KPC9zdmc+Cg==" alt=""></div>
       <div class="h3" style="margin-top:16px">Esta mezcla se sale de tu perfil</div>
       <div class="lbl" style="margin-top:12px;text-align:left">
         Tu perfil de inversionista es <b>Prudente</b>. La mezcla que armaste concentra más
@@ -960,8 +977,8 @@ body{padding-bottom:88px}
         y su riesgo son tuyos, y queda registrada.
       </div>
       <div class="footer2" style="margin-top:24px">
-        <button class="btn ghost" onclick="ajustarDesvio()">Ajustar la mezcla</button>
-        <button class="btn primary" onclick="aceptarDesvio()">Continuar y asumo el riesgo</button>
+        <button class="btn primary" onclick="ajustarDesvio()">Ajustar la mezcla</button>
+        <button class="btn riesgo" onclick="aceptarDesvio()">Continuar y asumo el riesgo</button>
       </div>
       <div class="cap" style="margin-top:12px;color:var(--grey-l05)">
         Decreto 1239 de 2024 · Circular Externa 014 de 2025 SFC
@@ -1061,7 +1078,12 @@ body{padding-bottom:88px}
       <div class="lg r">3 de 3</div>
     </div>
 
-    <div class="alert warn" style="margin-top:16px">
+        <!-- MEJORA 1a · la desviación aceptada se repite en el resumen -->
+    <div id="resDesvio" style="margin-top:16px;display:none"></div>
+
+    <!-- El precio de mercado es una nota OPERATIVA: en las pruebas pesaba
+         visualmente igual que la desviación de perfil, y no es comparable. -->
+<div class="alert nota" style="margin-top:16px">
       <div class="ic"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIyLjAyOTIiIGhlaWdodD0iMTkuMjUiIHZpZXdCb3g9IjAgMCAyMi4wMjkyIDE5LjI1IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iVHJpYW5nbGUtZXhjbGFtYXRpb24iIGQ9Ik0yMS43ODc5IDE2LjU0M0MyMi40NzU0IDE3Ljc0NjEgMjEuNjE2IDE5LjI1IDIwLjE5OCAxOS4yNUgxLjg1MDM4QzAuNDMyNDA2IDE5LjI1IC0wLjQyNjk2OSAxNy43NDYxIDAuMjE3NTYzIDE2LjU0M0w5LjQxMjg4IDAuOTAyMzQ0QzkuNzk5NTkgMC4zMDA3ODEgMTAuNDAxMiAwIDExLjA0NTcgMEMxMS42NDczIDAgMTIuMjQ4OCAwLjMwMDc4MSAxMi42MzU1IDAuOTAyMzQ0TDIxLjc4NzkgMTYuNTQzWk0yLjI4MDA2IDE3LjE4NzVIMTkuNzY4M0wxMS4wMDI3IDIuMjc3MzRMMi4yODAwNiAxNy4xODc1Wk0xMS4wNDU3IDEzLjE0ODRDMTEuNzc2MiAxMy4xNDg0IDEyLjM3NzcgMTMuNzUgMTIuMzc3NyAxNC40ODA1QzEyLjM3NzcgMTUuMjEwOSAxMS43NzYyIDE1LjgxMjUgMTEuMDQ1NyAxNS44MTI1QzEwLjI3MjMgMTUuODEyNSA5LjY3MDY5IDE1LjIxMDkgOS42NzA2OSAxNC40ODA1QzkuNjcwNjkgMTMuNzUgMTAuMjcyMyAxMy4xNDg0IDExLjA0NTcgMTMuMTQ4NFpNMTAuMDE0NCA2LjUzMTI1QzEwLjAxNDQgNS45NzI2NiAxMC40NDQxIDUuNSAxMS4wNDU3IDUuNUMxMS42MDQzIDUuNSAxMi4wNzY5IDUuOTcyNjYgMTIuMDc2OSA2LjUzMTI1VjEwLjY1NjJDMTIuMDc2OSAxMS4yNTc4IDExLjYwNDMgMTEuNjg3NSAxMS4wNDU3IDExLjY4NzVDMTAuNDQ0MSAxMS42ODc1IDEwLjAxNDQgMTEuMjU3OCAxMC4wMTQ0IDEwLjY1NjJWNi41MzEyNVoiIGZpbGw9IiM0MDQwNDAiLz4KPC9zdmc+Cg==" alt=""></div>
       <p><b>El valor de cada portafolio objeto de la transferencia está calculado según su precio de mercado de (ayer).</b> Al momento de hacerse efectiva la transferencia o cambio de portafolio <b>puede haber diferencias por las variaciones del precio de mercado</b> mientras ejecutamos tu decisión de inversión y por las transacciones de aportes o retiros que puedan procesar en las mismas fechas.</p>
     </div>
@@ -1082,7 +1104,7 @@ body{padding-bottom:88px}
       <img class="q" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjIyIiBoZWlnaHQ9IjIyIiB2aWV3Qm94PSIwIDAgMjIgMjIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJDaXJjbGUtcXVlc3Rpb24iIGQ9Ik0xMSAwQzE3LjA1ODYgMCAyMiA0Ljk0MTQxIDIyIDExQzIyIDE3LjEwMTYgMTcuMDU4NiAyMiAxMSAyMkM0Ljg5ODQ0IDIyIDAgMTcuMTAxNiAwIDExQzAgNC45NDE0MSA0Ljg5ODQ0IDAgMTEgMFpNMTEgMTkuOTM3NUMxNS44OTg0IDE5LjkzNzUgMTkuOTM3NSAxNS45NDE0IDE5LjkzNzUgMTFDMTkuOTM3NSA2LjEwMTU2IDE1Ljg5ODQgMi4wNjI1IDExIDIuMDYyNUM2LjA1ODU5IDIuMDYyNSAyLjA2MjUgNi4xMDE1NiAyLjA2MjUgMTFDMi4wNjI1IDE1Ljk0MTQgNi4wNTg1OSAxOS45Mzc1IDExIDE5LjkzNzVaTTExIDE0LjQzNzVDMTEuNzMwNSAxNC40Mzc1IDEyLjM3NSAxNS4wMzkxIDEyLjM3NSAxNS44MTI1QzEyLjM3NSAxNi41ODU5IDExLjczMDUgMTcuMTg3NSAxMSAxNy4xODc1QzEwLjE4MzYgMTcuMTg3NSA5LjYyNSAxNi41ODU5IDkuNjI1IDE1LjgxMjVDOS42MjUgMTUuMDM5MSAxMC4yMjY2IDE0LjQzNzUgMTEgMTQuNDM3NVpNMTIuNDE4IDUuNUMxNC4xMzY3IDUuNSAxNS40Njg4IDYuODMyMDMgMTUuNDI1OCA4LjUwNzgxQzE1LjQyNTggOS41MzkwNiAxNC44NjcyIDEwLjUyNzMgMTMuOTY0OCAxMS4wODU5TDEyLjAzMTIgMTIuMjg5MVYxMi4zNzVDMTIuMDMxMiAxMi45MzM2IDExLjU1ODYgMTMuNDA2MiAxMSAxMy40MDYyQzEwLjQ0MTQgMTMuNDA2MiA5Ljk2ODc1IDEyLjkzMzYgOS45Njg3NSAxMi4zNzVWMTEuNjg3NUM5Ljk2ODc1IDExLjM0MzggMTAuMTQwNiAxMSAxMC40ODQ0IDEwLjc4NTJMMTIuOTMzNiA5LjMyNDIyQzEzLjIzNDQgOS4xNTIzNCAxMy40MDYyIDguODUxNTYgMTMuNDA2MiA4LjUwNzgxQzEzLjQwNjIgNy45OTIxOSAxMi45MzM2IDcuNTYyNSAxMi4zNzUgNy41NjI1SDEwLjE4MzZDOS42Njc5NyA3LjU2MjUgOS4yODEyNSA3Ljk5MjE5IDkuMjgxMjUgOC41MDc4MUM5LjI4MTI1IDkuMDY2NDEgOC44MDg1OSA5LjUzOTA2IDguMjUgOS41MzkwNkM3LjY5MTQxIDkuNTM5MDYgNy4yMTg3NSA5LjA2NjQxIDcuMjE4NzUgOC41MDc4MUM3LjIxODc1IDYuODMyMDMgOC41NTA3OCA1LjUgMTAuMjI2NiA1LjVIMTIuNDE4WiIgZmlsbD0iIzQwNDA0MCIvPgo8L3N2Zz4K" alt="">
     </div>
     <div class="ckrow">
-      <button class="ck on" id="ckRiesgos" onclick="tog(this)"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJpY29uYW1vb246Y2hlY2stYm9sZCI+CjxwYXRoIGlkPSJWZWN0b3IgKFN0cm9rZSkiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTMuOTIyNiA0LjA3NzQxQzE0LjI0OCA0LjQwMjg1IDE0LjI0OCA0LjkzMDQ5IDEzLjkyMjYgNS4yNTU5Mkw3LjI1NTkyIDExLjkyMjZDNi45MzA0OSAxMi4yNDggNi40MDI4NSAxMi4yNDggNi4wNzc0MSAxMS45MjI2TDIuNzQ0MDggOC41ODkyNkMyLjQxODY0IDguMjYzODIgMi40MTg2NCA3LjczNjE4IDIuNzQ0MDggNy40MTA3NEMzLjA2OTUxIDcuMDg1MzEgMy41OTcxNSA3LjA4NTMxIDMuOTIyNTkgNy40MTA3NEw2LjY2NjY3IDEwLjE1NDhMMTIuNzQ0MSA0LjA3NzQxQzEzLjA2OTUgMy43NTE5NyAxMy41OTcyIDMuNzUxOTcgMTMuOTIyNiA0LjA3NzQxWiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt=""></button>
+      <button class="ck" id="ckRiesgos" onclick="tog(this)"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJpY29uYW1vb246Y2hlY2stYm9sZCI+CjxwYXRoIGlkPSJWZWN0b3IgKFN0cm9rZSkiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTMuOTIyNiA0LjA3NzQxQzE0LjI0OCA0LjQwMjg1IDE0LjI0OCA0LjkzMDQ5IDEzLjkyMjYgNS4yNTU5Mkw3LjI1NTkyIDExLjkyMjZDNi45MzA0OSAxMi4yNDggNi40MDI4NSAxMi4yNDggNi4wNzc0MSAxMS45MjI2TDIuNzQ0MDggOC41ODkyNkMyLjQxODY0IDguMjYzODIgMi40MTg2NCA3LjczNjE4IDIuNzQ0MDggNy40MTA3NEMzLjA2OTUxIDcuMDg1MzEgMy41OTcxNSA3LjA4NTMxIDMuOTIyNTkgNy40MTA3NEw2LjY2NjY3IDEwLjE1NDhMMTIuNzQ0MSA0LjA3NzQxQzEzLjA2OTUgMy43NTE5NyAxMy41OTcyIDMuNzUxOTcgMTMuOTIyNiA0LjA3NzQxWiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt=""></button>
       <p>Confirmo que conozco y acepto las características y riesgos de los portafolios seleccionados.</p>
     </div>
 
@@ -2049,7 +2071,7 @@ function renderResumen(){
       <div class="pct">${r.pct}%</div>
       <div class="txt"><div class="n">${r.n}</div>
         <div class="a">${money(DISPONIBLE * r.pct / 100)}</div></div>
-      <button class="ck on" onclick="tog(this)"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJpY29uYW1vb246Y2hlY2stYm9sZCI+CjxwYXRoIGlkPSJWZWN0b3IgKFN0cm9rZSkiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTMuOTIyNiA0LjA3NzQxQzE0LjI0OCA0LjQwMjg1IDE0LjI0OCA0LjkzMDQ5IDEzLjkyMjYgNS4yNTU5Mkw3LjI1NTkyIDExLjkyMjZDNi45MzA0OSAxMi4yNDggNi40MDI4NSAxMi4yNDggNi4wNzc0MSAxMS45MjI2TDIuNzQ0MDggOC41ODkyNkMyLjQxODY0IDguMjYzODIgMi40MTg2NCA3LjczNjE4IDIuNzQ0MDggNy40MTA3NEMzLjA2OTUxIDcuMDg1MzEgMy41OTcxNSA3LjA4NTMxIDMuOTIyNTkgNy40MTA3NEw2LjY2NjY3IDEwLjE1NDhMMTIuNzQ0MSA0LjA3NzQxQzEzLjA2OTUgMy43NTE5NyAxMy41OTcyIDMuNzUxOTcgMTMuOTIyNiA0LjA3NzQxWiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt=""></button>
+      <button class="ck" onclick="tog(this)"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJpY29uYW1vb246Y2hlY2stYm9sZCI+CjxwYXRoIGlkPSJWZWN0b3IgKFN0cm9rZSkiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTMuOTIyNiA0LjA3NzQxQzE0LjI0OCA0LjQwMjg1IDE0LjI0OCA0LjkzMDQ5IDEzLjkyMjYgNS4yNTU5Mkw3LjI1NTkyIDExLjkyMjZDNi45MzA0OSAxMi4yNDggNi40MDI4NSAxMi4yNDggNi4wNzc0MSAxMS45MjI2TDIuNzQ0MDggOC41ODkyNkMyLjQxODY0IDguMjYzODIgMi40MTg2NCA3LjczNjE4IDIuNzQ0MDggNy40MTA3NEMzLjA2OTUxIDcuMDg1MzEgMy41OTcxNSA3LjA4NTMxIDMuOTIyNTkgNy40MTA3NEw2LjY2NjY3IDEwLjE1NDhMMTIuNzQ0MSA0LjA3NzQxQzEzLjA2OTUgMy43NTE5NyAxMy41OTcyIDMuNzUxOTcgMTMuOTIyNiA0LjA3NzQxWiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt=""></button>
       <div class="pdf"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2LjUiIGhlaWdodD0iMjIiIHZpZXdCb3g9IjAgMCAxNi41IDIyIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBpZD0iZmlsZS1wZGYiIGQ9Ik03LjkwNjI1IDguOTM3NUM3LjkwNjI1IDkuNzUzOTEgNy42OTE0MSAxMC43NDIyIDcuNjA1NDcgMTEuMTI4OUM3LjIxODc1IDkuOTY4NzUgNy4yMTg3NSA5LjA2NjQxIDcuMjE4NzUgOC45Mzc1QzcuMjE4NzUgOC43NjU2MiA3LjM0NzY2IDguNTkzNzUgNy41NjI1IDguNTkzNzVDNy43MzQzOCA4LjU5Mzc1IDcuOTA2MjUgOC43NjU2MiA3LjkwNjI1IDguOTM3NVpNMTEgMEwxNi41IDUuNUgxMVYwWk0zLjQzNzUgMTguMTc1OEMzLjQzNzUgMTguMDg5OCAzLjQzNzUgMTguMDAzOSAzLjUyMzQ0IDE3LjkxOEMzLjk1MzEyIDE3LjQ0NTMgNC41MTE3MiAxNy4wNTg2IDUuMTU2MjUgMTYuNzE0OEM0LjY0MDYyIDE3LjUzMTIgNC4yNTM5MSAxOC4xMzI4IDQuMDM5MDYgMTguNDMzNkMzLjg2NzE5IDE4LjY5MTQgMy40Mzc1IDE4LjYwNTUgMy40Mzc1IDE4LjE3NThaTTkuNjI1IDUuNUM5LjYyNSA2LjI3MzQ0IDEwLjIyNjYgNi44NzUgMTEgNi44NzVIMTYuNVYxOS45Mzc1QzE2LjUgMjEuMDk3NyAxNS41NTQ3IDIyIDE0LjQzNzUgMjJIMi4wNjI1QzAuOTAyMzQ0IDIyIDAgMjEuMDk3NyAwIDE5LjkzNzVWMi4wNjI1QzAgMC45NDUzMTIgMC45MDIzNDQgMCAyLjA2MjUgMEg5LjYyNVY1LjVaTTEyLjU0NjkgMTMuNDA2MkgxMi4zMzJDMTIuMjAzMSAxMy40NDkyIDExLjMwMDggMTMuNDkyMiAxMC4wMTE3IDEzLjcwN0M5LjQ5NjA5IDEzLjIzNDQgOS4wNjY0MSAxMi42NzU4IDguNzIyNjYgMTIuMDc0MkM4LjgwODU5IDExLjk0NTMgOC44NTE1NiAxMS43NzM0IDguODk0NTMgMTEuNjQ0NUM4LjkzNzUgMTEuMzQzOCA5LjI4MTI1IDEwLjAxMTcgOS4yODEyNSA4LjkzNzVDOS4yODEyNSA3Ljk5MjE5IDguNTA3ODEgNy4yMTg3NSA3LjU2MjUgNy4yMTg3NUM2LjU3NDIyIDcuMjE4NzUgNS44NDM3NSA3Ljk5MjE5IDUuODQzNzUgOC45Mzc1QzUuODQzNzUgOC45ODA0NyA1Ljg0Mzc1IDEwLjQ0MTQgNi41MzEyNSAxMi4xNjAyQzYuMTg3NSAxMy4xNDg0IDUuNzE0ODQgMTQuMTM2NyA1LjI0MjE5IDE1LjEyNUM0LjEyNSAxNS42NDA2IDMuMjIyNjYgMTYuMjg1MiAyLjUzNTE2IDE2Ljk3MjdDMi4xOTE0MSAxNy4zMTY0IDIuMDYyNSAxNy43NDYxIDIuMDYyNSAxOC4yNjE3QzIuMDYyNSAxOS4yMDcgMi43OTI5NyAxOS45Mzc1IDMuNzM4MjggMTkuOTM3NUM0LjI5Njg4IDE5LjkzNzUgNC44MTI1IDE5LjY3OTcgNS4xNTYyNSAxOS4yNUM1LjU0Mjk3IDE4LjczNDQgNi4xMDE1NiAxNy44NzUgNi43MDMxMiAxNi43MTQ4QzcuNTE5NTMgMTYuNDE0MSA4LjQ2NDg0IDE2LjExMzMgOS40OTYwOSAxNS44OTg0QzEwLjE4MzYgMTYuNDE0MSAxMC45NTcgMTYuODAwOCAxMS44MTY0IDE3LjEwMTZDMTIuMDc0MiAxNy4xODc1IDEyLjI4OTEgMTcuMTg3NSAxMi41NDY5IDE3LjE4NzVDMTMuNjIxMSAxNy4xODc1IDE0LjQzNzUgMTYuMzcxMSAxNC40Mzc1IDE1LjI5NjlDMTQuNDM3NSAxNC4yNjU2IDEzLjU3ODEgMTMuNDA2MiAxMi41NDY5IDEzLjQwNjJaTTYuNzAzMTIgMTUuMjUzOUM3LjA0Njg4IDE0LjU2NjQgNy4zOTA2MiAxMy43OTMgNy42OTE0MSAxMi45NzY2QzguMDM1MTYgMTMuNTM1MiA4LjQ2NDg0IDE0LjA5MzggOC45ODA0NyAxNC42MDk0QzguMjUgMTQuNzgxMiA3LjQ3NjU2IDE0Ljk5NjEgNi43MDMxMiAxNS4yNTM5Wk0xMi41NDY5IDE1LjgxMjVDMTIuNDYwOSAxNS44MTI1IDEyLjM3NSAxNS44MTI1IDEyLjI0NjEgMTUuNzY5NUMxMS42NDQ1IDE1LjU1NDcgMTEuMDg1OSAxNS4yOTY5IDEwLjYxMzMgMTQuOTk2MUMxMS42NDQ1IDE0LjgyNDIgMTIuMzMyIDE0LjgyNDIgMTIuMzc1IDE0Ljc4MTJIMTIuNTQ2OUMxMi44MDQ3IDE0Ljc4MTIgMTMuMDYyNSAxNS4wMzkxIDEzLjA2MjUgMTUuMzM5OEMxMy4wNjI1IDE1LjU5NzcgMTIuODQ3NyAxNS44MTI1IDEyLjU0NjkgMTUuODEyNVoiIGZpbGw9IiMwMEM3M0QiLz4KPC9zdmc+Cg==" alt="Prospecto"></div>
     </div>`).join('');
   const c = CONTRATOS[state.contrato];
@@ -2063,7 +2085,7 @@ function renderResumen(){
     const e = d.excesos[0];
     av.style.display = '';
     av.innerHTML = `
-      <div class="alert info">
+      <div class="alert warn fuerte">
         <div class="ic"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJjaXJjbGUtZXhjbGFtYXRpb24iIGQ9Ik0xMiAwQzE4LjYwOTQgMCAyNCA1LjM5MDYyIDI0IDEyQzI0IDE4LjY1NjIgMTguNjA5NCAyNCAxMiAyNEM1LjM0Mzc1IDI0IDAgMTguNjU2MiAwIDEyQzAgNS4zOTA2MiA1LjM0Mzc1IDAgMTIgMFpNMTIgMjEuNzVDMTcuMzQzOCAyMS43NSAyMS43NSAxNy4zOTA2IDIxLjc1IDEyQzIxLjc1IDYuNjU2MjUgMTcuMzQzOCAyLjI1IDEyIDIuMjVDNi42MDkzOCAyLjI1IDIuMjUgNi42NTYyNSAyLjI1IDEyQzIuMjUgMTcuMzkwNiA2LjYwOTM4IDIxLjc1IDEyIDIxLjc1Wk0xMiAxNC4yNUMxMS4zNDM4IDE0LjI1IDEwLjg3NSAxMy43ODEyIDEwLjg3NSAxMy4xMjVWNy4xMjVDMTAuODc1IDYuNTE1NjIgMTEuMzQzOCA2IDEyIDZDMTIuNjA5NCA2IDEzLjEyNSA2LjUxNTYyIDEzLjEyNSA3LjEyNVYxMy4xMjVDMTMuMTI1IDEzLjc4MTIgMTIuNjA5NCAxNC4yNSAxMiAxNC4yNVpNMTIgMTUuODQzOEMxMi43OTY5IDE1Ljg0MzggMTMuNDUzMSAxNi41IDEzLjQ1MzEgMTcuMjk2OUMxMy40NTMxIDE4LjA5MzggMTIuNzk2OSAxOC43NSAxMiAxOC43NUMxMS4xNTYyIDE4Ljc1IDEwLjUgMTguMDkzOCAxMC41IDE3LjI5NjlDMTAuNSAxNi41IDExLjE1NjIgMTUuODQzOCAxMiAxNS44NDM4WiIgZmlsbD0iIzQwNDA0MCIvPgo8L3N2Zz4K" alt=""></div>
         <p><b>Esta mezcla se sale de tu perfil ${PERFIL}.</b>
            Queda ${e.pct}% en portafolios de riesgo ${BANDA[e.banda].label}, frente al
@@ -2318,8 +2340,9 @@ function pintarTendencia(box, opts = {}){
         <svg width="${W0}" height="${H0}" viewBox="0 0 ${W0} ${H0}">${esq}</svg>
         <div class="cmp-esq-txt">
           <b>Empieza a asignar porcentajes</b>
-          Acá verás cómo se han comportado los portafolios que elijas y tu
-          mezcla completa, frente a la composición que ya tienes.
+          Acá verás cómo se ha comportado cada portafolio que elijas. Te ayuda
+          a conocerlos —no a predecir— y te avisa si tu mezcla se sale de tu
+          perfil ${PERFIL}.
         </div>
       </div>`;
     return;
@@ -2488,6 +2511,16 @@ function startGestion(){
 }
 
 function finalizar(){
+  /* Las casillas ya no vienen premarcadas (los 4 perfiles del panel lo leyeron
+     como un patrón para que uno pase de largo sin leer), así que el flujo tiene
+     que exigirlas de verdad: aceptación expresa, no de fábrica. */
+  const prospectos = [...document.querySelectorAll('#listResumen .ck')];
+  const faltan = prospectos.filter(c => !c.classList.contains('on')).length;
+  if (faltan){
+    toast(`Acepta el prospecto de ${faltan === 1 ? 'el portafolio pendiente'
+           : 'los ' + faltan + ' portafolios pendientes'}.`);
+    return;
+  }
   if (!document.getElementById('ckRiesgos').classList.contains('on')){
     toast('Debes confirmar que conoces y aceptas las características y riesgos.');
     return;
