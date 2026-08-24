@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siempre Skandia — Informe completo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+  :root{
+    /* Tokens Skandia DS (sk-tokens.scss) */
+    --sk-color-primary:#00c73d;
+    --sk-color-primary-hover:#03a835;
+    --sk-color-primary-active:#009a2f;
+    --sk-color-accent:#16d727;
+    --sk-color-text:#232418;
+    --sk-color-text-muted:#63665a;
+    --sk-color-text-inverse:#f3f4ec;
+    --sk-color-border:#dfe2d5;
+    --sk-color-success:#00a34e;
+    --sk-color-warning:#ffae08;
+    --sk-color-error:#e03430;
+    --sk-color-info:#0099de;
+
+    /* Neutros de layout (no theming, propios de este documento) */
+    --bg:#f7f8f2;
+    --surface:#ffffff;
+    --surface-2:#eef0e6;
+    --surface-dark:#14150f;
+    --surface-dark-2:#1e2018;
+    --font-head:'Montserrat', system-ui, sans-serif;
+    --font-body:'Open Sans', system-ui, sans-serif;
+    --radius-s:6px;
+    --radius-m:10px;
+    --radius-l:16px;
+    --shadow-s:0 1px 3px rgba(20,21,15,0.06), 0 1px 2px rgba(20,21,15,0.05);
+    --shadow-m:0 8px 24px rgba(20,21,15,0.08), 0 2px 8px rgba(20,21,15,0.05);
+    --gradient-brand:linear-gradient(135deg, #00c73d, #8fe000);
+  }
+
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--font-body);
+    background:var(--bg);
+    color:var(--sk-color-text);
+    line-height:1.65;
+    padding:0 20px 100px;
+  }
+  .page{max-width:900px;margin:0 auto;}
+
+  a{color:var(--sk-color-primary-hover);}
+  strong{color:var(--sk-color-text);}
+  em{color:inherit;}
+
+  /* ── barra de progreso ─────────────────────────── */
+  .progress-bar{position:fixed;top:0;left:0;height:3px;width:0%;background:var(--gradient-brand);z-index:80;transition:width .1s linear;}
+
+  /* ── toolbar sticky ─────────────────────────────── */
+  .toolbar{
+    position:sticky; top:12px; z-index:70;
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--sk-color-border);
+    border-radius:100px; padding:10px 16px; margin:20px 0 16px;
+    box-shadow:var(--shadow-m);
+  }
+  .toolbar .back-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--font-head); font-size:12px; font-weight:700;
+    color:var(--sk-color-primary-active); text-decoration:none;
+    background:#eafcf0; border:1px solid #cdf3d8; border-radius:100px; padding:6px 12px;
+    white-space:nowrap;
+  }
+  .toolbar .back-link:hover{background:#d6f7e0;}
+  .toolbar select{
+    font-family:var(--font-body); font-size:12.5px; color:var(--sk-color-text);
+    background:var(--surface-2); border:1px solid var(--sk-color-border); border-radius:100px;
+    padding:7px 12px; flex:1 1 180px; max-width:280px; cursor:pointer;
+  }
+  .toolbar .search-wrap{flex:1 1 180px; position:relative; display:flex; align-items:center; min-width:140px;}
+  .toolbar input[type="search"]{
+    width:100%; font-family:var(--font-body); font-size:12.5px; color:var(--sk-color-text);
+    background:var(--surface-2); border:1px solid var(--sk-color-border); border-radius:100px;
+    padding:7px 14px 7px 30px; outline:none;
+  }
+  .toolbar input[type="search"]:focus{border-color:var(--sk-color-primary); box-shadow:0 0 0 3px rgba(0,199,61,0.15);}
+  .toolbar .search-wrap svg{position:absolute; left:10px; width:13px; height:13px; stroke:var(--sk-color-text-muted); pointer-events:none;}
+  .search-count{font-size:11.5px; color:var(--sk-color-text-muted); white-space:nowrap;}
+  mark{background:#caf9cb; color:inherit; border-radius:2px; padding:0 1px;}
+  mark.current{background:var(--sk-color-warning);}
+
+  /* ── hero ───────────────────────────────────────── */
+  .hero{
+    background:var(--surface-dark); border-radius:var(--radius-l);
+    padding:44px 48px; margin:16px 0 16px; position:relative; overflow:hidden;
+    color:var(--sk-color-text-inverse);
+  }
+  .hero::before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--gradient-brand);}
+  .hero::after{content:'';position:absolute;right:-70px;top:-70px;width:240px;height:240px;border-radius:50%;background:rgba(0,199,61,0.10);}
+  .hero-eyebrow{
+    font-family:var(--font-head); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--sk-color-primary); display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px;
+  }
+  .hero h1{font-family:var(--font-head); font-size:30px; font-weight:700; line-height:1.2; max-width:620px; position:relative;}
+  .hero .sub{font-size:14.5px; color:rgba(243,244,236,0.72); margin-top:12px; max-width:600px; line-height:1.6; position:relative;}
+  .hero-meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; position:relative;}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:rgba(243,244,236,0.85);
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:100px; padding:5px 12px;
+  }
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--sk-color-primary);flex-shrink:0;}
+  .chip.warn .dot{background:var(--sk-color-warning);}
+
+  .scope-note{
+    background:var(--surface); border:1px solid var(--sk-color-border); border-radius:var(--radius-m);
+    padding:16px 22px; margin-bottom:16px; font-size:13px; color:var(--sk-color-text-muted);
+  }
+  .scope-note strong{color:var(--sk-color-text);}
+
+  /* ── TOC ─────────────────────────────────────────── */
+  .toc{background:var(--surface); border:1px solid var(--sk-color-border); border-radius:var(--radius-l); padding:26px 30px; margin-bottom:16px; box-shadow:var(--shadow-s);}
+  .toc-title{font-family:var(--font-head); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--sk-color-text-muted); margin-bottom:16px;}
+  .toc-list{list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:9px 32px;}
+  .toc-list a{text-decoration:none; color:var(--sk-color-text-muted); font-size:13px; display:flex; gap:9px; align-items:baseline;}
+  .toc-list a:hover{color:var(--sk-color-primary-active);}
+  .toc-num{font-family:var(--font-head); font-weight:700; font-size:11px; color:var(--sk-color-primary); min-width:20px;}
+
+  /* ── sections ────────────────────────────────────── */
+  .section{background:var(--surface); border:1px solid var(--sk-color-border); border-radius:var(--radius-l); padding:34px 38px; margin-bottom:16px; box-shadow:var(--shadow-s); scroll-margin-top:70px;}
+  .section-head{display:flex; align-items:flex-start; gap:16px; margin-bottom:22px; padding-bottom:18px; border-bottom:1px solid var(--surface-2);}
+  .section-eyebrow{font-family:var(--font-head); font-size:11px; font-weight:700; color:var(--sk-color-primary-active); background:#eafcf0; border:1px solid #cdf3d8; border-radius:var(--radius-s); padding:5px 9px; white-space:nowrap; margin-top:2px; flex-shrink:0;}
+  .section h2{font-family:var(--font-head); font-size:18px; font-weight:700; line-height:1.3;}
+  .section .section-sub{font-size:13px; color:var(--sk-color-text-muted); margin-top:4px;}
+  .section h3{font-family:var(--font-head); font-size:14.5px; font-weight:700; margin-top:22px; margin-bottom:10px;}
+  .section h4{font-family:var(--font-head); font-size:12.5px; font-weight:700; margin-top:16px; margin-bottom:8px; color:var(--sk-color-text);}
+  .section p{font-size:13.5px; color:var(--sk-color-text-muted);}
+  .section p+p{margin-top:10px;}
+  .section p strong, .section li strong{color:var(--sk-color-text);}
+  .section > ul, .section > ol, .section li > ul{padding-left:20px; margin-top:8px;}
+  .section li{margin-bottom:7px; font-size:13.5px; color:var(--sk-color-text-muted);}
+  .section li::marker{color:var(--sk-color-primary); font-weight:700;}
+  .section-block+.section-block{margin-top:26px; padding-top:26px; border-top:1px dashed var(--surface-2);}
+
+  /* ── callouts ────────────────────────────────────── */
+  .callout{display:flex; gap:12px; border-radius:var(--radius-m); padding:14px 18px; font-size:13px; color:var(--sk-color-text-muted); margin-top:14px;}
+  .callout .icon{flex-shrink:0; font-size:15px;}
+  .callout-info{background:#ebf6fc; border:1px solid #cfe7f8;}
+  .callout-warn{background:#fff8ea; border:1px solid #ffe2b0;}
+  .callout-success{background:#eafcf0; border:1px solid #cdf3d8;}
+  .callout-danger{background:#fff5f4; border:1px solid #ffd2d0;}
+
+  /* ── stat grid ───────────────────────────────────── */
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-top:16px;}
+  .stat{background:var(--surface-2); border-radius:var(--radius-m); padding:16px 14px; text-align:center;}
+  .stat .num{font-family:var(--font-head); font-weight:700; font-size:26px; color:var(--sk-color-primary-active); font-variant-numeric:tabular-nums;}
+  .stat .label{font-size:11px; color:var(--sk-color-text-muted); margin-top:4px; line-height:1.4;}
+
+  /* ── tables ──────────────────────────────────────── */
+  .table-wrap{overflow-x:auto; border-radius:var(--radius-m); border:1px solid var(--sk-color-border); margin-top:14px;}
+  table{width:100%; border-collapse:collapse; font-size:12.8px;}
+  thead tr{background:var(--surface-2); border-bottom:2px solid var(--sk-color-border);}
+  thead th{padding:10px 13px; text-align:left; font-family:var(--font-head); font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--sk-color-text-muted); white-space:nowrap;}
+  tbody tr{border-bottom:1px solid var(--surface-2);}
+  tbody tr:last-child{border-bottom:none;}
+  tbody td{padding:10px 13px; color:var(--sk-color-text-muted); vertical-align:top;}
+  tbody td:first-child{color:var(--sk-color-text); font-weight:600;}
+  td.center, th.center{text-align:center;}
+  .score-3{color:var(--sk-color-primary-active); font-weight:700;}
+  .score-0{color:var(--sk-color-error); font-weight:700;}
+  .score-sd{color:var(--sk-color-text-muted); font-style:italic;}
+
+  /* ── tarjetas de referente (Tier A/B) ────────────── */
+  .ref-card{border:1px solid var(--sk-color-border); border-top:3px solid var(--sk-color-primary); border-radius:var(--radius-m); padding:20px 22px; margin-top:16px; background:var(--surface);}
+  .ref-card h3{margin-top:0; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+  .ref-card h3 a{font-size:11px; font-weight:600; color:var(--sk-color-text-muted); text-decoration:none;}
+  .ref-card h3 a:hover{color:var(--sk-color-primary-active);}
+  .ref-card h4{color:var(--sk-color-primary-active);}
+  .ref-card .verdict{background:var(--surface-2); border-radius:var(--radius-s); padding:10px 14px; margin-top:8px; font-size:13px; color:var(--sk-color-text);}
+  .ref-card .verdict strong{color:var(--sk-color-primary-active);}
+
+  /* ── b2link capacity cards ───────────────────────── */
+  .cap-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; margin-top:16px;}
+  .cap-card{border:1px solid var(--sk-color-border); border-radius:var(--radius-m); padding:14px 16px; background:var(--surface-2);}
+  .cap-card .n{font-family:var(--font-head); font-size:10px; font-weight:700; color:var(--sk-color-primary-active);}
+  .cap-card h5{font-family:var(--font-head); font-size:12.5px; font-weight:700; margin:4px 0 6px;}
+  .cap-card .state{display:inline-block; font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:2px 8px; border-radius:100px; margin-bottom:8px;}
+  .state-ideacion{background:#ebf6fc; color:#0b6693;}
+  .state-definicion{background:#fff8ea; color:#8a5800;}
+  .state-mvp{background:#eafcf0; color:#137a34;}
+  .state-concepto{background:var(--surface); color:var(--sk-color-text-muted); border:1px solid var(--sk-color-border);}
+  .cap-card p{font-size:12px; color:var(--sk-color-text-muted);}
+
+  /* ── territorios ─────────────────────────────────── */
+  .territory-card{border:1px solid var(--sk-color-border); border-radius:var(--radius-l); padding:22px 24px; margin-top:16px; background:var(--surface);}
+  .territory-card .t-tag{font-family:var(--font-head); font-size:11px; font-weight:700; color:#fff; background:var(--sk-color-primary-active); border-radius:100px; padding:4px 12px; display:inline-block; margin-bottom:10px;}
+  .territory-card h3{margin-top:0;}
+
+  /* ── riesgos ─────────────────────────────────────── */
+  .risk-card{display:flex; gap:16px; border:1px solid var(--sk-color-border); border-left:4px solid var(--sk-color-warning); border-radius:var(--radius-m); padding:16px 20px; margin-top:12px; background:var(--surface);}
+  .risk-num{font-family:var(--font-head); font-weight:700; font-size:18px; color:var(--sk-color-warning); flex-shrink:0;}
+  .risk-card h5{font-family:var(--font-head); font-size:13px; font-weight:700; margin-bottom:4px;}
+  .risk-card p{font-size:12.8px; color:var(--sk-color-text-muted);}
+  .risk-card .mitig{margin-top:6px; font-size:12.5px; color:var(--sk-color-text);}
+  .risk-card .mitig b{color:var(--sk-color-primary-active);}
+
+  /* ── preguntas ───────────────────────────────────── */
+  .q-list{list-style:none; counter-reset:q; display:grid; gap:10px; margin-top:16px; padding-left:0!important;}
+  .q-list li{counter-increment:q; display:flex; gap:12px; background:var(--surface-2); border-radius:var(--radius-m); padding:12px 16px; font-size:13.5px; color:var(--sk-color-text);}
+  .q-list li::marker{content:none;}
+  .q-list li::before{content:counter(q); font-family:var(--font-head); font-weight:700; font-size:12px; color:#fff; background:var(--sk-color-primary-active); border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+
+  blockquote{border-left:3px solid var(--sk-color-primary); background:#eafcf0; border-radius:0 var(--radius-m) var(--radius-m) 0; padding:12px 18px; margin:12px 0; font-size:13px; font-style:italic; color:var(--sk-color-text-muted);}
+
+  footer.doc-footer{text-align:center; font-size:12px; color:var(--sk-color-text-muted); padding:30px 0 10px;}
+
+  @media (max-width:640px){
+    .toc-list{grid-template-columns:1fr;}
+    .hero{padding:30px 24px;}
+    .section{padding:24px 22px;}
+    .toolbar{border-radius:var(--radius-m);}
+    .quadrant{flex-direction:column;}
+    .q-yaxis{flex-direction:row; width:auto; justify-content:space-between; padding-top:0; padding-bottom:8px;}
+  }
+
+  /* ── heatmap de puntajes (0–3) ────────────────────── */
+  td.score-1{color:#8a5800; font-weight:700;}
+  td.score-2{color:var(--sk-color-primary-active); font-weight:700;}
+  td.hm-0{background:#fff0ef;}
+  td.hm-1{background:#fff8ea;}
+  td.hm-2{background:#eafcf0;}
+  td.hm-3{background:#d3f7dd;}
+  td.hm-sd{background:var(--surface-2);}
+
+  /* ── tira de chequeo visual (16 criterios) ───────── */
+  .heat-row{display:flex; gap:5px; margin:16px 0 6px; flex-wrap:wrap;}
+  .heat-cell{flex:1 1 90px; min-width:90px; height:64px; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:var(--font-head); font-weight:700; color:#fff; text-align:center; padding:0 4px;}
+  .heat-cell .n{font-size:17px;}
+  .heat-cell .l{font-size:8.5px; font-weight:600; text-transform:uppercase; letter-spacing:.02em; margin-top:2px; line-height:1.2;}
+  .heat-0{background:#e0332e;}
+  .heat-1{background:#e39a3a;}
+  .heat-2{background:#7fbf6a;}
+  .heat-sd{background:#9a9c8e;}
+  .heat-legend{display:flex; gap:18px; flex-wrap:wrap; font-size:11.5px; color:var(--sk-color-text-muted); margin-bottom:16px;}
+  .heat-legend span{display:inline-flex; align-items:center; gap:6px;}
+  .heat-legend i{width:10px; height:10px; border-radius:3px; display:inline-block; flex-shrink:0;}
+
+  /* ── quadrant impacto × esfuerzo (mapa de oportunidades) ── */
+  .quadrant{display:flex; gap:12px; margin-top:16px;}
+  .q-yaxis{display:flex; flex-direction:column; justify-content:space-around; width:70px; flex-shrink:0; padding-top:28px;}
+  .q-yaxis span{font-family:var(--font-head); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--sk-color-text-muted); line-height:1.3;}
+  .q-body{flex:1; min-width:0;}
+  .q-xaxis{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;}
+  .q-xaxis span{font-family:var(--font-head); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--sk-color-text-muted); text-align:center;}
+  .q-grid{display:grid; grid-template-columns:repeat(3,1fr); grid-auto-rows:1fr; gap:8px;}
+  .q-cell{background:var(--surface-2); border:1px solid var(--sk-color-border); border-radius:var(--radius-m); padding:12px 14px; min-height:104px;}
+  .q-cell ul{list-style:none; display:grid; gap:6px; padding-left:0; margin-top:0;}
+  .q-cell li{font-size:11.6px; color:var(--sk-color-text); line-height:1.35; padding-left:14px; position:relative; margin-bottom:0;}
+  .q-cell li::before{content:'●'; position:absolute; left:0; color:var(--sk-color-primary); font-size:8px; top:4px;}
+  .q-cell.empty{display:flex; align-items:center; justify-content:center; color:var(--sk-color-text-muted); font-size:11px; font-style:italic;}
+
+  /* ── barra apilada (composición de la encuesta) ──── */
+  .stack-bar{display:flex; height:40px; border-radius:8px; overflow:hidden; margin-top:16px; border:1px solid var(--sk-color-border);}
+  .stack-seg{display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; font-family:var(--font-head); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 4px;}
+  .stack-legend{display:flex; gap:18px; flex-wrap:wrap; margin-top:10px; font-size:11.5px; color:var(--sk-color-text-muted);}
+  .stack-legend span{display:inline-flex; align-items:center; gap:6px;}
+  .stack-legend i{width:10px; height:10px; border-radius:3px; display:inline-block; flex-shrink:0;}
+
+  /* ── línea de tiempo (dos ventanas) ───────────────── */
+  .win-timeline{margin-top:20px;}
+  .win-track{display:flex; height:46px; border-radius:8px; overflow:hidden; border:1px solid var(--sk-color-border);}
+  .win-seg{display:flex; align-items:center; justify-content:center; font-family:var(--font-head); font-weight:700; font-size:12px; color:#fff;}
+  .win-seg.w1{background:var(--sk-color-error);}
+  .win-seg.gap{background:var(--surface-2); color:var(--sk-color-text-muted); font-weight:600;}
+  .win-seg.w2{background:var(--sk-color-primary-active);}
+  .win-ticks{display:flex; margin-top:6px; font-size:10.5px; color:var(--sk-color-text-muted); font-variant-numeric:tabular-nums;}
+  .win-ticks span{flex-shrink:0;}
+
+  /* ── volver arriba ────────────────────────────────── */
+  #backTop{
+    position:fixed; right:24px; bottom:24px; width:46px; height:46px; border-radius:50%; border:none;
+    background:var(--surface-dark); color:#fff; font-size:18px; cursor:pointer; box-shadow:var(--shadow-m);
+    opacity:0; pointer-events:none; transition:opacity .2s, transform .15s, background .15s; z-index:75;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #backTop.visible{opacity:1; pointer-events:auto;}
+  #backTop:hover{transform:translateY(-2px); background:var(--sk-color-primary-active);}
+
+  /* ── tarjeta de descarga .md ──────────────────────── */
+  .download-card{display:flex; align-items:center; flex-wrap:wrap; gap:14px; background:var(--surface-dark); border-radius:var(--radius-l); padding:20px 24px; margin-bottom:16px; position:relative; overflow:hidden;}
+  .download-card::before{content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--gradient-brand);}
+  .download-icon{font-size:22px; flex-shrink:0;}
+  .download-text{flex:1 1 320px;}
+  .download-text h3{font-family:var(--font-head); font-size:13.5px; font-weight:700; color:#fff; margin-bottom:3px;}
+  .download-text p{font-size:12px; color:rgba(243,244,236,0.68); line-height:1.5;}
+  .download-text p strong{color:#fff;}
+  .download-actions{display:flex; gap:8px; flex-wrap:wrap;}
+  .btn-download{font-family:var(--font-head); font-size:11.5px; font-weight:700; letter-spacing:.03em; text-decoration:none; border-radius:100px; padding:9px 18px; transition:transform .1s, background .15s; white-space:nowrap;}
+  .btn-download:hover{transform:translateY(-1px);}
+  .btn-download--primary{background:var(--sk-color-primary); color:#053d15;}
+  .btn-download--primary:hover{background:var(--sk-color-accent);}
+  .btn-download--ghost{color:rgba(255,255,255,0.85); border:1px solid rgba(255,255,255,0.25);}
+  .btn-download--ghost:hover{border-color:var(--sk-color-primary); color:var(--sk-color-primary);}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="page">
+
+  <div class="toolbar">
+    <a class="back-link" href="index.html">← Volver a la presentación</a>
+    <select id="jumpTo" aria-label="Ir a sección">
+      <option value="">Ir a sección…</option>
+    </select>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="search" id="searchInput" placeholder="Buscar en el documento…">
+    </div>
+    <span class="search-count" id="searchCount"></span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">v2 — integra hallazgos de B2Link</div>
+    <h1>Siempre Skandia — Benchmark y propuesta</h1>
+    <div class="sub">Experiencia de salida y relación pos-laboral del colaborador. Etapa 1: benchmark de concepto + propuesta de territorios de acción.</div>
+    <div class="hero-meta">
+      <span class="chip"><span class="dot"></span>Fecha: 24 de agosto de 2026 (v2, sobre la v1 del 20 de agosto)</span>
+      <span class="chip"><span class="dot"></span>Responsable: Equipo UX Skandia</span>
+      <span class="chip"><span class="dot"></span>Tipo de proyecto: IDENTIFICAR</span>
+    </div>
+  </div>
+
+  <div class="scope-note">
+    <strong>Alcance de este documento.</strong> Esta fase no produce prototipos ni indicadores de rotación (no disponibles a la fecha). A diferencia de la v1, que solo hacía benchmark externo, esta versión añade una lectura de capacidades internas en construcción (B2Link) que cambian el esfuerzo y el riesgo de varios de los hallazgos.
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">Contenido</div>
+    <ul class="toc-list">
+      <li><span class="toc-num">01</span><a href="#resumen">Resumen ejecutivo</a></li>
+      <li><span class="toc-num">02</span><a href="#enfoque">Nota de enfoque</a></li>
+      <li><span class="toc-num">03</span><a href="#fase1">Fase 1 · Preparación</a></li>
+      <li><span class="toc-num">04</span><a href="#tier-a">Tier A · Alumni y transición</a></li>
+      <li><span class="toc-num">05</span><a href="#tier-b">Tier B · Beneficio financiero</a></li>
+      <li><span class="toc-num">06</span><a href="#tier-c">Tier C · Skandia hoy y en construcción</a></li>
+      <li><span class="toc-num">07</span><a href="#resultados">Fase 3 · Resultados</a></li>
+      <li><span class="toc-num">08</span><a href="#journey">El journey completo</a></li>
+      <li><span class="toc-num">09</span><a href="#ventanas">Dos ventanas de contacto</a></li>
+      <li><span class="toc-num">10</span><a href="#mapa">Mapa de oportunidades</a></li>
+      <li><span class="toc-num">11</span><a href="#auditoria">Auditoría del instrumento de escucha</a></li>
+      <li><span class="toc-num">12</span><a href="#rutas">De 8 tipos a 3 rutas emocionales</a></li>
+      <li><span class="toc-num">13</span><a href="#dovetail">Investigación previa recuperada</a></li>
+      <li><span class="toc-num">14</span><a href="#territorios">Tres territorios de acción</a></li>
+      <li><span class="toc-num">15</span><a href="#riesgos">Riesgos de la conexión con B2Link</a></li>
+      <li><span class="toc-num">16</span><a href="#preguntas">Preguntas para decidir</a></li>
+      <li><span class="toc-num">17</span><a href="#limitaciones">Limitaciones</a></li>
+      <li><span class="toc-num">18</span><a href="#fuentes">Fuentes</a></li>
+    </ul>
+  </div>
+
+  <aside class="download-card">
+    <span class="download-icon">📄</span>
+    <div class="download-text">
+      <h3>Informe en formato Markdown</h3>
+      <p>Versión de texto plano del informe, para <strong>consulta rápida</strong> o para <strong>alimentar herramientas de IA</strong> (asistentes, agentes, NotebookLM…) como contexto del proyecto Siempre Skandia.</p>
+    </div>
+    <div class="download-actions">
+      <a class="btn-download btn-download--primary" href="assets/siempre-skandia-benchmark-y-propuesta-v2.md" download>⬇ Descargar .md</a>
+      <a class="btn-download btn-download--ghost" href="assets/siempre-skandia-benchmark-y-propuesta-v2.md" target="_blank" rel="noopener">Ver en línea ↗</a>
+    </div>
+  </aside>
+
+  <!-- 01 · RESUMEN EJECUTIVO -->
+  <section class="section" id="resumen">
+    <div class="section-head">
+      <span class="section-eyebrow">01</span>
+      <div><h2>Resumen ejecutivo</h2><div class="section-sub">Siete hallazgos, de mayor a más reciente</div></div>
+    </div>
+
+    <ol style="padding-left:20px; display:grid; gap:12px;">
+      <li><strong>El problema no es de contenido, es de experiencia de transición.</strong> Skandia ya tiene contenido financiero razonable — dos opciones de inversión de cesantías, documentos de retiro automatizados — pero el estado actual puntúa 0 o 1 sobre 3 en acompañamiento, comunidad, diferenciación por tipo de salida y medición: los cuatro bloques que el programa Siempre Skandia existe para resolver.</li>
+      <li><strong>Ningún referente observado combina lo que Skandia puede combinar.</strong> Los programas de alumni (KPMG, McKinsey) construyen comunidad pero no tocan lo financiero. Los productos financieros de transición (Falabella, Bolívar) protegen el ingreso pero no construyen comunidad ni reconocimiento. El cruce que se planteó — diagnóstico financiero coherente desde el onboarding hasta la oferta de salida — no tiene competencia directa observada en este benchmark. <strong>Y es, precisamente, el cruce que el frente B2Link ya está construyendo por otra puerta</strong> (ver punto 6): sin B2Link, ese cruce sería una aspiración de diseño; con B2Link, es un producto en desarrollo al que Siempre Skandia puede conectarse.</li>
+      <li><strong>El caso de negocio ya existe en la industria, no hay que inventarlo.</strong> El proveedor EnterpriseAlumni publica que el 83% de las personas en una red de alumni le comprarían a su ex empleador, y que el 20% de las contrataciones anuales de sus clientes vienen de esa red — la evidencia externa que sostiene el objetivo de convertir al retirado en cliente y embajador.</li>
+      <li><strong>El instrumento de escucha actual está roto por diseño, no por desinterés de la gente.</strong> De 26 preguntas de la encuesta de retiro, 18 evalúan cultura, beneficios o al líder directo — ninguna mide el proceso de retiro ni la intención de seguir como cliente.</li>
+      <li><strong>Diferenciar por los 8 tipos de retiro administrativos es innecesario si se diferencia por 3 rutas emocionales.</strong> El mismo principio que aplica el seguro de Bolívar (agrupar causales en categorías de elegibilidad, no en un flujo por causal) resuelve la pregunta sin multiplicar el esfuerzo de diseño por ocho.</li>
+      <li><strong>La propuesta no parte de cero en el frente financiero — y eso cambia el esfuerzo, no la ambición.</strong> Cuatro de los ocho criterios que hoy puntúan 0 en Skandia (6 · orientación financiera, 7 · empleabilidad, 8 · continuidad de producto financiero, 10 · cadencia editorial) tienen una capacidad equivalente <strong>en ideación o construcción</strong> dentro del frente B2Link, con dueños de negocio y avances ya en marcha. La pregunta para estos cuatro bloques deja de ser <em>"¿lo construimos?"</em> y pasa a ser <em>"¿cuándo estará disponible, y quién es dueño del momento de contacto?"</em> — una pregunta de gobernanza y calendario, no de diseño desde cero. Ver Tier C.2.</li>
+      <li><strong>El mercado asegurador colombiano ya resolvió, con reglas precisas, el tipo de terminación laboral.</strong> El seguro de Protección de Pagos de Seguros Bolívar para clientes Davivienda cubre despido sin justa causa y mutuo acuerdo, y excluye explícitamente renuncia voluntaria y período de prueba. Es evidencia de mercado, no solo una hipótesis de diseño, de que diferenciar por tipo de salida es una práctica estándar y implementable.</li>
+    </ol>
+
+    <div class="callout callout-success">
+      <div class="icon">🎯</div>
+      <div><strong>Lo que se pide a los stakeholders:</strong> elegir uno o más de los tres territorios de acción de este documento, con los que el equipo de UX empieza la siguiente fase de campo y prototipo — y decidir cómo se coordina Territorio B con el frente B2Link.</div>
+    </div>
+  </section>
+
+  <!-- 02 · NOTA DE ENFOQUE -->
+  <section class="section" id="enfoque">
+    <div class="section-head">
+      <span class="section-eyebrow">02</span>
+      <div><h2>Nota de enfoque</h2></div>
+    </div>
+    <p><strong>Skandia hoy no se puntúa junto a los competidores.</strong> Skandia se analiza aparte, como punto de partida, con su propia lectura de capacidad actual basada en los insumos internos (acta, PPT, encuesta).</p>
+    <p><strong>El alcance se amplió de "solo offboarding" a "onboarding → embajador".</strong> Se planteó en la reunión que la relación financiera no debería empezar en la salida. Este documento incorpora esa tesis en el journey de la sección 8, no solo en las 4 fases que ya traía el plan de Gestión Humana.</p>
+    <p><strong>El alcance se amplió de nuevo, en esta v2, a "qué se está construyendo en paralelo".</strong> La sesión de contexto de B2Link (24 de agosto) mostró que la tesis sobre el onboarding financiero ya tiene un vehículo de desarrollo activo — el frente B2Link — con piezas concretas (PAC de liquidaciones, fondo de emergencia, outplacement digital, Skandia Moments). Esta versión lee la propuesta de Siempre Skandia a la luz de esas piezas.</p>
+  </section>
+
+  <!-- 03 · FASE 1 -->
+  <section class="section" id="fase1">
+    <div class="section-head">
+      <span class="section-eyebrow">03 · Fase 1</span>
+      <div><h2>Preparación</h2><div class="section-sub">Objetivo, preguntas de investigación y criterios de análisis</div></div>
+    </div>
+
+    <h3>Objetivo del benchmark</h3>
+    <p>Identificar cómo resuelven otros programas de alumni, de transición de carrera, y productos financieros de protección al retiro, los mismos problemas que enfrenta Siempre Skandia — y traducirlo en territorios de acción concretos.</p>
+
+    <h3>Preguntas que debe responder</h3>
+    <ol>
+      <li>¿Cómo resuelven otras organizaciones la transición financiera del colaborador que sale?</li>
+      <li>¿Qué hace que una comunidad de ex colaboradores siga viva a los 12 meses, no solo el primer mes?</li>
+      <li>¿Hasta dónde se justifica diferenciar la experiencia por tipo de salida, y cómo lo hace el mercado?</li>
+      <li>¿Qué instrumento de feedback de salida sí logra respuesta, y qué lo hace distinto del actual?</li>
+      <li>¿Dónde está el punto de mayor apalancamiento entre onboarding y offboarding?</li>
+    </ol>
+
+    <h3>Selección de referentes</h3>
+    <p><strong>Criterio de inclusión:</strong> productos o programas reales, navegables públicamente, con reglas, contenido o beneficios suficientes para evaluar criterios de diseño. Dos tiers, porque compiten en categorías distintas y una sola tabla los haría incomparables.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Tier</th><th>Qué es</th><th>Referentes</th><th>Qué aprendemos de ellos</th></tr></thead>
+      <tbody>
+        <tr><td>A · Alumni y transición de carrera</td><td>Comunidad de ex colaboradores y acompañamiento de empleabilidad</td><td>KPMG Alumni Colombia, McKinsey Alumni Center, EnterpriseAlumni, LHH Outplacement, Randstad RiseSmart</td><td>Modelo de pertenencia, autogestión, contenido recurrente, y el caso de negocio de invertir en el ex colaborador</td></tr>
+        <tr><td>B · Beneficio financiero de protección al retiro</td><td>Producto real que protege el ingreso durante la transición laboral</td><td>Seguros Falabella (Seguro de Desempleo/Incapacidad), Seguros Bolívar (Protección de Pagos, clientes Davivienda)</td><td>Cómo se empaqueta un beneficio financiero de transición, y cómo se diferencian las reglas de elegibilidad por tipo de salida</td></tr>
+      </tbody>
+    </table></div>
+
+    <p style="margin-top:14px;"><strong>Referencia obligada aparte: Skandia hoy.</strong> No es un referente a comparar sino nuestro punto de partida. Se analiza en sección propia (Tier C), mapeando la capacidad real hoy contra las prácticas encontradas en los dos tiers — y, en esta v2, contra lo que ya está en construcción internamente (Tier C.2).</p>
+
+    <h4>Considerados y descartados</h4>
+    <ul>
+      <li><strong>Protección — página de beneficios tributarios de cesantías:</strong> descartada como referente de benchmark porque publica contenido informativo, no un producto o beneficio diferenciado.</li>
+      <li><strong>Deloitte/EY Alumni, PeoplePath, Right Management PowerSuite:</strong> mencionados en fuentes secundarias sin observación directa en esta sesión; quedan como ronda de ampliación si el equipo decide profundizar en el Territorio C.</li>
+      <li><strong>Porvenir, Colfondos:</strong> mismo género de contenido informativo que Protección; no se navegó ninguna página de beneficio diferenciado de estos dos en esta sesión.</li>
+    </ul>
+
+    <h3>Criterios de análisis</h3>
+    <p>16 criterios agrupados en los 5 bloques del propio programa Siempre Skandia, para que la matriz hable el mismo idioma que la propuesta.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Criterio</th><th>Trazabilidad</th><th>Bloque</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Claridad del proceso</td><td><em>"es un proceso que no está divulgado, que nadie conoce"</em></td><td>1 · Preparar la transición</td></tr>
+        <tr><td>2</td><td>Acompañamiento humano</td><td>Plan padrino/madrina, hoy "muy empírico"</td><td>1</td></tr>
+        <tr><td>3</td><td>Autogestión y trazabilidad</td><td>Portal de retiro propuesto en el PPT</td><td>1</td></tr>
+        <tr><td>4</td><td>Personalización del reconocimiento</td><td>Carta personalizada, video conmemorativo (PPT)</td><td>2 · Reconocer el legado</td></tr>
+        <tr><td>5</td><td>Escalabilidad y costo del reconocimiento</td><td><em>"no tenemos mucho presupuesto"</em></td><td>2</td></tr>
+        <tr><td>6</td><td>Orientación financiera de la transición</td><td><em>"cómo la persona va a recibir su dinero extra"</em></td><td>3 · Nuevo comienzo</td></tr>
+        <tr><td>7</td><td>Empleabilidad y desarrollo</td><td>Contenidos de empleabilidad (PPT)</td><td>3</td></tr>
+        <tr><td>8</td><td>Continuidad de producto financiero</td><td>B2Link, pack de desvinculación</td><td>3</td></tr>
+        <tr><td>9</td><td>Modelo de comunidad</td><td><em>"cómo crear esa comunidad, esa base de datos"</em></td><td>4 · Mantener la conexión</td></tr>
+        <tr><td>10</td><td>Cadencia y relevancia de comunicación</td><td>Boletines, comunicaciones periódicas (PPT)</td><td>4</td></tr>
+        <tr><td>11</td><td>Beneficios tangibles</td><td>Referidos, Boomerang Talent (PPT)</td><td>4</td></tr>
+        <tr><td>12</td><td>Contenidos</td><td>General</td><td>5 · Transversal</td></tr>
+        <tr><td>13</td><td>Diseño e identidad de marca</td><td>General</td><td>5</td></tr>
+        <tr><td>14</td><td>Navegación y arquitectura</td><td>General</td><td>5</td></tr>
+        <tr><td>15</td><td>Diferenciación por tipo de salida</td><td><em>"no sabría cómo atacar a una persona que sale sin justa causa"</em></td><td>5</td></tr>
+        <tr><td>16</td><td>Medición</td><td><em>"¿hay una calificación promedio?... no la tenemos"</em></td><td>5</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Escala de valoración</h3>
+    <p><code>3</code> fuerte y documentado · <code>2</code> presente · <code>1</code> débil o parcial · <code>0</code> ausente · <code>s/d</code> sin dato observable en esta sesión — nunca un puntaje inventado.</p>
+    <p><strong>Nivel de evidencia:</strong> todos los referentes de este benchmark fueron observados por navegación directa — marcados <code>T</code>. Donde se complementa con una cifra de fuente secundaria, se marca <code>P</code> en el texto. Para Tier C.2 (capacidades internas B2Link) se usa una marca de <strong>estado</strong>: <code>Ideación</code> · <code>En definición</code> · <code>MVP en desarrollo</code> · <code>Concepto sin prototipo</code>.</p>
+  </section>
+
+  <!-- 04 · TIER A -->
+  <section class="section" id="tier-a">
+    <div class="section-head">
+      <span class="section-eyebrow">04 · Fase 2</span>
+      <div><h2>Tier A · Alumni y transición de carrera</h2></div>
+    </div>
+
+    <div class="ref-card">
+      <h3>A1. KPMG Alumni Colombia <a href="https://kpmg.com/co/es/conocenos/alumni.html" target="_blank" rel="noopener">kpmg.com/co/es/conocenos/alumni.html ↗</a></h3>
+      <p><strong>Qué es.</strong> Página institucional dentro del sitio corporativo de KPMG Colombia — no un portal aparte. Evidencia: <code>T</code>.</p>
+      <h4>Lo que hace bien y nos sirve</h4>
+      <ul>
+        <li><strong>Regla de elegibilidad explícita y simple, en dos líneas:</strong> mínimo 6 meses trabajados, y salida "por voluntad propia o finalización del término del contrato". No construye 8 flujos distintos — construye una puerta de entrada con una condición binaria.</li>
+        <li>Mensaje emocional trabajado: <em>"Si fuiste parte de KPMG, siempre serás parte de nuestra historia"</em>.</li>
+        <li>Beneficios listados con claridad: red exclusiva, contenido especializado, eventos, oportunidades laborales.</li>
+        <li>Comunidad de más de 6.000 miembros (<code>P</code>, fuente secundaria).</li>
+        <li>Bajo costo de implementación: una landing más dos formularios de Microsoft Forms.</li>
+      </ul>
+      <h4>Debilidades</h4>
+      <ul>
+        <li>La inscripción y la actualización de datos ocurren en un formulario externo (Microsoft Forms) — rompe la experiencia justo en el momento de conversión.</li>
+        <li>No hay portal, directorio ni contenido recurrente visible dentro del dominio.</li>
+        <li>Cero mención de acompañamiento financiero.</li>
+      </ul>
+      <div class="verdict"><strong>Qué nos traemos.</strong> La regla de elegibilidad de una sola condición como modelo para diferenciar sin construir 8 rutas, y la advertencia de no repetir el antipatrón del formulario externo.</div>
+    </div>
+
+    <div class="ref-card">
+      <h3>A2. McKinsey Alumni Center <a href="https://www.mckinsey.com/alumni" target="_blank" rel="noopener">mckinsey.com/alumni ↗</a></h3>
+      <p><strong>Qué es.</strong> Portal completo, no una landing: directorio de búsqueda de alumni, perfil propio editable, bolsa de empleo, agenda de eventos, y una sección editorial de noticias con publicaciones frecuentes. Evidencia: <code>T</code>.</p>
+      <h4>Lo que hace bien y nos sirve</h4>
+      <ul>
+        <li>Arquitectura de información clara: <em>About · Directory · Careers · Events · Profile · News</em>, con flujo de registro propio dentro del dominio.</li>
+        <li>Cadencia editorial activa: artículos fechados en junio y julio de 2026, aproximadamente semanal.</li>
+        <li>Autogestión real: el propio alumni edita su perfil y controla su visibilidad.</li>
+      </ul>
+      <h4>Debilidades</h4>
+      <ul>
+        <li>Exige una inversión de producto y contenido muy superior al presupuesto de esta fase de Skandia.</li>
+        <li>Cero componente financiero — no es su categoría de negocio.</li>
+      </ul>
+      <div class="verdict"><strong>Qué nos traemos.</strong> Es el techo de madurez posible, no el punto de partida: autogestión dentro del propio dominio (nunca externalizada, como el antipatrón de KPMG) y cadencia editorial como el estándar a perseguir, no a igualar de inmediato.</div>
+    </div>
+
+    <div class="ref-card">
+      <h3>A3. EnterpriseAlumni <a href="https://enterprisealumni.com/" target="_blank" rel="noopener">enterprisealumni.com ↗</a></h3>
+      <p><strong>Qué es.</strong> No es un programa de alumni sino el proveedor de la plataforma — funciona como catálogo de capacidades y caso de negocio. Evidencia: <code>T</code>.</p>
+      <h4>El dato más valioso del benchmark</h4>
+      <div class="stat-grid">
+        <div class="stat"><div class="num">40%</div><div class="label">del ingreso nuevo neto es tocado por un alumni</div></div>
+        <div class="stat"><div class="num">83%</div><div class="label">de quienes están en una red de alumni le comprarían a su ex empleador</div></div>
+        <div class="stat"><div class="num">50%</div><div class="label">de los alumni que aplican a un empleo son contratados</div></div>
+        <div class="stat"><div class="num">20%</div><div class="label">de las contrataciones anuales del cliente vienen de su red de alumni</div></div>
+      </div>
+      <p style="margin-top:10px; font-size:11.5px;"><em>(Cifras publicadas por el proveedor — <code>P</code>, sin auditoría independiente en este documento.)</em></p>
+      <ul>
+        <li>Ofrece integración con Power BI para medir el programa con datos duros, no con una encuesta.</li>
+        <li>Explícitamente vende "Create a Community" — acceso instantáneo a eventos, empleo, desarrollo de carrera y contenido, a través de una app de marca propia.</li>
+      </ul>
+      <h4>Debilidades</h4>
+      <p>Es material de marketing de proveedor, no un producto final observado en uso; las cifras no tienen auditoría independiente en este documento.</p>
+      <div class="verdict"><strong>Qué nos traemos.</strong> El caso de negocio cuantificado — no hay que inventar el argumento de por qué invertir en el ex colaborador, ya existe en la industria — y la idea de medir con integración a un dashboard, no con una encuesta de salida.</div>
+    </div>
+
+    <div class="ref-card">
+      <h3>A4. LHH — Outplacement / Career Transition <a href="https://www.lhh.com/en-us/organizations/outplacement" target="_blank" rel="noopener">lhh.com ↗</a></h3>
+      <p><strong>Qué es.</strong> Modelo centrado en el coach humano certificado más tecnología de soporte (LHH Career Studio: datos de mercado en tiempo real, insights con IA, eventos en vivo). Evidencia: <code>T</code>.</p>
+      <h4>Lo que hace bien y nos sirve</h4>
+      <ul>
+        <li>Mensaje explícito: <em>"enfoque humano en un mundo de soluciones de IA"</em> — coherente con la necesidad de no automatizar de más un momento emocional.</li>
+        <li>Alianza con LinkedIn Learning para desarrollo de habilidades, combinando coach 1:1 con contenido escalable.</li>
+        <li>Especialistas de marca personal para ayudar al candidato a mostrar su experiencia.</li>
+      </ul>
+      <h4>Debilidades</h4>
+      <ul>
+        <li>Enfoque 100% de empleabilidad, cero componente financiero o tributario.</li>
+        <li>La URL directa del servicio redirigió al home durante la observación — fragilidad de navegación incluso en un player global.</li>
+      </ul>
+      <div class="verdict"><strong>Qué nos traemos.</strong> El principio de "acompañamiento humano primero, tecnología de soporte después" como advertencia de diseño para el portal de retiro que propone el PPT de Gestión Humana.</div>
+    </div>
+
+    <div class="ref-card">
+      <h3>A5. Randstad RiseSmart <a href="https://www.randstadenterprise.com/solutions/talent-transition/outplacement/" target="_blank" rel="noopener">randstadenterprise.com ↗</a></h3>
+      <p><strong>Qué es.</strong> Mismo modelo que LHH (coach más tecnología) con métricas de resultado más explícitas. Evidencia: <code>T</code>.</p>
+      <h4>Lo que hace bien y nos sirve</h4>
+      <ul>
+        <li>Cita investigación propia (<em>Randstad Enterprise Global Severance research</em>) sobre por qué las empresas ofrecen outplacement: <strong>proteger la marca empleadora, cultura employee-first, y mantener relaciones positivas con el talento</strong> — las tres razones son, textualmente, el objetivo de Siempre Skandia.</li>
+        <li>Métricas de resultado: 60% más rápido en conseguir empleo que el promedio nacional, 83% consigue salario igual o mayor.</li>
+        <li>Red de networking entre "alumni y pares" del propio programa de transición.</li>
+      </ul>
+      <h4>Debilidades</h4>
+      <p>Igual que LHH, sin componente financiero o tributario.</p>
+      <div class="verdict"><strong>Qué nos traemos.</strong> La cita de investigación de mercado, que sirve como evidencia externa directa para el resumen ejecutivo de la propuesta a los stakeholders.</div>
+    </div>
+  </section>
+
+  <!-- 05 · TIER B -->
+  <section class="section" id="tier-b">
+    <div class="section-head">
+      <span class="section-eyebrow">05 · Fase 2</span>
+      <div><h2>Tier B · Beneficio financiero de protección al retiro</h2></div>
+    </div>
+
+    <div class="ref-card">
+      <h3>B1. Seguros Falabella — Seguro de Desempleo / Incapacidad <a href="https://www.segurosfalabella.com.co/otros-seguros/seguro-de-desempleo" target="_blank" rel="noopener">segurosfalabella.com.co ↗</a></h3>
+      <p><strong>Qué es.</strong> Producto de seguro comprable en línea, con precio y coberturas públicas. Evidencia: <code>T</code>.</p>
+      <h4>El referente más cercano al cruce identificado en la reunión</h4>
+      <ul>
+        <li><strong>Precio y cobertura concretos:</strong> desde $21.990/mes, hasta 6 cuotas de $600.000 por pérdida involuntaria del empleo.</li>
+        <li><strong>Bundle de acompañamiento no financiero incluido en el mismo producto:</strong> asesoría telefónica en creación de hoja de vida y entrevistas laborales, asesoría financiera telefónica, orientación jurídica telefónica y <strong>orientación emocional telefónica</strong>. Un seguro de desempleo que empaqueta acompañamiento emocional es, funcionalmente, un primer borrador de lo que se describió en la reunión.</li>
+        <li>Dos planes según el tipo de trabajador (empleado dependiente vs. independiente), reconociendo que la cobertura debe variar según la relación laboral.</li>
+      </ul>
+      <h4>Debilidades</h4>
+      <ul>
+        <li>La orientación financiera es genérica (telefónica, sin personalización al momento específico del retiro).</li>
+        <li>Cero componente de comunidad o reconocimiento — es transaccional, no relacional.</li>
+      </ul>
+      <div class="verdict"><strong>Qué nos traemos.</strong> La prueba de que un mismo producto puede empaquetar protección económica, empleabilidad, y acompañamiento emocional a la vez — y el modelo de dos planes según tipo de vinculación laboral.</div>
+    </div>
+
+    <div class="ref-card">
+      <h3>B2. Seguros Bolívar — Protección de Pagos (clientes Davivienda) <a href="https://www.segurosbolivar.com/clientes-davivienda/cuide-sus-productos-financieros/proteccion-de-pagos" target="_blank" rel="noopener">segurosbolivar.com ↗</a></h3>
+      <p><strong>Qué es.</strong> Producto de seguro de protección de pagos ante desempleo involuntario, distribuido a través de un banco. Evidencia: <code>T</code>.</p>
+      <h4>El hallazgo más accionable de todo el benchmark</h4>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Cubre</th><th>No cubre</th></tr></thead>
+        <tbody>
+          <tr><td>Pérdida involuntaria del empleo</td><td>Renuncia y períodos de prueba</td></tr>
+          <tr><td>Terminación por mutuo consentimiento (ante el Ministerio de Trabajo)</td><td>Despido con justa causa</td></tr>
+          <tr><td>Terminación de contrato a término fijo por el empleador, antes del vencimiento</td><td>Retiro forzoso por edad, destitución o abandono del cargo (empleado público)</td></tr>
+          <tr><td>Terminación anticipada de contrato temporal o por obra/labor</td><td>Desempleo por expiración natural del plazo del contrato</td></tr>
+          <tr><td>Terminación de contrato de prestación de servicios por el contratante</td><td>Licencias no remuneradas y licencias de trabajo</td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin-top:12px;"><strong>Esta tabla responde la pregunta sobre los abordajes</strong> sobre cómo diferenciar el abordaje entre salida voluntaria, con justa causa y sin justa causa. El mercado asegurador colombiano ya tuvo que resolver exactamente ese problema para poder vender un producto, y lo resolvió con una tabla de dos columnas, no con ocho flujos.</p>
+      <h4>Debilidades</h4>
+      <ul>
+        <li>Es solo cobertura económica — no incluye orientación financiera, emocional ni de empleabilidad (a diferencia de Falabella).</li>
+        <li>Detalle de usabilidad real observado durante la navegación: la interfaz de tabs de coberturas usa una flecha "atrás" que queda visualmente cortada por overflow horizontal en la vista de escritorio.</li>
+      </ul>
+      <div class="verdict"><strong>Qué nos traemos.</strong> La tabla de cubre/no cubre como plantilla directa para la Ruta 2 (salida no elegida) del Anexo de rutas emocionales de esta misma propuesta — es la evidencia de mercado que faltaba para esa hipótesis.</div>
+    </div>
+  </section>
+
+  <!-- 06 · TIER C -->
+  <section class="section" id="tier-c">
+    <div class="section-head">
+      <span class="section-eyebrow">06</span>
+      <div><h2>Tier C · Nuestro punto de partida — Skandia hoy</h2><div class="section-sub">C.1 capacidad instalada · C.2 capacidad en construcción (B2Link)</div></div>
+    </div>
+
+    <p>A diferencia de los dos tiers anteriores, esta sección no puntúa un producto navegado sino que lee la capacidad real de Skandia hoy. Se divide en dos lecturas: <strong>C.1</strong> — lo que está instalado y operando hoy (idéntico a la v1) — y <strong>C.2</strong> — lo que está en construcción en el frente B2Link y que puede cambiar el esfuerzo de la propuesta (nuevo en esta v2).</p>
+
+    <div class="section-block">
+      <h3>C.1 · Capacidad instalada hoy</h3>
+      <p><strong>Proceso de retiro.</strong> Manual y empírico: contacto por WhatsApp y correo personal porque el colaborador pierde el acceso al correo corporativo. El proceso completo toma hasta 10 días desde la renuncia hasta el pago de la liquidación. No existe portal de seguimiento — el plan de Gestión Humana propone uno, sin desarrollar aún.</p>
+      <p><strong>Reconocimiento.</strong> En diseño, no implementado. Ya se descartó el kit físico por presupuesto; se está explorando una vía "más tecnológica" (carta personalizada, video).</p>
+      <p><strong>Transición financiera.</strong> Existen dos opciones públicas de dónde invertir las cesantías — un activo real y subestimado — pero cero sesión de orientación personalizada en el momento del retiro. B2Link y el pack de desvinculación están en desarrollo (ver C.2).</p>
+      <p><strong>Comunidad.</strong> No existe una comunidad de ex colaboradores ni base de datos de contacto post-retiro.</p>
+      <p><strong>Diferenciación por tipo de salida.</strong> Existen 8 tipos administrativos (fallecimiento, justa causa, mutuo acuerdo, período de prueba, renuncia voluntaria, sin justa causa, terminación de contrato, terminación por pensión) sin ninguna ruta de experiencia diferenciada entre ellos.</p>
+      <p><strong>Medición.</strong> La encuesta de retiro actual tiene 26 preguntas; 18 de ellas (69%) evalúan cultura, beneficios o al líder directo. Cero preguntas sobre el proceso de retiro, cero sobre transición financiera, cero indicador cuantitativo tipo NPS o eNPS. Es, en la práctica, una encuesta de clima laboral aplicada tarde — lo que explica la baja tasa de respuesta.</p>
+
+      <h4>Lectura de capacidad actual</h4>
+      <p style="font-size:12px;">(mismo criterio y escala del benchmark, sin comparar contra los competidores; sin cambios respecto a la v1 — la capacidad en construcción de C.2 no se anticipa aquí)</p>
+
+      <div class="heat-row">
+        <div class="heat-cell heat-1"><span class="n">1</span><span class="l">Claridad proceso</span></div>
+        <div class="heat-cell heat-2"><span class="n">2</span><span class="l">Acomp. humano</span></div>
+        <div class="heat-cell heat-1"><span class="n">1</span><span class="l">Autogestión</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Reconocimiento</span></div>
+        <div class="heat-cell heat-sd"><span class="n">s/d</span><span class="l">Escalabilidad</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Or. financiera</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Empleabilidad</span></div>
+        <div class="heat-cell heat-2"><span class="n">2</span><span class="l">Cont. producto</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Comunidad</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Cadencia</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Benef. tangibles</span></div>
+        <div class="heat-cell heat-2"><span class="n">2</span><span class="l">Contenidos</span></div>
+        <div class="heat-cell heat-2"><span class="n">2</span><span class="l">Marca</span></div>
+        <div class="heat-cell heat-2"><span class="n">2</span><span class="l">Navegación</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Dif. tipo salida</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Medición</span></div>
+      </div>
+      <div class="heat-legend">
+        <span><i style="background:#e0332e"></i>0 — ausente</span>
+        <span><i style="background:#e39a3a"></i>1 — débil/parcial</span>
+        <span><i style="background:#7fbf6a"></i>2 — presente</span>
+        <span><i style="background:#9a9c8e"></i>s/d — sin dato</span>
+      </div>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Criterio</th><th class="center">Skandia hoy</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Claridad del proceso</td><td class="center hm-1 score-1">1</td></tr>
+          <tr><td>2</td><td>Acompañamiento humano</td><td class="center hm-2 score-2">2</td></tr>
+          <tr><td>3</td><td>Autogestión y trazabilidad</td><td class="center hm-1 score-1">1</td></tr>
+          <tr><td>4</td><td>Personalización del reconocimiento</td><td class="center hm-0 score-0">0</td></tr>
+          <tr><td>5</td><td>Escalabilidad del reconocimiento</td><td class="center hm-sd score-sd">s/d — depende de decisión de presupuesto</td></tr>
+          <tr><td>6</td><td>Orientación financiera de la transición</td><td class="center hm-0 score-0">0</td></tr>
+          <tr><td>7</td><td>Empleabilidad y desarrollo</td><td class="center hm-0 score-0">0</td></tr>
+          <tr><td>8</td><td>Continuidad de producto financiero</td><td class="center hm-2 score-2">2</td></tr>
+          <tr><td>9</td><td>Modelo de comunidad</td><td class="center hm-0 score-0">0</td></tr>
+          <tr><td>10</td><td>Cadencia y relevancia de comunicación</td><td class="center hm-0 score-0">0</td></tr>
+          <tr><td>11</td><td>Beneficios tangibles</td><td class="center hm-0 score-0">0</td></tr>
+          <tr><td>12</td><td>Contenidos</td><td class="center hm-2 score-2">2</td></tr>
+          <tr><td>13</td><td>Diseño e identidad de marca</td><td class="center hm-2 score-2">2</td></tr>
+          <tr><td>14</td><td>Navegación y arquitectura</td><td class="center hm-2 score-2">2</td></tr>
+          <tr><td>15</td><td>Diferenciación por tipo de salida</td><td class="center hm-0 score-0">0</td></tr>
+          <tr><td>16</td><td>Medición</td><td class="center hm-0 score-0">0</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout callout-warn"><div class="icon">⚠️</div><div>Ocho de dieciséis criterios están en 0. Ninguno de los dos tiers externos tiene un perfil tan concentrado en un extremo — es, a la vez, el hallazgo más simple y el más útil de este benchmark: <strong>la oportunidad no está dispersa, está concentrada en un número acotado de bloques.</strong></div></div>
+    </div>
+
+    <div class="section-block">
+      <h3>C.2 · Capacidad en construcción — frente B2Link <span class="chip warn" style="margin-left:6px;"><span class="dot"></span>nuevo en v2</span></h3>
+      <p><strong>Fuente:</strong> B2Link es la iniciativa de go-to-market para relacionar a Skandia con los empleados-clientes y con los líderes de RH de las 347 empresas más grandes del país. Su avance más relevante para Siempre Skandia: <strong>el diagnóstico financiero desde el onboarding ya tiene un vehículo de desarrollo activo</strong>, con piezas concretas en distintos grados de madurez.</p>
+
+      <div class="cap-grid">
+        <div class="cap-card"><span class="n">01</span><span class="state state-ideacion">Ideación</span><h5>Índice de bienestar financiero del empleado colombiano</h5><p>Con Claudia y otros líderes. → Criterio 16 (medición) — marco conceptual y datos sectoriales para el instrumento de escucha.</p></div>
+        <div class="cap-card"><span class="n">02</span><span class="state state-definicion">En definición</span><h5>PAC / pack de desvinculación (con Gallito)</h5><p>→ Criterio 8 (continuidad de producto financiero) — Fase 3, momento 6 del journey.</p></div>
+        <div class="cap-card"><span class="n">03</span><span class="state state-ideacion">Idea temprana</span><h5>Fondo de emergencia por descuento de nómina</h5><p>Dos orígenes independientes en la organización. → Criterio 8 — momento 3 del journey (colaborador activo).</p></div>
+        <div class="cap-card"><span class="n">04</span><span class="state state-mvp">MVP en aterrizaje</span><h5>Plataforma de outplacement digital para todos los empleados</h5><p>Hoy solo existe como beneficio ejecutivo (~2.000 USD/programa). → Criterio 7 (empleabilidad, hoy en 0) — Ruta 2.</p></div>
+        <div class="cap-card"><span class="n">05</span><span class="state state-concepto">Concepto sin prototipo</span><h5>Skandia Moments</h5><p>Plataforma del lado del empleado. → Momentos 2 y 3 del journey.</p></div>
+        <div class="cap-card"><span class="n">06</span><span class="state state-mvp">En refinamiento</span><h5>Motor editorial / newsletter sectorial de bienestar financiero</h5><p>Newsletter ya creado, en refinamiento de contenido con Kiki. → Criterio 10 (cadencia editorial, hoy en 0) — Fase 4.</p></div>
+        <div class="cap-card"><span class="n">07</span><span class="state state-mvp">En uso</span><h5>Segmentación de 347 empresas por sector económico</h5><p>Valida la lógica de agrupar en pocas categorías — el mismo principio que las 3 rutas emocionales.</p></div>
+        <div class="cap-card"><span class="n">08</span><span class="state state-concepto">Hipótesis</span><h5>Advertencia sobre sesgo de testeo interno</h5><p>Regla de diseño transversal para cualquier prototipo de Siempre Skandia.</p></div>
+      </div>
+
+      <h4>Datos del índice de bienestar financiero</h4>
+      <p style="font-size:12px;">Citables como respaldo (fuente: análisis interno de datos Skandia)</p>
+      <div class="stat-grid">
+        <div class="stat"><div class="num">54%</div><div class="label">de empresas colombianas ya ofrecen programas de bienestar</div></div>
+        <div class="stat"><div class="num">79%</div><div class="label">no mide la salud financiera de su gente</div></div>
+        <div class="stat"><div class="num">41%</div><div class="label">de los empleados analizados tiene &lt;1 salario mínimo en cesantías</div></div>
+        <div class="stat"><div class="num">26%</div><div class="label">tiene la cuenta prácticamente en ceros</div></div>
+        <div class="stat"><div class="num">$3.3M</div><div class="label">media de cesantías de la base analizada</div></div>
+      </div>
+
+      <h4>Tres observaciones que se desprenden de cruzar C.2 con el benchmark externo</h4>
+      <ul>
+        <li><strong>Convergencia independiente en el acompañamiento emocional.</strong> El Tier B documentó que Falabella empaqueta orientación emocional telefónica dentro de su seguro (ver B1). La sesión de B2Link llegó al mismo componente por una vía completamente distinta: la salida laboral se identifica ahí como uno de los tres eventos más traumáticos de la vida, junto con el fallecimiento de un familiar y la separación de pareja. Dos fuentes sin contacto entre sí apuntan al mismo requisito de producto.</li>
+        <li><strong>Diferenciador real frente al Tier B.</strong> Falabella y Bolívar venden una prima que se pierde si no se usa. El fondo de emergencia por nómina invierte la lógica: el empleado <strong>ahorra</strong> en vez de pagar, y ese ahorro se vuelve suyo al momento de salir.</li>
+        <li><strong>El sesgo de testeo aplica también a este proyecto.</strong> La hipótesis formulada para el MVP de outplacement es que testear un producto solo con empleados internos genera sesgo. Regla que se adopta: lo interno sirve como ensayo operativo del proceso, no como muestra de validación de la propuesta de valor.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 07 · FASE 3 -->
+  <section class="section" id="resultados">
+    <div class="section-head">
+      <span class="section-eyebrow">07 · Fase 3</span>
+      <div><h2>Resultados</h2></div>
+    </div>
+
+    <h3>Matriz A — Tier alumni y transición de carrera</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Criterio</th><th class="center">KPMG</th><th class="center">McKinsey</th><th class="center">EnterpriseAlumni</th><th class="center">LHH</th><th class="center">RiseSmart</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Claridad del proceso</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td></tr>
+        <tr><td>2</td><td>Acompañamiento humano</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-3 score-3">3</td><td class="center hm-3 score-3">3</td></tr>
+        <tr><td>3</td><td>Autogestión y trazabilidad</td><td class="center hm-1 score-1">1</td><td class="center hm-3 score-3">3</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td></tr>
+        <tr><td>4</td><td>Personalización del reconocimiento</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td></tr>
+        <tr><td>5</td><td>Escalabilidad del reconocimiento</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td></tr>
+        <tr><td>6</td><td>Orientación financiera de la transición</td><td class="center hm-0 score-0">0</td><td class="center hm-0 score-0">0</td><td class="center hm-0 score-0">0</td><td class="center hm-0 score-0">0</td><td class="center hm-0 score-0">0</td></tr>
+        <tr><td>7</td><td>Empleabilidad y desarrollo</td><td class="center hm-2 score-2">2</td><td class="center hm-3 score-3">3</td><td class="center hm-2 score-2">2</td><td class="center hm-3 score-3">3</td><td class="center hm-3 score-3">3</td></tr>
+        <tr><td>8</td><td>Continuidad de producto financiero</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td></tr>
+        <tr><td>9</td><td>Modelo de comunidad</td><td class="center hm-2 score-2">2</td><td class="center hm-3 score-3">3</td><td class="center hm-3 score-3">3</td><td class="center hm-1 score-1">1</td><td class="center hm-2 score-2">2</td></tr>
+        <tr><td>10</td><td>Cadencia y relevancia de comunicación</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-3 score-3">3</td><td class="center hm-2 score-2">2</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td></tr>
+        <tr><td>11</td><td>Beneficios tangibles</td><td class="center hm-2 score-2">2</td><td class="center hm-2 score-2">2</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-2 score-2">2</td></tr>
+        <tr><td>12</td><td>Contenidos</td><td class="center hm-2 score-2">2</td><td class="center hm-3 score-3">3</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-2 score-2">2</td><td class="center hm-2 score-2">2</td></tr>
+        <tr><td>13</td><td>Diseño e identidad de marca</td><td class="center hm-2 score-2">2</td><td class="center hm-3 score-3">3</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-2 score-2">2</td><td class="center hm-2 score-2">2</td></tr>
+        <tr><td>14</td><td>Navegación y arquitectura</td><td class="center hm-2 score-2">2</td><td class="center hm-3 score-3">3</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-1 score-1">1</td><td class="center hm-1 score-1">1</td></tr>
+        <tr><td>15</td><td>Diferenciación por tipo de salida</td><td class="center hm-1 score-1">1</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td></tr>
+        <tr><td>16</td><td>Medición</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-3 score-3">3</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-2 score-2">2</td></tr>
+        <tr><td colspan="2"><strong>Evidencia</strong></td><td class="center">T</td><td class="center">T</td><td class="center">T</td><td class="center">T</td><td class="center">T</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Matriz B — Tier beneficio financiero de protección al retiro</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Criterio</th><th class="center">Falabella</th><th class="center">Bolívar (Davivienda)</th></tr></thead>
+      <tbody>
+        <tr><td>6</td><td>Orientación financiera de la transición</td><td class="center hm-1 score-1">1</td><td class="center hm-0 score-0">0</td></tr>
+        <tr><td>7</td><td>Empleabilidad y desarrollo</td><td class="center hm-2 score-2">2</td><td class="center hm-0 score-0">0</td></tr>
+        <tr><td>8</td><td>Continuidad de producto financiero</td><td class="center hm-3 score-3">3</td><td class="center hm-3 score-3">3</td></tr>
+        <tr><td>9</td><td>Modelo de comunidad</td><td class="center hm-0 score-0">0</td><td class="center hm-0 score-0">0</td></tr>
+        <tr><td>11</td><td>Beneficios tangibles</td><td class="center hm-3 score-3">3</td><td class="center hm-2 score-2">2</td></tr>
+        <tr><td>12</td><td>Contenidos</td><td class="center hm-2 score-2">2</td><td class="center hm-3 score-3">3</td></tr>
+        <tr><td>13</td><td>Diseño e identidad de marca</td><td class="center hm-2 score-2">2</td><td class="center hm-2 score-2">2</td></tr>
+        <tr><td>14</td><td>Navegación y arquitectura</td><td class="center hm-2 score-2">2</td><td class="center hm-2 score-2">2</td></tr>
+        <tr><td>15</td><td>Diferenciación por tipo de salida</td><td class="center hm-1 score-1">1</td><td class="center hm-3 score-3">3</td></tr>
+        <tr><td>16</td><td>Medición</td><td class="center hm-sd score-sd">s/d</td><td class="center hm-sd score-sd">s/d</td></tr>
+        <tr><td colspan="2"><strong>Evidencia</strong></td><td class="center">T</td><td class="center">T</td></tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:11.5px; margin-top:6px;"><em>(criterios 1–5, 10 no aplican a esta categoría de producto — s/d)</em></p>
+
+    <h3>Resumen global — patrones transversales</h3>
+    <p><strong>Los dos tiers resuelven, cada uno, la mitad del problema que se planteó en el proyecto.</strong> El criterio 6 (orientación financiera) está en 0 en los cinco referentes del Tier A y en 0–1 en el Tier B; el criterio 9 (comunidad) está en 0 en ambos productos financieros y en 2–3 en los programas de alumni. Ningún referente de los siete cruza ambas mitades — es la oportunidad de diferenciación real de Siempre Skandia. En esta v2, el hallazgo se completa: <strong>el frente B2Link es el intento interno de cruzar ambas mitades</strong> (índice + comunidad + producto financiero), aunque hoy en piezas separadas y sin integrar entre sí todavía.</p>
+    <p><strong>El criterio 15 (diferenciación por tipo de salida) tiene su mejor resolución en el tier que menos se esperaría.</strong> No es un programa de alumni el que mejor resuelve la pregunta de Skandia Siempre — es un seguro (Bolívar), porque la naturaleza del producto lo obliga a definir con precisión legal quién califica. La lección de diseño es que la diferenciación por tipo de salida se resuelve mejor como tabla de elegibilidad que como flujo narrativo distinto.</p>
+    <p><strong>El criterio 16 (medición) es débil en casi todo el mercado observado</strong>, salvo donde hay un modelo de negocio que lo exige. Solo EnterpriseAlumni y RiseSmart lo resuelven con fuerza. Esto confirma que el problema de medición de Skandia no es un caso aislado sino la norma cuando nadie exige medir.</p>
+    <p><strong>Skandia hoy no está simplemente "por debajo" del mercado — está ausente en bloques completos</strong> donde el mercado sí tiene algo, aunque sea parcial. Los criterios 6, 7, 9, 10, 11, 15 y 16 están en 0 para Skandia mientras que cada uno tiene al menos un referente externo en 2 o 3 — <strong>y, para cuatro de esos criterios (6, 7, 8, 10), tampoco hay que mirar solo hacia afuera: ya hay una capacidad equivalente en construcción puertas adentro (Tier C.2).</strong></p>
+
+    <h4>Buenas prácticas: qué nos traemos y dónde aterriza</h4>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Práctica</th><th>Fuente</th><th>Dónde aterriza</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Regla de elegibilidad de una sola condición, no ocho flujos</td><td>KPMG</td><td>Fase "Preparar la transición" — filtro de entrada al programa</td></tr>
+        <tr><td>2</td><td>Tabla de cubre/no cubre por causal de salida</td><td>Seguros Bolívar</td><td>Base directa de la Ruta 2 (salida no elegida)</td></tr>
+        <tr><td>3</td><td>Autogestión siempre dentro del dominio propio, nunca externa</td><td>McKinsey (acierto) vs. KPMG (antipatrón)</td><td>Diseño del portal de seguimiento del retiro (PPT slide 6)</td></tr>
+        <tr><td>4</td><td>Bundle de protección económica + empleabilidad + acompañamiento emocional</td><td>Seguros Falabella</td><td>Territorio B — acompañar la transición financiera</td></tr>
+        <tr><td>5</td><td>Caso de negocio cuantificado del retorno de invertir en el ex colaborador</td><td>EnterpriseAlumni</td><td>Resumen ejecutivo de la propuesta a stakeholders</td></tr>
+        <tr><td>6</td><td>Medir con integración a un dashboard, no con una encuesta sin indicador</td><td>EnterpriseAlumni, RiseSmart</td><td>Rediseño del instrumento de escucha</td></tr>
+        <tr><td>7</td><td>"Enfoque humano primero, tecnología de soporte después"</td><td>LHH</td><td>Advertencia de diseño para el portal de retiro</td></tr>
+        <tr><td>8</td><td>Investigación de mercado citable sobre invertir en la transición de salida</td><td>Randstad RiseSmart</td><td>Resumen ejecutivo de la propuesta</td></tr>
+        <tr><td>9</td><td>Cadencia editorial recurrente como lo que sostiene una comunidad viva</td><td>McKinsey</td><td>Territorio C — construir comunidad sostenible</td></tr>
+        <tr><td>10</td><td>Dos planes según tipo de vinculación laboral (dependiente/independiente)</td><td>Seguros Falabella</td><td>Matiz para contratistas o prestación de servicios</td></tr>
+        <tr><td>11</td><td>Producto de ahorro (no de prima) como fondo de emergencia por nómina</td><td>B2Link — hipótesis interna</td><td>Territorio B — supera la categoría de "seguro de desempleo"</td></tr>
+        <tr><td>12</td><td>Datos sectoriales reales como argumento de autoridad, no mensajes genéricos</td><td>B2Link — índice de bienestar financiero</td><td>Territorio A y C</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 08 · JOURNEY -->
+  <section class="section" id="journey">
+    <div class="section-head">
+      <span class="section-eyebrow">08</span>
+      <div><h2>El journey completo — de onboarding a embajador</h2></div>
+    </div>
+    <p>Se propuso que la relación financiera no debería empezar en la salida sino en el día 1. El journey recoge esa tesis y la conecta con las 4 fases que Gestión Humana ya diseñó para el offboarding.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Momento</th><th>Qué vive la persona</th><th>Hoy en Skandia</th><th>Con Siempre Skandia</th><th>Contacto financiero</th><th>Capacidad B2Link que lo soporta</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Ingreso</td><td>Llega a Skandia</td><td>Onboarding operativo estándar</td><td>Igual</td><td>—</td><td>—</td></tr>
+        <tr><td>2 · Onboarding</td><td>Se instala en su rol</td><td>Sin diagnóstico financiero</td><td>Diagnóstico y plan personalizado con un FP</td><td>1er contacto</td><td>Skandia Moments (concepto)</td></tr>
+        <tr><td>3 · Colaborador activo</td><td>Vive su carrera</td><td>Beneficios y bienestar activos</td><td>Auditoría financiera anual opcional</td><td>2do contacto</td><td>Skandia Moments + fondo de emergencia (idea)</td></tr>
+        <tr><td>4 · Retiro</td><td>Renuncia o es desvinculado</td><td>Proceso manual, hasta 10 días, sin diferenciación</td><td>Ruta según tabla de elegibilidad + encuesta con eNPS</td><td>3er contacto</td><td>PAC de desvinculación — solo viable en la Ventana 1 (0–10 días)</td></tr>
+        <tr><td>5 · Siempre Skandia</td><td>Recibe reconocimiento</td><td>No existe</td><td>Reconocimiento + comunidad + orientación en ventana de 15–45 días</td><td>4to contacto</td><td>Outplacement digital (MVP) en Ruta 2</td></tr>
+        <tr><td>6 · Cliente</td><td>Decide si se queda</td><td>Sin seguimiento</td><td>Continuidad coherente con el diagnóstico del día 1</td><td>Producto de continuidad</td><td>PAC / fondo de emergencia (en definición)</td></tr>
+        <tr><td>7 · Embajador</td><td>Recomienda Skandia</td><td>No existe</td><td>Comunidad activa, referidos, Boomerang Talent</td><td>—</td><td>Motor editorial / newsletter sectorial</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout callout-info"><div class="icon">💡</div><div><strong>Por qué importa el momento 2:</strong> sin él, el contacto del momento 5 se lee como venta oportunista. La investigación previa recuperada de Dovetail confirma que empresas clientes de Skandia ya operan diagnósticos financieros desde el ingreso.</div></div>
+  </section>
+
+  <!-- 09 · VENTANAS -->
+  <section class="section" id="ventanas">
+    <div class="section-head">
+      <span class="section-eyebrow">09 · Nuevo en v2</span>
+      <div><h2>Dos ventanas de contacto</h2></div>
+    </div>
+    <p>La ventana de mayor apertura del colaborador a una oferta financiera podría ser en los <strong>15–45 días posteriores</strong> a la liquidación. Cruzar esto con B2Link revela que en realidad hay <strong>dos ventanas, con lógicas distintas</strong>, y que tratarlas como una sola puede hacer perder la más frágil de las dos.</p>
+    <p>En sesiones de contexto previas, se reportó que el proceso completo — desde la renuncia hasta el pago de la liquidación — toma <strong>hasta 10 días</strong>. El PAC de desvinculación solo tiene sentido si se ofrece <strong>antes</strong> de que la liquidación caiga en la cuenta de ahorros ordinaria: una vez cae ahí, el beneficio tributario que lo justifica desaparece y no se puede recuperar después.</p>
+
+    <div class="win-timeline">
+      <div class="win-track">
+        <div class="win-seg w1" style="width:22.2%;" title="Ventana 1 · Pre-pago (0–10 días) — única ventana viable para el PAC">Ventana 1</div>
+        <div class="win-seg gap" style="width:11.1%;" title="Días 10–15 — sin ventana definida">·</div>
+        <div class="win-seg w2" style="width:66.7%;" title="Ventana 2 · Post-pago (15–45 días) — orientación financiera abierta">Ventana 2</div>
+      </div>
+      <div class="win-ticks">
+        <span style="width:22.2%;">0–10 días</span>
+        <span style="width:11.1%; text-align:center;">10–15</span>
+        <span style="width:66.7%; text-align:right;">15–45 días</span>
+      </div>
+    </div>
+
+    <div class="table-wrap"><table>
+      <thead><tr><th>Ventana</th><th>Días</th><th>Qué se juega</th><th>Si se pierde</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Pre-pago</td><td>0–10 (desde la renuncia/notificación hasta el pago)</td><td>Dónde cae la liquidación — única ventana viable para el PAC</td><td>Se pierde el beneficio tributario de ese ciclo. No es recuperable: la próxima liquidación es la única otra oportunidad</td></tr>
+        <tr><td>2 · Post-pago</td><td>15–45 días después del pago</td><td>Cesantías, plan financiero, vinculación a comunidad, empleabilidad</td><td>Se recupera — el contacto post-pago sigue siendo viable más adelante, solo pierde fuerza</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout callout-warn"><div class="icon">⚠️</div><div><strong>La tensión de diseño:</strong> la Ventana 1 cae exactamente en los días más crudos del proceso, sobre todo en Ruta 2 (salida no elegida) — el mismo momento en que "si uno le dice ahí va, le vendo un producto, me dice yo no quiero nada, y se cambia". <strong>Regla propuesta:</strong> en Ruta 2, el primer contacto abre con utilidad (información del proceso, acceso al outplacement), y el PAC se presenta como protección del dinero que la persona ya ganó — nunca como oferta comercial de entrada. En Ruta 1 (salida elegida), el PAC puede presentarse con más naturalidad dentro de la misma conversación de reconocimiento.</div></div>
+  </section>
+
+  <!-- 10 · MAPA -->
+  <section class="section" id="mapa">
+    <div class="section-head">
+      <span class="section-eyebrow">10</span>
+      <div><h2>Mapa de oportunidades</h2></div>
+    </div>
+    <p>Cada oportunidad está trazada a una fuente — ninguna aparece sin respaldo en el benchmark o en la investigación interna. El esfuerzo de tres oportunidades baja porque una capacidad equivalente ya está en construcción en B2Link, y se añaden tres oportunidades nuevas que ese frente habilita directamente.</p>
+
+    <div class="quadrant">
+      <div class="q-yaxis"><span>Impacto<br>alto</span><span>Impacto<br>medio</span></div>
+      <div class="q-body">
+        <div class="q-xaxis"><span>Esfuerzo bajo</span><span>Esfuerzo medio</span><span>Esfuerzo alto</span></div>
+        <div class="q-grid">
+          <div class="q-cell"><ul>
+            <li>Rediseñar el instrumento de feedback</li>
+            <li>Tabla de elegibilidad por tipo de salida</li>
+            <li>PAC en la Ventana 1 (0–10 días)</li>
+          </ul></div>
+          <div class="q-cell"><ul>
+            <li>Orientación financiera 15–45 días</li>
+            <li>Diagnóstico financiero desde onboarding</li>
+            <li>Módulo de empleabilidad (outplacement)</li>
+            <li>Comunidad con cadencia editorial</li>
+          </ul></div>
+          <div class="q-cell empty">Sin oportunidades aquí</div>
+          <div class="q-cell"><ul>
+            <li>Reconocimiento personalizado sin kit físico</li>
+          </ul></div>
+          <div class="q-cell"><ul>
+            <li>Beneficios post-retiro y referidos</li>
+          </ul></div>
+          <div class="q-cell"><ul>
+            <li>Portal de seguimiento del retiro</li>
+            <li>Fondo de emergencia por nómina</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap"><table>
+      <thead><tr><th>Oportunidad</th><th>Impacto</th><th>Esfuerzo</th><th>Fuente</th></tr></thead>
+      <tbody>
+        <tr><td>Rediseñar el instrumento de feedback con eNPS y valor de retorno</td><td>Alto</td><td>Bajo</td><td>Auditoría interna — ya es compromiso del acta</td></tr>
+        <tr><td>Definir la ruta por tipo de salida como tabla de elegibilidad, no como 8 flujos</td><td>Alto</td><td>Bajo</td><td>Tier B — Seguros Bolívar</td></tr>
+        <tr><td>Oferta del PAC de desvinculación dentro de la Ventana 1 (0–10 días)</td><td>Alto</td><td><strong>Bajo</strong></td><td>B2Link — el producto lo construye el equipo comercial con Gallito; Siempre Skandia solo diseña el momento y el mensaje</td></tr>
+        <tr><td>Orientación financiera en la ventana de 15–45 días post-liquidación</td><td>Alto</td><td>Medio</td><td>Reunión 10-ago + Tier B — Falabella + Dovetail</td></tr>
+        <tr><td>Diagnóstico financiero desde el onboarding</td><td>Alto</td><td><strong>Medio</strong> <em>(antes Alto)</em></td><td>Tesis de la reunión + Dovetail + Skandia Moments ya conceptualizado</td></tr>
+        <tr><td>Módulo de empleabilidad apoyado en el outplacement digital en desarrollo</td><td>Alto</td><td>Medio</td><td>B2Link — MVP ya en aterrizaje</td></tr>
+        <tr><td>Portal de seguimiento del proceso de retiro, autogestionado en dominio propio</td><td>Medio</td><td>Alto</td><td>PPT Gestión Humana — con advertencia de McKinsey vs. KPMG</td></tr>
+        <tr><td>Comunidad de ex colaboradores con cadencia editorial</td><td>Alto</td><td><strong>Medio</strong> <em>(antes Alto)</em></td><td>Tier A — McKinsey + motor editorial ya creado en B2Link</td></tr>
+        <tr><td>Reconocimiento personalizado sin kit físico</td><td>Medio</td><td>Bajo</td><td>PPT Gestión Humana, acotado por presupuesto</td></tr>
+        <tr><td>Beneficios post-retiro y referidos (Boomerang Talent)</td><td>Medio</td><td>Medio</td><td>PPT Gestión Humana</td></tr>
+        <tr><td>Fondo de emergencia por descuento de nómina</td><td>Medio (para Siempre Skandia)</td><td>Alto</td><td>B2Link — producto nuevo, sin fecha comprometida, fuera del plazo de noviembre</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 11 · AUDITORIA -->
+  <section class="section" id="auditoria">
+    <div class="section-head">
+      <span class="section-eyebrow">11</span>
+      <div><h2>Auditoría del instrumento de escucha actual</h2><div class="section-sub">Fuente: encuesta de retiro (Uforms), 26 preguntas activas</div></div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Bloque de la encuesta actual</th><th class="center">N.º preguntas</th><th>¿Mide algo del objetivo de Siempre Skandia?</th></tr></thead>
+      <tbody>
+        <tr><td>Datos del retiro (nombre, cargo, motivo, empresa destino)</td><td class="center">6</td><td>No — es trazabilidad, no experiencia</td></tr>
+        <tr><td>Beneficios / cultura / capacitación / desarrollo / compensación / horario / instalaciones / RSE</td><td class="center">8</td><td>No — clima laboral general</td></tr>
+        <tr><td>Aspectos positivos / qué mejorar (abiertas)</td><td class="center">2</td><td>Parcial — texto libre, sin indicador</td></tr>
+        <tr><td>Evaluación del líder (relacionamiento, aprendizaje, gestión, comunicación, inteligencia emocional)</td><td class="center">10</td><td>No</td></tr>
+        <tr><td>Proceso de retiro</td><td class="center score-0">0</td><td>—</td></tr>
+        <tr><td>Transición financiera</td><td class="center score-0">0</td><td>—</td></tr>
+        <tr><td>Indicador cuantitativo (NPS/eNPS)</td><td class="center score-0">0</td><td>—</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>Composición de las 26 preguntas actuales</h4>
+    <div class="stack-bar">
+      <div class="stack-seg" style="width:23.1%; background:#8a8d7e;" title="Datos del retiro — 6 preguntas — no mide experiencia">6</div>
+      <div class="stack-seg" style="width:30.8%; background:#6b6e5e;" title="Beneficios/cultura/desarrollo — 8 preguntas — clima laboral general">8</div>
+      <div class="stack-seg" style="width:7.7%; background:var(--sk-color-warning); color:#4a3400;" title="Aspectos positivos/qué mejorar — 2 preguntas — mide parcialmente">2</div>
+      <div class="stack-seg" style="width:38.5%; background:#54573f;" title="Evaluación del líder — 10 preguntas — no mide experiencia de salida">10</div>
+    </div>
+    <div class="stack-legend">
+      <span><i style="background:#6b6e5e"></i>No mide el objetivo de Siempre Skandia (24 de 26 preguntas)</span>
+      <span><i style="background:var(--sk-color-warning)"></i>Mide parcialmente, sin indicador (2 de 26)</span>
+    </div>
+
+    <h3>Instrumento propuesto</h3>
+    <p style="font-size:12px;">Principio: cada pregunta debe devolver valor a quien la responde, no solo recoger dato para Skandia.</p>
+    <ol>
+      <li>¿Qué tan claro fue el proceso de salida desde el día que informaste tu retiro? (1–5)</li>
+      <li>¿En algún momento el proceso tomó más tiempo del esperado? (Sí/No + dónde)</li>
+      <li>¿Tu padrino/madrina resolvió tus dudas? (1–5 + comentario)</li>
+      <li>Del 0 al 10, ¿qué tan probable es que le hables bien de Skandia a un conocido? — <strong>eNPS de salida</strong></li>
+      <li>¿Ya sabes qué vas a hacer con tu liquidación y cesantías? (ya tengo un plan / me gustaría orientación / no lo he pensado) → dispara la invitación a la sesión de orientación financiera</li>
+      <li>¿Te interesaría mantenerte informado de contenidos y oportunidades como ex colaborador? (Sí/No) — captura consentimiento para la comunidad</li>
+      <li>¿Qué aspectos positivos destacarías de tu paso por Skandia? (abierta, se conserva)</li>
+      <li>¿Qué crees que podríamos cambiar o hacer mejor? (abierta, se conserva)</li>
+      <li>¿Cómo calificarías el acompañamiento de tu líder durante tu tiempo en Skandia? (1–5) — reemplaza el bloque de 10 preguntas de liderazgo</li>
+    </ol>
+    <p>De 26 preguntas a 9, con 3 datos nuevos que hoy no existen (eNPS de salida, claridad del proceso, intención de continuar como cliente). Es insumo directo para el compromiso ya registrado en el acta de migrar la encuesta a Qualtrics.</p>
+    <div class="callout callout-info"><div class="icon">💡</div><div><strong>Nota:</strong> la pregunta 5 es, de hecho, una primera señal de bienestar financiero individual. Si el índice de bienestar financiero de B2Link avanza a un marco publicado, esta pregunta puede alinearse con esa métrica — sin que Siempre Skandia tenga que esperar a que el índice esté listo para lanzar su propio instrumento en noviembre.</div></div>
+  </section>
+
+  <!-- 12 · RUTAS -->
+  <section class="section" id="rutas">
+    <div class="section-head">
+      <span class="section-eyebrow">12</span>
+      <div><h2>De 8 tipos de retiro a 3 rutas emocionales</h2></div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Ruta</th><th>Tipos que agrupa</th><th>Tono</th><th>Precedente de mercado</th><th>Capacidad de B2Link que la soporta</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Salida elegida</td><td>Renuncia voluntaria, mutuo acuerdo</td><td>Celebratorio pleno: reconocimiento, video, invitación a comunidad</td><td>Seguros Bolívar excluye la renuncia de su cobertura — el mercado también trata esta ruta como distinta</td><td>PAC presentado dentro de la conversación de reconocimiento; motor editorial para la invitación a comunidad</td></tr>
+        <tr><td>2 · Salida no elegida</td><td>Sin justa causa, justa causa, terminación de contrato, período de prueba</td><td>Prioridad en velocidad y utilidad inmediata; reconocimiento sobrio</td><td>Seguros Bolívar cubre "sin justa causa" y "mutuo consentimiento" con reglas explícitas</td><td>Outplacement digital (MVP) como primer contacto de utilidad; PAC presentado después, como protección</td></tr>
+        <tr><td>3 · Cierre de ciclo</td><td>Terminación por pensión, fallecimiento</td><td>Acompañamiento patrimonial/sucesoral; interlocutor puede cambiar a beneficiarios</td><td>Sin precedente directo en el benchmark — territorio propio de Skandia</td><td>Sin capacidad de B2Link identificada — territorio propio de Skandia, sin cambio</td></tr>
+      </tbody>
+    </table></div>
+    <p>Diseñar 8 experiencias distintas no es viable con el presupuesto y el plazo de noviembre. Las 3 rutas comparten el mismo esqueleto de proceso y varían tono, prioridad de contenido, y momento de la invitación a la comunidad.</p>
+  </section>
+
+  <!-- 13 · DOVETAIL -->
+  <section class="section" id="dovetail">
+    <div class="section-head">
+      <span class="section-eyebrow">13</span>
+      <div><h2>Investigación previa recuperada</h2></div>
+    </div>
+    <p>Se revisaron 110 proyectos del workspace de Dovetail del equipo de UX Skandia. <strong>No existe investigación directa sobre offboarding de colaboradores</strong> — el proyecto parte de cero en ese frente específico. Se recuperó un activo adyacente:</p>
+    <blockquote>"Microcharlas de 15 minutos una vez a la semana" sobre finanzas personales, validación de salud financiera para otorgar préstamos, y la idea de un "dashboard para simular qué inversión podría hacer la empresa en beneficios para sus empleados".<span class="src">— Entrevista de bienestar financiero corporativo, proyecto <em>Bienestar Financiero</em>, un líder de bienestar de una empresa cliente de Skandia</span></blockquote>
+    <p>Es evidencia externa, no solo intuición interna, de que el diagnóstico financiero desde el onboarding ya es práctica de mercado — observada por el propio equipo de Skandia.</p>
+  </section>
+
+  <!-- 14 · TERRITORIOS -->
+  <section class="section" id="territorios">
+    <div class="section-head">
+      <span class="section-eyebrow">14</span>
+      <div><h2>Tres territorios de acción</h2><div class="section-sub">No son prototipos — son focos de trabajo posibles</div></div>
+    </div>
+    <p>Los stakeholders eligen uno, varios, o piden un cuarto no contemplado aquí.</p>
+
+    <div class="territory-card">
+      <span class="t-tag">Territorio A</span>
+      <h3>Escuchar y medir</h3>
+      <p>Arreglar el instrumento de feedback y establecer el eNPS de salida que hoy no existe. Es la base sin la cual ningún otro territorio puede probarse. Bajo esfuerzo, alto impacto, ya es compromiso del acta.</p>
+      <p style="margin-top:8px; font-size:12.5px;"><em>v2: alinear conceptualmente la pregunta 5 del instrumento con el futuro índice de bienestar financiero de B2Link, sin depender de su fecha de publicación.</em></p>
+    </div>
+
+    <div class="territory-card">
+      <span class="t-tag">Territorio B</span>
+      <h3>Acompañar la transición financiera</h3>
+      <p><strong>Reescrito en v2.</strong> Deja de ser "diseñar desde cero" y pasa a ser "diseñar la experiencia sobre productos que otro equipo ya está construyendo": el PAC de desvinculación en la Ventana 1, el outplacement digital como primer contacto de utilidad en Ruta 2, y el fondo de emergencia como posible producto de continuidad más adelante.</p>
+      <p style="margin-top:8px;">Baja el riesgo de construir desde cero, pero sube la dependencia de un calendario que Siempre Skandia no controla — B2Link es "un proyecto de todo el año", sin fechas comprometidas para noviembre. Sigue siendo el territorio de mayor diferenciación frente al mercado.</p>
+    </div>
+
+    <div class="territory-card">
+      <span class="t-tag">Territorio C</span>
+      <h3>Construir comunidad sostenible</h3>
+      <p>Diseñar el modelo de comunidad con las 4 fases ya planteadas, aprendiendo del portal propio de McKinsey y evitando el formulario externo de KPMG.</p>
+      <p style="margin-top:8px; font-size:12.5px;"><em>v2: reutilizar el motor editorial y los datos sectoriales que B2Link ya construyó, en vez de montar una segunda operación de contenido desde cero.</em></p>
+      <p style="margin-top:8px;">Sigue siendo el de mayor esfuerzo y el que más tiempo necesita antes de noviembre.</p>
+    </div>
+  </section>
+
+  <!-- 15 · RIESGOS -->
+  <section class="section" id="riesgos">
+    <div class="section-head">
+      <span class="section-eyebrow">15 · Nuevo en v2</span>
+      <div><h2>Riesgos de la conexión con B2Link</h2></div>
+    </div>
+    <p>Conectar Siempre Skandia con capacidades que otro frente está construyendo reduce el esfuerzo de diseño, pero introduce cuatro riesgos que no existían cuando Territorio B se pensaba como un desarrollo propio.</p>
+
+    <div class="risk-card"><div class="risk-num">1</div><div><h5>Dependencia de un calendario ajeno</h5><p>Noviembre es el plazo de Siempre Skandia; B2Link es un proyecto de todo el año sin fechas comprometidas para sus piezas (PAC, fondo de emergencia, outplacement).</p><div class="mitig"><b>Mitigación:</b> diseñar cada momento del journey para funcionar con y sin la capacidad de B2Link disponible.</div></div></div>
+
+    <div class="risk-card"><div class="risk-num">2</div><div><h5>Percepción de venta oportunista en Ruta 2</h5><p>Es exactamente lo que se advirtió en la reunión del 10 de agosto sobre no querer que la persona sienta que "le estoy metiendo un producto". El riesgo se concentra en la Ventana 1 (0–10 días).</p><div class="mitig"><b>Mitigación:</b> la regla de diseño de "Dos ventanas de contacto" — utilidad primero, PAC como protección del dinero ganado, nunca como oferta de entrada.</div></div></div>
+
+    <div class="risk-card"><div class="risk-num">3</div><div><h5>Sesgo de testeo interno</h5><p>La hipótesis sobre el MVP de outplacement — que probarlo solo con empleados de Skandia genera un sesgo de adopción forzada — aplica igual a cualquier prototipo de Siempre Skandia.</p><div class="mitig"><b>Mitigación:</b> usar lo interno como ensayo operativo del proceso, no como validación de la propuesta de valor; buscar contraste externo antes de escalar.</div></div></div>
+
+    <div class="risk-card"><div class="risk-num">4</div><div><h5>Rol doble de Skandia como empleador y proveedor financiero</h5><p>Frente a sus propios empleados, Skandia ocupa dos roles a la vez — quien los emplea y quien conoce su situación financiera.</p><div class="mitig"><b>Mitigación:</b> hacia Gestión Humana, solo dato agregado y anónimo; el perfil financiero individual se queda entre esa persona y su FP, nunca sube a un reporte de RH.</div></div></div>
+  </section>
+
+  <!-- 16 · PREGUNTAS -->
+  <section class="section" id="preguntas">
+    <div class="section-head">
+      <span class="section-eyebrow">16</span>
+      <div><h2>Preguntas para decidir en próximas</h2></div>
+    </div>
+    <ul class="q-list">
+      <li>¿Cuál de los tres territorios es prioritario para la primera versión de noviembre — o se trabajan el Territorio A y uno de los otros dos en paralelo?</li>
+      <li>¿Quién es dueño del momento 4 del journey (retiro, Ventana 1) cuando ahí se cruzan Gestión Humana y el equipo comercial del PAC — y cómo se coordina la entrega a tiempo?</li>
+      <li>¿Es aceptable, en Ruta 2, ofrecer el PAC dentro de los primeros 10 días — o el riesgo de percepción de venta oportunista pesa más que el beneficio tributario de esa ventana?</li>
+      <li>¿Qué ve exactamente Gestión Humana del perfil financiero de un colaborador, y qué se queda solo entre la persona y su FP?</li>
+      <li>¿El calendario de noviembre se diseña esperando la disponibilidad del PAC y del outplacement digital, o se diseña independiente de ellos?</li>
+      <li>¿Es viable pedir de nuevo los indicadores de rotación, ahora acotados a un dato agregado sin riesgo de sensibilidad?</li>
+      <li>¿Qué presupuesto real existe para el Territorio C, dado que ya se descartó el kit físico?</li>
+    </ul>
+  </section>
+
+  <!-- 17 · LIMITACIONES -->
+  <section class="section" id="limitaciones">
+    <div class="section-head">
+      <span class="section-eyebrow">17</span>
+      <div><h2>Limitaciones de este documento</h2></div>
+    </div>
+    <ul>
+      <li><strong>Sin indicadores de rotación</strong>, no se dimensiona el impacto del proyecto en volumen de clientes retenidos.</li>
+      <li><strong>Las capacidades de B2Link (índice, PAC, fondo de emergencia, outplacement, Skandia Moments) están en ideación o en construcción, sin fechas comprometidas.</strong> El diseño de Siempre Skandia no debe volverse dependiente de ellas.</li>
+      <li><strong><code>s/d</code> es un resultado, no un vacío.</strong> Que la mayoría de los referentes de alumni no publique nada sobre orientación financiera, y que los productos financieros no publiquen nada sobre comunidad, es en sí mismo el hallazgo central de este benchmark.</li>
+      <li><strong>El Tier B tiene solo dos referentes.</strong> La búsqueda de productos financieros de transición con presencia pública propia en Colombia fue limitada — la mayoría de estos seguros se distribuyen de forma "invisible", empaquetados dentro de una tarjeta de crédito o un banco.</li>
+    </ul>
+  </section>
+
+  <!-- 18 · FUENTES -->
+  <section class="section" id="fuentes">
+    <div class="section-head">
+      <span class="section-eyebrow">18</span>
+      <div><h2>Fuentes</h2></div>
+    </div>
+    <h4>Metodología</h4>
+    <ol>
+      <li><a href="https://design-toolkit.recursos.uoc.edu/es/guia/benchmarking/" target="_blank" rel="noopener">Benchmarking — UOC Design Toolkit</a></li>
+      <li>Playbook Research Skandia — tipo de proyecto IDENTIFICAR</li>
+    </ol>
+    <h4>Tier A · Alumni y transición de carrera</h4>
+    <ol start="3">
+      <li><a href="https://kpmg.com/co/es/conocenos/alumni.html" target="_blank" rel="noopener">KPMG Alumni Colombia</a></li>
+      <li><a href="https://www.mckinsey.com/alumni" target="_blank" rel="noopener">McKinsey Alumni Center</a></li>
+      <li><a href="https://enterprisealumni.com/" target="_blank" rel="noopener">EnterpriseAlumni</a></li>
+      <li><a href="https://www.lhh.com/en-us/organizations/outplacement" target="_blank" rel="noopener">LHH — Outplacement services</a></li>
+      <li><a href="https://www.randstadenterprise.com/solutions/talent-transition/outplacement/" target="_blank" rel="noopener">Randstad RiseSmart — Outplacement</a></li>
+    </ol>
+    <h4>Tier B · Beneficio financiero de protección al retiro</h4>
+    <ol start="8">
+      <li><a href="https://www.segurosfalabella.com.co/otros-seguros/seguro-de-desempleo" target="_blank" rel="noopener">Seguros Falabella — Seguro de Desempleo o Incapacidad</a></li>
+      <li><a href="https://www.segurosbolivar.com/clientes-davivienda/cuide-sus-productos-financieros/proteccion-de-pagos" target="_blank" rel="noopener">Seguros Bolívar — Protección de Pagos, clientes Davivienda</a></li>
+    </ol>
+    <h4>Insumos internos</h4>
+    <ol start="10">
+      <li>Acta y transcripción — Reunión Siempre Skandia, 10 de agosto de 2026</li>
+      <li><em>Propuesta Plan Retirados</em> — PPT de Gestión Humana</li>
+      <li>Correo de contexto — tipos de retiro Skandia</li>
+      <li>Encuesta de retiro actual — Uforms (26 preguntas)</li>
+      <li>Dovetail — proyectos <em>Retención ante Retiros FP's</em> y <em>Bienestar Financiero</em> (workspace UX Skandia)</li>
+      <li>Sesión de contexto B2Link, 24 de agosto de 2026</li>
+    </ol>
+  </section>
+
+  <footer class="doc-footer">Siempre Skandia · Benchmark y propuesta v2 · Equipo UX Skandia</footer>
+</div>
+
+<button id="backTop" aria-label="Volver arriba">↑</button>
+
+<script>
+  // progreso de lectura + botón volver arriba
+  const bar = document.getElementById('progressBar');
+  const backTop = document.getElementById('backTop');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    bar.style.width = scrolled + '%';
+    backTop.classList.toggle('visible', h.scrollTop > 500);
+  });
+  backTop.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+  // jump-to-section
+  const jump = document.getElementById('jumpTo');
+  document.querySelectorAll('.toc-list a').forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.getAttribute('href');
+    opt.textContent = a.textContent;
+    jump.appendChild(opt);
+  });
+  jump.addEventListener('change', () => {
+    if (jump.value) { document.querySelector(jump.value).scrollIntoView({behavior:'smooth'}); jump.value=''; }
+  });
+
+  // búsqueda simple con resaltado
+  const input = document.getElementById('searchInput');
+  const countEl = document.getElementById('searchCount');
+  let marks = [];
+  let current = -1;
+
+  function clearMarks(){
+    marks.forEach(m => {
+      const parent = m.parentNode;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+    marks = [];
+    current = -1;
+    countEl.textContent = '';
+  }
+
+  function doSearch(term){
+    clearMarks();
+    if(!term || term.length < 2) return;
+    const walker = document.createTreeWalker(document.querySelector('.page'), NodeFilter.SHOW_TEXT, {
+      acceptNode(node){
+        if(!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        if(node.parentNode.closest('script,style,.toolbar')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const targets = [];
+    let node;
+    const lower = term.toLowerCase();
+    while(node = walker.nextNode()){
+      if(node.nodeValue.toLowerCase().includes(lower)) targets.push(node);
+    }
+    targets.forEach(node => {
+      const regex = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'ig');
+      const frag = document.createDocumentFragment();
+      const parts = node.nodeValue.split(regex);
+      parts.forEach(part => {
+        if(part.toLowerCase() === lower){
+          const m = document.createElement('mark');
+          m.textContent = part;
+          frag.appendChild(m);
+          marks.push(m);
+        } else {
+          frag.appendChild(document.createTextNode(part));
+        }
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+    countEl.textContent = marks.length ? (marks.length + (marks.length===1?' resultado':' resultados')) : 'sin resultados';
+    if(marks.length){ current = 0; marks[0].classList.add('current'); marks[0].scrollIntoView({behavior:'smooth', block:'center'}); }
+  }
+
+  let debounce;
+  input.addEventListener('input', (e) => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => doSearch(e.target.value.trim()), 200);
+  });
+  input.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && marks.length){
+      marks[current].classList.remove('current');
+      current = (current + 1) % marks.length;
+      marks[current].classList.add('current');
+      marks[current].scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+</script>
+</body>
+</html>

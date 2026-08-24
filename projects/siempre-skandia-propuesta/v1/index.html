@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siempre Skandia — Presentación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+  :root{
+    /* Tokens Skandia DS */
+    --sk-color-primary:#00c73d;
+    --sk-color-primary-hover:#03a835;
+    --sk-color-primary-active:#009a2f;
+    --sk-color-accent:#16d727;
+    --sk-color-text:#232418;
+    --sk-color-text-muted:#63665a;
+    --sk-color-text-inverse:#f3f4ec;
+    --sk-color-border:#dfe2d5;
+    --sk-color-warning:#ffae08;
+    --sk-color-error:#e03430;
+    --sk-color-info:#0099de;
+
+    /* Neutros propios del deck (mundo visual único: no cambia con el tema del sistema) */
+    --ink:#14150f;
+    --ink-2:#1c1e15;
+    --ink-3:#262819;
+    --ink-line:rgba(255,255,255,0.12);
+    --ink-text:#f3f4ec;
+    --ink-text-muted:#a3a695;
+
+    --paper:#f6f7f1;
+    --card:#ffffff;
+    --card-2:#eef0e6;
+    --line:#e0e2d6;
+    --text:#1d1e16;
+    --text-muted:#63665a;
+
+    --font-head:'Montserrat', system-ui, sans-serif;
+    --font-body:'Open Sans', system-ui, sans-serif;
+    --gradient-brand:linear-gradient(135deg, #00c73d, #8fe000);
+    --radius-m:12px;
+    --radius-l:20px;
+    --shadow-card:0 10px 30px rgba(20,21,15,0.08), 0 2px 8px rgba(20,21,15,0.05);
+  }
+
+  html,body{height:100%;}
+  body{
+    font-family:var(--font-body);
+    color:var(--text);
+    background:var(--ink);
+    overflow:hidden;
+  }
+
+  /* ── deck ─────────────────────────────────────────── */
+  .deck{position:relative; width:100vw; height:100dvh; overflow:hidden;}
+
+  .slide{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    padding:4.5vh 7vw;
+    background:var(--paper);
+    opacity:0; visibility:hidden;
+    transform:translateX(40px);
+    transition:opacity .45s ease, transform .45s ease, visibility 0s linear .45s;
+    overflow:hidden;
+  }
+  .slide.active{
+    opacity:1; visibility:visible; transform:translateX(0);
+    transition:opacity .45s ease, transform .45s ease;
+    z-index:2;
+  }
+  .slide.prev{transform:translateX(-40px);}
+
+  .slide.dark{background:var(--ink); color:var(--ink-text);}
+  .slide-inner{width:100%; max-width:1180px; margin:0 auto;}
+
+  /* ── typography helpers ──────────────────────────── */
+  .eyebrow{
+    font-family:var(--font-head); font-size:clamp(11px,1vw,13px); font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--sk-color-primary);
+    display:flex; align-items:center; gap:10px; margin-bottom:13px;
+  }
+  .eyebrow .step{color:var(--text-muted); font-weight:600; letter-spacing:.08em;}
+  .dark .eyebrow .step{color:var(--ink-text-muted);}
+
+  .slide-inner{max-height:100%; overflow-y:auto; overflow-x:hidden; scrollbar-width:thin;}
+
+  h1.headline{
+    font-family:var(--font-head); font-weight:700; line-height:1.08;
+    font-size:clamp(28px,4vw,48px); color:var(--text); text-wrap:balance; max-width:16ch;
+  }
+  .dark h1.headline{color:#fff;}
+  h1.headline em{font-style:normal; color:var(--sk-color-primary);}
+
+  h2.slide-title{
+    font-family:var(--font-head); font-weight:700; line-height:1.16;
+    font-size:clamp(21px,2.4vw,31px); color:var(--text); text-wrap:balance; max-width:22ch; margin-bottom:10px;
+  }
+  .dark h2.slide-title{color:#fff;}
+
+  p.lede{font-size:clamp(13.5px,1.15vw,16.5px); color:var(--text-muted); line-height:1.5; max-width:64ch;}
+  .dark p.lede{color:var(--ink-text-muted);}
+
+  .accent{color:var(--sk-color-primary);}
+
+  /* ── slide 1 · cover ─────────────────────────────── */
+  .cover::after{
+    content:''; position:absolute; right:6vw; top:50%; transform:translateY(-50%); width:36vw; height:36vw; max-width:440px; max-height:440px;
+    border-radius:50%; background:radial-gradient(circle at 30% 30%, rgba(0,199,61,0.22), rgba(0,199,61,0) 65%);
+    pointer-events:none;
+  }
+  .cover .slide-inner{text-align:center;}
+  .cover .eyebrow{justify-content:center;}
+  .cover-rule{width:56px; height:5px; border-radius:3px; background:var(--gradient-brand); margin:0 auto 16px;}
+  .cover h1.headline, .cover h2.slide-title{margin-left:auto; margin-right:auto;}
+  .cover .lede{margin:14px auto 0; max-width:52ch;}
+  .cover-meta{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:28px; position:relative;}
+  .meta-chip{
+    display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-text-muted);
+    background:rgba(255,255,255,0.06); border:1px solid var(--ink-line); border-radius:100px; padding:7px 16px;
+  }
+  .meta-chip .dot{width:6px; height:6px; border-radius:50%; background:var(--sk-color-primary);}
+
+  /* ── slide 2 · contexto ──────────────────────────── */
+  .quote-block{
+    border-left:4px solid var(--sk-color-primary); background:var(--card); border-radius:0 var(--radius-m) var(--radius-m) 0;
+    padding:26px 32px; margin:26px 0; box-shadow:var(--shadow-card); max-width:56ch;
+  }
+  .quote-block p{font-family:var(--font-head); font-size:clamp(17px,1.9vw,23px); font-weight:600; font-style:italic; line-height:1.4; color:var(--text);}
+  .quote-block .src{margin-top:10px; font-family:var(--font-body); font-size:12.5px; font-style:normal; color:var(--text-muted);}
+
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:28px;}
+  .fact-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-m); padding:22px 24px;}
+  .fact-card h4{font-family:var(--font-head); font-size:13px; font-weight:700; letter-spacing:.03em; margin-bottom:8px;}
+  .fact-card h4.good{color:var(--sk-color-primary-active);}
+  .fact-card h4.gap{color:var(--sk-color-error);}
+  .fact-card p{font-size:14.5px; color:var(--text-muted); line-height:1.55;}
+
+  /* ── stat strip / scorecard ──────────────────────── */
+  .stat-strip{display:flex; gap:14px; margin-top:32px; flex-wrap:wrap;}
+  .stat-box{flex:1 1 160px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-m); padding:22px 20px; text-align:left;}
+  .stat-box .num{font-family:var(--font-head); font-weight:700; font-size:clamp(28px,3.4vw,44px); color:var(--sk-color-primary-active); font-variant-numeric:tabular-nums; line-height:1;}
+  .stat-box .lbl{font-size:12.5px; color:var(--text-muted); margin-top:8px; line-height:1.4;}
+
+  .heat-row{display:flex; gap:5px; margin-top:26px; flex-wrap:wrap;}
+  .heat-cell{
+    flex:1 1 60px; min-width:60px; height:64px; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-family:var(--font-head); font-weight:700; font-size:13px; color:#fff; position:relative;
+  }
+  .heat-cell .n{font-size:18px;}
+  .heat-cell .l{font-size:8.5px; font-weight:600; text-transform:uppercase; letter-spacing:.02em; margin-top:2px; text-align:center; padding:0 3px; line-height:1.15;}
+  .heat-0{background:#e0332e;}
+  .heat-1{background:#e39a3a;}
+  .heat-2{background:#7fbf6a;}
+  .heat-legend{display:flex; gap:20px; margin-top:14px; font-size:11.5px; color:var(--text-muted);}
+  .heat-legend span{display:inline-flex; align-items:center; gap:6px;}
+  .heat-legend i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+
+  /* ── slide 5 · B2Link capacities ─────────────────── */
+  .cap-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:24px;}
+  .cap-tile{background:var(--ink-2); border:1px solid var(--ink-line); border-radius:var(--radius-m); padding:18px; }
+  .cap-tile .st{font-family:var(--font-head); font-size:9.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--sk-color-primary); margin-bottom:8px; display:block;}
+  .cap-tile h5{font-family:var(--font-head); font-size:13.5px; font-weight:700; color:#fff; line-height:1.3; margin-bottom:6px;}
+  .cap-tile p{font-size:11.5px; color:var(--ink-text-muted); line-height:1.45;}
+
+  /* ── slide 6 · journey timeline ───────────────────── */
+  .timeline{display:flex; gap:0; margin-top:34px; position:relative;}
+  .timeline::before{content:''; position:absolute; top:19px; left:20px; right:20px; height:2px; background:var(--line);}
+  .tl-step{flex:1; text-align:left; position:relative; padding-right:14px;}
+  .tl-dot{width:40px; height:40px; border-radius:50%; background:var(--card); border:2px solid var(--sk-color-primary); color:var(--sk-color-primary-active); font-family:var(--font-head); font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:center; position:relative; z-index:1; margin-bottom:14px;}
+  .tl-step.future .tl-dot{border-color:var(--line); color:var(--text-muted); background:var(--card);}
+  .tl-step h5{font-family:var(--font-head); font-size:12.5px; font-weight:700; margin-bottom:6px; line-height:1.3;}
+  .tl-step p{font-size:11.5px; color:var(--text-muted); line-height:1.4;}
+
+  /* ── slide 7 · rutas ──────────────────────────────── */
+  .route-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:28px;}
+  .route-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-m); padding:24px; border-top:4px solid var(--sk-color-primary);}
+  .route-card.r2{border-top-color:var(--sk-color-warning);}
+  .route-card.r3{border-top-color:var(--sk-color-info);}
+  .route-card .tag{font-family:var(--font-head); font-size:10.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;}
+  .route-card h4{font-family:var(--font-head); font-size:16px; font-weight:700; margin-bottom:10px;}
+  .route-card p{font-size:12.5px; color:var(--text-muted); line-height:1.5;}
+  .route-card p+p{margin-top:8px;}
+
+  /* ── slide 8 · ventanas ───────────────────────────── */
+  .window-row{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:30px;}
+  .window-card{border-radius:var(--radius-m); padding:26px 28px;}
+  .window-card.w1{background:#fff3f2; border:1px solid #ffcecb;}
+  .window-card.w2{background:#eafcf0; border:1px solid #cdf3d8;}
+  .window-card .wnum{font-family:var(--font-head); font-weight:700; font-size:34px; color:var(--sk-color-error); line-height:1;}
+  .window-card.w2 .wnum{color:var(--sk-color-primary-active);}
+  .window-card .wdays{font-family:var(--font-head); font-weight:700; font-size:13px; margin-top:6px; margin-bottom:14px; color:var(--text);}
+  .window-card p{font-size:13px; color:var(--text-muted); line-height:1.5;}
+
+  .win-timeline{margin-top:24px;}
+  .win-track{display:flex; height:38px; border-radius:8px; overflow:hidden; border:1px solid var(--line);}
+  .win-seg{display:flex; align-items:center; justify-content:center; font-family:var(--font-head); font-weight:700; font-size:11px; color:#fff;}
+  .win-seg.w1{background:var(--sk-color-error);}
+  .win-seg.gap{background:var(--card-2); color:var(--text-muted); font-weight:600;}
+  .win-seg.w2{background:var(--sk-color-primary-active);}
+  .win-ticks{display:flex; margin-top:6px; font-size:10.5px; color:var(--text-muted); font-variant-numeric:tabular-nums;}
+  .win-ticks span{flex-shrink:0;}
+
+  /* ── slide 9 · territorios overview ──────────────── */
+  .terr-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:30px;}
+  .terr-card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius-l); padding:26px; position:relative;}
+  .terr-badge{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:var(--sk-color-primary); color:#fff; font-family:var(--font-head); font-weight:700; font-size:15px; margin-bottom:16px;}
+  .terr-card h4{font-family:var(--font-head); font-size:16.5px; font-weight:700; margin-bottom:10px;}
+  .terr-card p{font-size:13px; color:var(--text-muted); line-height:1.55;}
+  .terr-meta{display:flex; gap:8px; margin-top:16px;}
+  .pill{font-family:var(--font-head); font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; padding:4px 10px; border-radius:100px;}
+  .pill.impact{background:#eafcf0; color:#137a34;}
+  .pill.effort-bajo{background:#eafcf0; color:#137a34;}
+  .pill.effort-medio{background:#fff8ea; color:#8a5800;}
+  .pill.effort-alto{background:#fff5f4; color:#8a1613;}
+
+  /* ── slide 10 · territorio B detalle ─────────────── */
+  .flow-row{display:flex; align-items:stretch; gap:0; margin-top:30px;}
+  .flow-step{flex:1; background:var(--ink-2); border:1px solid var(--ink-line); border-radius:var(--radius-m); padding:20px; position:relative;}
+  .flow-step+.flow-step{margin-left:34px;}
+  .flow-step+.flow-step::before{content:'→'; position:absolute; left:-30px; top:50%; transform:translateY(-50%); color:var(--sk-color-primary); font-size:20px; font-weight:700;}
+  .flow-step .k{font-family:var(--font-head); font-size:9.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--sk-color-primary); display:block; margin-bottom:8px;}
+  .flow-step h5{font-family:var(--font-head); font-size:14px; font-weight:700; color:#fff; margin-bottom:6px;}
+  .flow-step p{font-size:11.5px; color:var(--ink-text-muted); line-height:1.45;}
+
+  /* ── slide 11 · riesgos ───────────────────────────── */
+  .risk-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:28px;}
+  .risk-tile{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--sk-color-warning); border-radius:var(--radius-m); padding:18px 20px;}
+  .risk-tile h5{font-family:var(--font-head); font-size:13.5px; font-weight:700; margin-bottom:6px;}
+  .risk-tile p{font-size:12px; color:var(--text-muted); line-height:1.5;}
+  .risk-tile .m{margin-top:8px; font-size:11.5px; color:var(--sk-color-primary-active); font-weight:600;}
+
+  /* ── slide 12 · pedimos hoy ───────────────────────── */
+  .ask-list{list-style:none; display:grid; gap:14px; margin-top:28px; max-width:74ch;}
+  .ask-list li{display:flex; gap:16px; align-items:flex-start; font-size:15.5px; color:var(--ink-text); line-height:1.5;}
+  .ask-num{flex-shrink:0; width:30px; height:30px; border-radius:50%; background:var(--sk-color-primary); color:#0b2b0f; font-family:var(--font-head); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center;}
+
+  /* ── slide 13 · cierre ────────────────────────────── */
+  .doc-link{
+    display:inline-flex; align-items:center; gap:12px; margin-top:20px; background:rgba(255,255,255,0.06); border:1px solid var(--ink-line);
+    border-radius:100px; padding:12px 24px 12px 18px; text-decoration:none; transition:background .15s, transform .1s;
+  }
+  .doc-link:hover{background:rgba(255,255,255,0.11); transform:translateX(2px);}
+  .doc-link .ic{width:38px; height:38px; border-radius:50%; background:var(--gradient-brand); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .doc-link .ic svg{width:18px; height:18px; stroke:#0b2b0f;}
+  .doc-link .tt{font-family:var(--font-head); font-weight:700; font-size:14.5px; color:#fff;}
+  .doc-link .ds{font-size:12px; color:var(--ink-text-muted); margin-top:2px;}
+
+  /* ── nav controls ─────────────────────────────────── */
+  .nav-ui{position:fixed; inset:0; pointer-events:none; z-index:10;}
+  .progress-rail{position:absolute; top:0; left:0; right:0; height:4px; background:rgba(255,255,255,0.15);}
+  .progress-fill{height:100%; background:var(--gradient-brand); width:7.6%; transition:width .4s ease;}
+
+  .nav-btn{
+    position:absolute; bottom:32px; width:48px; height:48px; border-radius:50%; border:1px solid rgba(255,255,255,0.25);
+    background:rgba(20,21,15,0.35); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; pointer-events:auto; transition:background .15s, transform .1s; color:#fff;
+  }
+  .nav-btn:hover{background:rgba(20,21,15,0.55);}
+  .nav-btn:active{transform:scale(0.93);}
+  .nav-btn svg{width:18px; height:18px; stroke:currentColor;}
+  #btnPrev{right:96px;}
+  #btnNext{right:32px;}
+  .nav-btn[disabled]{opacity:.25; cursor:default;}
+
+  .slide-counter{
+    position:absolute; bottom:44px; left:32px; font-family:var(--font-head); font-size:12px; font-weight:700;
+    color:rgba(255,255,255,0.6); letter-spacing:.04em; pointer-events:none; font-variant-numeric:tabular-nums;
+  }
+  .slide-counter b{color:#fff;}
+
+  @media (max-width:900px){
+    .two-col, .cap-row, .route-cards, .terr-grid, .risk-grid, .window-row{grid-template-columns:1fr;}
+    .flow-row{flex-direction:column;}
+    .flow-step+.flow-step{margin-left:0; margin-top:34px;}
+    .flow-step+.flow-step::before{content:'↓'; left:50%; top:-30px; transform:translateX(-50%);}
+    .heat-row{overflow-x:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 1 · COVER -->
+  <section class="slide dark cover active" data-title="Portada">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">Insumo 1 de 2</span> · Equipo UX Skandia</div>
+      <div class="cover-rule"></div>
+      <h1 class="headline">Siempre <em>Skandia</em></h1>
+      <p class="lede">Cerrar un capítulo con Skandia no debería significar cerrar la relación. Benchmark de mercado + propuesta de territorios de acción para la experiencia de salida del colaborador.</p>
+      <div class="cover-meta">
+        <span class="meta-chip"><span class="dot"></span>Etapa 1 · IDENTIFICAR</span>
+        <span class="meta-chip"><span class="dot"></span>24 de agosto de 2026</span>
+        <span class="meta-chip"><span class="dot"></span>Primer insumo para decisión</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · CONTEXTO -->
+  <section class="slide" data-title="Contexto">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">01</span> Punto de partida</div>
+      <h2 class="slide-title">La pregunta que abrió el proyecto</h2>
+      <div class="quote-block">
+        <p>"¿Cómo podemos mejorar la experiencia de una persona retirada… para que siga siendo cliente de nosotros, para que sea un buen embajador de la marca?"</p>
+        <div class="src">— Gestión Humana, reunión del 10 de agosto de 2026</div>
+      </div>
+      <div class="two-col">
+        <div class="fact-card">
+          <h4 class="good">✓ Ya existe</h4>
+          <p>El proceso operativo de retiro ya está digitalizado: documentos de liquidación automáticos, paz y salvos por Teams, dos opciones públicas de inversión de cesantías.</p>
+        </div>
+        <div class="fact-card">
+          <h4 class="gap">✕ No existe</h4>
+          <p>Acompañamiento diferenciado, comunidad de ex colaboradores, orientación financiera en el momento del retiro, y un indicador que diga si el proceso funcionó.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · BENCHMARK CONDENSADO -->
+  <section class="slide" data-title="Lo que dice el mercado">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">02</span> Benchmark · 7 referentes de mercado</div>
+      <h2 class="slide-title">Dos mundos que nunca se cruzan</h2>
+      <p class="lede">Comunidades de alumni (KPMG, McKinsey) construyen pertenencia pero no tocan lo financiero. Productos de protección (Falabella, Bolívar) protegen el ingreso pero no construyen comunidad. <strong>Ningún referente cruza ambas mitades.</strong></p>
+      <div class="stat-strip">
+        <div class="stat-box"><div class="num">83%</div><div class="lbl">de una red de alumni le compraría a su ex empleador — EnterpriseAlumni</div></div>
+        <div class="stat-box"><div class="num">20%</div><div class="lbl">de las contrataciones anuales del cliente vienen de su red de alumni</div></div>
+        <div class="stat-box"><div class="num">0/5</div><div class="lbl">referentes de alumni con algo de orientación financiera</div></div>
+        <div class="stat-box"><div class="num">2</div><div class="lbl">columnas: así resuelve Bolívar la diferenciación por tipo de salida — no 8 flujos</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · SKANDIA HOY: SCORECARD -->
+  <section class="slide" data-title="Skandia hoy">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">03</span> Punto de partida propio</div>
+      <h2 class="slide-title">Skandia hoy: <span class="accent">8 de 16</span> bloques en cero</h2>
+      <p class="lede">No es que estemos por debajo del mercado — estamos ausentes en bloques completos donde el mercado ya tiene algo, aunque sea parcial.</p>
+      <div class="heat-row">
+        <div class="heat-cell heat-1"><span class="n">1</span><span class="l">Claridad proceso</span></div>
+        <div class="heat-cell heat-2"><span class="n">2</span><span class="l">Acomp. humano</span></div>
+        <div class="heat-cell heat-1"><span class="n">1</span><span class="l">Autogestión</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Reconocimiento</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Or. financiera</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Empleabilidad</span></div>
+        <div class="heat-cell heat-2"><span class="n">2</span><span class="l">Cont. producto</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Comunidad</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Cadencia</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Benef. tangibles</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Dif. tipo salida</span></div>
+        <div class="heat-cell heat-0"><span class="n">0</span><span class="l">Medición</span></div>
+      </div>
+      <div class="heat-legend">
+        <span><i style="background:#e0332e"></i>0 — ausente</span>
+        <span><i style="background:#e39a3a"></i>1 — débil/parcial</span>
+        <span><i style="background:#7fbf6a"></i>2 — presente</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · B2LINK CAPACIDADES (interno) -->
+  <section class="slide dark" data-title="Lo que ya construimos">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">04</span> Hallazgo clave</div>
+      <h2 class="slide-title">No partimos de cero en lo financiero</h2>
+      <p class="lede">El frente B2Link ya tiene, en distintos grados de madurez, piezas que cubren 4 de los 8 bloques en cero. La pregunta deja de ser "¿lo construimos?" y pasa a ser "¿cuándo llega, y quién es dueño del momento?".</p>
+      <div class="cap-row">
+        <div class="cap-tile"><span class="st">En definición</span><h5>PAC de desvinculación</h5><p>Liquidación en un vehículo Skandia en vez de cuenta de ahorros — beneficio tributario.</p></div>
+        <div class="cap-tile"><span class="st">MVP en aterrizaje</span><h5>Outplacement digital</h5><p>Hoy solo existe para ejecutivos senior (~2.000 USD). Se está llevando a todos los empleados.</p></div>
+        <div class="cap-tile"><span class="st">Ideación</span><h5>Índice de bienestar financiero</h5><p>Primer índice del empleado colombiano — marco y datos sectoriales para medir.</p></div>
+        <div class="cap-tile"><span class="st">En refinamiento</span><h5>Motor editorial sectorial</h5><p>Newsletter con datos reales por sector, ya construido, reusable para comunidad.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · JOURNEY -->
+  <section class="slide" data-title="El journey completo">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">05</span> De onboarding a embajador</div>
+      <h2 class="slide-title">La relación no debería empezar en la salida</h2>
+      <p class="lede">Sin un primer contacto financiero desde el día 1, la oferta del momento 5 se lee como venta oportunista.</p>
+      <div class="timeline">
+        <div class="tl-step"><div class="tl-dot">1</div><h5>Ingreso</h5><p>Onboarding estándar</p></div>
+        <div class="tl-step"><div class="tl-dot">2</div><h5>Onboarding financiero</h5><p>Diagnóstico + plan con un FP</p></div>
+        <div class="tl-step"><div class="tl-dot">3</div><h5>Colaborador activo</h5><p>Auditoría financiera anual</p></div>
+        <div class="tl-step"><div class="tl-dot">4</div><h5>Retiro</h5><p>Ruta por tipo de salida + eNPS</p></div>
+        <div class="tl-step"><div class="tl-dot">5</div><h5>Siempre Skandia</h5><p>Reconocimiento + comunidad</p></div>
+        <div class="tl-step future"><div class="tl-dot">6</div><h5>Cliente</h5><p>Continuidad coherente</p></div>
+        <div class="tl-step future"><div class="tl-dot">7</div><h5>Embajador</h5><p>Referidos, Boomerang Talent</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · TRES RUTAS -->
+  <section class="slide" data-title="Tres rutas, no ocho">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">06</span> Diferenciación por tipo de salida</div>
+      <h2 class="slide-title">3 rutas emocionales, no 8 flujos administrativos</h2>
+      <p class="lede">El mismo principio que ya usa un seguro real del mercado colombiano (Bolívar): agrupar por elegibilidad, no diseñar un flujo por cada causal.</p>
+      <div class="route-cards">
+        <div class="route-card">
+          <div class="tag">Ruta 1</div>
+          <h4>Salida elegida</h4>
+          <p>Renuncia voluntaria, mutuo acuerdo.</p>
+          <p><strong>Tono:</strong> celebratorio pleno — reconocimiento, video, comunidad.</p>
+        </div>
+        <div class="route-card r2">
+          <div class="tag">Ruta 2</div>
+          <h4>Salida no elegida</h4>
+          <p>Sin justa causa, justa causa, terminación de contrato, período de prueba.</p>
+          <p><strong>Tono:</strong> velocidad y utilidad inmediata primero; reconocimiento sobrio.</p>
+        </div>
+        <div class="route-card r3">
+          <div class="tag">Ruta 3</div>
+          <h4>Cierre de ciclo</h4>
+          <p>Terminación por pensión, fallecimiento.</p>
+          <p><strong>Tono:</strong> acompañamiento patrimonial/sucesoral. Territorio propio de Skandia.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · DOS VENTANAS -->
+  <section class="slide" data-title="Dos ventanas">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">07</span> Tensión de diseño</div>
+      <h2 class="slide-title">Dos ventanas de contacto, no una</h2>
+      <p class="lede">El proceso completo hasta el pago toma hasta 10 días. Perder esa ventana pierde, sin recuperación, el beneficio tributario del PAC de desvinculación.</p>
+      <div class="window-row">
+        <div class="window-card w1">
+          <div class="wnum">0–10</div>
+          <div class="wdays">Ventana 1 · Pre-pago</div>
+          <p>Única ventana viable para el PAC. Cae en los días emocionalmente más crudos del proceso, sobre todo en Ruta 2. <strong>Si se pierde: no es recuperable</strong> — la próxima liquidación es la única otra oportunidad.</p>
+        </div>
+        <div class="window-card w2">
+          <div class="wnum">15–45</div>
+          <div class="wdays">Ventana 2 · Post-pago</div>
+          <p>Cesantías, plan financiero, comunidad, empleabilidad. Si se pierde, se recupera más adelante — solo pierde fuerza.</p>
+        </div>
+      </div>
+      <div class="win-timeline">
+        <div class="win-track">
+          <div class="win-seg w1" style="width:22.2%;">Ventana 1</div>
+          <div class="win-seg gap" style="width:11.1%;">·</div>
+          <div class="win-seg w2" style="width:66.7%;">Ventana 2</div>
+        </div>
+        <div class="win-ticks">
+          <span style="width:22.2%;">0–10 días</span>
+          <span style="width:11.1%; text-align:center;">10–15</span>
+          <span style="width:66.7%; text-align:right;">15–45 días</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · TERRITORIOS OVERVIEW -->
+  <section class="slide" data-title="La propuesta">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">08 · La propuesta</span> Tres territorios de acción</div>
+      <h2 class="slide-title">No son prototipos — son focos para elegir</h2>
+      <div class="terr-grid">
+        <div class="terr-card">
+          <div class="terr-badge">A</div>
+          <h4>Escuchar y medir</h4>
+          <p>Rediseñar el instrumento de feedback: de 26 preguntas de clima laboral a 9 con eNPS de salida. Base sin la cual nada más puede probarse.</p>
+          <div class="terr-meta"><span class="pill impact">Alto impacto</span><span class="pill effort-bajo">Bajo esfuerzo</span></div>
+        </div>
+        <div class="terr-card">
+          <div class="terr-badge">B</div>
+          <h4>Acompañar la transición financiera</h4>
+          <p>Diseñar el contacto en las dos ventanas, sobre productos que B2Link ya está construyendo. Mayor diferenciación frente al mercado.</p>
+          <div class="terr-meta"><span class="pill impact">Alto impacto</span><span class="pill effort-medio">Esfuerzo medio</span></div>
+        </div>
+        <div class="terr-card">
+          <div class="terr-badge">C</div>
+          <h4>Construir comunidad sostenible</h4>
+          <p>Modelo de comunidad de ex colaboradores, reutilizando el motor editorial que B2Link ya construyó.</p>
+          <div class="terr-meta"><span class="pill impact">Alto impacto</span><span class="pill effort-alto">Esfuerzo alto</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · TERRITORIO B EN DETALLE -->
+  <section class="slide dark" data-title="Territorio B en detalle">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">09</span> Territorio B — el de mayor diferenciación</div>
+      <h2 class="slide-title">De "diseñar desde cero" a "diseñar sobre lo que ya se construye"</h2>
+      <p class="lede">Baja el riesgo de construir un producto financiero desde cero. Sube la dependencia de un calendario que Siempre Skandia no controla.</p>
+      <div class="flow-row">
+        <div class="flow-step"><span class="k">Ruta 2 · Ventana 1</span><h5>Utilidad primero</h5><p>Acceso al outplacement digital como primer contacto — nunca una oferta comercial de entrada.</p></div>
+        <div class="flow-step"><span class="k">Mismo contacto</span><h5>PAC como protección</h5><p>Se presenta como proteger el dinero que la persona ya ganó, no como venderle algo nuevo.</p></div>
+        <div class="flow-step"><span class="k">Ventana 2</span><h5>Continuidad</h5><p>Orientación financiera abierta, fondo de emergencia como producto de relación a futuro.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · RIESGOS -->
+  <section class="slide" data-title="Riesgos a gestionar">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">10</span> Antes de avanzar</div>
+      <h2 class="slide-title">Cuatro riesgos que abre esta conexión</h2>
+      <div class="risk-grid">
+        <div class="risk-tile"><h5>1 · Calendario ajeno</h5><p>B2Link es un proyecto de todo el año, sin fechas comprometidas.</p><div class="m">→ Cada momento del journey funciona con y sin esa capacidad disponible.</div></div>
+        <div class="risk-tile"><h5>2 · Venta oportunista</h5><p>El riesgo se concentra en la Ventana 1, el momento más frágil de Ruta 2.</p><div class="m">→ Utilidad primero, PAC como protección — nunca como oferta de entrada.</div></div>
+        <div class="risk-tile"><h5>3 · Sesgo de testeo interno</h5><p>Validar solo con empleados de Skandia genera adopción forzada, no elección real.</p><div class="m">→ Lo interno es ensayo operativo, no validación de valor.</div></div>
+        <div class="risk-tile"><h5>4 · Rol doble de Skandia</h5><p>Empleador y proveedor financiero de la misma persona, a la vez.</p><div class="m">→ A Gestión Humana solo dato agregado; el perfil individual queda con la persona y su FP.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · LO QUE PEDIMOS -->
+  <section class="slide dark" data-title="Lo que pedimos hoy">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">11</span> Decisión de hoy</div>
+      <h2 class="slide-title">Lo que pedimos a los stakeholders</h2>
+      <ul class="ask-list">
+        <li><span class="ask-num">1</span> Elegir uno o más de los tres territorios — o Territorio A en paralelo con otro.</li>
+        <li><span class="ask-num">2</span> Definir quién es dueño del momento de retiro cuando se cruzan Gestión Humana y el equipo comercial del PAC.</li>
+        <li><span class="ask-num">3</span> Decidir si el calendario de noviembre espera al PAC y al outplacement, o avanza independiente de ellos.</li>
+        <li><span class="ask-num">4</span> Acotar qué ve Gestión Humana del perfil financiero de un colaborador.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 13 · CIERRE -->
+  <section class="slide dark cover" data-title="Cierre">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="step">Insumo 1 de 2</span> Próximos pasos</div>
+      <h2 class="slide-title">Este es un primer insumo, no una decisión cerrada</h2>
+      <p class="lede">El benchmark completo, las 7 fichas de referentes, la auditoría de la encuesta actual y el detalle de cada territorio están en el documento de respaldo.</p>
+      <a class="doc-link" href="documento.html">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+        <span><span class="tt">Abrir el informe completo →</span><br><span class="ds">Benchmark, matrices, fichas de referentes y fuentes</span></span>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<div class="nav-ui">
+  <div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+  <button class="nav-btn" id="btnPrev" aria-label="Anterior" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="nav-btn" id="btnNext" aria-label="Siguiente">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+  <div class="slide-counter"><b id="curNum">01</b> / <span id="totNum">13</span></div>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let idx = 0;
+
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const curNum = document.getElementById('curNum');
+  const totNum = document.getElementById('totNum');
+  const progressFill = document.getElementById('progressFill');
+  totNum.textContent = String(total).padStart(2,'0');
+
+  function render(){
+    slides.forEach((s,i) => {
+      s.classList.toggle('active', i === idx);
+      s.classList.toggle('prev', i < idx);
+    });
+    curNum.textContent = String(idx+1).padStart(2,'0');
+    progressFill.style.width = ((idx+1)/total*100) + '%';
+    btnPrev.disabled = idx === 0;
+    btnNext.disabled = idx === total-1;
+  }
+
+  function next(){ if(idx < total-1){ idx++; render(); } }
+  function prev(){ if(idx > 0){ idx--; render(); } }
+
+  btnNext.addEventListener('click', next);
+  btnPrev.addEventListener('click', prev);
+
+  window.addEventListener('keydown', (e) => {
+    if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); next(); }
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+    else if(e.key === 'Home'){ idx = 0; render(); }
+    else if(e.key === 'End'){ idx = total-1; render(); }
+  });
+
+  // swipe táctil
+  let touchX = null;
+  document.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    if(touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if(dx < -40) next(); else if(dx > 40) prev();
+    touchX = null;
+  });
+
+  render();
+</script>
+</body>
+</html>
