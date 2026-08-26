@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menú App · La recomendación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde:#00c73d; --lima:#8fe000; --verde-osc:#007c26;
+    --texto:#232323; --texto-2:#404040; --gris:#666; --gris-3:#8c8c8c;
+    --linea:#e6e6e6; --fondo:#f2f3f4; --azul:#3f6fd8;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--fondo);font-family:'Open Sans',sans-serif;color:var(--texto);-webkit-font-smoothing:antialiased;line-height:1.45}
+
+  .slide{min-height:100vh;display:flex;align-items:center;padding:72px 26px;border-bottom:1px solid var(--linea)}
+  .in{max-width:900px;margin:0 auto;width:100%}
+  .slide.oscura{background:linear-gradient(135deg,#0f2417,#1b4a2a 55%,#0d7a33);color:#fff;border-bottom:0}
+  .slide.clara{background:#fff}
+
+  .num{font-family:'Montserrat';font-weight:700;font-size:12px;letter-spacing:2px;color:var(--verde);margin:0 0 20px}
+  .oscura .num{color:var(--lima)}
+  h1{font-family:'Montserrat';font-weight:800;font-size:clamp(34px,6vw,60px);line-height:1.05;letter-spacing:-1px;margin:0 0 20px}
+  h2{font-family:'Montserrat';font-weight:800;font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.6px;margin:0 0 24px}
+  .bajada{font-size:clamp(16px,2vw,20px);color:#d9f2e0;max-width:660px;margin:0}
+  .clara .bajada, .slide:not(.oscura) .bajada{color:var(--gris)}
+
+  .meta{display:flex;flex-wrap:wrap;gap:30px;margin-top:44px;padding-top:24px;border-top:1px solid rgba(255,255,255,.2)}
+  .meta div{font-size:13px;color:#9fd6b2}
+  .meta b{display:block;font-family:'Montserrat';font-weight:700;font-size:20px;color:#fff}
+
+  .puntos{display:flex;flex-direction:column;gap:22px;margin:0;padding:0;list-style:none}
+  .puntos li{display:flex;gap:18px;align-items:flex-start}
+  .puntos .i{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--verde);color:#fff;font-family:'Montserrat';font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .puntos h3{font-family:'Montserrat';font-weight:700;font-size:19px;margin:0 0 4px}
+  .puntos p{margin:0;font-size:15.5px;color:var(--gris)}
+
+  table{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
+  th,td{padding:14px 12px;text-align:left;border-bottom:1px solid var(--linea);vertical-align:top}
+  th{font-family:'Montserrat';font-weight:700;font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--gris)}
+  td.voto{font-family:'Montserrat';font-weight:800;font-size:17px;width:76px}
+  .vC{color:#b8860b} .vB{color:var(--verde-osc)} .vA{color:var(--azul)} .vN{color:var(--gris-3)}
+  td small{display:block;color:var(--gris-3);font-size:12.5px;margin-top:3px}
+
+  blockquote{margin:26px 0 0;font-family:'Montserrat';font-weight:600;font-size:clamp(18px,2.4vw,24px);line-height:1.35;color:var(--texto);border-left:4px solid var(--verde);padding-left:20px}
+  blockquote cite{display:block;margin-top:10px;font-family:'Open Sans';font-style:normal;font-weight:400;font-size:13.5px;color:var(--gris-3)}
+  .oscura blockquote{color:#fff;border-left-color:var(--lima)}
+  .oscura blockquote cite{color:#9fd6b2}
+
+  .contraste{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:8px}
+  .contraste > div{background:var(--fondo);border-radius:16px;padding:22px}
+  .clara .contraste > div{background:var(--fondo)}
+  .contraste h3{font-family:'Montserrat';font-weight:700;font-size:16px;margin:0 0 8px}
+  .contraste p{margin:0;font-size:14.5px;color:var(--gris)}
+  .contraste .eti{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:100px;margin-bottom:10px}
+  .eti.a{background:#e8eefb;color:var(--azul)} .eti.c{background:#fdf6e3;color:#8a6d1a}
+
+  .cierre{font-family:'Montserrat';font-weight:800;font-size:clamp(22px,3.4vw,32px);line-height:1.25;letter-spacing:-.4px;margin-top:34px}
+  .nota{margin-top:26px;font-size:14px;color:var(--gris);border-left:3px solid var(--gris-3);padding-left:16px;max-width:660px}
+  .oscura .nota{color:#bfe6cd;border-left-color:#9fd6b2}
+
+  footer{padding:40px 26px 60px;text-align:center;font-size:13px;color:var(--gris-3)}
+  footer a{color:#0099de;text-decoration:none}
+  footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<section class="slide oscura">
+  <div class="in">
+    <p class="num">MENÚ APP · GESTIÓN DE PORTAFOLIOS</p>
+    <h1>La recomendación:<br>Versión C</h1>
+    <p class="bajada">Una sola puerta en el menú, nombrada por lo que contiene. Es la única de las tres a la que nadie le encontró una desventaja: ninguna de las diez personas dijo que le quitara algo, y para todas es primera o segunda opción.</p>
+    <div class="meta">
+      <div><b>7</b> rondas</div>
+      <div><b>10</b> personas</div>
+      <div><b>2</b> segmentos</div>
+      <div><b>3</b> arquitecturas</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide clara">
+  <div class="in">
+    <p class="num">01</p>
+    <h2>C no le quita nada a nadie</h2>
+    <table>
+      <thead><tr><th>Quién</th><th>Voto</th><th>Qué dijo</th></tr></thead>
+      <tbody>
+        <tr><td>Financial Explorer<small>4 de 5 personas</small></td><td class="voto vC">C</td><td>Gana la ronda con el nombre descriptivo</td></tr>
+        <tr><td>Roberto<small>10 años cliente</small></td><td class="voto vB">B</td><td>“Es casi un empate y ustedes deberían leerlo así”</td></tr>
+        <tr><td>Capital Investor<small>mono-canal</small></td><td class="voto vB">B</td><td>“A mí no me cuesta nada acompañar ese cambio”</td></tr>
+        <tr><td>Capital Investor<small>dual-canal</small></td><td class="voto vA">A</td><td>Ordenan <b>A &gt; C &gt; B</b>: C les resuelve el nombre, no el mapa</td></tr>
+      </tbody>
+    </table>
+    <p class="bajada" style="margin-top:26px">Los dos votos por B fueron “casi un empate” e inercia de haberla probado primero — ninguno señaló una desventaja de C. <b>A solo gana donde se usan los dos canales.</b></p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="in">
+    <p class="num">02</p>
+    <h2>Tres razones</h2>
+    <ul class="puntos">
+      <li><span class="i">1</span><div>
+        <h3>La arquitectura ya estaba decidida</h3>
+        <p>Una puerta le gana a dos en cinco rondas y en los dos segmentos. Las únicas veces que A ganó fue cuando tenía contenido que B no tenía — al igualar el inventario, los tres votos volvieron.</p>
+      </div></li>
+      <li><span class="i">2</span><div>
+        <h3>Renombrar la fila salió gratis, y quedó probado</h3>
+        <p>Esa era la duda que justificaba la C: ¿B ganaba por la puerta única o porque “Servicios” ya estaba aprendido? Cuatro de cinco se corrigieron solos. Si la mejora no cuesta, no hay razón para no tomarla.</p>
+      </div></li>
+      <li><span class="i">3</span><div>
+        <h3>A no puede ser la elección global</h3>
+        <p>Su beneficio solo lo cobra quien usa los dos canales. Su costo lo paga todo el mundo, en cada visita.</p>
+      </div></li>
+    </ul>
+    <blockquote>Ochenta por ciento arquitectura, veinte por ciento la palabra. Y ese veinte tampoco es mi memoria: lo que uno se aprende en diez años no es una palabra, es un camino.<cite>Roberto · el testimonio que más pesaba sobre la costumbre</cite></blockquote>
+  </div>
+</section>
+
+<section class="slide clara">
+  <div class="in">
+    <p class="num">03</p>
+    <h2>Por qué C sobre A<br>si solo usas la app</h2>
+    <div class="contraste">
+      <div>
+        <span class="eti a">Versión A</span>
+        <h3>Cobra una decisión antes de mostrar nada</h3>
+        <p>Sin el mapa del portal en la cabeza, “Transacciones” e “Inversiones” no son dos categorías: son dos sinónimos de “mi plata”. Y en móvil el menú es modal — equivocarse cuesta devolverse un nivel entero.</p>
+      </div>
+      <div>
+        <span class="eti a">Versión A</span>
+        <h3>Y no devuelve nada a cambio</h3>
+        <p>Su única ventaja es parecerse al portal. Quien no lo abre no tiene de dónde transferir.</p>
+      </div>
+      <div>
+        <span class="eti c">Versión C</span>
+        <h3>Previene el error que las otras dos no ven</h3>
+        <p>No es equivocarse de rama: es <b>no entrar</b>. Para quien abre la app cada dos meses, ese es el modo de falla dominante — y solo C nombra la puerta por lo que el usuario viene a hacer.</p>
+      </div>
+    </div>
+    <blockquote>Yo no me equivoco de camino, yo me salgo. Ese fallo no se mide en toques equivocados, se mide en sesiones abandonadas.<cite>Andrés · cuatro años sin abrir la app</cite></blockquote>
+    <p class="cierre">A ordena por cómo Skandia guarda las cosas.<br>C ordena por lo que el cliente viene a hacer.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="in">
+    <p class="num">04</p>
+    <h2>Tres condiciones antes de lanzarla</h2>
+    <ul class="puntos">
+      <li><span class="i">1</span><div>
+        <h3>Cerrar Aportes y Documentos primero</h3>
+        <p>La etiqueta descriptiva sube la expectativa: dos personas entraron a “trámites” buscando aportar y buscando su certificado, y ninguno estaba. Con “Servicios” esos huecos pasaban desapercibidos; con C quedan expuestos.</p>
+      </div></li>
+      <li><span class="i">2</span><div>
+        <h3>Cerrar el texto exacto de la fila</h3>
+        <p>“Consulta y trámites” nombra la fila enumerando sus bloques, y eso no escala — el título no cupo sin encogerse. Un nombre-concepto aguanta un tercer bloque sin renegociarse.</p>
+      </div></li>
+      <li><span class="i">3</span><div>
+        <h3>Sincronizar con asesores y call center</h3>
+        <p>El costo de renombrar no lo paga el usuario en la app: lo paga en la llamada. “Servicios” es la palabra que el canal humano lleva años usando.</p>
+      </div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide oscura">
+  <div class="in">
+    <p class="num">05</p>
+    <h2>Lo que C no resuelve</h2>
+    <p class="bajada">Los dual-canal —Privilegio y Elite Wealth, donde está el 31% del AUM— no se mueven. C les resolvió la palabra, no el mapa.</p>
+    <blockquote>Compró la mitad del problema y me está cobrando como si hubiera comprado todo.<cite>Ricardo · Elite Wealth</cite></blockquote>
+    <p class="cierre" style="color:#fff">No piden dos puertas.<br>Piden el mismo mapa.</p>
+    <p class="nota"><b>Inferencia mía, no hallazgo del panel:</b> si la convergencia se hiciera al revés —que el portal adopte la estructura de la app, en vez de la app copiar la del portal— existiría la transferencia entre canales y desaparecería el costo de la doble puerta en móvil. Es una decisión más cara y excede este prototipo, pero es la única salida que le da a los dual-canal lo que piden sin cobrárselo a la mayoría.</p>
+  </div>
+</section>
+
+<footer>
+  Menú App · agosto 2026 · Val<br>
+  <a href="../v1/">Informe completo de las pruebas</a> · <a href="../p1/">Prototipo navegable</a><br><br>
+  Los paneles son agentes que simulan personas de la Segmentación Skandia 2026, no usuarios reales: priorizan qué llevar a validación, no la reemplazan.
+</footer>
+
+</body>
+</html>
