@@ -1029,14 +1029,22 @@ body{padding-bottom:88px}
 .mgrupo:first-child{margin-top:8px}
 .mgrupo .n{margin-left:auto;font-weight:400}
 
-/* Cifras de cabecera. Sin la dona, las tres reparten el ancho completo. */
-.mres{display:flex;margin-top:12px;padding:12px 0 14px;gap:8px;
-  border-top:1px solid var(--n03);border-bottom:1px solid var(--n03)}
-.mres > div{flex:1;min-width:0;text-align:center}
-.mres > div + div{border-left:1px solid var(--n03)}
+/* Contraste perfil→composición y rendimiento, apilados: en 311 px las dos
+   celdas no caben lado a lado sin partir «Prudente → Conservador». */
+.mres{margin-top:12px;border-top:1px solid var(--n03);border-bottom:1px solid var(--n03)}
+.mres .mvs{padding:11px 0}
+.mres .rt{padding:11px 0;border-top:1px solid var(--n03);display:flex;
+  align-items:baseline;justify-content:space-between;gap:10px}
 .mres .k{display:block;font:400 12px/16px var(--os);color:var(--gris-txt)}
-.mres .v{display:block;font:700 14px/20px var(--mont);color:var(--grey);margin-top:3px}
-.mres .v.alerta{color:#8A5A00}
+.mres .rt .k{display:inline}
+.mres .duo{display:flex;align-items:center;gap:10px;margin-top:6px}
+.mres .v{display:inline-flex;align-items:center;gap:6px;
+  font:700 14px/20px var(--mont);color:var(--grey)}
+.mres .v .ri{width:15px;height:15px;flex:0 0 15px;background-size:contain;
+  background-repeat:no-repeat;background-position:center}
+.mres .fl{font:400 15px/20px var(--os);color:var(--gris-txt)}
+.mres .fl.dif{color:var(--link-oscuro);font-weight:700}
+.mres .rt .v{font:700 14px/20px var(--mont)}
 
 /* atajos */
 
@@ -3531,6 +3539,8 @@ function mobActualRender(){
   const tot = ACTUAL.reduce((a, r) => a + r.pct, 0);
   document.getElementById('mobPagAct').innerHTML =
     mobChip('actual') +
+    /* El mismo bloque que en la nueva: es lo que permite compararlas. */
+    mobVs(ACTUAL, false) +
     '<div class="mcard-d">Disponible: <b>' + money(DISPONIBLE) + '</b></div>' +
     '<div class="mlist">' + ACTUAL.map(r =>
       '<div class="mrow">' + riesgoIcon(r.riesgo) +
@@ -3567,18 +3577,8 @@ function mobNuevaRender(){
   box.innerHTML =
     mobChip('nueva') +
     /* Dona + cifras: sin esto se elige a ciegas. */
-    '<div class="mres">' +
-      '<div><span class="k">Portafolios</span><span class="v">' + sel.length + '</span></div>' +
-      '<div><span class="k">Rentabilidad est.</span><span class="v">' +
-        (sel.length ? rentaPonderada(state.nueva).toFixed(1).replace('.', ',') + '% E.A.' : '—') +
-      '</span></div>' +
-      '<div><span class="k">Perfil</span><span class="v' + (dv.hay ? ' alerta' : '') + '">' +
-        (sel.length ? (BANDA[pm] ? BANDA[pm].label : pm) : '—') + '</span></div>' +
-    '</div>' +
+    mobVs(state.nueva, dv.hay) +
     aviso +
-    /* Aviso de perfil aquí y no solo en el resumen: enterarse al final de
-       que la composición se sale del perfil obliga a rehacer el trabajo. */
-    (dv.hay ? mobAviso('warn', mobTextoDesvio(dv)) : '') +
     '<div class="mtools">' +
       '<button class="ic-only" onclick="mobBuscarTgl()" aria-label="Buscar">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -3635,6 +3635,28 @@ function mobTendencia(){
   if (mobEstado.tendencia)
     pintarTendencia(document.getElementById('mobGraf'), {W:326, H:190});
   log('tendencia', mobEstado.tendencia ? 'visible' : 'plegada');
+}
+
+/* Mismo contraste que la franja de escritorio: el cliente es Prudente y el
+   producto Conservador, cada lado con el nombre de SU escala. La flecha
+   cambia de color cuando la composición se sale del perfil — ese es el aviso
+   de desviación, en lugar de la alerta amarilla. Se muestra igual en las dos
+   composiciones para poder compararlas. */
+function mobVs(rows, desviado){
+  const pc = PERFIL_EQUIV[PERFIL], pm = perfilMezcla(rows);
+  const hay = rows.some(r => r.pct > 0);
+  return '<div class="mres">' +
+    '<div class="mvs"><span class="k">Tu perfil → tu composición</span>' +
+      '<span class="duo">' +
+        '<span class="v">' + riesgoIcon(pc) + PERFIL + '</span>' +
+        '<span class="fl' + (desviado ? ' dif' : '') + '">→</span>' +
+        '<span class="v">' + (hay && pm ? riesgoIcon(pm) + BANDA[pm].label
+          : '<span class="ri ri-none"></span>—') + '</span>' +
+      '</span></div>' +
+    '<div class="rt"><span class="k">Rendimiento 12m</span>' +
+      '<span class="v">' + (hay ? rentaPonderada(rows).toFixed(1).replace('.', ',') +
+        '% E.A.' : '—') + '</span></div>' +
+  '</div>';
 }
 
 function mobAviso(tipo, html){
