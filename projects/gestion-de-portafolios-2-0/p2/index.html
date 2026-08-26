@@ -823,17 +823,18 @@ body{padding-bottom:88px}
 .mmode span{flex:1}
 .mmode svg{width:16px;height:16px;color:var(--green);flex:0 0 16px}
 
-/* — chip que alterna entre las dos composiciones —
-   Sustituye al carrusel de puntos: el swipe no se anunciaba y la página de
-   trabajo quedaba detrás de un gesto que hay que descubrir. El chip dice
-   qué se está viendo y, al tocarlo, lleva a la otra. */
-.mswap{display:inline-flex;align-items:center;gap:9px;min-height:44px;
-  padding:8px 14px 8px 16px;border:1px solid var(--green);border-radius:100px;
-  background:#F6FCF2;cursor:pointer;
-  font:700 15px/21px var(--mont);color:var(--green-txt)}
-.mswap:active{background:var(--primary-l04, #CAF9CB)}
-.mswap:focus-visible{outline:2px solid var(--green-txt);outline-offset:2px}
-.mswap svg{width:16px;height:16px;flex:0 0 16px;color:var(--green)}
+/* — segmentado de composiciones —
+   El activo lleva --estilos-degrade, el degradado verde→lima de la marca.
+   El rótulo inactivo va en --texts-medium y no en el gris claro del mockup:
+   #A5A5A5 sobre el fondo da 2,4:1 y es un control, no texto decorativo. */
+.mswap{display:flex;background:#F7F7F7;border-radius:100px;padding:4px;gap:2px}
+.mswap button{flex:1;min-height:40px;border:0;border-radius:100px;background:0;
+  cursor:pointer;font:700 15px/21px var(--mont);color:var(--gris-txt);
+  padding:6px 10px;transition:color .15s}
+.mswap button.on{background:linear-gradient(135deg, var(--green), var(--green-sec));
+  color:#fff;cursor:default}
+.mswap button:not(.on):hover{color:var(--green-txt)}
+.mswap button:focus-visible{outline:2px solid var(--green-txt);outline-offset:2px}
 
 .mcard{background:#fff;border:1px solid var(--n03);border-radius:16px;padding:16px}
 .mcard.gris{background:#FAFAFA}
@@ -1012,7 +1013,10 @@ body{padding-bottom:88px}
    4 · Vuelve la dona, con rentabilidad y perfil, que la alineación con
        Figma se habia llevado.
    ─────────────────────────────────────────────────────────────────── */
-.mlist.libre{max-height:none;overflow:visible;padding-right:0}
+/* La lista vuelve a topar: sin tope, 20 filas de ~69 px empujaban la
+   tendencia casi 1400 px hacia abajo y dejaba de encontrarse. Con «Tu
+   selección» arriba, el scroll interno ya no esconde lo que importa. */
+.mlist.libre{max-height:348px;overflow-y:auto;padding-right:10px}
 
 .mgrupo{display:flex;align-items:center;gap:7px;margin:16px 0 2px;
   font:700 12px/16px var(--os);color:var(--gris-txt)}
@@ -1055,6 +1059,25 @@ body{padding-bottom:88px}
   min-height:40px;white-space:nowrap}
 .mmz .add[disabled]{color:var(--gris-txt);opacity:.5;cursor:not-allowed}
 
+
+/* — tendencia plegable —
+   El ojo va en el verde de marca; el rótulo en --green-txt, porque #00C73D
+   sobre blanco da 2,27:1 y como texto de 14 px no se leería. */
+.macor{border-top:1px solid var(--n03);margin-top:6px}
+.macor-h{width:100%;border:0;background:0;padding:14px 0 12px;display:flex;
+  align-items:center;gap:9px;cursor:pointer;min-height:48px}
+.macor-h .ojo{width:17px;height:17px;flex:0 0 17px;color:var(--green)}
+.macor-h .t{flex:1;text-align:left;font:700 14px/19px var(--mont);color:var(--green-txt)}
+.macor-h .ch{width:14px;height:14px;flex:0 0 14px;color:var(--green);transition:transform .2s}
+.macor.on .macor-h .ch{transform:rotate(180deg)}
+.macor-c{display:none;padding-bottom:6px}
+.macor.on .macor-c{display:block}
+/* La cabecera de la gráfica está pensada para 840 px: en 326 hay que
+   apilarla, o el título queda en una columna de 122 px. */
+#mobGraf .cmp-head{display:block}
+#mobGraf .cmp-head .cap{margin-bottom:9px}
+#mobGraf .cmp-per{width:100%}
+#mobGraf .cmp-per select{width:100%;min-height:40px}
 
 /* — pie — */
 .mfoot{flex:0 0 auto;padding:12px 16px 22px;background:#fff;border-top:1px solid var(--n03)}
@@ -3401,7 +3424,8 @@ document.querySelectorAll('.screen .content').forEach(c => _obs.observe(c));
    ═══════════════════════════════════════════════════════════════════ */
 /* Arranca en la página 2 (nueva composición): es donde está la tarea.
    La composición actual queda a un swipe, como referencia. */
-let mobEstado = {pantalla:1, pagina:'nueva', busca:'', filtro:null, buscando:false};
+let mobEstado = {pantalla:1, pagina:'nueva', busca:'', filtro:null, buscando:false,
+                 tendencia:false};
 
 function setDevice(d){
   document.getElementById('mobWrap').classList.toggle('on', d === 'mob');
@@ -3464,17 +3488,16 @@ function mobFiltro(b){
 }
 
 
-/* El título es un chip que alterna entre las dos composiciones. Sustituye
-   al carrusel de puntos: el swipe no se anunciaba y la página de trabajo
-   quedaba escondida detrás de un gesto. */
+/* Segmentado de dos posiciones, con el degradado de marca en el activo.
+   Sustituye al carrusel de puntos: el swipe no se anunciaba y la vista de
+   trabajo quedaba detrás de un gesto que hay que descubrir. Aquí las dos
+   opciones están a la vista y se ve cuál está activa. */
 function mobChip(vista){
-  const otra = vista === 'nueva' ? 'actual' : 'nueva';
-  return '<button class="mswap" onclick="mobPag(\'' + otra + '\')" ' +
-    'aria-label="Cambiar a ' + (otra === 'nueva' ? 'nueva composición' : 'composición actual') + '">' +
-    '<span>' + (vista === 'nueva' ? 'Nueva composición' : 'Composición actual') + '</span>' +
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
-    'stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4-4 4"/><path d="M21 7H3"/>' +
-    '<path d="M7 21l-4-4 4-4"/><path d="M3 17h18"/></svg></button>';
+  const op = (k, txt) => '<button class="' + (vista === k ? 'on' : '') + '"' +
+    (vista === k ? ' aria-current="true"' : ' onclick="mobPag(\'' + k + '\')"') +
+    '>' + txt + '</button>';
+  return '<div class="mswap" role="group" aria-label="Composición que se muestra">' +
+    op('actual', 'Actual') + op('nueva', 'Nueva') + '</div>';
 }
 
 function mobRender(){
@@ -3534,7 +3557,6 @@ function mobNuevaRender(){
       '<div><span class="k">Perfil</span><span class="v' + (dv.hay ? ' alerta' : '') + '">' +
         (sel.length ? (BANDA[pm] ? BANDA[pm].label : pm) : '—') + '</span></div>' +
     '</div>' +
-    mobMezclasHTML() +
     '<div class="mtools">' +
       '<button class="ic-only" onclick="mobBuscarTgl()" aria-label="Buscar">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -3552,6 +3574,7 @@ function mobNuevaRender(){
       ORDEN_BANDA.map(b => '<button class="' + (f === b ? 'on' : '') + '" ' +
         'onclick="mobFiltro(\'' + b + '\')">' + BANDA[b].label + '</button>').join('') +
     '</div>' +
+    mobMezclasHTML() +
     aviso +
     /* Aviso de perfil aquí y no solo en el resumen: enterarse al final de
        que la composición se sale del perfil obliga a rehacer el trabajo. */
@@ -3567,8 +3590,33 @@ function mobNuevaRender(){
       (!filas.length ? '<div class="mpie" style="padding:22px 0">Nada coincide con la ' +
         'búsqueda.</div>' : '') +
     '</div>' +
+    mobTendenciaHTML() +
     '<div class="mpie">Cuando sume <b>100%</b>, podrás avanzar.</div>';
 
+}
+
+/* Tendencia plegable. Va debajo de la lista, que está topada para que no
+   quede fuera de alcance. */
+function mobTendenciaHTML(){
+  return '<div class="macor' + (mobEstado.tendencia ? ' on' : '') + '" id="mobAcor">' +
+    '<button class="macor-h" onclick="mobTendencia()" aria-expanded="' +
+      (mobEstado.tendencia ? 'true' : 'false') + '" aria-controls="mobGraf">' +
+      '<svg class="ojo" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/>' +
+        '<circle cx="12" cy="12" r="3"/></svg>' +
+      '<span class="t">' + (mobEstado.tendencia ? 'Ocultar' : 'Ver') + ' tendencia</span>' +
+      '<svg class="ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+      'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M6 9l6 6 6-6"/></svg></button>' +
+    '<div class="macor-c"><div id="mobGraf"></div></div></div>';
+}
+function mobTendencia(){
+  mobEstado.tendencia = !mobEstado.tendencia;
+  mobNuevaRender();
+  if (mobEstado.tendencia)
+    pintarTendencia(document.getElementById('mobGraf'), {W:326, H:190});
+  log('tendencia', mobEstado.tendencia ? 'visible' : 'plegada');
 }
 
 function mobAviso(tipo, html){
