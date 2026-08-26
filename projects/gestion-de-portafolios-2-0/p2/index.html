@@ -455,11 +455,7 @@ img{display:block}
 .vs-cta .graf-chev{width:13px;height:13px;flex:0 0 13px;transition:transform .18s;
   filter:brightness(0) saturate(100%) invert(38%) sepia(84%) saturate(1352%) hue-rotate(115deg)}
 .vs-cta.plegado .graf-chev{transform:rotate(180deg)}
-/* Enlace al comparador completo, dentro de la propia gráfica */
-.cmp-mas{display:block;margin:0 0 8px auto;background:none;border:0;padding:0;
-  cursor:pointer;font:700 11px/16px var(--os);color:var(--green-acc);
-  text-decoration:underline}
-.cmp-mas:hover{color:#00631E}
+
 /* Plegada: la tarjeta encoge y, como la lista de Composición actual es el
    bloque elástico con flex-basis 0, la pareja se reajusta sola y las dos
    siguen midiendo lo mismo. */
@@ -632,6 +628,7 @@ body{padding-bottom:88px}
 
 /* ── MEJORA 5 · Mezclas guardadas como chips (una sola fila) ── */
 .mz-row-wrap{display:flex;align-items:center;gap:10px;margin-top:14px}
+.mz.add.off{opacity:.4;cursor:not-allowed}
 .mz-lbl{color:var(--grey-l03);flex:0 0 auto}
 .mz-row{display:flex;gap:8px;align-items:center;overflow-x:auto;flex:1;min-width:0;
   padding:2px 0}
@@ -880,7 +877,7 @@ body{padding-bottom:88px}
              Cada chip se renombra con su lápiz. -->
         <div class="mz-row-wrap">
           <div class="mz-row" id="mzRow"></div>
-          <button class="mz add" onclick="nuevaMezcla()"
+          <button class="mz add" id="mzAdd" onclick="nuevaMezcla()"
                   title="Empezar una mezcla nueva en blanco"
                   aria-label="Empezar una mezcla nueva en blanco">+</button>
         </div>
@@ -1080,36 +1077,6 @@ body{padding-bottom:88px}
   <!-- Popup Rentabilidad histórica por portafolio (fuera de alcance) -->
   <!-- MEJORA 7 · Comparador de rentabilidad.
        El botón que lo abre ya existía en el header de Nueva composición. -->
-  <div class="ov" id="ov-rent">
-    <div class="box" style="width:940px;padding:28px 32px 30px">
-      <button class="mx" onclick="closeOv('ov-rent')"><img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjEzLjc1IiBoZWlnaHQ9IjEzLjc5MyIgdmlld0JveD0iMCAwIDEzLjc1IDEzLjc5MyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggaWQ9IlhtYXJrIiBkPSJNMTMuNDI3NyAxMi4wMDk4QzEzLjgxNDUgMTIuNDM5NSAxMy44MTQ1IDEzLjA4NCAxMy40Mjc3IDEzLjQ3MDdDMTIuOTk4IDEzLjkwMDQgMTIuMzUzNSAxMy45MDA0IDExLjk2NjggMTMuNDcwN0w2Ljg5NjQ4IDguMzU3NDJMMS43ODMyIDEzLjQ3MDdDMS4zNTM1MiAxMy45MDA0IDAuNzA4OTg0IDEzLjkwMDQgMC4zMjIyNjYgMTMuNDcwN0MtMC4xMDc0MjIgMTMuMDg0IC0wLjEwNzQyMiAxMi40Mzk1IDAuMzIyMjY2IDEyLjAwOThMNS40MzU1NSA2Ljg5NjQ4TDAuMzIyMjY2IDEuNzgzMkMtMC4xMDc0MjIgMS4zNTM1MiAtMC4xMDc0MjIgMC43MDg5ODQgMC4zMjIyNjYgMC4zMjIyNjZDMC43MDg5ODQgLTAuMTA3NDIyIDEuMzUzNTIgLTAuMTA3NDIyIDEuNzQwMjMgMC4zMjIyNjZMNi44OTY0OCA1LjQ3ODUyTDEyLjAwOTggMC4zNjUyMzRDMTIuMzk2NSAtMC4wNjQ0NTMxIDEzLjA0MSAtMC4wNjQ0NTMxIDEzLjQyNzcgMC4zNjUyMzRDMTMuODU3NCAwLjc1MTk1MyAxMy44NTc0IDEuMzk2NDggMTMuNDI3NyAxLjgyNjE3TDguMzE0NDUgNi44OTY0OEwxMy40Mjc3IDEyLjAwOThaIiBmaWxsPSIjMDBDNzNEIi8+Cjwvc3ZnPgo=" alt="Cerrar"></button>
-      <div class="cmp-head">
-        <div style="flex:1;min-width:0">
-          <div class="h3">Comparador de rentabilidad</div>
-          <div class="cap">Variación acumulada de la mezcla que estás armando, frente a la que ya tienes.</div>
-        </div>
-        <div class="cmp-per">
-          <select id="cmpPer" onchange="cmpPeriodo(this.value)" aria-label="Periodo">
-            <option value="1M">Último mes</option>
-            <option value="3M">Últimos 3 meses</option>
-            <option value="6M">Últimos 6 meses</option>
-            <option value="12M" selected>Últimos 12 meses</option>
-            <option value="3A">Últimos 3 años</option>
-            <option value="5A">Desde el inicio</option>
-          </select>
-          <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDaGV2cm9uLWRvd24iPgo8cGF0aCBpZD0iQ2hldnJvbi1kb3duXzIiIGQ9Ik0xMi44ODY3IDYuMjYxMjlMOC40MTAxNiAxMC41NTA0QzguMjY5NTMgMTAuNjY3NSA4LjEyODkxIDEwLjcxNDQgOC4wMTE3MiAxMC43MTQ0QzcuODcxMDkgMTAuNzE0NCA3LjczMDQ3IDEwLjY2NzUgNy42MTMyOCAxMC41NzM4TDMuMTEzMjggNi4yNjEyOUMyLjg3ODkxIDYuMDUwMzUgMi44Nzg5MSA1LjY3NTM1IDMuMDg5ODQgNS40NjQ0MUMzLjMwMDc4IDUuMjMwMDQgMy42NzU3OCA1LjIzMDA0IDMuODg2NzIgNS40NDA5OEw4LjAxMTcyIDkuMzc4NDhMMTIuMTEzMyA1LjQ0MDk4QzEyLjMyNDIgNS4yMzAwNCAxMi42OTkyIDUuMjMwMDQgMTIuOTEwMiA1LjQ2NDQxQzEzLjEyMTEgNS42NzUzNSAxMy4xMjExIDYuMDUwMzUgMTIuODg2NyA2LjI2MTI5WiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt="">
-        </div>
-      </div>
-      <div id="cmpBody"></div>
-      <div class="cmp-legal">
-        <p><b>Esto es información, no una recomendación.</b> Lo que ves es cómo se
-           comportaron estos portafolios en el pasado; no es una promesa de lo que
-           harán después. Tú tomas la decisión y Skandia la ejecuta.</p>
-      </div>
-      <button class="btn primary" style="width:100%;margin-top:20px"
-              onclick="closeOv('ov-rent')">Entiendo</button>
-    </div>
-  </div>
 </section>
 
 
@@ -1995,6 +1962,17 @@ function perfilDe(pcts){
    barra de bandas, en una fracción del espacio. La composición vigente no
    necesita chip — es toda la columna izquierda, siempre visible.        */
 function renderMezclas(){
+  /* El botón + se apaga en el tope en vez de desaparecer: que el control siga
+     visible explica por qué no se puede seguir añadiendo. */
+  const add = document.getElementById('mzAdd');
+  if (add){
+    const lleno = state.mezclas.length >= MAX_MEZCLAS;
+    add.disabled = lleno;
+    add.classList.toggle('off', lleno);
+    add.title = lleno
+      ? `Máximo ${MAX_MEZCLAS} mezclas guardadas`
+      : 'Empezar una mezcla nueva en blanco';
+  }
   const row = document.getElementById('mzRow');
   if (!row) return;
   syncActiva();
@@ -2030,7 +2008,16 @@ function renderMezclas(){
 /* Empieza una mezcla en blanco sin tocar las que ya existen.
    No hay paso de "guardar": la mezcla existe desde que se crea y cada
    edición se escribe sola sobre ella. El nombre se cambia con el lápiz. */
+/* Tope de mezclas guardadas. Sin límite los chips desbordaban la fila y el
+   workspace dejaba de ayudar: comparar entre veinte candidatas no es
+   comparar. Cuatro caben en una línea sin scroll. */
+const MAX_MEZCLAS = 4;
+
 function nuevaMezcla(){
+  if (state.mezclas.length >= MAX_MEZCLAS){
+    toast(`Puedes tener hasta ${MAX_MEZCLAS} mezclas guardadas. Borra una para crear otra.`);
+    return;
+  }
   syncActiva();
   let i = 2, n = `Mezcla ${i}`;
   while (state.mezclas.some(m => m.nombre === n)) n = `Mezcla ${++i}`;
@@ -2389,6 +2376,9 @@ function pintarTendencia(box, opts = {}){
      aparecer ahí —ejes, rejilla, una curva insinuada— para que el espacio se
      lea como "acá va algo" y no como un hueco. */
   if (!curvas.some(c => c.id === 'nueva')) {
+    const legalVacio = `
+      <div class="cmp-legal"><p><b>Esto es información, no una recomendación.</b>
+        El comportamiento pasado no es una promesa de lo que harán después.</p></div>`;
     const W0 = opts.W || 840, H0 = opts.H || 300;
     const PL0 = 62, PR0 = 8, PT0 = 8, PB0 = 30;
     let esq = '';
@@ -2416,7 +2406,7 @@ function pintarTendencia(box, opts = {}){
           a conocerlos —no a predecir— y te avisa si tu mezcla se sale de tu
           perfil ${PERFIL}.
         </div>
-      </div>`;
+      </div>${legalVacio}`;
     return;
   }
 
@@ -2508,10 +2498,30 @@ function pintarTendencia(box, opts = {}){
             <b>${curvas.omitidos}</b> (${curvas.pesoOmitido}% de tu mezcla) no
             aparecen, pero sí están contados en <b>Tu mezcla nueva</b>.` : ''}</div>`
     : '';
+  const selector = `
+    <div class="cmp-head">
+      <div class="cap" style="flex:1;min-width:0">Variación acumulada de la mezcla
+        que estás armando, frente a la que ya tienes.</div>
+      <div class="cmp-per">
+        <select id="cmpPer" onchange="cmpPeriodo(this.value)" aria-label="Periodo">
+          ${CMP_PERIODOS.map(p => `<option value="${p.k}"${p.k === cmpEstado.periodo
+            ? ' selected' : ''}>${p.label}</option>`).join('')}
+        </select>
+        <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDaGV2cm9uLWRvd24iPgo8cGF0aCBpZD0iQ2hldnJvbi1kb3duXzIiIGQ9Ik0xMi44ODY3IDYuMjYxMjlMOC40MTAxNiAxMC41NTA0QzguMjY5NTMgMTAuNjY3NSA4LjEyODkxIDEwLjcxNDQgOC4wMTE3MiAxMC43MTQ0QzcuODcxMDkgMTAuNzE0NCA3LjczMDQ3IDEwLjY2NzUgNy42MTMyOCAxMC41NzM4TDMuMTEzMjggNi4yNjEyOUMyLjg3ODkxIDYuMDUwMzUgMi44Nzg5MSA1LjY3NTM1IDMuMDg5ODQgNS40NjQ0MUMzLjMwMDc4IDUuMjMwMDQgMy42NzU3OCA1LjIzMDA0IDMuODg2NzIgNS40NDA5OEw4LjAxMTcyIDkuMzc4NDhMMTIuMTEzMyA1LjQ0MDk4QzEyLjMyNDIgNS4yMzAwNCAxMi42OTkyIDUuMjMwMDQgMTIuOTEwMiA1LjQ2NDQxQzEzLjEyMTEgNS42NzUzNSAxMy4xMjExIDYuMDUwMzUgMTIuODg2NyA2LjI2MTI5WiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt="">
+      </div>
+    </div>`;
+
+  /* La advertencia vivía en el modal; al eliminarlo tiene que viajar con la
+     gráfica. No es decoración: es obligatoria (CE 014/2025 + D.1239/2024). */
+  const legal = `
+    <div class="cmp-legal">
+      <p><b>Esto es información, no una recomendación.</b> Lo que ves es cómo se
+         comportaron estos portafolios en el pasado; no es una promesa de lo que
+         harán después. Tú tomas la decisión y Skandia la ejecuta.</p>
+    </div>`;
+
   box.innerHTML = `
-    ${nota}
-    ${conKpis ? '' : `<button class="cmp-mas" onclick="openOv('ov-rent')">
-        Ver comparador completo · otros periodos →</button>`}
+    ${selector}${nota}
     <div class="cmp-plot">
       <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
         ${grid}${ejex}${paths}${rotulos}
@@ -2525,12 +2535,11 @@ function pintarTendencia(box, opts = {}){
         <div class="v ${varia(actual)>=0?'up':'dn'}">${cmpFmt(varia(actual))}</div></div>
       <div class="cmp-kpi"><div class="k">Diferencia</div>
         <div class="v ${dif>=0?'up':'dn'}">${cmpFmt(dif)}</div></div>
-      ${rp!==null ? `<div class="cmp-kpi"><div class="k">Rentabilidad ponderada (% E.A.)</div>
-        <div class="v">${rp.toFixed(1).replace('.',',')} %</div></div>` : ''}
-    </div>`}`;
+      ${/* La rentabilidad ponderada NO se repite acá: ya está en la franja
+            gris, a cien píxeles de distancia. */ ''}
+    </div>`}${legal}`;
 }
 
-function renderCmp(){ pintarTendencia(document.getElementById('cmpBody'), {W:840, H:300, kpis:true}); }
 
 /* MEJORA 9 · la misma gráfica, a ancho completo, dentro de la tarjeta.
    Sin la fila de KPIs (la franja gris ya da el rendimiento) y más baja,
@@ -2538,7 +2547,7 @@ function renderCmp(){ pintarTendencia(document.getElementById('cmpBody'), {W:840
 function renderGraf(){
   const box = document.getElementById('grafNueva');
   if (!box || box.classList.contains('oculta')) return;   // plegada: nada que dibujar
-  pintarTendencia(box, {W:830, H:190, kpis:false});   // 854 menos el padding de la caja
+  pintarTendencia(box, {W:830, H:190, kpis:true});   // 854 menos el padding de la caja
 }
 
 /* La tendencia se puede plegar: ocupa ~240 px y no todo el mundo la necesita
@@ -2559,19 +2568,15 @@ function toggleGraf(){
   log('tendencia', oculta ? 'plegada' : 'visible');
 }
 
-/* Los chips y el periodo afectan a las dos vistas a la vez. */
-function refrescarTendencias(){ renderGraf(); renderCmp(); }
 
 function cmpPeriodo(k){
   cmpEstado.periodo = k;
   const p = CMP_PERIODOS.find(p => p.k === k);
   log('comparador_periodo', p ? p.label : k);
-  refrescarTendencias();
+  renderGraf();
 }
 
 function openOv(id){
-  // MEJORA 7 · el comparador se calcula al abrir: refleja la mezcla de ESE momento
-  if (id === 'ov-rent') { renderCmp(); log('comparador_abierto', 'periodo=' + cmpEstado.periodo); }
   document.getElementById(id).classList.add('on');
   if (id === 'ov-onb') renderOnb();
   if (id === 'ov-desvio'){
