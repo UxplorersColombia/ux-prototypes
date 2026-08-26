@@ -445,24 +445,31 @@ img{display:block}
 /* Acordeón: la cabecera entera es el control, no un enlace suelto al lado.
    Área de clic completa y chevron que gira, que es el patrón que la gente
    ya reconoce. */
-.graf-cab{display:flex;align-items:center;gap:8px;width:100%;margin-top:12px;
-  padding:7px 10px;background:#FCFCFC;border:1px solid var(--n03);
-  border-radius:10px;cursor:pointer;text-align:left;
-  transition:background .12s,border-color .12s}
-.graf-cab:hover{background:#F6FBF7;border-color:var(--green)}
-.graf-cab:focus-visible{outline:2px solid var(--green-acc);outline-offset:2px}
+/* La caja envuelve cabecera Y gráfica: sin esto la cabecera se leía como un
+   elemento suelto y no como el control de lo que hay debajo. */
+.graf-acc{margin-top:12px;flex:0 0 auto;border:1px solid var(--n03);
+  border-radius:10px;overflow:hidden;transition:border-color .12s}
+.graf-acc:hover{border-color:var(--n05)}
+.graf-cab{display:flex;align-items:center;gap:8px;width:100%;
+  padding:8px 12px;background:#FCFCFC;border:0;
+  border-bottom:1px solid var(--n03);cursor:pointer;text-align:left;
+  transition:background .12s}
+.graf-cab:hover{background:#F1F8F3}
+.graf-cab:focus-visible{outline:2px solid var(--green-acc);outline-offset:-2px}
+/* Plegada, la cabecera es la caja entera: sin línea inferior. */
+.graf-acc.plegado .graf-cab{border-bottom:0}
 .graf-tit{flex:1;font:700 10px/14px var(--os);color:var(--gris-etq);
   text-transform:uppercase;letter-spacing:.02em}
 .graf-hint{font:400 11px/16px var(--os);color:var(--gris-txt)}
 .graf-chev{width:14px;height:14px;flex:0 0 14px;transition:transform .18s;
   filter:brightness(0) saturate(100%) invert(45%)}
 /* Plegado: el chevron apunta hacia abajo (abrir); desplegado, hacia arriba. */
-.graf-cab.plegado .graf-chev{transform:rotate(180deg)}
+.graf-acc.plegado .graf-chev{transform:rotate(180deg)}
 /* Plegada: la tarjeta encoge y, como la lista de Composición actual es el
    bloque elástico con flex-basis 0, la pareja se reajusta sola y las dos
    siguen midiendo lo mismo. */
 .nv-graf.oculta{display:none}
-.nv-graf{margin-top:6px;flex:0 0 auto}
+.nv-graf{padding:10px 12px 12px;background:#fff}
 .nv-graf .cmp-plot{margin-top:6px}
 .nv-graf .cmp-nota{margin-top:6px}
 
@@ -895,13 +902,15 @@ body{padding-bottom:88px}
         <!-- MEJORA 9 · la tendencia, a ancho completo, igual que en el modal.
              La cabecera va FUERA de #grafNueva porque renderGraf() reescribe
              ese nodo entero en cada cambio de mezcla. -->
-        <button class="graf-cab" id="grafTog" onclick="toggleGraf()"
-                aria-controls="grafNueva" aria-expanded="true">
-          <span class="graf-tit">Tendencia · 12 meses</span>
-          <span class="graf-hint" id="grafHint">Ocultar</span>
-          <img class="graf-chev" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDaGV2cm9uLWRvd24iPgo8cGF0aCBpZD0iQ2hldnJvbi1kb3duXzIiIGQ9Ik0xMi44ODY3IDYuMjYxMjlMOC40MTAxNiAxMC41NTA0QzguMjY5NTMgMTAuNjY3NSA4LjEyODkxIDEwLjcxNDQgOC4wMTE3MiAxMC43MTQ0QzcuODcxMDkgMTAuNzE0NCA3LjczMDQ3IDEwLjY2NzUgNy42MTMyOCAxMC41NzM4TDMuMTEzMjggNi4yNjEyOUMyLjg3ODkxIDYuMDUwMzUgMi44Nzg5MSA1LjY3NTM1IDMuMDg5ODQgNS40NjQ0MUMzLjMwMDc4IDUuMjMwMDQgMy42NzU3OCA1LjIzMDA0IDMuODg2NzIgNS40NDA5OEw4LjAxMTcyIDkuMzc4NDhMMTIuMTEzMyA1LjQ0MDk4QzEyLjMyNDIgNS4yMzAwNCAxMi42OTkyIDUuMjMwMDQgMTIuOTEwMiA1LjQ2NDQxQzEzLjEyMTEgNS42NzUzNSAxMy4xMjExIDYuMDUwMzUgMTIuODg2NyA2LjI2MTI5WiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt="">
-        </button>
-        <div class="nv-graf" id="grafNueva"></div>
+        <div class="graf-acc" id="grafAcc">
+          <button class="graf-cab" id="grafTog" onclick="toggleGraf()"
+                  aria-controls="grafNueva" aria-expanded="true">
+            <span class="graf-tit">Tendencia · 12 meses</span>
+            <span class="graf-hint" id="grafHint">Ocultar</span>
+            <img class="graf-chev" src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJDaGV2cm9uLWRvd24iPgo8cGF0aCBpZD0iQ2hldnJvbi1kb3duXzIiIGQ9Ik0xMi44ODY3IDYuMjYxMjlMOC40MTAxNiAxMC41NTA0QzguMjY5NTMgMTAuNjY3NSA4LjEyODkxIDEwLjcxNDQgOC4wMTE3MiAxMC43MTQ0QzcuODcxMDkgMTAuNzE0NCA3LjczMDQ3IDEwLjY2NzUgNy42MTMyOCAxMC41NzM4TDMuMTEzMjggNi4yNjEyOUMyLjg3ODkxIDYuMDUwMzUgMi44Nzg5MSA1LjY3NTM1IDMuMDg5ODQgNS40NjQ0MUMzLjMwMDc4IDUuMjMwMDQgMy42NzU3OCA1LjIzMDA0IDMuODg2NzIgNS40NDA5OEw4LjAxMTcyIDkuMzc4NDhMMTIuMTEzMyA1LjQ0MDk4QzEyLjMyNDIgNS4yMzAwNCAxMi42OTkyIDUuMjMwMDQgMTIuOTEwMiA1LjQ2NDQxQzEzLjEyMTEgNS42NzUzNSAxMy4xMjExIDYuMDUwMzUgMTIuODg2NyA2LjI2MTI5WiIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K" alt="">
+          </button>
+          <div class="nv-graf" id="grafNueva"></div>
+        </div>
         <!-- MEJORA 8 · el VS pasa de columna de 220 a franja horizontal -->
         <div class="vs vs-h" id="vsBlock"></div>
 
@@ -2525,7 +2534,7 @@ function renderCmp(){ pintarTendencia(document.getElementById('cmpBody'), {W:840
 function renderGraf(){
   const box = document.getElementById('grafNueva');
   if (!box || box.classList.contains('oculta')) return;   // plegada: nada que dibujar
-  pintarTendencia(box, {W:854, H:190, kpis:false});
+  pintarTendencia(box, {W:830, H:190, kpis:false});   // 854 menos el padding de la caja
 }
 
 /* La tendencia se puede plegar: ocupa ~240 px y no todo el mundo la necesita
@@ -2537,7 +2546,7 @@ function toggleGraf(){
   const btn = document.getElementById('grafTog');
   const oculta = box.classList.toggle('oculta');
   document.querySelector('.col-nueva').classList.toggle('sin-graf', oculta);
-  btn.classList.toggle('plegado', oculta);
+  document.getElementById('grafAcc').classList.toggle('plegado', oculta);
   document.getElementById('grafHint').textContent = oculta ? 'Mostrar' : 'Ocultar';
   btn.setAttribute('aria-expanded', oculta ? 'false' : 'true');
   if (!oculta) renderGraf();
