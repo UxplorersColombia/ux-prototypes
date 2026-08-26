@@ -306,11 +306,6 @@ img{display:block}
   font:400 12px/18px var(--os);color:var(--grey-l03)}
 .cmp-esq-txt b{display:block;font:700 14px/20px var(--mont);color:var(--grey);
   margin-bottom:4px}
-.cmp-foot{display:flex;gap:12px;margin-top:20px}
-.cmp-kpi{flex:1;background:#FCFCFC;border-radius:10px;padding:12px 14px}
-.cmp-kpi .k{font:400 12px/18px var(--os);color:var(--grey-l03)}
-.cmp-kpi .v{font:700 20px/28px var(--mt);color:var(--grey);margin-top:2px}
-.cmp-kpi .v.up{color:#0E9F3C} .cmp-kpi .v.dn{color:var(--err-d)}
 /* Advertencia obligatoria (CE 014/2025 + D.1239/2024). Acá queda la capa
    humana; el texto normativo completo —no garantía, obligaciones de medio,
    "no constituye recomendación"— ya vive en el popup ov-renta, que se abre
@@ -2170,7 +2165,7 @@ function abrirGuardar(){
   document.getElementById('guardarMotivo').style.display = bloqueos.length ? '' : 'none';
 
   const m = state.mezclas.find(x => x.id === state.activa);
-  document.getElementById('guardarQue').textContent = m ? m.nombre : 'tu mezcla';
+  document.getElementById('guardarQue').textContent = m ? m.nombre : 'tu versión';
   const n = state.mezclas.length;   // Kiki f-16: pluralizar en código, no "mezcla(s)"
   document.getElementById('guardarNMez').textContent = `${n} versi${n === 1 ? 'ón' : 'ones'}`;
   openOv('ov-guardar');
@@ -2211,7 +2206,7 @@ function bannerProgreso(){
   b.style.display = '';
   // Kiki f-21: redacción neutra, sin "a medias" (coloquial y valorativo)
   b.querySelector('.txt-r').innerHTML = guardadas
-    ? `Tienes una gestión sin terminar con <b>${guardadas} mezcla${guardadas > 1 ? 's' : ''} guardada${guardadas > 1 ? 's' : ''}</b>.`
+    ? `Tienes una gestión sin terminar con <b>${guardadas} versi${guardadas > 1 ? 'ones' : 'ón'} guardada${guardadas > 1 ? 's' : ''}</b>.`
     : `Tienes una gestión sin terminar (<b>${t}% asignado</b>).`;
 }
 
@@ -2491,7 +2486,7 @@ function cmpCurvas(){
    cifras distintas. */
 function pintarTendencia(box, opts = {}){
   if (!box) return;
-  const W = opts.W || 840, H = opts.H || 300, conKpis = opts.kpis !== false;
+  const W = opts.W || 840, H = opts.H || 300;
   const per = CMP_PERIODOS.find(p => p.k === cmpEstado.periodo);
   const fin = CMP_DIAS - 1, ini = Math.max(0, fin - per.dias);
   const curvas = cmpCurvas();
@@ -2527,8 +2522,8 @@ function pintarTendencia(box, opts = {}){
         <div class="cmp-esq-txt">
           <b>Empieza a asignar porcentajes</b>
           Acá verás cómo se ha comportado cada portafolio que elijas. Te ayuda
-          a conocerlos —no a predecir— y te avisa si tu mezcla se sale de tu
-          perfil ${PERFIL}.
+          a conocerlos —no a predecir— y te avisa si tu composición se sale
+          de tu perfil ${PERFIL}.
         </div>
       </div>${legalVacio}`;
     return;
@@ -2607,10 +2602,8 @@ function pintarTendencia(box, opts = {}){
       stroke="#fff" stroke-width="3" paint-order="stroke">${txt}</text>`;
   });
 
-  const nueva = curvas.find(c => c.id === 'nueva'), actual = curvas.find(c => c.id === 'actual');
-  const dif = varia(nueva) - varia(actual);
-  const rp = rentaPonderada(state.nueva);
-
+  /* Los KPIs salieron: repetían en cifras lo que la curva ya muestra y lo que
+     la franja gris ya dice. Ese alto se lo queda la gráfica. */
   const cuantos = curvas.length - 2;   // sin contar mezcla y actual
   const pista = cuantos > 0
     ? `Cada portafolio se dibuja con el color de su punto en la lista;
@@ -2619,7 +2612,7 @@ function pintarTendencia(box, opts = {}){
   const nota = (curvas.omitidos > 0 || pista)
     ? `<div class="cmp-nota">${pista}${curvas.omitidos > 0
         ? ` Se dibujan los <b>${MAX_SERIES}</b> de mayor peso; otros
-            <b>${curvas.omitidos}</b> (${curvas.pesoOmitido}% de tu mezcla) no
+            <b>${curvas.omitidos}</b> (${curvas.pesoOmitido}% de tu composición) no
             aparecen, pero sí están contados en <b>Tu composición nueva</b>.` : ''}</div>`
     : '';
   const selector = `
@@ -2652,16 +2645,7 @@ function pintarTendencia(box, opts = {}){
       </svg>
       <div class="cmp-tip" id="cmpTip"></div>
     </div>
-    ${!conKpis ? '' : `<div class="cmp-foot">
-      <div class="cmp-kpi"><div class="k">Tu composición nueva · ${per.label.toLowerCase()}</div>
-        <div class="v ${varia(nueva)>=0?'up':'dn'}">${cmpFmt(varia(nueva))}</div></div>
-      <div class="cmp-kpi"><div class="k">Tu composición actual</div>
-        <div class="v ${varia(actual)>=0?'up':'dn'}">${cmpFmt(varia(actual))}</div></div>
-      <div class="cmp-kpi"><div class="k">Diferencia</div>
-        <div class="v ${dif>=0?'up':'dn'}">${cmpFmt(dif)}</div></div>
-      ${/* La rentabilidad ponderada NO se repite acá: ya está en la franja
-            gris, a cien píxeles de distancia. */ ''}
-    </div>`}${legal}`;
+    ${legal}`;
 }
 
 
@@ -2671,7 +2655,7 @@ function pintarTendencia(box, opts = {}){
 function renderGraf(){
   const box = document.getElementById('grafNueva');
   if (!box || box.classList.contains('oculta')) return;   // plegada: nada que dibujar
-  pintarTendencia(box, {W:830, H:190, kpis:true});   // 854 menos el padding de la caja
+  pintarTendencia(box, {W:830, H:268});   // 854 menos el padding; +78 de alto que dejaron los KPIs
 }
 
 /* La tendencia se puede plegar: ocupa ~240 px y no todo el mundo la necesita
