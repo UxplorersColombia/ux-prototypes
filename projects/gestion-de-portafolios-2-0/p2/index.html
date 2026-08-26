@@ -636,6 +636,12 @@ body{padding-bottom:88px}
   border:1px solid var(--info-d);border-radius:8px;padding:10px 16px;margin-bottom:16px}
 .reanudar img{width:20px;height:20px}
 .reanudar .txt-r{flex:1}
+.reanudar .cerrar-r{width:32px;height:32px;flex:0 0 32px;border:0;background:0;
+  cursor:pointer;color:var(--gris-txt);border-radius:100px;
+  display:flex;align-items:center;justify-content:center}
+.reanudar .cerrar-r:hover{background:rgba(0,0,0,.06);color:var(--grey)}
+.reanudar .cerrar-r:focus-visible{outline:2px solid var(--link-oscuro);outline-offset:2px}
+.reanudar .cerrar-r svg{width:15px;height:15px}
 
 /* Razón del contrato deshabilitado */
 .ctr .razon{font:400 12px/18px var(--os);color:var(--err-d);margin-top:4px}
@@ -1326,8 +1332,11 @@ body{padding-bottom:88px}
     <div id="reanudar" class="reanudar" style="display:none">
       <img src="data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGlkPSJjaXJjbGUtZXhjbGFtYXRpb24iIGQ9Ik0xMiAwQzE4LjYwOTQgMCAyNCA1LjM5MDYyIDI0IDEyQzI0IDE4LjY1NjIgMTguNjA5NCAyNCAxMiAyNEM1LjM0Mzc1IDI0IDAgMTguNjU2MiAwIDEyQzAgNS4zOTA2MiA1LjM0Mzc1IDAgMTIgMFpNMTIgMjEuNzVDMTcuMzQzOCAyMS43NSAyMS43NSAxNy4zOTA2IDIxLjc1IDEyQzIxLjc1IDYuNjU2MjUgMTcuMzQzOCAyLjI1IDEyIDIuMjVDNi42MDkzOCAyLjI1IDIuMjUgNi42NTYyNSAyLjI1IDEyQzIuMjUgMTcuMzkwNiA2LjYwOTM4IDIxLjc1IDEyIDIxLjc1Wk0xMiAxNC4yNUMxMS4zNDM4IDE0LjI1IDEwLjg3NSAxMy43ODEyIDEwLjg3NSAxMy4xMjVWNy4xMjVDMTAuODc1IDYuNTE1NjIgMTEuMzQzOCA2IDEyIDZDMTIuNjA5NCA2IDEzLjEyNSA2LjUxNTYyIDEzLjEyNSA3LjEyNVYxMy4xMjVDMTMuMTI1IDEzLjc4MTIgMTIuNjA5NCAxNC4yNSAxMiAxNC4yNVpNMTIgMTUuODQzOEMxMi43OTY5IDE1Ljg0MzggMTMuNDUzMSAxNi41IDEzLjQ1MzEgMTcuMjk2OUMxMy40NTMxIDE4LjA5MzggMTIuNzk2OSAxOC43NSAxMiAxOC43NUMxMS4xNTYyIDE4Ljc1IDEwLjUgMTguMDkzOCAxMC41IDE3LjI5NjlDMTAuNSAxNi41IDExLjE1NjIgMTUuODQzOCAxMiAxNS44NDM4WiIgZmlsbD0iIzQwNDA0MCIvPgo8L3N2Zz4K" alt="">
       <span class="txt-r lbl"></span>
-      <button class="btn primary" style="height:32px;font-size:14px;padding:4px 20px" onclick="reanudar()">Retomar</button>
-      <button class="lnk-alert" onclick="descartarProgreso()">Descartar</button>
+      <button class="cerrar-r" onclick="cerrarBanner()"
+              aria-label="Cerrar este aviso">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     </div>
 
     <div class="crumb" style="height:20px">
@@ -2806,6 +2815,15 @@ function reanudar(){
   document.getElementById('reanudar').style.display = 'none';
 }
 
+/* La ✕ solo cierra el aviso. El progreso NO se borra: sigue en
+   localStorage y vuelve a anunciarse al recargar. Con los botones fuera,
+   este aviso ya no ofrece camino de vuelta a la sesión guardada —
+   reanudar() y descartarProgreso() se conservan, pero sin disparador. */
+function cerrarBanner(){
+  document.getElementById('reanudar').style.display = 'none';
+  log('aviso_progreso_cerrado');
+}
+
 function descartarProgreso(){
   localStorage.removeItem(LS);
   log('progreso_descartado');
@@ -3557,6 +3575,10 @@ function mobNuevaRender(){
       '<div><span class="k">Perfil</span><span class="v' + (dv.hay ? ' alerta' : '') + '">' +
         (sel.length ? (BANDA[pm] ? BANDA[pm].label : pm) : '—') + '</span></div>' +
     '</div>' +
+    aviso +
+    /* Aviso de perfil aquí y no solo en el resumen: enterarse al final de
+       que la composición se sale del perfil obliga a rehacer el trabajo. */
+    (dv.hay ? mobAviso('warn', mobTextoDesvio(dv)) : '') +
     '<div class="mtools">' +
       '<button class="ic-only" onclick="mobBuscarTgl()" aria-label="Buscar">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -3575,10 +3597,6 @@ function mobNuevaRender(){
         'onclick="mobFiltro(\'' + b + '\')">' + BANDA[b].label + '</button>').join('') +
     '</div>' +
     mobMezclasHTML() +
-    aviso +
-    /* Aviso de perfil aquí y no solo en el resumen: enterarse al final de
-       que la composición se sale del perfil obliga a rehacer el trabajo. */
-    (dv.hay ? mobAviso('warn', mobTextoDesvio(dv)) : '') +
     '<div class="mlist libre">' +
       (puestos.length ? '<div class="mgrupo">Tu selección<span class="n">' +
         puestos.length + ' de ' + state.nueva.length + '</span></div>' +
