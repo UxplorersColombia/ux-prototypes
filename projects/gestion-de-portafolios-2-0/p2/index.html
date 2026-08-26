@@ -461,13 +461,16 @@ img{display:block}
 .nv-graf .cmp-plot{margin-top:6px}
 .nv-graf .cmp-nota{margin-top:6px}
 
-/* Nombre de portafolio como enlace al detalle */
+/* Nombre de portafolio como enlace al detalle.
+   Sin subrayado en reposo: la línea punteada recorría toda la fila hasta el
+   monto y se leía como un separador, no como un enlace. La pista de que es
+   clicable queda en el hover y en el foco de teclado. */
 .prow .n.pf-link{background:none;border:0;padding:0;text-align:left;cursor:pointer;
-  font:inherit;color:inherit;border-bottom:1px dotted var(--n05)}
-.prow .n.pf-link:hover{color:var(--green-txt);border-bottom-color:var(--green-txt)}
+  font:inherit;color:inherit}
+.prow .n.pf-link:hover{color:var(--green-txt);text-decoration:underline;
+  text-underline-offset:3px}
 .prow .n.pf-link:focus-visible{outline:2px solid var(--green-txt);outline-offset:2px}
-.prow.muted .n.pf-link{border-bottom-color:transparent}
-.prow.muted .n.pf-link:hover{color:var(--green-txt);border-bottom-color:var(--green-txt)}
+.prow.muted .n.pf-link:hover{color:var(--green-txt)}
 
 /* Popover: fixed y colgado del body para que la lista con overflow no lo corte */
 .pf-pop{position:fixed;z-index:60;width:330px;background:#fff;border-radius:12px;
@@ -566,15 +569,6 @@ img{display:block}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 
 /* Navegador del prototipo (no forma parte del diseño) */
-#pnav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:150;
-  background:#2C2C2C;color:#fff;border-radius:100px;box-shadow:0 6px 24px rgba(0,0,0,.24);
-  display:flex;align-items:center;gap:4px;padding:6px 8px;font:600 12px/16px var(--os)}
-#pnav button{color:#fff;padding:6px 12px;border-radius:100px;opacity:.75;white-space:nowrap}
-#pnav button:hover{opacity:1;background:rgba(255,255,255,.12)}
-#pnav button.on{opacity:1;background:var(--green)}
-#pnav .sep{width:1px;height:20px;background:rgba(255,255,255,.22);margin:0 4px}
-#pnav.min .grow{display:none}
-#pnav .tgl{opacity:.6;padding:6px 10px}
 body{padding-bottom:88px}
 
 /* ═══════════════════════════════════════════════════════════
@@ -754,7 +748,6 @@ body{padding-bottom:88px}
 .tz-dt{font:400 12px/18px var(--os);opacity:.82;margin-top:3px;word-break:break-word}
 .tz-ts{font:400 12px/17px ui-monospace,SFMono-Regular,Menlo,monospace;opacity:.42;margin-top:4px}
 .tz-empty{padding:20px;font:400 14px/21px var(--os);opacity:.5}
-#pnav b{color:#8FE000;margin-left:4px}
 
 /* ══════════════════════════════════════════════════════════════════
    SELECTOR DE DISPOSITIVO + VISTA MÓVIL
@@ -773,11 +766,8 @@ body{padding-bottom:88px}
 #devbar button:not(.on):hover{background:var(--n03)}
 #devbar svg{width:15px;height:15px}
 
-/* El padding inferior deja libre la barra de navegación del prototipo
-   (#pnav, fija abajo), que si no tapa el botón de continuar. */
 #mobWrap{display:none;justify-content:center;padding:16px 0 24px;background:#F7F7F7}
-body.movil #pnav{display:none}
-#mobWrap.on{display:flex}
+body.movil #mobWrap.on{display:flex}
 #mobFrame{width:390px;height:844px;background:#fff;border-radius:44px;position:relative;
   box-shadow:0 0 0 10px #232323, 0 20px 60px rgba(0,0,0,.30);overflow:hidden;
   display:flex;flex-direction:column}
@@ -1509,24 +1499,7 @@ body.movil #pnav{display:none}
   <div id="trazaBody"></div>
 </div>
 
-<div id="pnav">
-  <button class="tgl" onclick="document.getElementById('pnav').classList.toggle('min')"
-          title="Mostrar / ocultar el navegador del prototipo">⌘</button>
-  <span class="grow sep"></span>
-  <button class="grow" data-sc="sc-cuenta" onclick="go('sc-cuenta')">1 · Por tu cuenta</button>
-  <button class="grow" data-sc="sc-gestion" onclick="go('sc-gestion')">2 · Gestión total</button>
-  <button class="grow" data-sc="sc-resumen" onclick="go('sc-resumen')">3 · Resumen</button>
-  <span class="grow sep"></span>
-  <button class="grow" onclick="setEstado(0)">0 %</button>
-  <button class="grow" onclick="setEstado(50)">50 %</button>
-  <button class="grow" onclick="setEstado(100)">100 %</button>
-  <span class="grow sep"></span>
-  <button class="grow" onclick="openOv('ov-onb')">Onboarding</button>
-  <button class="grow" onclick="toggleTraza()">Traza <b id="trazaN">0</b></button>
-  <button class="grow" onclick="reset()">Reiniciar</button>
-  <span class="grow sep"></span>
-  <button class="grow" onclick="window.open('../p1/','_blank')" title="Réplica fiel del Figma">Ver baseline</button>
-</div>
+
 
 <script>
 /* ═══════════════════════════════════════════════════════════
@@ -2635,8 +2608,6 @@ function onbPrev(){ state.onb = Math.max(0, state.onb - 1); renderOnb(); }
 function go(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   document.querySelectorAll('.ov').forEach(o => o.classList.remove('on'));
-  document.querySelectorAll('#pnav button[data-sc]').forEach(b =>
-    b.classList.toggle('on', b.dataset.sc === id));
   if (id === 'sc-resumen') renderResumen();
   window.scrollTo(0,0);
   /* FIX · Cada .screen tiene min-height:950 y su .content va posicionado,
@@ -3464,7 +3435,6 @@ function mobFinalizar(){ if (total() === 100) mobGo(3); }
 /* ── Arranque ─────────────────────────────────────────────── */
 renderActual(); renderNueva(); renderContratos(); renderOnb();
 renderTraza(); bannerProgreso();
-document.querySelector('#pnav button[data-sc="sc-cuenta"]').classList.add('on');
 log('sesion_iniciada', `perfil=${PERFIL}`);
 mobCtrRender(); mobRender();
 fit();
