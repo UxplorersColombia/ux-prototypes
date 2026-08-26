@@ -1015,26 +1015,16 @@ body{padding-bottom:88px}
 .mgrupo:first-child{margin-top:8px}
 .mgrupo .n{margin-left:auto;font-weight:400}
 
-/* dona compacta + cifras de cabecera */
-.mres{display:flex;align-items:center;gap:14px;margin-top:12px;
-  padding-bottom:14px;border-bottom:1px solid var(--n03)}
-.mres .donut{width:104px;height:104px;flex:0 0 104px}
-.mres .donut svg{width:104px;height:104px}
-.mres .lbl-c .big{font:700 20px/24px var(--mont)}
-.mres .lbl-c .sub{font:400 10px/14px var(--os)}
-.mres .kk{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
-.mres .kk > div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.mres .kk .k{font:400 12px/16px var(--os);color:var(--gris-txt)}
-.mres .kk .v{font:700 13px/18px var(--mont);color:var(--grey);text-align:right}
-.mres .kk .v.alerta{color:#8A5A00}
+/* Cifras de cabecera. Sin la dona, las tres reparten el ancho completo. */
+.mres{display:flex;margin-top:12px;padding:12px 0 14px;gap:8px;
+  border-top:1px solid var(--n03);border-bottom:1px solid var(--n03)}
+.mres > div{flex:1;min-width:0;text-align:center}
+.mres > div + div{border-left:1px solid var(--n03)}
+.mres .k{display:block;font:400 12px/16px var(--os);color:var(--gris-txt)}
+.mres .v{display:block;font:700 14px/20px var(--mont);color:var(--grey);margin-top:3px}
+.mres .v.alerta{color:#8A5A00}
 
 /* atajos */
-.macc{display:flex;gap:7px;margin-top:12px}
-.macc button{flex:1;min-height:48px;border:1px solid var(--n04, #DDDDDD);background:#fff;
-  border-radius:8px;font:700 12px/15px var(--os);color:var(--green-txt);cursor:pointer;
-  padding:6px 3px}
-.macc button:active{background:#F6FCF2}
-.macc button[disabled]{color:var(--gris-txt);opacity:.45;cursor:not-allowed}
 
 /* pasos junto a la caja del Figma */
 .mstep{width:38px;height:44px;flex:0 0 38px;border:1px solid var(--n04, #DDDDDD);
@@ -1067,21 +1057,6 @@ body{padding-bottom:88px}
   min-height:40px;white-space:nowrap}
 .mmz .add[disabled]{color:var(--gris-txt);opacity:.5;cursor:not-allowed}
 
-/* tendencia plegable */
-.macor{border-top:1px solid var(--n03);margin-top:14px}
-.macor-h{width:100%;border:0;background:0;padding:14px 0 12px;display:flex;align-items:center;
-  gap:10px;cursor:pointer;min-height:48px}
-.macor-h .t{flex:1;text-align:left;font:700 14px/19px var(--mont);color:var(--grey)}
-.macor-h .ch{width:14px;height:14px;color:var(--gris-txt);transition:transform .2s}
-.macor.on .macor-h .ch{transform:rotate(180deg)}
-.macor-c{display:none;padding-bottom:6px}
-.macor.on .macor-c{display:block}
- /* La cabecera de la gráfica está pensada para 840 px: en 326 hay que
-    apilarla, o el título queda en una columna de 122 px. */
-#mobGraf .cmp-head{display:block}
-#mobGraf .cmp-head .cap{margin-bottom:9px}
-#mobGraf .cmp-per{width:100%}
-#mobGraf .cmp-per select{width:100%;min-height:40px}
 
 /* — pie — */
 .mfoot{flex:0 0 auto;padding:12px 16px 22px;background:#fff;border-top:1px solid var(--n03)}
@@ -3431,8 +3406,7 @@ document.querySelectorAll('.screen .content').forEach(c => _obs.observe(c));
    ═══════════════════════════════════════════════════════════════════ */
 /* Arranca en la página 2 (nueva composición): es donde está la tarea.
    La composición actual queda a un swipe, como referencia. */
-let mobEstado = {pantalla:1, pagina:1, busca:'', filtro:null, buscando:false,
-                 tendencia:false};
+let mobEstado = {pantalla:1, pagina:1, busca:'', filtro:null, buscando:false};
 
 function setDevice(d){
   document.getElementById('mobWrap').classList.toggle('on', d === 'mob');
@@ -3541,22 +3515,13 @@ function mobNuevaRender(){
   box.innerHTML =
     '<div class="mcard-t">Nueva composición</div>' +
     /* Dona + cifras: sin esto se elige a ciegas. */
-    '<div class="mres"><div class="donut" id="mobDonut"></div><div class="kk">' +
+    '<div class="mres">' +
       '<div><span class="k">Portafolios</span><span class="v">' + sel.length + '</span></div>' +
       '<div><span class="k">Rentabilidad est.</span><span class="v">' +
         (sel.length ? rentaPonderada(state.nueva).toFixed(1).replace('.', ',') + '% E.A.' : '—') +
       '</span></div>' +
       '<div><span class="k">Perfil</span><span class="v' + (dv.hay ? ' alerta' : '') + '">' +
         (sel.length ? (BANDA[pm] ? BANDA[pm].label : pm) : '—') + '</span></div>' +
-    '</div></div>' +
-    /* Atajos del escritorio. */
-    '<div class="macc">' +
-      '<button onclick="mobAtajo(\'iguales\')">Repartir<br>por igual</button>' +
-      '<button onclick="mobAtajo(\'copiar\')">Copiar la<br>actual</button>' +
-      '<button onclick="mobAtajo(\'completar\')"' + (t === 0 || t >= 100 ? ' disabled' : '') +
-        '>Completar<br>el resto</button>' +
-      '<button onclick="mobAtajo(\'vaciar\')"' + (t === 0 ? ' disabled' : '') +
-        '>Empezar<br>de cero</button>' +
     '</div>' +
     mobMezclasHTML() +
     '<div class="mtools">' +
@@ -3591,14 +3556,8 @@ function mobNuevaRender(){
       (!filas.length ? '<div class="mpie" style="padding:22px 0">Nada coincide con la ' +
         'búsqueda.</div>' : '') +
     '</div>' +
-    mobTendenciaHTML() +
     '<div class="mpie">Cuando sume <b>100%</b>, podrás avanzar.</div>';
 
-  donut(document.getElementById('mobDonut'),
-        sel.map(x => ({pct:x.pct, color:COLOR[x.n]})),
-        {big:t + '%', sub:t === 100 ? 'listo' : 'de 100%'}, {absolute:true});
-  if (mobEstado.tendencia)
-    pintarTendencia(document.getElementById('mobGraf'), {W:326, H:190});
 }
 
 function mobAviso(tipo, html){
@@ -3638,17 +3597,6 @@ function mobFilaHTML(r, i){
 }
 function mobPaso(i, d){ mobSet(i, state.nueva[i].pct + d); }
 
-function mobAtajo(k){
-  if (k === 'iguales')   partesIguales();
-  if (k === 'copiar')    replicarActual();
-  if (k === 'completar') completar100();
-  if (k === 'vaciar'){
-    state.nueva.forEach((r, i) => { r.pct = 0; liveUpdate(i); });
-    toast('Composición vaciada');
-  }
-  mobRender();
-}
-
 /* Versiones guardadas: mismas del escritorio y mismo tope de 4. */
 function mobMezclasHTML(){
   return '<div class="mmz">' +
@@ -3671,23 +3619,6 @@ function mobNuevaMezcla(){
   nuevaMezcla(); mobRender();
 }
 
-/* Tendencia: sin ella se elige sin ver cómo se han comportado. */
-function mobTendenciaHTML(){
-  return '<div class="macor' + (mobEstado.tendencia ? ' on' : '') + '" id="mobAcor">' +
-    '<button class="macor-h" onclick="mobTendencia()">' +
-      '<span class="t">Cómo se han comportado</span>' +
-      '<svg class="ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-      'stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>' +
-    '<div class="macor-c">' +
-      '<div id="mobGraf"></div>' +
-    '</div></div>';
-}
-function mobTendencia(){
-  mobEstado.tendencia = !mobEstado.tendencia;
-  document.getElementById('mobAcor').classList.toggle('on', mobEstado.tendencia);
-  if (mobEstado.tendencia)
-    pintarTendencia(document.getElementById('mobGraf'), {W:326, H:190});
-}
 function mobCtrRender(){
   const box = document.getElementById('mobCtr');
   if (!box) return;
