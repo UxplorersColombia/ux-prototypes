@@ -468,6 +468,35 @@ img{display:block}
 .nv-graf .cmp-plot{margin-top:6px}
 .nv-graf .cmp-nota{margin-top:6px}
 
+/* Nombre de portafolio como enlace al detalle */
+.prow .n.pf-link{background:none;border:0;padding:0;text-align:left;cursor:pointer;
+  font:inherit;color:inherit;border-bottom:1px dotted var(--n05)}
+.prow .n.pf-link:hover{color:var(--green-acc);border-bottom-color:var(--green-acc)}
+.prow .n.pf-link:focus-visible{outline:2px solid var(--green-acc);outline-offset:2px}
+.prow.muted .n.pf-link{border-bottom-color:transparent}
+.prow.muted .n.pf-link:hover{color:var(--green-acc);border-bottom-color:var(--green-acc)}
+
+/* Popover: fixed y colgado del body para que la lista con overflow no lo corte */
+.pf-pop{position:fixed;z-index:60;width:330px;background:#fff;border-radius:12px;
+  border:1px solid var(--n03);box-shadow:0 8px 28px rgba(0,0,0,.14);
+  padding:14px 16px 12px;opacity:0;transform:translateY(-4px);
+  transition:opacity .12s,transform .12s}
+.pf-pop.on{opacity:1;transform:none}
+.pf-pop-cab{display:flex;align-items:center;gap:8px;
+  font:700 13px/18px var(--mont);color:var(--grey)}
+.pf-pop-cab .cd{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.pf-pop-sub{margin:10px 0 6px;font:400 10px/14px var(--os);color:var(--gris-etq);
+  text-transform:uppercase;letter-spacing:.02em}
+.pf-pop-fila{display:flex;align-items:center;gap:8px;padding:3px 0;
+  font:400 12px/18px var(--os);color:var(--grey)}
+.pf-pop-fila .q{flex:1;min-width:0}
+.pf-pop-fila .barra{width:64px;height:6px;border-radius:3px;background:var(--n03);
+  flex:0 0 64px;overflow:hidden}
+.pf-pop-fila .barra i{display:block;height:100%;border-radius:3px}
+.pf-pop-fila b{font:700 12px/18px var(--os);flex:0 0 34px;text-align:right}
+.pf-pop-pie{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);
+  font:400 10px/15px var(--os);color:var(--gris-etq)}
+
 .ov{position:absolute;inset:0;z-index:40;display:none;background:rgba(255,255,255,.72);
   backdrop-filter:blur(3px)}
 .ov.on{display:block}
@@ -1425,6 +1454,83 @@ const COLOR = {};
   if (!(r.n in COLOR)) COLOR[r.n] = PALETA[Object.keys(COLOR).length % PALETA.length];
 });
 
+/* ⚠ DATOS PLACEHOLDER de composición interna. En qué invierte cada
+   portafolio; los reales salen de Inversiones. Sirven para probar el
+   patrón de "ver el detalle sin salir de la pantalla", no para dar cifras.
+   Los porcentajes de cada portafolio suman 100. */
+const COMPOSICION = {
+  'FPV Especial Vista':            [['Efectivo y equivalentes',55],['Deuda pública corto plazo',30],['CDT bancarios',15]],
+  'FPV PRO':                       [['Deuda pública Colombia',45],['Deuda corporativa local',35],['Efectivo',20]],
+  'FPV Strategist Liquidez Col':   [['Efectivo',60],['CDT bancarios',25],['Deuda pública corto plazo',15]],
+  'FPV Strategist Liquidez USA':   [['Money market USA',70],['Treasuries corto plazo',30]],
+  'FPV Strategist Conservador':    [['Renta fija local',50],['Renta fija global',30],['Acciones globales',12],['Efectivo',8]],
+  'FVP Especial CAT 6 meses - C':  [['CDT a 6 meses',80],['Efectivo',20]],
+  'FVP Especial CAT 12 meses - C': [['CDT a 12 meses',85],['Efectivo',15]],
+  'FPV Strategist Moderado':       [['Renta fija global',40],['Acciones globales',35],['Renta fija local',20],['Efectivo',5]],
+  'FPV Strategist Balanceado':     [['Acciones globales',45],['Renta fija global',35],['Alternativos',12],['Efectivo',8]],
+  'FPV Strategist Renta Fija Global':[['Bonos soberanos desarrollados',50],['Bonos corporativos grado inversión',40],['Efectivo',10]],
+  'FPV Bonos Colombia Plus':       [['TES Colombia',55],['Deuda corporativa local',35],['Efectivo',10]],
+  'FPV Especial Inmobiliario':     [['Renta inmobiliaria comercial',45],['Renta inmobiliaria logística',30],['Desarrollo inmobiliario',25]],
+  'FPV Acciones Emergentes':       [['Acciones Asia emergente',45],['Acciones Latinoamérica',30],['Acciones EMEA',25]],
+  'FPV Strategist Acciones Colombia':[['Acciones alta capitalización Col',60],['Acciones media capitalización Col',40]],
+  'FPV Strategist Acciones Global':[['Acciones EE. UU.',50],['Acciones Europa',25],['Acciones Asia desarrollada',25]],
+  'FPV Acciones Nuevas Tecnologías':[['Semiconductores',35],['Software e IA',35],['Plataformas digitales',30]],
+  'FPV Strategist Agresivo':       [['Acciones globales',65],['Acciones emergentes',25],['Alternativos',10]],
+  'FPV Especial Activos Alternativos':[['Capital privado',40],['Deuda privada',30],['Infraestructura',30]],
+  'Bitcoin':                       [['Bitcoin (spot)',100]],
+  'Ethereum':                      [['Ethereum (spot)',100]]
+};
+
+/* Detalle del portafolio en un popover. Va en position:fixed y colgado del
+   body, no dentro de la lista: la lista tiene overflow-y y lo recortaría. */
+let popAbierto = null;
+function verComposicion(ev, nombre){
+  ev.stopPropagation();
+  cerrarComposicion();
+  const filas = COMPOSICION[nombre];
+  if (!filas) return;
+  const orig = ACTUAL.concat(NUEVA).find(r => r.n === nombre);
+  const pop = document.createElement('div');
+  pop.className = 'pf-pop';
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-label', 'En qué invierte ' + nombre);
+  pop.innerHTML = `
+    <div class="pf-pop-cab">
+      <span class="cd" style="background:${COLOR[nombre] || 'var(--n05)'}"></span>
+      <b>${nombre}</b>
+      ${orig ? riesgoIcon(orig.riesgo) : ''}
+    </div>
+    <div class="pf-pop-sub">En qué invierte</div>
+    ${filas.map(([q,p]) => `
+      <div class="pf-pop-fila">
+        <span class="q">${q}</span>
+        <span class="barra"><i style="width:${p}%;background:${COLOR[nombre] || 'var(--n05)'}"></i></span>
+        <b>${p}%</b>
+      </div>`).join('')}
+    <div class="pf-pop-pie">Composición indicativa. Puede variar según el
+      mandato del portafolio y las condiciones de mercado.</div>`;
+  document.body.appendChild(pop);
+
+  // anclado al nombre, y volteado hacia arriba si no cabe abajo
+  const r = ev.currentTarget.getBoundingClientRect();
+  const h = pop.offsetHeight, w = pop.offsetWidth;
+  let top = r.bottom + 8;
+  if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 8);
+  let left = r.left;
+  if (left + w > window.innerWidth - 8) left = Math.max(8, window.innerWidth - w - 8);
+  pop.style.top = top + 'px';
+  pop.style.left = left + 'px';
+  pop.classList.add('on');
+  popAbierto = pop;
+  log('composicion_portafolio', nombre);
+}
+function cerrarComposicion(){
+  if (popAbierto){ popAbierto.remove(); popAbierto = null; }
+}
+document.addEventListener('click', cerrarComposicion);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarComposicion(); });
+window.addEventListener('scroll', cerrarComposicion, true);
+
 /* MEJORA · Contratos ordenados por saldo disponible (desc) y el
    deshabilitado con RAZÓN explícita. En el Figma el default era el
    contrato con $0 y el deshabilitado no explicaba por qué.
@@ -1633,13 +1739,15 @@ function renderActual(){
       <div class="dot" style="background:${COLOR[r.n]}"></div>
       ${riesgoIcon(r.riesgo)}
       <div class="pct">${r.pct}%</div>
-      <div class="txt"><div class="n">${r.n}</div><div class="a">${money(r.amt)}</div></div>
+      <div class="txt"><button class="n pf-link" onclick="verComposicion(event,'${r.n.replace(/'/g,"\\'")}')"
+             title="Ver en qué invierte">${r.n}</button><div class="a">${money(r.amt)}</div></div>
     </div>`).join('');
 }
 
 
 /* ── Render columna derecha (editable) ────────────────────── */
 function renderNueva(){
+  cerrarComposicion();
   const t = total(), falta = 100 - t;
 
   // Los seleccionados suben al tope, igual que en los frames del Figma
@@ -1662,7 +1770,8 @@ function renderNueva(){
            style="${has ? 'background:' + COLOR[r.n] : ''}"></div>
       ${riesgoIcon(r.riesgo)}
       ${r.nuevo ? '<div class="chip-new">Nuevo</div>' : ''}
-      <div class="txt"><div class="n">${r.n}</div></div>
+      <div class="txt"><button class="n pf-link" onclick="verComposicion(event,'${r.n.replace(/'/g,"\\'")}')"
+             title="Ver en qué invierte">${r.n}</button></div>
       <div class="pctbox ${has ? 'has' : ''}">
         <input type="text" inputmode="numeric" maxlength="3" value="${r.pct}" data-i="${i}"
                aria-label="Porcentaje para ${r.n}">
