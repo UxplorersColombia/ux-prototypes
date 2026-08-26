@@ -1601,12 +1601,27 @@ function log(evento, detalle){
   renderTraza();
 }
 
+/* El panel muestra una etiqueta legible, no la clave cruda: las claves
+   (mezcla_nueva, mezcla_activada…) NO se renombran porque alimentan la
+   trazabilidad que la CE 014/2025 exige poder reconstruir, y cambiarlas
+   partiría la serie histórica. La clave real queda en el title de la fila,
+   así el equipo la sigue viendo sin que el vocabulario viejo se cuele a la
+   pantalla. */
+const EV_ETIQUETA = {
+  mezcla_nueva:        'versión creada',
+  mezcla_activada:     'versión activada',
+  mezcla_renombrada:   'versión renombrada',
+  mezcla_borrada:      'versión borrada',
+  mezcla_confirmada:   'composición confirmada'
+};
+const etiquetaEvento = ev => EV_ETIQUETA[ev] || ev.replace(/_/g, ' ');
+
 function renderTraza(){
   const b = document.getElementById('trazaBody');
   if (!b) return;
   b.innerHTML = traza.length ? traza.map(e => `
-    <div class="tz-row">
-      <div class="tz-ev">${e.evento}</div>
+    <div class="tz-row" title="evento: ${e.evento}">
+      <div class="tz-ev">${etiquetaEvento(e.evento)}</div>
       <div class="tz-dt">${e.detalle}</div>
       <div class="tz-ts">${e.canal} · ${e.ts}</div>
     </div>`).join('') :
