@@ -755,9 +755,294 @@ body{padding-bottom:88px}
 .tz-ts{font:400 12px/17px ui-monospace,SFMono-Regular,Menlo,monospace;opacity:.42;margin-top:4px}
 .tz-empty{padding:20px;font:400 14px/21px var(--os);opacity:.5}
 #pnav b{color:#8FE000;margin-left:4px}
+
+/* ══════════════════════════════════════════════════════════════════
+   SELECTOR DE DISPOSITIVO + VISTA MÓVIL
+   El layout de escritorio es absoluto (left:91px sobre 1440px), así que
+   no se puede reflowear: el móvil es su propio render sobre el MISMO
+   `state`. Cualquier cambio en una vista se ve en la otra.
+   ══════════════════════════════════════════════════════════════════ */
+#devbar{display:flex;justify-content:center;gap:4px;padding:12px 0 4px;
+  background:var(--n02, #F7F7F7)}
+#devbar .seg{display:inline-flex;background:#fff;border:1px solid var(--n03);
+  border-radius:100px;padding:3px;box-shadow:var(--sk-input)}
+#devbar button{border:0;background:transparent;cursor:pointer;border-radius:100px;
+  padding:8px 22px;font:700 14px/20px var(--os);color:var(--gris-txt);
+  display:inline-flex;align-items:center;gap:7px;transition:.15s}
+#devbar button.on{background:var(--green);color:#fff}
+#devbar button:not(.on):hover{background:var(--n03)}
+#devbar svg{width:15px;height:15px}
+
+/* El padding inferior deja libre la barra de navegación del prototipo
+   (#pnav, fija abajo), que si no tapa el botón de continuar. */
+#mobWrap{display:none;justify-content:center;padding:16px 0 24px;background:#F7F7F7}
+body.movil #pnav{display:none}
+#mobWrap.on{display:flex}
+#mobFrame{width:390px;height:844px;background:#fff;border-radius:44px;position:relative;
+  box-shadow:0 0 0 10px #232323, 0 20px 60px rgba(0,0,0,.30);overflow:hidden;
+  display:flex;flex-direction:column}
+#mobFrame .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  width:112px;height:26px;background:#232323;border-radius:100px;z-index:60}
+
+/* — cabecera — */
+.mh{flex:0 0 auto;padding:38px 18px 10px;background:#fff;position:relative;z-index:30;
+  border-bottom:1px solid var(--n03)}
+.mh-top{display:flex;align-items:center;gap:10px;min-height:34px}
+.mh-back{width:44px;height:44px;border-radius:100px;border:1px solid var(--n03);
+  background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  flex:0 0 44px;margin-left:-5px}
+.mh-back svg{width:16px;height:16px}
+.mh-tit{font:700 17px/22px var(--mont);color:var(--grey);flex:1;min-width:0}
+.mh-paso{font:400 12px/16px var(--os);color:var(--gris-txt);flex:0 0 auto}
+
+/* — barra de avance pegajosa: el dato que el cliente necesita siempre — */
+.mprog{padding:10px 18px 12px;background:#fff;border-bottom:1px solid var(--n03);
+  flex:0 0 auto;position:relative;z-index:29}
+.mprog-l{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.mprog-n{font:700 20px/24px var(--mont);color:var(--grey)}
+.mprog-n.full{color:var(--green-txt)}
+.mprog-f{font:400 13px/18px var(--os);color:var(--gris-txt)}
+.mprog-bar{height:8px;border-radius:100px;background:var(--n03);overflow:hidden}
+.mprog-bar i{display:block;height:100%;border-radius:100px;background:var(--green);
+  transition:width .25s}
+.mprog-bar i.over{background:var(--err-d, #E03430)}
+
+/* — cuerpo con scroll — */
+.mbody{flex:1 1 0;overflow-y:auto;background:#F7F7F7;padding:14px 14px 20px;
+  -webkit-overflow-scrolling:touch}
+.mbody::-webkit-scrollbar{width:0}
+
+/* — control segmentado actual/nueva — */
+.mseg{display:flex;background:var(--n03);border-radius:100px;padding:3px;margin-bottom:14px}
+.mseg button{flex:1;border:0;background:transparent;border-radius:100px;padding:10px 4px;
+  font:700 13px/18px var(--os);color:var(--gris-txt);cursor:pointer;min-height:44px}
+.mseg button.on{background:#fff;color:var(--grey);box-shadow:var(--sk-input)}
+
+.mcard{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;
+  box-shadow:var(--sk1)}
+.mcard-t{font:700 15px/20px var(--mont);color:var(--grey);margin-bottom:2px}
+.mcard-s{font:400 13px/18px var(--os);color:var(--gris-txt)}
+
+/* — dona — */
+.mdonut{display:flex;flex-direction:column;align-items:center;gap:12px}
+.mdonut .donut{width:172px;height:172px;flex:0 0 172px}
+.mdonut .donut svg{width:172px;height:172px}
+.mdonut .lbl-c .big{font:700 26px/30px var(--mont)}
+.mdonut .lbl-c .sub{font:400 12px/16px var(--os)}
+.mkpi{display:flex;width:100%;border-top:1px solid var(--n03);padding-top:12px;gap:8px}
+.mkpi > div{flex:1;text-align:center;min-width:0}
+.mkpi > div + div{border-left:1px solid var(--n03)}
+.mkpi .k{font:400 12px/16px var(--os);color:var(--gris-txt);display:block}
+.mkpi .v{font:700 14px/20px var(--mont);color:var(--grey);display:block;margin-top:2px}
+.mkpi .v.alerta{color:#8A5A00}
+
+/* — atajos — */
+.macc{display:flex;gap:8px;margin-bottom:12px}
+.macc button{flex:1;min-height:46px;border:1px solid var(--n03);background:#fff;
+  border-radius:12px;font:700 12px/16px var(--os);color:var(--green-txt);cursor:pointer;
+  padding:6px 4px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px}
+.macc button:active{background:#F6FCF2}
+.macc button[disabled]{color:var(--gris-txt);opacity:.5}
+
+/* — buscador: con 20 portafolios, encontrarlos a mano es el cuello de botella — */
+.msearch{position:relative;margin-bottom:10px}
+.msearch input{width:100%;height:46px;border:1px solid var(--n03);border-radius:12px;
+  padding:0 40px 0 38px;font:400 14px/20px var(--os);color:var(--grey);background:#fff}
+.msearch input:focus{outline:none;border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(0,199,61,.14)}
+.msearch .ic{position:absolute;left:13px;top:15px;width:16px;height:16px;
+  pointer-events:none;color:var(--gris-txt)}
+.msearch .clr{position:absolute;right:8px;top:9px;width:28px;height:28px;border:0;
+  background:transparent;cursor:pointer;color:var(--gris-txt);font:400 18px/1 var(--os);
+  border-radius:100px;display:none}
+.msearch .clr.on{display:block}
+
+.mgrupo{font:700 12px/16px var(--os);color:var(--gris-txt);margin:14px 2px 7px;
+  display:flex;align-items:center;gap:6px}
+.mgrupo .c{width:7px;height:7px;border-radius:100px;flex:0 0 7px}
+
+/* — tarjeta de portafolio — */
+.mpf{background:#fff;border-radius:14px;padding:12px 13px;margin-bottom:9px;
+  border:1px solid transparent;box-shadow:var(--sk1)}
+.mpf.act{border-color:var(--green)}
+.mpf.fuera{border-color:var(--warn-d)}
+.mpf-a{display:flex;align-items:flex-start;gap:9px;margin-bottom:11px}
+.mpf-dot{width:11px;height:11px;border-radius:100px;flex:0 0 11px;margin-top:4px;
+  background:var(--n03);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
+.mpf-n{flex:1;min-width:0}
+.mpf-nom{font:700 14px/19px var(--os);color:var(--grey);text-align:left;background:0;
+  border:0;cursor:pointer;padding:12px 0;margin:-12px 0;   /* 19+24 = 43 px táctiles */
+  text-decoration:underline dotted var(--n05);text-underline-offset:3px}
+.mpf-nom:active{color:var(--green-txt);text-decoration-color:var(--green-txt)}
+.mpf-sub{font:400 12px/16px var(--os);color:var(--gris-txt);margin-top:2px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mpf-ri{font-size:12px}
+.mpf-b{display:flex;align-items:center;gap:9px}
+.mstep{width:44px;height:44px;border-radius:12px;border:1px solid var(--n03);background:#fff;
+  font:700 20px/1 var(--os);color:var(--grey);cursor:pointer;flex:0 0 44px;
+  display:flex;align-items:center;justify-content:center}
+.mstep:active{background:var(--n03)}
+.mstep[disabled]{opacity:.35;cursor:not-allowed}
+.mpf-in{flex:1;min-width:0;height:44px;border:1px solid var(--n03);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;gap:2px;background:#FAFAFA}
+.mpf.act .mpf-in{background:#F6FCF2;border-color:var(--green)}
+.mpf-in input{width:46px;height:100%;border:0;background:transparent;text-align:right;
+  font:700 17px/22px var(--mont);color:var(--grey);padding:0}
+.mpf-in input:focus{outline:none}
+.mpf-in .sym{font:700 15px/20px var(--mont);color:var(--gris-txt)}
+.mpf-amt{font:400 12px/16px var(--os);color:var(--gris-txt);text-align:right;
+  margin-top:7px;min-height:16px}
+
+.mvacio{text-align:center;padding:26px 14px;color:var(--gris-txt);
+  font:400 13px/19px var(--os)}
+
+/* — acordeón de tendencia — */
+.macor{background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;
+  box-shadow:var(--sk1)}
+.macor-h{width:100%;border:0;background:#fff;padding:15px 16px;display:flex;
+  align-items:center;gap:10px;cursor:pointer;min-height:52px}
+.macor-h .t{flex:1;text-align:left;font:700 14px/19px var(--mont);color:var(--grey)}
+.macor-h .ch{width:14px;height:14px;color:var(--gris-txt);transition:transform .2s}
+.macor.on .macor-h .ch{transform:rotate(180deg)}
+.macor-c{display:none;padding:0 12px 14px}
+.macor.on .macor-c{display:block}
+
+/* — barra inferior fija — */
+.mfoot{flex:0 0 auto;padding:12px 16px 26px;background:#fff;
+  border-top:1px solid var(--n03);box-shadow:0 -3px 14px rgba(0,0,0,.05)}
+.mfoot .btn{width:100%;height:50px;font:700 16px/22px var(--mont)}
+.mfoot .aviso{font:400 11px/15px var(--os);color:var(--gris-txt);text-align:center;
+  margin-top:9px}
+
+/* — lista de solo lectura (composición actual) — */
+.mro{display:flex;align-items:center;gap:9px;padding:11px 0;
+  border-bottom:1px solid var(--n03)}
+.mro:last-child{border-bottom:0}
+.mro .d{width:10px;height:10px;border-radius:100px;flex:0 0 10px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.28)}
+.mro .n{flex:1;min-width:0;font:400 13px/18px var(--os);color:var(--grey)}
+.mro .p{font:700 14px/19px var(--mont);color:var(--grey);flex:0 0 auto}
+
+/* — pantallas móviles — */
+.mscreen{display:none;flex-direction:column;height:100%}
+.mscreen.on{display:flex}
+.mintro{padding:20px 4px}
+.mintro h2{font:700 22px/28px var(--mont);color:var(--grey);margin-bottom:8px}
+.mintro p{font:400 14px/21px var(--os);color:var(--gris-txt);margin-bottom:16px}
+.mchip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;
+  background:#F6FCF2;color:var(--green-txt);font:700 12px/16px var(--os)}
+.mlist-ctr{display:flex;align-items:center;gap:11px;padding:14px 0;
+  border-bottom:1px solid var(--n03);cursor:pointer;width:100%;background:0;border:0;
+  text-align:left}
+.mlist-ctr .r{width:20px;height:20px;border-radius:100px;border:2px solid var(--n05);
+  flex:0 0 20px;display:flex;align-items:center;justify-content:center}
+.mlist-ctr.on .r{border-color:var(--green)}
+.mlist-ctr.on .r::after{content:'';width:10px;height:10px;border-radius:100px;
+  background:var(--green)}
+.mlist-ctr .i{flex:1;min-width:0}
+.mlist-ctr .i b{display:block;font:700 14px/19px var(--os);color:var(--grey)}
+.mlist-ctr .i span{display:block;font:400 12px/17px var(--os);color:var(--gris-txt)}
+.mok{text-align:center;padding:26px 10px}
+.mok .ic{width:66px;height:66px;border-radius:100px;background:#F6FCF2;margin:0 auto 14px;
+  display:flex;align-items:center;justify-content:center;color:var(--green-txt)}
+.mok h2{font:700 20px/26px var(--mont);color:var(--grey);margin-bottom:7px}
+.mok p{font:400 14px/21px var(--os);color:var(--gris-txt)}
+
 </style>
 </head>
 <body>
+<!-- ══ Selector de dispositivo ══════════════════════════════════════ -->
+<div id="devbar">
+  <div class="seg">
+    <button data-dev="desk" class="on" onclick="setDevice('desk')" aria-pressed="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14"
+        rx="2"/><path d="M8 21h8M12 17v4"/></svg>Escritorio</button>
+    <button data-dev="mob" onclick="setDevice('mob')" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20"
+        rx="3"/><path d="M11 18h2"/></svg>Móvil</button>
+  </div>
+</div>
+
+<!-- ══ Marco móvil ═══════════════════════════════════════════════════ -->
+<div id="mobWrap">
+ <div id="mobFrame">
+  <div class="notch"></div>
+
+  <!-- Pantalla 1 · elegir contrato -->
+  <section class="mscreen on" id="mob-1">
+    <div class="mh"><div class="mh-top">
+      <div class="mh-tit">Gestión de portafolios</div>
+      <div class="mh-paso">1 de 3</div></div></div>
+    <div class="mbody">
+      <div class="mintro">
+        <span class="mchip">Perfil Prudente</span>
+        <h2 style="margin-top:12px">Organiza tu inversión a tu manera</h2>
+        <p>Eliges tú los portafolios y cuánto va en cada uno. Skandia ejecuta
+           tu instrucción sin darte una recomendación.</p>
+      </div>
+      <div class="mcard">
+        <div class="mcard-t" style="margin-bottom:10px">Elige el contrato</div>
+        <div id="mobCtr"></div>
+      </div>
+      <p style="font:400 11px/16px var(--os);color:var(--gris-txt);padding:0 4px">
+        Vigilado por la Superintendencia Financiera de Colombia.</p>
+    </div>
+    <div class="mfoot">
+      <button class="btn primary" onclick="mobGo(2)">Comenzar</button>
+    </div>
+  </section>
+
+  <!-- Pantalla 2 · asignar porcentajes -->
+  <section class="mscreen" id="mob-2">
+    <div class="mh"><div class="mh-top">
+      <button class="mh-back" onclick="mobGo(1)" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="mh-tit">Tu composición</div>
+      <div class="mh-paso">2 de 3</div></div></div>
+
+    <div class="mprog">
+      <div class="mprog-l">
+        <span class="mprog-n" id="mobPct">0%</span>
+        <span class="mprog-f" id="mobFalta">Faltan 100%</span>
+      </div>
+      <div class="mprog-bar"><i id="mobBar" style="width:0%"></i></div>
+    </div>
+
+    <div class="mbody">
+      <div class="mseg">
+        <button class="on" data-mt="nueva" onclick="mobTab('nueva')">Tu composición nueva</button>
+        <button data-mt="actual" onclick="mobTab('actual')">La actual</button>
+      </div>
+      <div id="mobNueva"></div>
+      <div id="mobActual" style="display:none"></div>
+    </div>
+
+    <div class="mfoot">
+      <button class="btn primary" id="mobCta" onclick="mobFinalizar()" disabled>Continuar</button>
+      <div class="aviso" id="mobAviso">Asigna el 100% para continuar</div>
+    </div>
+  </section>
+
+  <!-- Pantalla 3 · confirmación -->
+  <section class="mscreen" id="mob-3">
+    <div class="mh"><div class="mh-top">
+      <button class="mh-back" onclick="mobGo(2)" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="mh-tit">Confirma tu instrucción</div>
+      <div class="mh-paso">3 de 3</div></div></div>
+    <div class="mbody" id="mobResumen"></div>
+    <div class="mfoot">
+      <button class="btn primary" onclick="mobConfirmar()">Confirmar y enviar</button>
+    </div>
+  </section>
+ </div>
+</div>
+
 <div id="stageWrap"><div id="stage">
 
 <!-- ══════════════════════════════════════════════════════════
@@ -1442,21 +1727,21 @@ const NUEVA = [
    28,7 contra el verde de "Tu mezcla". Saturación media 0,41: tonos
    apagados, no neón — maximizar la separación a secas daba colores
    chillones, impropios de un producto financiero. */
-/* Paleta oficial del Design System — tokens --charts-c01..c40 (primitive-color.css).
-   Se eligieron 20 de los 40 maximizando la separación perceptual: ΔE mínimo 27,0.
-   OJO: en los archivos locales del DS (primitive-color.css y preview/color-charts.html)
-   c09 y c15 están transpuestos respecto a la fuente de diseño: el archivo dice
-   c09=#DE423E y c15=#FECD72, y la fuente dice lo contrario. Las etiquetas de abajo
-   siguen la fuente de diseño. Los hex son los correctos en cualquier caso.
-   Van ordenados de mayor a menor contraste sobre blanco, así los portafolios que
-   más se usan reciben los tonos más legibles. Once quedan por debajo del 3:1 que
-   pide WCAG 1.4.11 para objetos gráficos: es una limitación de la paleta de marca,
-   compensada abajo con trazo más grueso en las curvas y un aro de contorno en los
-   puntos y en la dona, que dan borde sin alterar el color. */
-const PALETA = ['#6F32C6','#7B3FA1','#1F6FEB','#73777B','#2E8B57',  /* c32 c37 c33 c26 c34 */
-                '#DE423E','#368CB5','#BC6995','#F50CC9','#BF9078',  /* c15 c18 c12 c20 c24 */
-                '#60A9A6','#F28C28','#F4B400','#A1DD70','#B5D1FF',  /* c03 c39 c35 c01 c30 */
-                '#C5D8A4','#FECD72','#00F59F','#FFE2E2','#B2F9FC']; /* c17 c09 c19 c27 c23 */
+/* Paleta oficial de gráficas del Design System, tokens --charts-c01..c20,
+   en el orden en que aparecen en el sistema. Es la gama que el DS pone primero
+   y la que se usa en las donas.
+   c09 y c15 siguen la fuente de diseño (c09 ámbar, c15 rojo); los archivos
+   locales tokens/primitive-color.css y preview/color-charts.html los tienen
+   transpuestos — conviene corregirlo allí.
+   Es una gama pastel: 15 de los 20 quedan por debajo del 3:1 que pide WCAG
+   1.4.11, y c07 baja a 1,35:1. En la dona no estorba, porque son rellenos
+   grandes y el peor par contiguo queda en ΔE 21. En la curva de tendencia sí,
+   así que cada trazo lleva debajo un halo oscuro que le da borde sobre el
+   blanco sin tocar el color. Los puntos y la dona llevan aro por lo mismo. */
+const PALETA = ['#A1DD70','#A4D7E1','#60A9A6','#FF9460','#8BA2C1',  /* c01 c02 c03 c04 c05 */
+                '#F67E7D','#DDDFD0','#6A7491','#FECD72','#95DBB7',  /* c06 c07 c08 c09 c10 */
+                '#FFBF9F','#BC6995','#D9D052','#D6C09C','#DE423E',  /* c11 c12 c13 c14 c15 */
+                '#CBA1D2','#C5D8A4','#368CB5','#00F59F','#F50CC9']; /* c16 c17 c18 c19 c20 */
 const COLOR = {};
 [...ACTUAL, ...NUEVA].forEach(r => {
   if (!(r.n in COLOR)) COLOR[r.n] = PALETA[Object.keys(COLOR).length % PALETA.length];
@@ -2608,6 +2893,12 @@ function pintarTendencia(box, opts = {}){
     for (let i = ini; i <= fin; i += paso)
       d += (d ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y((c.serie[i]/c.serie[ini]-1)*100).toFixed(1);
     d += 'L' + x(fin).toFixed(1) + ' ' + y(varia(c)).toFixed(1);
+    /* Halo: un trazo oscuro algo más ancho por debajo. Da borde a los tonos
+       pálidos de la paleta sobre el fondo blanco sin alterar su color. Las
+       líneas de referencia (key) no lo llevan: ya contrastan por sí solas. */
+    if (!c.key) paths += `<path d="${d}" fill="none" stroke="rgba(0,0,0,.38)"
+      stroke-width="${c.w + 1.6}" stroke-linejoin="round" stroke-linecap="round"
+      ${c.dash ? `stroke-dasharray="${c.dash}"` : ''}/>`;
     paths += `<path d="${d}" fill="none" stroke="${c.color}" stroke-width="${c.w}"
       stroke-linejoin="round" stroke-linecap="round"
       ${c.dash ? `stroke-dasharray="${c.dash}"` : ''}/>`;
@@ -2863,11 +3154,319 @@ const _obs = new ResizeObserver(fit);
 _obs.observe(document.getElementById('stage'));
 document.querySelectorAll('.screen .content').forEach(c => _obs.observe(c));
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   VISTA MÓVIL
+   El escritorio usa posicionamiento absoluto sobre un lienzo de 1440 px,
+   así que no admite reflow. El móvil es un render propio que lee y escribe
+   el MISMO `state`: lo que se asigna en una vista aparece en la otra.
+   Decisiones de uso, por orden de impacto:
+   · el % asignado vive en una barra fija arriba — es el dato que gobierna
+     toda la tarea y no puede quedar fuera de pantalla;
+   · pasos de ±1 con botones de 44 px, porque teclear en móvil es el punto
+     donde más se abandona. El campo sigue disponible para saltos grandes;
+   · buscador y agrupación por riesgo: 20 portafolios no se recorren a mano;
+   · actual y nueva no caben lado a lado, así que van en un segmentado.
+   ═══════════════════════════════════════════════════════════════════ */
+let mobEstado = {pantalla:1, tab:'nueva', busca:'', tendencia:false};
+
+function setDevice(d){
+  document.getElementById('mobWrap').classList.toggle('on', d === 'mob');
+  document.body.classList.toggle('movil', d === 'mob');
+  document.getElementById('stageWrap').style.display = d === 'mob' ? 'none' : 'flex';
+  document.querySelectorAll('#devbar button').forEach(b => {
+    const on = b.dataset.dev === d;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  if (d === 'mob'){ mobRender(); mobCtrRender(); }
+  else fit();
+  log('vista_cambiada', d === 'mob' ? 'movil' : 'escritorio');
+}
+
+function mobGo(n){
+  if (n === 3) mobResumenRender();
+  mobEstado.pantalla = n;
+  document.querySelectorAll('.mscreen').forEach(x => x.classList.remove('on'));
+  document.getElementById('mob-' + n).classList.add('on');
+  const b = document.querySelector('#mob-' + n + ' .mbody');
+  if (b) b.scrollTop = 0;
+}
+
+function mobTab(t){
+  mobEstado.tab = t;
+  document.querySelectorAll('.mseg button').forEach(b =>
+    b.classList.toggle('on', b.dataset.mt === t));
+  document.getElementById('mobNueva').style.display  = t === 'nueva'  ? '' : 'none';
+  document.getElementById('mobActual').style.display = t === 'actual' ? '' : 'none';
+  if (t === 'actual') mobActualRender();
+}
+
+/* Escribe en state y delega en liveUpdate() para que el escritorio
+   se actualice solo: una sola fuente de verdad. */
+function mobSet(i, valor){
+  let v = parseInt(String(valor).replace(/\D/g, ''), 10);
+  if (isNaN(v)) v = 0;
+  const otros = state.nueva.reduce((a, r, k) => a + (k === i ? 0 : r.pct), 0);
+  v = Math.max(0, Math.min(v, 100 - otros));      // nunca deja pasar de 100
+  state.nueva[i].pct = v;
+  liveUpdate(i);
+  mobRender();
+}
+function mobStep(i, d){ mobSet(i, state.nueva[i].pct + d); }
+
+function mobBuscar(v){
+  mobEstado.busca = v.toLowerCase().trim();
+  document.querySelector('.msearch .clr').classList.toggle('on', !!v);
+  mobListaRender();
+}
+function mobLimpiar(){
+  const inp = document.querySelector('.msearch input');
+  if (inp) inp.value = '';
+  mobBuscar('');
+}
+
+function mobRender(){
+  const t = total(), falta = 100 - t;
+  const pct = document.getElementById('mobPct');
+  if (!pct) return;
+  pct.textContent = t + '%';
+  pct.classList.toggle('full', t === 100);
+  document.getElementById('mobFalta').textContent =
+    t === 100 ? 'Listo, ya asignaste todo' :
+    t > 100   ? 'Te pasaste ' + (t - 100) + '%' : 'Faltan ' + falta + '%';
+  const bar = document.getElementById('mobBar');
+  bar.style.width = Math.min(100, t) + '%';
+  bar.classList.toggle('over', t > 100);
+
+  const cta = document.getElementById('mobCta');
+  cta.disabled = t !== 100;
+  document.getElementById('mobAviso').textContent =
+    t === 100 ? 'Podrás revisarlo antes de confirmar' : 'Asigna el 100% para continuar';
+
+  mobResumenSuperior();
+  mobListaRender();
+  if (mobEstado.tendencia) pintarTendencia(document.getElementById('mobGraf'),
+    {W:330, H:210});
+}
+
+/* Dona + los dos datos que el cliente compara: perfil y rentabilidad. */
+function mobResumenSuperior(){
+  const box = document.getElementById('mobNueva');
+  if (!box) return;
+  let cab = document.getElementById('mobCab');
+  if (!cab){
+    box.innerHTML =
+      '<div class="mcard" id="mobCab"></div>' +
+      '<div class="macc" id="mobAcc"></div>' +
+      '<div class="msearch">' +
+        '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+          'stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/>' +
+          '<path d="M20 20l-3.5-3.5"/></svg>' +
+        '<input type="text" placeholder="Busca un portafolio" aria-label="Buscar" ' +
+          'oninput="mobBuscar(this.value)">' +
+        '<button class="clr" onclick="mobLimpiar()" aria-label="Limpiar">&times;</button>' +
+      '</div>' +
+      '<div id="mobLista"></div>' +
+      '<div class="macor" id="mobAcor">' +
+        '<button class="macor-h" onclick="mobTendencia()">' +
+          '<span class="t">Ver cómo se han comportado</span>' +
+          '<svg class="ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+            'stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>' +
+        '</button>' +
+        '<div class="macor-c"><div id="mobGraf"></div></div>' +
+      '</div>';
+    cab = document.getElementById('mobCab');
+    mobAccRender();
+  }
+  const t = total(), sel = state.nueva.filter(x => x.pct > 0);
+  const pm = perfilMezcla(), dv = desviacion(), d = dv.hay;
+  cab.innerHTML =
+    '<div class="mdonut">' +
+      '<div class="donut" id="mobDonut"></div>' +
+      '<div class="mkpi">' +
+        '<div><span class="k">Portafolios</span><span class="v">' + sel.length + '</span></div>' +
+        '<div><span class="k">Rentabilidad est.</span><span class="v">' +
+          (sel.length ? rentaPonderada(state.nueva).toFixed(1).replace('.', ',') + '% E.A.' : '—') +
+        '</span></div>' +
+        '<div><span class="k">Perfil</span><span class="v' + (d ? ' alerta' : '') + '">' +
+          (sel.length ? (BANDA[pm] ? BANDA[pm].label : pm) : '—') + '</span></div>' +
+      '</div>' +
+    '</div>';
+  donut(document.getElementById('mobDonut'),
+        sel.map(x => ({pct:x.pct, color:COLOR[x.n]})),
+        {big:t + '%', sub:t === 100 ? 'asignado' : 'de 100%'}, {absolute:true});
+  if (d) cab.insertAdjacentHTML('beforeend',
+    '<div style="margin-top:12px;padding:11px 12px;border-radius:12px;' +
+    'background:var(--warn-l);font:400 12px/17px var(--os);color:#8A5A00">' +
+    mobTextoDesvio(dv) + '</div>');
+}
+
+/* El aviso nombra la banda concreta y las dos cifras: para un perfil Prudente,
+   "llevas 25% en agresivo y tu tope es 10%" es accionable; "se sale de tu
+   perfil" no dice qué mover. */
+function mobTextoDesvio(dv){
+  const partes = dv.excesos.map(e =>
+    'llevas ' + e.pct + '% en riesgo ' + BANDA[e.banda].label.toLowerCase() +
+    ' y tu tope es ' + e.tope + '%');
+  return 'Tu perfil es ' + PERFIL + ': ' + partes.join(', y ') +
+    '. Puedes continuar, pero quedará registrado que fue decisión tuya.';
+}
+
+function mobAccRender(){
+  document.getElementById('mobAcc').innerHTML =
+    '<button onclick="mobPartesIguales()">Repartir<br>por igual</button>' +
+    '<button onclick="mobCopiarActual()">Copiar la<br>actual</button>' +
+    '<button onclick="mobVaciar()">Empezar<br>de cero</button>';
+}
+function mobPartesIguales(){ partesIguales(); mobRender(); }
+function mobCopiarActual(){ replicarActual(); mobRender(); }
+function mobVaciar(){
+  state.nueva.forEach((r, i) => { r.pct = 0; });
+  state.nueva.forEach((r, i) => liveUpdate(i));
+  mobRender();
+  toast('Composición vaciada');
+}
+
+function mobTendencia(){
+  mobEstado.tendencia = !mobEstado.tendencia;
+  document.getElementById('mobAcor').classList.toggle('on', mobEstado.tendencia);
+  if (mobEstado.tendencia) pintarTendencia(document.getElementById('mobGraf'), {W:330, H:210});
+}
+
+/* Lista agrupada por banda de riesgo, filtrada por el buscador. */
+function mobListaRender(){
+  const box = document.getElementById('mobLista');
+  if (!box) return;
+  const q = mobEstado.busca;
+  let html = '', vistos = 0;
+  ORDEN_BANDA.forEach(banda => {
+    const grupo = state.nueva
+      .map((r, i) => ({r, i}))
+      .filter(o => o.r.riesgo === banda && (!q || o.r.n.toLowerCase().includes(q)));
+    if (!grupo.length) return;
+    vistos += grupo.length;
+    const b = BANDA[banda];
+    html += '<div class="mgrupo"><span class="c" style="background:' + b.color + '"></span>' +
+            'Riesgo ' + b.label + ' · ' + grupo.length + '</div>';
+    grupo.forEach(o => {
+      const r = o.r, i = o.i, has = r.pct > 0;
+      const tope = TOLERANCIA[PERFIL][r.riesgo];
+      const fuera = has && tope !== undefined && r.pct > tope;
+      html +=
+        '<div class="mpf' + (has ? ' act' : '') + (fuera ? ' fuera' : '') + '">' +
+          '<div class="mpf-a">' +
+            '<span class="mpf-dot" style="' + (has ? 'background:' + COLOR[r.n] : '') + '"></span>' +
+            '<div class="mpf-n">' +
+              '<button class="mpf-nom" onclick="verComposicion(event,\'' +
+                r.n.replace(/'/g, "\\'") + '\')">' + r.n + '</button>' +
+              '<div class="mpf-sub">' +
+                '<span>' + (RENTA[r.n] !== undefined
+                  ? RENTA[r.n].toFixed(1).replace('.', ',') + '% E.A.' : 'Sin histórico') + '</span>' +
+                (r.nuevo ? '<span class="mchip" style="padding:2px 8px">Nuevo</span>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="mpf-b">' +
+            '<button class="mstep" onclick="mobStep(' + i + ',-1)" aria-label="Quitar 1%"' +
+              (r.pct <= 0 ? ' disabled' : '') + '>&minus;</button>' +
+            '<div class="mpf-in">' +
+              '<input type="text" inputmode="numeric" maxlength="3" value="' + r.pct + '" ' +
+                'aria-label="Porcentaje para ' + r.n + '" ' +
+                'onchange="mobSet(' + i + ',this.value)" onfocus="this.select()">' +
+              '<span class="sym">%</span>' +
+            '</div>' +
+            '<button class="mstep" onclick="mobStep(' + i + ',1)" aria-label="Añadir 1%"' +
+              (total() >= 100 ? ' disabled' : '') + '>+</button>' +
+          '</div>' +
+          (has ? '<div class="mpf-amt">' + money(DISPONIBLE * r.pct / 100) + '</div>' : '') +
+        '</div>';
+    });
+  });
+  box.innerHTML = vistos ? html :
+    '<div class="mvacio">No encontramos portafolios con «' + q + '».<br>' +
+    '<button class="link" onclick="mobLimpiar()">Ver todos</button></div>';
+}
+
+function mobActualRender(){
+  const box = document.getElementById('mobActual');
+  const tot = ACTUAL.reduce((a, r) => a + r.pct, 0);
+  box.innerHTML =
+    '<div class="mcard"><div class="mdonut">' +
+      '<div class="donut" id="mobDonutAct"></div>' +
+      '<div class="mkpi">' +
+        '<div><span class="k">Portafolios</span><span class="v">' + ACTUAL.length + '</span></div>' +
+        '<div><span class="k">Rentabilidad est.</span><span class="v">' +
+          rentaPonderada(ACTUAL).toFixed(1).replace('.', ',') + '% E.A.</span></div>' +
+        '<div><span class="k">Perfil</span><span class="v">' +
+          (BANDA[perfilMezcla(ACTUAL)] ? BANDA[perfilMezcla(ACTUAL)].label : '—') + '</span></div>' +
+      '</div></div></div>' +
+    '<div class="mcard"><div class="mcard-t" style="margin-bottom:6px">En qué está hoy</div>' +
+      ACTUAL.map(r =>
+        '<div class="mro"><span class="d" style="background:' + COLOR[r.n] + '"></span>' +
+        '<span class="n">' + r.n + '</span><span class="p">' + r.pct + '%</span></div>').join('') +
+    '</div>';
+  donut(document.getElementById('mobDonutAct'),
+        ACTUAL.map(r => ({pct:r.pct, color:COLOR[r.n]})),
+        {big:tot + '%', sub:'invertido'}, {absolute:true});
+}
+
+function mobCtrRender(){
+  const box = document.getElementById('mobCtr');
+  if (!box) return;
+  box.innerHTML = CONTRATOS.map((c, i) => {
+    const bloq = c.dis || c.sinSaldo;
+    return '<button class="mlist-ctr' + (state.contrato === i ? ' on' : '') + '"' +
+      (bloq ? ' disabled style="opacity:.5"' : ' onclick="mobPickCtr(' + i + ')"') + '>' +
+      '<span class="r"></span><span class="i"><b>' + c.t + '</b>' +
+      '<span>' + c.num + ' · ' + money(c.saldo) +
+      (bloq ? ' · ' + (c.razon || 'No disponible') : '') + '</span></span></button>';
+  }).join('');
+}
+function mobPickCtr(i){ state.contrato = i; mobCtrRender(); }
+
+function mobResumenRender(){
+  const box = document.getElementById('mobResumen');
+  const sel = state.nueva.filter(r => r.pct > 0);
+  const dv = desviacion(), d = dv.hay, pm = perfilMezcla();
+  box.innerHTML =
+    '<div class="mcard">' +
+      '<div class="mcard-t">Esto es lo que vas a instruir</div>' +
+      '<div class="mcard-s" style="margin-bottom:12px">Se moverá el 100% de ' +
+        money(DISPONIBLE) + '.</div>' +
+      sel.map(r =>
+        '<div class="mro"><span class="d" style="background:' + COLOR[r.n] + '"></span>' +
+        '<span class="n">' + r.n + '</span><span class="p">' + r.pct + '%</span></div>').join('') +
+    '</div>' +
+    (d ? '<div class="mcard" style="background:var(--warn-l)">' +
+      '<div class="mcard-t" style="color:#8A5A00">Se sale de tu perfil</div>' +
+      '<div class="mcard-s" style="color:#8A5A00">' + mobTextoDesvio(dv) + '</div></div>' : '') +
+    '<div class="mcard">' +
+      '<div class="mcard-s">Skandia ejecuta tu instrucción sin darte una recomendación. ' +
+      'Esta operación es de solo ejecución.</div></div>';
+}
+
+function mobConfirmar(){
+  log('composicion_confirmada', 'canal=movil');
+  document.getElementById('mobResumen').innerHTML =
+    '<div class="mok"><div class="ic">' +
+      '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" ' +
+        'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M20 6L9 17l-5-5"/></svg></div>' +
+    '<h2>Recibimos tu instrucción</h2>' +
+    '<p>Te avisamos cuando quede aplicada. Puedes seguirla desde tus movimientos.</p></div>';
+  document.querySelector('#mob-3 .mfoot').innerHTML =
+    '<button class="btn ghost" onclick="mobGo(1)">Volver al inicio</button>';
+}
+
+function mobFinalizar(){ if (total() === 100) mobGo(3); }
+
 /* ── Arranque ─────────────────────────────────────────────── */
 renderActual(); renderNueva(); renderContratos(); renderOnb();
 renderTraza(); bannerProgreso();
 document.querySelector('#pnav button[data-sc="sc-cuenta"]').classList.add('on');
 log('sesion_iniciada', `perfil=${PERFIL}`);
+mobCtrRender(); mobRender();
 fit();
 </script>
 
