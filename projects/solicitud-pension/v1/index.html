@@ -26,6 +26,13 @@
   .sk-dd-scroll::-webkit-scrollbar-thumb{background:#00c73d;border-radius:100px;border:2px solid #fff;}
   .sk-dd-scroll{scrollbar-width:thin;scrollbar-color:#00c73d transparent;}
   .sk-btn-group button{ font-family:'Montserrat',sans-serif !important; font-size:14px !important; font-weight:700 !important; }
+  /* Tabla de plazos de respuesta (modal de la pantalla final) */
+  .sk-plazos{ width:100%; border-collapse:collapse; font-family:'Open Sans',sans-serif; }
+  .sk-plazos th{ background:#00c73d; color:#fff; font-family:'Montserrat',sans-serif; font-weight:700; font-size:13px; padding:12px 14px; text-align:left; border:1px solid #d9d9d9; }
+  .sk-plazos th:last-child{ text-align:center; width:112px; }
+  .sk-plazos td{ border:1px solid #e9e9e9; padding:12px 14px; vertical-align:middle; font-size:13.5px; color:#404040; line-height:1.45; }
+  .sk-plazos td:last-child{ text-align:center; white-space:nowrap; font-weight:600; }
+  .sk-plazos .sk-norma{ display:block; margin-top:4px; font-size:11px; line-height:1.4; color:#878787; }
   @media (max-width:768px) {
     .sk-card  { padding:16px 0 !important; border:none !important; border-radius:0 !important; box-shadow:none !important; background:transparent !important; }
     .sk-grid-2{ grid-template-columns:1fr !important; }
@@ -34,6 +41,11 @@
     .sk-btn-group{ flex-direction:column-reverse !important; gap:12px !important; }
     .sk-benef-form{ border:none !important; border-radius:0 !important; padding:16px 0 !important; }
     .sk-btn-group button{ flex:none !important; width:100% !important; height:54px !important; justify-content:center !important; text-align:center !important; }
+    .sk-plazos th{ font-size:11.5px !important; padding:9px 8px !important; }
+    .sk-plazos th:last-child{ width:74px !important; }
+    .sk-plazos td{ font-size:12px !important; padding:9px 8px !important; }
+    .sk-plazos td:last-child{ font-size:11.5px !important; }
+    .sk-plazos .sk-norma{ font-size:9.5px !important; margin-top:3px !important; }
     .sk-bread-num{ display:none !important; }
     .sk-file-row{ flex-wrap:wrap !important; }
     .sk-file-row button{ flex:none !important; width:100% !important; margin-top:4px; justify-content:center !important; }
@@ -138,7 +150,7 @@
 
     <!-- ============ IN-FLOW CARD ============ -->
     <sc-if value="{{ inFlow }}" hint-placeholder-val="{{ true }}">
-      <div class="sk-card" style="background:#ffffff;border:1px solid #e9e9e9;border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,0.04);padding:36px 40px;">
+      <div class="sk-card" style="background:var(--Secondary-Neutral-N00, #FFF);border-radius:16px;box-shadow:0 0 4px 0 rgba(61,75,92,0.15);padding:36px 40px;">
 
         <!-- Progress -->
         <sc-if value="{{ showSteps }}" hint-placeholder-val="{{ true }}">
@@ -588,24 +600,20 @@
           <h2 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:18px;text-align:center;color:#363636;margin:0 0 6px;">Información EPS</h2>
           <p style="text-align:center;color:#666666;font-size:14px;margin:0 0 24px;">Las cotizaciones por concepto del Plan Obligatorio de Salud (POS) se realizarán en la entidad que indicas a continuación:</p>
           <div style="position:relative;">
-            <div onClick="{{ epsSelect.onToggle }}" style="width:100%;height:58px;box-sizing:border-box;padding:25px 38px 7px 14px;border:1.5px solid {{ epsSelect.border }};border-radius:8px;background:#fff;box-shadow:0 0 6px 0 rgba(61, 75, 92, 0.15);font-family:'Open Sans',sans-serif;font-size:15px;color:{{ epsSelect.color }};cursor:pointer;display:flex;align-items:center;transition:border-color .15s;">{{ epsSelect.value }}</div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#878787" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:14px;top:21px;pointer-events:none;transform:{{ epsSelect.chevron }};transition:transform .2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            <sc-if value="{{ epsSelect.isOpen }}" hint-placeholder-val="{{ false }}">
-              <div class="sk-dd-scroll" style="position:absolute;left:0;right:0;top:64px;z-index:30;background:#fff;border-radius:8px;box-shadow:0 12px 32px -8px rgba(0,0,0,0.12),0 4px 8px -2px rgba(0,0,0,0.06);max-height:230px;overflow-y:auto;padding:4px 0;">
-                <sc-for list="{{ epsSelect.opts }}" as="o" hint-placeholder-count="5">
-                  <div onClick="{{ o.onClick }}" style="padding:13px 16px;cursor:pointer;font-family:'Open Sans',sans-serif;font-size:15px;color:#404040;background:{{ o.bg }};transition:background .12s;" style-hover="background:#f6fcf2;">{{ o.label }}</div>
-                </sc-for>
+            <input type="text" value="{{ epsVal }}" onInput="{{ onEpsInput }}" onBlur="{{ onEpsBlur }}" placeholder="Ej. Sura EPS" style="width:100%;height:58px;box-sizing:border-box;padding:25px 14px 7px;border:1.5px solid {{ epsBorder }};border-radius:8px;background:#fff;box-shadow:0 0 6px 0 rgba(61, 75, 92, 0.15);font-family:'Open Sans',sans-serif;font-size:15px;color:#404040;outline:none;transition:border-color .15s;" style-focus="border-color:#00c73d;">
+            <label style="position:absolute;left:14px;top:9px;font-family:'Open Sans',sans-serif;font-size:12px;color:{{ epsLabelColor }};pointer-events:none;">Nombre de la EPS*</label>
+            <sc-if value="{{ epsErr }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:6px;align-items:center;margin-top:5px;font-family:'Open Sans',sans-serif;font-size:12px;color:#e03430;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e03430" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12" y2="16.01"></line></svg>
+                Completa el campo.
               </div>
             </sc-if>
-            <label style="position:absolute;left:14px;top:9px;font-family:'Open Sans',sans-serif;font-size:12px;color:#878787;pointer-events:none;">Nombre de la EPS</label>
           </div>
-          <sc-if value="{{ showEpsOtro }}" hint-placeholder-val="{{ false }}">
-            <div style="position:relative;margin-top:16px;">
-              <input type="text" value="{{ epsOtroVal }}" onInput="{{ onEpsOtroInput }}" onBlur="{{ onEpsOtroBlur }}" placeholder="Nombre de la EPS" style="width:100%;height:58px;box-sizing:border-box;padding:25px 14px 7px;border:1.5px solid {{ epsOtroBorder }};border-radius:8px;background:#fff;box-shadow:0 0 6px 0 rgba(61, 75, 92, 0.15);font-family:'Open Sans',sans-serif;font-size:15px;color:#404040;outline:none;transition:border-color .15s;" style-focus="border-color:#00c73d;">
-              <label style="position:absolute;left:14px;top:9px;font-family:'Open Sans',sans-serif;font-size:12px;color:#878787;pointer-events:none;">Especifica el nombre de la EPS*</label>
-            </div>
-          </sc-if>
           <div style="display:flex;align-items:center;gap:12px;background:#ebf4ff;border:1px solid #bcdcff;border-radius:10px;padding:14px 18px;margin-top:18px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="8.01"></line><line x1="11" y1="12" x2="12" y2="12"></line><line x1="12" y1="12" x2="12" y2="16"></line></svg>
+            <span style="font-size:13.5px;color:#404040;line-height:1.5;">Si resides en otro país, escribe: <strong>No aplica porque vivo en otro país</strong>.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:#ebf4ff;border:1px solid #bcdcff;border-radius:10px;padding:14px 18px;margin-top:12px;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="8.01"></line><line x1="11" y1="12" x2="12" y2="12"></line><line x1="12" y1="12" x2="12" y2="16"></line></svg>
             <div style="font-size:13.5px;color:#404040;line-height:1.5;">Según la Ley 2010 (Reforma Tributaria), la cotización mensual de salud se calcula según el número de salarios mínimos legales mensuales vigentes (SMLMV):
               <div style="margin-top:6px;">• 1 SMLMV: <strong>4%</strong>&nbsp;&nbsp;• Más de 1 y hasta 2 SMLMV: <strong>10%</strong>&nbsp;&nbsp;• Más de 2 SMLMV: <strong>12%</strong></div>
@@ -1051,6 +1059,12 @@
       <div style="text-align:center;padding:60px 0 40px;">
         <h2 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:18px;color:#363636;margin:0 0 12px;">¡Solicitud realizada con éxito!🎉</h2>
         <p style="max-width:520px;margin:0 auto 32px;color:#666666;font-size:14px;line-height:1.6;">Te hemos enviado un mensaje de confirmación a tu correo registrado. Esta solicitud está sujeta a validación y aprobación por parte de Skandia, te estaremos contactando una vez haya finalizado o ante cualquier novedad. Si tienes dudas o quieres hacer seguimiento de tu solicitud por favor contáctate con nosotros a través del chat o al <strong style="color:#404040;">PBX 658 4000</strong> o a la <strong style="color:#404040;">línea nacional 01 8000 517 526</strong>.</p>
+        <div style="max-width:520px;margin:0 auto 16px;">
+          <span onClick="{{ onOpenPlazosModal }}" style="display:inline-flex;align-items:center;gap:8px;color:#00c73d;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c73d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            ¿Cuándo responderemos la solicitud?
+          </span>
+        </div>
         <div class="sk-btn-group" style="display:flex;gap:16px;justify-content:center;max-width:520px;margin:0 auto;">
           <button onClick="{{ onReset }}" style="display:flex;height:40px;flex-direction:column;justify-content:center;align-items:center;gap:8px;flex:1 0 0;padding:0 28px;border-radius:100px;border:2px solid #00c73d;background:#00c73d;color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Regresar al inicio</button>
         </div>
@@ -1329,6 +1343,44 @@
     </div>
   </sc-if>
 
+
+  <!-- ============ MODAL: PLAZOS DE RESPUESTA ============ -->
+  <sc-if value="{{ showPlazosModal }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(255,255,255,0.94);display:flex;align-items:center;justify-content:center;padding:24px;z-index:50;">
+      <div class="sk-dd-scroll" style="animation:skModalIn .25s ease-out;position:relative;display:flex;width:760px;max-width:100%;max-height:88vh;overflow-y:auto;padding:36px 40px;flex-direction:column;gap:18px;border-radius:16px;background:#fff;box-shadow:0 0 30px 0 rgba(61,75,92,0.15);">
+        <div onClick="{{ onClosePlazosModal }}" style="position:absolute;top:16px;right:16px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#00c73d;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
+        <h2 style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;color:#363636;margin:0;text-align:center;">¿Cuándo responderemos la solicitud?</h2>
+        <div style="height:1px;background:#e9e9e9;"></div>
+        <p style="font-size:13.5px;color:#404040;line-height:1.55;margin:0;">Primero revisaremos la información que registraste en tu solicitud, lo que toma <strong>3 días hábiles</strong>. Si todo está correcto, a partir de ese momento empiezan a contar los términos de ley que aparecen a continuación, según la prestación que solicitaste.</p>
+        <table class="sk-plazos">
+          <thead>
+            <tr>
+              <th>Prestación</th>
+              <th>Términos de Ley</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Pensión de Vejez Normal o Anticipada<span class="sk-norma">Ley 797 de 2003 artículo 9, modifica artículo 33 Ley 100 de 1993</span></td><td>120 días</td></tr>
+            <tr><td>Garantía de Pensión Mínima<span class="sk-norma">Ley 797 de 2003 artículo 9, modifica artículo 33 Ley 100 de 1993</span></td><td>120 días</td></tr>
+            <tr><td>Pensión Familiar<span class="sk-norma">Ley 797 de 2003 artículo 9, modifica artículo 33 Ley 100 de 1993</span></td><td>120 días</td></tr>
+            <tr><td>Pensión Especial por Hijo Inválido<span class="sk-norma">Ley 797 de 2003 artículo 9, modifica artículo 33 Ley 100 de 1993</span></td><td>120 días</td></tr>
+            <tr><td>Devolución de Saldos Vejez (afiliados o BEPS)<span class="sk-norma">Ley 797 de 2003 artículo 9, modifica artículo 33 Ley 100 de 1993</span></td><td>120 días</td></tr>
+            <tr><td>Pensión de Invalidez<span class="sk-norma">Decreto 656 de 1994 Artículo 19</span></td><td>120 días</td></tr>
+            <tr><td>Devolución de Saldos de Invalidez<span class="sk-norma">Decreto 656 de 1994 Artículo 19</span></td><td>120 días</td></tr>
+            <tr><td>Pensión Sobrevivencia (Afiliado-pensionado)<span class="sk-norma">Ley 717 de 2001 Artículo 1</span></td><td>60 días</td></tr>
+            <tr><td>Devolución de Saldos de Sobrevivencia<span class="sk-norma">Ley 717 de 2001 Artículo 1</span></td><td>60 días</td></tr>
+            <tr><td>Auxilio Funerario<span class="sk-norma">Artículo 2.2.8.4.2 del Decreto 1833 de 2016</span></td><td>5 días hábiles</td></tr>
+            <tr><td>Excedentes de libre disponibilidad<span class="sk-norma">Ley 1755 de 2015 art 14</span></td><td>15 días hábiles</td></tr>
+          </tbody>
+        </table>
+        <div class="sk-btn-group sk-btn-group-modal" style="display:flex;gap:12px;width:100%;">
+          <button onClick="{{ onClosePlazosModal }}" style="flex:1;height:54px;border-radius:100px;border:2px solid #00c73d;background:#fff;color:#00c73d;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Regresar</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1040,&quot;height&quot;:920},&quot;tipoInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Ninguno&quot;,&quot;Vejez&quot;,&quot;Devolución de saldos&quot;,&quot;Invalidez&quot;],&quot;default&quot;:&quot;Ninguno&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;divorciado&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
@@ -1338,7 +1390,7 @@ class Component extends DCLogic {
     stepIdx: 0, done: false,
     excedentes: false, excedTooltip: false, cuentaDocState: 'empty', docsState: 'empty', recibe: false, tramita: false, recibeEntidad: null, tramitaEntidad: null, excedCalc: 'si', excedGiroCuenta: '', excedGiroTipo: '', excedTipo: '', excedNota: false, excedTransfCual: '', excedTransfNo: '', excedEntidad: '', excedEntidadErr: false, excedBanco: '',
     email: 'and****@correo.com', emailErr: false,
-    ddOpen: null, ddCivil: 'Casado/a', ddLugar: 'Bogotá D.C.', ddTrabajador: 'Empleado', ddEps: 'Sura EPS', ddPais: 'Colombia', ddDepartamento: 'Cundinamarca', ddCiudadAfiliado: 'Bogotá D.C.', ddLugarQuery: '', ddCiudadAfiliQuery: '', epsOtro: '', epsOtroErr: false, epsOpen: false,
+    ddOpen: null, ddCivil: 'Casado/a', ddLugar: 'Bogotá D.C.', ddTrabajador: 'Empleado', ddEps: 'Sura EPS', ddPais: 'Colombia', ddDepartamento: 'Cundinamarca', ddCiudadAfiliado: 'Bogotá D.C.', ddLugarQuery: '', ddCiudadAfiliQuery: '', epsOtro: '', epsOtroErr: false, ddEpsErr: false, epsOpen: false,
     ddRecibeTipo: 'Vejez', ddTramitaTipo: 'Vejez', ddRecibeInvalidezOrigen: '', ddTramitaInvalidezOrigen: '',
     datosHijos: '2', datosDir: 'Calle 123 # 45-67', datosCelular: '300 *** **45', datosTelefono: '6012345678', datosTelefonoEmp: '', datosEdad: '62', datosGenero: 'Masculino',
     datosHijosErr: false, datosDirErr: false, ddLugarErr: false, datosCelularErr: false, emailErrMsg: '',
@@ -1351,12 +1403,12 @@ class Component extends DCLogic {
     noBono: false, noBonoOpc: '',
     benefParentesco: 'conyuge', hijoInvalido: false, hijoEstudios: false, hijoCustodia: false, hijoUnico: false,
     modalidad: null, aseguradora: '', modDecl: false, modInfoDecl: false, retiroDecl: false, rentaDecl: false, benefMode: null, benefList: [], benefFormOpen: false, benefEditIdx: null, benefDocIdx: 0,
-    modAccRetiro: false, modAccRenta: false, modSelectOpen: false, epsOpen: false,
+    modAccRetiro: false, modAccRenta: false, modSelectOpen: false,
     tycA1: true, tycA2: true, tycA3: true, tycA5: false, tycAuth: false,
     showExitModal: false,
     subsidioModo: '', showSubsidioModal: false, subsidioSel: '',
     showDocsModal: false, docModalType: 'vejez', docModalParentesco: 'conyuge', docModalTypeOpen: false,
-    showTycAuthModal: false,
+    showTycAuthModal: false, showPlazosModal: false,
   };
 
   FLOWS = {
@@ -2137,9 +2189,7 @@ class Component extends DCLogic {
       !!s.email && !s.emailErr &&
       !!s.datosHijos && !!s.datosDir && !!s.datosCelular
     );
-    const epsValid = !is('eps') || (
-      (s.ddEps !== 'Otra' || !!s.epsOtro)
-    );
+    const epsValid = !is('eps') || !!(s.ddEps || '').trim();
     const benefValid = !is('beneficiarios') || (s.benefList.length > 0 || s.benefMode === 'none');
     const modalidadValid = !is('modalidad') || (
       s.modalidad !== null &&
@@ -2178,18 +2228,12 @@ class Component extends DCLogic {
       siniestroSubtitle: (s.type === 'subsidio' || s.type === 'calificacion') ? 'Autoriza la consulta de tu historia clínica para tramitar la solicitud.' : 'Cuéntanos cómo y cuándo ocurrió el evento que da origen a tu solicitud.',
       showSiniestroFields: s.type !== 'subsidio' && s.type !== 'calificacion',
       isNoBono: is('nobono'), isTyc: is('tyc'),
-      epsSelect: (() => {
-        const epsList = ['Sura EPS','Nueva EPS','Sanitas','Compensar','Famisanar','Salud Total','Medimás','Coosalud','Aliansalud','Coomeva','Otra'];
-        return {
-          value: s.ddEps || '',
-          color: s.ddEps ? '#404040' : '#a5a5a5',
-          border: s.epsOpen ? '#00c73d' : 'transparent',
-          chevron: s.epsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-          isOpen: s.epsOpen,
-          onToggle: () => this.set('epsOpen', !s.epsOpen),
-          opts: epsList.map(name => ({ label: name, bg: s.ddEps === name ? '#f6fcf2' : '#fff', onClick: () => this.setState({ ddEps: name, epsOpen: false, epsOtroErr: false }) })),
-        };
-      })(),
+      epsVal: s.ddEps || '',
+      epsErr: s.ddEpsErr,
+      epsBorder: s.ddEpsErr ? '#e03430' : 'transparent',
+      epsLabelColor: s.ddEpsErr ? '#e03430' : '#878787',
+      onEpsInput: (e) => this.setState({ ddEps: e.target.value, ddEpsErr: false }),
+      onEpsBlur: (e) => { if (!e.target.value.trim()) this.set('ddEpsErr', true); },
       showEpsOtro: s.ddEps === 'Otra',
       epsOtroVal: s.epsOtro || '',
       epsOtroBorder: s.epsOtroErr ? '#e03430' : 'transparent',
@@ -2235,6 +2279,9 @@ class Component extends DCLogic {
       onCloseDocsModal: () => this.setState({ showDocsModal: false, docModalTypeOpen: false }),
       onDocsContinue: () => { const onTipo = this.curKey() === 'tipo'; this.setState({ showDocsModal: false, docModalTypeOpen: false }); if (onTipo) this.nextFromFlow(); },
       onOpenTycAuthModal: () => this.set('showTycAuthModal', true),
+      onOpenPlazosModal: () => this.set('showPlazosModal', true),
+      onClosePlazosModal: () => this.set('showPlazosModal', false),
+      showPlazosModal: s.showPlazosModal,
       onCloseTycAuthModal: () => this.set('showTycAuthModal', false),
       onAcceptTycAuth: () => {
         if (!(s.tycA1 && s.tycA2 && s.tycA3)) return;
