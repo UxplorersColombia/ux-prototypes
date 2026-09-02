@@ -113,7 +113,9 @@ function buildCards(projects) {
     // Fix #9: sin decimales flotantes en animation-delay
     const delay = (Math.min(i, 8) * 0.05).toFixed(2);
     // Fix #4: article con aria-labelledby | Fix #5: avatar aria-hidden (autor ya está en meta)
-    return `<article class="card" data-author="${esc(p.meta.author)}" data-status="${esc(p.meta.status)}" style="animation-delay:${delay}s" aria-labelledby="${cardId}">
+    // Búsqueda por palabra clave: name + project + description + author, normalizado (sin tildes, minúsculas)
+    const searchStr = esc(normalize([p.meta.name, p.meta.project, p.meta.description, p.meta.author].join(' ')));
+    return `<article class="card" data-author="${esc(p.meta.author)}" data-status="${esc(p.meta.status)}" data-search="${searchStr}" style="animation-delay:${delay}s" aria-labelledby="${cardId}">
   <div class="card-header">
     <div class="card-title-block">
       <span class="badge ${badgeClass}">${status}</span>
@@ -225,6 +227,14 @@ select{appearance:none;-webkit-appearance:none;background:var(--surface);border:
 select:hover{border-color:var(--border-med)}
 /* Fix #6: opacidad .35 → ratio Non-text Contrast 3:1 (WCAG 1.4.11) */
 select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,199,61,.35)}
+.search-group{flex:1;min-width:200px}
+.search-wrap{position:relative;width:100%;max-width:340px}
+.search-wrap svg{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-light)}
+input[type=search]{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--bordes-s);padding:.5rem .875rem .5rem 2.25rem;font-size:.875rem;font-family:"Open Sans",sans-serif;color:var(--text-dark);transition:border-color .15s var(--ease-std),box-shadow .15s var(--ease-std)}
+input[type=search]::placeholder{color:var(--text-light)}
+input[type=search]:hover{border-color:var(--border-med)}
+input[type=search]:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,199,61,.35)}
+input[type=search]::-webkit-search-cancel-button{cursor:pointer}
 .toolbar-end{margin-left:auto;display:flex;align-items:center;gap:var(--sp-m)}
 /* Fix #2: --text-subtle pasa WCAG AA */
 .result-count{font-size:.8rem;color:var(--text-subtle);font-variant-numeric:tabular-nums}
@@ -321,6 +331,8 @@ footer a:hover{color:var(--brand-hover)}
   main{padding:var(--sp-m);grid-template-columns:1fr}
   .filter-label{display:none}
   select{min-width:120px}
+  .search-group{min-width:0;width:100%;order:-1}
+  .search-wrap{max-width:none}
 }
 
 /* ── REDUCED MOTION (ui-ux-pro-max §7) ── */
@@ -331,6 +343,13 @@ footer a:hover{color:var(--brand-hover)}
   // ── JS: microinteracciones (ui-ux-pro-max §7: 150-300ms, transform/opacity) ─
   const js = `
 var _noMotion=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* Normaliza para búsqueda: minúsculas, sin tildes (espejo de normalize() en Node) */
+function normalizeSearch(s){
+  return String(s||'').toLowerCase()
+    .replace(/é/g,'e').replace(/ó/g,'o').replace(/í/g,'i')
+    .replace(/á/g,'a').replace(/ú/g,'u').replace(/ñ/g,'n');
+}
 
 /* Count-up — ease-out cúbico, tabular-nums */
 function animateCount(el,from,to,dur){
@@ -362,11 +381,13 @@ function initTilt(){
 /* Filtros con re-animación suave (300ms, ease-out) */
 function applyFilters(){
   var a=document.getElementById('fa').value,s=document.getElementById('fs').value;
+  var q=normalizeSearch(document.getElementById('fq').value.trim());
   var cards=document.querySelectorAll('.card'),v=0,delay=0;
   cards.forEach(function(c){
     var archived=c.dataset.status==='archivado';
     var statusOk=s?c.dataset.status===s:!archived;
-    var ok=(!a||c.dataset.author===a)&&statusOk;
+    var queryOk=q?(c.dataset.search||'').indexOf(q)>-1:true;
+    var ok=(!a||c.dataset.author===a)&&statusOk&&queryOk;
     if(ok){
       c.classList.remove('hidden');
       if(!_noMotion){
@@ -388,12 +409,20 @@ function applyFilters(){
   /* Fix aria-label del stat dinámicamente */
   var statWrap=document.querySelector('.header-stat');
   if(statWrap)statWrap.setAttribute('aria-label',v+' prototipo'+(v!==1?'s':'')+' activo'+(v!==1?'s':''));
-  document.getElementById('rcount').textContent=(a||s)?v+' resultado'+(v!==1?'s':''):'';
+  document.getElementById('rcount').textContent=(a||s||q)?v+' resultado'+(v!==1?'s':''):'';
+}
+
+/* Debounce simple: evita recalcular en cada tecla mientras se escribe */
+var _searchTimer=null;
+function onSearchInput(){
+  clearTimeout(_searchTimer);
+  _searchTimer=setTimeout(applyFilters,120);
 }
 
 function clearFilters(){
   document.getElementById('fa').value='';
   document.getElementById('fs').value='';
+  document.getElementById('fq').value='';
   applyFilters();
 }
 
@@ -451,6 +480,13 @@ document.addEventListener('DOMContentLoaded',function(){
 </header>
 
 <div class="toolbar" role="toolbar" aria-label="Filtros del catálogo">
+  <div class="filter-group search-group">
+    <label class="filter-label" for="fq">Buscar</label>
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="search" id="fq" placeholder="Buscar por palabra clave…" oninput="onSearchInput()" aria-label="Buscar por palabra clave en nombre, proyecto, descripción o autor">
+    </div>
+  </div>
   <div class="filter-group">
     <label class="filter-label" for="fa">Autor</label>
     <div class="select-wrap">
