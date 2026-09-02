@@ -278,6 +278,12 @@
   .check-row.checked .box::after{content:''; width:0.4em; height:0.7em; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg); margin-top:-0.15em;}
   .check-row p{font-size:1.2em; margin:0; color:var(--text-dark);}
   .check-row a{color:var(--sk-green); font-weight:700; text-decoration:underline;}
+  .chk-box{width:1.3em; height:1.3em; border:2px solid var(--border-track); border-radius:2px; background:#fff; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 0 1px rgba(0,0,0,.25);}
+  .chk-box.checked{background:var(--sk-green); border-color:var(--sk-green); position:relative;}
+  .chk-box.checked::after{content:''; width:0.4em; height:0.7em; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg); margin-top:-0.15em;}
+  .employer-card .doc-card-head{cursor:pointer;}
+  .employer-card .tag{white-space:nowrap;}
+  #employer-coverage-label{transition:color .15s ease;}
   @media (max-width: 720px){
     .frame{font-size:6px;}
   }
@@ -397,15 +403,62 @@
           </div>
         </div>
 
-        <!-- STEP 2 -->
+        <!-- STEP 2 (Monto) -->
         <div class="step-body" id="step2" data-step="2" style="display:none;">
+          <div class="balance-block">
+            <p class="balance-caption">Saldo total en Cesantías</p>
+            <p class="balance-amount" id="saldo-total-display">$7.500.000</p>
+          </div>
+
+          <!-- Sub-state: selection list -->
+          <div class="tab-panel" data-panel4="list" style="width:100%;display:flex;flex-direction:column;gap:1em;">
+            <div class="option-row" id="opt-monto">
+              <div class="option-main">
+                <span class="lbl">Retirar un monto específico</span>
+                <div class="option-sub" id="monto-input-wrap" style="display:none;">
+                  <input type="text" inputmode="numeric" id="monto-input" class="val" style="border:none;outline:none;background:transparent;width:100%;font-family:inherit;" value="5.000.000" />
+                  <span class="avail" id="monto-disponible-label">Disponible: $7.500.000</span>
+                </div>
+              </div>
+              <img class="chev" id="img-chev1" alt="" />
+            </div>
+            <div class="option-row" id="opt-total">
+              <div class="option-main"><span class="lbl">Retirar la totalidad de tu dinero</span></div>
+              <img class="chev" id="img-chev2" alt="" />
+            </div>
+          </div>
+
+          <!-- Sub-state: totalidad confirm -->
+          <div class="tab-panel" data-panel4="confirm" style="display:none;width:100%;">
+            <p class="amount-question">¿Qué tipo de retiro harás?</p>
+            <div class="option-row selected" style="margin-bottom:1em;">
+              <div class="option-main"><span class="lbl" id="monto-confirm-label">Retirar la totalidad de tu dinero</span></div>
+            </div>
+            <div class="disclaimer-box" style="margin-bottom:1em;">
+              <img id="img-calendar" alt="" />
+              <p>Tu dinero estará disponible <b>hasta en 3 días hábiles.</b> <span class="link">Ver más</span></p>
+            </div>
+            <div class="revoke-note">
+              <p>Al dar clic en Continuar, aceptas revocar tu decisión de ahorro al Mecanismo de Protección al Cesante</p>
+              <img id="img-help2" alt="" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-outline" id="step2-back">Regresar</button>
+            <button class="btn btn-fill" id="step2-continue" disabled>Continuar</button>
+          </div>
+        </div>
+
+        <!-- STEP 3 (Subir archivos) -->
+        <div class="step-body" id="step3" data-step="3" style="display:none;">
           <div class="alert-info">
             <img id="img-info2" alt="" />
             <p>No podremos tramitar tu solicitud si los archivos están incompletos, protegidos con contraseña o no son válidos.</p>
           </div>
           <div style="width:100%;">
             <p class="step-title" style="margin-bottom:0.2em;">Adjunta los documentos requeridos</p>
-            <p class="step-title" style="font-family:'Open Sans',sans-serif;font-weight:500;font-size:1.4em;color:var(--text-light);margin-top:0;" id="step2-subtitle">Adquisición de vivienda</p>
+            <p class="step-title" style="font-family:'Open Sans',sans-serif;font-weight:500;font-size:1.4em;color:var(--text-light);margin-top:0;" id="step3-subtitle">Adquisición de vivienda</p>
           </div>
           <p class="doc-counter" id="doc-counter">1/2 documentos cargados</p>
           <div class="doc-list" id="doc-list">
@@ -420,7 +473,7 @@
               </div>
             </div>
             <div class="doc-card">
-              <div class="doc-card-head"><img id="img-file2" alt="" /><span class="name">Carta del empleador autorizando el retiro</span></div>
+              <div class="doc-card-head"><img id="img-file2" alt="" /><span class="name">Carta del empleador actual autorizando el retiro</span></div>
               <div class="doc-hint">Esta debe incluir:
                 <ul>
                   <li>Nombre completo y número de identificación del afiliado.</li>
@@ -437,14 +490,30 @@
               </div>
             </div>
           </div>
+
+          <div class="employer-block" id="employer-block" style="width:100%;display:flex;flex-direction:column;gap:0.8em;">
+            <div class="alert-info" id="employer-covered-msg" style="display:none;background:#ECFDF3;border-color:var(--sk-green);">
+              <img id="img-info-covered" alt="" />
+              <p>Tu empleador actual cubre el monto que solicitaste. No necesitas subir cartas de empleadores anteriores.</p>
+            </div>
+            <div id="employer-picker" style="display:none;width:100%;">
+              <div class="alert-info" style="background:#FFF7E6;border-color:#F5B826;">
+                <img id="img-info-warning" alt="" />
+                <p>Tus cesantías están repartidas entre varios empleadores. Con tu empleador actual solo cubres <b id="employer-actual-amount">$3.000.000</b> de los <b id="employer-monto-solicitado">$5.000.000</b> que solicitaste. Elige de qué empleador(es) anterior(es) quieres certificar la terminación del contrato para cubrir el faltante — puedes elegir el que quieras, siempre que la suma alcance.</p>
+              </div>
+              <p class="doc-counter" style="margin-top:0.8em;" id="employer-coverage-label">Cobertura seleccionada: $0 de $2.000.000 necesarios</p>
+              <div class="doc-list" id="employer-list" style="max-height:none;"></div>
+            </div>
+          </div>
+
           <div class="btn-row">
-            <button class="btn btn-outline" id="step2-back">Regresar</button>
-            <button class="btn btn-fill" id="step2-continue">Continuar</button>
+            <button class="btn btn-outline" id="step3-back">Regresar</button>
+            <button class="btn btn-fill" id="step3-continue">Continuar</button>
           </div>
         </div>
 
-        <!-- STEP 3 -->
-        <div class="step-body" id="step3" data-step="3" style="display:none;">
+        <!-- STEP 4 (A dónde enviar) -->
+        <div class="step-body" id="step4" data-step="4" style="display:none;">
           <p class="step-title">¿A dónde quieres enviar tu dinero?</p>
           <div class="tabs">
             <button class="tab" data-tab="cuenta">Cuenta bancaria</button>
@@ -531,55 +600,8 @@
           </div>
 
           <div class="btn-row">
-            <button class="btn btn-outline" id="step3-back">Regresar</button>
-            <button class="btn btn-fill" id="step3-continue">Continuar</button>
-          </div>
-        </div>
-
-        <!-- STEP 4 -->
-        <div class="step-body" id="step4" data-step="4" style="display:none;">
-          <div class="balance-block">
-            <p class="balance-caption">Saldo total en Cesantías</p>
-            <p class="balance-amount">$998.897</p>
-          </div>
-
-          <!-- Sub-state: selection list -->
-          <div class="tab-panel" data-panel4="list" style="width:100%;display:flex;flex-direction:column;gap:1em;">
-            <div class="option-row" id="opt-monto">
-              <div class="option-main">
-                <span class="lbl">Retirar un monto específico</span>
-                <div class="option-sub">
-                  <span class="val">Otro valor</span>
-                  <span class="avail">Disponible: $834.008</span>
-                </div>
-              </div>
-              <img class="chev" id="img-chev1" alt="" />
-            </div>
-            <div class="option-row" id="opt-total">
-              <div class="option-main"><span class="lbl">Retirar la totalidad de tu dinero</span></div>
-              <img class="chev" id="img-chev2" alt="" />
-            </div>
-          </div>
-
-          <!-- Sub-state: totalidad confirm -->
-          <div class="tab-panel" data-panel4="confirm" style="display:none;width:100%;">
-            <p class="amount-question">¿Qué tipo de retiro harás?</p>
-            <div class="option-row selected" style="margin-bottom:1em;">
-              <div class="option-main"><span class="lbl">Retirar la totalidad de tu dinero</span></div>
-            </div>
-            <div class="disclaimer-box" style="margin-bottom:1em;">
-              <img id="img-calendar" alt="" />
-              <p>Tu dinero estará disponible <b>hasta en 3 días hábiles.</b> <span class="link">Ver más</span></p>
-            </div>
-            <div class="revoke-note">
-              <p>Al dar clic en Continuar, aceptas revocar tu decisión de ahorro al Mecanismo de Protección al Cesante</p>
-              <img id="img-help2" alt="" />
-            </div>
-          </div>
-
-          <div class="btn-row">
             <button class="btn btn-outline" id="step4-back">Regresar</button>
-            <button class="btn btn-fill" id="step4-continue" disabled>Continuar</button>
+            <button class="btn btn-fill" id="step4-continue">Continuar</button>
           </div>
         </div>
 
@@ -594,7 +616,7 @@
               <div class="summary-row"><span class="k">Motivo de retiro</span><span class="v" id="resumen-motivo">Adquisición de vivienda</span></div>
               <div class="summary-row"><span class="k">GMF(4X1000)</span><span class="v">$1.000*</span></div>
               <div class="summary-row"><span class="k">Comisión de administración</span><span class="v">$2.000*</span></div>
-              <div class="summary-row"><span class="k">Monto a recibir</span><span class="v">$250.000</span></div>
+              <div class="summary-row"><span class="k">Monto a recibir</span><span class="v" id="resumen-monto-recibir">$250.000</span></div>
             </div>
           </div>
 
@@ -673,6 +695,8 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   document.getElementById('img-calendar').src = IMG_CALENDAR;
   document.getElementById('img-sami').src = IMG_SAMI;
   document.getElementById('img-info2').src = IMG_INFO_ICON2;
+  document.getElementById('img-info-covered').src = IMG_INFO_ICON2;
+  document.getElementById('img-info-warning').src = IMG_INFO_ICON2;
   document.getElementById('img-file1').src = IMG_FILE_ICON;
   document.getElementById('img-file1b').src = IMG_FILE_ICON;
   document.getElementById('img-file2').src = IMG_FILE_ICON;
@@ -703,7 +727,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
       refreshRadios(list);
       if(id === 'motivo-list'){
         var motivoLabel = card.querySelector('.name').textContent;
-        document.getElementById('step2-subtitle').textContent = motivoLabel;
+        document.getElementById('step3-subtitle').textContent = motivoLabel;
         var resumenMotivo = document.getElementById('resumen-motivo');
         if(resumenMotivo) resumenMotivo.textContent = motivoLabel;
         document.getElementById('step1-continue').disabled = false;
@@ -711,10 +735,10 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
     });
   });
 
-  // Tabs
+  // Tabs (paso "A dónde enviar")
   var currentTab = 'cuenta';
   var tabs = document.querySelectorAll('.tab');
-  var panels3 = document.querySelectorAll('#step3 .tab-panel');
+  var panels3 = document.querySelectorAll('#step4 .tab-panel');
   function setTab(tab){
     currentTab = tab;
     tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === tab); });
@@ -722,6 +746,137 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   }
   tabs.forEach(function(t){ t.addEventListener('click', function(){ setTab(t.dataset.tab); }); });
   setTab('cuenta');
+
+  // ── Cesantías repartidas entre empleadores ──────────────────────────────
+  function formatCOP(n){
+    return '$' + Math.round(n).toLocaleString('es-CO');
+  }
+  var CURRENT_EMPLOYER_SALDO = 3000000;
+  var PREVIOUS_EMPLOYERS = [
+    {id:'abc', name:'Comercializadora ABC S.A.S.', periodo:'Ene 2019 – Mar 2021', saldo:1200000},
+    {id:'xyz', name:'Industrias Manufactureras XYZ', periodo:'Abr 2021 – Ago 2023', saldo:2500000},
+    {id:'valle', name:'Constructora Del Valle S.A.', periodo:'Sep 2023 – Dic 2024', saldo:800000}
+  ];
+  var TOTAL_SALDO = CURRENT_EMPLOYER_SALDO + PREVIOUS_EMPLOYERS.reduce(function(a,e){ return a + e.saldo; }, 0);
+  var montoSolicitado = 5000000;
+
+  document.getElementById('saldo-total-display').textContent = formatCOP(TOTAL_SALDO);
+  document.getElementById('monto-disponible-label').textContent = 'Disponible: ' + formatCOP(TOTAL_SALDO);
+  document.getElementById('monto-input').value = montoSolicitado.toLocaleString('es-CO');
+
+  function prepareStep3Employers(){
+    var shortfall = montoSolicitado - CURRENT_EMPLOYER_SALDO;
+    var coveredMsg = document.getElementById('employer-covered-msg');
+    var picker = document.getElementById('employer-picker');
+    var list = document.getElementById('employer-list');
+    list.innerHTML = '';
+    PREVIOUS_EMPLOYERS.forEach(function(emp){ emp.selected = false; emp.letterUploaded = false; });
+
+    if(shortfall <= 0){
+      coveredMsg.style.display = '';
+      picker.style.display = 'none';
+      checkStep3Continue();
+      return;
+    }
+    coveredMsg.style.display = 'none';
+    picker.style.display = '';
+    document.getElementById('employer-actual-amount').textContent = formatCOP(CURRENT_EMPLOYER_SALDO);
+    document.getElementById('employer-monto-solicitado').textContent = formatCOP(montoSolicitado);
+
+    var isTotalidad = (montoSolicitado === TOTAL_SALDO);
+
+    PREVIOUS_EMPLOYERS.forEach(function(emp){
+      var card = document.createElement('div');
+      card.className = 'doc-card employer-card';
+      card.innerHTML =
+        '<div class="doc-card-head emp-head" style="justify-content:space-between;">' +
+          '<div style="display:flex;align-items:center;gap:0.8em;">' +
+            '<div class="chk-box emp-box"></div>' +
+            '<span class="name">' + emp.name + ' <span style="color:var(--text-light);font-weight:400;">(' + emp.periodo + ')</span></span>' +
+          '</div>' +
+          '<span class="tag">Disponible: ' + formatCOP(emp.saldo) + '</span>' +
+        '</div>' +
+        '<div class="doc-hint emp-hint" style="display:none;">Carta de terminación de contrato laboral. Debe incluir fecha de finalización del contrato, nombre del empleador y del trabajador, y firma autorizada.</div>' +
+        '<div class="doc-pending emp-pending" style="display:none;">' +
+          '<img class="emp-upload-ic" alt="" />' +
+          '<span class="btn-upload">Subir carta de terminación</span>' +
+          '<span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>' +
+        '</div>';
+      list.appendChild(card);
+      card.querySelector('.emp-upload-ic').src = IMG_UPLOAD_ICON;
+
+      var headEl = card.querySelector('.emp-head');
+      var boxEl = card.querySelector('.emp-box');
+      var hintEl = card.querySelector('.emp-hint');
+      var pendEl = card.querySelector('.emp-pending');
+
+      function setSelected(sel){
+        emp.selected = sel;
+        boxEl.classList.toggle('checked', sel);
+        hintEl.style.display = sel ? '' : 'none';
+        pendEl.style.display = sel ? '' : 'none';
+        if(!sel){
+          emp.letterUploaded = false;
+          pendEl.className = 'doc-pending emp-pending';
+          pendEl.innerHTML =
+            '<img class="emp-upload-ic" alt="" src="' + IMG_UPLOAD_ICON + '" />' +
+            '<span class="btn-upload">Subir carta de terminación</span>' +
+            '<span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>';
+        }
+      }
+
+      headEl.addEventListener('click', function(){
+        if(isTotalidad) return;
+        setSelected(!emp.selected);
+        updateEmployerCoverage();
+      });
+
+      pendEl.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if(pendEl.classList.contains('uploaded')) return;
+        pendEl.classList.add('uploaded');
+        pendEl.style.background = '#ECFDF3';
+        pendEl.style.border = '1px dashed var(--sk-green)';
+        pendEl.style.flexDirection = 'row';
+        pendEl.style.justifyContent = 'space-between';
+        pendEl.style.textAlign = 'left';
+        pendEl.innerHTML =
+          '<div class="left" style="display:flex;align-items:center;gap:0.8em;">' +
+            '<img src="' + IMG_FILE_ICON + '" style="width:1.6em;height:1.6em;" />' +
+            '<div><div class="title" style="font-family:\'Montserrat\',sans-serif;font-weight:700;font-size:1.4em;color:var(--text-dark);">Carga exitosa</div><div class="sub" style="font-family:\'Montserrat\',sans-serif;font-weight:500;font-size:1.4em;color:var(--text-light);">carta_terminacion_' + emp.id + '.pdf</div></div>' +
+          '</div>' +
+          '<img class="upload-ic" src="' + IMG_UPLOAD_ICON + '" style="width:2em;height:2em;" />';
+        emp.letterUploaded = true;
+        updateEmployerCoverage();
+      });
+
+      if(isTotalidad){ setSelected(true); }
+    });
+
+    updateEmployerCoverage();
+  }
+
+  function updateEmployerCoverage(){
+    var shortfall = montoSolicitado - CURRENT_EMPLOYER_SALDO;
+    var selected = PREVIOUS_EMPLOYERS.filter(function(e){ return e.selected; });
+    var selectedSum = selected.reduce(function(a,e){ return a + e.saldo; }, 0);
+    var label = document.getElementById('employer-coverage-label');
+    if(label){
+      label.textContent = 'Cobertura seleccionada: ' + formatCOP(selectedSum) + ' de ' + formatCOP(shortfall) + ' necesarios';
+      label.style.color = selectedSum >= shortfall ? 'var(--sk-green)' : '#c0392b';
+    }
+    checkStep3Continue();
+  }
+
+  function checkStep3Continue(){
+    var btn = document.getElementById('step3-continue');
+    var shortfall = montoSolicitado - CURRENT_EMPLOYER_SALDO;
+    if(shortfall <= 0){ btn.disabled = false; return; }
+    var selected = PREVIOUS_EMPLOYERS.filter(function(e){ return e.selected; });
+    var selectedSum = selected.reduce(function(a,e){ return a + e.saldo; }, 0);
+    var allUploaded = selected.length > 0 && selected.every(function(e){ return e.letterUploaded; });
+    btn.disabled = !(selectedSum >= shortfall && allUploaded);
+  }
 
   // Progress bar
   var progressTrack = document.getElementById('progress-track');
@@ -769,12 +924,60 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
     goToStep(2);
   });
 
+  // STEP 2 — Monto
+  var montoInput = document.getElementById('monto-input');
+  function updateMontoFromInput(){
+    var raw = montoInput.value.replace(/[^\d]/g,'');
+    var val = parseInt(raw || '0', 10);
+    montoInput.value = val ? val.toLocaleString('es-CO') : '';
+    var continueBtn = document.getElementById('step2-continue');
+    if(val > 0 && val <= TOTAL_SALDO){
+      montoSolicitado = val;
+      continueBtn.disabled = false;
+    } else {
+      continueBtn.disabled = true;
+    }
+  }
+  document.getElementById('opt-monto').addEventListener('click', function(e){
+    if(e.target === montoInput) return;
+    document.getElementById('opt-monto').classList.add('selected');
+    document.getElementById('opt-total').classList.remove('selected');
+    document.getElementById('monto-input-wrap').style.display = '';
+    montoInput.focus();
+    updateMontoFromInput();
+  });
+  montoInput.addEventListener('click', function(e){ e.stopPropagation(); });
+  montoInput.addEventListener('input', updateMontoFromInput);
+
+  document.getElementById('opt-total').addEventListener('click', function(){
+    document.getElementById('opt-total').classList.add('selected');
+    document.getElementById('opt-monto').classList.remove('selected');
+    document.getElementById('monto-input-wrap').style.display = 'none';
+    montoSolicitado = TOTAL_SALDO;
+    document.getElementById('monto-confirm-label').textContent = 'Retirar la totalidad de tu dinero (' + formatCOP(TOTAL_SALDO) + ')';
+    document.querySelector('[data-panel4="list"]').style.display = 'none';
+    document.querySelector('[data-panel4="confirm"]').style.display = '';
+    document.getElementById('step2-continue').disabled = false;
+  });
+
   document.getElementById('step2-back').addEventListener('click', function(){
-    goToStep(1);
+    var confirmPanel = document.querySelector('[data-panel4="confirm"]');
+    if(confirmPanel.style.display !== 'none'){
+      confirmPanel.style.display = 'none';
+      document.querySelector('[data-panel4="list"]').style.display = '';
+      document.getElementById('opt-total').classList.remove('selected');
+      document.getElementById('step2-continue').disabled = true;
+    } else {
+      goToStep(1);
+    }
   });
   document.getElementById('step2-continue').addEventListener('click', function(){
+    if(document.getElementById('step2-continue').disabled) return;
+    prepareStep3Employers();
     goToStep(3);
   });
+
+  // STEP 3 — Subir archivos (+ cesantías repartidas entre empleadores)
   document.getElementById('doc-pending-2').addEventListener('click', function(){
     var el = document.getElementById('doc-pending-2');
     if(el.classList.contains('uploaded')) return;
@@ -801,33 +1004,17 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
     goToStep(2);
   });
   document.getElementById('step3-continue').addEventListener('click', function(){
+    if(document.getElementById('step3-continue').disabled) return;
     goToStep(4);
   });
 
+  // STEP 4 — A dónde enviar
   document.getElementById('step4-back').addEventListener('click', function(){
-    var listPanel = document.querySelector('[data-panel4="list"]');
-    var confirmPanel = document.querySelector('[data-panel4="confirm"]');
-    if(confirmPanel.style.display !== 'none'){
-      confirmPanel.style.display = 'none';
-      listPanel.style.display = '';
-      document.getElementById('step4-continue').disabled = true;
-    } else {
-      goToStep(3);
-    }
+    goToStep(3);
   });
   document.getElementById('step4-continue').addEventListener('click', function(){
-    if(document.getElementById('step4-continue').disabled) return;
+    document.getElementById('resumen-monto-recibir').textContent = formatCOP(Math.max(montoSolicitado - 3000, 0));
     goToStep(5);
-  });
-
-  document.getElementById('opt-total').addEventListener('click', function(){
-    document.querySelector('[data-panel4="list"]').style.display = 'none';
-    document.querySelector('[data-panel4="confirm"]').style.display = '';
-    document.getElementById('step4-continue').disabled = false;
-  });
-  document.getElementById('opt-monto').addEventListener('click', function(){
-    document.getElementById('opt-monto').classList.toggle('selected');
-    showToast('Selecciona un monto específico (detalle no incluido en este alcance de Figma). Prueba "Retirar la totalidad" para ver el siguiente estado.');
   });
 
   // Step 5: summary checkboxes gate the final button
@@ -853,5 +1040,4 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   goToStep(1);
 })();
 </script>
-
 </html>
