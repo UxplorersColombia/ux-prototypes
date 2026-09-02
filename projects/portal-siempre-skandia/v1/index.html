@@ -146,7 +146,7 @@
   nombres de PrimeIcons ampliamente documentados y estables (home, wallet,
   file, users, compass, megaphone, download, check, check-circle,
   exclamation-triangle, info-circle, times-circle, flag-fill,
-  chevron-left, chevron-down, calendar, comment) — si alguno no calzara
+  chevron-left, chevron-down, comment) — si alguno no calzara
   exactamente con el catálogo real al verificarlo en el showcase de
   PrimeNG, es una revisión de una línea (cambiar el nombre de clase), no
   un rediseño.
@@ -763,6 +763,29 @@
      entre los ítems que le tocaron, así que un ítem solo en la última
      fila (ej. Novedades cuando Apoyo está oculto) se estira solo. */
   .hub-grid{display:flex;flex-wrap:wrap;gap:var(--size-m);}
+  /* Tarjeta de notificación de wf1 (recordatorio de entrevista/encuesta) —
+     color sólido de marca, no blanco (pedido de Javier, 2026-09-02).
+     Distinta de .sk-card--accent/--comercial (retirados antes por pedido
+     de Javier: esas solo agregaban un borde de color a una tarjeta blanca)
+     — aquí cambia el fondo completo, tratamiento nuevo, no una reversión
+     de lo ya retirado. El botón se invierte (fondo blanco, texto verde)
+     porque .sk-btn--secondary (verde sobre transparente) sería ilegible
+     sobre el propio gradiente verde. Contraste texto/fondo del botón:
+     --primary-d02 sobre blanco, el mismo mejor-disponible que ya usa el
+     archivo para :focus-visible (~3.71:1) — mismo tipo de hallazgo de
+     contraste ya documentado en otros botones, no una regresión nueva. */
+  .wf1-notif-card{background:var(--estilos-degrade);}
+  .wf1-notif-card .sk-card__header{color:var(--texts-white);}
+  .wf1-notif-card .sk-card__subheader{color:var(--texts-white);opacity:.92;}
+  .wf1-notif-card .sk-btn--secondary{background:var(--texts-white);border-color:var(--texts-white);color:var(--primary-d02);}
+  .wf1-notif-card .sk-btn--secondary:hover{background:var(--background-grey-light);}
+
+  /* Tarjetas destacadas de wf1 (Mi dinero + Mis documentos) — mismo
+     mecanismo de flex-wrap que .hub-grid, contenedor propio porque llevan
+     tipografía sk-card__header/__subheader (grande), no hub-tile__title/
+     __sub (compacta). Decisión de Javier, 2026-09-02. */
+  .wf1-featured{display:flex;flex-wrap:wrap;gap:var(--size-m);margin-bottom:var(--size-l);}
+  .wf1-featured > .sk-card{flex:1 1 260px;margin-bottom:0;}
   /* Fase 6: la identidad visual base de .hub-tile (fondo/sombra/padding/
      cursor/borde/flex-basis) y `.hub-tile.priority` ya se fusionaron en
      sk-card + sk-card--clickable/--priority (ver arriba) y esas 2 reglas
@@ -774,6 +797,14 @@
   .hub-tile .pi{font-size:22px;color:var(--primary-00);margin-bottom:8px;display:block;}
   .hub-tile__title{font-weight:700;font-size:.875rem;margin:0 0 2px;}
   .hub-tile__sub{font-size:.75rem;color:var(--texts-medium);margin:0;}
+  /* Auditoría /impeccable (hallazgos #2/#7) — densidad de estado de
+     documentos, reusa los colores "dark" ya usados en sk-alert (líneas
+     561-563) en vez de inventar un tono nuevo. Decorativo (aria-hidden en
+     su contenedor): cada estado ya es accesible como texto en su sk-badge. */
+  .doc-status-dots{display:flex;gap:4px;}
+  .doc-status-dot{width:8px;height:8px;border-radius:999px;background:var(--neutral-l04);flex-shrink:0;}
+  .doc-status-dot--success{background:var(--feedback-success-dark);}
+  .doc-status-dot--warning{background:var(--feedback-warning-dark);}
   /* Aparición escalonada de las tarjetas del hub al entrar a wf1 — se
      activa junto con .screen.is-shown (mismo mecanismo del cambio de
      pantalla, ver showScreen()). @keyframes + animation-delay a propósito
@@ -870,9 +901,6 @@
   </symbol>
   <symbol id="pi-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M5.5 9l6.5 6.5L18.5 9"/>
-  </symbol>
-  <symbol id="pi-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9.5h18"/><path d="M8 3v4"/><path d="M16 3v4"/>
   </symbol>
   <symbol id="pi-comment" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 3.5V16H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"/>
@@ -1101,19 +1129,56 @@
           <!-- REVISOR: subtítulo sugerido — content.md no definía uno para esta variante (Ruta 3, beneficiario/fallecimiento). El wording evita a propósito conjugar sobre el colaborador fallecido, para no anticipar la decisión de Legal/Comunicaciones sobre tiempos verbales y cómo nombrarlo (PRD §6, decisión 11) — ese matiz sigue sin resolver y necesita validación de Legal, no solo de Kiki, antes de producción. -->
         </div>
 
-        <!-- Acto 2 — Acción (CTA hacia el hub) -->
-        <div style="margin:var(--size-l) 0;max-width:420px;">
-          <sk-button fluid>
-            <button class="sk-btn sk-btn--primary sk-interactive" data-goto="wf2" data-r1-label="Ver mi proceso" data-r2-label="Ver mis pendientes" data-r3-label="Ver mi proceso">Ver mis pendientes</button>
-          </sk-button>
-          <p class="sk-caption variant" data-r="r1" style="margin-top:8px;">Empecemos por lo importante: tus documentos y tu dinero.</p>
-          <p class="sk-caption variant" data-r="r2" style="margin-top:8px;">Si buscas apoyo para tu próximo paso profesional, también lo tienes disponible aquí.</p>
+        <!-- Acto 2 — contexto de apoyo, sin CTA propio (decisión de Javier,
+             2026-09-02): el botón "Ver mis pendientes"/"Ver mi proceso" se
+             retiró por quedar redundante — llevaba al mismo destino (wf2)
+             que ya cubre la tarjeta destacada "Mi dinero" de abajo. Se
+             conserva el copy de contexto tal cual (content.md v5), ya no
+             como caption de un botón sino como texto de apoyo previo a las
+             tarjetas destacadas. -->
+        <div style="max-width:420px;margin-top:var(--size-m);">
+          <p class="sk-caption variant" data-r="r2">Si buscas apoyo para tu próximo paso profesional, también lo tienes disponible aquí.</p>
         </div>
 
-        <!-- Notificación contextual de Entrevista / Encuesta (controlada por QA "qaNotif") -->
-        <div id="wf1Notif" style="display:none;max-width:520px;">
+        <!-- Tarjetas destacadas — Mi dinero y Mis documentos, siempre
+             visibles en las 3 rutas (decisión de Javier, 2026-09-02: son lo
+             más importante en las 3 rutas). Copy literal, el mismo que
+             tenían como módulos del hub (content.md v5) — solo cambia la
+             tipografía (sk-card__header/__subheader, más grande que
+             hub-tile__title/__sub) y la posición, ya no conviven en el
+             grid plano con Comunidad/Apoyo/Novedades. -->
+        <div class="wf1-featured">
+          <button class="hub-tile sk-card sk-card--clickable sk-interactive" data-goto="wf2">
+            <i class="pi pi-wallet"><svg><use href="#pi-wallet"></use></svg></i>
+            <p class="sk-card__header">Mi dinero</p>
+            <p class="sk-card__subheader">En qué va tu liquidación</p>
+            <div class="sk-progressbar"><div class="sk-progressbar__fill" id="wf1MoneyFill" style="width:0%"></div></div>
+            <p class="sk-caption" id="wf1MoneyLabel" style="margin:0;"></p>
+          </button>
+          <button class="hub-tile sk-card sk-card--clickable sk-interactive" data-goto="wf3">
+            <i class="pi pi-file"><svg><use href="#pi-file"></use></svg></i>
+            <p class="sk-card__header">Mis documentos</p>
+            <p class="sk-card__subheader">Disponibles para descargar</p>
+            <!-- Densidad de estado (auditoría /impeccable, hallazgo #2) —
+                 decorativo: cada documento ya tiene su estado accesible en
+                 wf3 (texto del sk-badge); esto es solo un eco visual. -->
+            <div class="doc-status-dots" id="wf1DocsDots" aria-hidden="true"></div>
+            <p class="sk-caption" id="wf1DocsCountLabel" aria-hidden="true" style="margin:4px 0 0;"></p>
+          </button>
+        </div>
+
+        <!-- Notificación contextual de Entrevista / Encuesta (controlada por
+             QA "qaNotif") — a petición de Javier (2026-09-02): ocupa el 100%
+             del ancho de contenido (antes max-width:520px) y usa
+             --estilos-degrade, el token de gradiente REAL de marca
+             (semantic-color.css, sin uso hasta ahora en este archivo) en
+             vez de fondo blanco, para que un recordatorio con acción
+             pendiente (entrevista o encuesta) destaque de las tarjetas
+             informativas de alrededor. Ver overrides de texto/botón junto
+             a .sk-card en el bloque <style>. -->
+        <div id="wf1Notif" style="display:none;">
           <sk-card>
-            <div class="sk-card">
+            <div class="sk-card wf1-notif-card">
               <p class="sk-card__header" id="wf1NotifTitle">Tu entrevista de retiro</p>
               <p class="sk-card__subheader" id="wf1NotifSub">Nos ayuda a entender tu experiencia en Skandia. Te toma unos minutos.</p>
               <sk-button>
@@ -1126,27 +1191,16 @@
         <hr class="divider">
         <p class="sk-h2 content-gap">Tu proceso</p>
 
-        <!-- Hub de módulos — visibilidad dinámica por ruta (CSS por
-             data-route-group; regla wf1: un módulo oculto para una ruta NO
-             existe como ítem, nunca se muestra deshabilitado/con candado).
-             Corrección v5 (obs-002, revisión de Kiki): Kiki formalizó este
-             hub completo en content.md (no estaba documentado antes) y
-             corrigió la tarjeta de Apoyo — el subtítulo decía "Outplacement"
-             (jerga interna) y ahora dice "Acompañamiento profesional"
-             (lenguaje de usuario), consistente con la misma regla que ya
-             aplicaba al título del módulo. Las otras 4 tarjetas quedaron
-             aprobadas tal cual estaban. -->
+        <!-- Hub de módulos secundarios — visibilidad dinámica por ruta (CSS
+             por data-route-group; regla wf1: un módulo oculto para una ruta
+             NO existe como ítem, nunca se muestra deshabilitado/con
+             candado). Mi dinero y Mis documentos se promovieron arriba
+             (decisión de Javier, 2026-09-02) — su copy no cambió, solo su
+             posición. Corrección v5 (obs-002, revisión de Kiki): Kiki
+             formalizó este hub completo en content.md, incluida la tarjeta
+             de Apoyo con su subtítulo "Acompañamiento profesional"
+             (lenguaje de usuario, ya no la jerga interna "Outplacement"). -->
         <div class="hub-grid">
-          <button class="hub-tile sk-card sk-card--clickable sk-interactive" data-goto="wf2">
-            <i class="pi pi-wallet"><svg><use href="#pi-wallet"></use></svg></i>
-            <p class="hub-tile__title">Mi dinero</p>
-            <p class="hub-tile__sub">En qué va tu liquidación</p>
-          </button>
-          <button class="hub-tile sk-card sk-card--clickable sk-interactive" data-goto="wf3">
-            <i class="pi pi-file"><svg><use href="#pi-file"></use></svg></i>
-            <p class="hub-tile__title">Mis documentos</p>
-            <p class="hub-tile__sub">Disponibles para descargar</p>
-          </button>
           <button class="hub-tile v-community sk-card sk-card--clickable sk-interactive" data-goto="wf7">
             <i class="pi pi-users"><svg><use href="#pi-users"></use></svg></i>
             <p class="hub-tile__title">Comunidad</p>
@@ -1197,6 +1251,13 @@
     <section class="screen" data-screen="wf2">
       <h1 class="sk-display">En qué va tu dinero</h1>
       <p class="sk-body muted content-gap" style="margin-top:6px;">Aquí puedes ver en qué etapa está tu liquidación, actualizada el <strong>28 ago. 2026</strong>.</p>
+
+      <!-- Resumen visual de avance (auditoría /impeccable, hallazgo #5) —
+           el dato (stage/total) ya lo calcula renderStage(); el formato
+           numérico "X / N" ya existía en qaStageLabel (barra QA) y ahora
+           también es visible para el colaborador. Sin copy nuevo. -->
+      <div class="sk-progressbar" style="max-width:640px;"><div class="sk-progressbar__fill" id="wf2Fill" style="width:0%"></div></div>
+      <p class="sk-caption content-gap" id="wf2ProgressLabel" style="max-width:640px;"></p>
 
       <!-- Variante Ruta 1 / Ruta 2 — 5 etapas MPO (sin firma, ronda 3) -->
       <div class="variant" data-rg="r1 r2" id="wf2Full" style="max-width:640px;">
@@ -1266,6 +1327,12 @@
 
       <h1 class="sk-display">Tus documentos</h1>
       <p class="sk-body muted content-gap" style="margin-top:6px;">Aquí tienes los documentos que Skandia preparó para ti. Descárgalos cuando los necesites.</p>
+
+      <!-- Resumen de conjunto (auditoría /impeccable, hallazgo #7) —
+           decorativo: reusa los mismos 2 estados de color de los sk-badge
+           de abajo, cada uno ya accesible en su propia tarjeta. -->
+      <div class="doc-status-dots" id="wf3DocsSummary" aria-hidden="true"></div>
+      <p class="sk-caption" id="wf3DocsCountLabel" aria-hidden="true" style="margin:4px 0 var(--size-m);"></p>
 
       <div class="card-grid" id="wf3List">
         <sk-card>
@@ -1587,13 +1654,17 @@
 
     <!-- ============================================================
          wf8 — NOVEDADES
-         Ajuste 4, ronda 3: piezas informativas/comerciales ahora se ven
-         como tarjetas de bloc/blog — fecha (con ícono de calendario) y
-         título separados visualmente, no como una línea de texto plano.
-         El texto en sí sigue siendo exactamente el formato de content.md
-         ("[Título del comunicado] · [fecha]"), solo reordenado en dos
-         líneas dentro de la tarjeta — no se inventó ningún título ni
-         fecha de ejemplo, se dejaron los placeholders tal cual.
+         Ajuste 4, ronda 3: piezas informativas/comerciales se ven como
+         tarjetas de bloc/blog.
+         Ajuste 2026-09-02 (pedido de Javier): se quitó el campo fecha de
+         las tarjetas. Título y texto de apoyo ya no son los placeholders
+         `[Título del comunicado]`/`[fecha]` — son copy TENTATIVO escrito
+         por Kiki (Modo Content Designer) a pedido explícito de Javier,
+         calibrado contra content.md v5 y PRD §4/§5. Sigue sin ser
+         comunicado real ni aprobado por Gestión Humana/Comunicaciones —
+         cada tarjeta lleva su propio flag 🟡 inline (data-audience=
+         "reviewer", ocultable con el toggle QA), mismo tratamiento que ya
+         usa wf7 para contenido no confirmado.
          Comerciales: Ruta 1/3 desde el inicio; Ruta 2 solo después de 10
          días hábiles desde la notificación (Ventana 1) — controlado por
          QA "días desde notificación".
@@ -1607,14 +1678,16 @@
       <div class="news-grid content-gap">
         <div class="news-card sk-card">
           <i class="pi pi-megaphone" style="font-size:22px;color:var(--primary-00);display:block;margin-bottom:8px;"><svg><use href="#pi-megaphone"></use></svg></i>
-          <p class="sk-card__header">[Título del comunicado]</p>
-          <p class="sk-body muted"><i class="pi pi-calendar" style="font-size:.85em;margin-right:4px;"><svg><use href="#pi-calendar"></use></svg></i>[fecha]</p>
+          <p class="sk-card__header">Calendario de pagos de fin de año</p>
+          <p class="sk-body muted">Conoce las fechas generales de pago para este cierre de año.</p>
+          <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:flex;margin-top:6px;"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Título/texto tentativo de Kiki, pendiente de confirmar con Gestión Humana/Comunicaciones — no es un comunicado real.</span></p>
           <button type="button" class="sk-btn sk-btn--tertiary sk-interactive" style="margin-top:8px;">Ver más</button>
         </div>
         <div class="news-card sk-card">
           <i class="pi pi-megaphone" style="font-size:22px;color:var(--primary-00);display:block;margin-bottom:8px;"><svg><use href="#pi-megaphone"></use></svg></i>
-          <p class="sk-card__header">[Título del comunicado]</p>
-          <p class="sk-body muted"><i class="pi pi-calendar" style="font-size:.85em;margin-right:4px;"><svg><use href="#pi-calendar"></use></svg></i>[fecha]</p>
+          <p class="sk-card__header">Nuevos canales de atención para tu proceso</p>
+          <p class="sk-body muted">Te contamos las formas más rápidas de resolver tus dudas durante tu proceso.</p>
+          <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:flex;margin-top:6px;"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Título/texto tentativo de Kiki, pendiente de confirmar con Gestión Humana/Comunicaciones — no es un comunicado real.</span></p>
           <button type="button" class="sk-btn sk-btn--tertiary sk-interactive" style="margin-top:8px;">Ver más</button>
         </div>
       </div>
@@ -1624,8 +1697,9 @@
         <div class="news-grid">
           <div class="news-card sk-card">
             <i class="pi pi-megaphone" style="font-size:22px;color:var(--feedback-info-dark);display:block;margin-bottom:8px;"><svg><use href="#pi-megaphone"></use></svg></i>
-            <p class="sk-card__header">[Título del comunicado]</p>
-            <p class="sk-body muted"><i class="pi pi-calendar" style="font-size:.85em;margin-right:4px;"><svg><use href="#pi-calendar"></use></svg></i>[fecha]</p>
+            <p class="sk-card__header">Tu ahorro pensional, a tu manera</p>
+            <p class="sk-body muted">Si ya tienes un producto con Skandia, puedes seguir aportando por tu cuenta, sin compromiso.</p>
+            <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:flex;margin-top:6px;"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Título/texto tentativo de Kiki, pendiente de confirmar con Gestión Humana/Comunicaciones — no es un comunicado real.</span></p>
             <button type="button" class="sk-btn sk-btn--tertiary sk-interactive" style="margin-top:8px;">Ver más</button>
           </div>
         </div>
@@ -1683,14 +1757,6 @@
     document.querySelectorAll('.variant[data-rg]').forEach(function(el){
       if (el.getAttribute('data-rg').split(' ').indexOf(group) > -1) el.style.display = 'block';
     });
-
-    // CTA principal de wf1 cambia de texto por ruta (mismo botón, mismo destino)
-    var cta = document.querySelector('[data-goto="wf2"][data-r1-label]');
-    if (cta){
-      if (route==='r1') cta.textContent = cta.getAttribute('data-r1-label');
-      else if (route==='r2') cta.textContent = cta.getAttribute('data-r2-label');
-      else cta.textContent = cta.getAttribute('data-r3-label');
-    }
 
     // Regla wf1: navegación — un módulo oculto para una ruta NO existe como
     // ítem (nunca deshabilitado/con candado). Comunidad: oculto solo en Ruta 2.
@@ -1840,6 +1906,21 @@
       else { li.classList.add('pending'); dot.textContent = String(idx+1); }
     });
 
+    // Auditoría /impeccable (hallazgos #1/#5) — resumen visual de avance,
+    // misma fuente de verdad (stage/total) que ya usa qaStageLabel arriba.
+    // wf1MoneyFill es el mismo dato, previsualizado en el hub — una sola
+    // fuente, dos vistas.
+    var total = isReduced ? 3 : 5;
+    var pct = Math.round(((stage+1) / total) * 100);
+    var wf2Fill = document.getElementById('wf2Fill');
+    var wf2ProgressLabel = document.getElementById('wf2ProgressLabel');
+    var wf1MoneyFill = document.getElementById('wf1MoneyFill');
+    var wf1MoneyLabel = document.getElementById('wf1MoneyLabel');
+    if (wf2Fill) wf2Fill.style.width = pct + '%';
+    if (wf2ProgressLabel) wf2ProgressLabel.textContent = (stage+1) + ' / ' + total;
+    if (wf1MoneyFill) wf1MoneyFill.style.width = pct + '%';
+    if (wf1MoneyLabel) wf1MoneyLabel.textContent = (stage+1) + ' / ' + total;
+
     if (!isReduced){
       // Microcopy de contexto (content.md v4): solo en el tramo entre
       // "Liquidación solicitada" (idx 3) activa y "Pago realizado" (idx 4).
@@ -1858,8 +1939,37 @@
     var forceEmpty = document.getElementById('qaDocsEmpty').checked;
     document.getElementById('wf3List').style.display = forceEmpty ? 'none' : 'flex';
     document.getElementById('wf3Empty').style.display = forceEmpty ? 'block' : 'none';
+    renderDocsSummary(forceEmpty);
   }
   document.getElementById('qaDocsEmpty').addEventListener('change', renderWf3);
+
+  // Auditoría /impeccable (hallazgos #2/#7) — densidad de estado de
+  // documentos, leída directamente de los sk-badge reales de wf3 (nunca
+  // duplicada a mano) para que el hub y wf3 compartan una sola fuente.
+  function renderDocsSummary(forceEmpty){
+    var dotsHtml = '';
+    var ready = 0, total = 0;
+    if (!forceEmpty){
+      document.querySelectorAll('#wf3List [data-badge]').forEach(function(b){
+        var state = b.classList.contains('sk-badge--success') ? 'success' : b.classList.contains('sk-badge--warning') ? 'warning' : '';
+        dotsHtml += '<span class="doc-status-dot' + (state ? ' doc-status-dot--' + state : '') + '"></span>';
+        total++;
+        if (state === 'success') ready++;
+      });
+    }
+    // Mismo formato numérico bare "X / N" ya establecido para el avance de
+    // wf2/wf1 (precedente: qaStageLabel) — aquí "listos / total" en vez de
+    // "etapa actual / total", pero mismo lenguaje visual, sin copy nuevo.
+    var countText = total ? (ready + ' / ' + total) : '';
+    var hubDots = document.getElementById('wf1DocsDots');
+    var wf3Dots = document.getElementById('wf3DocsSummary');
+    var hubCount = document.getElementById('wf1DocsCountLabel');
+    var wf3Count = document.getElementById('wf3DocsCountLabel');
+    if (hubDots) hubDots.innerHTML = dotsHtml;
+    if (wf3Dots) wf3Dots.innerHTML = dotsHtml;
+    if (hubCount) hubCount.textContent = countText;
+    if (wf3Count) wf3Count.textContent = countText;
+  }
   document.querySelectorAll('#wf3List [data-download]').forEach(function(btn){
     btn.addEventListener('click', function(){
       var simulateError = document.getElementById('qaDownloadError').checked;
