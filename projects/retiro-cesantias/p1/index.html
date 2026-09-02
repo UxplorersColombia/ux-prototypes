@@ -93,7 +93,7 @@
   .aside{
     width:50%; height:100%; background:var(--sk-turquoise);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:1.6em; padding:0 4.8em; flex-shrink:0;
+    gap:1.6em; padding:0 4.8em; flex-shrink:0; position:relative;
   }
   .aside img.illus{width:18.8em; height:18.4em;}
   .aside h2{font-family:'Montserrat',sans-serif; font-weight:700; font-size:2.4em; margin:0; line-height:1.33; text-align:center;}
@@ -106,7 +106,7 @@
     align-items:center; justify-content:center; padding-top:2.4em; position:relative;
   }
   .breadcrumb{
-    position:absolute; top:3.2em; left:8.9em; display:flex; align-items:center; gap:0.8em; z-index:5;
+    position:absolute; top:2em; left:5em; display:flex; align-items:center; gap:0.8em; z-index:5;
   }
   .breadcrumb img{width:3.2em; height:3.2em; cursor:pointer;}
   .breadcrumb .crumbs{display:flex; align-items:center; gap:0.4em; font-size:1.2em;}
@@ -114,7 +114,7 @@
   .breadcrumb .crumbs .current{color:var(--sk-green); font-weight:700;}
   .breadcrumb .crumbs .step-label{color:var(--text-dark); font-weight:700;}
   .content-col{
-    width:100%; max-width:52em; padding:3.6em 4.8em 1.6em; display:flex; flex-direction:column;
+    width:100%; max-width:52em; padding:1.6em 4.8em; display:flex; flex-direction:column;
     align-items:center; justify-content:safe center; gap:1.6em; height:100%;
     overflow-y:auto; box-sizing:border-box;
   }
@@ -252,6 +252,7 @@
   .doc-card-head img{width:1.6em; height:1.6em;}
   .doc-card-head .name{font-family:'Open Sans',sans-serif; font-weight:700; font-size:1.4em; color:var(--text-dark);}
   .doc-hint{font-size:1.2em; color:var(--text-dark); line-height:1.6;}
+  .friendly-note{width:100%; font-size:1.2em; color:var(--text-dark); line-height:1.6; margin:0;}
   .doc-hint ul{margin:0.4em 0 0; padding-left:1.2em;}
   .doc-success{background:#ECFDF3; border:1px dashed var(--sk-green); border-radius:16px; padding:1em; display:flex; align-items:center; justify-content:space-between; gap:0.8em;}
   .doc-success .left{display:flex; align-items:center; gap:0.8em;}
@@ -290,6 +291,19 @@
   .employer-row-head .name{font-family:'Open Sans',sans-serif; font-weight:700; font-size:1.4em; color:var(--text-dark);}
   .employer-row-head .tag{white-space:nowrap; flex-shrink:0;}
   .employer-row .emp-pending{margin-top:0.8em;}
+  .motivo-accordion{width:100%; display:flex; flex-direction:column; gap:0.8em;}
+  .motivo-cat{border:1px solid var(--border-track); border-radius:16px; overflow:hidden; transition:border-color .15s ease;}
+  .motivo-cat.open{border-color:var(--sk-green);}
+  .motivo-cat-head{display:flex; align-items:center; gap:0.6em; padding:1em 1.2em; cursor:pointer;}
+  .motivo-cat-name{flex:1; font-size:1.4em; color:var(--text-dark);}
+  .motivo-cat-head .motivo-info{width:1.4em; height:1.4em; flex-shrink:0;}
+  .motivo-cat-head .motivo-chevron{width:1.2em; height:1.2em; flex-shrink:0; transform:rotate(90deg); transition:transform .15s ease;}
+  .motivo-cat.open .motivo-cat-head .motivo-chevron{transform:rotate(-90deg);}
+  .motivo-cat-body{display:none; flex-direction:column; padding:0 1.2em 0.8em;}
+  .motivo-cat.open .motivo-cat-body{display:flex;}
+  .motivo-option{display:flex; align-items:center; gap:0.8em; padding:0.6em 0; cursor:pointer; font-size:1.4em; color:var(--text-dark);}
+  .motivo-option .radio{width:1.25em; height:1.25em; flex-shrink:0; display:flex;}
+  .motivo-option .radio img{width:100%; height:100%;}
   @media (max-width: 720px){
     .frame{font-size:6px;}
   }
@@ -316,6 +330,13 @@
 
   <div class="panel-card">
     <div class="aside">
+      <div class="breadcrumb">
+        <img id="img-back" alt="volver" />
+        <div class="crumbs">
+          <a>Inicio</a><span>/</span><a>Retiros</a><span>/</span>
+          <span class="current">Cesantías</span>
+        </div>
+      </div>
       <img class="illus" id="img-retiros" alt="Retiros" />
       <div>
         <h2>Retiros</h2>
@@ -325,14 +346,6 @@
     </div>
 
     <div class="main">
-      <div class="breadcrumb">
-        <img id="img-back" alt="volver" />
-        <div class="crumbs">
-          <a>Inicio</a><span>/</span><a>Retiros</a><span>/</span>
-          <span class="current">Cesantías</span>
-        </div>
-      </div>
-
       <div class="content-col">
         <div class="progress-wrap">
           <div class="progress-track" id="progress-track"></div>
@@ -342,70 +355,61 @@
         <!-- STEP 1 -->
         <div class="step-body" id="step1" data-step="1">
           <p class="step-title">¿Cuál es el motivo de tu retiro?</p>
-          <div class="accounts-row">
-            <div class="accounts-list" id="motivo-list" style="max-height:22em;">
-              <div class="account-card selected" data-acc="vivienda">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Adquisición de vivienda</span></div></div>
+          <div class="motivo-accordion" id="motivo-accordion">
+            <div class="motivo-cat" data-cat="terminacion">
+              <div class="motivo-cat-head">
+                <span class="motivo-cat-name">Terminación de contrato laboral</span>
+                <img class="motivo-info" alt="" />
+                <img class="motivo-chevron" alt="" />
               </div>
-              <div class="account-card" data-acc="predial">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Predial</span></div></div>
-              </div>
-              <div class="account-card" data-acc="terminacion">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Terminación del contrato laboral</span></div></div>
-              </div>
-              <div class="account-card" data-acc="sustitucion">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Sustitución de empleadores</span></div></div>
-              </div>
-              <div class="account-card" data-acc="salario-integral">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Cambio a salario integral</span></div></div>
-              </div>
-              <div class="account-card" data-acc="servicio-militar">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Prestación de servicio militar</span></div></div>
-              </div>
-              <div class="account-card" data-acc="independientes">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Independientes o Aportes Voluntarios</span></div></div>
-              </div>
-              <div class="account-card" data-acc="ahorro-educativo">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Ahorro Programado o Seguro Educativo</span></div></div>
-              </div>
-              <div class="account-card" data-acc="estudios">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Para tus estudios</span></div></div>
-              </div>
-              <div class="account-card" data-acc="pareja">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Para tu pareja</span></div></div>
-              </div>
-              <div class="account-card" data-acc="hijo">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Para tu hijo/a</span></div></div>
-              </div>
-              <div class="account-card" data-acc="propiedad-estatal">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Compra de propiedad accionaria estatal</span></div></div>
-              </div>
-              <div class="account-card" data-acc="muerte">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Muerte del trabajador</span></div></div>
-              </div>
-              <div class="account-card" data-acc="mejora">
-                <div class="radio"><img class="radio-img" /></div>
-                <div class="account-info"><div class="account-title-row"><span class="name">Mejora</span></div></div>
+              <div class="motivo-cat-body">
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Terminación el contrato laboral</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Muerte del trabajador</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Cambio a salario integral</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Sustitución de empleadores</span></label>
               </div>
             </div>
-            <div class="scrollbar-track"><div class="scrollbar-thumb"></div></div>
+            <div class="motivo-cat" data-cat="vivienda">
+              <div class="motivo-cat-head">
+                <span class="motivo-cat-name">Vivienda</span>
+                <img class="motivo-info" alt="" />
+                <img class="motivo-chevron" alt="" />
+              </div>
+              <div class="motivo-cat-body">
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Mejora o liberación de vivienda</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Adquisición de vivienda</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Pago de Impuesto predial</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Compra de propiedad accionaria estatal</span></label>
+              </div>
+            </div>
+            <div class="motivo-cat" data-cat="estudios">
+              <div class="motivo-cat-head">
+                <span class="motivo-cat-name">Estudios</span>
+                <img class="motivo-info" alt="" />
+                <img class="motivo-chevron" alt="" />
+              </div>
+              <div class="motivo-cat-body">
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Para tus estudios</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Para tu pareja</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Para tu hijo/a</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Ahorro Programado o Seguro Educativo</span></label>
+              </div>
+            </div>
+            <div class="motivo-cat" data-cat="otros">
+              <div class="motivo-cat-head">
+                <span class="motivo-cat-name">Otros</span>
+                <img class="motivo-info" alt="" />
+                <img class="motivo-chevron" alt="" />
+              </div>
+              <div class="motivo-cat-body">
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Independientes o Aportes Voluntarios</span></label>
+                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Prestación de servicio militar</span></label>
+              </div>
+            </div>
           </div>
           <div class="btn-row">
             <button class="btn btn-outline" id="step1-back">Regresar</button>
-            <button class="btn btn-fill" id="step1-continue">Continuar</button>
+            <button class="btn btn-fill" id="step1-continue" disabled>Continuar</button>
           </div>
         </div>
 
@@ -495,24 +499,17 @@
                 <span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>
               </div>
             </div>
-          </div>
 
-          <div class="employer-block" id="employer-block" style="width:100%;display:flex;flex-direction:column;gap:0.8em;">
             <div class="alert-info" id="employer-covered-msg" style="display:none;background:#ECFDF3;border-color:var(--sk-green);">
               <img id="img-info-covered" alt="" />
               <p>Tu empleador actual cubre el monto que solicitaste. No necesitas subir cartas de empleadores anteriores.</p>
             </div>
-            <div id="employer-picker" style="display:none;width:100%;">
-              <div class="alert-info" style="background:#FFF7E6;border-color:#F5B826;">
-                <img id="img-info-warning" alt="" />
-                <p>Tus cesantías están repartidas entre varios empleadores. Con tu empleador actual solo cubres <b id="employer-actual-amount">$3.000.000</b> de los <b id="employer-monto-solicitado">$5.000.000</b> que solicitaste. Elige de qué empleador(es) anterior(es) quieres certificar la terminación del contrato para cubrir el faltante — puedes elegir el que quieras, siempre que la suma alcance.</p>
-              </div>
-              <div class="doc-card" style="margin-top:0.8em;">
-                <div class="doc-card-head"><img id="img-file-emp" alt="" /><span class="name">Carta de terminación de contrato laboral</span></div>
-                <div class="doc-hint">Debe incluir fecha de finalización del contrato, nombre del empleador y del trabajador, y firma autorizada.</div>
-                <p class="doc-counter" style="margin:0.4em 0 0; font-size:1.2em;" id="employer-coverage-label">Cobertura seleccionada: $0 de $2.000.000 necesarios</p>
-                <div id="employer-list" style="display:flex; flex-direction:column;"></div>
-              </div>
+
+            <div class="doc-card" id="employer-picker" style="display:none;">
+              <div class="doc-card-head"><img id="img-file-emp" alt="" /><span class="name">Carta de terminación de contrato laboral</span></div>
+              <p class="friendly-note" style="margin:0.4em 0 0;">Tu empleador actual cubre <b id="employer-actual-amount">$3.000.000</b> de los <b id="employer-monto-solicitado">$5.000.000</b> que solicitaste. Elige de cuál(es) empleador(es) anteriores quieres certificar la terminación para completar el resto.</p>
+              <p class="doc-counter" style="margin:0.4em 0 0; font-size:1.2em;" id="employer-coverage-label">Cobertura seleccionada: $0 de $2.000.000 necesarios</p>
+              <div id="employer-list" style="display:flex; flex-direction:column;"></div>
             </div>
           </div>
 
@@ -706,7 +703,6 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   document.getElementById('img-sami').src = IMG_SAMI;
   document.getElementById('img-info2').src = IMG_INFO_ICON2;
   document.getElementById('img-info-covered').src = IMG_INFO_ICON2;
-  document.getElementById('img-info-warning').src = IMG_INFO_ICON2;
   document.getElementById('img-file1').src = IMG_FILE_ICON;
   document.getElementById('img-file1b').src = IMG_FILE_ICON;
   document.getElementById('img-file2').src = IMG_FILE_ICON;
@@ -717,6 +713,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
 
   document.querySelectorAll('.radio-img').forEach(function(img){
     var card = img.closest('.account-card');
+    if(!card) return;
     img.src = card.classList.contains('selected') ? IMG_RADIO_SELECTED : IMG_RADIO_UNSELECTED;
   });
 
@@ -728,7 +725,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   }
 
   // Account selection within lists
-  ['cuenta-list','traslado-list','motivo-list'].forEach(function(id){
+  ['cuenta-list','traslado-list'].forEach(function(id){
     var list = document.getElementById(id);
     list.addEventListener('click', function(e){
       var card = e.target.closest('.account-card');
@@ -736,13 +733,31 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
       list.querySelectorAll('.account-card').forEach(function(c){ c.classList.remove('selected'); });
       card.classList.add('selected');
       refreshRadios(list);
-      if(id === 'motivo-list'){
-        var motivoLabel = card.querySelector('.name').textContent;
-        document.getElementById('step3-subtitle').textContent = motivoLabel;
-        var resumenMotivo = document.getElementById('resumen-motivo');
-        if(resumenMotivo) resumenMotivo.textContent = motivoLabel;
-        document.getElementById('step1-continue').disabled = false;
-      }
+    });
+  });
+
+  // Motivo accordion (paso 1)
+  var motivoAccordion = document.getElementById('motivo-accordion');
+  motivoAccordion.querySelectorAll('.motivo-info').forEach(function(img){ img.src = IMG_INFO_ICON2; });
+  motivoAccordion.querySelectorAll('.motivo-chevron').forEach(function(img){ img.src = IMG_CHEVRON_RIGHT; });
+  motivoAccordion.querySelectorAll('.radio-img').forEach(function(img){ img.src = IMG_RADIO_UNSELECTED; });
+  motivoAccordion.querySelectorAll('.motivo-cat-head').forEach(function(head){
+    head.addEventListener('click', function(){
+      var cat = head.closest('.motivo-cat');
+      var wasOpen = cat.classList.contains('open');
+      motivoAccordion.querySelectorAll('.motivo-cat').forEach(function(c){ c.classList.remove('open'); });
+      if(!wasOpen) cat.classList.add('open');
+    });
+  });
+  motivoAccordion.querySelectorAll('.motivo-option').forEach(function(opt){
+    opt.addEventListener('click', function(){
+      motivoAccordion.querySelectorAll('.radio-img').forEach(function(img){ img.src = IMG_RADIO_UNSELECTED; });
+      opt.querySelector('.radio-img').src = IMG_RADIO_SELECTED;
+      var motivoLabel = opt.querySelector('.label').textContent;
+      document.getElementById('step3-subtitle').textContent = motivoLabel;
+      var resumenMotivo = document.getElementById('resumen-motivo');
+      if(resumenMotivo) resumenMotivo.textContent = motivoLabel;
+      document.getElementById('step1-continue').disabled = false;
     });
   });
 
