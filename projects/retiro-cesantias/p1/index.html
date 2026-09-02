@@ -282,9 +282,14 @@
   .chk-box{width:1.3em; height:1.3em; border:2px solid var(--border-track); border-radius:2px; background:#fff; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 0 1px rgba(0,0,0,.25);}
   .chk-box.checked{background:var(--sk-green); border-color:var(--sk-green); position:relative;}
   .chk-box.checked::after{content:''; width:0.4em; height:0.7em; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg); margin-top:-0.15em;}
-  .employer-card .doc-card-head{cursor:pointer;}
-  .employer-card .tag{white-space:nowrap;}
   #employer-coverage-label{transition:color .15s ease;}
+  .employer-row{width:100%; padding:0.8em 0; border-bottom:1px solid var(--border-soft);}
+  .employer-row:last-child{border-bottom:none;}
+  .employer-row-head{display:flex; align-items:center; justify-content:space-between; gap:0.8em; cursor:pointer;}
+  .employer-row-head .left{display:flex; align-items:center; gap:0.8em; min-width:0;}
+  .employer-row-head .name{font-family:'Open Sans',sans-serif; font-weight:700; font-size:1.4em; color:var(--text-dark);}
+  .employer-row-head .tag{white-space:nowrap; flex-shrink:0;}
+  .employer-row .emp-pending{margin-top:0.8em;}
   @media (max-width: 720px){
     .frame{font-size:6px;}
   }
@@ -502,8 +507,12 @@
                 <img id="img-info-warning" alt="" />
                 <p>Tus cesantías están repartidas entre varios empleadores. Con tu empleador actual solo cubres <b id="employer-actual-amount">$3.000.000</b> de los <b id="employer-monto-solicitado">$5.000.000</b> que solicitaste. Elige de qué empleador(es) anterior(es) quieres certificar la terminación del contrato para cubrir el faltante — puedes elegir el que quieras, siempre que la suma alcance.</p>
               </div>
-              <p class="doc-counter" style="margin-top:0.8em;" id="employer-coverage-label">Cobertura seleccionada: $0 de $2.000.000 necesarios</p>
-              <div class="doc-list" id="employer-list" style="max-height:none;"></div>
+              <div class="doc-card" style="margin-top:0.8em;">
+                <div class="doc-card-head"><img id="img-file-emp" alt="" /><span class="name">Carta de terminación de contrato laboral</span></div>
+                <div class="doc-hint">Debe incluir fecha de finalización del contrato, nombre del empleador y del trabajador, y firma autorizada.</div>
+                <p class="doc-counter" style="margin:0.4em 0 0; font-size:1.2em;" id="employer-coverage-label">Cobertura seleccionada: $0 de $2.000.000 necesarios</p>
+                <div id="employer-list" style="display:flex; flex-direction:column;"></div>
+              </div>
             </div>
           </div>
 
@@ -701,6 +710,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   document.getElementById('img-file1').src = IMG_FILE_ICON;
   document.getElementById('img-file1b').src = IMG_FILE_ICON;
   document.getElementById('img-file2').src = IMG_FILE_ICON;
+  document.getElementById('img-file-emp').src = IMG_FILE_ICON;
   document.getElementById('img-upload1').src = IMG_UPLOAD_ICON;
   document.getElementById('img-upload2').src = IMG_UPLOAD_ICON;
   document.getElementById('img-info5a').src = IMG_INFO_ICON5;
@@ -787,34 +797,31 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
     var isTotalidad = (montoSolicitado === TOTAL_SALDO);
 
     PREVIOUS_EMPLOYERS.forEach(function(emp){
-      var card = document.createElement('div');
-      card.className = 'doc-card employer-card';
-      card.innerHTML =
-        '<div class="doc-card-head emp-head" style="justify-content:space-between;">' +
-          '<div style="display:flex;align-items:center;gap:0.8em;">' +
+      var row = document.createElement('div');
+      row.className = 'employer-row';
+      row.innerHTML =
+        '<div class="employer-row-head emp-head">' +
+          '<div class="left">' +
             '<div class="chk-box emp-box"></div>' +
             '<span class="name">' + emp.name + ' <span style="color:var(--text-light);font-weight:400;">(' + emp.periodo + ')</span></span>' +
           '</div>' +
           '<span class="tag">Disponible: ' + formatCOP(emp.saldo) + '</span>' +
         '</div>' +
-        '<div class="doc-hint emp-hint" style="display:none;">Carta de terminación de contrato laboral. Debe incluir fecha de finalización del contrato, nombre del empleador y del trabajador, y firma autorizada.</div>' +
         '<div class="doc-pending emp-pending" style="display:none;">' +
           '<img class="emp-upload-ic" alt="" />' +
           '<span class="btn-upload">Subir carta de terminación</span>' +
           '<span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>' +
         '</div>';
-      list.appendChild(card);
-      card.querySelector('.emp-upload-ic').src = IMG_UPLOAD_ICON;
+      list.appendChild(row);
+      row.querySelector('.emp-upload-ic').src = IMG_UPLOAD_ICON;
 
-      var headEl = card.querySelector('.emp-head');
-      var boxEl = card.querySelector('.emp-box');
-      var hintEl = card.querySelector('.emp-hint');
-      var pendEl = card.querySelector('.emp-pending');
+      var headEl = row.querySelector('.emp-head');
+      var boxEl = row.querySelector('.emp-box');
+      var pendEl = row.querySelector('.emp-pending');
 
       function setSelected(sel){
         emp.selected = sel;
         boxEl.classList.toggle('checked', sel);
-        hintEl.style.display = sel ? '' : 'none';
         pendEl.style.display = sel ? '' : 'none';
         if(!sel){
           emp.letterUploaded = false;
