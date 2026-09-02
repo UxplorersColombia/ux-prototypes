@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing Seguros — Portal Clientes | Skandia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2f3f4;
+    --surface: #ffffff;
+    --surface-tint: #f6fcf2;
+    --border: #e9e9e9;
+    --border-strong: #caf9cb;
+    --ink: #232323;
+    --ink-soft: #404040;
+    --ink-muted: #666666;
+    --accent: #00c73d;
+    --accent-dark: #03a835;
+    --accent-tint: #e7ffe9;
+    --link: #0099de;
+    --shadow: rgba(20, 30, 20, 0.08);
+    --overlay: rgba(20, 24, 20, 0.5);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14170f;
+      --surface: #1c211a;
+      --surface-tint: #1e2b1a;
+      --border: #2c332a;
+      --border-strong: #2f5a34;
+      --ink: #f2f5ef;
+      --ink-soft: #d6dbd2;
+      --ink-muted: #9aa398;
+      --accent: #3ee06d;
+      --accent-dark: #2ec25c;
+      --accent-tint: #16321f;
+      --link: #5bc4f5;
+      --shadow: rgba(0, 0, 0, 0.4);
+      --overlay: rgba(6, 8, 5, 0.65);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f;
+    --surface: #1c211a;
+    --surface-tint: #1e2b1a;
+    --border: #2c332a;
+    --border-strong: #2f5a34;
+    --ink: #f2f5ef;
+    --ink-soft: #d6dbd2;
+    --ink-muted: #9aa398;
+    --accent: #3ee06d;
+    --accent-dark: #2ec25c;
+    --accent-tint: #16321f;
+    --link: #5bc4f5;
+    --shadow: rgba(0, 0, 0, 0.4);
+    --overlay: rgba(6, 8, 5, 0.65);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink-soft);
+    font-family: 'Open Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px 60px;
+  }
+  h1, h2, h3, .display { font-family: 'Montserrat', system-ui, sans-serif; text-wrap: balance; }
+  a { color: var(--link); }
+
+  .shell {
+    width: 100%;
+    max-width: 1320px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 24px 60px -24px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---- top bar ---- */
+  .topbar {
+    height: 68px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(20px, 4vw, 40px);
+    gap: 20px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Montserrat'; font-weight: 700; font-size: 18px; color: var(--ink); }
+  .logo .mark {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800;
+  }
+  .spacer { flex: 1; }
+  .bell {
+    position: relative; width: 42px; height: 42px; border-radius: 50%;
+    background: var(--surface-tint); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .bell .dot {
+    position: absolute; top: -2px; right: -2px; width: 17px; height: 17px; border-radius: 50%;
+    background: #e03430; color: #fff; font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface);
+  }
+  .hello { display: flex; align-items: center; gap: 10px; font-size: 14.5px; color: var(--ink-soft); white-space: nowrap; }
+  .hello strong { color: var(--accent); }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent);
+    background: var(--border); display: flex; align-items: flex-end; justify-content: center; overflow: hidden;
+  }
+  .cta-pill {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 100px; padding: 12px 22px; font-size: 14.5px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; font-family: 'Open Sans';
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .cta-pill:hover { background: var(--accent-dark); }
+  .cta-pill:active { transform: scale(0.98); }
+  .cta-pill:focus-visible, .card-cta:focus-visible, .adv-cta:focus-visible, .ghost-btn:focus-visible, .icon-btn:focus-visible, .cat-tab:focus-visible, .modal-close:focus-visible, .slot:focus-visible {
+    outline: 2px solid var(--link); outline-offset: 2px;
+  }
+
+  .body-scroll { padding: clamp(20px, 3vw, 36px) clamp(20px, 5vw, 52px) 44px; display: flex; flex-direction: column; gap: 26px; }
+
+  .crumb { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--ink-muted); }
+  .crumb b { color: var(--accent); font-weight: 700; }
+  .crumb .sep { color: var(--border-strong); }
+
+  /* category row */
+  .cat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .cat-tab {
+    border: 1px solid var(--border); border-radius: 14px; padding: 15px 18px;
+    display: flex; flex-direction: column; gap: 6px; position: relative;
+    background: var(--surface); font-family: 'Open Sans'; text-align: left; cursor: default;
+  }
+  .cat-tab.active { border: 2px solid var(--accent); }
+  .cat-tab .badge {
+    position: absolute; top: 12px; right: 14px; background: var(--accent-tint); color: var(--accent-dark);
+    font-size: 10.5px; font-weight: 700; border-radius: 100px; padding: 3px 10px;
+  }
+  .cat-tab .icon { width: 34px; height: 34px; border-radius: 50%; background: var(--surface-tint); display: flex; align-items: center; justify-content: center; }
+  .cat-tab .label { font-size: 13.5px; color: var(--ink); font-weight: 600; }
+  .cat-tab.active .label { font-weight: 700; }
+  .cat-tab .value { font-size: 13.5px; color: var(--ink-muted); }
+
+  /* hero */
+  .hero {
+    background: linear-gradient(120deg, var(--accent), var(--accent-dark) 65%);
+    border-radius: 20px; padding: clamp(24px, 3vw, 36px) clamp(24px, 4vw, 40px);
+    display: flex; align-items: center; justify-content: space-between; gap: 28px; color: #fff;
+  }
+  .hero-copy { display: flex; flex-direction: column; gap: 12px; max-width: 620px; }
+  .hero-copy h1 { margin: 0; font-size: clamp(22px, 2.6vw, 28px); line-height: 1.25; font-weight: 700; }
+  .hero-copy p { margin: 0; font-size: 15px; line-height: 1.5; color: #eafff0; }
+  .hero-ctas { display: flex; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
+  .hero-primary {
+    display: inline-flex; align-items: center; gap: 9px; background: #fff; color: var(--accent-dark);
+    border: none; border-radius: 100px; padding: 13px 24px; font-size: 14.5px; font-weight: 700; cursor: pointer;
+    font-family: 'Open Sans'; transition: transform 0.15s ease;
+  }
+  .hero-primary:hover { transform: translateY(-1px); }
+  .hero-secondary {
+    display: inline-flex; align-items: center; gap: 9px; background: transparent; color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.55); border-radius: 100px; padding: 13px 22px;
+    font-size: 14.5px; font-weight: 700; cursor: pointer; font-family: 'Open Sans';
+  }
+  .hero-icon { flex-shrink: 0; opacity: 0.9; }
+
+  /* products */
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .section-head h2 { margin: 0; font-size: 19px; color: var(--ink); font-weight: 700; }
+  .section-head .note { font-size: 12.5px; color: var(--ink-muted); }
+
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .product-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 22px; display: flex; flex-direction: column; gap: 12px;
+    box-shadow: 0 1px 2px var(--shadow);
+  }
+  .product-card .icon { width: 42px; height: 42px; border-radius: 12px; background: var(--surface-tint); display: flex; align-items: center; justify-content: center; }
+  .product-card h3 { margin: 0; font-size: 16.5px; color: var(--ink); }
+  .product-card .kicker { font-size: 12.5px; color: var(--ink-muted); }
+  .product-card .desc { font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); }
+  .feat-list { display: flex; flex-direction: column; gap: 7px; margin-top: 2px; }
+  .feat { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-soft); }
+  .feat svg { flex-shrink: 0; }
+  .card-cta {
+    margin-top: auto; padding-top: 8px;
+  }
+  .card-cta button {
+    width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 100px;
+    padding: 11px 0; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: 'Open Sans';
+  }
+  .card-cta button:hover { background: var(--accent-dark); }
+
+  /* advisors */
+  .advisors {
+    background: var(--surface-tint); border: 1px solid var(--border-strong); border-radius: 20px;
+    padding: clamp(20px, 3vw, 30px) clamp(20px, 3vw, 32px); display: flex; flex-direction: column; gap: 20px;
+  }
+  .advisors h2 { margin: 0; font-size: 19px; color: var(--ink); }
+  .advisors .lede { font-size: 14px; color: var(--ink-soft); max-width: 720px; }
+  .adv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .adv-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .adv-top { display: flex; align-items: center; gap: 13px; }
+  .adv-avatar {
+    width: 48px; height: 48px; border-radius: 50%; color: #fff; display: flex; align-items: center;
+    justify-content: center; font-family: 'Montserrat'; font-weight: 700; font-size: 15px; flex-shrink: 0;
+  }
+  .adv-name { font-family: 'Montserrat'; font-weight: 700; font-size: 15.5px; color: var(--ink); }
+  .adv-role { font-size: 11.5px; font-weight: 700; color: var(--accent-dark); }
+  .adv-tag { font-size: 12px; color: var(--ink-muted); }
+  .adv-actions { display: flex; gap: 8px; }
+  .adv-cta {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+    background: var(--accent); color: #fff; border: none; border-radius: 100px; padding: 10px 0;
+    font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Open Sans';
+  }
+  .adv-cta:hover { background: var(--accent-dark); }
+  .icon-btn {
+    width: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--surface); border: 1.5px solid var(--accent); border-radius: 100px; cursor: pointer;
+  }
+  .icon-btn.plain { border: 1.5px solid var(--border); }
+
+  .random-btn {
+    align-self: flex-start; display: inline-flex; align-items: center; gap: 9px;
+    background: var(--surface); border: 1.5px dashed var(--accent); color: var(--accent-dark);
+    border-radius: 100px; padding: 12px 20px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+    font-family: 'Open Sans';
+  }
+  .random-btn:hover { background: var(--accent-tint); }
+
+  /* modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: var(--overlay); display: none;
+    align-items: center; justify-content: center; z-index: 20; padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    width: 100%; max-width: 420px; background: var(--surface); border-radius: 20px; padding: 30px;
+    display: flex; flex-direction: column; gap: 15px; box-shadow: 0 30px 70px -20px rgba(0,0,0,0.4);
+  }
+  .modal-icon { display: flex; justify-content: center; }
+  .modal-icon span {
+    width: 68px; height: 68px; border-radius: 50%; background: var(--surface-tint);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal h3 { margin: 0; text-align: center; font-size: 19px; color: var(--ink); }
+  .modal .sub { text-align: center; font-size: 14px; color: var(--ink-muted); line-height: 1.45; margin: 0; }
+  .modal .sub strong { color: var(--ink); }
+  .slots { display: flex; flex-direction: column; gap: 9px; margin-top: 2px; }
+  .slot {
+    display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 15px; font-size: 13.5px; color: var(--ink); font-weight: 600; cursor: pointer;
+    background: var(--surface); font-family: 'Open Sans'; width: 100%; text-align: left;
+  }
+  .slot.selected { border: 1.5px solid var(--accent); background: var(--accent-tint); font-weight: 700; }
+  .modal-confirm {
+    margin-top: 4px; background: var(--accent); color: #fff; border: none; border-radius: 100px;
+    padding: 13px 0; font-size: 14.5px; font-weight: 700; cursor: pointer; font-family: 'Open Sans';
+  }
+  .modal-confirm:hover { background: var(--accent-dark); }
+  .modal-close {
+    background: none; border: none; color: var(--ink-muted); font-size: 13.5px; font-weight: 700;
+    cursor: pointer; padding: 4px 0; font-family: 'Open Sans';
+  }
+  .confirm-banner {
+    display: none; align-items: center; gap: 10px; background: var(--accent-tint); color: var(--accent-dark);
+    border-radius: 12px; padding: 12px 16px; font-size: 13.5px; font-weight: 600;
+  }
+  .confirm-banner.show { display: flex; }
+
+  .fab {
+    position: fixed; right: 26px; bottom: 26px; width: 54px; height: 54px; border-radius: 50%;
+    background: #232323; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 20px -4px rgba(0,0,0,0.35); cursor: pointer; z-index: 5;
+  }
+
+  @media (max-width: 880px) {
+    .cat-row { grid-template-columns: repeat(2, 1fr); }
+    .product-grid { grid-template-columns: 1fr; }
+    .adv-grid { grid-template-columns: 1fr; }
+    .hero { flex-direction: column; align-items: flex-start; }
+    .hero-icon { display: none; }
+    .hello span:not(strong) { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="logo"><span class="mark">sk</span> Portal Clientes</div>
+    <div class="spacer"></div>
+    <div class="bell">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+      <span class="dot">4</span>
+    </div>
+    <div class="hello">
+      <span class="avatar"><svg width="26" height="26" viewBox="0 0 24 24" fill="#8a949c"><circle cx="12" cy="8" r="4"></circle><path d="M4 22c0-4.4 3.6-8 8-8s8 3.6 8 8z"></path></svg></span>
+      <span>Hola, <strong>Valeria</strong> 👋</span>
+    </div>
+    <button class="cta-pill" id="btn-generic">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+      Agendar asesoría
+    </button>
+  </div>
+
+  <div class="body-scroll">
+    <div class="crumb">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink-soft)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+      <span>Inicio</span><span class="sep">/</span><b>Protección</b>
+    </div>
+
+    <div class="cat-row">
+      <div class="cat-tab">
+        <span class="icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink-soft)" stroke-width="1.8" stroke-linecap="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-4 4"></path></svg></span>
+        <span class="label">Ahorro e Inversión</span>
+        <span class="value">$ 1.272.818,5</span>
+      </div>
+      <div class="cat-tab">
+        <span class="icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--link)" stroke-width="1.8" stroke-linecap="round"><path d="M19 5c-1.5-2-4-2-5.5 0S12 8 12 8s-.5-3-2-5S6 2 4.5 4 3 8 4 10c1.5 3 5 6 8 8 3-2 6.5-5 8-8 1-2 .5-4-1-5z"></path></svg></span>
+        <span class="label">Pensiones y Cesantías</span>
+        <span class="value">$ 48.505.683,25</span>
+      </div>
+      <div class="cat-tab active">
+        <span class="badge">Protección</span>
+        <span class="icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"></path></svg></span>
+        <span class="label">Protege lo que más te importa hoy.</span>
+      </div>
+      <div class="cat-tab">
+        <span class="badge">Crédito</span>
+        <span class="icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink-soft)" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path></svg></span>
+        <span class="label">Descubre cómo solicitar un crédito.</span>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-copy">
+        <h1>Más de 50 años protegiendo a quienes más quieres</h1>
+        <p>Descubre el seguro de vida que se ajusta a tu momento — ahorro, patrimonio o retiro — y resuelve tus dudas en una asesoría gratuita, sin compromiso.</p>
+        <div class="hero-ctas">
+          <button class="hero-primary" id="btn-hero">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accent-dark)" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+            Agendar asesoría gratuita
+          </button>
+          <button class="hero-secondary">Ver mis seguros activos</button>
+        </div>
+      </div>
+      <svg class="hero-icon" width="130" height="130" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"></path><path d="m9 12 2 2 4-4"></path></svg>
+    </div>
+
+    <div>
+      <div class="section-head" style="margin-bottom:14px;">
+        <h2>Elige el seguro para tu momento de vida</h2>
+        <span class="note">Información con fines demostrativos</span>
+      </div>
+      <div class="product-grid">
+
+        <div class="product-card">
+          <span class="icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path></svg></span>
+          <h3>Skandia Crea Ahorro</h3>
+          <div class="kicker">Vida con ahorro · 18 a 60 años</div>
+          <p class="desc">Protección por muerte e incapacidad total, mientras construyes capital para tus metas con posibles rendimientos.</p>
+          <div class="feat-list">
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Desde $300.000 al mes</div>
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Plazo de 5 a 20 años</div>
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Asesoría financiera incluida</div>
+          </div>
+          <div class="card-cta"><button data-topic="Crea Ahorro" data-advisor="1" class="btn-open">Agendar sobre este seguro</button></div>
+        </div>
+
+        <div class="product-card">
+          <span class="icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v20M2 12h20"></path></svg></span>
+          <h3>Skandia Crea Patrimonio</h3>
+          <div class="kicker">Ahorro de largo plazo · 18 a 60 años</div>
+          <p class="desc">Construye una reserva patrimonial con beneficios tributarios y define libremente a quién quieres proteger.</p>
+          <div class="feat-list">
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Meta mínima $160.000.000</div>
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Plazo de 10 a 25 años</div>
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Beneficiarios flexibles</div>
+          </div>
+          <div class="card-cta"><button data-topic="Crea Patrimonio" data-advisor="2" class="btn-open">Agendar sobre este seguro</button></div>
+        </div>
+
+        <div class="product-card">
+          <span class="icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+          <h3>Skandia Crea Retiro</h3>
+          <div class="kicker">Pensión individual · aportes flexibles</div>
+          <p class="desc">Aporta a tu ritmo (único, mensual, trimestral o semestral) y elige cómo recibir tu pensión al retirarte.</p>
+          <div class="feat-list">
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Liquidez en cualquier momento</div>
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Pago único o pensión vitalicia</div>
+            <div class="feat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>Reportes mensuales de reserva</div>
+          </div>
+          <div class="card-cta"><button data-topic="Crea Retiro" data-advisor="3" class="btn-open">Agendar sobre este seguro</button></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="advisors">
+      <div>
+        <h2>Habla con un asesor Skandia</h2>
+        <p class="lede">Tienes 3 asesores disponibles para resolver tus dudas de protección. Elige con quién agendar o deja que te asignemos uno al azar.</p>
+      </div>
+
+      <div class="adv-grid" id="adv-grid"></div>
+
+      <button class="random-btn" id="btn-random">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-dark)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"></path><path d="M4 20 21 3"></path><path d="M21 16v5h-5"></path><path d="M15 15l6 6"></path><path d="M4 4l5 5"></path></svg>
+        No tengo preferencia, asígnenme un asesor al azar
+      </button>
+
+      <div class="confirm-banner" id="confirm-banner">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accent-dark)" stroke-width="2.2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>
+        <span id="confirm-text"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fab" title="Asistente Skandia">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="11" r="3" fill="var(--accent)"></circle><circle cx="16" cy="11" r="3" fill="#8fe000"></circle></svg>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-icon"><span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span></div>
+    <h3 id="modal-title">¡Listo, <span id="modal-advisor-name">tu asesor</span> te espera!</h3>
+    <p class="sub">Tu asesoría gratuita sobre <strong id="modal-topic">protección</strong> quedará agendada. Elige un horario disponible.</p>
+    <div class="slots" id="slots">
+      <button class="slot selected" data-slot="Hoy, 4:30 p.m.">Hoy, 4:30 p.m.</button>
+      <button class="slot" data-slot="Mañana, 10:00 a.m.">Mañana, 10:00 a.m.</button>
+      <button class="slot" data-slot="Jueves, 2:00 p.m.">Jueves, 2:00 p.m.</button>
+    </div>
+    <button class="modal-confirm" id="modal-confirm">Confirmar cita</button>
+    <button class="modal-close" id="modal-close">Cancelar</button>
+  </div>
+</div>
+
+<script>
+  const ADVISORS = [
+    { initials: "CG", name: "Carlos Eduardo González", role: "TU ASESOR DE INVERSIONES", tag: "Ya te acompaña en Multifund", grad: "linear-gradient(135deg,#00c73d,#8fe000)" },
+    { initials: "DR", name: "Diana Marcela Rojas", role: "ESPECIALISTA EN SEGUROS DE VIDA", tag: "12 años de experiencia", grad: "linear-gradient(135deg,#0099de,#29b6ea)" },
+    { initials: "JT", name: "Jorge Andrés Torres", role: "ESPECIALISTA EN PROTECCIÓN Y RETIRO", tag: "Disponible esta semana", grad: "linear-gradient(135deg,#f5a623,#f57c23)" },
+  ];
+
+  const grid = document.getElementById("adv-grid");
+  grid.innerHTML = ADVISORS.map((a, i) => `
+    <div class="adv-card">
+      <div class="adv-top">
+        <span class="adv-avatar" style="background:${a.grad}">${a.initials}</span>
+        <div>
+          <div class="adv-role">${a.role}</div>
+          <div class="adv-name">${a.name}</div>
+          <div class="adv-tag">${a.tag}</div>
+        </div>
+      </div>
+      <div class="adv-actions">
+        <button class="adv-cta btn-open" data-advisor="${i}" data-topic="protección">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+          Agendar cita
+        </button>
+        <button class="icon-btn" title="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.4A10 10 0 1 0 12 2m4.9 13.4c-.2.6-1.2 1.1-1.7 1.2-.5 0-1.1 0-3.2-1.1a11 11 0 0 1-4.2-4.4c-.5-1-.6-1.9-.2-2.6.2-.4.6-.8 1-.9h.7c.2 0 .4.1.6.6l.7 1.6c.1.3 0 .5-.1.7l-.4.5c-.2.2-.2.3-.1.5.4.8 1 1.5 1.8 2 .6.4 1 .5 1.2.3l.6-.6c.2-.2.4-.2.6-.1l1.6.8c.4.2.5.3.5.5 0 .2 0 .7-.2 1.1"></path></svg></button>
+        <button class="icon-btn plain" title="Correo"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-soft)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2.5 6.5 9.5 7 9.5-7"></path></svg></button>
+      </div>
+    </div>
+  `).join("");
+
+  const overlay = document.getElementById("modal-overlay");
+  const modalName = document.getElementById("modal-advisor-name");
+  const modalTopic = document.getElementById("modal-topic");
+  const slotsWrap = document.getElementById("slots");
+  const confirmBanner = document.getElementById("confirm-banner");
+  const confirmText = document.getElementById("confirm-text");
+  let chosenSlot = "Hoy, 4:30 p.m.";
+  let lastAdvisor = null;
+
+  function openModal(advisorIndex, topic) {
+    const advisor = ADVISORS[advisorIndex] || ADVISORS[0];
+    lastAdvisor = advisor;
+    modalName.textContent = advisor.name;
+    modalTopic.textContent = topic || "protección";
+    overlay.classList.add("open");
+  }
+
+  document.querySelectorAll(".btn-open").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.dataset.advisor || "0", 10);
+      openModal(idx, btn.dataset.topic);
+    });
+  });
+
+  document.getElementById("btn-generic").addEventListener("click", () => openModal(0, "protección"));
+  document.getElementById("btn-hero").addEventListener("click", () => openModal(0, "protección"));
+
+  document.getElementById("btn-random").addEventListener("click", () => {
+    const idx = Math.floor(Math.random() * ADVISORS.length);
+    openModal(idx, "protección");
+  });
+
+  slotsWrap.addEventListener("click", (e) => {
+    const slot = e.target.closest(".slot");
+    if (!slot) return;
+    chosenSlot = slot.dataset.slot;
+    slotsWrap.querySelectorAll(".slot").forEach(s => s.classList.remove("selected"));
+    slot.classList.add("selected");
+  });
+
+  function closeModal() { overlay.classList.remove("open"); }
+  document.getElementById("modal-close").addEventListener("click", closeModal);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+  document.getElementById("modal-confirm").addEventListener("click", () => {
+    closeModal();
+    confirmText.textContent = `Cita confirmada con ${lastAdvisor.name} — ${chosenSlot}`;
+    confirmBanner.classList.add("show");
+  });
+</script>
+</body>
+</html>
