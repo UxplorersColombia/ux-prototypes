@@ -424,8 +424,8 @@
             <div class="option-row" id="opt-monto">
               <div class="option-main">
                 <span class="lbl">Retirar un monto específico</span>
-                <div class="option-sub" id="monto-input-wrap" style="display:none;">
-                  <input type="text" inputmode="numeric" id="monto-input" class="val" style="border:none;outline:none;background:transparent;width:100%;font-family:inherit;" value="5.000.000" />
+                <div class="option-sub" id="monto-input-wrap">
+                  <input type="text" inputmode="numeric" id="monto-input" class="val" placeholder="Otro valor" style="border:none;outline:none;background:transparent;width:100%;font-family:inherit;" />
                   <span class="avail" id="monto-disponible-label">Disponible: $7.500.000</span>
                 </div>
               </div>
@@ -783,11 +783,10 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
     {id:'valle', name:'Constructora Del Valle S.A.', periodo:'Sep 2023 – Dic 2024', saldo:800000}
   ];
   var TOTAL_SALDO = CURRENT_EMPLOYER_SALDO + PREVIOUS_EMPLOYERS.reduce(function(a,e){ return a + e.saldo; }, 0);
-  var montoSolicitado = 5000000;
+  var montoSolicitado = 0;
 
   document.getElementById('saldo-total-display').textContent = formatCOP(TOTAL_SALDO);
   document.getElementById('monto-disponible-label').textContent = 'Disponible: ' + formatCOP(TOTAL_SALDO);
-  document.getElementById('monto-input').value = montoSolicitado.toLocaleString('es-CO');
 
   function prepareStep3Employers(){
     var shortfall = montoSolicitado - CURRENT_EMPLOYER_SALDO;
@@ -964,17 +963,19 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
     if(e.target === montoInput) return;
     document.getElementById('opt-monto').classList.add('selected');
     document.getElementById('opt-total').classList.remove('selected');
-    document.getElementById('monto-input-wrap').style.display = '';
     montoInput.focus();
     updateMontoFromInput();
   });
-  montoInput.addEventListener('click', function(e){ e.stopPropagation(); });
+  montoInput.addEventListener('click', function(e){
+    e.stopPropagation();
+    document.getElementById('opt-monto').classList.add('selected');
+    document.getElementById('opt-total').classList.remove('selected');
+  });
   montoInput.addEventListener('input', updateMontoFromInput);
 
   document.getElementById('opt-total').addEventListener('click', function(){
     document.getElementById('opt-total').classList.add('selected');
     document.getElementById('opt-monto').classList.remove('selected');
-    document.getElementById('monto-input-wrap').style.display = 'none';
     montoSolicitado = TOTAL_SALDO;
     document.getElementById('monto-confirm-label').textContent = 'Retirar la totalidad de tu dinero (' + formatCOP(TOTAL_SALDO) + ')';
     document.querySelector('[data-panel4="list"]').style.display = 'none';
