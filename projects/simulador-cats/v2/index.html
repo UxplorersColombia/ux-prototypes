@@ -30,12 +30,20 @@
     --sk-ease:cubic-bezier(0.4,0,0.2,1);
     --sk-surface-100:#f1f3f5; --sk-surface-200:#e2e2e2;
     --sk-input-focus:#16d727; --sk-placeholder:#a5a5a5; --sk-tertiary-hover:#f6fcf2;
+    /* sk-components-angular no publica paleta de dataviz/gráficas — no existe --sk-color-chart-* ni similar.
+       Estos 3 tonos son una convención propia del simulador, derivada del verde de marca; no son tokens oficiales. */
     --charts-c01:#a1dd70; --charts-c02:#a4d7e1; --charts-c03:#60a9a6;
-    --font-brand:'Montserrat',Verdana,Arial,sans-serif;
-    --font-body:'Open Sans','Segoe UI',Arial,sans-serif;
+    --sk-font-title:'Montserrat',sans-serif;
+    --sk-font-body:'Open Sans',system-ui,sans-serif;
+    --sk-font-weight-regular:400; --sk-font-weight-medium:500; --sk-font-weight-bold:700;
+    --sk-shadow-subtle:0 0 2px rgba(68,68,68,0.15);
+    --sk-shadow-surface:0 0 2px 0 rgba(61,75,92,0.15);
+    --sk-shadow-raised:0 4px 16px rgba(0,0,0,0.12);
+    --sk-shadow-overlay:0 8px 24px rgba(0,0,0,0.16);
+    --sk-success-border:#87f491; --sk-success-icon:#00a34e; --sk-error:#e03430;
   }
   *{box-sizing:border-box;}
-  body{margin:0;font-family:var(--font-body);background:var(--sk-n1);color:var(--sk-surface-800);-webkit-font-smoothing:antialiased;}
+  body{margin:0;font-family:var(--sk-font-body);background:var(--sk-n1);color:var(--sk-surface-800);-webkit-font-smoothing:antialiased;}
   .wrap{max-width:960px;margin:0 auto;padding:0 20px 80px;}
 
   a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
@@ -53,25 +61,65 @@
   h1{font-size:23px;font-weight:800;margin:0 0 4px;}
   .subtitle{font-size:13.5px;color:var(--sk-n4);font-weight:500;max-width:680px;line-height:1.5;margin:0 0 22px;}
 
-  .card{background:var(--sk-surface-0);border:1px solid var(--sk-n3);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 2px rgba(0,0,0,0.03);}
+  .card{background:var(--sk-surface-0);border:1px solid var(--sk-n3);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;box-shadow:var(--sk-shadow-surface);}
   .card-title{margin:0 0 4px;font-size:14px;font-weight:800;}
   .card-desc{font-size:12.5px;color:var(--sk-n4);margin-bottom:18px;font-weight:500;}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
-  .field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px;}
-  .field .unit-input{position:relative;}
-  .field .unit-input input{padding-right:32px;}
-  .field .unit-input span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sk-placeholder);font-weight:600;}
-  input[type="text"], select{
-    width:100%;border:1px solid var(--sk-n3);border-radius:4px;padding:12px 12px;
-    font-family:var(--font-body);font-size:14px;line-height:1.5;color:var(--sk-surface-800);
-    background:var(--sk-surface-0);transition:border-color .15s var(--sk-ease), border-radius .15s var(--sk-ease), box-shadow .15s var(--sk-ease);
+  /* sk-input-number lleva su label FUERA de la caja (16px + 6px margen); sk-input-select la lleva
+     flotando DENTRO. Al ponerlos lado a lado, empujamos el select para que ambas cajas alineen arriba. */
+  .grid .sk-field{margin-top:22px;}
+
+  /* Réplica en HTML/CSS plano de sk-input-select: el real NO es un <select> nativo — es un
+     trigger custom (role=combobox) + popover con sk-listbox. El <select> nativo queda oculto
+     como fuente de verdad para no reescribir selectCat()/recalc(), y este combo lo sincroniza. */
+  .sk-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .sk-field{display:block;position:relative;}
+  .sk-field .box{
+    position:relative;display:flex;align-items:center;gap:8px;height:58px;padding:8px 16px;cursor:pointer;
+    border:1px solid var(--sk-n3);border-radius:4px;background:var(--sk-surface-0);
+    transition:border-color .12s var(--sk-ease), border-radius .12s var(--sk-ease), box-shadow .12s var(--sk-ease);
   }
-  input::placeholder{color:var(--sk-placeholder);}
-  input:focus, select:focus{outline:none;border-color:var(--sk-input-focus);border-radius:8px;box-shadow:0 0 0 3px rgba(0,199,61,.14);}
-  input.money{border-color:transparent;border-radius:var(--sk-radius-sm);box-shadow:0 0 4px rgba(68,68,68,0.15);}
-  input.money:focus{border-color:var(--sk-primary);border-radius:var(--sk-radius-sm);box-shadow:0 0 4px rgba(68,68,68,0.15), 0 0 0 3px rgba(0,199,61,0.18);}
-  .field .help{font-size:11px;color:var(--sk-n4);margin-top:5px;line-height:1.5;}
+  .sk-field .box:hover:not(.is-focused){border-color:var(--sk-primary);}
+  .sk-field .box.is-focused{border-color:var(--sk-input-focus);border-radius:8px;}
+  .sk-field .box.is-floating:not(.is-focused){border-color:transparent;border-radius:8px;box-shadow:var(--sk-shadow-subtle);}
+  .sk-field .inner{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:1px;}
+  .sk-field label{
+    color:var(--sk-n4);font-family:var(--sk-font-body);font-size:12px;line-height:20px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .12s var(--sk-ease);
+  }
+  .sk-field .box.is-focused label{color:var(--sk-input-focus);}
+  .sk-field .value{color:var(--sk-surface-800);font-family:var(--sk-font-body);font-size:14px;line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sk-field .chevron{flex:none;width:16px;height:16px;color:var(--sk-n4);pointer-events:none;transition:transform .24s var(--sk-ease);}
+  .sk-field .box.is-focused .chevron{transform:rotate(180deg);}
+  .sk-field .help{font-size:11px;color:var(--sk-n4);margin-top:5px;line-height:1.5;}
+
+  /* Popover del combo — contrato visual de sk-listbox dentro de sk-input-select (ficha: container
+     y opción con radius 4px, NO 8px -- ese es el radius de los inputs, no el del listbox/popover) */
+  .sk-popover{
+    position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;margin:0;padding:8px;list-style:none;
+    background:var(--sk-surface-0);border-radius:4px;box-shadow:var(--sk-shadow-overlay);
+    max-height:280px;overflow-y:auto;
+  }
+  .sk-popover li{min-height:40px;padding:8px;border-radius:4px;display:flex;align-items:center;
+    font-family:var(--sk-font-body);font-size:14px;color:var(--sk-surface-800);cursor:pointer;}
+  .sk-popover li:hover, .sk-popover li.is-active{background:var(--sk-n1);}
+  .sk-popover li[aria-selected="true"]{background:rgba(0,199,61,0.08);}
+
+  /* Réplica de sk-input-number modo currency: label fijo arriba (NO flotante), prefijo "$" fuera
+     del valor editable, radius 8px fijo y sombra siempre-on — a diferencia de sk-input-text/select. */
+  .sk-numfield{display:block;}
+  .sk-numfield label{display:block;font-size:11px;line-height:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px;}
+  .sk-numfield .num-box{
+    height:58px;padding:8px 12px;border:1px solid transparent;border-radius:8px;background:var(--sk-surface-0);
+    display:flex;align-items:center;gap:6px;box-shadow:var(--sk-shadow-subtle);
+    transition:border-color .12s var(--sk-ease), box-shadow .12s var(--sk-ease);
+  }
+  .sk-numfield .num-box:hover:not(:focus-within){border-color:var(--sk-primary);}
+  .sk-numfield .num-box:focus-within{border-color:var(--sk-input-focus);box-shadow:var(--sk-shadow-subtle), 0 0 0 3px rgba(0,199,61,.18);}
+  .sk-numfield .num-box.is-error{border-color:var(--sk-error);box-shadow:var(--sk-shadow-subtle), 0 0 0 3px rgba(224,49,49,.15);}
+  .sk-numfield .prefix{flex:none;color:var(--sk-n4);font-family:var(--sk-font-body);font-size:14px;font-weight:600;}
+  .sk-numfield input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:var(--sk-font-body);font-size:14px;color:var(--sk-surface-800);}
 
   /* Ficha del CAT seleccionado — campos de solo lectura (no inputs), ver reunión 31 jul: fechas/rango no deben editarse */
   .cat-ficha{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px;}
@@ -83,14 +131,14 @@
   .cat-ficha .fi-item dd{margin:0;font-size:13.5px;font-weight:700;color:var(--sk-surface-800);line-height:1.4;}
   .cat-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;}
   #alertEstado:not(:empty){margin-top:16px;}
-  .cat-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-brand);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:0.4px;border-radius:var(--sk-radius-pill);padding:4px 10px;}
+  .cat-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--sk-font-title);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:0.4px;border-radius:var(--sk-radius-pill);padding:4px 10px;}
   .cat-badge.recaudo{background:var(--sk-primary-tint);color:var(--sk-primary-pressed);}
   .cat-badge.proximo{background:var(--sk-info-bg);color:var(--sk-info-ink);}
   .cat-badge.vigencia{background:var(--sk-info-bg);color:var(--sk-info-ink);}
   .cat-badge.vencido{background:var(--sk-surface-100);color:var(--sk-n4);}
-  .cat-name{font-family:var(--font-brand);font-size:16px;font-weight:800;color:var(--sk-surface-800);}
+  .cat-name{font-family:var(--sk-font-title);font-size:16px;font-weight:800;color:var(--sk-surface-800);}
 
-  .btn{font-family:var(--font-brand);font-weight:700;font-size:14px;line-height:1;border-radius:100px;padding:12px 22px;cursor:pointer;border:2px solid transparent;display:inline-flex;align-items:center;gap:8px;transition:background .2s,border-color .2s,color .2s,box-shadow .2s;}
+  .btn{font-family:var(--sk-font-title);font-weight:700;font-size:14px;line-height:1;border-radius:100px;padding:12px 22px;cursor:pointer;border:2px solid transparent;display:inline-flex;align-items:center;gap:8px;transition:background .2s,border-color .2s,color .2s,box-shadow .2s;}
   .btn svg{width:16px;height:16px;}
   .btn-primary{background:var(--sk-primary);color:#fff;}
   .btn-primary:hover{background:var(--sk-primary-hover);}
@@ -98,11 +146,14 @@
   .btn-tertiary:hover{background:var(--sk-tertiary-hover);}
   .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;}
 
-  .sk-alert{border-radius:var(--sk-radius-sm);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:500;margin-bottom:16px;backdrop-filter:blur(4px);}
+  /* Colores por variante (bg/border/ícono) según ficha sk-alert; el texto siempre es --sk-color-text (--sk-surface-800) sobre el pastel — el alert real no tiñe el mensaje, solo el ícono. */
+  .sk-alert{border-radius:var(--sk-radius-sm);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:500;margin-bottom:16px;backdrop-filter:blur(4px);color:var(--sk-surface-800);}
   .sk-alert .ico{font-size:16px;line-height:1.3;flex:none;}
   .sk-alert svg{width:18px;height:18px;flex:none;}
-  .sk-alert-info{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);color:var(--sk-info-ink);}
-  .sk-alert-warning{background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);color:var(--sk-warning-ink);}
+  .sk-alert-info{background:var(--sk-info-bg);border:1px solid var(--sk-info-border);}
+  .sk-alert-info svg{color:var(--sk-info-border);}
+  .sk-alert-warning{background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);}
+  .sk-alert-warning svg{color:var(--sk-warning-border);}
   .sk-alert-title{font-weight:800;margin-bottom:2px;}
 
   .result-banner{background:var(--sk-success-bg);border:1px solid #3fae63;border-radius:var(--sk-radius-sm);padding:20px 22px;margin-bottom:6px;}
@@ -117,22 +168,22 @@
   .sc-card.min{background:var(--sk-warning-bg);border-color:var(--sk-warning-border);}
   .sc-card.mid{background:var(--sk-info-bg);border-color:var(--sk-info-border);}
   .sc-card.max{background:var(--sk-success-bg);border-color:#3fae63;}
-  .sc-card .sc-lbl{font-family:var(--font-brand);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px;}
-  .sc-card .sc-tir{font-family:var(--font-brand);font-size:19px;font-weight:800;color:var(--sk-surface-800);}
+  .sc-card .sc-lbl{font-family:var(--sk-font-title);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px;}
+  .sc-card .sc-tir{font-family:var(--sk-font-title);font-size:19px;font-weight:800;color:var(--sk-surface-800);}
   .sc-card .sc-row{font-size:11.5px;color:var(--sk-n4);margin-top:8px;display:flex;justify-content:space-between;gap:8px;}
   .sc-card .sc-row b{color:var(--sk-surface-800);font-weight:700;white-space:nowrap;}
   .legend{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 12px;font-size:11.5px;color:var(--sk-n4);}
   .legend span{display:inline-flex;align-items:center;gap:6px;}
   .sw{width:10px;height:10px;border-radius:3px;display:inline-block;}
   svg.chart{width:100%;height:auto;display:block;}
-  .axis{font-size:10px;fill:var(--sk-n4);font-family:var(--font-body);}
+  .axis{font-size:10px;fill:var(--sk-n4);font-family:var(--sk-font-body);}
 
   .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   @media (max-width:700px){ .compare-grid{grid-template-columns:1fr;} }
   .compare-card{border-radius:var(--sk-radius-md);padding:16px;border:1.5px solid var(--sk-n3);background:var(--sk-n1);}
-  .compare-card h3{margin:0 0 2px;font-family:var(--font-brand);font-size:13.5px;color:var(--sk-surface-800);}
+  .compare-card h3{margin:0 0 2px;font-family:var(--sk-font-title);font-size:13.5px;color:var(--sk-surface-800);}
   .compare-card .csub{font-size:11.5px;color:var(--sk-n4);margin-bottom:10px;}
-  .compare-card .cbig{font-family:var(--font-brand);font-size:20px;font-weight:800;color:var(--sk-primary-pressed);}
+  .compare-card .cbig{font-family:var(--sk-font-title);font-size:20px;font-weight:800;color:var(--sk-primary-pressed);}
   .compare-card .cbig .u{font-size:11px;color:var(--sk-n4);font-weight:600;}
   .mini-row{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px dashed var(--sk-n3);}
   .mini-row b{color:var(--sk-surface-800);}
@@ -150,6 +201,21 @@
   .help-body p.legal-title{font-weight:800;color:var(--sk-surface-800);}
   .help-body ol{margin:0 0 10px;padding-left:20px;}
   .help-body ol li{margin-bottom:8px;}
+
+  .faq-intro{margin:0 0 14px;}
+  .faq-chart{display:block;width:100%;max-width:576px;height:auto;margin:0 auto 2px;}
+  .faq-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:11.5px;color:var(--sk-n4);margin:6px 0 2px;}
+  .faq-legend span{display:inline-flex;align-items:center;gap:6px;}
+  .faq-legend i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none;}
+  .faq-caption{font-size:11px;color:var(--sk-n4);margin-bottom:16px;}
+  .faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  @media (max-width:640px){.faq-grid{grid-template-columns:1fr;}}
+  .faq-card{background:var(--sk-surface-0);border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);padding:13px 15px;}
+  .faq-card h4{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:var(--sk-font-title);font-size:13px;font-weight:800;color:var(--sk-surface-800);}
+  .faq-card h4 svg{width:18px;height:18px;flex:none;color:var(--sk-primary-pressed);}
+  .faq-card p{margin:0;font-size:12px;line-height:1.55;}
+  .faq-summary{display:flex;gap:10px;align-items:flex-start;background:var(--sk-success-bg);border:1px solid var(--sk-success-border);border-radius:var(--sk-radius-sm);padding:13px 15px;font-size:12.5px;line-height:1.55;color:var(--sk-surface-800);}
+  .faq-summary svg{width:18px;height:18px;flex:none;margin-top:1px;color:var(--sk-success-icon);}
 
   .vigencia-badge{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--sk-warning-ink);background:var(--sk-warning-bg);border:1px solid var(--sk-warning-border);border-radius:var(--sk-radius-pill);padding:5px 12px;width:fit-content;max-width:100%;text-align:center;}
   .vigencia-badge svg{width:15px;height:15px;flex:none;}
@@ -178,7 +244,7 @@
   }
   .tc-modal-panel{
     background:var(--sk-surface-0); border-radius:var(--radius); border:1px solid var(--sk-n3);
-    box-shadow:0 8px 24px rgba(0,0,0,.16); width:100%; max-width:560px; max-height:90vh; overflow-y:auto;
+    box-shadow:var(--sk-shadow-overlay); width:100%; max-width:560px; max-height:90vh; overflow-y:auto;
     transform:translateY(10px) scale(.98); filter:blur(4px);
     transition:transform .16s var(--sk-ease), filter .16s var(--sk-ease);
   }
@@ -187,7 +253,7 @@
     transition:transform .28s cubic-bezier(0.16,1,0.3,1), filter .28s cubic-bezier(0.16,1,0.3,1);
   }
   .tc-modal-header{padding:20px 24px;border-bottom:1px solid var(--sk-n2);}
-  .tc-modal-header h3{font-family:var(--font-brand);font-size:14px;font-weight:800;color:var(--sk-surface-800);margin:0;}
+  .tc-modal-header h3{font-family:var(--sk-font-title);font-size:14px;font-weight:800;color:var(--sk-surface-800);margin:0;}
   .tc-modal-body{padding:20px 24px;font-size:13px;line-height:1.6;color:var(--sk-surface-800);}
   .tc-modal-body p{margin:0 0 12px;}
   .tc-modal-body p:last-child{margin-bottom:0;}
@@ -195,9 +261,9 @@
 
   h1, .card-title, .field label, .result-title, .result-tag,
   .vigencia-badge, .disclaimer-main, .cat-name{
-    font-family:var(--font-brand);
+    font-family:var(--sk-font-title);
   }
-  .audience-tag{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-brand);font-weight:700;font-size:11px;letter-spacing:0.4px;text-transform:uppercase;color:var(--sk-surface-800);background:var(--sk-surface-100);border:1px solid var(--sk-surface-200);border-radius:var(--sk-radius-pill);padding:6px 12px;}
+  .audience-tag{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-family:var(--sk-font-title);font-weight:700;font-size:11px;letter-spacing:0.4px;text-transform:uppercase;color:var(--sk-surface-800);background:var(--sk-surface-100);border:1px solid var(--sk-surface-200);border-radius:var(--sk-radius-pill);padding:6px 12px;}
   .audience-tag svg{width:14px;height:14px;}
 
   @media (max-width:600px){
@@ -257,10 +323,17 @@
       <h2 class="card-title">¿Qué CAT estás presentando?</h2>
       <div class="card-desc">Selecciona el CAT. Sus fechas y rango objetivo ya están definidos desde que Skandia lo comercializa — por eso se muestran, no se editan.</div>
 
-      <div class="field" style="max-width:420px;">
-        <label>CAT</label>
-        <select id="catSel">
-          <!-- opciones generadas por JS -->
+      <div class="sk-field" style="max-width:420px;">
+        <div class="box is-floating" id="catSelBox" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="catSelList" aria-labelledby="catSelLabel">
+          <div class="inner">
+            <label id="catSelLabel">CAT</label>
+            <span class="value"></span>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          <ul class="sk-popover" id="catSelList" role="listbox" aria-labelledby="catSelLabel" hidden></ul>
+        </div>
+        <select id="catSel" class="sk-visually-hidden" aria-hidden="true" tabindex="-1">
+          <!-- opciones generadas por JS; fuente de verdad para selectCat(), oculta visualmente -->
         </select>
       </div>
 
@@ -284,13 +357,23 @@
       <h2 class="card-title">Tu simulación</h2>
       <div class="card-desc">Cambia el monto o la frecuencia y el resultado de abajo se actualiza al instante.</div>
       <div class="grid">
-        <div class="field">
-          <label>Monto a invertir</label>
-          <input type="text" inputmode="numeric" class="money" id="monto" value="10.000.000">
+        <div class="sk-numfield">
+          <label for="monto">Monto a invertir</label>
+          <div class="num-box" id="montoBox">
+            <span class="prefix">$</span>
+            <input type="text" inputmode="numeric" id="monto" value="10.000.000">
+          </div>
         </div>
-        <div class="field">
-          <label>Frecuencia de pagos periódicos (cupón)</label>
-          <select id="frecuencia">
+        <div class="sk-field">
+          <div class="box is-floating" id="frecuenciaBox" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="frecuenciaList" aria-labelledby="frecuenciaLabel">
+            <div class="inner">
+              <label id="frecuenciaLabel">Frecuencia de pagos periódicos (cupón)</label>
+              <span class="value"></span>
+            </div>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            <ul class="sk-popover" id="frecuenciaList" role="listbox" aria-labelledby="frecuenciaLabel" hidden></ul>
+          </div>
+          <select id="frecuencia" class="sk-visually-hidden" aria-hidden="true" tabindex="-1">
             <option value="2">Semestral</option>
             <option value="1">Anual</option>
           </select>
@@ -339,6 +422,64 @@
           <div class="row"><b>Ejemplo:</b> Si las tasas de interés del mercado suben, los títulos existentes pueden perder atractivo frente a nuevas emisiones y su precio baja — el saldo diario puede verse menor. Si las tasas bajan, ocurre lo contrario.</div>
           <div class="row"><b>Por qué le sirve a tu cliente:</b> Esa variación diaria es del mercado, no del resultado final — puede tranquilizar a un cliente que ve el saldo moverse sin haber pasado nada con su inversión.</div>
           <div class="row"><b>Qué sigue:</b> Como el CAT es cerrado y está diseñado para llegar hasta el vencimiento, lo importante es evaluar el resultado completo al final del plazo — cupones, valor final y comisiones — no el saldo de un día puntual.</div>
+        </div>
+      </details>
+
+      <!-- FAQ: variación entre cupones — acordeón para no alargar el simulador (pregunta más recurrente de los FP) -->
+      <details class="help-block">
+        <summary>¿Por qué un cupón puede llegar por un valor distinto al anterior?</summary>
+        <div class="help-body">
+          <p class="faq-intro">Es normal que los montos netos varíen entre un pago y otro. No significa que el CAT esté rindiendo menos ni que el capital haya cambiado — suele deberse a dos razones operativas:</p>
+
+          <svg class="faq-chart" viewBox="0 0 500 210" role="img" aria-label="Ilustración: el cupón 1 cubre un período adicional; en los cupones 3 y 4, ya agotada la reserva, la comisión se descuenta directamente del flujo, dejando un monto neto más bajo.">
+            <text x="77" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="var(--sk-primary-pressed)">más alto</text>
+            <text x="191" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="var(--sk-primary-pressed)">en línea</text>
+            <text x="362" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="var(--sk-warning-ink)">se estabiliza más abajo</text>
+
+            <rect x="40" y="72" width="74" height="78" fill="var(--sk-primary-tint)"></rect>
+            <rect x="40" y="50" width="74" height="22" fill="var(--sk-primary)"></rect>
+
+            <rect x="154" y="72" width="74" height="78" fill="var(--sk-primary-tint)"></rect>
+
+            <rect x="268" y="90" width="74" height="60" fill="var(--sk-warning-border)"></rect>
+            <rect x="268" y="72" width="74" height="18" fill="none" stroke="var(--sk-warning-border)" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+
+            <rect x="382" y="90" width="74" height="60" fill="var(--sk-warning-border)"></rect>
+            <rect x="382" y="72" width="74" height="18" fill="none" stroke="var(--sk-warning-border)" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+
+            <line x1="20" y1="150" x2="480" y2="150" stroke="var(--sk-n3)"></line>
+
+            <text x="77" y="168" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sk-surface-800)">Cupón 1</text>
+            <text x="191" y="168" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sk-surface-800)">Cupón 2</text>
+            <text x="305" y="168" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sk-surface-800)">Cupón 3</text>
+            <text x="419" y="168" text-anchor="middle" font-size="12" font-weight="800" fill="var(--sk-surface-800)">Cupón 4</text>
+            <text x="77" y="184" text-anchor="middle" font-size="10" fill="var(--sk-n4)">cubre más días</text>
+            <text x="191" y="184" text-anchor="middle" font-size="10" fill="var(--sk-n4)">período normal</text>
+            <text x="305" y="184" text-anchor="middle" font-size="10" fill="var(--sk-n4)">reserva agotada</text>
+            <text x="419" y="184" text-anchor="middle" font-size="10" fill="var(--sk-n4)">nivel estable</text>
+          </svg>
+          <div class="faq-legend">
+            <span><i style="background:var(--sk-primary-tint)"></i>Monto neto recibido</span>
+            <span><i style="background:var(--sk-primary)"></i>Días adicionales del primer período</span>
+            <span><i style="background:var(--sk-surface-0);border:1.5px dashed var(--sk-warning-border);"></i>Comisión descontada del flujo</span>
+          </div>
+          <div class="faq-caption">Ilustrativo. El capital de referencia es el mismo en todos los períodos.</div>
+
+          <div class="faq-grid">
+            <div class="faq-card">
+              <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>El primer cupón puede verse más alto</h4>
+              <p>Los títulos pagan en fechas fijas definidas por el emisor. Si tu CAT inició después del último pago, el primer cupón cubre un período más largo — recibes el cupón completo del semestre, no solo la parte proporcional. Esto no genera ajustes en los cupones siguientes.</p>
+            </div>
+            <div class="faq-card">
+              <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="16" height="10" rx="2"/><line x1="22" y1="10" x2="22" y2="14"/><line x1="6" y1="10" x2="6" y2="14"/></svg>El fondo de gastos puede agotarse</h4>
+              <p>El CAT mantiene una reserva para cubrir gastos y comisión de administración. Mientras tenga saldo, los cupones llegan sin ese descuento visible; al agotarse, la comisión se descuenta directamente del flujo.</p>
+            </div>
+          </div>
+
+          <div class="faq-summary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <div><b>La comisión siempre estuvo contemplada.</b> Lo que cambia es de dónde se descuenta, no cuánto se cobra.</div>
+          </div>
         </div>
       </details>
     </div>
@@ -416,126 +557,44 @@
 </div>
 
 <script>
-// ---------- Fuente de datos: CSV publicado (Google Sheets) con respaldo embebido ----------
-// Hoja "Datos CAT" de "Simulador CATs Datos Maestros", publicada en la web como CSV.
-// Si el fetch falla (sin internet, CSP, hoja despublicada), cae al snapshot embebido de abajo.
-const DATA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTzAs5R-SLz-ziwP-sLFDm_pcfKKms_NTlmgOsRNreuLLxAoke9frb6nak6fh9-rg/pub?gid=520437735&single=true&output=csv';
-const SNAPSHOT_DATE = '2026-08-20';
+// ---------- Fuente de datos: snapshot embebido, actualizado a mano ----------
+// El equipo de producto gestiona el rango objetivo en "Simulador CATs Datos Maestros.xlsx"
+// (OneDrive). Mientras se resuelve una automatización directa contra ese archivo, cada
+// cambio se avisa a Javier y se refleja aquí a mano.
+const SNAPSHOT_DATE = '2026-09-08';
 
 // Snapshot tomado de "Simulador CATs Datos Maestros.xlsx" (hoja "Datos CAT") en la fecha de arriba.
+// Nota: el Excel traía dos filas para Nutresa 2030-II (fechas y plazo idénticos, rango distinto);
+// por indicación de producto se dejó "CAT Bonos Nutresa 2030-II" y se descartó la fila vieja.
 const CATS_SNAPSHOT = [
-  { id:'cat-nutresa-2030-ii', nombre:'CAT NUTRESA 2030-II', emisor:'Grupo Nutresa',
-    fRecaudoIni:'2026-07-28', fInicio:'2026-08-11', fFin:'2030-05-14',
-    plazoAnios:3.7568455640744798, frecuenciaDefault:2,
-    objMin:11.5, objMax:13.0, objMid:12.25, montoMinimo:0 },
-  { id:'cat-aval-2030', nombre:'CAT AVAL 2030', emisor:'Grupo Aval',
+  { id:'cat-bono-ecopetrol-2030-i', nombre:'CAT Bono Ecopetrol 2030-I', emisor:'Ecopetrol',
+    fRecaudoIni:'2026-09-02', fInicio:'2026-09-15', fFin:'2030-04-29',
+    plazoAnios:3.619934282584885, frecuenciaDefault:2,
+    objMin:11.8, objMax:13.2, objMid:12.5, montoMinimo:0 },
+  { id:'cat-bono-grupo-aval-2030-i', nombre:'CAT Bono Grupo Aval 2030-I', emisor:'Grupo Aval',
     fRecaudoIni:'2026-08-18', fInicio:'2026-09-01', fFin:'2030-02-04',
     plazoAnios:3.4282584884994525, frecuenciaDefault:2,
-    objMin:11.6, objMax:12.6, objMid:12.1, montoMinimo:0 }
+    objMin:11.6, objMax:12.6, objMid:12.1, montoMinimo:0 },
+  { id:'cat-bonos-nutresa-2030-ii', nombre:'CAT Bonos Nutresa 2030-II', emisor:'Nutresa',
+    fRecaudoIni:'2026-07-28', fInicio:'2026-08-11', fFin:'2030-05-14',
+    plazoAnios:3.7568455640744798, frecuenciaDefault:2,
+    objMin:11.6, objMax:12.1, objMid:11.85, montoMinimo:0 },
+  { id:'cat-bonos-nutresa-2030-i', nombre:'CAT Bonos Nutresa 2030-I', emisor:'Nutresa',
+    fRecaudoIni:'2026-07-02', fInicio:'2026-07-17', fFin:'2030-05-14',
+    plazoAnios:3.825301204819277, frecuenciaDefault:2,
+    objMin:12.5, objMax:13.0, objMid:12.75, montoMinimo:0 },
+  { id:'cat-5-noviembre-2027', nombre:'CAT 5 noviembre 2027', emisor:'Gobierno Colombia',
+    fRecaudoIni:'2026-06-09', fInicio:'2026-06-17', fFin:'2027-11-05',
+    plazoAnios:1.3863013698630138, frecuenciaDefault:1,
+    objMin:10.5, objMax:11.0, objMid:10.75, montoMinimo:0 }
 ];
 
 let CATS = [];
 let catActual = null;
-
-// Quita tildes vía NFD (descompone á -> a + acento) y borra los acentos sueltos
-function slugify(s){
-  return (s||'').toString().normalize('NFD').replace(/\p{Diacritic}/gu,'')
-    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-}
-
-// Parser CSV mínimo (RFC4180): soporta comas y saltos de línea dentro de campos entre comillas.
-function parseCSV(text){
-  const rows = []; let row = [], field = '', inQuotes = false;
-  for(let i=0;i<text.length;i++){
-    const ch = text[i];
-    if(inQuotes){
-      if(ch === '"'){ if(text[i+1] === '"'){ field += '"'; i++; } else inQuotes = false; }
-      else field += ch;
-    }else{
-      if(ch === '"') inQuotes = true;
-      else if(ch === ','){ row.push(field); field=''; }
-      else if(ch === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
-      else if(ch === '\r'){ /* ignorado, el salto real llega con \n */ }
-      else field += ch;
-    }
-  }
-  if(field.length || row.length){ row.push(field); rows.push(row); }
-  return rows;
-}
-
-function parseNum(s){
-  if(s == null) return NaN;
-  s = String(s).trim().replace(/[$%\s]/g,'');
-  if(!s) return NaN;
-  if(s.includes(',') && s.includes('.')) s = s.replace(/\./g,'').replace(',', '.');
-  else if(s.includes(',')) s = s.replace(',', '.');
-  return parseFloat(s);
-}
-function parsePct(s){
-  const n = parseNum(s);
-  if(!isFinite(n)) return NaN;
-  return Math.abs(n) <= 1 ? n*100 : n;
-}
-function parseFechaCSV(s){
-  s = (s||'').toString().trim();
-  if(!s) return null;
-  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-  if(m) return `${m[1].padStart(4,'0')}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
-  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-  return null;
-}
-
-// Localiza la fila de encabezado por su texto (no por número fijo de fila) y lee hasta
-// la primera fila con la columna "Nombre del CAT" vacía. Descarta filas incompletas.
-function mapearFilas(rows){
-  const headerIdx = rows.findIndex(r => (r[0]||'').trim() === 'Nombre del CAT');
-  if(headerIdx === -1) return [];
-  const out = [];
-  for(let i = headerIdx+1; i < rows.length; i++){
-    const r = rows[i];
-    if(!r || !(r[0]||'').trim()) break;
-    const nombre = r[0].trim();
-    const emisor = (r[1]||'').trim();
-    const fRecaudoIni = parseFechaCSV(r[2]);
-    const fInicio = parseFechaCSV(r[3]); // fecha fin de recaudo — ver nota en el plan
-    const fFin = parseFechaCSV(r[4]);
-    const plazoAnios = parseNum(r[5]);
-    const frecTxt = (r[6]||'').trim().toLowerCase();
-    const frecuenciaDefault = frecTxt.startsWith('anual') ? 1 : 2;
-    const objMin = parsePct(r[7]);
-    const objMidRaw = parsePct(r[8]);
-    const objMax = parsePct(r[9]);
-    const montoMinimo = parseNum(r[10]) || 0;
-
-    if(!nombre || !fRecaudoIni || !fInicio || !fFin || !isFinite(objMin) || !isFinite(objMax)){
-      console.warn('CATs: fila descartada por datos incompletos', r);
-      continue;
-    }
-    out.push({
-      id: slugify(nombre), nombre, emisor,
-      fRecaudoIni, fInicio, fFin,
-      plazoAnios: isFinite(plazoAnios) ? plazoAnios : null,
-      frecuenciaDefault, objMin, objMax,
-      objMid: isFinite(objMidRaw) ? objMidRaw : (objMin+objMax)/2,
-      montoMinimo
-    });
-  }
-  return out;
-}
+let catCombo = null, frecCombo = null;
 
 async function cargarDatos(){
-  if(!DATA_URL) return {cats: CATS_SNAPSHOT, origen:'snapshot'};
-  try{
-    const res = await fetch(DATA_URL, {cache:'no-store'});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const parsed = mapearFilas(parseCSV(await res.text()));
-    if(!parsed.length) throw new Error('CSV sin filas válidas');
-    return {cats: parsed, origen: 'online'};
-  }catch(e){
-    console.warn('CATs: no se pudo cargar el CSV en línea, usando snapshot embebido —', e.message);
-    return {cats: CATS_SNAPSHOT, origen: 'snapshot'};
-  }
+  return CATS_SNAPSHOT;
 }
 
 // ---------- Estado del CAT, derivado de fechas (el Excel no trae columna de estado) ----------
@@ -605,7 +664,8 @@ function solveCoupon(monto, precioPct, targetAnnualPct, frecuencia, periodos){
   return {nominal, cuponPeriodo, cuponAnualPct, totalCupones};
 }
 
-// ---------- Input de monto (miles con puntos, igual a los simuladores de crédito) ----------
+// ---------- Input de monto (miles con puntos, réplica de sk-input-number mode="currency") ----------
+const MONTO_MAX = 9999999999; // límite del campo: $9.999.999.999 (10 dígitos)
 function digitsOnly(str){ return (str||'').replace(/[^\d]/g,''); }
 function formatThousands(digits){ if(!digits) return ''; return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
 function getMoneyVal(id){ return parseFloat(digitsOnly(document.getElementById(id).value)) || 0; }
@@ -613,7 +673,8 @@ function setupMoneyInput(id){
   const el = document.getElementById(id);
   el.addEventListener('input', () => {
     const caretFromEnd = el.value.length - el.selectionStart;
-    const digits = digitsOnly(el.value);
+    let digits = digitsOnly(el.value);
+    if(digits.length > String(MONTO_MAX).length) digits = digits.slice(0, String(MONTO_MAX).length);
     el.value = formatThousands(digits);
     const pos = Math.max(0, el.value.length - caretFromEnd);
     el.setSelectionRange(pos, pos);
@@ -621,16 +682,86 @@ function setupMoneyInput(id){
   });
 }
 
+// ---------- Combobox custom (réplica de sk-input-select: trigger + popover, no <select> nativo) ----------
+// El <select> oculto sigue siendo la fuente de verdad (lo leen selectCat()/recalc() sin cambios);
+// este combo dibuja el trigger y el popover reales y lo sincroniza en ambos sentidos.
+function comboRefresh(boxId, listId, selectId){
+  const select = document.getElementById(selectId);
+  const list = document.getElementById(listId);
+  const valueEl = document.querySelector('#' + boxId + ' .value');
+  list.innerHTML = Array.from(select.options).map((o, i) =>
+    `<li role="option" id="${listId}-opt-${i}" data-value="${o.value}" aria-selected="${o.selected}">${o.textContent}</li>`
+  ).join('');
+  const selected = select.options[select.selectedIndex];
+  valueEl.textContent = selected ? selected.textContent : '';
+}
+
+function comboSetup(boxId, listId, selectId){
+  const box = document.getElementById(boxId);
+  const list = document.getElementById(listId);
+  const select = document.getElementById(selectId);
+  let activeIndex = -1;
+
+  const items = () => Array.from(list.querySelectorAll('li'));
+  function setActive(i){
+    const els = items();
+    if(!els.length) return;
+    els.forEach(el => el.classList.remove('is-active'));
+    activeIndex = Math.max(0, Math.min(i, els.length - 1));
+    els[activeIndex].classList.add('is-active');
+    box.setAttribute('aria-activedescendant', els[activeIndex].id);
+  }
+  function open(){
+    box.classList.add('is-open', 'is-focused');
+    box.setAttribute('aria-expanded', 'true');
+    list.hidden = false;
+    const selIdx = items().findIndex(el => el.getAttribute('aria-selected') === 'true');
+    setActive(selIdx >= 0 ? selIdx : 0);
+  }
+  function close(){
+    box.classList.remove('is-open', 'is-focused');
+    box.setAttribute('aria-expanded', 'false');
+    box.removeAttribute('aria-activedescendant');
+    list.hidden = true;
+    activeIndex = -1;
+  }
+  function choose(li){
+    select.value = li.dataset.value;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    comboRefresh(boxId, listId, selectId);
+    close();
+    box.focus();
+  }
+
+  box.addEventListener('click', () => { box.classList.contains('is-open') ? close() : open(); });
+  box.addEventListener('focus', () => box.classList.add('is-focused'));
+  box.addEventListener('blur', () => { if(!box.classList.contains('is-open')) box.classList.remove('is-focused'); });
+  box.addEventListener('keydown', (e) => {
+    const isOpen = box.classList.contains('is-open');
+    if(e.key === 'ArrowDown'){ e.preventDefault(); isOpen ? setActive(activeIndex + 1) : open(); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); isOpen ? setActive(activeIndex - 1) : open(); }
+    else if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); if(!isOpen) open(); else { const els = items(); if(els[activeIndex]) choose(els[activeIndex]); } }
+    else if(e.key === 'Escape'){ if(isOpen){ e.preventDefault(); close(); } }
+  });
+  list.addEventListener('click', (e) => { const li = e.target.closest('li'); if(li) choose(li); });
+  document.addEventListener('click', (e) => { if(box.classList.contains('is-open') && !box.contains(e.target) && !list.contains(e.target)) close(); });
+
+  comboRefresh(boxId, listId, selectId);
+  return { refresh: () => comboRefresh(boxId, listId, selectId) };
+}
+
 // ---------- Selector de CAT ----------
 function poblarSelectCat(){
   const sel = document.getElementById('catSel');
   sel.innerHTML = CATS.map(c => `<option value="${c.id}">${c.nombre} · ${ESTADO_LABEL[estadoCat(c)]}</option>`).join('');
   sel.addEventListener('change', () => selectCat(sel.value));
+  if(catCombo) catCombo.refresh();
 }
 
 function selectCat(id){
   catActual = CATS.find(c => c.id === id) || CATS[0];
   document.getElementById('frecuencia').value = catActual.frecuenciaDefault;
+  if(frecCombo) frecCombo.refresh();
   renderFichaCat();
   recalc();
 }
@@ -699,15 +830,18 @@ function drawChart(min, mid, max, periodos, monto){
   const W=700,H=260, padL=64,padB=34,padT=18,padR=90;
   const chartW = W-padL-padR, chartH = H-padT-padB;
 
+  // Los cupones intermedios solo acumulan el interés recibido — el capital se devuelve
+  // recién en el último pago junto con el cupón final, así que ahí se ve el quiebre real.
   function cumulative(sc){
-    const arr=[monto];
-    for(let i=1;i<=periodos;i++) arr.push(monto + sc.cuponPeriodo*i);
+    const arr=[0];
+    for(let i=1;i<periodos;i++) arr.push(sc.cuponPeriodo*i);
+    arr.push(sc.cuponPeriodo*periodos + monto);
     return arr;
   }
   const cMin = cumulative(min), cMid = cumulative(mid), cMax = cumulative(max);
 
   const yTop = max.valorFinal * 1.04;
-  const yBottom = monto * 0.98;
+  const yBottom = 0;
   const scaleY = chartH / (yTop - yBottom || 1);
   const xStep = chartW / periodos;
   const X = i => padL + i*xStep;
@@ -724,7 +858,7 @@ function drawChart(min, mid, max, periodos, monto){
     s += `<text class="axis" x="${padL-8}" y="${(y+4).toFixed(1)}" text-anchor="end">${abrevCOP(v)}</text>`;
   }
 
-  // Colores del sistema de diseño para gráficas, en su orden consecutivo (--charts-c01, c02, c03)
+  // Colores propios del simulador para las 3 series (no hay paleta de dataviz oficial en sk-components-angular)
   const series = [
     { arr: cMin, color: 'var(--charts-c01)' },
     { arr: cMid, color: 'var(--charts-c02)' },
@@ -733,7 +867,7 @@ function drawChart(min, mid, max, periodos, monto){
   series.forEach(sr => {
     s += `<path d="${pathFor(sr.arr)}" fill="none" stroke="${sr.color}" stroke-width="2.75" stroke-linejoin="round" stroke-linecap="round"></path>`;
   });
-  s += `<circle cx="${X(0)}" cy="${Y(monto)}" r="4" fill="var(--sk-surface-800)"></circle>`;
+  s += `<circle cx="${X(0)}" cy="${Y(0)}" r="4" fill="var(--sk-surface-800)"></circle>`;
 
   // Puntos finales + etiquetas de valor con separación mínima para que no se amontonen
   const endPts = [
@@ -816,10 +950,9 @@ function recalc(){
   renderComparison(monto, frecuencia, periodos, objMid, freqCap);
 }
 
-function actualizarBadgesVigencia(origen){
-  document.getElementById('fichaVigenciaTxt').textContent = origen === 'online'
-    ? `Rango objetivo informado por la Mesa de Inversiones — actualizado en línea ${fmtDate(new Date())}`
-    : `Rango objetivo informado por la Mesa de Inversiones — corte del ${fmtDate(parseISODate(SNAPSHOT_DATE))}`;
+function actualizarBadgesVigencia(){
+  document.getElementById('fichaVigenciaTxt').textContent =
+    `Rango objetivo informado por la Mesa de Inversiones — corte del ${fmtDate(parseISODate(SNAPSHOT_DATE))}`;
   document.getElementById('simFooterTxt').textContent =
     `Este corte aplica a los ${CATS.length} CATs listados arriba — no solo al que tengas seleccionado ahora`;
 }
@@ -854,17 +987,19 @@ function closeTycModal(){
   tycModal.setAttribute('aria-hidden','true');
   document.body.style.overflow = '';
   document.removeEventListener('keydown', trapTabKey);
-  (tycFocusReturnTo || document.getElementById('catSel')).focus();
+  (tycFocusReturnTo || document.getElementById('catSelBox')).focus();
 }
 document.getElementById('tycModalBtn').addEventListener('click', closeTycModal);
 
 // ---------- Init ----------
-cargarDatos().then(({cats, origen}) => {
+cargarDatos().then(cats => {
   CATS = ordenarCats(cats);
   poblarSelectCat();
-  actualizarBadgesVigencia(origen);
+  actualizarBadgesVigencia();
   setupMoneyInput('monto');
   document.getElementById('frecuencia').addEventListener('change', recalc);
+  catCombo = comboSetup('catSelBox', 'catSelList', 'catSel');
+  frecCombo = comboSetup('frecuenciaBox', 'frecuenciaList', 'frecuencia');
   selectCat(CATS[0].id);
   openTycModal();
 });
