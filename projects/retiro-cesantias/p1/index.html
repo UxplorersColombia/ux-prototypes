@@ -259,16 +259,17 @@
   .doc-hint{font-size:1.2em; color:var(--text-dark); line-height:1.6;}
   .friendly-note{width:100%; font-size:1.2em; color:var(--text-dark); line-height:1.6; margin:0;}
   .doc-hint ul{margin:0.4em 0 0; padding-left:1.2em;}
-  .doc-success{background:#ECFDF3; border:1px dashed var(--sk-green); border-radius:16px; padding:1em; display:flex; align-items:center; justify-content:space-between; gap:0.8em;}
-  .doc-success .left{display:flex; align-items:center; gap:0.8em;}
-  .doc-success .title{font-family:'Montserrat',sans-serif; font-weight:700; font-size:1.4em; color:var(--text-dark);}
-  .doc-success .sub{font-family:'Montserrat',sans-serif; font-weight:500; font-size:1.4em; color:var(--text-light);}
-  .doc-success img.upload-ic{width:2em; height:2em; flex-shrink:0;}
-  .doc-pending{background:#fff; border:1px dashed #C5C5C5; border-radius:16px; padding:1.6em; display:flex; flex-direction:column; align-items:center; gap:0.6em; text-align:center; cursor:pointer;}
-  .doc-pending img{width:2em; height:2em;}
-  .doc-pending .btn-upload{font-family:'Montserrat',sans-serif; font-weight:700; color:var(--sk-green); font-size:1.4em;}
-  .doc-pending .hint{font-size:1.2em; color:var(--text-light);}
-  .doc-pending.uploaded{border-style:solid; border-color:var(--sk-green); background:#ECFDF3;}
+  .doc-upload-field{width:100%; display:flex; flex-direction:column; gap:0.4em;}
+  .doc-upload-box{width:100%; background:#fff; border:1px dashed #C5C5C5; border-radius:16px; padding:1em 1.6em; display:flex; align-items:center; gap:0.8em; cursor:pointer; box-sizing:border-box;}
+  .doc-upload-field.uploaded .doc-upload-box{background:#ECFDF3; border-color:var(--sk-green); cursor:default;}
+  .doc-upload-icon-left{width:1.6em; height:1.6em; flex-shrink:0;}
+  .doc-upload-icon-right{width:2.2em; height:2.2em; flex-shrink:0; margin-left:auto;}
+  .doc-upload-text{flex:1; font-family:'Open Sans',sans-serif; font-weight:700; font-size:1.4em; color:var(--text-dark);}
+  .doc-upload-text .link{color:var(--sk-green); text-decoration:underline;}
+  .doc-upload-textblock{flex:1; display:flex; flex-direction:column; gap:0.2em;}
+  .doc-upload-textblock .title{font-family:'Montserrat',sans-serif; font-weight:700; font-size:1.4em; color:var(--text-dark);}
+  .doc-upload-textblock .sub{font-family:'Montserrat',sans-serif; font-weight:500; font-size:1.4em; color:var(--text-light);}
+  .doc-upload-field .hint{font-size:1.2em; color:var(--text-light);}
   .summary-block{width:100%; display:flex; flex-direction:column; gap:0.4em;}
   .summary-title{font-family:'Montserrat',sans-serif; font-weight:700; font-size:1.4em; color:var(--text-dark); text-align:left; width:100%; margin:0;}
   .summary-table{width:100%; border:1px solid var(--border-track); border-radius:16px; overflow:hidden;}
@@ -477,12 +478,13 @@
           <div class="doc-list" id="doc-list">
             <div class="doc-card">
               <div class="doc-card-head"><img id="img-file1" alt="" /><span class="name">Copia de la cédula (ambas caras)</span></div>
-              <div class="doc-success">
-                <div class="left">
-                  <img id="img-file1b" alt="" />
-                  <div><div class="title">Carga exitosa</div><div class="sub">nomb.docx_01</div></div>
+              <div class="doc-upload-field uploaded">
+                <div class="doc-upload-box">
+                  <img class="doc-upload-icon-left" id="img-file1b" alt="" />
+                  <div class="doc-upload-textblock"><div class="title">Carga exitosa</div><div class="sub">nomb.docx_01</div></div>
+                  <img class="doc-upload-icon-right" id="img-upload1" alt="" />
                 </div>
-                <img class="upload-ic" id="img-upload1" alt="" />
+                <span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>
               </div>
             </div>
             <div class="doc-card">
@@ -496,9 +498,12 @@
                   <li>Membrete de la empresa, NIT, firma, nombre y cargo de quien autoriza.</li>
                 </ul>
               </div>
-              <div class="doc-pending" id="doc-pending-2">
-                <img id="img-upload2" alt="" />
-                <span class="btn-upload">Subir archivo</span>
+              <div class="doc-upload-field" id="doc-pending-2">
+                <div class="doc-upload-box">
+                  <img class="doc-upload-icon-left" id="img-upload2" alt="" />
+                  <span class="doc-upload-text">Arrastra y suelta tu archivo aquí o <span class="link">selecciona un archivo</span></span>
+                  <img class="doc-upload-icon-right" id="img-upload2-action" alt="" />
+                </div>
                 <span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>
               </div>
             </div>
@@ -682,6 +687,7 @@ const IMG_CALENDAR = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlv
 const IMG_FILE_ICON = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMzIgMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJGaWxlIj4KPHBhdGggaWQ9IkZpbGVfMiIgZD0iTTE4Ljc1IDVMMjQuMjUgMTAuNUgxOC43NVY1Wk0xNy4zNzUgMTAuNUMxNy4zNzUgMTEuMjczNCAxNy45NzY2IDExLjg3NSAxOC43NSAxMS44NzVIMjQuMjVWMjQuOTM3NUMyNC4yNSAyNi4wOTc3IDIzLjMwNDcgMjcgMjIuMTg3NSAyN0g5LjgxMjVDOC42NTIzNCAyNyA3Ljc1IDI2LjA5NzcgNy43NSAyNC45Mzc1VjcuMDYyNUM3Ljc1IDUuOTQ1MzEgOC42NTIzNCA1IDkuODEyNSA1SDE3LjM3NVYxMC41WiIgZmlsbD0iIzAwOTlERSIvPgo8L2c+Cjwvc3ZnPgo=";
 const IMG_UPLOAD_ICON = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJVcGxvYWQiPgo8cGF0aCBpZD0iVXBsb2FkXzIiIGQ9Ik02LjY5MTQxIDkuNDMzNTlDNi4yMzQzOCA5LjAxMTcyIDYuMjM0MzggOC4yNzM0NCA2LjY5MTQxIDcuODUxNTZMMTEuMTkxNCAzLjM1MTU2QzExLjQwMjMgMy4xNDA2MiAxMS42ODM2IDMgMTIgM0MxMi4yODEyIDMgMTIuNTYyNSAzLjE0MDYyIDEyLjc3MzQgMy4zNTE1NkwxNy4yNzM0IDcuODUxNTZDMTcuNzMwNSA4LjI3MzQ0IDE3LjczMDUgOS4wMTE3MiAxNy4yNzM0IDkuNDMzNTlDMTYuODUxNiA5Ljg5MDYyIDE2LjExMzMgOS44OTA2MiAxNS42OTE0IDkuNDMzNTlMMTMuMTI1IDYuODY3MTlWMTUuMzc1QzEzLjEyNSAxNi4wMDc4IDEyLjU5NzcgMTYuNSAxMiAxNi41QzExLjM2NzIgMTYuNSAxMC44NzUgMTYuMDA3OCAxMC44NzUgMTUuMzc1VjYuODY3MTlMOC4yNzM0NCA5LjQzMzU5QzcuODUxNTYgOS44OTA2MiA3LjExMzI4IDkuODkwNjIgNi42OTE0MSA5LjQzMzU5Wk0xOS44NzUgMTUuMzc1QzIwLjQ3MjcgMTUuMzc1IDIxIDE1LjkwMjMgMjEgMTYuNVYxOS44NzVDMjEgMjAuNTA3OCAyMC40NzI3IDIxIDE5Ljg3NSAyMUg0LjEyNUMzLjQ5MjE5IDIxIDMgMjAuNTA3OCAzIDE5Ljg3NVYxNi41QzMgMTUuOTAyMyAzLjQ5MjE5IDE1LjM3NSA0LjEyNSAxNS4zNzVIOS43NUM5Ljc1IDE2LjY0MDYgMTAuNzM0NCAxNy42MjUgMTIgMTcuNjI1QzEzLjIzMDUgMTcuNjI1IDE0LjI1IDE2LjY0MDYgMTQuMjUgMTUuMzc1SDE5Ljg3NVpNMTguMTg3NSAxOS4wMzEyQzE4LjY0NDUgMTkuMDMxMiAxOS4wMzEyIDE4LjY3OTcgMTkuMDMxMiAxOC4xODc1QzE5LjAzMTIgMTcuNzMwNSAxOC42NDQ1IDE3LjM0MzggMTguMTg3NSAxNy4zNDM4QzE3LjY5NTMgMTcuMzQzOCAxNy4zNDM4IDE3LjczMDUgMTcuMzQzOCAxOC4xODc1QzE3LjM0MzggMTguNjc5NyAxNy42OTUzIDE5LjAzMTIgMTguMTg3NSAxOS4wMzEyWiIgZmlsbD0iIzAwQzczRCIvPgo8L2c+Cjwvc3ZnPgo=";
 const IMG_UPLOAD_EMPTY = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjIxIDMwIDIyIDIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNMzIuNjg3NSAzNy4yMDdMMzYuMTI1IDQwLjY4NzVDMzYuNTU0NyA0MS4wNzQyIDM2LjU1NDcgNDEuNzE4OCAzNi4xMjUgNDIuMTA1NUMzNS45NTMxIDQyLjMyMDMgMzUuNjk1MyA0Mi40MDYyIDM1LjQzNzUgNDIuNDA2MkMzNS4xMzY3IDQyLjQwNjIgMzQuODc4OSA0Mi4zMjAzIDM0LjcwNyA0Mi4xMDU1TDMzLjAzMTIgNDAuNDI5N1Y0NC44MTI1QzMzLjAzMTIgNDUuNDE0MSAzMi41NTg2IDQ1Ljg0MzggMzIgNDUuODQzOEMzMS4zOTg0IDQ1Ljg0MzggMzAuOTY4OCA0NS40MTQxIDMwLjk2ODggNDQuODEyNVY0MC40Mjk3TDI5LjI1IDQyLjEwNTVDMjguODIwMyA0Mi41MzUyIDI4LjE3NTggNDIuNTM1MiAyNy43ODkxIDQyLjEwNTVDMjcuMzU5NCA0MS43MTg4IDI3LjM1OTQgNDEuMDc0MiAyNy43ODkxIDQwLjY0NDVMMzEuMjI2NiAzNy4yMDdDMzEuNjEzMyAzNi44MjAzIDMyLjI1NzggMzYuODIwMyAzMi42ODc1IDM3LjIwN1pNNDAuMjUgMzMuMTI1QzQxLjc1MzkgMzMuMTI1IDQzIDM0LjM3MTEgNDMgMzUuODc1VjQ2Ljg3NUM0MyA0OC40MjE5IDQxLjc1MzkgNDkuNjI1IDQwLjI1IDQ5LjYyNUgyMy43NUMyMi4yMDMxIDQ5LjYyNSAyMSA0OC40MjE5IDIxIDQ2Ljg3NVYzMy4xMjVDMjEgMzEuNjIxMSAyMi4yMDMxIDMwLjM3NSAyMy43NSAzMC4zNzVIMjguNzc3M0MyOS41MDc4IDMwLjM3NSAzMC4xOTUzIDMwLjY3NTggMzAuNzEwOSAzMS4xOTE0TDMyLjgxNjQgMzMuMTI1SDQwLjI1Wk00MC45Mzc1IDQ2Ljg3NVYzNS44NzVDNDAuOTM3NSAzNS41MzEyIDQwLjU5MzggMzUuMTg3NSA0MC4yNSAzNS4xODc1SDMyTDI5LjI1IDMyLjY1MjNDMjkuMTIxMSAzMi41MjM0IDI4Ljk0OTIgMzIuNDM3NSAyOC43NzczIDMyLjQzNzVIMjMuNzVDMjMuMzYzMyAzMi40Mzc1IDIzLjA2MjUgMzIuNzgxMiAyMy4wNjI1IDMzLjEyNVY0Ni44NzVDMjMuMDYyNSA0Ny4yNjE3IDIzLjM2MzMgNDcuNTYyNSAyMy43NSA0Ny41NjI1SDQwLjI1QzQwLjU5MzggNDcuNTYyNSA0MC45Mzc1IDQ3LjI2MTcgNDAuOTM3NSA0Ni44NzVaIiBmaWxsPSIjQTVBNUE1Ii8+Cjwvc3ZnPgo=";
+const IMG_UPLOAD_GREEN = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjIxIDMwIDIyIDIwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNMzIuNjg3NSAzNy4yMDdMMzYuMTI1IDQwLjY4NzVDMzYuNTU0NyA0MS4wNzQyIDM2LjU1NDcgNDEuNzE4OCAzNi4xMjUgNDIuMTA1NUMzNS45NTMxIDQyLjMyMDMgMzUuNjk1MyA0Mi40MDYyIDM1LjQzNzUgNDIuNDA2MkMzNS4xMzY3IDQyLjQwNjIgMzQuODc4OSA0Mi4zMjAzIDM0LjcwNyA0Mi4xMDU1TDMzLjAzMTIgNDAuNDI5N1Y0NC44MTI1QzMzLjAzMTIgNDUuNDE0MSAzMi41NTg2IDQ1Ljg0MzggMzIgNDUuODQzOEMzMS4zOTg0IDQ1Ljg0MzggMzAuOTY4OCA0NS40MTQxIDMwLjk2ODggNDQuODEyNVY0MC40Mjk3TDI5LjI1IDQyLjEwNTVDMjguODIwMyA0Mi41MzUyIDI4LjE3NTggNDIuNTM1MiAyNy43ODkxIDQyLjEwNTVDMjcuMzU5NCA0MS43MTg4IDI3LjM1OTQgNDEuMDc0MiAyNy43ODkxIDQwLjY0NDVMMzEuMjI2NiAzNy4yMDdDMzEuNjEzMyAzNi44MjAzIDMyLjI1NzggMzYuODIwMyAzMi42ODc1IDM3LjIwN1pNNDAuMjUgMzMuMTI1QzQxLjc1MzkgMzMuMTI1IDQzIDM0LjM3MTEgNDMgMzUuODc1VjQ2Ljg3NUM0MyA0OC40MjE5IDQxLjc1MzkgNDkuNjI1IDQwLjI1IDQ5LjYyNUgyMy43NUMyMi4yMDMxIDQ5LjYyNSAyMSA0OC40MjE5IDIxIDQ2Ljg3NVYzMy4xMjVDMjEgMzEuNjIxMSAyMi4yMDMxIDMwLjM3NSAyMy43NSAzMC4zNzVIMjguNzc3M0MyOS41MDc4IDMwLjM3NSAzMC4xOTUzIDMwLjY3NTggMzAuNzEwOSAzMS4xOTE0TDMyLjgxNjQgMzMuMTI1SDQwLjI1Wk00MC45Mzc1IDQ2Ljg3NVYzNS44NzVDNDAuOTM3NSAzNS41MzEyIDQwLjU5MzggMzUuMTg3NSA0MC4yNSAzNS4xODc1SDMyTDI5LjI1IDMyLjY1MjNDMjkuMTIxMSAzMi41MjM0IDI4Ljk0OTIgMzIuNDM3NSAyOC43NzczIDMyLjQzNzVIMjMuNzVDMjMuMzYzMyAzMi40Mzc1IDIzLjA2MjUgMzIuNzgxMiAyMy4wNjI1IDMzLjEyNVY0Ni44NzVDMjMuMDYyNSA0Ny4yNjE3IDIzLjM2MzMgNDcuNTYyNSAyMy43NSA0Ny41NjI1SDQwLjI1QzQwLjU5MzggNDcuNTYyNSA0MC45Mzc1IDQ3LjI2MTcgNDAuOTM3NSA0Ni44NzVaIiBmaWxsPSIjMDBDNzNEIi8+Cjwvc3ZnPgo=";
 const IMG_INFO_ICON2 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMzIgMzIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJjaXJjbGUtZXhjbGFtYXRpb24iPgo8cGF0aCBpZD0iY2lyY2xlLWV4Y2xhbWF0aW9uXzIiIGQ9Ik0xNiA0QzIyLjYwOTQgNCAyOCA5LjM5MDYyIDI4IDE2QzI4IDIyLjY1NjIgMjIuNjA5NCAyOCAxNiAyOEM5LjM0Mzc1IDI4IDQgMjIuNjU2MiA0IDE2QzQgOS4zOTA2MiA5LjM0Mzc1IDQgMTYgNFpNMTYgMjUuNzVDMjEuMzQzOCAyNS43NSAyNS43NSAyMS4zOTA2IDI1Ljc1IDE2QzI1Ljc1IDEwLjY1NjIgMjEuMzQzOCA2LjI1IDE2IDYuMjVDMTAuNjA5NCA2LjI1IDYuMjUgMTAuNjU2MiA2LjI1IDE2QzYuMjUgMjEuMzkwNiAxMC42MDk0IDI1Ljc1IDE2IDI1Ljc1Wk0xNiAxOC4yNUMxNS4zNDM4IDE4LjI1IDE0Ljg3NSAxNy43ODEyIDE0Ljg3NSAxNy4xMjVWMTEuMTI1QzE0Ljg3NSAxMC41MTU2IDE1LjM0MzggMTAgMTYgMTBDMTYuNjA5NCAxMCAxNy4xMjUgMTAuNTE1NiAxNy4xMjUgMTEuMTI1VjE3LjEyNUMxNy4xMjUgMTcuNzgxMiAxNi42MDk0IDE4LjI1IDE2IDE4LjI1Wk0xNiAxOS44NDM4QzE2Ljc5NjkgMTkuODQzOCAxNy40NTMxIDIwLjUgMTcuNDUzMSAyMS4yOTY5QzE3LjQ1MzEgMjIuMDkzOCAxNi43OTY5IDIyLjc1IDE2IDIyLjc1QzE1LjE1NjIgMjIuNzUgMTQuNSAyMi4wOTM4IDE0LjUgMjEuMjk2OUMxNC41IDIwLjUgMTUuMTU2MiAxOS44NDM4IDE2IDE5Ljg0MzhaIiBmaWxsPSIjNDA0MDQwIi8+CjwvZz4KPC9zdmc+Cg==";
 const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSIgc3R5bGU9ImRpc3BsYXk6IGJsb2NrOyIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGlkPSJjaXJjbGUtZXhjbGFtYXRpb24iPgo8cGF0aCBpZD0iY2lyY2xlLWV4Y2xhbWF0aW9uXzIiIGQ9Ik04IDJDMTEuMzA0NyAyIDE0IDQuNjk1MzEgMTQgOEMxNCAxMS4zMjgxIDExLjMwNDcgMTQgOCAxNEM0LjY3MTg4IDE0IDIgMTEuMzI4MSAyIDhDMiA0LjY5NTMxIDQuNjcxODggMiA4IDJaTTggMTIuODc1QzEwLjY3MTkgMTIuODc1IDEyLjg3NSAxMC42OTUzIDEyLjg3NSA4QzEyLjg3NSA1LjMyODEyIDEwLjY3MTkgMy4xMjUgOCAzLjEyNUM1LjMwNDY5IDMuMTI1IDMuMTI1IDUuMzI4MTIgMy4xMjUgOEMzLjEyNSAxMC42OTUzIDUuMzA0NjkgMTIuODc1IDggMTIuODc1Wk04IDkuMTI1QzcuNjcxODggOS4xMjUgNy40Mzc1IDguODkwNjIgNy40Mzc1IDguNTYyNVY1LjU2MjVDNy40Mzc1IDUuMjU3ODEgNy42NzE4OCA1IDggNUM4LjMwNDY5IDUgOC41NjI1IDUuMjU3ODEgOC41NjI1IDUuNTYyNVY4LjU2MjVDOC41NjI1IDguODkwNjIgOC4zMDQ2OSA5LjEyNSA4IDkuMTI1Wk04IDkuOTIxODhDOC4zOTg0NCA5LjkyMTg4IDguNzI2NTYgMTAuMjUgOC43MjY1NiAxMC42NDg0QzguNzI2NTYgMTEuMDQ2OSA4LjM5ODQ0IDExLjM3NSA4IDExLjM3NUM3LjU3ODEyIDExLjM3NSA3LjI1IDExLjA0NjkgNy4yNSAxMC42NDg0QzcuMjUgMTAuMjUgNy41NzgxMiA5LjkyMTg4IDggOS45MjE4OFoiIGZpbGw9IiM0MDQwNDAiLz4KPC9nPgo8L3N2Zz4K";
 
@@ -711,8 +717,9 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   document.getElementById('img-file1b').src = IMG_FILE_ICON;
   document.getElementById('img-file2').src = IMG_FILE_ICON;
   document.getElementById('img-file-emp').src = IMG_FILE_ICON;
-  document.getElementById('img-upload1').src = IMG_UPLOAD_ICON;
+  document.getElementById('img-upload1').src = IMG_UPLOAD_GREEN;
   document.getElementById('img-upload2').src = IMG_UPLOAD_EMPTY;
+  document.getElementById('img-upload2-action').src = IMG_UPLOAD_GREEN;
   document.getElementById('img-info5a').src = IMG_INFO_ICON5;
 
   document.querySelectorAll('.radio-img').forEach(function(img){
@@ -825,9 +832,12 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
             '<span class="tag">Disponible: ' + formatCOP(emp.saldo) + '</span>' +
           '</div>' +
         '</div>' +
-        '<div class="doc-pending emp-pending" style="display:none;">' +
-          '<img class="emp-upload-ic" alt="" />' +
-          '<span class="btn-upload">Subir carta de terminación</span>' +
+        '<div class="doc-upload-field emp-pending" style="display:none;">' +
+          '<div class="doc-upload-box">' +
+            '<img class="emp-upload-ic doc-upload-icon-left" alt="" />' +
+            '<span class="doc-upload-text">Arrastra y suelta tu archivo aquí o <span class="link">selecciona un archivo</span></span>' +
+            '<img class="doc-upload-icon-right" alt="" src="' + IMG_UPLOAD_GREEN + '" />' +
+          '</div>' +
           '<span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>' +
         '</div>';
       list.appendChild(row);
@@ -843,10 +853,13 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
         pendEl.style.display = sel ? '' : 'none';
         if(!sel){
           emp.letterUploaded = false;
-          pendEl.className = 'doc-pending emp-pending';
+          pendEl.className = 'doc-upload-field emp-pending';
           pendEl.innerHTML =
-            '<img class="emp-upload-ic" alt="" src="' + IMG_UPLOAD_EMPTY + '" />' +
-            '<span class="btn-upload">Subir carta de terminación</span>' +
+            '<div class="doc-upload-box">' +
+              '<img class="emp-upload-ic doc-upload-icon-left" alt="" src="' + IMG_UPLOAD_EMPTY + '" />' +
+              '<span class="doc-upload-text">Arrastra y suelta tu archivo aquí o <span class="link">selecciona un archivo</span></span>' +
+              '<img class="doc-upload-icon-right" alt="" src="' + IMG_UPLOAD_GREEN + '" />' +
+            '</div>' +
             '<span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>';
         }
       }
@@ -861,17 +874,13 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
         ev.stopPropagation();
         if(pendEl.classList.contains('uploaded')) return;
         pendEl.classList.add('uploaded');
-        pendEl.style.background = '#ECFDF3';
-        pendEl.style.border = '1px dashed var(--sk-green)';
-        pendEl.style.flexDirection = 'row';
-        pendEl.style.justifyContent = 'space-between';
-        pendEl.style.textAlign = 'left';
         pendEl.innerHTML =
-          '<div class="left" style="display:flex;align-items:center;gap:0.8em;">' +
-            '<img src="' + IMG_FILE_ICON + '" style="width:1.6em;height:1.6em;" />' +
-            '<div><div class="title" style="font-family:\'Montserrat\',sans-serif;font-weight:700;font-size:1.4em;color:var(--text-dark);">Carga exitosa</div><div class="sub" style="font-family:\'Montserrat\',sans-serif;font-weight:500;font-size:1.4em;color:var(--text-light);">carta_terminacion_' + emp.id + '.pdf</div></div>' +
+          '<div class="doc-upload-box">' +
+            '<img class="doc-upload-icon-left" src="' + IMG_FILE_ICON + '" alt="" />' +
+            '<div class="doc-upload-textblock"><div class="title">Carga exitosa</div><div class="sub">carta_terminacion_' + emp.id + '.pdf</div></div>' +
+            '<img class="doc-upload-icon-right" src="' + IMG_UPLOAD_GREEN + '" alt="" />' +
           '</div>' +
-          '<img class="upload-ic" src="' + IMG_UPLOAD_ICON + '" style="width:2em;height:2em;" />';
+          '<span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>';
         emp.letterUploaded = true;
         updateEmployerCoverage();
       });
@@ -1010,21 +1019,11 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
     var el = document.getElementById('doc-pending-2');
     if(el.classList.contains('uploaded')) return;
     el.classList.add('uploaded');
-    el.innerHTML = '';
-    var left = document.createElement('div');
-    left.className = 'left';
-    var img = document.createElement('img');
-    img.src = IMG_FILE_ICON;
-    img.style.width = '1.6em'; img.style.height = '1.6em';
-    var info = document.createElement('div');
-    info.innerHTML = '<div class="title">Carga exitosa</div><div class="sub">carta_empleador.pdf</div>';
-    left.appendChild(img); left.appendChild(info);
-    var upIcon = document.createElement('img');
-    upIcon.className = 'upload-ic';
-    upIcon.src = IMG_UPLOAD_ICON;
-    el.className = 'doc-success';
-    el.appendChild(left);
-    el.appendChild(upIcon);
+    var box = el.querySelector('.doc-upload-box');
+    box.innerHTML =
+      '<img class="doc-upload-icon-left" src="' + IMG_FILE_ICON + '" alt="" />' +
+      '<div class="doc-upload-textblock"><div class="title">Carga exitosa</div><div class="sub">carta_empleador.pdf</div></div>' +
+      '<img class="doc-upload-icon-right" src="' + IMG_UPLOAD_GREEN + '" alt="" />';
     document.getElementById('doc-counter').textContent = '2/2 documentos cargados';
   });
 
