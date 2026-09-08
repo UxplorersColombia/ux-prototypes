@@ -1044,9 +1044,17 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   document.getElementById('step3-back').addEventListener('click', function(){
     goToStep(2);
   });
+  var step4Skipped = false;
   document.getElementById('step3-continue').addEventListener('click', function(){
     prepareStep3Employers();
-    goToStep(4);
+    var shortfall = montoSolicitado - CURRENT_EMPLOYER_SALDO;
+    if(shortfall <= 0){
+      step4Skipped = true;
+      goToStep(5);
+    } else {
+      step4Skipped = false;
+      goToStep(4);
+    }
   });
 
   // STEP 4 — Cartas de terminación de contrato (empleadores anteriores)
@@ -1060,7 +1068,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
 
   // STEP 5 — A dónde enviar
   document.getElementById('step5-back').addEventListener('click', function(){
-    goToStep(4);
+    goToStep(step4Skipped ? 3 : 4);
   });
   document.getElementById('step5-continue').addEventListener('click', function(){
     document.getElementById('resumen-monto-recibir').textContent = formatCOP(Math.max(montoSolicitado - 3000, 0));
