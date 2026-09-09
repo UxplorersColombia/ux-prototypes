@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Porqué de las Cartas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,650&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F8F6;
+    --paper-raised:#FFFFFF;
+    --ink:#182420;
+    --ink-soft:#4B5650;
+    --ink-faint:#7A8580;
+    --line:#DEE5E0;
+    --line-soft:#E9EFEA;
+    --accent:#00A63D;
+    --accent-deep:#067A2E;
+    --accent-tint:#E7F8ED;
+    --gap-deep:#9A5B12;
+    --gap-tint:#FBF1E3;
+    --serif-shadow: rgba(24,36,32,.06);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#121815;
+      --paper-raised:#1A211E;
+      --ink:#EDF3EF;
+      --ink-soft:#B7C2BC;
+      --ink-faint:#7E8B85;
+      --line:#2B3733;
+      --line-soft:#232D29;
+      --accent:#35D879;
+      --accent-deep:#7FE8A6;
+      --accent-tint:#173424;
+      --gap-deep:#F0B368;
+      --gap-tint:#2E2417;
+      --serif-shadow: rgba(0,0,0,.35);
+    }
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink-soft);
+    font-family:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',Georgia,serif;
+    color:var(--ink);
+    text-wrap:balance;
+    margin:0;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',ui-monospace,monospace;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--accent-deep);
+  }
+  .tabular{font-variant-numeric:tabular-nums;}
+
+  .page{max-width:840px; margin:0 auto; padding:4.5rem 1.75rem 6rem;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{display:flex; flex-direction:column; gap:1.1rem; margin-bottom:3rem;}
+  .masthead h1{font-size:2.5rem; font-weight:650; font-optical-sizing:auto; line-height:1.12;}
+  .masthead .dek{font-size:1.08rem; color:var(--ink-soft); max-width:60ch; margin:0;}
+  .meta-row{
+    display:flex; flex-wrap:wrap; gap:.5rem 1.6rem; margin-top:.6rem;
+    padding-top:1.1rem; border-top:1px solid var(--line);
+  }
+  .meta-item{display:flex; flex-direction:column; gap:.18rem;}
+  .meta-item .k{font-family:'IBM Plex Mono',monospace; font-size:.68rem; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-faint);}
+  .meta-item .v{font-size:.86rem; color:var(--ink); font-weight:500;}
+  .meta-item .v a{color:var(--accent-deep);}
+
+  /* ---------- Verdicts ---------- */
+  .verdict-grid{display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; margin-bottom:3rem;}
+  @media (max-width:640px){ .verdict-grid{grid-template-columns:1fr;} }
+  .verdict{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:14px;
+    padding:1.8rem 1.8rem; box-shadow:0 1px 2px var(--serif-shadow);
+    display:flex; flex-direction:column; gap:.7rem;
+  }
+  .verdict .stat{
+    font-family:'Fraunces',serif; font-weight:650; font-size:2.1rem; line-height:1.05;
+    color:var(--accent-deep);
+  }
+  .verdict p{margin:0; font-size:.95rem; color:var(--ink-soft);}
+  .verdict p b{color:var(--ink); font-weight:600;}
+
+  /* ---------- Step tracker ---------- */
+  section{margin-bottom:3.4rem;}
+  .section-head{margin-bottom:1.4rem;}
+  .section-head h2{font-size:1.5rem; font-weight:600; margin-top:.35rem;}
+  .section-head .sub{font-size:.92rem; color:var(--ink-faint); margin-top:.35rem; max-width:64ch;}
+
+  .tracker{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:14px;
+    padding:1.8rem 1.8rem 1.6rem;
+  }
+  .tracker-row{display:flex; gap:.6rem;}
+  .tstep{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:.55rem; position:relative;
+  }
+  .tstep .dot{
+    width:2rem; height:2rem; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:.8rem;
+    background:var(--accent-tint); color:var(--accent-deep); border:1px solid var(--accent);
+  }
+  .tstep.break .dot{background:var(--gap-tint); color:var(--gap-deep); border-color:var(--gap-deep);}
+  .tstep .bar{position:absolute; top:1rem; left:calc(-50% + 1rem); width:calc(100% - 2rem); height:2px; background:var(--line); z-index:-1;}
+  .tstep:first-child .bar{display:none;}
+  .tstep .lbl{font-size:.72rem; text-align:center; color:var(--ink-faint); line-height:1.35; max-width:8rem;}
+  .tstep.break .lbl{color:var(--gap-deep); font-weight:600;}
+  .tracker-callout{
+    margin-top:1.4rem; padding-top:1.2rem; border-top:1px dashed var(--line);
+    font-size:.88rem; color:var(--ink-soft);
+  }
+  .tracker-callout b{color:var(--ink);}
+
+  /* ---------- Persona cards ---------- */
+  .persona-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem;}
+  @media (max-width:760px){ .persona-grid{grid-template-columns:1fr;} }
+  .persona{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:14px;
+    padding:1.5rem 1.4rem; display:flex; flex-direction:column; gap:.9rem;
+  }
+  .persona-head{display:flex; align-items:center; gap:.65rem;}
+  .avatar{
+    width:2.4rem; height:2.4rem; border-radius:50%; background:var(--ink);
+    color:var(--paper); display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:650; font-size:.95rem; flex-shrink:0;
+  }
+  .persona-head .who .name{font-weight:600; color:var(--ink); font-size:.95rem; line-height:1.25;}
+  .persona-head .who .role{font-size:.74rem; color:var(--ink-faint);}
+  .quote{
+    font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:1rem;
+    color:var(--ink); line-height:1.42; margin:0; padding-left:.75rem;
+    border-left:2px solid var(--accent);
+  }
+  .persona p.body{font-size:.85rem; margin:0; color:var(--ink-soft);}
+  .persona p.body b{color:var(--ink); font-weight:600;}
+  .persona .verdict-tag{
+    margin-top:auto; padding-top:.8rem; border-top:1px solid var(--line-soft);
+    display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:var(--ink-faint);
+  }
+  .persona .verdict-tag b{color:var(--gap-deep);}
+
+  /* ---------- Signal grid ---------- */
+  .signal-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:1.1rem;}
+  @media (max-width:640px){ .signal-grid{grid-template-columns:1fr;} }
+  .signal{
+    border-radius:14px; padding:1.3rem 1.3rem; border:1px solid var(--line);
+    background:var(--paper-raised); display:flex; flex-direction:column; gap:.6rem;
+  }
+  .signal .kicker{font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase;}
+  .signal.gap .kicker{color:var(--gap-deep);}
+  .signal h3{font-size:1rem; font-weight:600; margin:0;}
+  .signal p{font-size:.85rem; margin:0; color:var(--ink-soft);}
+  .signal .count{
+    font-family:'Fraunces',serif; font-weight:650; font-size:1.7rem; color:var(--ink);
+    line-height:1;
+  }
+  .signal .quote-mini{font-style:italic; color:var(--ink-faint); font-size:.82rem;}
+
+  /* ---------- Recommendations ---------- */
+  .rec-list{display:flex; flex-direction:column; gap:0;}
+  .rec{
+    display:flex; gap:1.1rem; padding:1.1rem 0; border-bottom:1px solid var(--line-soft);
+  }
+  .rec:last-child{border-bottom:none;}
+  .rec .n{
+    font-family:'IBM Plex Mono',monospace; font-size:.78rem; font-weight:600; color:var(--accent-deep);
+    flex-shrink:0; width:1.6rem; padding-top:.15rem;
+  }
+  .rec .body h4{font-family:'IBM Plex Sans',sans-serif; font-size:.92rem; font-weight:600; color:var(--ink); margin:0 0 .3rem;}
+  .rec .body p{font-size:.85rem; margin:0; color:var(--ink-soft);}
+
+  /* ---------- Footer / methodology ---------- */
+  .status{
+    border:1px solid var(--line); border-radius:14px; padding:1.5rem 1.7rem;
+    background:var(--paper-raised); display:flex; flex-direction:column; gap:.9rem;
+  }
+  .status-row{display:flex; align-items:center; justify-content:space-between; gap:1rem; font-size:.88rem; padding:.55rem 0; border-bottom:1px solid var(--line-soft);}
+  .status-row:last-of-type{border-bottom:none;}
+  .status-row .who{color:var(--ink); font-weight:500;}
+  .status-pill{
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:600;
+    padding:.2rem .55rem; border-radius:99px; letter-spacing:.03em;
+  }
+  .status-pill.done{background:var(--accent-tint); color:var(--accent-deep);}
+  .status-pill.pending{background:var(--gap-tint); color:var(--gap-deep);}
+  .status .footnote{font-size:.82rem; color:var(--ink-faint); margin:.3rem 0 0;}
+
+  footer{margin-top:3.5rem; padding-top:1.5rem; border-top:1px solid var(--line); font-size:.78rem; color:var(--ink-faint);}
+</style>
+</head>
+
+<div class="page">
+
+  <div class="masthead">
+    <span class="eyebrow">Testeo con panel Financial Explorer · Prototipo p2 en vivo</span>
+    <h1>¿Se entiende por qué pedimos esas cartas?</h1>
+    <p class="dek">Probamos el flujo publicado de 6 pasos con una instrucción explícita: ignorar lo que es limitación de prototipo (botones sin función, datos de ejemplo, comisiones fijas) y enfocarnos en dos preguntas — ¿el flujo se siente amigable e intuitivo?, y ¿las personas entienden por qué de repente les pedimos cartas de terminación de empleadores anteriores?</p>
+    <div class="meta-row">
+      <div class="meta-item"><span class="k">Segmento</span><span class="v">Financial Explorer · 46.6% de la base</span></div>
+      <div class="meta-item"><span class="k">Prototipo evaluado</span><span class="v">p2 · 6 pasos · <a href="../p2/">GitHub Pages</a></span></div>
+      <div class="meta-item"><span class="k">Foco</span><span class="v">Intuitividad + comprensión del Paso 4</span></div>
+      <div class="meta-item"><span class="k">Panel</span><span class="v tabular">3 de 5 personas</span></div>
+    </div>
+  </div>
+
+  <div class="verdict-grid">
+    <div class="verdict">
+      <span class="eyebrow">¿Es intuitivo?</span>
+      <div class="stat">Sí — salvo un quiebre</div>
+      <p>Las tres personas describen los pasos 1, 2, 3, 5 y 6 como <b>fluidos y bien redactados</b>. El único momento que rompe el ritmo es la transición hacia el Paso 4, que las tres describen como una sorpresa a mitad de camino.</p>
+    </div>
+    <div class="verdict">
+      <span class="eyebrow">¿Entienden el porqué?</span>
+      <div class="stat tabular">3/3 lo dedujeron solas</div>
+      <p>Las tres pudieron explicar correctamente la lógica de negocio (el empleador actual no cubre todo, hay que completar con anteriores) — pero <b>ninguna la vio anticipada</b>. La entendieron leyendo el Paso 4, no antes.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">Dónde se rompe el ritmo</span>
+      <h2>Cinco pasos fluidos, uno que sorprende</h2>
+      <p class="sub">Usamos la misma idea del rastreador de progreso del propio prototipo para ubicar exactamente en qué punto del recorrido aparece la fricción.</p>
+    </div>
+    <div class="tracker">
+      <div class="tracker-row">
+        <div class="tstep"><div class="dot">1</div><span class="lbl">Motivo</span></div>
+        <div class="tstep"><div class="bar"></div><div class="dot">2</div><span class="lbl">Monto</span></div>
+        <div class="tstep"><div class="bar"></div><div class="dot">3</div><span class="lbl">Subir archivos</span></div>
+        <div class="tstep break"><div class="bar"></div><div class="dot">4</div><span class="lbl">Cartas de empleadores</span></div>
+        <div class="tstep"><div class="bar"></div><div class="dot">5</div><span class="lbl">A dónde enviar</span></div>
+        <div class="tstep"><div class="bar"></div><div class="dot">6</div><span class="lbl">Resumen</span></div>
+      </div>
+      <p class="tracker-callout"><b>Andrés:</b> "es la diferencia entre un flujo que se siente guiado y uno que se siente reactivo — a mí me tomó por sorpresa, no porque el paso esté mal diseñado en sí, sino porque no hubo ninguna pista antes de llegar ahí."</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">Panel Financial Explorer</span>
+      <h2>Lo que dijeron, en sus palabras</h2>
+    </div>
+    <div class="persona-grid">
+      <div class="persona">
+        <div class="persona-head">
+          <div class="avatar">C</div>
+          <div class="who"><div class="name">Carolina</div><div class="role">Contadora ansiosa, 34, Bogotá · 1 año en Skandia</div></div>
+        </div>
+        <p class="quote">"Esa explicación me la tuve que inventar yo... la pantalla no me lo dice así de entrada."</p>
+        <p class="body">Reconstruyó sola la lógica ("si uno pide más de lo que el trabajo actual alcanza a cubrir, toca ir a buscar el resto en los trabajos anteriores"), pero llegar al Paso 4 sin aviso la hizo <b>"parar en seco"</b>. El resumen final tampoco le muestra el desglose: "firmar algo que no puedo revisar completo me da un poco de nervios."</p>
+        <div class="verdict-tag">Entendió, pero <b>tarde y sola</b></div>
+      </div>
+
+      <div class="persona">
+        <div class="persona-head">
+          <div class="avatar">R</div>
+          <div class="who"><div class="name">Roberto</div><div class="role">Ingeniero civil leal, 41, Barranquilla · 10 años en Skandia</div></div>
+        </div>
+        <p class="quote">"Como si me hubieran cambiado las reglas a la mitad del partido sin avisarme antes del saque."</p>
+        <p class="body">El contador de cobertura le pareció clarísimo ("hasta mi hijo de 12 años lo pillaría"), pero no supo qué pasaba al seleccionar más cobertura de la necesaria. Para un cliente nuevo sin su antigüedad, dice, esto <b>"genera desconfianza porque parece que le están pidiendo papeles de más sin justificación."</b></p>
+        <div class="verdict-tag">Entendió, pero <b>tuvo que inferirlo</b></div>
+      </div>
+
+      <div class="persona">
+        <div class="persona-head">
+          <div class="avatar">A</div>
+          <div class="who"><div class="name">Andrés</div><div class="role">Ingeniero de software desconectado, 31, Medellín · 5 años en Skandia</div></div>
+        </div>
+        <p class="quote">"La frase está bien escrita, el problema es el momento en que aparece, no el texto."</p>
+        <p class="body">Pensó que con una carta ya había terminado, y en el Paso 4 descubrió que necesitaba cuatro. <b>Le llama "revelación tardía de complejidad":</b> cada pregunta individual tiene sentido, pero el conjunto se siente reactivo, no guiado.</p>
+        <div class="verdict-tag">Entendió, pero <b>fue una sorpresa</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">Señal convergente</span>
+      <h2>Cuatro cosas en las que las tres coincidieron</h2>
+      <p class="sub">Perfiles distintos, mismo punto de fricción — eso es señal, no casualidad de muestra.</p>
+    </div>
+    <div class="signal-grid">
+      <div class="signal gap">
+        <span class="kicker">Sin aviso previo</span>
+        <div class="count tabular">3/3</div>
+        <h3>Nadie anticipa el Paso 4</h3>
+        <p>El Monto (Paso 2) y la carga de la primera carta (Paso 3) no dejan ninguna pista de que el retiro podría necesitar más documentos. El Paso 4 llega como excepción, no como parte esperada del recorrido.</p>
+      </div>
+      <div class="signal gap">
+        <span class="kicker">Resumen incompleto</span>
+        <div class="count tabular">3/3</div>
+        <h3>El resumen no confirma el rompecabezas</h3>
+        <p class="quote-mini">Roberto: "es como si me hicieran armar el rompecabezas y luego no me dejaran ver la fotico de cómo quedó."</p>
+      </div>
+      <div class="signal gap">
+        <span class="kicker">Ambigüedad</span>
+        <div class="count tabular">2/3</div>
+        <h3>¿Qué pasa si me paso de la meta?</h3>
+        <p>Roberto y Andrés seleccionaron cobertura de sobra sin que el sistema les explicara si eso ajusta algo, se pierde, o se gira de más.</p>
+      </div>
+      <div class="signal gap">
+        <span class="kicker">Copy inconsistente</span>
+        <div class="count tabular">3/3</div>
+        <h3>"Vivienda" aparece sin venir al caso</h3>
+        <p>Los requisitos de la carta del empleador mencionan vivienda aunque el motivo elegido fue terminación de contrato — las tres dudaron un momento si se habían equivocado de flujo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="eyebrow">Con base en lo anterior</span>
+      <h2>Cuatro ajustes concretos</h2>
+    </div>
+    <div class="rec-list">
+      <div class="rec">
+        <span class="n">01</span>
+        <div class="body">
+          <h4>Anticipar la posibilidad desde el Paso 2 o 3</h4>
+          <p>Una frase breve basta, como propone Andrés: "Si tu empleador actual no cubre el monto completo, te pediremos certificar el resto con empleadores anteriores." Convierte el Paso 4 en algo esperado, no en una excepción.</p>
+        </div>
+      </div>
+      <div class="rec">
+        <span class="n">02</span>
+        <div class="body">
+          <h4>Mostrar el desglose por fuente en el Resumen</h4>
+          <p>Antes de firmar con clave y PIN, listar de dónde sale cada peso — por ejemplo "Empleador actual: $3.0M + 3 empleadores anteriores: $4.5M" — cierra el círculo que hoy deja a las tres personas firmando "a ciegas" sobre ese punto.</p>
+        </div>
+      </div>
+      <div class="rec">
+        <span class="n">03</span>
+        <div class="body">
+          <h4>Explicar qué pasa con el exceso de cobertura</h4>
+          <p>Si seleccionar de más no tiene consecuencia, decirlo explícitamente evita la duda; si sí la tiene, es información que debe verse antes de continuar, no después.</p>
+        </div>
+      </div>
+      <div class="rec">
+        <span class="n">04</span>
+        <div class="body">
+          <h4>Ajustar los requisitos de la carta al motivo elegido</h4>
+          <p>Que la lista de requisitos no mencione "vivienda" cuando el motivo fue terminación de contrato — es una inconsistencia pequeña pero que cuesta confianza justo al inicio del paso más denso del flujo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:1rem;">
+    <div class="section-head">
+      <span class="eyebrow">Estado del panel</span>
+      <h2>Metodología y alcance</h2>
+    </div>
+    <div class="status">
+      <div class="status-row"><span class="who">Carolina — contadora ansiosa</span><span class="status-pill done">Evaluada</span></div>
+      <div class="status-row"><span class="who">Roberto — ingeniero leal</span><span class="status-pill done">Evaluada</span></div>
+      <div class="status-row"><span class="who">Andrés — técnico desconectado</span><span class="status-pill done">Evaluada</span></div>
+      <div class="status-row"><span class="who">Patricia — ejecutiva Privilegio</span><span class="status-pill pending">Pendiente</span></div>
+      <div class="status-row"><span class="who">Daniel — voluntario a medias</span><span class="status-pill pending">Pendiente</span></div>
+      <p class="footnote">Este informe (v1) cubre 3 de las 5 personas del panel Financial Explorer, evaluando exclusivamente el prototipo p2 publicado en GitHub Pages. Por instrucción explícita, no incluye limitaciones propias de un prototipo estático (botones sin función, datos de ejemplo) — el foco es intuitividad y comprensión de la lógica de cartas de empleadores anteriores. Patricia y Daniel se incorporarán en una próxima versión.</p>
+    </div>
+  </section>
+
+  <footer>
+    Retiro de Cesantías · Portal Clientes Skandia — testeo cualitativo con panel sintético Financial Explorer.
+  </footer>
+
+</div>
+</html>
