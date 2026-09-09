@@ -312,7 +312,46 @@
   @media (max-width: 720px){
     .frame{font-size:6px;}
   }
+
+  /* ---------- Device preview toggle (Desktop / Móvil) ---------- */
+  .view-toggle{
+    position:fixed; top:1.2em; right:1.2em; z-index:999;
+    display:flex; gap:2px; background:#fff; padding:4px; border-radius:999px;
+    box-shadow:0 2px 12px rgba(0,0,0,.18); font-family:'Montserrat',sans-serif;
+  }
+  .view-toggle button{
+    border:none; background:transparent; padding:7px 16px; border-radius:999px;
+    font-size:13px; font-weight:700; cursor:pointer; color:#8a8a8a;
+    font-family:'Montserrat',sans-serif; transition:background .15s ease, color .15s ease;
+  }
+  .view-toggle button.active{ background:var(--sk-green); color:#fff; }
+  body.preview-mobile{ background:#dde1e4; }
+
+  .frame.mobile{
+    width:390px; height:844px; flex-shrink:0;
+    border-radius:44px;
+    box-shadow:0 0 0 10px #1c1c1e, 0 0 0 13px #3a3a3c, 0 30px 70px rgba(0,0,0,.4);
+    font-size:14px;
+  }
+  .frame.mobile .sidebar{ display:none; }
+  .frame.mobile .header{ padding:0 1.2em; gap:1em; }
+  .frame.mobile .logo-divider span{ font-size:1.1em; }
+  .frame.mobile .panel-card{ flex-direction:column; overflow-y:auto; overflow-x:hidden; }
+  .frame.mobile .aside{
+    width:100%; height:auto; flex-shrink:0; padding:1.6em 1.4em 1.2em; gap:0.7em;
+  }
+  .frame.mobile .aside img.illus{ width:6.5em; height:6.4em; }
+  .frame.mobile .aside h2{ font-size:1.5em; }
+  .frame.mobile .aside p{ font-size:0.95em; }
+  .frame.mobile .main{ width:100%; height:auto; flex:1 0 auto; padding-top:1.2em; }
+  .frame.mobile .breadcrumb{ left:1.2em; top:0.9em; }
+  .frame.mobile .breadcrumb img{ width:2.4em; height:2.4em; }
+  .frame.mobile .content-col{ height:auto; overflow-y:visible; padding:1em 1.2em 1.6em; max-width:none; }
 </style>
+<div class="view-toggle" id="view-toggle">
+  <button type="button" id="btn-view-desktop" class="active">Desktop</button>
+  <button type="button" id="btn-view-mobile">Móvil</button>
+</div>
 <div class="stage">
 <div class="frame" id="frame">
 
@@ -1103,6 +1142,20 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   });
 
   goToStep(1);
+
+  var frameEl = document.getElementById('frame');
+  var btnDesktop = document.getElementById('btn-view-desktop');
+  var btnMobile = document.getElementById('btn-view-mobile');
+  function setView(mode){
+    var isMobile = mode === 'mobile';
+    frameEl.classList.toggle('mobile', isMobile);
+    document.body.classList.toggle('preview-mobile', isMobile);
+    btnDesktop.classList.toggle('active', !isMobile);
+    btnMobile.classList.toggle('active', isMobile);
+    frameEl.scrollTop = 0;
+  }
+  btnDesktop.addEventListener('click', function(){ setView('desktop'); });
+  btnMobile.addEventListener('click', function(){ setView('mobile'); });
 })();
 </script>
 </html>
