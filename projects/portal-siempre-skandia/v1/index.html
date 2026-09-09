@@ -487,6 +487,17 @@
     --sk-shadow-raised:0 4px 16px rgba(0,0,0,.12);
     --sk-shadow-overlay:0 8px 24px rgba(0,0,0,.16); /* aditivo, sin consumidor hoy (para modal/date-picker futuros) */
 
+    /* — sk-modal (docs/componentes/sk-modal.md §3.Y, sk-components-ref) —
+       RONDA 27: el modal de gates (.gate-modal-panel) usaba un ancho
+       inventado (min(92vw,560px), entre small y medium, sin fuente real).
+       Se declaran los 3 anchos oficiales del componente aunque hoy solo
+       se consuma "large" — mismo criterio que --sk-shadow-* arriba,
+       declarados completos por fidelidad a la ficha aunque el archivo no
+       use todavía los otros dos. */
+    --sk-modal-width-small:400px;
+    --sk-modal-width-medium:600px;
+    --sk-modal-width-large:800px;
+
     /* — Motion (features/motion.md, oficiales). RONDA 5 corrige un
        valor real, no solo el nombre: `base` es 320ms, no los 220ms que
        usaban rondas previas como aproximación. Las curvas SÍ coinciden
@@ -715,12 +726,20 @@
   .nav-drawer .nav-item:hover{background:var(--sk-color-disabled);}
   .nav-drawer .nav-item.active{color:var(--sk-color-text);background:var(--sk-color-success-light);font-weight:700;}
 
-  /* ---------- Modal obligatorio de encuesta (Gate 1: wf4 antes de wf3;
-     Gate 2: wf5 antes de #wf3List) ----------
-     Deliberadamente NO comparte código con `.drawer-overlay`/`.nav-drawer`
-     de arriba: ese drawer es descartable (Escape/click-fuera/botón X); este
-     modal no debe serlo mientras la encuesta no esté completa — nada de
-     click-en-overlay ni botón de cerrar en su JS.
+  /* ---------- Modal de encuesta (Gate 1: wf4 antes de wf3; Gate 2: wf5
+     antes de #wf3List) ----------
+     RONDA 22, 2026-09-09 — pasa de no-descartable a descartable. Javier:
+     quedó "bastante restrictiva" (bloqueaba TODO el resto del portal —
+     ver nota de `inert` en `setAppInert()` del <script> — sin ninguna
+     salida) y pidió poder declinar en el momento. Se agrega un botón X
+     (`.gate-modal-close`) + Escape + click en el overlay, los 3 llaman a
+     `declineGateModal()` (ver <script>) — decidir "ahora no" NUNCA marca
+     la encuesta como completada (esos flags solo se setean al llegar de
+     verdad al paso final, ver `renderWf4()`/`renderWf5()`), así que sigue
+     preguntando en la próxima visita a "Mis documentos", solo que ya no
+     deja a la persona sin poder ir a ver ninguna otra sección mientras
+     tanto. Ahora SÍ comparte el mismo patrón de descarte que
+     `.drawer-overlay`/`.nav-drawer` de arriba.
      `position:fixed` (relativo al viewport, no al contenido) a propósito:
      wf3 puede ser más alto que un viewport, y un overlay `absolute` dentro
      de `.app-shell` se centraría respecto a esa altura total, no a lo que
@@ -741,15 +760,27 @@
     transition:opacity var(--sk-motion-duration-base) var(--sk-motion-ease-standard);
   }
   .gate-modal-overlay.is-open{opacity:1;pointer-events:auto;}
+  /* RONDA 27 — Javier pidió el size Large (800px) de sk-modal para las 2
+     encuestas (Entrevista wf4 y Encuesta wf5, las dos únicas que usan
+     este modal de gates). Antes el ancho era un valor inventado
+     (min(92vw,560px), ni small ni medium ni large reales) — se reemplaza
+     por `--sk-modal-width-large` y el `max-width` documentado en la
+     ficha (`calc(100vw - 32px)`, no un vw redondeado a mano). */
   .gate-modal-panel{
+    position:relative; /* RONDA 22 — ancla el botón X (.gate-modal-close), absoluto */
     background:var(--sk-color-surface);border-radius:12px;
-    width:min(92vw,560px);max-height:85vh;overflow-y:auto;
+    width:var(--sk-modal-width-large);max-width:calc(100vw - 32px);max-height:85vh;overflow-y:auto;
     padding:var(--sk-space-l);
     box-shadow:var(--sk-shadow-overlay); /* declarado desde RONDA 5 "para modal/date-picker futuros" — este es ese consumidor */
   }
   @media (max-width:480px){
     .gate-modal-panel{padding:var(--sk-space-m);max-height:90vh;}
   }
+  /* RONDA 22 — reusa la apariencia de `.nav-drawer__close-btn` (mismo botón
+     circular de 40px, mismo hover/focus) en vez de duplicar esas reglas;
+     solo agrega el posicionamiento propio de este modal (esquina superior
+     derecha del panel, no del drawer). */
+  .gate-modal-close{position:absolute;top:8px;right:8px;z-index:1;}
   body.gate-modal-open{overflow:hidden;}
 
   /* --- Contenido: fila en desktop (rail + main), columna en mobile --- */
@@ -859,6 +890,7 @@
     font-family:var(--sk-font-title);font-weight:var(--sk-font-weight-bold);font-size:1rem;cursor:pointer;
     border-radius:999px;padding:14px 24px;text-align:center;display:inline-flex;
     align-items:center;justify-content:center;gap:8px;border:none;width:100%;
+    text-decoration:none; /* primer <a class="sk-btn"> del archivo (CTA externo a compensar.com en wf6) — sin esto hereda el subrayado nativo del navegador. */
     transition:background var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
                border-color var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
                box-shadow var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
@@ -1528,6 +1560,40 @@
   .wf1-notif-card .sk-btn--secondary{background:var(--sk-color-text-inverse);border-color:var(--sk-color-text-inverse);color:var(--sk-color-primary-active);}
   .wf1-notif-card .sk-btn--secondary:hover{background:var(--sk-color-disabled);}
 
+  /* RONDA 23, 2026-09-09 — hero emocional de wf1, SOLO Ruta 1.
+     Javier pidió un recurso emocional en Inicio inspirado en el brochure
+     "Siempre Skandia" (`conocimiento/IMAGEN REFERENCIA BROUCHURE.png`,
+     portada). Reusa `--sk-gradient-brand` (mismo token que
+     `.wf1-notif-card`, ya validado en este archivo) en vez de una imagen
+     de stock — el brochure usa una foto real de campaña que este
+     prototipo no tiene licencia para reproducir.
+     Por qué SOLO Ruta 1: content.md (Voz y tono, tabla de matices) es
+     explícito — "Ruta 1 puede celebrar porque la relación ya es de
+     gratitud mutua. Ruta 2 no puede" — y su columna "Evitar" para Ruta 2
+     prohíbe literalmente "módulo festivo" en los primeros 10 días. El
+     brochure en sí mismo solo se envía a quien sale por Ruta 1 (dato ya
+     confirmado en esta conversación). Ruta 3 tampoco: su arco es sobrio/
+     acompañante, nunca celebratorio (content.md, "Arcos narrativos").
+     Extenderlo a otras rutas sería una decisión de tono nueva, no algo
+     que este pedido cubra. */
+  .wf1-hero{
+    background:var(--sk-gradient-brand);border-radius:16px;
+    padding:var(--sk-space-l);margin-bottom:var(--sk-space-l);
+    color:var(--sk-color-text-inverse);
+    display:flex;align-items:center;gap:var(--sk-space-l);
+  }
+  .wf1-hero__mark{width:64px;height:64px;flex-shrink:0;opacity:.9;}
+  .wf1-hero__eyebrow{
+    font-family:var(--sk-font-title);font-weight:700;font-size:.8125rem;
+    letter-spacing:.03em;text-transform:uppercase;opacity:.85;margin:0 0 6px;
+  }
+  .wf1-hero__title{font-family:var(--sk-font-title);font-weight:700;font-size:1.5rem;line-height:1.3;margin:0 0 8px;}
+  .wf1-hero__body{font-size:1rem;line-height:1.5;margin:0;max-width:56ch;}
+  @media (max-width:480px){
+    .wf1-hero{flex-direction:column;align-items:flex-start;padding:var(--sk-space-m);}
+    .wf1-hero__mark{width:40px;height:40px;}
+  }
+
   /* Tarjetas destacadas de wf1 (Mi dinero + Mis documentos) — mismo
      mecanismo de flex-wrap que .hub-grid, contenedor propio porque llevan
      tipografía sk-card__header/__subheader (grande), no hub-tile__title/
@@ -1579,6 +1645,35 @@
   .card-grid > sk-card{flex:1 1 240px;margin-bottom:0;}
   .news-grid{display:flex;flex-wrap:wrap;gap:var(--sk-space-m);}
   .news-grid > .news-card{flex:1 1 260px;}
+  /* RONDA 20 — wf6 (Apoyo), lista de beneficios Compensar: con 3 tarjetas
+     por fila (.card-grid) las alturas quedaban dispares por el line-wrap
+     del título/texto ("Acompañamiento integral" vs. "Bolsa de empleo"),
+     dejando la última fila de 2 desalineada con la de 3 — feedback visual
+     de Javier en desktop. Layout propio para esta lista (no toca
+     .card-grid, que sigue igual en wf3): una columna de tarjetas
+     horizontales, ícono a la izquierda y texto a la derecha, así ninguna
+     fila depende de que dos tarjetas vecinas midan lo mismo. */
+  .benefit-list{display:flex;flex-direction:column;gap:var(--sk-space-s);}
+  .benefit-card{display:flex;align-items:center;gap:16px;}
+  .benefit-card > i{flex-shrink:0;margin-bottom:0;}
+  .benefit-card__body{min-width:0;}
+  .benefit-card__body .sk-card__header{margin-bottom:2px;}
+  /* Tarjeta final "¿Cómo acceder?" — pedido explícito de Javier de
+     destacarla con un gradiente para que se lea como la acción a tomar,
+     no como un sexto beneficio de la lista. Gradiente con los 2 tonos
+     literales de --sk-color-primary/-active (mismo criterio de fidelidad
+     de marca ya documentado arriba para el botón: valores reales del DS,
+     no un color inventado). El botón dentro se invierte a fondo blanco/
+     texto verde — el primary verde-sobre-verde-degradado no tendría
+     contraste suficiente para leerse como botón. */
+  .sk-card--cta{
+    background:linear-gradient(135deg, var(--sk-color-primary) 0%, var(--sk-color-primary-active) 100%);
+    border-color:transparent;color:#fff;
+  }
+  .sk-card--cta .sk-card__header{color:#fff;}
+  .sk-card--cta .sk-body.muted{color:rgba(255,255,255,.9);}
+  .sk-card--cta .sk-btn--primary{background:#fff;color:var(--sk-color-primary);}
+  .sk-card--cta .sk-btn--primary:hover{background:#f2f2f2;}
   .divider{height:1px;background:var(--sk-color-border);margin:var(--sk-space-m) 0;border:none;}
   .content-gap{margin-top:0;margin-bottom:var(--sk-space-m);}
 
@@ -1652,6 +1747,19 @@
   </symbol>
   <symbol id="pi-comment" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 3.5V16H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"/>
+  </symbol>
+  <!-- Sección de apoyo (wf6) — 3 íconos nuevos para las tarjetas del
+       beneficio Outplacement Compensar (capacitación, bolsa de empleo,
+       proceso 100% digital). Mismo estilo de trazo (stroke, 24x24) que el
+       resto del sprite. -->
+  <symbol id="pi-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 6.5C10.5 5 8 4.5 4 4.5v13c4 0 6.5.5 8 2 1.5-1.5 4-2 8-2v-13c-4 0-6.5.5-8 2Z"/><path d="M12 6.5v13"/>
+  </symbol>
+  <symbol id="pi-briefcase" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/>
+  </symbol>
+  <symbol id="pi-mobile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>
   </symbol>
   <!-- RONDA 15 — 2 íconos nuevos para el menú lateral (rail+drawer): no
        existía hamburguesa ni "cerrar" como trazo recto (solo pi-times-circle,
@@ -1742,14 +1850,13 @@
         <option value="wf8">wf8 · Novedades</option>
       </select>
     </div>
-    <div class="qa-field">
-      <label for="qaNotif">Notificación activa en Inicio (wf1)</label>
-      <select id="qaNotif">
-        <option value="none">Ninguna</option>
-        <option value="entrevista">Entrevista de retiro</option>
-        <option value="encuesta">Encuesta de satisfacción</option>
-      </select>
-    </div>
+    <!-- RONDA 22 — se quita el selector manual "Notificación activa en
+         Inicio (wf1)": Javier pidió dejar de simularlo a mano ahora que
+         Entrevista/Encuesta son un beneficio real que se va a incluir.
+         renderWf1Notif() (ver <script>) ya calcula esto solo, a partir de
+         esta misma etapa de "Mi dinero" — es la regla que el PRD siempre
+         documentó (wf4/wf5, "Transición") pero que antes solo vivía en
+         este selector manual, nunca conectada al dato real. -->
     <div class="qa-field">
       <label for="qaStage">Etapa Mi dinero (wf2): <span id="qaStageLabel">1</span></label>
       <input type="range" id="qaStage" min="0" max="4" value="0" step="1">
@@ -1779,8 +1886,19 @@
       <label for="qaUploadError">wf3 — simular archivo rechazado en la próxima carga</label>
     </div>
     <div class="qa-field checkline">
-      <input type="checkbox" id="qaHideReviewerNotes">
+      <input type="checkbox" id="qaHideReviewerNotes" checked>
       <label for="qaHideReviewerNotes">Ocultar comentarios de decisiones no tomadas (🟡)</label>
+    </div>
+    <!-- RONDA 21 — Gate 1/Gate 2 (entrevista/encuesta obligatorias, RONDA 18)
+         persisten en localStorage a propósito (no deben volver a interrumpir
+         en visitas futuras una vez completadas — ver evaluateWf3Gates()).
+         Efecto secundario para quien revisa: una vez completadas una vez en
+         este navegador, el modal deja de reaparecer y el ajuste "desaparece"
+         de la demo — no porque se haya quitado del código, sino porque el
+         estado de sesión simulado ya quedó en "completado". Este botón de
+         QA limpia esas 2 llaves para poder volver a ver el modal. -->
+    <div class="qa-field">
+      <button type="button" class="qa-collapse-btn sk-interactive" id="qaResetGates" style="margin-left:0;">Reiniciar entrevista/encuesta obligatorias (wf3)</button>
     </div>
   </div>
   </div></div>
@@ -1830,8 +1948,15 @@
        Escape — se cierra solo desde dentro de la propia encuesta (ver
        closeGateModal en el JS). El panel real de wf4/wf5 se reparenta aquí
        (no se clona) para no duplicar ids ya usados por renderWf4()/renderWf5(). -->
-  <div class="gate-modal-overlay" id="gateModal" role="dialog" aria-modal="true" aria-label="Paso obligatorio antes de continuar">
-    <div class="gate-modal-panel" id="gateModalBody"></div>
+  <div class="gate-modal-overlay" id="gateModal" role="dialog" aria-modal="true" aria-label="Antes de continuar">
+    <div class="gate-modal-panel" id="gateModalBody">
+      <!-- RONDA 22 — hijo ESTÁTICO de #gateModalBody: openGateModal()/
+           declineGateModal() solo appendChild/mueven el panel real
+           (wf4Panel/wf5Panel) como hermano de este botón, nunca lo tocan. -->
+      <button type="button" class="nav-drawer__close-btn gate-modal-close sk-interactive" id="gateModalCloseBtn" aria-label="Cerrar y decidir más tarde">
+        <i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i>
+      </button>
+    </div>
   </div>
 
   <nav class="side-rail" id="sideRail">
@@ -1952,6 +2077,11 @@
          (nunca la cálida de Ruta 1) — ver applyRoute() en el JS; el
          selector QA abre en Ruta 1 solo por conveniencia de revisión
          (ajuste 6, ronda 3), la regla de negocio no cambió.
+         RONDA 23, 2026-09-09 — Ruta 1 gana un hero emocional (`.wf1-hero`)
+         antes del saludo de Acto 1, inspirado en el brochure "Siempre
+         Skandia" que se le envía por correo. Ver la nota completa junto
+         al CSS `.wf1-hero` (por qué solo Ruta 1, y qué copy del brochure
+         se reusó) y junto al HTML dentro de `data-r="r1"` más abajo.
          Componente: sk-card (resumen) · sk-button skType="primary" (CTA) ·
          sk-skeleton (carga) · nav armada dinámicamente por ruta (superior
          en desktop, inferior en mobile).
@@ -1972,6 +2102,33 @@
       <div id="wf1Content">
         <!-- Acto 1 — Reconocimiento (varía por ruta) -->
         <div class="variant" data-r="r1">
+          <!-- RONDA 23 — hero emocional, ver nota junto al CSS `.wf1-hero`
+               (por qué solo Ruta 1). Copy adaptado del brochure "Siempre
+               Skandia": el título reusa casi literal la frase de la
+               burbuja de portada ("No es un adiós, es el inicio de nuevas
+               historias juntos"); el cuerpo combina la bajada de portada
+               ("Cada etapa cuenta...") con el cierre del brochure
+               ("Siempre Skandia es más que un programa, es una comunidad
+               que sigue contigo, hoy y siempre") — no es copy nuevo
+               inventado, es contenido ya escrito y aprobado por el
+               negocio para este mismo programa, solo adaptado de pieza
+               impresa/PDF a pantalla. Aun así queda flageado 🟡 porque el
+               calibrado de tono para PANTALLA (vs. brochure impreso) no
+               ha pasado por Kiki todavía — mismo criterio que el resto de
+               copy nueva de este archivo.
+               RONDA 24, 2026-09-09 — oculto "por ahora" a pedido de
+               Javier: lo revisará con los stakeholders en una sesión
+               posterior antes de dejarlo visible de nuevo. No se borra —
+               solo display:none en el hero y en su flag de revisor. -->
+          <div class="wf1-hero" style="display:none;">
+            <svg class="wf1-hero__mark" viewBox="-2 -2 41 41" aria-hidden="true"><use href="#sk-logo-lockup" x="0" y="-10.34" width="280" height="48"></use></svg>
+            <div>
+              <p class="wf1-hero__eyebrow">Siempre Skandia</p>
+              <p class="wf1-hero__title">No es un adiós. Es el inicio de nuevas historias, juntos.</p>
+              <p class="wf1-hero__body">Cada etapa cuenta. Gracias por ser parte de esta historia — Siempre Skandia es más que un programa, es una comunidad que sigue contigo, hoy y siempre.</p>
+            </div>
+          </div>
+          <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:none;margin-top:6px;margin-bottom:var(--sk-space-m);"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Copy del hero adaptado del brochure "Siempre Skandia" (portada) compartido por los stakeholders — pendiente de calibrar tono de pantalla y confirmar wording final con Kiki.</span></p>
           <h1 class="sk-display">Hola, [Nombre]. Gracias por tu paso por Skandia.</h1>
           <p class="sk-body content-gap" style="margin-top:8px;">Aquí tienes todo tu proceso de salida, y también un espacio para seguir cerca si quieres.</p>
         </div>
@@ -2017,8 +2174,11 @@
           </button>
         </div>
 
-        <!-- Notificación contextual de Entrevista / Encuesta (controlada por
-             QA "qaNotif") — a petición de Javier (2026-09-02): ocupa el 100%
+        <!-- Notificación contextual de Entrevista / Encuesta (RONDA 22:
+             calculada sola por renderWf1Notif() a partir de la etapa real
+             de "Mi dinero" — antes se elegía a mano con el selector QA
+             "qaNotif", ya retirado; ver nota junto a renderWf1Notif()) — a
+             petición de Javier (2026-09-02): ocupa el 100%
              del ancho de contenido (antes max-width:520px) y usa
              --sk-gradient-brand (RONDA 5: renombrado desde --estilos-degrade;
              confirmado como token real de marca en sk-components-angular,
@@ -2104,6 +2264,22 @@
          Componente: sk-stepper (simulado, ver nota CSS) · sk-tag/sk-badge
          (estado) · sk-button skType="secondary" ("Ver mis documentos",
          ya no "Firmar mis documentos").
+
+         RONDA 22, 2026-09-09 — "Liquidación solicitada" pasa de la etapa 5
+         a la etapa 2 (pedido explícito de Javier), en Ruta 1 y Ruta 2 (una
+         sola lista compartida, `data-rg="r1 r2"`). Es un reordenamiento de
+         presentación, no una corrección del MPO — el paso MPO de cada
+         etapa no cambió, solo su posición en pantalla (ver content.md v7).
+         Nuevo orden de `data-idx`: 0 Notificación → 1 Liquidación
+         solicitada → 2 Documentos en preparación → 3 Documentos
+         pendientes de tu firma → 4 Paz y salvo en revisión → 5 Pago
+         realizado. Ruta 3 (variante reducida) no tiene esta etapa, sin
+         cambios. Efecto en JS: la condición de renderStage() que mostraba
+         el CTA de conveniencia "Ver mis documentos" desde "Documentos en
+         preparación" en adelante estaba anclada al índice viejo
+         (`stage >= 1`) — se corrigió a `stage >= 2` para seguir apuntando
+         a la misma etapa por NOMBRE, no a un número que ya no le
+         corresponde.
     ============================================================ -->
     <section class="screen" data-screen="wf2">
       <nav class="sk-breadcrumb" aria-label="Breadcrumb"><ol class="sk-breadcrumb__list"><li><a class="sk-breadcrumb__link" href="#wf1" data-goto="wf1">Inicio</a></li><li><span class="sk-breadcrumb__separator" aria-hidden="true">/</span><span class="sk-breadcrumb__link sk-breadcrumb__link--active" aria-current="page">Mi dinero</span></li></ol></nav>
@@ -2126,8 +2302,11 @@
       <div class="variant" data-rg="r1 r2" id="wf2Full" style="max-width:640px;">
         <ul class="stepper-sim" id="wf2StepperFull">
           <li data-idx="0"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Notificación registrada el 20 ago. 2026</p></div></li>
-          <li data-idx="1"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos en preparación</p></div></li>
-          <li data-idx="2"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div>
+          <li data-idx="1"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div>
+            <p class="stepper-sim__label">Liquidación solicitada — hasta 3 días hábiles</p>
+          </div></li>
+          <li data-idx="2"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos en preparación</p></div></li>
+          <li data-idx="3"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div>
             <p class="stepper-sim__label">Documentos pendientes de tu firma</p>
             <div class="stepper-sim__note" id="wf2UploadNote"></div>
             <div style="margin-top:8px;">
@@ -2136,11 +2315,8 @@
               </sk-button>
             </div>
           </div></li>
-          <li data-idx="3"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div>
-            <p class="stepper-sim__label">Paz y salvo (certificado de que no tienes pendientes con la empresa) en revisión — hasta 3 días hábiles</p>
-          </div></li>
           <li data-idx="4"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div>
-            <p class="stepper-sim__label">Liquidación solicitada — hasta 3 días hábiles</p>
+            <p class="stepper-sim__label">Paz y salvo (certificado de que no tienes pendientes con la empresa) en revisión — hasta 3 días hábiles</p>
           </div></li>
           <li data-idx="5"><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Pago realizado el [fecha]</p></div></li>
         </ul>
@@ -2449,14 +2625,78 @@
     </section>
 
     <!-- ============================================================
-         wf4 — ENTREVISTA DE RETIRO (sin cambios de contenido en esta
-         ronda — solo íconos reemplazados, ver ajuste 3).
-         Datos pre-llenados editables · motivo de salida OCULTO por completo
-         en Ruta 2 (🟢 resuelto en el PRD, no reemplazado por versión neutral)
-         · 2 preguntas abiertas · evaluación de líder (1 pregunta).
-         Componente: sk-input-text (datos) · sk-radio-group (motivo, options[]) ·
-         sk-textarea (abiertas) · sk-select-button (escala 1-5) ·
-         sk-progress-bar ("Pregunta X de Y") · sk-button
+         wf4 — ENTREVISTA DE RETIRO
+         RONDA 25, 2026-09-09 — reemplazo COMPLETO del contenido, fuente:
+         guion revisado y aprobado por stakeholders
+         (`conocimiento/Entrevista de retiro.docx`). El docx trae 2 grupos
+         paralelos de 15 preguntas (8 bloques temáticos cada uno):
+         "Grupo 1" (renuncia voluntaria, terminación de contrato y retiro
+         por pensión) y "Grupo 2" (terminación con/sin justa causa).
+         Mapeo de rutas — Grupo 1 → Ruta 1 Y Ruta 3-colaborador (pensión,
+         `data-r="r1 r3c"`, mismo copy exacto para las dos); Grupo 2 →
+         Ruta 2 (`data-r="r2"`). Ruta 3-beneficiario (r3b) NO recibe esta
+         entrevista — inferencia de contenido (las preguntas presuponen
+         experiencia laboral propia: "tu líder", "tu equipo"), no pedida
+         explícitamente por Javier, pendiente de que la confirme. Gate 1
+         (ver <script>, evaluateWf3Gates) se ajustó para excluir solo r3b,
+         ya no toda Ruta 3.
+         Conversión de formato (pedido explícito de Javier: nada queda
+         abierto salvo 2 excepciones puntuales que él mismo señaló): las
+         preguntas de calificación pasan a escala Likert de 5 puntos
+         etiquetada (RONDA 26 — ver nota más abajo, reemplaza la escala
+         numérica 1-5 sin etiquetas de la RONDA 25), las binarias a Sí/No
+         (sk-radio-group de 2 opciones, patrón de wf5 paso 1). De las 6
+         preguntas que en el docx eran abiertas, 4 (cultura a destacar,
+         beneficio a fortalecer, cambios en beneficios, desarrollo que
+         faltó) se descartan sin captura propia (RONDA 26 — antes vivían
+         fusionadas en una pregunta de opción múltiple al final de cada
+         grupo, retirada a pedido de Javier); las otras 2 (una por grupo,
+         las preguntas de cierre del docx) se dejan abiertas tal cual —
+         pedido explícito de Javier tras revisar la primera versión de
+         este plan, y quedan como la ÚNICA pregunta del paso 8 desde
+         RONDA 26.
+
+         RONDA 26, 2026-09-09 — dos ajustes de Javier tras revisar la
+         RONDA 25:
+         1. La escala numérica 1-5 (sk-select-button, botones "1".."5"
+            sin etiqueta) no comunicaba qué significaba cada extremo —
+            se reemplaza por una escala Likert de 5 puntos, etiquetada,
+            en formato sk-radio-group vertical (igual que el resto de
+            preguntas de una sola respuesta de este módulo, no
+            sk-select-button — 5 etiquetas de texto no caben bien en
+            los pills compactos de esa componente, pensada para números/
+            frases cortas). Dos sets de etiquetas según cómo esté
+            redactada la pregunta: "¿Consideras/Sentiste que...?" usa
+            acuerdo (Muy en desacuerdo · En desacuerdo · Neutral · De
+            acuerdo · Muy de acuerdo); "¿Cómo calificarías/describirías/
+            fue...?" usa calidad (Muy malo/a · Malo/a · Regular · Bueno/a
+            · Muy bueno/a, concordado en género con el sustantivo de la
+            pregunta — "la comunicación... muy buena", "el ambiente...
+            muy bueno").
+         2. Se quita la pregunta de opción múltiple del paso 8 (Cierre)
+            en los 2 grupos — Javier pidió dejar únicamente la pregunta
+            abierta ahí. Las 4 preguntas que esa opción múltiple absorbía
+            quedan sin captura propia en este instrumento.
+         Recorte moderado (nivel elegido por Javier vía pregunta directa):
+         Grupo 1 funde "Relación con compañeros" y "Desarrollo
+         profesional" (2 preguntas → 1 cada uno, eran la misma señal);
+         Grupo 2 no funde nada más — sus pares "compañeros/conflictos" y
+         "clima/escuchado" son señales distintas (una positiva, una de
+         alerta). Resultado (tras RONDA 26): Grupo 1 = 11 preguntas/9
+         pasos, Grupo 2 = 13 preguntas/9 pasos (antes: 5 pasos genéricos,
+         reducidos de un benchmark de 9 preguntas — ver content.md v2).
+         Todo el copy se tradujo de "usted" a "tú" y se reescribió para
+         evitar participios con género referidos a la persona ("se sintió
+         reconocido" → "sentiste que tu trabajo fue reconocido") — pasado
+         además por /skandia-comunicacion antes de implementar.
+         Se retira por completo el "motivo de salida" (radio de 9
+         opciones) — el docx no lo incluye; ese dato ya lo tiene Gestión
+         Humana por otra vía (mismo razonamiento ya documentado para
+         Ruta 2, ahora aplica a los 2 grupos).
+         Componente: sk-input-text (datos, sin cambios) · sk-radio-group
+         (escala Likert de 5 puntos Y Sí/No — ambas de una sola
+         respuesta, mismo componente) · sk-textarea (solo la pregunta
+         abierta final de cada grupo) · sk-progress-bar ("Pregunta X de Y")
     ============================================================ -->
     <section class="screen" data-screen="wf4">
       <div style="max-width:640px;">
@@ -2470,6 +2710,7 @@
       <p class="sk-caption gate-modal-kicker" id="wf4Kicker" style="display:none;color:var(--sk-color-primary);font-weight:600;margin:0 0 4px;">Antes de ver tus documentos</p>
       <h1 class="sk-display">Tu entrevista de retiro</h1>
       <p class="sk-body muted content-gap" style="margin-top:6px;">Nos ayuda a entender tu experiencia en Skandia. Te toma unos minutos.</p>
+      <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:flex;margin-top:6px;margin-bottom:6px;"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Copy adaptado del guion "Entrevista de retiro.docx" (stakeholders) — conversión de formato y fusiones son criterio de content design, pendiente de confirmar con Kiki.</span></p>
 
       <sk-progress-bar><div class="sk-progressbar"><div class="sk-progressbar__fill" id="wf4Fill" style="width:0%"><span class="sk-progressbar__label"></span></div></div></sk-progress-bar>
       <p class="sk-caption content-gap" id="wf4Progress">Pregunta 1 de 4</p>
@@ -2477,51 +2718,135 @@
       <div id="wf4Steps">
         <!-- Paso 0 — confirmación de datos (siempre) -->
         <div class="wf4-step" data-step="0">
-          <p class="sk-body content-gap">Confirma que estos datos estén correctos: [Nombre] · [Cargo] · [Área].</p>
+          <p class="sk-body content-gap">Confirma que tus datos estén correctos:</p>
           <!-- REVISOR: Datos de ejemplo para este prototipo — en producción vienen pre-llenados del sistema. -->
           <sk-input-text><div class="sk-field"><div class="sk-field__box is-floating"><span class="sk-field__label">Nombre</span><input type="text" value="Laura Gómez"></div></div></sk-input-text>
           <sk-input-text><div class="sk-field"><div class="sk-field__box is-floating"><span class="sk-field__label">Cargo</span><input type="text" value="Analista de Mercadeo"></div></div></sk-input-text>
           <sk-input-text><div class="sk-field"><div class="sk-field__box is-floating"><span class="sk-field__label">Área</span><input type="text" value="Mercadeo y Comunicaciones"></div></div></sk-input-text>
         </div>
 
-        <!-- Paso 1 — motivo de salida (oculto por completo en Ruta 2) -->
-        <div class="wf4-step v-motivo" data-step="1">
-          <sk-radio-group>
-          <fieldset class="sk-radio-group">
-            <legend class="sk-body" style="font-weight:600;">¿Cuál de estas opciones describe mejor tu salida?</legend>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Nueva oferta laboral</label>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Estudios</label>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Emprendimiento</label>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Atención familiar</label>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Ambiente de trabajo</label>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Traslado a agencia</label>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Viaje al exterior</label>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Motivos de salud</label>
-            <label class="sk-radio-row"><input type="radio" name="motivo">Otra</label>
-          </fieldset>
-          </sk-radio-group>
-        </div>
-
-        <!-- Paso 2 — aspectos positivos -->
-        <div class="wf4-step" data-step="2">
-          <sk-textarea><div class="sk-ta"><label class="sk-ta__label">Aspectos positivos</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="4" placeholder="¿Qué aspectos positivos destacarías de tu paso por Skandia?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea>
-        </div>
-
-        <!-- Paso 3 — qué mejorar -->
-        <div class="wf4-step" data-step="3">
-          <sk-textarea><div class="sk-ta"><label class="sk-ta__label">Qué mejorar</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="4" placeholder="Pensando en tus compañeros que siguen en Skandia, ¿qué crees que podríamos cambiar o hacer mejor?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea>
-        </div>
-
-        <!-- Paso 4 — evaluación del líder -->
-        <div class="wf4-step" data-step="4">
-          <p class="sk-body content-gap">¿Cómo calificarías el acompañamiento de tu líder, [Nombre del líder], durante tu tiempo en Skandia?</p>
-          <sk-select-button>
-          <div class="sk-selectbutton sk-selectbutton--scale" data-scale="1-5">
-            <button type="button" class="sk-interactive" data-val="1">1</button><button type="button" class="sk-interactive" data-val="2">2</button>
-            <button type="button" class="sk-interactive" data-val="3">3</button><button type="button" class="sk-interactive" data-val="4">4</button>
-            <button type="button" class="sk-interactive" data-val="5">5</button>
+        <!-- Paso 1 — Compensación -->
+        <div class="wf4-step" data-step="1">
+          <p class="sk-h2 content-gap">Compensación</p>
+          <div class="variant" data-r="r1 r3c">
+            <p class="sk-body content-gap">¿Consideras que tu compensación era competitiva frente al mercado?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Muy de acuerdo</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Sentiste que tu trabajo fue reconocido como se merecía?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Muy de acuerdo</label></fieldset></sk-radio-group>
           </div>
-          </sk-select-button>
+          <div class="variant" data-r="r2">
+            <p class="sk-body content-gap">¿Consideras que tu compensación era acorde con tus responsabilidades?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Muy de acuerdo</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Sentiste que los resultados de tu trabajo fueron reconocidos?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Muy de acuerdo</label></fieldset></sk-radio-group>
+          </div>
+        </div>
+
+        <!-- Paso 2 — Relación con el líder -->
+        <div class="wf4-step" data-step="2">
+          <p class="sk-h2 content-gap">Relación con el líder</p>
+          <div class="variant" data-r="r1 r3c">
+            <p class="sk-body content-gap">¿Cómo calificarías la comunicación con tu líder?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Muy mala</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Muy buena</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Tu líder apoyó tu desarrollo y desempeño?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-lider-apoyo-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-apoyo-g1">No</label></fieldset></sk-radio-group>
+          </div>
+          <div class="variant" data-r="r2">
+            <p class="sk-body content-gap">¿Recibías retroalimentación clara sobre tu desempeño?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-lider-retro-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-retro-g2">No</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Cómo calificarías el trato que recibiste de tus líderes?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Muy malo</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Muy bueno</label></fieldset></sk-radio-group>
+          </div>
+        </div>
+
+        <!-- Paso 3 — Relación con compañeros (Grupo 1: fusionada en 1 sola pregunta) -->
+        <div class="wf4-step" data-step="3">
+          <p class="sk-h2 content-gap">Relación con compañeros</p>
+          <div class="variant" data-r="r1 r3c">
+            <p class="sk-body content-gap">¿Cómo calificarías tu relación con tu equipo, incluido el apoyo que recibiste cuando lo necesitaste?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Muy mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Muy buena</label></fieldset></sk-radio-group>
+          </div>
+          <div class="variant" data-r="r2">
+            <p class="sk-body content-gap">¿Cómo fue la colaboración con tu equipo?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Muy mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Muy buena</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Hubo conflictos que afectaran tu trabajo diario?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-conflictos-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-conflictos-g2">No</label></fieldset></sk-radio-group>
+          </div>
+        </div>
+
+        <!-- Paso 4 — Ambiente laboral y cultura -->
+        <div class="wf4-step" data-step="4">
+          <p class="sk-h2 content-gap">Ambiente laboral y cultura</p>
+          <div class="variant" data-r="r1 r3c">
+            <p class="sk-body content-gap">¿Cómo describirías el ambiente laboral de la compañía?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Muy malo</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Muy bueno</label></fieldset></sk-radio-group>
+          </div>
+          <div class="variant" data-r="r2">
+            <p class="sk-body content-gap">¿Cómo calificarías el clima laboral de la compañía?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Muy malo</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Muy bueno</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Sentiste que tus inquietudes o sugerencias eran escuchadas?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-escuchado-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-escuchado-g2">No</label></fieldset></sk-radio-group>
+          </div>
+        </div>
+
+        <!-- Paso 5 — Beneficios -->
+        <div class="wf4-step" data-step="5">
+          <p class="sk-h2 content-gap">Beneficios</p>
+          <div class="variant" data-r="r1 r3c">
+            <p class="sk-body content-gap">¿Sientes que los beneficios que recibiste cubrieron tus necesidades?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-g1">No</label></fieldset></sk-radio-group>
+          </div>
+          <div class="variant" data-r="r2">
+            <p class="sk-body content-gap">¿Los beneficios que recibiste cumplieron tus expectativas?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Muy de acuerdo</label></fieldset></sk-radio-group>
+          </div>
+        </div>
+
+        <!-- Paso 6 — Carga laboral -->
+        <div class="wf4-step" data-step="6">
+          <p class="sk-h2 content-gap">Carga laboral</p>
+          <div class="variant" data-r="r1 r3c">
+            <p class="sk-body content-gap">¿Consideras que tu carga de trabajo era razonable?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-carga-razonable-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-carga-razonable-g1">No</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Lograste mantener equilibrio entre tu trabajo y tu vida personal?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-equilibrio-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-equilibrio-g1">No</label></fieldset></sk-radio-group>
+          </div>
+          <div class="variant" data-r="r2">
+            <p class="sk-body content-gap">¿La carga laboral era adecuada para el cargo que ocupabas?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-carga-adecuada-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-carga-adecuada-g2">No</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Contabas con las herramientas necesarias para cumplir tus funciones?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-herramientas-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-herramientas-g2">No</label></fieldset></sk-radio-group>
+          </div>
+        </div>
+
+        <!-- Paso 7 — Desarrollo profesional (Grupo 1: fusionada en 1 sola pregunta) -->
+        <div class="wf4-step" data-step="7">
+          <p class="sk-h2 content-gap">Desarrollo profesional</p>
+          <div class="variant" data-r="r1 r3c">
+            <p class="sk-body content-gap">¿Sentiste que tuviste oportunidades de aprendizaje y crecimiento en la compañía?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Muy de acuerdo</label></fieldset></sk-radio-group>
+          </div>
+          <div class="variant" data-r="r2">
+            <p class="sk-body content-gap">¿Las capacitaciones que recibiste fueron útiles para tu rol?</p>
+            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-capacitaciones-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-capacitaciones-g2">No</label></fieldset></sk-radio-group>
+          </div>
+        </div>
+
+        <!-- Paso 8 — Cierre: RONDA 26 — Javier pidió quitar la opción múltiple
+             compartida que absorbía las 4 preguntas abiertas del docx (cultura
+             a destacar, beneficio a fortalecer, cambios en beneficios,
+             desarrollo que faltó) y dejar SOLO la pregunta abierta de cada
+             grupo (la excepción que ya había pedido, ver nota de cabecera).
+             Esas 4 preguntas quedan sin captura propia — la abierta final,
+             ya de por sí amplia, es el único lugar de reflexión libre. -->
+        <div class="wf4-step" data-step="8">
+          <p class="sk-h2 content-gap">Antes de terminar</p>
+          <div class="variant" data-r="r1 r3c">
+            <sk-textarea><div class="sk-ta"><label class="sk-ta__label">¿Algo más que quieras contarnos?</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="4" placeholder="¿Qué pudo haber hecho la compañía para mejorar tu experiencia laboral?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea>
+          </div>
+          <div class="variant" data-r="r2">
+            <sk-textarea><div class="sk-ta"><label class="sk-ta__label">¿Algo más que quieras contarnos?</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="4" placeholder="¿Qué recomendación darías para mejorar la experiencia de los colaboradores?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea>
+          </div>
         </div>
       </div>
 
@@ -2545,12 +2870,32 @@
     </section>
 
     <!-- ============================================================
-         wf5 — ENCUESTA DE SATISFACCIÓN DEL PROCESO (sin cambios de
-         contenido en esta ronda — solo íconos reemplazados, ver ajuste 3).
+         wf5 — ENCUESTA DE SATISFACCIÓN DEL PROCESO
          🟡 No confirmada por Gestión Humana — propuesta de content design de
          Kiki (PRD §6, decisiones 6/7). 6 preguntas + confirmación.
-         Componente: sk-select-button (escalas 1-5 y 0-10) · sk-radio-group
-         (Sí/No) · sk-textarea · sk-checkbox (consentimiento) · sk-progress-bar
+
+         RONDA 28, 2026-09-09 — 4 ajustes de Javier:
+         1. Preguntas 1 y 3: la escala numérica 1-5 sin etiquetas
+            (sk-select-button) pasa a escala Likert de 5 puntos etiquetada
+            (sk-radio-group vertical), mismo patrón ya usado en wf4 (RONDA
+            26). Pregunta 1 ("¿Qué tan claro fue...?") usa un set de
+            etiquetas propio de claridad (Muy confuso · Confuso · Regular ·
+            Claro · Muy claro), análogo al set de calidad de wf4. Pregunta 3
+            ("¿Tu padrino/madrina resolvió tus dudas?") usa el set de
+            acuerdo de wf4 (Muy en desacuerdo · En desacuerdo · Neutral · De
+            acuerdo · Muy de acuerdo).
+         2. Pregunta 3: se quita el textarea "Comentario (opcional)" — con
+            la escala ya etiquetada, no hace falta captura abierta extra.
+         3. Pregunta 4 (NPS 0-10): se agrega una fila con los extremos
+            explicados ("0 = Nada probable" / "10 = Muy probable"), la
+            escala numérica sola no comunicaba qué significaba cada punta.
+         4. Pregunta 6: el checkbox único (marcado = interesado, sin marcar
+            = ambiguo entre "no" y "no respondió") pasa a sk-radio-group
+            Sí/No — mismo patrón de radio Sí/No que el resto del archivo
+            (corrección de Javier: primer intento usó 2 sk-checkbox
+            independientes, pero pidió radiobuttons).
+         Componente: sk-select-button (escala 0-10) · sk-radio-group
+         (Likert de 5 puntos y Sí/No) · sk-progress-bar
     ============================================================ -->
     <section class="screen" data-screen="wf5">
       <div style="max-width:640px;">
@@ -2576,7 +2921,7 @@
       <div id="wf5Steps">
         <div class="wf5-step" data-step="0">
           <p class="sk-body content-gap">¿Qué tan claro fue el proceso de salida desde el día que informaste tu retiro?</p>
-          <sk-select-button><div class="sk-selectbutton sk-selectbutton--scale"><button type="button" class="sk-interactive">1</button><button type="button" class="sk-interactive">2</button><button type="button" class="sk-interactive">3</button><button type="button" class="sk-interactive">4</button><button type="button" class="sk-interactive">5</button></div></sk-select-button>
+          <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Muy confuso</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Confuso</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Regular</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Claro</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Muy claro</label></fieldset></sk-radio-group>
         </div>
         <div class="wf5-step" data-step="1">
           <p class="sk-body content-gap">¿En algún momento el proceso tomó más tiempo del esperado?</p>
@@ -2590,8 +2935,7 @@
         </div>
         <div class="wf5-step" data-step="2">
           <p class="sk-body content-gap">¿Tu padrino/madrina<span class="placeholder-note" style="display:inline" data-audience="reviewer">🟡 propuesta sin confirmar por Kiki: "(tu acompañante asignado durante el proceso de salida)"</span> resolvió tus dudas?</p>
-          <sk-select-button><div class="sk-selectbutton sk-selectbutton--scale"><button type="button" class="sk-interactive">1</button><button type="button" class="sk-interactive">2</button><button type="button" class="sk-interactive">3</button><button type="button" class="sk-interactive">4</button><button type="button" class="sk-interactive">5</button></div></sk-select-button>
-          <sk-textarea><div class="sk-ta" style="margin-top:10px;"><label class="sk-ta__label">Comentario (opcional)</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="2"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea>
+          <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Muy de acuerdo</label></fieldset></sk-radio-group>
         </div>
         <div class="wf5-step" data-step="3">
           <p class="sk-body content-gap">Del 0 al 10, ¿qué tan probable es que le hables bien de Skandia a un conocido?</p>
@@ -2601,6 +2945,7 @@
             <button type="button" class="sk-interactive">5</button><button type="button" class="sk-interactive">6</button><button type="button" class="sk-interactive">7</button><button type="button" class="sk-interactive">8</button><button type="button" class="sk-interactive">9</button><button type="button" class="sk-interactive">10</button>
           </div>
           </sk-select-button>
+          <div class="row-between" style="margin-top:4px;"><p class="sk-caption muted">0 = Nada probable</p><p class="sk-caption muted">10 = Muy probable</p></div>
         </div>
         <div class="wf5-step" data-step="4">
           <p class="sk-body content-gap">¿Ya sabes qué vas a hacer con tu liquidación y cesantías<span class="placeholder-note" style="display:inline" data-audience="reviewer">🟡 propuesta sin confirmar por Kiki: puede necesitar un enlace/gloss breve explicando el término para quien no lo conozca</span>?</p>
@@ -2616,12 +2961,8 @@
           </div>
         </div>
         <div class="wf5-step" data-step="5">
-          <sk-checkbox>
-          <label class="sk-checkbox-row">
-            <input type="checkbox">
-            <span class="sk-body">¿Te interesaría mantenerte informado de contenidos y oportunidades como ex colaborador?</span>
-          </label>
-          </sk-checkbox>
+          <p class="sk-body content-gap">¿Te interesaría mantenerte informado de contenidos y oportunidades como ex colaborador?</p>
+          <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf5-mantenerse">Sí</label><label class="sk-radio-row"><input type="radio" name="wf5-mantenerse">No</label></fieldset></sk-radio-group>
         </div>
       </div>
 
@@ -2652,12 +2993,50 @@
          descripción genérica ("Recursos generales de empleabilidad.") sin
          diferenciar qué aporta cada una — Kiki formalizó copy propio para
          cada tarjeta, ya aplicado abajo.
-         Regla de fallback: SIEMPRE la versión general por defecto (no hay
-         dato de elegibilidad confirmado — riesgo abierto confirmado por
-         Javier, PRD §6 decisión 5). La variante "ejecutivo" solo se ve
-         desde el toggle QA, marcada 🟡 no confirmada. Oculto en Ruta 3.
-         Componente: sk-card (recursos, uno por tarjeta) · sk-button
-         skType="primary" ("Empezar mi acompañamiento", solo elegible).
+
+         RONDA 19, 2026-09-09 — variante general reemplazada por el
+         beneficio real de Outplacement Compensar. Los stakeholders
+         compartieron el brochure "Siempre Skandia" que se envía por correo
+         a quien sale por Ruta 1 (`conocimiento/IMAGEN REFERENCIA
+         BROUCHURE.png`, sección 6, "Outplacement Compensar: un apoyo para
+         tu próximo paso"); ese es el beneficio que efectivamente se va a
+         ofrecer, así que reemplaza las tarjetas placeholder "Hoja de
+         vida"/"Entrevistas" en vez de flaguearse como 🟡 no confirmado —
+         viene de una fuente ya validada por el negocio, no de copy
+         tentativo de Kiki. Los 5 beneficios del brochure pasan a ser 5
+         tarjetas (uno por beneficio, sin botón "Ver más" por pedido
+         explícito de Javier — el brochure no tiene "ver más" por tarjeta,
+         solo el CTA final al sitio) y se cierra con el mismo CTA del
+         brochure ("¿Cómo acceder?" + botón a compensar.com). Pendiente:
+         Kiki formalizar este copy en content.md (ya reflejado ahí como
+         propuesta) y confirmar la URL exacta con Gestión Humana/Compensar
+         antes de producción.
+         Regla de fallback sin cambios: SIEMPRE la versión general por
+         defecto (no hay dato de elegibilidad confirmado para el beneficio
+         ejecutivo interno de Skandia — riesgo abierto confirmado por
+         Javier, PRD §6 decisión 5). La variante "ejecutivo" (wf6Exec, un
+         beneficio distinto y más amplio pagado por Skandia, no por
+         Compensar) solo se ve desde el toggle QA, marcada 🟡 no
+         confirmada — el beneficio Compensar de abajo no depende de esa
+         elegibilidad, así que no se toca. Oculto en Ruta 3.
+         Componente: sk-card (un beneficio por tarjeta, sin CTA propio) ·
+         sk-button skType="primary" (CTA único final, enlaza a
+         compensar.com) · skType="primary" ("Empezar mi acompañamiento",
+         solo elegible/ejecutivo).
+
+         RONDA 20, 2026-09-09 — layout de la lista de beneficios, feedback
+         visual de Javier en desktop: 3 tarjetas por fila (.card-grid,
+         flex-basis 240px) quedaban desalineadas porque el título de cada
+         una envuelve a distinta altura ("Bolsa de empleo" en 1 línea vs.
+         "Acompañamiento integral" en 2), y la fila final de 2 tarjetas se
+         veía suelta. Se cambió a `.benefit-list` (columna, una tarjeta por
+         fila, ícono a la izquierda + texto a la derecha) — ninguna fila
+         depende de la altura de una tarjeta vecina. `.card-grid` en sí no
+         se tocó (sigue usándose igual en wf3). La tarjeta final "¿Cómo
+         acceder?" se destaca con `.sk-card--cta` (gradiente de los 2
+         tonos literales de --sk-color-primary/-active, pedido explícito
+         de Javier) para que se lea como la acción a tomar, no como un
+         sexto beneficio más de la lista.
     ============================================================ -->
     <section class="screen" data-screen="wf6">
       <div style="max-width:820px;">
@@ -2665,25 +3044,60 @@
       <h1 class="sk-display">Apoyo para tu próximo paso</h1>
 
       <div id="wf6General">
-        <p class="sk-body muted content-gap" style="margin-top:6px;">Aquí tienes recursos para tu próximo paso profesional.</p>
+        <p class="sk-body muted content-gap" style="margin-top:6px;">Como parte de tu proceso de desvinculación, puedes acceder al Subsidio de Desempleo de Compensar: un beneficio que te brinda acompañamiento y herramientas para volver al mundo laboral.</p>
 
-        <div class="card-grid">
+        <div class="benefit-list">
           <sk-card>
-            <div class="sk-card">
-              <i class="pi pi-file" style="font-size:22px;color:var(--sk-color-primary);display:block;margin-bottom:8px;"><svg><use href="#pi-file"></use></svg></i>
-              <p class="sk-card__header">Hoja de vida</p>
-              <p class="sk-body muted">Cómo estructurar tu experiencia y destacar lo relevante.</p>
-              <button type="button" class="sk-btn sk-btn--tertiary sk-interactive" style="margin-top:8px;">Ver más</button>
+            <div class="sk-card benefit-card">
+              <i class="pi pi-compass" style="font-size:22px;color:var(--sk-color-primary);"><svg><use href="#pi-compass"></use></svg></i>
+              <div class="benefit-card__body">
+                <p class="sk-card__header">Acompañamiento integral</p>
+                <p class="sk-body muted">Orientación laboral personalizada para fortalecer tu perfil y tus habilidades.</p>
+              </div>
             </div>
           </sk-card>
           <sk-card>
-            <div class="sk-card">
-              <i class="pi pi-comment" style="font-size:22px;color:var(--sk-color-primary);display:block;margin-bottom:8px;"><svg><use href="#pi-comment"></use></svg></i>
-              <p class="sk-card__header">Entrevistas</p>
-              <p class="sk-body muted">Preguntas frecuentes y cómo prepararte con confianza.</p>
-              <button type="button" class="sk-btn sk-btn--tertiary sk-interactive" style="margin-top:8px;">Ver más</button>
+            <div class="sk-card benefit-card">
+              <i class="pi pi-book" style="font-size:22px;color:var(--sk-color-primary);"><svg><use href="#pi-book"></use></svg></i>
+              <div class="benefit-card__body">
+                <p class="sk-card__header">Capacitación y formación</p>
+                <p class="sk-body muted">Cursos y talleres virtuales para potenciar tus competencias.</p>
+              </div>
             </div>
           </sk-card>
+          <sk-card>
+            <div class="sk-card benefit-card">
+              <i class="pi pi-briefcase" style="font-size:22px;color:var(--sk-color-primary);"><svg><use href="#pi-briefcase"></use></svg></i>
+              <div class="benefit-card__body">
+                <p class="sk-card__header">Bolsa de empleo</p>
+                <p class="sk-body muted">Acceso a vacantes exclusivas y alianzas con empresas.</p>
+              </div>
+            </div>
+          </sk-card>
+          <sk-card>
+            <div class="sk-card benefit-card">
+              <i class="pi pi-wallet" style="font-size:22px;color:var(--sk-color-primary);"><svg><use href="#pi-wallet"></use></svg></i>
+              <div class="benefit-card__body">
+                <p class="sk-card__header">Apoyo económico</p>
+                <p class="sk-body muted">Subsidio económico mensual mientras encuentras tu próxima oportunidad.</p>
+              </div>
+            </div>
+          </sk-card>
+          <sk-card>
+            <div class="sk-card benefit-card">
+              <i class="pi pi-mobile" style="font-size:22px;color:var(--sk-color-primary);"><svg><use href="#pi-mobile"></use></svg></i>
+              <div class="benefit-card__body">
+                <p class="sk-card__header">Fácil y 100% digital</p>
+                <p class="sk-body muted">Todo el proceso lo puedes realizar desde la comodidad de tu hogar.</p>
+              </div>
+            </div>
+          </sk-card>
+        </div>
+
+        <div class="sk-card sk-card--cta content-gap" style="margin-top:var(--sk-space-m);">
+          <p class="sk-card__header">¿Cómo acceder?</p>
+          <p class="sk-body muted">Ingresa al sitio de Compensar y sigue los pasos para aplicar al subsidio. Tienes hasta 12 meses después de tu desvinculación para hacerlo.</p>
+          <sk-button style="display:block;margin-top:var(--sk-space-s);"><a href="https://www.compensar.com/subsidio/subsidio-de-desempleo" target="_blank" rel="noopener" class="sk-btn sk-btn--primary sk-interactive" style="width:auto;">Ir a compensar.com</a></sk-button>
         </div>
       </div>
 
@@ -2697,7 +3111,12 @@
         <sk-button style="display:block;margin:var(--sk-space-m) 0;max-width:340px;"><button class="sk-btn sk-btn--primary sk-interactive" style="width:100%;">Empezar mi acompañamiento</button></sk-button>
       </div>
 
-      <div class="sk-alert sk-callout" data-type="info" data-variant="info" data-audience="user" style="margin-top:var(--sk-space-m);max-width:640px;">
+      <!-- RONDA 21 — oculta por pedido de Javier ("por ahora"): con la
+           tarjeta CTA a compensar.com ya cerrando la sección, este aviso
+           de "estamos ampliando" quedaba redundante/sin foco claro. No se
+           borra (sigue siendo microcopy formalizado en content.md) — solo
+           display:none, por si se retoma más adelante. -->
+      <div class="sk-alert sk-callout" data-type="info" data-variant="info" data-audience="user" style="display:none;margin-top:var(--sk-space-m);max-width:640px;">
         <i class="pi pi-info-circle"><svg><use href="#pi-info-circle"></use></svg></i>
         <div class="sk-alert__body"><p class="sk-alert__msg">Estamos ampliando este apoyo — si hay novedades, te avisamos aquí.</p></div>
       </div>
@@ -2867,19 +3286,21 @@
       el.classList.toggle('priority', el.classList.contains('hub-tile') && group === 'r2');
     });
 
-    // Entrevista/Encuesta "según aplique" en Ruta 3 — colaborador (pensión)
-    // sí las recibe; beneficiario NO, por defecto defensivo.
-    var notifBlockable = (route === 'r3b');
-    window.__wf1NotifBlockable = notifBlockable;
+    // RONDA 22 — antes se calculaba acá un flag de bloqueo (solo r3b) que
+    // renderWf1Notif() leía de una variable global. Ahora renderWf1Notif()
+    // decide todo por su cuenta (incluida Ruta 3 completa, ver nota junto
+    // a esa función) — este llamado solo refresca el aviso al cambiar de
+    // ruta.
     renderWf1Notif();
 
     // wf2 — elegir variante de stepper según grupo de ruta
     renderStage();
 
-    // wf4 — motivo de salida oculto por completo en Ruta 2 (🟢 resuelto PRD)
-    document.querySelectorAll('.v-motivo').forEach(function(el){
-      el.style.display = (route === 'r2') ? 'none' : '';
-    });
+    // RONDA 25 — wf4 ya no tiene la pregunta de "motivo de salida" (el
+    // nuevo guion no la incluye) ni exclusiones de paso por ruta; el
+    // texto por ruta vive dentro de cada paso vía `.variant[data-r]`,
+    // igual que el resto del archivo (ya togglado arriba). Solo falta
+    // reiniciar el índice de paso.
     rebuildWf4Steps();
 
     // wf8 — recalcular ventana 1
@@ -2926,6 +3347,10 @@
     // entrevista (Gate 1, bloquea toda la pantalla) o la encuesta (Gate 2,
     // bloquea solo la sección de descarga) — ver evaluateWf3Gates() más abajo.
     if (id === 'wf3') evaluateWf3Gates();
+    // RONDA 22 — recalcula el aviso de Entrevista/Encuesta cada vez que se
+    // entra a Inicio (p.ej. tras completar o declinar una encuesta desde
+    // el gate modal, que también aterriza acá vía declineGateModal()).
+    if (id === 'wf1') renderWf1Notif();
 
     document.getElementById('qaScreen').value = id;
     window.scrollTo(0,0);
@@ -2989,16 +3414,20 @@
     document.body.classList.add('gate-modal-open');
     gateModal.classList.add('is-open');
     if (kind === 'wf4'){ wf4Idx = 0; renderWf4(); } else { wf5Idx = 0; renderWf5(); }
-    var els = gateFocusableEls();
-    if (els[0]) els[0].focus();
+    // Enfoca el primer campo REAL de la encuesta, no el botón X (que
+    // también es "focusable" y, por orden de DOM, aparece primero dentro
+    // de #gateModalBody — ver nota junto a gateFocusableEls()).
+    var firstField = gateFocusableEls().filter(function(el){ return panel.contains(el); })[0];
+    if (firstField) firstField.focus();
   }
 
-  // Sin mecanismos de descarte (a propósito): esta función SOLO se llama
-  // desde dentro de la propia encuesta al completarla (ver renderWf4()/
-  // renderWf5()) — nunca desde Escape, click-fuera ni un botón X.
-  function closeGateModal(){
+  // RONDA 22 — teardown común entre "completar" (closeGateModal) y
+  // "declinar por ahora" (declineGateModal): reparenta el panel de vuelta
+  // a su <section> original y apaga el bloqueo del resto de la app. Lo
+  // único que cambia entre los dos casos es qué pasa DESPUÉS (ver abajo).
+  function teardownGateModal(){
     var kind = currentGateModal;
-    if (!kind) return;
+    if (!kind) return null;
     var panel = (kind === 'wf4') ? wf4Panel : wf5Panel;
     var home = (kind === 'wf4') ? wf4PanelHome : wf5PanelHome;
     document.getElementById(kind === 'wf4' ? 'wf4Kicker' : 'wf5Kicker').style.display = 'none';
@@ -3008,11 +3437,44 @@
     setAppInert(false);
     currentGateModal = null;
     if (gateLastFocused && typeof gateLastFocused.focus === 'function') gateLastFocused.focus();
+    return kind;
+  }
+
+  // Se llama SOLO al completar de verdad la encuesta (ver wf4DoneContinue/
+  // wf5DoneContinue más abajo, y renderWf4()/renderWf5() que marcan el
+  // flag de completado antes de que este botón exista). Re-evalúa los
+  // gates de wf3 porque completar uno puede revelar el siguiente (Gate 1
+  // → Gate 2) o desbloquear la sección de descarga.
+  function closeGateModal(){
+    if (!teardownGateModal()) return;
     evaluateWf3Gates();
   }
 
+  // RONDA 22 — "cerrar y decidir más tarde": declinar NUNCA marca la
+  // encuesta como completada (ese flag solo lo setea renderWf4()/
+  // renderWf5() al llegar de verdad al paso final) y NO vuelve a llamar
+  // evaluateWf3Gates() en el momento — si lo hiciera y la persona sigue
+  // en wf3, reabriría el mismo modal de inmediato (evaluateWf3Gates()
+  // reabre Gate 1 mientras interviewDone sea falso), anulando el botón de
+  // cerrar. En vez de eso, navega a Inicio: la próxima vez que la persona
+  // entre a "Mis documentos" por su cuenta, showScreen('wf3') vuelve a
+  // evaluar los gates normalmente.
+  function declineGateModal(){
+    if (!teardownGateModal()) return;
+    showScreen('wf1');
+  }
+  document.getElementById('gateModalCloseBtn').addEventListener('click', declineGateModal);
+  // Click en el fondo oscuro (nunca en el panel blanco, que también vive
+  // dentro de #gateModal): mismo criterio de "click-fuera cierra" que ya
+  // usa .drawer-overlay.
+  gateModal.addEventListener('click', function(e){
+    if (e.target === gateModal) declineGateModal();
+  });
+
   gateModal.addEventListener('keydown', function(e){
-    if (e.key !== 'Tab' || currentGateModal === null) return;
+    if (currentGateModal === null) return;
+    if (e.key === 'Escape'){ e.preventDefault(); declineGateModal(); return; }
+    if (e.key !== 'Tab') return;
     var els = gateFocusableEls();
     if (!els.length) return;
     var first = els[0], last = els[els.length - 1];
@@ -3026,7 +3488,13 @@
     // que puede dispararse desde cualquier pantalla) fuerce el modal de la
     // entrevista fuera de contexto.
     if (state.screen !== 'wf3') return;
-    if (!state.gates.interviewDone){ openGateModal('wf4'); return; }
+    // RONDA 25 — Gate 1 (Entrevista) ahora aplica a r1, r2 y r3c
+    // (colaborador/pensión); el único interlocutor excluido es r3b
+    // (beneficiario/fallecimiento) — el guion revisado no tiene una
+    // versión para alguien que reporta la experiencia laboral de otra
+    // persona. Antes se excluía TODO el grupo r3; ahora la exclusión es
+    // puntual a r3b (ver nota de cabecera del HTML de wf4).
+    if (state.route !== 'r3b' && !state.gates.interviewDone){ openGateModal('wf4'); return; }
     // Respeta el toggle QA "simular sin documentos disponibles" (renderWf3):
     // si ya está forzado a vacío, Gate 2 no tiene nada que aportar encima.
     if (document.getElementById('qaDocsEmpty').checked) return;
@@ -3040,6 +3508,17 @@
   document.getElementById('wf4DoneContinue').addEventListener('click', closeGateModal);
   document.getElementById('wf5DoneContinue').addEventListener('click', closeGateModal);
   document.getElementById('wf3SurveyCta').addEventListener('click', function(){ openGateModal('wf5'); });
+
+  // RONDA 21 — ver nota HTML junto al botón en la qa-bar: limpia las 2
+  // llaves de localStorage de los gates y fuerza una re-evaluación
+  // inmediata si ya se está parado en wf3, para poder revisar el modal
+  // sin tener que borrar localStorage a mano desde devtools.
+  document.getElementById('qaResetGates').addEventListener('click', function(){
+    try { localStorage.removeItem(GATE_INTERVIEW_KEY); localStorage.removeItem(GATE_SURVEY_KEY); } catch(e){}
+    state.gates.interviewDone = false;
+    state.gates.surveyDone = false;
+    showScreen('wf3'); // navega directo a wf3 para que el modal se vea de inmediato, sin importar la pantalla actual
+  });
 
   /* ---------- RONDA 15 — Menú lateral: rail colapsable + drawer mobile ----------
      Adicional al wiring genérico de arriba (que ya conecta los 3 juegos de
@@ -3141,26 +3620,57 @@
     n.style.display = (n.style.display === 'none') ? 'block' : 'none';
   });
 
-  /* ---------- wf1 — notificación contextual ---------- */
+  /* ---------- wf1 — notificación contextual ----------
+     RONDA 22, 2026-09-09 — antes esto se elegía a mano con el selector QA
+     "qaNotif" (retirado); Javier pidió automatizarlo con el avance real de
+     "Mi dinero" (qaStage), tal como el PRD siempre lo documentó (wf4/wf5,
+     "Transición") pero nunca estaba realmente conectado al dato.
+     Ruta 1/Ruta 2 (stepper completo, 6 etapas — ver reorden RONDA 22 más
+     arriba): Entrevista aparece en "Documentos en preparación"/"Documentos
+     pendientes de tu firma" (idx 2-3), antes de "Paz y salvo en revisión"
+     (idx 4); Encuesta aparece en "Pago realizado" (idx 5). Cualquiera de
+     las dos se apaga sola si ya se completó (state.gates), sin esperar a
+     que cambie la etapa.
+     Ruta 3 (grupo r3, colaborador Y beneficiario): oculto por completo,
+     sin excepción. El PRD deja EXPLÍCITAMENTE pendiente de definir cómo
+     mapea esto a la variante reducida de 3 etapas genéricas (no hay un
+     equivalente real a "Documentos en preparación" ahí) — inventar ese
+     mapeo violaría el mismo principio de diseño defensivo que ya rige el
+     resto del portal (sección 5, punto 2: ante un dato incierto, la
+     versión más sobria es no mostrar nada, no adivinar).
+     RONDA 25 — esta exclusión de TODO r3 sigue igual a propósito, aunque
+     Gate 1 (evaluateWf3Gates, más abajo) ahora sí incluye a r3c. Son 2
+     decisiones distintas: Gate 1 depende de si el guion de la Entrevista
+     aplica a ese interlocutor (sí, para r3c); este aviso depende de si
+     hay una etapa de "Mi dinero" desde la cual calcular CUÁNDO mostrarlo
+     (no, para todo r3) — ese segundo problema no se resolvió, así que
+     r3c sigue sin ver el aviso opcional aunque sí reciba el Gate 1
+     obligatorio al entrar a "Mis documentos". No confundir una exclusión
+     con la otra en una futura revisión.
+     Antes de esta ronda solo bloqueaba r3b (beneficiario); r3c (colaborador, pensión) en
+     la práctica ya mostraba "Ninguna" siempre porque esa era la opción por
+     defecto del selector retirado, así que este cambio no quita nada que
+     un usuario real llegara a ver. */
   function renderWf1Notif(){
-    var notif = document.getElementById('qaNotif').value;
     var box = document.getElementById('wf1Notif');
-    if (notif === 'none' || window.__wf1NotifBlockable){
-      box.style.display = 'none';
-      return;
-    }
-    box.style.display = 'block';
-    if (notif === 'entrevista'){
+    if (routeGroup(state.route) === 'r3'){ box.style.display = 'none'; return; }
+    var stage = parseInt(document.getElementById('qaStage').value, 10);
+    var showEntrevista = !state.gates.interviewDone && stage >= 2 && stage <= 3;
+    var showEncuesta = !state.gates.surveyDone && stage >= 5;
+    if (showEntrevista){
+      box.style.display = 'block';
       document.getElementById('wf1NotifTitle').textContent = 'Tu entrevista de retiro';
       document.getElementById('wf1NotifSub').textContent = 'Nos ayuda a entender tu experiencia en Skandia. Te toma unos minutos.';
       document.getElementById('wf1NotifGo').onclick = function(){ showScreen('wf4'); };
-    } else {
+    } else if (showEncuesta){
+      box.style.display = 'block';
       document.getElementById('wf1NotifTitle').textContent = 'Ya terminaste tu proceso. Cuéntanos cómo te fue';
       document.getElementById('wf1NotifSub').textContent = 'Son unas preguntas cortas — menos de 3 minutos.';
       document.getElementById('wf1NotifGo').onclick = function(){ showScreen('wf5'); };
+    } else {
+      box.style.display = 'none';
     }
   }
-  document.getElementById('qaNotif').addEventListener('change', renderWf1Notif);
 
   /* ---------- wf2 — Mi dinero: stepper simulado (6 etapas — RONDA 17
      agrega "Documentos pendientes de tu firma", resuelve decisión
@@ -3209,12 +3719,16 @@
       var uploaded = (typeof window.__uploadCount === 'number') ? window.__uploadCount : 0;
       document.getElementById('wf2UploadNote').textContent = uploaded + ' de 7 documentos subidos';
       // CTA "Ver mis documentos": relevante desde que hay documentos en
-      // preparación en adelante (idx >= 1) — conveniencia adicional a la
-      // etapa 2, que ya tiene su propio CTA "Subir mis documentos".
-      document.getElementById('wf2DocsCta').style.display = (stage >= 1) ? 'block' : 'none';
+      // preparación en adelante (idx >= 2 desde RONDA 22 — antes idx 1,
+      // reordenado junto con "Liquidación solicitada", ver nota arriba) —
+      // conveniencia adicional a la etapa 3, que ya tiene su propio CTA
+      // "Subir mis documentos".
+      document.getElementById('wf2DocsCta').style.display = (stage >= 2) ? 'block' : 'none';
     }
   }
-  document.getElementById('qaStage').addEventListener('input', renderStage);
+  // RONDA 22 — el aviso de Inicio también depende de esta etapa (ver
+  // renderWf1Notif()), no solo el propio stepper de wf2.
+  document.getElementById('qaStage').addEventListener('input', function(){ renderStage(); renderWf1Notif(); });
 
   /* ---------- wf3 — Documentos (descarga — ajuste A, ronda 3) ---------- */
   function renderWf3(){
@@ -3328,19 +3842,23 @@
   });
   updateUploadSummary();
 
-  /* ---------- wf4 — Entrevista (paginado) ---------- */
+  /* ---------- wf4 — Entrevista (paginado) ----------
+     RONDA 25 — todos los pasos aplican a las 3 rutas incluidas (r1/r2/
+     r3c); ya no hay exclusión de paso por ruta (el "motivo de salida" que
+     antes se ocultaba en Ruta 2 se retiró por completo, ver nota de
+     cabecera del HTML). visibleSteps ya no filtra nada — se deja como
+     variable (en vez de usar `steps` directo) porque el resto de esta
+     función y evaluateWf3Gates() dependen de su longitud/índices, y así
+     una futura exclusión de paso solo necesita tocar esta línea. */
   var wf4Idx = 0;
   function rebuildWf4Steps(){
-    // El paso "motivo" (data-step=1) se excluye por completo en Ruta 2 —
-    // no se reemplaza por una versión neutral (🟢 resuelto en el PRD).
     document.querySelectorAll('.wf4-step').forEach(function(s){ s.style.display = 'none'; });
     wf4Idx = 0;
     renderWf4();
   }
   function renderWf4(){
     var steps = Array.prototype.slice.call(document.querySelectorAll('.wf4-step'));
-    var isR2 = state.route === 'r2';
-    var visibleSteps = steps.filter(function(s){ return !(isR2 && s.classList.contains('v-motivo')); });
+    var visibleSteps = steps;
     steps.forEach(function(s){ s.style.display = 'none'; });
     document.getElementById('wf4Done').style.display = 'none';
     document.getElementById('wf4Steps').style.display = 'block';
@@ -3361,11 +3879,20 @@
     var total = visibleSteps.length;
     document.getElementById('wf4Progress').textContent = 'Pregunta ' + (wf4Idx+1) + ' de ' + total;
     setSkProgressFill('wf4Fill', Math.round(((wf4Idx+1)/total)*100));
-    document.getElementById('wf4Prev').disabled = (wf4Idx === 0);
+    // RONDA 22 — en la pregunta 1, "Atrás" ya no queda muerto/disabled
+    // cuando esta encuesta vive dentro del gate modal (currentGateModal
+    // === 'wf4'): pasa a ser la segunda forma de "cerrar o atrás" que
+    // pidió Javier (la primera es el botón X). Fuera del modal (pantalla
+    // wf4 normal, accedida por el selector QA o el aviso de Inicio) sigue
+    // disabled en la pregunta 1 — no hay modal que cerrar ahí.
+    document.getElementById('wf4Prev').disabled = (wf4Idx === 0 && currentGateModal !== 'wf4');
     document.getElementById('wf4Next').textContent = (wf4Idx === total-1) ? 'Enviar' : 'Continuar';
   }
   document.getElementById('wf4Next').addEventListener('click', function(){ wf4Idx++; renderWf4(); });
-  document.getElementById('wf4Prev').addEventListener('click', function(){ if (wf4Idx>0){ wf4Idx--; renderWf4(); } });
+  document.getElementById('wf4Prev').addEventListener('click', function(){
+    if (wf4Idx>0){ wf4Idx--; renderWf4(); }
+    else if (currentGateModal === 'wf4'){ declineGateModal(); }
+  });
   document.querySelectorAll('#wf4Steps .sk-selectbutton button').forEach(function(b){
     b.addEventListener('click', function(){
       b.parentElement.querySelectorAll('button').forEach(function(x){ x.classList.remove('is-active'); });
@@ -3396,11 +3923,16 @@
     steps[wf5Idx].style.display = 'block';
     document.getElementById('wf5Progress').textContent = 'Pregunta ' + (wf5Idx+1) + ' de ' + steps.length;
     setSkProgressFill('wf5Fill', Math.round(((wf5Idx+1)/steps.length)*100));
-    document.getElementById('wf5Prev').disabled = (wf5Idx === 0);
+    // RONDA 22 — mismo criterio que wf4Prev (ver esa nota): dentro del
+    // gate modal, "Atrás" en la pregunta 1 cierra en vez de quedar muerto.
+    document.getElementById('wf5Prev').disabled = (wf5Idx === 0 && currentGateModal !== 'wf5');
     document.getElementById('wf5Next').textContent = (wf5Idx === steps.length-1) ? 'Enviar' : 'Continuar';
   }
   document.getElementById('wf5Next').addEventListener('click', function(){ wf5Idx++; renderWf5(); });
-  document.getElementById('wf5Prev').addEventListener('click', function(){ if (wf5Idx>0){ wf5Idx--; renderWf5(); } });
+  document.getElementById('wf5Prev').addEventListener('click', function(){
+    if (wf5Idx>0){ wf5Idx--; renderWf5(); }
+    else if (currentGateModal === 'wf5'){ declineGateModal(); }
+  });
   document.querySelectorAll('#wf5Steps .sk-selectbutton button').forEach(function(b){
     if (b.id === 'wf5FinSaber' || b.id === 'wf5FinOrient') return;
     b.addEventListener('click', function(){
@@ -3453,6 +3985,11 @@
   document.getElementById('qaHideReviewerNotes').addEventListener('change', function(){
     document.body.setAttribute('data-hide-reviewer-notes', this.checked ? 'true' : 'false');
   });
+  // RONDA 28 — Javier pidió que este toggle arranque encendido por defecto
+  // (checkbox ya marcado arriba); aplica el atributo del body ya en el
+  // Init para que el estado "limpio" se vea desde la primera carga, sin
+  // depender de que alguien haga clic primero.
+  document.body.setAttribute('data-hide-reviewer-notes', document.getElementById('qaHideReviewerNotes').checked ? 'true' : 'false');
 
   /* ---------- Init ---------- */
   // Ajuste 6, ronda 3: arranca en Ruta 1 SOLO para que la primera vista de
