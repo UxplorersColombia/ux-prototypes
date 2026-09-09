@@ -121,14 +121,114 @@
   .sk-numfield .prefix{flex:none;color:var(--sk-n4);font-family:var(--sk-font-body);font-size:14px;font-weight:600;}
   .sk-numfield input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:var(--sk-font-body);font-size:14px;color:var(--sk-surface-800);}
 
+  /* Zona editable: los inputs conservan el design system, pero se agrupan sobre un lienzo
+     verde tenue para que se lean de inmediato como "lo que tú defines" frente a los datos
+     de solo lectura del CAT (fechas, rango objetivo). */
+  .edit-zone{position:relative;background:var(--sk-tertiary-hover);border:1.5px solid var(--sk-primary-tint);
+    border-radius:var(--sk-radius-md);padding:16px 18px 18px;}
+  .edit-zone + .edit-zone{margin-top:14px;}
+  .edit-zone .ez-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .edit-zone .ez-tag{display:inline-flex;align-items:center;gap:6px;background:var(--sk-primary);color:#fff;
+    font-family:var(--sk-font-title);font-size:9.5px;font-weight:800;letter-spacing:0.7px;text-transform:uppercase;
+    border-radius:var(--sk-radius-pill);padding:4px 10px;}
+  .edit-zone .ez-tag svg{width:12px;height:12px;flex:none;}
+  .edit-zone .ez-hint{font-size:11.5px;color:var(--sk-n4);font-weight:500;}
+
+  /* Dos columnas: el control a la izquierda, contexto útil a la derecha, para que la zona
+     no quede con media caja vacía en pantallas anchas. */
+  .edit-zone .ez-body{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start;}
+  /* minmax(0,1fr), no 1fr a secas: sin el mínimo en 0 el track del grid se dimensiona al
+     min-content del hijo (el <span class="value"> del combobox usa white-space:nowrap), y
+     el texto largo del CAT seleccionado desborda toda la columna en vez de truncar con
+     ellipsis — bug real detectado en mobile, no una preferencia de estilo. */
+  @media (max-width:720px){
+    .edit-zone .ez-body{grid-template-columns:minmax(0,1fr);}
+    /* Sin columna propia para alinearse, el aside queda a ras del borde del edit-zone en vez
+       de bajo el contenido del campo de arriba (que sí lleva el hueco de 32px del numerito) */
+    .ez-aside{margin-left:32px;}
+  }
+
+  .ez-field{position:relative;padding-left:32px;}
+  .ez-field .ez-num{position:absolute;left:0;top:18px;width:22px;height:22px;border-radius:50%;
+    background:var(--sk-primary-pressed);color:#fff;font-family:var(--sk-font-title);font-size:11px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;}
+  .ez-field.num .ez-num{top:0;}
+
+  .ez-aside{background:rgba(255,255,255,.72);border:1px solid var(--sk-primary-tint);border-radius:8px;
+    padding:13px 15px;font-size:11.5px;color:var(--sk-n4);line-height:1.6;}
+  .ez-aside.note{display:flex;gap:10px;align-items:flex-start;}
+  .ez-aside.note svg{width:16px;height:16px;flex:none;color:var(--sk-primary-pressed);margin-top:1px;}
+  .ez-aside .cb-lbl{font-family:var(--sk-font-title);font-size:9.5px;font-weight:800;text-transform:uppercase;
+    letter-spacing:0.6px;color:var(--sk-n4);margin-bottom:9px;}
+
+  /* Atajos de monto y selector de período de la gráfica: cada grupo es una selección única
+     entre alternativas mutuamente excluyentes — el caso de uso real de sk-select-button, no
+     de sk-chip (ver docs/componentes/sk-select-button.md de sk-components-ref). Réplica del
+     segmented control: botones contiguos con borde compartido colapsado (margin-left:-1px),
+     radius solo en los extremos, seleccionado = relleno --sk-primary con texto blanco.
+     skSize="small": alto 32px, fuente 12px. El borde idle (#d1d5db) y el hover (#f6fcf2) son
+     los hex de la ficha real; no hay --sk-color-border definido en este proyecto. */
+  /* flex-wrap:wrap en las dos: por default un flex item no encoge más allá de su propio
+     min-content, y "$500M"/etiquetas cortas sin espacios no tienen dónde partirse — en
+     pantallas angostas el grupo entero se desborda del borde de la tarjeta en vez de
+     encoger. Con wrap, si no entran en una fila pasan a la siguiente en vez de desbordar. */
+  .monto-chips, .chart-steps{display:flex;flex-wrap:wrap;}
+  .chart-steps{flex-wrap:wrap;margin:10px 0 0;}
+  .monto-chips button, .chart-steps button{
+    font-family:var(--sk-font-body);font-size:12px;font-weight:500;line-height:1;
+    height:32px;padding:0 14px;margin-left:-1px;position:relative;
+    border:1px solid #d1d5db;background:var(--sk-surface-0);color:var(--sk-surface-800);
+    cursor:pointer;transition:background .12s var(--sk-ease), border-color .12s var(--sk-ease), color .12s var(--sk-ease);}
+  .monto-chips button:first-child, .chart-steps button:first-child{margin-left:0;border-radius:8px 0 0 8px;}
+  .monto-chips button:last-child, .chart-steps button:last-child{border-radius:0 8px 8px 0;}
+  .monto-chips button:hover:not(.on), .chart-steps button:hover:not(.on){border-color:var(--sk-primary);background:#f6fcf2;z-index:1;}
+  .monto-chips button:focus-visible, .chart-steps button:focus-visible{z-index:3;}
+
+  /* Frecuencia: control secundario, fuera del lienzo editable */
+  .freq-row{margin-top:16px;padding-top:16px;border-top:1px dashed var(--sk-n3);}
+
   /* Ficha del CAT seleccionado — campos de solo lectura (no inputs), ver reunión 31 jul: fechas/rango no deben editarse */
-  .cat-ficha{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px;}
-  .cat-ficha .fi-item{display:flex;gap:12px;align-items:flex-start;background:var(--sk-n1);border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);padding:12px 14px;}
-  .cat-ficha .fi-ico{flex:none;width:32px;height:32px;border-radius:var(--sk-radius-sm);background:var(--sk-primary-tint);color:var(--sk-primary-pressed);display:flex;align-items:center;justify-content:center;}
-  .cat-ficha .fi-ico svg{width:18px;height:18px;}
-  .cat-ficha .fi-text{min-width:0;}
-  .cat-ficha .fi-item dt{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:4px;}
-  .cat-ficha .fi-item dd{margin:0;font-size:13.5px;font-weight:700;color:var(--sk-surface-800);line-height:1.4;}
+  .cat-ficha{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:18px;}
+  @media (max-width:680px){ .cat-ficha{grid-template-columns:1fr;} }
+  .cat-ficha > div{margin:0;}
+
+  /* Tarjeta principal: el rango objetivo es el argumento comercial, se trata como tal */
+  .fi-hero{position:relative;overflow:hidden;border-radius:var(--sk-radius-md);padding:20px 22px 16px;
+    background:linear-gradient(135deg,#00a834 0%,#00c73d 58%,#16d727 100%);
+    box-shadow:var(--sk-shadow-raised);color:#fff;}
+  .fi-hero::after{content:'';position:absolute;right:-52px;top:-72px;width:190px;height:190px;border-radius:50%;
+    background:rgba(255,255,255,.16);pointer-events:none;}
+  .fi-hero::before{content:'';position:absolute;right:16px;bottom:-64px;width:130px;height:130px;border-radius:50%;
+    background:rgba(255,255,255,.10);pointer-events:none;}
+  .fi-hero .h-lbl{position:relative;font-family:var(--sk-font-title);font-size:11px;font-weight:800;
+    text-transform:uppercase;letter-spacing:1.1px;color:rgba(255,255,255,.92);display:flex;align-items:center;gap:7px;}
+  .fi-hero .h-lbl svg{width:15px;height:15px;flex:none;}
+  .fi-hero .h-val{position:relative;font-family:var(--sk-font-title);font-size:38px;font-weight:800;line-height:1.05;
+    margin-top:8px;letter-spacing:-0.5px;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px rgba(0,0,0,.10);}
+  .fi-hero .h-val .to{font-size:22px;font-weight:700;opacity:.85;margin:0 4px;}
+  .fi-hero .h-pill{position:relative;display:inline-block;margin-top:10px;background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.45);border-radius:var(--sk-radius-pill);
+    padding:3px 11px;font-size:11px;font-weight:700;letter-spacing:.3px;}
+  .fi-hero .h-foot{position:relative;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.28);
+    font-size:10.5px;line-height:1.5;color:rgba(255,255,255,.92);}
+
+  /* Tarjeta secundaria: plazo, con mini-línea de tiempo */
+  .fi-side{border-radius:var(--sk-radius-md);padding:18px 20px 16px;background:var(--sk-surface-0);
+    border:1.5px solid var(--sk-n3);display:flex;flex-direction:column;}
+  .fi-side .s-lbl{font-family:var(--sk-font-title);font-size:11px;font-weight:800;text-transform:uppercase;
+    letter-spacing:1.1px;color:var(--sk-n4);display:flex;align-items:center;gap:7px;}
+  .fi-side .s-lbl svg{width:15px;height:15px;flex:none;color:var(--sk-primary-pressed);}
+  .fi-side .s-val{font-family:var(--sk-font-title);font-size:30px;font-weight:800;color:var(--sk-surface-800);
+    line-height:1.1;margin-top:8px;letter-spacing:-0.4px;font-variant-numeric:tabular-nums;}
+  .fi-side .s-track{position:relative;height:4px;border-radius:3px;background:var(--sk-n2);margin:16px 0 8px;}
+  .fi-side .s-track i{position:absolute;top:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;
+    background:var(--sk-surface-0);border:3px solid var(--sk-primary);}
+  .fi-side .s-track i.a{left:2px;} .fi-side .s-track i.b{left:calc(100% - 2px);border-color:var(--sk-primary-pressed);}
+  .fi-side .s-track b{position:absolute;left:0;top:0;height:100%;width:100%;border-radius:3px;
+    background:linear-gradient(90deg,var(--sk-primary-tint),var(--sk-primary));}
+  .fi-side .s-dates{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--sk-n4);}
+  .fi-side .s-dates span b{display:block;color:var(--sk-surface-800);font-size:11.5px;font-weight:700;margin-top:1px;}
+  .fi-side .s-dates span:last-child{text-align:right;}
   .cat-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;}
   #alertEstado:not(:empty){margin-top:16px;}
   .cat-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--sk-font-title);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:0.4px;border-radius:var(--sk-radius-pill);padding:4px 10px;}
@@ -162,20 +262,95 @@
   .result-sub{font-size:12.5px;color:var(--sk-success-ink);opacity:0.85;margin-top:6px;font-weight:500;}
 
   /* Escenarios del rango objetivo */
-  .scenarios3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px;}
+  .scenarios3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:10px;align-items:stretch;}
   @media (max-width:640px){ .scenarios3{grid-template-columns:1fr;} }
-  .sc-card{border-radius:var(--sk-radius-md);padding:16px;border:1.5px solid var(--sk-n3);}
-  .sc-card.min{background:var(--sk-warning-bg);border-color:var(--sk-warning-border);}
-  .sc-card.mid{background:var(--sk-info-bg);border-color:var(--sk-info-border);}
-  .sc-card.max{background:var(--sk-success-bg);border-color:#3fae63;}
-  .sc-card .sc-lbl{font-family:var(--sk-font-title);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.4px;color:var(--sk-n4);margin-bottom:6px;}
-  .sc-card .sc-tir{font-family:var(--sk-font-title);font-size:19px;font-weight:800;color:var(--sk-surface-800);}
-  .sc-card .sc-row{font-size:11.5px;color:var(--sk-n4);margin-top:8px;display:flex;justify-content:space-between;gap:8px;}
-  .sc-card .sc-row b{color:var(--sk-surface-800);font-weight:700;white-space:nowrap;}
+
+  /* Los tres escenarios comparten estructura; el color de la barra superior es el mismo
+     que usa cada serie en la gráfica, para que la tarjeta y la línea se lean como una sola cosa. */
+  .sc-card{position:relative;overflow:hidden;border-radius:var(--sk-radius-md);padding:18px 16px 14px;
+    background:var(--sk-surface-0);border:1.5px solid var(--sk-n3);
+    display:flex;flex-direction:column;transition:transform .18s var(--sk-ease),box-shadow .18s var(--sk-ease);}
+  .sc-card:hover{transform:translateY(-2px);box-shadow:var(--sk-shadow-raised);}
+  .sc-card .sc-bar{position:absolute;top:0;left:0;right:0;height:4px;}
+  .sc-card.min .sc-bar{background:var(--charts-c01);}
+  .sc-card.mid .sc-bar{background:var(--sk-primary);}
+  .sc-card.max .sc-bar{background:var(--charts-c03);}
+  .sc-card.mid{background:var(--sk-tertiary-hover);border-color:var(--sk-primary);box-shadow:var(--sk-shadow-surface);}
+
+  .sc-card .sc-lbl{display:flex;align-items:center;gap:6px;font-family:var(--sk-font-title);font-size:10.5px;
+    font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:var(--sk-n4);}
+  .sc-card .sc-dot{width:9px;height:9px;border-radius:3px;flex:none;}
+  .sc-card.min .sc-dot{background:var(--charts-c01);}
+  .sc-card.mid .sc-dot{background:var(--charts-c02);}
+  .sc-card.max .sc-dot{background:var(--charts-c03);}
+
+  .sc-card .sc-tir{font-family:var(--sk-font-title);font-size:27px;font-weight:800;color:var(--sk-surface-800);
+    line-height:1.1;margin-top:9px;letter-spacing:-0.4px;font-variant-numeric:tabular-nums;}
+  .sc-card.mid .sc-tir{color:var(--sk-primary-pressed);}
+  .sc-card .sc-u{font-size:12px;font-weight:700;color:var(--sk-n4);margin-left:4px;letter-spacing:0;}
+  .sc-card .sc-pos{font-size:10.5px;color:var(--sk-n4);margin-top:3px;}
+
+  .sc-card .sc-rows{margin-top:auto;padding-top:12px;}
+  .sc-card .sc-row{font-size:11.5px;color:var(--sk-n4);display:flex;justify-content:space-between;gap:8px;
+    padding:6px 0;border-top:1px dashed var(--sk-n3);}
+  .sc-card .sc-row b{color:var(--sk-surface-800);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .sc-card.mid .sc-row b{color:var(--sk-primary-pressed);}
+  .sc-card .sc-tag{position:absolute;top:12px;right:12px;background:var(--sk-primary);color:#fff;
+    font-family:var(--sk-font-title);font-size:9px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;
+    border-radius:var(--sk-radius-pill);padding:3px 9px;}
   .legend{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 12px;font-size:11.5px;color:var(--sk-n4);}
   .legend span{display:inline-flex;align-items:center;gap:6px;}
   .sw{width:10px;height:10px;border-radius:3px;display:inline-block;}
-  svg.chart{width:100%;height:auto;display:block;}
+  /* chart-scroll: en pantallas angostas el viewBox (700 de ancho) se encogía hasta ~300px
+     y todo el texto interno (ejes, montos, etiquetas) quedaba ilegible — el SVG no tiene
+     tipografía responsive propia, escala entera con el viewBox. Se fija un ancho mínimo
+     legible y se deja hacer scroll horizontal en vez de seguir encogiendo. */
+  .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  svg.chart{width:100%;min-width:640px;height:auto;display:block;touch-action:manipulation;}
+  svg.chart .hitband{fill:transparent;cursor:pointer;}
+  svg.chart .hitband:hover + .bandhl, svg.chart .hitband:focus + .bandhl{opacity:0.5;}
+  svg.chart .bandhl{fill:var(--sk-primary-tint);opacity:0;transition:opacity .15s var(--sk-ease);pointer-events:none;}
+  svg.chart .bandhl.on{opacity:0.7;}
+  svg.chart .payline{stroke:var(--sk-n4);stroke-width:1;stroke-dasharray:3 3;opacity:0.45;}
+  svg.chart .paydot{transition:r .15s var(--sk-ease);}
+  svg.chart path, svg.chart circle, svg.chart text, svg.chart line{pointer-events:none;}
+  svg.chart .hitband{pointer-events:all;}
+  svg.chart .stepline{transition:stroke-dashoffset .9s var(--sk-ease);}
+  .chart-hint{font-size:11px;color:var(--sk-n4);margin:2px 0 10px;display:flex;align-items:center;gap:6px;}
+  .chart-detail{border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);background:var(--sk-n1);padding:12px 14px;margin-top:10px;font-size:12.5px;line-height:1.6;}
+  .chart-detail .cd-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+  .chart-detail .cd-t{font-family:var(--sk-font-title);font-size:13.5px;font-weight:800;color:var(--sk-surface-800);}
+  .chart-detail .cd-d{font-size:11.5px;color:var(--sk-n4);}
+  .chart-detail .cd-rows{display:block;margin-top:2px;}
+  .cd-tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .cd-tbl th{text-align:left;font-family:var(--sk-font-title);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--sk-n4);padding:0 0 6px;border-bottom:1px solid var(--sk-n3);}
+  .cd-tbl th.num{text-align:right;}
+  .cd-tbl td{padding:7px 0;border-bottom:1px dashed var(--sk-n3);color:var(--sk-n4);}
+  .cd-tbl td.num{text-align:right;font-weight:700;color:var(--sk-surface-800);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .cd-tbl tr.mid td{background:var(--sk-n1);}
+  .cd-tbl td .sw{margin-right:7px;vertical-align:middle;}
+  .cd-tbl tr.tot td{border-bottom:none;padding-top:9px;color:var(--sk-surface-800);font-weight:700;}
+  .chart-detail .cd-row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed var(--sk-n3);}
+  .chart-detail .cd-row b{color:var(--sk-surface-800);white-space:nowrap;}
+  .chart-detail .cd-row i.sw{margin-right:6px;}
+  .chart-detail .cd-note{margin-top:8px;font-size:11.5px;color:var(--sk-n4);}
+  .chart-detail .cd-cap{margin-top:8px;background:var(--sk-info-bg);border-left:3px solid var(--sk-info-border);border-radius:4px;padding:8px 10px;font-size:12px;color:var(--sk-info-ink);}
+  .final-range{margin-top:14px;border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);background:var(--sk-surface-0);padding:14px 16px 10px;}
+  .final-range .fr-t{font-family:var(--sk-font-title);font-size:13.5px;font-weight:800;color:var(--sk-surface-800);margin-bottom:2px;}
+  .final-range .fr-s{font-size:11.5px;color:var(--sk-n4);margin-bottom:10px;}
+  .final-range svg{width:100%;min-width:640px;height:auto;display:block;}
+  .fr-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px;}
+  .fr-chip{border:1px solid var(--sk-n3);border-radius:var(--sk-radius-sm);padding:8px 10px;background:var(--sk-n1);}
+  .fr-chip .l{font-family:var(--sk-font-title);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--sk-n4);display:flex;align-items:center;gap:6px;}
+  .fr-chip .v{font-family:var(--sk-font-title);font-size:15px;font-weight:800;color:var(--sk-surface-800);margin-top:3px;font-variant-numeric:tabular-nums;}
+  .fr-chip .u{font-size:11px;color:var(--sk-n4);font-weight:600;}
+  .fr-chip.mid{background:var(--sk-success-bg);border-color:var(--sk-success-border);}
+  .fr-note{font-size:11px;color:var(--sk-n4);margin:10px 0 0;}
+  .monto-chips button.on, .chart-steps button.on{background:var(--sk-primary);border-color:var(--sk-primary);color:#fff;font-weight:700;z-index:2;}
+  /* "P7 · vencimiento" es el único segmento con texto largo — en mobile fuerza su propio
+     salto de línea dentro del segmented control. Se oculta el sufijo y queda "P7" a secas,
+     igual de ancho que sus vecinos. */
+  @media (max-width:480px){ .chart-steps .cs-suffix{display:none;} }
   .axis{font-size:10px;fill:var(--sk-n4);font-family:var(--sk-font-body);}
 
   .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -321,9 +496,15 @@
     <!-- CAT ACTIVO -->
     <div class="card">
       <h2 class="card-title">¿Qué CAT estás presentando?</h2>
-      <div class="card-desc">Selecciona el CAT. Sus fechas y rango objetivo ya están definidos desde que Skandia lo comercializa — por eso se muestran, no se editan.</div>
+      <div class="card-desc">Selecciona el CAT. Sus fechas y rango objetivo ya están definidos desde que Skandia lo comercializa.</div>
 
-      <div class="sk-field" style="max-width:420px;">
+      <div class="edit-zone">
+        <div class="ez-head">
+          <span class="ez-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Elige el CAT a simular</span>
+        </div>
+        <div class="ez-body">
+        <div class="ez-field"><span class="ez-num">1</span>
+      <div class="sk-field">
         <div class="box is-floating" id="catSelBox" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="catSelList" aria-labelledby="catSelLabel">
           <div class="inner">
             <label id="catSelLabel">CAT</label>
@@ -336,6 +517,12 @@
           <!-- opciones generadas por JS; fuente de verdad para selectCat(), oculta visualmente -->
         </select>
       </div>
+        </div>
+        <div class="ez-aside note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>Al cambiar el CAT se actualizan el <b>rango objetivo</b>, el <b>plazo</b> y los tres escenarios de abajo.</div>
+        </div>
+        </div>
+      </div>
 
       <div id="alertEstado"></div>
 
@@ -344,7 +531,7 @@
         <span class="cat-badge" id="catEstadoBadge"></span>
       </div>
 
-      <dl class="cat-ficha" id="catFicha"></dl>
+      <div class="cat-ficha" id="catFicha"></div>
 
       <div class="vigencia-badge" style="margin-top:16px; display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -354,17 +541,38 @@
 
     <!-- SIMULACIÓN -->
     <div class="card">
-      <h2 class="card-title">Tu simulación</h2>
-      <div class="card-desc">Cambia el monto o la frecuencia y el resultado de abajo se actualiza al instante.</div>
-      <div class="grid">
-        <div class="sk-numfield">
-          <label for="monto">Monto a invertir</label>
-          <div class="num-box" id="montoBox">
-            <span class="prefix">$</span>
-            <input type="text" inputmode="numeric" id="monto" value="10.000.000">
+      <h2 class="card-title">Simulación</h2>
+      <div class="card-desc">Ajusta el monto que tu cliente quiere invertir.</div>
+
+      <div class="edit-zone">
+        <div class="ez-head">
+          <span class="ez-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>¿Cuánto quieres invertir?</span>
+        </div>
+        <div class="ez-body">
+          <div class="ez-field num"><span class="ez-num">2</span>
+            <div class="sk-numfield">
+              <label for="monto">Monto a invertir</label>
+              <div class="num-box" id="montoBox">
+                <span class="prefix">$</span>
+                <input type="text" inputmode="numeric" id="monto" value="10.000.000">
+              </div>
+            </div>
+          </div>
+          <div class="ez-aside">
+            <div class="cb-lbl">Montos frecuentes</div>
+            <div class="monto-chips" id="montoChips">
+              <button type="button" data-m="50000000">$50M</button>
+              <button type="button" data-m="100000000">$100M</button>
+              <button type="button" data-m="250000000">$250M</button>
+              <button type="button" data-m="500000000">$500M</button>
+            </div>
           </div>
         </div>
-        <div class="sk-field">
+      </div>
+
+      <!-- Frecuencia: viene predeterminada por el CAT, así que queda fuera de la zona editable -->
+      <div class="freq-row">
+        <div class="sk-field" style="max-width:420px;">
           <div class="box is-floating" id="frecuenciaBox" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="frecuenciaList" aria-labelledby="frecuenciaLabel">
             <div class="inner">
               <label id="frecuenciaLabel">Frecuencia de pagos periódicos (cupón)</label>
@@ -377,7 +585,7 @@
             <option value="2">Semestral</option>
             <option value="1">Anual</option>
           </select>
-          <div class="help">Solo semestral y anual, las frecuencias que Skandia comercializa realmente en sus CAT.</div>
+          <div class="help">Definida para cada CAT.</div>
         </div>
       </div>
     </div>
@@ -402,8 +610,19 @@
         <span><i class="sw" style="background:var(--charts-c01)"></i>Límite inferior</span>
         <span><i class="sw" style="background:var(--charts-c02)"></i>Punto medio</span>
         <span><i class="sw" style="background:var(--charts-c03)"></i>Límite superior</span>
+        <span><i class="sw" style="background:var(--charts-c01);opacity:.28"></i>Rango entre límites</span>
+        <span><i class="sw" style="background:var(--sk-info-bg);border:1px solid var(--sk-info-border)"></i>Devolución del capital</span>
       </div>
-      <svg class="chart" id="chart" viewBox="0 0 700 260"></svg>
+      <p class="chart-hint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px;flex:none;"><path d="M9 11a3 3 0 1 1 6 0c0 2-3 3-3 3"/><circle cx="12" cy="12" r="10"/></svg>
+        Cada escalón es un pago de cupón; la banda muestra el rango entre el límite inferior y el superior. Toca cualquier período para ver su detalle.
+      </p>
+      <div class="chart-scroll">
+        <svg class="chart" id="chart" viewBox="0 0 700 336" role="img" aria-label="Evolución de lo recibido: un escalón por cada pago de cupón y un salto final cuando se devuelve el capital junto con el último cupón."></svg>
+      </div>
+      <div class="chart-steps" id="chartSteps"></div>
+      <div class="chart-detail" id="chartDetail"></div>
+      <div class="final-range" id="finalRange"></div>
 
       <details class="help-block" style="display:none;">
         <summary>Así funciona: el cupón es tu "arriendo"</summary>
@@ -669,6 +888,30 @@ const MONTO_MAX = 9999999999; // límite del campo: $9.999.999.999 (10 dígitos)
 function digitsOnly(str){ return (str||'').replace(/[^\d]/g,''); }
 function formatThousands(digits){ if(!digits) return ''; return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
 function getMoneyVal(id){ return parseFloat(digitsOnly(document.getElementById(id).value)) || 0; }
+function setupMontoChips(){
+  const box = document.getElementById('montoChips');
+  if(!box) return;
+  const el = document.getElementById('monto');
+  box.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      el.value = formatThousands(b.getAttribute('data-m'));
+      recalc();
+      el.focus();
+    });
+  });
+}
+
+// sk-select-button es selección única (T | null): el segmento activo refleja el monto
+// vigente, y ninguno queda marcado si el asesor escribe un valor que no es un atajo.
+function syncMontoChipsSelection(){
+  const box = document.getElementById('montoChips');
+  if(!box) return;
+  const monto = getMoneyVal('monto');
+  box.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('on', parseFloat(b.getAttribute('data-m')) === monto);
+  });
+}
+
 function setupMoneyInput(id){
   const el = document.getElementById(id);
   el.addEventListener('input', () => {
@@ -786,115 +1029,305 @@ function renderFichaCat(){
   };
   document.getElementById('alertEstado').innerHTML = ALERTAS[estado];
 
-  const ICO = {
-    target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
-    calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'
-  };
-  const fiItem = (icon, label, value) => `
-    <div class="fi-item">
-      <div class="fi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[icon]}</svg></div>
-      <div class="fi-text"><dt>${label}</dt><dd>${value}</dd></div>
-    </div>`;
   const anios = (isFinite(c.plazoAnios) && c.plazoAnios) ? c.plazoAnios : monthsBetween(fInicio, fFin)/12;
-  document.getElementById('catFicha').innerHTML =
-    fiItem('target', 'Rango objetivo neto E.A.', `${pct1(c.objMin)} a ${pct1(c.objMax)}`) +
-    fiItem('calendar', 'Plazo', `${fmtDate(fInicio)} al ${fmtDate(fFin)} · ${fmtAnios(anios)}`);
+  const icoTarget = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></svg>';
+  const icoClock  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
+
+  document.getElementById('catFicha').innerHTML = `
+    <div class="fi-hero">
+      <div class="h-lbl">${icoTarget}Rango objetivo</div>
+      <div class="h-val">${pct1(c.objMin)}<span class="to">a</span>${pct1(c.objMax)}</div>
+      <span class="h-pill">Efectivo anual</span>
+      <div class="h-foot">Rentabilidad neta, ya descontada la comisión de administración. Es un rango objetivo, no una rentabilidad garantizada.</div>
+    </div>
+    <div class="fi-side">
+      <div class="s-lbl">${icoClock}Plazo</div>
+      <div class="s-val">${fmtAnios(anios)}</div>
+      <div class="s-track"><b></b><i class="a"></i><i class="b"></i></div>
+      <div class="s-dates">
+        <span>Inicio<b>${fmtDate(fInicio)}</b></span>
+        <span>Vencimiento<b>${fmtDate(fFin)}</b></span>
+      </div>
+    </div>`;
 }
 
 // ---------- Render de resultados ----------
 function renderScenarios3(min, mid, max, freqCap){
-  document.getElementById('scenarios3').innerHTML = `
-    <div class="sc-card min">
-      <div class="sc-lbl">Límite inferior</div>
-      <div class="sc-tir">${pct1(min.rAnual*100)} E.A.</div>
-      <div class="sc-row"><span>Pago ${freqCap}</span><b>${fmtCOP(min.cuponPeriodo)}</b></div>
-      <div class="sc-row"><span>Valor final estimado</span><b>${fmtCOP(min.valorFinal)}</b></div>
-    </div>
-    <div class="sc-card mid">
-      <div class="sc-lbl">Punto medio</div>
-      <div class="sc-tir">${pct1(mid.rAnual*100)} E.A.</div>
-      <div class="sc-row"><span>Pago ${freqCap}</span><b>${fmtCOP(mid.cuponPeriodo)}</b></div>
-      <div class="sc-row"><span>Valor final estimado</span><b>${fmtCOP(mid.valorFinal)}</b></div>
-    </div>
-    <div class="sc-card max">
-      <div class="sc-lbl">Límite superior</div>
-      <div class="sc-tir">${pct1(max.rAnual*100)} E.A.</div>
-      <div class="sc-row"><span>Pago ${freqCap}</span><b>${fmtCOP(max.cuponPeriodo)}</b></div>
-      <div class="sc-row"><span>Valor final estimado</span><b>${fmtCOP(max.valorFinal)}</b></div>
-    </div>
-  `;
+  const card = (cls, label, pos, sc, tag) => `
+    <div class="sc-card ${cls}">
+      <span class="sc-bar"></span>
+      ${tag ? `<span class="sc-tag">${tag}</span>` : ''}
+      <div class="sc-lbl"><i class="sc-dot"></i>${label}</div>
+      <div class="sc-tir">${pct1(sc.rAnual*100)}<span class="sc-u">E.A.</span></div>
+      <div class="sc-pos">${pos}</div>
+      <div class="sc-rows">
+        <div class="sc-row"><span>Pago ${freqCap}</span><b>${fmtCOP(sc.cuponPeriodo)}</b></div>
+        <div class="sc-row"><span>Al vencimiento</span><b>${fmtCOP(sc.valorFinal)}</b></div>
+      </div>
+    </div>`;
+
+  document.getElementById('scenarios3').innerHTML =
+    card('min', 'Límite inferior', 'Piso del rango objetivo', min) +
+    card('mid', 'Punto medio', 'Centro del rango objetivo', mid, 'Central') +
+    card('max', 'Límite superior', 'Techo del rango objetivo', max);
 }
 
-function drawChart(min, mid, max, periodos, monto){
+let chartSel = null;
+
+function addMonths(d, m){ const x = new Date(d.getTime()); x.setMonth(x.getMonth() + m); return x; }
+function mesPago(fIni, i, frecuencia){
+  const d = addMonths(fIni, Math.round(i*12/frecuencia));
+  return d.toLocaleDateString('es-CO', {month:'short', year:'2-digit'}).replace('.','').replace(' de ',' ');
+}
+function mesPagoLargo(fIni, i, frecuencia){
+  const d = addMonths(fIni, Math.round(i*12/frecuencia));
+  const t = d.toLocaleDateString('es-CO', {month:'long', year:'numeric'});
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+function drawChart(min, mid, max, periodos, monto, fInicio, frecuencia){
   const svg = document.getElementById('chart');
-  const W=700,H=260, padL=64,padB=34,padT=18,padR=90;
-  const chartW = W-padL-padR, chartH = H-padT-padB;
+  const W=700, H=336, padL=68, padR=96, padT=48, padB=54;
 
-  // Los cupones intermedios solo acumulan el interés recibido — el capital se devuelve
-  // recién en el último pago junto con el cupón final, así que ahí se ve el quiebre real.
-  function cumulative(sc){
-    const arr=[0];
-    for(let i=1;i<periodos;i++) arr.push(sc.cuponPeriodo*i);
-    arr.push(sc.cuponPeriodo*periodos + monto);
-    return arr;
+  // Zona de cupones (escala normal) y zona del capital (por encima del quiebre de escala).
+  // Sin el quiebre, la devolución del capital aplasta los cupones y no se vería el crecimiento.
+  const yPlotBottom = H - padB;
+  const yPlotTop    = padT + 92;
+  const yBreak      = padT + 72;
+  const yCapTop     = padT;
+
+  const kMin=[0], kMid=[0], kMax=[0];
+  for(let i=1;i<=periodos;i++){
+    kMin.push(min.cuponPeriodo*i); kMid.push(mid.cuponPeriodo*i); kMax.push(max.cuponPeriodo*i);
   }
-  const cMin = cumulative(min), cMid = cumulative(mid), cMax = cumulative(max);
+  const kTop = (kMax[periodos] || 1) * 1.10;
 
-  const yTop = max.valorFinal * 1.04;
-  const yBottom = 0;
-  const scaleY = chartH / (yTop - yBottom || 1);
-  const xStep = chartW / periodos;
+  const xStep = (W-padL-padR)/periodos;
   const X = i => padL + i*xStep;
-  const Y = v => padT + (yTop - v)*scaleY;
+  const Y = v => yPlotBottom - (v/kTop)*(yPlotBottom-yPlotTop);
 
-  function pathFor(arr){ return arr.map((v,i)=> `${i===0?'M':'L'} ${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join(' '); }
+  if(chartSel !== null && (chartSel < 1 || chartSel > periodos)) chartSel = null;
 
-  let s = '';
-  const ticks = 4;
+  function stepPts(arr){
+    const p=[[X(0),Y(arr[0])]];
+    for(let i=1;i<=periodos;i++){ p.push([X(i),Y(arr[i-1])]); p.push([X(i),Y(arr[i])]); }
+    return p;
+  }
+  const pMin=stepPts(kMin), pMid=stepPts(kMid), pMax=stepPts(kMax);
+  const toPath = pts => pts.map((p,i)=>`${i===0?'M':'L'} ${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+
+  let s='';
+
+  // Total recibido al vencimiento (cupones + capital), rotulado arriba
+  s += `<text x="${padL}" y="18" font-family="var(--sk-font-title)" font-size="10.5" font-weight="800" fill="var(--sk-n4)" letter-spacing="0.4">TOTAL RECIBIDO AL VENCIMIENTO</text>`;
+  s += `<text x="${padL}" y="35" font-family="var(--sk-font-title)" font-size="14" font-weight="800" fill="var(--sk-surface-800)">entre ${abrevCOP(min.valorFinal)} y ${abrevCOP(max.valorFinal)}</text>`;
+  s += `<text x="${W-padR}" y="35" text-anchor="end" font-size="11" fill="var(--sk-n4)">punto medio ${abrevCOP(mid.valorFinal)}</text>`;
+
+  // Banda del rango: todo lo que hay entre el límite inferior y el superior
+  s += `<path d="${toPath(pMax)} ${pMin.slice().reverse().map(p=>`L ${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ')} Z" fill="var(--charts-c01)" opacity="0.26"></path>`;
+
+  // Rejilla y eje de valores (solo la zona de cupones)
+  const ticks=4;
   for(let t=0;t<=ticks;t++){
-    const v = yBottom + (yTop-yBottom)*t/ticks;
-    const y = Y(v);
+    const v = kTop*t/ticks, y = Y(v);
     s += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}" stroke="var(--sk-n2)"></line>`;
     s += `<text class="axis" x="${padL-8}" y="${(y+4).toFixed(1)}" text-anchor="end">${abrevCOP(v)}</text>`;
   }
 
-  // Colores propios del simulador para las 3 series (no hay paleta de dataviz oficial en sk-components-angular)
-  const series = [
-    { arr: cMin, color: 'var(--charts-c01)' },
-    { arr: cMid, color: 'var(--charts-c02)' },
-    { arr: cMax, color: 'var(--charts-c03)' }
-  ];
-  series.forEach(sr => {
-    s += `<path d="${pathFor(sr.arr)}" fill="none" stroke="${sr.color}" stroke-width="2.75" stroke-linejoin="round" stroke-linecap="round"></path>`;
+  // Bandas interactivas
+  for(let i=1;i<=periodos;i++){
+    s += `<rect class="hitband" data-p="${i}" x="${X(i-1).toFixed(1)}" y="${yCapTop}" width="${xStep.toFixed(1)}" height="${(yPlotBottom-yCapTop).toFixed(1)}" tabindex="0" role="button" aria-label="Período ${i}"></rect>`;
+    s += `<rect class="bandhl${chartSel===i?' on':''}" x="${X(i-1).toFixed(1)}" y="${yCapTop}" width="${xStep.toFixed(1)}" height="${(yPlotBottom-yCapTop).toFixed(1)}"></rect>`;
+    s += `<line class="payline" x1="${X(i).toFixed(1)}" y1="${yPlotTop}" x2="${X(i).toFixed(1)}" y2="${yPlotBottom}"></line>`;
+  }
+
+  // Líneas de los tres límites
+  [[pMin,'var(--charts-c01)',2.2],[pMax,'var(--charts-c03)',2.2],[pMid,'var(--charts-c02)',3]].forEach(sr=>{
+    s += `<path class="stepline" d="${toPath(sr[0])}" fill="none" stroke="${sr[1]}" stroke-width="${sr[2]}" stroke-linejoin="round" stroke-linecap="round"></path>`;
   });
+
+  // Un punto por cada cupón pagado
+  for(let i=1;i<=periodos;i++){
+    s += `<circle class="paydot" cx="${X(i).toFixed(1)}" cy="${Y(kMid[i]).toFixed(1)}" r="${chartSel===i?5.5:3.4}" fill="var(--charts-c02)" stroke="var(--sk-surface-0)" stroke-width="1.5"></circle>`;
+  }
   s += `<circle cx="${X(0)}" cy="${Y(0)}" r="4" fill="var(--sk-surface-800)"></circle>`;
 
-  // Puntos finales + etiquetas de valor con separación mínima para que no se amontonen
-  const endPts = [
-    { val: cMin[periodos], color: 'var(--charts-c01)' },
-    { val: cMid[periodos], color: 'var(--charts-c02)' },
-    { val: cMax[periodos], color: 'var(--charts-c03)' }
-  ].map(p => ({ ...p, dotY: Y(p.val), labelY: Y(p.val) })).sort((a,b) => a.dotY - b.dotY);
-  const minGap = 15;
-  for(let i=1;i<endPts.length;i++){
-    if(endPts[i].labelY - endPts[i-1].labelY < minGap) endPts[i].labelY = endPts[i-1].labelY + minGap;
-  }
-  endPts.forEach(p => {
-    s += `<circle cx="${X(periodos)}" cy="${p.dotY.toFixed(1)}" r="3.5" fill="${p.color}"></circle>`;
-    if(Math.abs(p.labelY - p.dotY) > 2){
-      s += `<line x1="${(X(periodos)+5).toFixed(1)}" y1="${p.dotY.toFixed(1)}" x2="${(X(periodos)+11).toFixed(1)}" y2="${p.labelY.toFixed(1)}" stroke="var(--sk-n3)"></line>`;
-    }
-    s += `<text class="axis" x="${(X(periodos)+13).toFixed(1)}" y="${(p.labelY+3).toFixed(1)}" text-anchor="start" font-weight="700" fill="var(--sk-surface-800)">${abrevCOP(p.val)}</text>`;
+  // Quiebre de escala + bloque de capital, igual en los tres escenarios
+  const zig=[]; for(let x=padL; x<W-padR; x+=14){ zig.push(`${x},${yBreak} ${x+7},${yBreak-5} ${x+14},${yBreak}`); }
+  s += `<polyline points="${zig.join(' ')}" fill="none" stroke="var(--sk-n3)" stroke-width="1.5"></polyline>`;
+  s += `<text class="axis" x="${padL-8}" y="${(yBreak+4)}" text-anchor="end">escala</text>`;
+
+  const capX = X(periodos-1) - 6, capW = xStep + 12, capH = (yBreak-10-yCapTop);
+  s += `<rect x="${capX.toFixed(1)}" y="${yCapTop}" width="${capW.toFixed(1)}" height="${capH.toFixed(1)}" fill="var(--sk-info-bg)" stroke="var(--sk-info-border)" stroke-width="1.5" rx="8"></rect>`;
+  s += `<line x1="${X(periodos).toFixed(1)}" y1="${Y(kMid[periodos]).toFixed(1)}" x2="${X(periodos).toFixed(1)}" y2="${(yBreak-6).toFixed(1)}" stroke="var(--sk-info-border)" stroke-width="3" stroke-linecap="round"></line>`;
+  s += `<path d="M ${(X(periodos)-6).toFixed(1)} ${(yBreak-2).toFixed(1)} L ${X(periodos).toFixed(1)} ${(yBreak-12).toFixed(1)} L ${(X(periodos)+6).toFixed(1)} ${(yBreak-2).toFixed(1)} Z" fill="var(--sk-info-border)"></path>`;
+  const capCx = capX + capW/2;
+  s += `<text x="${capCx.toFixed(1)}" y="${(yCapTop+20)}" text-anchor="middle" fill="var(--sk-info-ink)" font-family="var(--sk-font-title)" font-size="9.5" font-weight="800" letter-spacing="0.3">DEVOLUCIÓN</text>`;
+  s += `<text x="${capCx.toFixed(1)}" y="${(yCapTop+32)}" text-anchor="middle" fill="var(--sk-info-ink)" font-family="var(--sk-font-title)" font-size="9.5" font-weight="800" letter-spacing="0.3">DEL CAPITAL</text>`;
+  s += `<text x="${capCx.toFixed(1)}" y="${(yCapTop+51)}" text-anchor="middle" fill="var(--sk-info-ink)" font-family="var(--sk-font-title)" font-size="15" font-weight="800">${abrevCOP(monto)}</text>`;
+
+  // Etiquetas del último cupón por límite (solo cupones, sin capital)
+  const endPts=[
+    {v:kMin[periodos],c:'var(--charts-c01)'},
+    {v:kMid[periodos],c:'var(--charts-c02)'},
+    {v:kMax[periodos],c:'var(--charts-c03)'}
+  ].map(p=>({...p,dotY:Y(p.v),labY:Y(p.v)})).sort((a,b)=>a.dotY-b.dotY);
+  for(let i=1;i<endPts.length;i++){ if(endPts[i].labY-endPts[i-1].labY<15) endPts[i].labY=endPts[i-1].labY+15; }
+  s += `<text class="axis" x="${(X(periodos)+13).toFixed(1)}" y="${(endPts[0].labY-12).toFixed(1)}" text-anchor="start" font-size="9">solo cupones</text>`;
+  endPts.forEach(p=>{
+    s += `<circle cx="${X(periodos)}" cy="${p.dotY.toFixed(1)}" r="3.5" fill="${p.c}"></circle>`;
+    if(Math.abs(p.labY-p.dotY)>2) s += `<line x1="${(X(periodos)+5).toFixed(1)}" y1="${p.dotY.toFixed(1)}" x2="${(X(periodos)+11).toFixed(1)}" y2="${p.labY.toFixed(1)}" stroke="var(--sk-n3)"></line>`;
+    s += `<text class="axis" x="${(X(periodos)+13).toFixed(1)}" y="${(p.labY+3).toFixed(1)}" text-anchor="start" font-weight="700" fill="var(--sk-surface-800)">${abrevCOP(p.v)}</text>`;
   });
 
-  s += `<line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="var(--sk-n3)"></line>`;
-  const xLabelEvery = Math.max(1, Math.ceil(periodos/8));
+  // Eje de períodos: número y mes de pago
+  s += `<line x1="${padL}" y1="${yPlotBottom}" x2="${W-padR}" y2="${yPlotBottom}" stroke="var(--sk-n3)"></line>`;
+  const every = Math.max(1, Math.ceil(periodos/8));
   for(let i=0;i<=periodos;i++){
-    if(i%xLabelEvery===0 || i===periodos){
-      s += `<text class="axis" x="${X(i).toFixed(1)}" y="${H-padB+16}" text-anchor="middle">${i===0?'Inicio':'P'+i}</text>`;
+    if(i%every===0 || i===periodos){
+      const bold = (chartSel===i) ? ' font-weight="700" fill="var(--sk-surface-800)"' : '';
+      s += `<text class="axis" x="${X(i).toFixed(1)}" y="${yPlotBottom+16}" text-anchor="middle"${bold}>${i===0?'Inicio':'P'+i}</text>`;
+      if(i>0) s += `<text class="axis" x="${X(i).toFixed(1)}" y="${yPlotBottom+30}" text-anchor="middle" font-size="9">${mesPago(fInicio,i,frecuencia)}</text>`;
     }
   }
+
   svg.innerHTML = s;
+
+  svg.querySelectorAll('.stepline').forEach(p=>{
+    try{
+      const len=p.getTotalLength();
+      p.style.strokeDasharray=len; p.style.strokeDashoffset=len;
+      requestAnimationFrame(()=>{requestAnimationFrame(()=>{p.style.strokeDashoffset=0;});});
+    }catch(e){}
+  });
+
+  svg.querySelectorAll('.hitband').forEach(b=>{
+    const p=parseInt(b.getAttribute('data-p'),10);
+    b.addEventListener('click',()=>selectPeriodo(p));
+    b.addEventListener('mouseenter',()=>renderChartDetail(p,min,mid,max,periodos,monto,fInicio,frecuencia));
+    b.addEventListener('mouseleave',()=>renderChartDetail(chartSel,min,mid,max,periodos,monto,fInicio,frecuencia));
+    b.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();selectPeriodo(p);} });
+  });
+
+  renderChartSteps(periodos);
+  renderChartDetail(chartSel,min,mid,max,periodos,monto,fInicio,frecuencia);
+  renderFinalRange(min,mid,max,monto,periodos);
+}
+
+function renderFinalRange(min, mid, max, monto, periodos){
+  const box = document.getElementById('finalRange');
+  if(!box) return;
+  if(!(monto>0)){ box.innerHTML=''; return; }
+
+  const W=700, H=168, padL=14, padR=14;
+  const barTop=34, barH=34;
+  const inner = W-padL-padR;
+  const vMax = max.valorFinal || 1;
+  const px = v => padL + (v/vMax)*inner;
+
+  const xCap=px(monto), xMin=px(min.valorFinal), xMax=px(max.valorFinal);
+
+  // Los tres límites quedan a pocos píxeles entre sí en la escala real, así que el detalle
+  // del rango se muestra ampliado abajo en lugar de amontonar las etiquetas sobre la barra.
+  const zL = padL+58, zR = W-padR-58;
+  const span = (max.valorFinal - min.valorFinal) || 1;
+  const zx = v => zL + ((v - min.valorFinal)/span)*(zR-zL);
+  const zY = 126;
+
+  let g = '';
+
+  g += `<text x="${padL}" y="18" font-size="11" fill="var(--sk-n4)">Inicio de la inversión</text>`;
+  g += `<text x="${W-padR}" y="18" text-anchor="end" font-size="11" fill="var(--sk-n4)">Al vencimiento · período ${periodos}</text>`;
+
+  g += `<rect x="${padL}" y="${barTop}" width="${(xCap-padL).toFixed(1)}" height="${barH}" fill="var(--sk-info-bg)" stroke="var(--sk-info-border)" stroke-width="1" rx="6"></rect>`;
+  // Mismo tratamiento que "Tu capital" (relleno tenue + borde, texto oscuro) en vez del
+  // verde sólido + texto blanco de --sk-primary — ese combo es el de los botones (.btn-primary)
+  // en esta misma página, y hacía leer la barra como si fuera clickeable.
+  g += `<rect x="${(xCap-6).toFixed(1)}" y="${barTop}" width="${(xMax-xCap+6).toFixed(1)}" height="${barH}" fill="var(--sk-primary-tint)" stroke="var(--sk-primary-pressed)" stroke-width="1" rx="6"></rect>`;
+  g += `<text x="${(padL+(xCap-padL)/2).toFixed(1)}" y="${barTop+21}" text-anchor="middle" font-family="var(--sk-font-title)" font-size="12" font-weight="800" fill="var(--sk-info-ink)">Tu capital · ${abrevCOP(monto)}</text>`;
+  if(xMax-xCap > 110){
+    g += `<text x="${(xCap+(xMax-xCap)/2).toFixed(1)}" y="${barTop+21}" text-anchor="middle" font-family="var(--sk-font-title)" font-size="12" font-weight="800" fill="var(--sk-primary-pressed)">Todos los cupones</text>`;
+  }
+
+  // Ventana del rango sobre la barra + conectores hacia el detalle ampliado
+  g += `<rect x="${(xMin-2).toFixed(1)}" y="${barTop-5}" width="${Math.max(xMax-xMin+4,6).toFixed(1)}" height="${barH+10}" fill="none" stroke="var(--sk-surface-800)" stroke-width="1.5" rx="4"></rect>`;
+  g += `<path d="M ${(xMin-2).toFixed(1)} ${barTop+barH+5} L ${zL} ${zY-26}" stroke="var(--sk-n3)" stroke-width="1" stroke-dasharray="3 3" fill="none"></path>`;
+  g += `<path d="M ${(xMax+2).toFixed(1)} ${barTop+barH+5} L ${zR} ${zY-26}" stroke="var(--sk-n3)" stroke-width="1" stroke-dasharray="3 3" fill="none"></path>`;
+
+  // Detalle ampliado del rango
+  g += `<text x="${padL}" y="${zY-32}" font-family="var(--sk-font-title)" font-size="10" font-weight="800" fill="var(--sk-n4)" letter-spacing="0.4">DETALLE DEL RANGO (AMPLIADO)</text>`;
+  g += `<line x1="${zL}" y1="${zY}" x2="${zR}" y2="${zY}" stroke="var(--sk-n3)" stroke-width="3" stroke-linecap="round"></line>`;
+
+  [[min.valorFinal,'var(--charts-c01)','Límite inferior','start'],
+   [mid.valorFinal,'var(--charts-c02)','Punto medio','middle'],
+   [max.valorFinal,'var(--charts-c03)','Límite superior','end']].forEach(m=>{
+    const x = zx(m[0]);
+    g += `<circle cx="${x.toFixed(1)}" cy="${zY}" r="6" fill="${m[1]}" stroke="var(--sk-surface-0)" stroke-width="2"></circle>`;
+    g += `<text x="${x.toFixed(1)}" y="${zY-14}" text-anchor="${m[3]}" font-family="var(--sk-font-title)" font-size="12.5" font-weight="800" fill="var(--sk-surface-800)">${abrevCOP(m[0])}</text>`;
+    g += `<text x="${x.toFixed(1)}" y="${zY+20}" text-anchor="${m[3]}" font-size="10.5" fill="var(--sk-n4)">${m[2]}</text>`;
+  });
+
+  box.innerHTML = `
+    <div class="fr-t">Lo que podrías tener al vencimiento</div>
+    <div class="fr-s">Tu capital más todos los cupones del CAT, según dónde se ubique el resultado dentro del rango objetivo.</div>
+    <div class="chart-scroll">
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Al vencimiento el total recibido se ubicaría entre ${abrevCOP(min.valorFinal)} y ${abrevCOP(max.valorFinal)}.">${g}</svg>
+    </div>
+    <div class="fr-chips">
+      <div class="fr-chip"><div class="l"><i class="sw" style="background:var(--charts-c01)"></i>Límite inferior</div><div class="v">${fmtCOP(min.valorFinal)}</div><div class="u">TIR ${pct1(min.rAnual*100)}</div></div>
+      <div class="fr-chip mid"><div class="l"><i class="sw" style="background:var(--charts-c02)"></i>Punto medio</div><div class="v">${fmtCOP(mid.valorFinal)}</div><div class="u">TIR ${pct1(mid.rAnual*100)}</div></div>
+      <div class="fr-chip"><div class="l"><i class="sw" style="background:var(--charts-c03)"></i>Límite superior</div><div class="v">${fmtCOP(max.valorFinal)}</div><div class="u">TIR ${pct1(max.rAnual*100)}</div></div>
+    </div>
+    <p class="fr-note">Ningún escenario está garantizado. El rango objetivo es una estimación y puede variar.</p>`;
+}
+
+function selectPeriodo(p){
+  chartSel = (chartSel === p) ? null : p;
+  recalc();
+}
+
+function renderChartSteps(periodos){
+  const box=document.getElementById('chartSteps');
+  if(!box) return;
+  let html=''; const paso=Math.max(1,Math.ceil(periodos/10));
+  for(let i=1;i<=periodos;i++){
+    if(i%paso===0 || i===periodos || i===1)
+      html += `<button type="button" data-p="${i}" class="${chartSel===i?'on':''}">P${i}${i===periodos?'<span class="cs-suffix"> · vencimiento</span>':''}</button>`;
+  }
+  box.innerHTML=html;
+  box.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>selectPeriodo(parseInt(b.getAttribute('data-p'),10))));
+}
+
+function renderChartDetail(p, min, mid, max, periodos, monto, fInicio, frecuencia){
+  const box=document.getElementById('chartDetail');
+  if(!box) return;
+
+  if(p === null || p === undefined){
+    box.innerHTML = `
+      <div class="cd-head"><span class="cd-t">Cómo recibes tu dinero</span></div>
+      <div>En cada uno de los <b>${periodos} períodos</b> recibes un cupón, que puede ubicarse en cualquier punto entre el límite inferior y el superior del rango objetivo. En el período <b>${periodos}</b> se devuelve además tu capital de ${fmtCOP(monto)}.</div>
+      <div class="cd-note">El capital de referencia no cambia con los pagos: se devuelve completo al vencimiento.</div>`;
+    return;
+  }
+
+  const esFinal = (p === periodos);
+  box.innerHTML = `
+    <div class="cd-head">
+      <span class="cd-t">Período ${p}${esFinal?' · vencimiento':''}</span>
+      <span class="cd-d">Mes de pago · ${mesPagoLargo(fInicio,p,frecuencia)}</span>
+    </div>
+    <table class="cd-tbl">
+      <thead><tr><th>Escenario</th><th class="num">Cupón que puede pagar</th></tr></thead>
+      <tbody>
+        <tr><td><i class="sw" style="background:var(--charts-c01)"></i>Límite inferior</td><td class="num">${fmtCOP(min.cuponPeriodo)}</td></tr>
+        <tr class="mid"><td><i class="sw" style="background:var(--charts-c02)"></i>Punto medio</td><td class="num">${fmtCOP(mid.cuponPeriodo)}</td></tr>
+        <tr><td><i class="sw" style="background:var(--charts-c03)"></i>Límite superior</td><td class="num">${fmtCOP(max.cuponPeriodo)}</td></tr>
+      </tbody>
+    </table>
+    ${esFinal
+      ? `<div class="cd-cap"><b>En este pago se devuelve el capital:</b> ${fmtCOP(monto)}, además del último cupón. Por eso el período ${periodos} es mucho mayor que los anteriores.</div>`
+      : `<div class="cd-note">El capital sigue invertido y se devuelve completo en el período ${periodos}.</div>`}
+  `;
 }
 
 function renderComparison(monto, frecuencia, periodos, objMid, freqCap){
@@ -946,8 +1379,9 @@ function recalc(){
     `Con ${fmtCOP(monto)} en ${c.nombre}, el valor final estimado va de ${fmtCOP(min.valorFinal)} a ${fmtCOP(max.valorFinal)} al vencimiento.`;
 
   renderScenarios3(min, mid, max, freqCap);
-  drawChart(min, mid, max, periodos, monto);
+  drawChart(min, mid, max, periodos, monto, fInicio, frecuencia);
   renderComparison(monto, frecuencia, periodos, objMid, freqCap);
+  syncMontoChipsSelection();
 }
 
 function actualizarBadgesVigencia(){
@@ -997,6 +1431,7 @@ cargarDatos().then(cats => {
   poblarSelectCat();
   actualizarBadgesVigencia();
   setupMoneyInput('monto');
+  setupMontoChips();
   document.getElementById('frecuencia').addEventListener('change', recalc);
   catCombo = comboSetup('catSelBox', 'catSelList', 'catSel');
   frecCombo = comboSetup('frecuenciaBox', 'frecuenciaList', 'frecuencia');
