@@ -333,20 +333,50 @@
     box-shadow:0 0 0 10px #1c1c1e, 0 0 0 13px #3a3a3c, 0 30px 70px rgba(0,0,0,.4);
     font-size:14px;
   }
+  /* Header: sin sidebar, hamburguesa a la derecha del header */
   .frame.mobile .sidebar{ display:none; }
-  .frame.mobile .header{ padding:0 1.2em; gap:1em; }
+  .frame.mobile .header{ padding:0 1.2em; gap:0.8em; box-shadow:0 1px 0 var(--border-track); }
   .frame.mobile .logo-divider span{ font-size:1.1em; }
-  .frame.mobile .panel-card{ flex-direction:column; overflow-y:auto; overflow-x:hidden; }
-  .frame.mobile .aside{
-    width:100%; height:auto; flex-shrink:0; padding:1.6em 1.4em 1.2em; gap:0.7em;
+  .mobile-hamburger{ display:none; }
+  .frame.mobile .mobile-hamburger{ display:block; width:1.3em; height:1.3em; margin-left:auto; cursor:pointer; }
+
+  /* Sin panel de ilustración: el contenido principal ocupa todo el ancho */
+  .frame.mobile .panel-card{ overflow:hidden; }
+  .frame.mobile .aside{ display:none; }
+  .frame.mobile .main{ width:100%; height:100%; padding-top:0; }
+  .breadcrumb-mobile{ display:none; }
+  .frame.mobile .breadcrumb-mobile{
+    display:flex; position:absolute; left:0; top:0; width:100%; box-sizing:border-box;
+    padding:1em 1.2em; gap:0.5em; z-index:5; background:#fff;
   }
-  .frame.mobile .aside img.illus{ width:6.5em; height:6.4em; }
-  .frame.mobile .aside h2{ font-size:1.5em; }
-  .frame.mobile .aside p{ font-size:0.95em; }
-  .frame.mobile .main{ width:100%; height:auto; flex:1 0 auto; padding-top:1.2em; }
-  .frame.mobile .breadcrumb{ left:1.2em; top:0.9em; }
-  .frame.mobile .breadcrumb img{ width:2.4em; height:2.4em; }
-  .frame.mobile .content-col{ height:auto; overflow-y:visible; padding:1em 1.2em 1.6em; max-width:none; }
+  .frame.mobile .breadcrumb-mobile img{ width:1.7em; height:1.7em; }
+  .frame.mobile .breadcrumb-mobile .crumbs{ font-size:1em; }
+  .frame.mobile .content-col{ padding:3.4em 1.2em 1.6em; max-width:none; gap:1em; }
+
+  /* Progreso y títulos alineados a la izquierda, como en un flujo mobile nativo */
+  .frame.mobile .progress-count{ text-align:left; font-size:1em; }
+  .frame.mobile .step-title{ text-align:left; font-size:1.5em; align-self:flex-start; width:100%; }
+
+  /* Filas planas: borde fino en vez de sombra */
+  .frame.mobile .motivo-cat-head{ box-shadow:none; border-color:var(--border-track); }
+  .frame.mobile .motivo-cat.open .motivo-cat-head{ border-color:var(--sk-green); }
+  .frame.mobile .motivo-cat-head .motivo-info{ display:none; }
+  .frame.mobile .option-row,
+  .frame.mobile .account-card,
+  .frame.mobile .doc-card{ box-shadow:none; }
+  .frame.mobile .option-row,
+  .frame.mobile .account-card{ border-color:var(--border-track); }
+
+  /* Botones: acción principal arriba y de ancho completo, como en la guía mobile */
+  .frame.mobile .btn-row{ flex-direction:column-reverse; gap:0.8em; }
+  .frame.mobile .btn{ flex:none; width:100%; }
+
+  /* Tabs: alto automático para que la etiqueta pueda partirse sin encimarse con lo de abajo */
+  .frame.mobile .tabs{ height:auto; }
+  .frame.mobile .tab{ height:auto; padding:0.6em 0.3em; font-size:1.05em; line-height:1.25; white-space:normal; }
+
+  /* Metadatos de cuenta: que envuelvan en vez de recortarse */
+  .frame.mobile .account-meta{ flex-wrap:wrap; row-gap:0.2em; font-size:1.05em; }
 </style>
 <div class="view-toggle" id="view-toggle">
   <button type="button" id="btn-view-desktop" class="active">Desktop</button>
@@ -361,6 +391,7 @@
       <img id="img-nombre" alt="skandia" style="height:1.05em;" />
     </div>
     <div class="logo-divider"><span>Portal Clientes</span></div>
+    <img class="mobile-hamburger" id="img-hamburger-mobile" alt="menu" />
   </div>
 
   <div class="sidebar">
@@ -390,6 +421,13 @@
     </div>
 
     <div class="main">
+      <div class="breadcrumb breadcrumb-mobile">
+        <img id="img-back-mobile" alt="volver" />
+        <div class="crumbs">
+          <a>Inicio</a><span>/</span><a>Retiros</a><span>/</span>
+          <span class="current">Cesantías</span>
+        </div>
+      </div>
       <div class="content-col">
         <div class="alert-info" id="step2-top-alert" style="display:none;">
           <img id="img-info-monto" alt="" />
@@ -754,6 +792,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   document.getElementById('img-isotipo').src = IMG_ISOTIPO;
   document.getElementById('img-nombre').src = IMG_NOMBRE;
   document.getElementById('img-hamburger').src = IMG_POINTS_VERDE;
+  document.getElementById('img-hamburger-mobile').src = IMG_POINTS_VERDE;
   document.getElementById('img-casa').src = IMG_CASA;
   document.getElementById('img-mano').src = IMG_MANO_DINERO;
   document.getElementById('img-chevup').src = IMG_CHEVRON_UP_SIDEBAR;
@@ -761,6 +800,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   document.getElementById('img-help1').src = IMG_CIRCLE_QUESTION;
   document.getElementById('img-help2').src = IMG_CIRCLE_QUESTION;
   document.getElementById('img-back').src = IMG_ARROW_LEFT;
+  document.getElementById('img-back-mobile').src = IMG_ARROW_LEFT;
   document.getElementById('img-chevleft').src = IMG_CHEVRON_LEFT;
   document.getElementById('img-chevright-pag').src = IMG_CHEVRON_RIGHT_PAG;
   document.getElementById('img-plus1').src = IMG_PLUS;
