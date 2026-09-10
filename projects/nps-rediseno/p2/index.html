@@ -5,113 +5,107 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NPS y CES Portal — Prototipo</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600;700&display=swap');
 
   :root{
     --primary-00:#00c73d; --primary-d01:#03a835; --primary-l04:#caf9cb;
-    --texts-dark:#404040; --texts-medium:#666666;
     --title:'Montserrat'; --body:'Open Sans';
   }
   *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; }
+  html,body{ margin:0; padding:0; height:100%; }
   body{
     font-family: var(--body), system-ui, sans-serif;
-    background:#e9e9e9; -webkit-font-smoothing:antialiased;
-    display:flex; flex-direction:column; align-items:center; gap:20px;
-    padding:76px 24px 60px;
+    background:#1b1b1b; -webkit-font-smoothing:antialiased;
   }
   svg{ display:block; }
 
   .harness{
-    position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:80;
-    display:flex; gap:6px; background:rgba(20,20,20,.9); padding:6px; border-radius:8px;
+    position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:90;
+    display:flex; gap:6px; background:rgba(20,20,20,.9); padding:5px; border-radius:8px;
   }
   .harness button{
-    font-family:var(--body); font-weight:700; font-size:12.5px; color:#cfd6cf;
-    background:transparent; border:none; border-radius:6px; padding:8px 18px; cursor:pointer;
+    font-family:var(--body); font-weight:700; font-size:12px; color:#cfd6cf;
+    background:transparent; border:none; border-radius:6px; padding:7px 16px; cursor:pointer;
   }
   .harness button.active{ background:var(--primary-00); color:#fff; }
 
-  .note{
-    max-width:900px; font-family:var(--body); font-size:13px; color:#555; text-align:center; line-height:1.6;
-  }
-  .note b{ color:#1a1a1a; }
-
-  /* ══════════════ MARCO DE LA ENCUESTA (lo que realmente controla Qualtrics) ══════════════ */
-  .survey-frame{
-    width:100%; max-width:1040px; aspect-ratio: 16/9.2;
-    position:relative; overflow:hidden;
-    background:
-      radial-gradient(circle at 78% 82%, rgba(143,224,0,.28), transparent 45%),
-      radial-gradient(circle at 15% 15%, rgba(0,199,61,.25), transparent 50%),
-      linear-gradient(160deg, #0b3d20 0%, #0f6b32 55%, #12833a 100%);
-    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  /* ═══ Lienzo: la foto de marca ocupa todo el viewport (imagen de fondo de Qualtrics) ═══ */
+  .stage{
+    position:relative; width:100%; min-height:100vh;
+    background-image:url('assets/mural.webp');
+    background-size:cover; background-position:center 22%;
+    display:flex; justify-content:center; align-items:flex-start;
+    padding:70px 0 48px;
   }
 
-  /* tarjeta: rectángulo plano semitransparente, sin radio grande ni sombra —
-     igual estructura y posición que el intercept real de Qualtrics */
+  /* ═══ Tarjeta: centrada, plana, translúcida — misma estructura del intercept real ═══ */
   .card{
-    position:absolute; top:0; left:0;
-    width:58%; height:100%;
-    background:rgba(10,18,14,.66);
-    padding:44px 48px;
+    width:62%; max-width:900px; min-height:640px;
+    background:rgba(58,58,58,.74);
+    border-radius:8px;
+    padding:40px 44px 34px;
     display:flex; flex-direction:column;
     color:#fff;
   }
-  @media (max-width:720px){ .card{ width:100%; padding:32px 24px; } }
+  @media (max-width:860px){ .card{ width:100%; border-radius:0; padding:28px 22px; } }
 
-  .brand-line{ display:flex; align-items:center; gap:8px; margin-bottom:28px; opacity:.9; }
-  .brand-line .mark{ width:16px; height:16px; }
-  .brand-line span{ font-family:var(--title); font-weight:700; font-size:13px; letter-spacing:.02em; color:#fff; }
+  .brand-line{ display:flex; align-items:center; gap:8px; margin-bottom:26px; }
+  .brand-line .mark{ width:15px; height:15px; }
+  .brand-line span{ font-family:var(--title); font-weight:700; font-size:12.5px; color:#fff; opacity:.95; }
 
   .step{ display:none; flex:1; flex-direction:column; }
   .step.active{ display:flex; }
 
-  .context-tag{ font-family:var(--body); font-size:12px; font-weight:700; color:#c9f7c9; margin-bottom:10px; }
-
-  .qtitle{
-    font-family:var(--body); font-weight:700; font-size:19px; line-height:1.4;
-    color:#fff; margin-bottom:26px; max-width:44ch;
+  .headline{
+    font-family:var(--body); font-weight:700; font-size:20px; text-align:center;
+    margin-bottom:26px; color:#fff;
   }
+  .qtext{
+    font-family:var(--body); font-weight:700; font-size:16px; line-height:1.5;
+    color:#fff; margin-bottom:22px;
+  }
+  .context-tag{ font-family:var(--body); font-size:12.5px; font-weight:700; color:var(--primary-l04); margin-bottom:12px; }
 
-  .scale-row{ display:flex; justify-content:space-between; margin-bottom:8px; }
+  .scale-anchors{ display:flex; justify-content:space-between; font-size:13.5px; color:#fff; margin-bottom:8px; padding:0 6px; }
+  .scale-row{ display:flex; gap:6px; margin-bottom:30px; }
   .scale-row button{
-    background:none; border:none; color:#fff; font-family:var(--body); font-size:14px;
-    font-weight:500; cursor:pointer; padding:4px 6px; opacity:.85;
+    flex:1; background:rgba(255,255,255,.09); border:none; color:#fff;
+    font-family:var(--body); font-size:14px; padding:11px 0; cursor:pointer;
   }
-  .scale-row button.sel{ font-weight:800; color:var(--primary-l04); opacity:1; text-decoration:underline; text-underline-offset:4px; }
-  .scale-anchors{ display:flex; justify-content:space-between; font-size:12.5px; color:rgba(255,255,255,.75); margin-bottom:30px; }
+  .scale-row button:hover{ background:rgba(255,255,255,.18); }
+  .scale-row button.sel{ background:var(--primary-00); font-weight:700; }
 
   .qtextarea{
-    width:100%; min-height:70px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.35);
-    border-radius:2px; color:#fff; font-family:var(--body); font-size:14px; padding:10px; margin-bottom:24px; resize:none;
+    width:100%; min-height:70px; background:transparent; border:1px solid #fff;
+    color:#fff; font-family:var(--body); font-size:14px; padding:10px; margin-bottom:24px; resize:vertical;
   }
-  .qtextarea::placeholder{ color:rgba(255,255,255,.6); }
+  .qtextarea::placeholder{ color:rgba(255,255,255,.55); }
   .qtextarea:focus{ outline:none; border-color:var(--primary-00); }
 
-  .list{ display:flex; flex-direction:column; margin-bottom:20px; }
+  .list{ display:flex; flex-direction:column; margin-bottom:24px; }
   .list .opt{
-    padding:13px 0; border-bottom:1px solid rgba(255,255,255,.18);
+    padding:19px 20px; border-bottom:1px solid rgba(255,255,255,.22);
     font-family:var(--body); font-size:14.5px; color:#fff; cursor:pointer;
   }
-  .list .opt:hover{ color:var(--primary-l04); }
-  .list .opt.sel{ color:var(--primary-l04); font-weight:700; }
+  .list .opt:hover{ background:rgba(255,255,255,.07); }
+  .list .opt.sel{ background:rgba(0,199,61,.22); font-weight:700; }
 
   .spacer{ flex:1; }
 
-  .actions{ display:flex; justify-content:space-between; gap:12px; margin-top:auto; }
+  .actions{ display:flex; justify-content:space-between; align-items:center; margin-top:auto; }
+  .actions .right{ margin-left:auto; }
   .btn{
-    font-family:var(--body); font-weight:700; font-size:13.5px; color:#fff;
-    background:var(--primary-00); border:none; border-radius:3px; padding:11px 26px; cursor:pointer;
+    font-family:var(--body); font-weight:600; font-size:14px; color:#fff;
+    background:#3cc153; border:none; border-radius:4px; padding:10px 26px; cursor:pointer;
   }
   .btn:hover{ background:var(--primary-d01); }
-  .btn[disabled]{ background:rgba(255,255,255,.25); color:rgba(255,255,255,.6); cursor:not-allowed; }
+  .btn[disabled]{ background:rgba(255,255,255,.22); color:rgba(255,255,255,.55); cursor:not-allowed; }
 
-  .thanks-text{ font-family:var(--body); font-size:15px; color:#fff; line-height:1.6; max-width:40ch; }
+  .thanks-text{ font-family:var(--body); font-weight:700; font-size:16px; color:#fff; text-align:center; line-height:1.7; padding:20px 0; }
 
   .qualtrics-tag{
-    position:absolute; bottom:14px; right:20px; color:rgba(255,255,255,.7);
-    font-size:11.5px; font-family:var(--body);
+    position:fixed; bottom:0; right:0; background:rgba(30,30,30,.85);
+    color:rgba(255,255,255,.85); font-size:12px; font-family:var(--body); padding:6px 12px;
   }
 </style>
 </head>
@@ -122,47 +116,52 @@
   <button id="btnShowCes">Disparo: CES (tras retiro)</button>
 </div>
 
-<p class="note">Estructura real de Qualtrics: imagen de fondo a pantalla completa + tarjeta plana semitransparente anclada arriba-izquierda, opciones en lista simple, botones rectangulares planos. Lo único que cambia frente a lo que hay hoy en producción: <b>imagen de fondo</b> (de foto de stock a un tono de marca), <b>tipografía</b> (Montserrat/Open Sans), <b>una línea de marca</b> arriba de la pregunta, y <b>color</b> de acento en las selecciones — nada de la estructura de tarjeta ni de botones.</p>
-
-<div class="survey-frame">
+<div class="stage">
   <div class="card">
     <div class="brand-line">
       <svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M4 20 L12 4 L20 20 Z" fill="#fff"/></svg>
       <span>skandia</span>
     </div>
 
-    <!-- ═══ NPS ═══ -->
-    <div id="blockNps">
+    <!-- ═══════════ NPS ═══════════ -->
+    <div id="blockNps" style="display:contents;">
       <div class="step active" data-step="score">
-        <div class="qtitle">Pensando en tu experiencia con la gestión realizada a través del Portal, ¿qué tan probable es que recomiendes a Skandia a un familiar, amigo o colega?</div>
-        <div class="scale-row" id="npsScoreRow"></div>
+        <div class="headline">Tu opinión nos ayuda a mejorar nuestro Portal.</div>
+        <div class="qtext">Pensando en tu experiencia con la gestión realizada a través del Portal, ¿qué tan probable es que recomiendes a Skandia a un familiar, amigo o colega?</div>
         <div class="scale-anchors"><span>Nada Probable</span><span>Muy Probable</span></div>
-        <div class="qtitle" style="font-size:15px; margin-bottom:10px;">¿Por qué motivo brindas esta calificación?</div>
-        <textarea class="qtextarea" placeholder="Escribe aquí"></textarea>
+        <div class="scale-row" id="npsScoreRow"></div>
+        <div class="qtext">¿Por qué motivo brindas esta calificación?</div>
+        <textarea class="qtextarea" placeholder=""></textarea>
         <div class="spacer"></div>
-        <div class="actions"><span></span><button class="btn" id="npsBtnScore" disabled>Continuar</button></div>
+        <div class="actions"><span class="right"><button class="btn" id="npsBtnScore" disabled>Continuar</button></span></div>
       </div>
 
       <div class="step" data-step="task">
-        <div class="qtitle">¿Lograste hacer lo que necesitabas hoy?</div>
+        <div class="qtext">¿Lograste hacer lo que necesitabas hoy?</div>
         <div class="list" id="npsTaskChoices">
           <div class="opt" data-v="si">Sí</div>
           <div class="opt" data-v="parcial">Parcialmente</div>
           <div class="opt" data-v="no">No</div>
         </div>
         <div class="spacer"></div>
-        <div class="actions"><button class="btn" onclick="goTo('blockNps','score')">Atrás</button><button class="btn" id="npsBtnTask" disabled>Continuar</button></div>
+        <div class="actions">
+          <button class="btn" onclick="goTo('blockNps','score')">Atrás</button>
+          <button class="btn" id="npsBtnTask" disabled>Continuar</button>
+        </div>
       </div>
 
       <div class="step" data-step="help">
-        <div class="qtitle">¿Necesitas ayuda para completar tu gestión?</div>
+        <div class="qtext">¿Necesitas ayuda para completar tu gestión?</div>
         <div class="list" id="npsHelpChoices">
           <div class="opt" data-v="si">Sí</div>
           <div class="opt" data-v="solucionado">No, ya lo solucioné</div>
           <div class="opt" data-v="no">No, ya no lo necesito</div>
         </div>
         <div class="spacer"></div>
-        <div class="actions"><button class="btn" onclick="goTo('blockNps','task')">Atrás</button><button class="btn" id="npsBtnHelp" disabled>Continuar</button></div>
+        <div class="actions">
+          <button class="btn" onclick="goTo('blockNps','task')">Atrás</button>
+          <button class="btn" id="npsBtnHelp" disabled>Continuar</button>
+        </div>
       </div>
 
       <div class="step" data-step="thanks">
@@ -170,15 +169,14 @@
       </div>
     </div>
 
-    <!-- ═══ CES ═══ -->
+    <!-- ═══════════ CES ═══════════ -->
     <div id="blockCes" style="display:none;">
       <div class="step active" data-step="ces">
         <div class="context-tag">Después de: Retiro solicitado</div>
-        <div class="qtitle">¿Qué tan fácil fue hacer lo que necesitabas?</div>
+        <div class="headline">¿Qué tan fácil fue hacer lo que necesitabas?</div>
         <div class="scale-row" id="cesScoreRow"></div>
-        <div class="scale-anchors"><span>Muy Difícil</span><span>Muy Fácil</span></div>
         <div class="spacer"></div>
-        <div class="actions"><span></span><button class="btn" id="cesBtnScore" disabled>Continuar</button></div>
+        <div class="actions"><span class="right"><button class="btn" id="cesBtnScore" disabled>Continuar</button></span></div>
       </div>
 
       <div class="step" data-step="thanks">
@@ -187,8 +185,9 @@
     </div>
 
   </div>
-  <div class="qualtrics-tag">Con tecnología de Qualtrics ↗</div>
 </div>
+
+<div class="qualtrics-tag">Con tecnología de Qualtrics ↗</div>
 
 <script>
   function goTo(block, step){
@@ -245,14 +244,14 @@
     this.classList.add('active');
     document.getElementById('btnShowCes').classList.remove('active');
     document.getElementById('blockCes').style.display = 'none';
-    document.getElementById('blockNps').style.display = 'block';
+    document.getElementById('blockNps').style.display = 'contents';
     goTo('blockNps','score');
   });
   document.getElementById('btnShowCes').addEventListener('click', function(){
     this.classList.add('active');
     document.getElementById('btnShowNps').classList.remove('active');
     document.getElementById('blockNps').style.display = 'none';
-    document.getElementById('blockCes').style.display = 'block';
+    document.getElementById('blockCes').style.display = 'contents';
     goTo('blockCes','ces');
   });
 </script>
