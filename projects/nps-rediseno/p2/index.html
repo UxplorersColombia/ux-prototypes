@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NPS y CES Portal — Prototipo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --primary-00:#00c73d; --primary-d01:#03a835; --primary-l04:#caf9cb;
+    --texts-dark:#404040; --texts-medium:#666666;
+    --title:'Montserrat'; --body:'Open Sans';
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family: var(--body), system-ui, sans-serif;
+    background:#e9e9e9; -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; align-items:center; gap:20px;
+    padding:76px 24px 60px;
+  }
+  svg{ display:block; }
+
+  .harness{
+    position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:80;
+    display:flex; gap:6px; background:rgba(20,20,20,.9); padding:6px; border-radius:8px;
+  }
+  .harness button{
+    font-family:var(--body); font-weight:700; font-size:12.5px; color:#cfd6cf;
+    background:transparent; border:none; border-radius:6px; padding:8px 18px; cursor:pointer;
+  }
+  .harness button.active{ background:var(--primary-00); color:#fff; }
+
+  .note{
+    max-width:900px; font-family:var(--body); font-size:13px; color:#555; text-align:center; line-height:1.6;
+  }
+  .note b{ color:#1a1a1a; }
+
+  /* ══════════════ MARCO DE LA ENCUESTA (lo que realmente controla Qualtrics) ══════════════ */
+  .survey-frame{
+    width:100%; max-width:1040px; aspect-ratio: 16/9.2;
+    position:relative; overflow:hidden;
+    background:
+      radial-gradient(circle at 78% 82%, rgba(143,224,0,.28), transparent 45%),
+      radial-gradient(circle at 15% 15%, rgba(0,199,61,.25), transparent 50%),
+      linear-gradient(160deg, #0b3d20 0%, #0f6b32 55%, #12833a 100%);
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+
+  /* tarjeta: rectángulo plano semitransparente, sin radio grande ni sombra —
+     igual estructura y posición que el intercept real de Qualtrics */
+  .card{
+    position:absolute; top:0; left:0;
+    width:58%; height:100%;
+    background:rgba(10,18,14,.66);
+    padding:44px 48px;
+    display:flex; flex-direction:column;
+    color:#fff;
+  }
+  @media (max-width:720px){ .card{ width:100%; padding:32px 24px; } }
+
+  .brand-line{ display:flex; align-items:center; gap:8px; margin-bottom:28px; opacity:.9; }
+  .brand-line .mark{ width:16px; height:16px; }
+  .brand-line span{ font-family:var(--title); font-weight:700; font-size:13px; letter-spacing:.02em; color:#fff; }
+
+  .step{ display:none; flex:1; flex-direction:column; }
+  .step.active{ display:flex; }
+
+  .context-tag{ font-family:var(--body); font-size:12px; font-weight:700; color:#c9f7c9; margin-bottom:10px; }
+
+  .qtitle{
+    font-family:var(--body); font-weight:700; font-size:19px; line-height:1.4;
+    color:#fff; margin-bottom:26px; max-width:44ch;
+  }
+
+  .scale-row{ display:flex; justify-content:space-between; margin-bottom:8px; }
+  .scale-row button{
+    background:none; border:none; color:#fff; font-family:var(--body); font-size:14px;
+    font-weight:500; cursor:pointer; padding:4px 6px; opacity:.85;
+  }
+  .scale-row button.sel{ font-weight:800; color:var(--primary-l04); opacity:1; text-decoration:underline; text-underline-offset:4px; }
+  .scale-anchors{ display:flex; justify-content:space-between; font-size:12.5px; color:rgba(255,255,255,.75); margin-bottom:30px; }
+
+  .qtextarea{
+    width:100%; min-height:70px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.35);
+    border-radius:2px; color:#fff; font-family:var(--body); font-size:14px; padding:10px; margin-bottom:24px; resize:none;
+  }
+  .qtextarea::placeholder{ color:rgba(255,255,255,.6); }
+  .qtextarea:focus{ outline:none; border-color:var(--primary-00); }
+
+  .list{ display:flex; flex-direction:column; margin-bottom:20px; }
+  .list .opt{
+    padding:13px 0; border-bottom:1px solid rgba(255,255,255,.18);
+    font-family:var(--body); font-size:14.5px; color:#fff; cursor:pointer;
+  }
+  .list .opt:hover{ color:var(--primary-l04); }
+  .list .opt.sel{ color:var(--primary-l04); font-weight:700; }
+
+  .spacer{ flex:1; }
+
+  .actions{ display:flex; justify-content:space-between; gap:12px; margin-top:auto; }
+  .btn{
+    font-family:var(--body); font-weight:700; font-size:13.5px; color:#fff;
+    background:var(--primary-00); border:none; border-radius:3px; padding:11px 26px; cursor:pointer;
+  }
+  .btn:hover{ background:var(--primary-d01); }
+  .btn[disabled]{ background:rgba(255,255,255,.25); color:rgba(255,255,255,.6); cursor:not-allowed; }
+
+  .thanks-text{ font-family:var(--body); font-size:15px; color:#fff; line-height:1.6; max-width:40ch; }
+
+  .qualtrics-tag{
+    position:absolute; bottom:14px; right:20px; color:rgba(255,255,255,.7);
+    font-size:11.5px; font-family:var(--body);
+  }
+</style>
+</head>
+<body>
+
+<div class="harness">
+  <button class="active" id="btnShowNps">Disparo: NPS</button>
+  <button id="btnShowCes">Disparo: CES (tras retiro)</button>
+</div>
+
+<p class="note">Estructura real de Qualtrics: imagen de fondo a pantalla completa + tarjeta plana semitransparente anclada arriba-izquierda, opciones en lista simple, botones rectangulares planos. Lo único que cambia frente a lo que hay hoy en producción: <b>imagen de fondo</b> (de foto de stock a un tono de marca), <b>tipografía</b> (Montserrat/Open Sans), <b>una línea de marca</b> arriba de la pregunta, y <b>color</b> de acento en las selecciones — nada de la estructura de tarjeta ni de botones.</p>
+
+<div class="survey-frame">
+  <div class="card">
+    <div class="brand-line">
+      <svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M4 20 L12 4 L20 20 Z" fill="#fff"/></svg>
+      <span>skandia</span>
+    </div>
+
+    <!-- ═══ NPS ═══ -->
+    <div id="blockNps">
+      <div class="step active" data-step="score">
+        <div class="qtitle">Pensando en tu experiencia con la gestión realizada a través del Portal, ¿qué tan probable es que recomiendes a Skandia a un familiar, amigo o colega?</div>
+        <div class="scale-row" id="npsScoreRow"></div>
+        <div class="scale-anchors"><span>Nada Probable</span><span>Muy Probable</span></div>
+        <div class="qtitle" style="font-size:15px; margin-bottom:10px;">¿Por qué motivo brindas esta calificación?</div>
+        <textarea class="qtextarea" placeholder="Escribe aquí"></textarea>
+        <div class="spacer"></div>
+        <div class="actions"><span></span><button class="btn" id="npsBtnScore" disabled>Continuar</button></div>
+      </div>
+
+      <div class="step" data-step="task">
+        <div class="qtitle">¿Lograste hacer lo que necesitabas hoy?</div>
+        <div class="list" id="npsTaskChoices">
+          <div class="opt" data-v="si">Sí</div>
+          <div class="opt" data-v="parcial">Parcialmente</div>
+          <div class="opt" data-v="no">No</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="actions"><button class="btn" onclick="goTo('blockNps','score')">Atrás</button><button class="btn" id="npsBtnTask" disabled>Continuar</button></div>
+      </div>
+
+      <div class="step" data-step="help">
+        <div class="qtitle">¿Necesitas ayuda para completar tu gestión?</div>
+        <div class="list" id="npsHelpChoices">
+          <div class="opt" data-v="si">Sí</div>
+          <div class="opt" data-v="solucionado">No, ya lo solucioné</div>
+          <div class="opt" data-v="no">No, ya no lo necesito</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="actions"><button class="btn" onclick="goTo('blockNps','task')">Atrás</button><button class="btn" id="npsBtnHelp" disabled>Continuar</button></div>
+      </div>
+
+      <div class="step" data-step="thanks">
+        <div class="thanks-text">¡Gracias por compartir tu opinión! 💚<br>Seguiremos trabajando para hacer tu experiencia cada vez mejor.</div>
+      </div>
+    </div>
+
+    <!-- ═══ CES ═══ -->
+    <div id="blockCes" style="display:none;">
+      <div class="step active" data-step="ces">
+        <div class="context-tag">Después de: Retiro solicitado</div>
+        <div class="qtitle">¿Qué tan fácil fue hacer lo que necesitabas?</div>
+        <div class="scale-row" id="cesScoreRow"></div>
+        <div class="scale-anchors"><span>Muy Difícil</span><span>Muy Fácil</span></div>
+        <div class="spacer"></div>
+        <div class="actions"><span></span><button class="btn" id="cesBtnScore" disabled>Continuar</button></div>
+      </div>
+
+      <div class="step" data-step="thanks">
+        <div class="thanks-text">¡Gracias! 💚<br>Tu opinión nos ayuda a mejorar esta gestión.</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="qualtrics-tag">Con tecnología de Qualtrics ↗</div>
+</div>
+
+<script>
+  function goTo(block, step){
+    document.querySelectorAll('#' + block + ' .step').forEach(function(el){ el.classList.remove('active'); });
+    document.querySelector('#' + block + ' .step[data-step="' + step + '"]').classList.add('active');
+  }
+
+  function buildScale(container, labels, onPick){
+    labels.forEach(function(label){
+      var b = document.createElement('button');
+      b.textContent = label;
+      b.addEventListener('click', function(){
+        Array.prototype.forEach.call(container.querySelectorAll('button'), function(x){ x.classList.remove('sel'); });
+        b.classList.add('sel');
+        onPick();
+      });
+      container.appendChild(b);
+    });
+  }
+
+  buildScale(document.getElementById('npsScoreRow'), ['0','1','2','3','4','5','6','7','8','9','10'], function(){
+    document.getElementById('npsBtnScore').disabled = false;
+  });
+  document.getElementById('npsBtnScore').addEventListener('click', function(){ goTo('blockNps','task'); });
+
+  var npsTaskAnswer = null;
+  document.querySelectorAll('#npsTaskChoices .opt').forEach(function(opt){
+    opt.addEventListener('click', function(){
+      document.querySelectorAll('#npsTaskChoices .opt').forEach(function(x){ x.classList.remove('sel'); });
+      opt.classList.add('sel');
+      npsTaskAnswer = opt.dataset.v;
+      document.getElementById('npsBtnTask').disabled = false;
+    });
+  });
+  document.getElementById('npsBtnTask').addEventListener('click', function(){
+    goTo('blockNps', npsTaskAnswer === 'si' ? 'thanks' : 'help');
+  });
+
+  document.querySelectorAll('#npsHelpChoices .opt').forEach(function(opt){
+    opt.addEventListener('click', function(){
+      document.querySelectorAll('#npsHelpChoices .opt').forEach(function(x){ x.classList.remove('sel'); });
+      opt.classList.add('sel');
+      document.getElementById('npsBtnHelp').disabled = false;
+    });
+  });
+  document.getElementById('npsBtnHelp').addEventListener('click', function(){ goTo('blockNps','thanks'); });
+
+  buildScale(document.getElementById('cesScoreRow'), ['Muy Fácil','Fácil','Ni Fácil/Ni Difícil','Difícil','Muy Difícil'], function(){
+    document.getElementById('cesBtnScore').disabled = false;
+  });
+  document.getElementById('cesBtnScore').addEventListener('click', function(){ goTo('blockCes','thanks'); });
+
+  document.getElementById('btnShowNps').addEventListener('click', function(){
+    this.classList.add('active');
+    document.getElementById('btnShowCes').classList.remove('active');
+    document.getElementById('blockCes').style.display = 'none';
+    document.getElementById('blockNps').style.display = 'block';
+    goTo('blockNps','score');
+  });
+  document.getElementById('btnShowCes').addEventListener('click', function(){
+    this.classList.add('active');
+    document.getElementById('btnShowNps').classList.remove('active');
+    document.getElementById('blockNps').style.display = 'none';
+    document.getElementById('blockCes').style.display = 'block';
+    goTo('blockCes','ces');
+  });
+</script>
+
+</body>
+</html>

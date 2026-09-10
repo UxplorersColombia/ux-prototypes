@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NPS y CES App — Prototipo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --primary-d01:#03a835; --primary-00:#00c73d; --primary-l04:#caf9cb; --primary-l05:#f6fcf2;
+    --primarygrey-00:#404040; --primarygrey-l03:#666666; --primarygrey-l04:#878787; --primarygrey-l05:#a5a5a5;
+    --secondarygreencomplementary-00:#8fe000;
+    --neutral-00:#ffffff; --neutral-l01:#fafafa; --neutral-l02:#f7f7f7; --neutral-l03:#e9e9e9;
+    --neutral-l04:#dddddd; --neutral-l05:#c5c5c5;
+    --texts-dark:var(--primarygrey-00); --texts-medium:var(--primarygrey-l03); --texts-white:var(--neutral-00);
+    --icon-neutral:var(--primarygrey-00); --icon-brand:var(--primary-00);
+    --button-brand-default:var(--primary-00); --button-brand-hover:var(--primary-d01);
+    --button-brand-tertiary-hover:var(--primary-l05);
+    --button-disable:var(--neutral-l03);
+    --background-principal:var(--neutral-00); --background-grey-light:var(--neutral-l02);
+    --stroke-grey-light:var(--neutral-l04); --stroke-grey-medium:var(--neutral-l05);
+    --estilos-degrade: linear-gradient(135deg, var(--primary-00), var(--secondarygreencomplementary-00));
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+    --shadow-md: 0 4px 12px -2px rgba(0,0,0,.08), 0 2px 4px -1px rgba(0,0,0,.04);
+    --shadow-lg: 0 12px 32px -8px rgba(0,0,0,.12), 0 4px 8px -2px rgba(0,0,0,.06);
+    --bordes-s:4px; --bordes-m:16px; --bordes-xl:104px;
+    --title:'Montserrat'; --body:'Open Sans';
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: var(--body), 'Open Sans', system-ui, sans-serif;
+    background:#e8e8e8;
+    color:var(--texts-dark);
+    -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh;
+    padding:80px 24px 24px;
+  }
+  h1,h2,h3,h4{ font-family: var(--title), 'Montserrat', sans-serif; font-weight:700; margin:0; }
+  svg{ display:block; }
+
+  /* ── Selector de escenario (arnés de prueba) ── */
+  .harness{
+    position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:80;
+    display:flex; gap:6px; background:rgba(20,20,20,.85); padding:6px; border-radius:999px;
+    box-shadow:0 8px 24px -8px rgba(0,0,0,.4);
+  }
+  .harness button{
+    font-family:var(--body); font-weight:700; font-size:12.5px; color:#cfd6cf;
+    background:transparent; border:none; border-radius:999px; padding:8px 18px; cursor:pointer;
+  }
+  .harness button.active{ background:var(--primary-00); color:#fff; }
+
+  /* ── Frame del dispositivo ── */
+  .device{
+    width:390px; height:800px; background:var(--background-principal);
+    border-radius:40px; overflow:hidden; position:relative;
+    box-shadow: var(--shadow-lg);
+    border:8px solid #1a1a1a;
+  }
+  .statusbar{ height:24px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; font-size:12px; font-weight:600; color:var(--texts-dark); }
+
+  .home{ padding:0 20px; }
+  .home-header{ display:flex; align-items:center; justify-content:space-between; padding:8px 0 16px; }
+  .home-logo{ display:flex; align-items:center; gap:8px; }
+  .home-logo .mark{ width:24px; height:24px; }
+  .home-logo span{ font-family:var(--title); font-weight:700; font-size:16px; color:var(--texts-dark); }
+  .home-greet{ font-family:var(--title); font-weight:700; font-size:20px; color:var(--texts-dark); margin-bottom:16px; }
+  .home-card{
+    background:var(--background-principal); border:1px solid var(--stroke-grey-light);
+    border-radius:var(--bordes-m); padding:16px; margin-bottom:12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .home-card .label{ font-size:13px; color:var(--texts-medium); font-weight:500; margin-bottom:6px; }
+  .home-card .amount{ font-family:var(--title); font-weight:700; font-size:22px; color:var(--primary-d01); }
+  .home-card .btn-retiro{
+    margin-top:10px; background:var(--primary-00); color:#fff; border:none; border-radius:999px;
+    padding:8px 16px; font-family:var(--body); font-weight:700; font-size:12px; cursor:pointer;
+  }
+  .home-bottomnav{
+    position:absolute; bottom:0; left:0; right:0; height:78px;
+    background:var(--background-principal); border-top:1px solid var(--stroke-grey-light);
+    display:flex; align-items:center; justify-content:space-around; padding-bottom:14px;
+  }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; color:var(--texts-medium); font-weight:500; }
+  .nav-item.active{ color:var(--icon-brand); }
+  .nav-fab{
+    width:52px; height:52px; border-radius:50%; background:var(--button-brand-default);
+    display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-md);
+    margin-top:-30px;
+  }
+
+  /* ── Scrim + Bottom sheet ── */
+  .scrim{
+    position:absolute; inset:0; background:rgba(0,0,0,.4);
+    display:flex; align-items:flex-end; z-index:10;
+  }
+  .sheet{
+    width:100%; background:var(--background-principal);
+    border-radius:var(--bordes-m) var(--bordes-m) 0 0;
+    box-shadow: var(--shadow-lg);
+    padding:8px 20px 28px;
+    display:flex; flex-direction:column;
+    max-height:88%;
+    animation: sheet-in .22s ease-out;
+  }
+  @keyframes sheet-in{ from{ transform:translateY(24px); opacity:.6;} to{ transform:translateY(0); opacity:1; } }
+  .sheet-grabber{ width:36px; height:4px; background:var(--stroke-grey-medium); border-radius:100px; margin:6px auto 4px; }
+  .sheet-topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; min-height:32px; }
+  .sheet-eyebrow{ font-size:12px; font-weight:600; color:var(--texts-medium); }
+
+  .btn-close{
+    width:32px; height:32px; border-radius:50%; border:none; background:transparent;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--icon-neutral);
+    transition: background-color .15s, color .15s;
+    flex-shrink:0;
+  }
+  .btn-close:hover{ background:var(--button-brand-tertiary-hover); color:var(--icon-brand); }
+
+  .sheet-body{ overflow-y:auto; padding-top:4px; }
+  .step{ display:none; }
+  .step.active{ display:block; animation: fade-in .18s ease-out; }
+  @keyframes fade-in{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .q-title{ font-family:var(--title); font-weight:700; font-size:20px; line-height:1.75rem; color:var(--texts-dark); margin-bottom:20px; }
+
+  .context-tag{
+    display:inline-block; font-size:12px; font-weight:700; color:var(--primary-d01);
+    background:var(--primary-l05); border-radius:999px; padding:5px 14px; margin-bottom:16px;
+  }
+
+  .score-row{
+    display:grid; grid-template-columns:repeat(var(--n,11), minmax(0,1fr));
+    border:1.5px solid var(--stroke-grey-medium); border-radius:var(--bordes-s);
+    overflow:hidden; margin-bottom:8px; width:100%;
+  }
+  .score-btn{
+    width:auto; height:40px; min-width:0; border-radius:0;
+    border:none; border-right:1px solid var(--stroke-grey-medium);
+    background:var(--background-principal);
+    color:var(--texts-dark); font-family:var(--body); font-weight:600; font-size:13px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
+    transition: background-color .15s, color .15s;
+  }
+  .score-btn:last-child{ border-right:none; }
+  .score-btn:hover{ background:var(--button-brand-tertiary-hover); }
+  .score-btn.selected{ background:var(--button-brand-default); color:#fff; }
+  .score-anchors{ display:flex; justify-content:space-between; font-size:12px; color:var(--texts-medium); font-weight:500; margin-top:4px; margin-bottom:28px; }
+
+  .sk-textarea-wrap{ position:relative; margin-bottom:24px; }
+  textarea.sk-textarea{
+    width:100%; min-height:120px; resize:vertical;
+    border:1px solid var(--stroke-grey-medium); border-radius:8px;
+    padding:14px; font-family:var(--body); font-size:16px; color:var(--texts-dark);
+    outline:none; transition:border-color .15s; background:var(--background-principal);
+  }
+  textarea.sk-textarea:focus{ border:2px solid var(--primary-00); padding:13px; }
+  .char-count{ text-align:right; font-size:12px; color:var(--texts-medium); margin-top:4px; }
+
+  .choice-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:28px; }
+  .choice-pill{
+    display:flex; align-items:center; gap:12px;
+    border:1.5px solid var(--stroke-grey-medium); border-radius:12px;
+    padding:14px 16px; cursor:pointer; transition: border-color .15s, background-color .15s;
+    background:var(--background-principal);
+  }
+  .choice-pill:hover{ border-color:var(--primary-00); }
+  .choice-pill.selected{ border-color:var(--primary-00); background:var(--primary-l05); }
+  .choice-radio{
+    width:18px; height:18px; border-radius:50%; border:1.5px solid var(--stroke-grey-medium);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .choice-pill.selected .choice-radio{ border:2px solid var(--primary-00); }
+  .choice-radio .dot{ width:9px; height:9px; border-radius:50%; background:var(--primary-00); display:none; }
+  .choice-pill.selected .choice-radio .dot{ display:block; }
+  .choice-label{ font-family:var(--body); font-size:15px; font-weight:500; color:var(--texts-dark); }
+
+  .sk-btn{
+    width:100%; height:48px; border-radius:var(--bordes-xl);
+    font-family:var(--body); font-weight:600; font-size:16px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    cursor:pointer; border:1.5px solid transparent; transition: background-color .15s, border-color .15s, color .15s;
+  }
+  .sk-btn[disabled]{ background:var(--button-disable) !important; color:var(--primarygrey-l03) !important; border-color:transparent !important; cursor:not-allowed; }
+  .sk-btn.primary{ background:var(--button-brand-default); color:#fff; }
+  .sk-btn.primary:not([disabled]):hover{ background:var(--button-brand-hover); }
+
+  .progress-dots{ display:flex; gap:6px; margin-bottom:18px; }
+  .dot-step{ width:20px; height:4px; border-radius:100px; background:var(--neutral-l03); transition:background-color .2s; }
+  .dot-step.done{ background:var(--primary-l04); }
+  .dot-step.current{ background:var(--primary-00); }
+
+  .close-screen{ text-align:center; padding:32px 8px 12px; }
+  .close-screen .icon-wrap{
+    width:64px; height:64px; border-radius:50%; margin:0 auto 20px;
+    background:var(--estilos-degrade); display:flex; align-items:center; justify-content:center;
+  }
+  .close-screen p{ font-family:var(--body); font-size:16px; line-height:1.5rem; color:var(--texts-dark); margin-top:12px; }
+</style>
+</head>
+<body>
+
+<div class="harness">
+  <button class="active" id="btnShowNps">Disparo: NPS</button>
+  <button id="btnShowCes">Disparo: CES (tras retiro)</button>
+</div>
+
+<div class="device">
+  <div class="statusbar"><span>9:41</span><span>●●●●  📶  🔋</span></div>
+
+  <div class="home">
+    <div class="home-header">
+      <div class="home-logo">
+        <svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M4 20 L12 4 L20 20 Z" fill="#00c73d"/></svg>
+        <span>skandia</span>
+      </div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#404040" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </div>
+    <div class="home-greet">¡Hola Valeria!</div>
+    <div class="home-card">
+      <div class="label">Ahorro e Inversión</div>
+      <div class="amount">$1.210.161</div>
+    </div>
+    <div class="home-card">
+      <div class="label">Pensión Obligatoria y Cesantías</div>
+      <div class="amount">$47.424.033</div>
+      <button class="btn-retiro">Solicitar retiro</button>
+    </div>
+  </div>
+  <div class="home-bottomnav">
+    <div class="nav-item active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+      Home
+    </div>
+    <div class="nav-fab">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    </div>
+    <div class="nav-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Productos
+    </div>
+  </div>
+
+  <!-- ═══ NPS — relacional, bottom sheet completo ═══ -->
+  <div class="scrim" id="scrimNps">
+    <div class="sheet">
+      <div class="sheet-grabber"></div>
+      <div class="sheet-topbar">
+        <span class="sheet-eyebrow" id="npsEyebrow">&nbsp;</span>
+        <button class="btn-close" onclick="hideDevice('scrimNps')" aria-label="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+
+        <div class="step active" data-step="score">
+          <div class="progress-dots"><div class="dot-step current"></div><div class="dot-step"></div><div class="dot-step"></div></div>
+          <div class="q-title">¿Qué tan probable es que nos recomiendes a un familiar, amigo o compañero de trabajo?</div>
+          <div class="score-row" id="npsScoreRow" style="--n:11"></div>
+          <div class="score-anchors"><span>Nada probable</span><span>Muy probable</span></div>
+          <button class="sk-btn primary" id="npsBtnScore" disabled>Continuar</button>
+        </div>
+
+        <div class="step" data-step="reason">
+          <div class="progress-dots"><div class="dot-step done"></div><div class="dot-step current"></div><div class="dot-step"></div></div>
+          <div class="q-title">¿Qué fue lo principal que influyó en tu calificación?</div>
+          <div class="sk-textarea-wrap">
+            <textarea class="sk-textarea" id="npsReason" maxlength="280" placeholder="Escribe tu respuesta aquí"></textarea>
+            <div class="char-count"><span id="npsCharCount">0</span>/280</div>
+          </div>
+          <button class="sk-btn primary" id="npsBtnReason" disabled>Continuar</button>
+        </div>
+
+        <div class="step" data-step="task">
+          <div class="progress-dots"><div class="dot-step done"></div><div class="dot-step done"></div><div class="dot-step current"></div></div>
+          <div class="q-title">¿Lograste hacer lo que necesitabas hoy?</div>
+          <div class="choice-list" id="npsTaskChoices">
+            <div class="choice-pill" data-value="si"><span class="choice-radio"><span class="dot"></span></span><span class="choice-label">Sí</span></div>
+            <div class="choice-pill" data-value="parcial"><span class="choice-radio"><span class="dot"></span></span><span class="choice-label">Parcialmente</span></div>
+            <div class="choice-pill" data-value="no"><span class="choice-radio"><span class="dot"></span></span><span class="choice-label">No</span></div>
+          </div>
+          <button class="sk-btn primary" id="npsBtnTask" disabled>Continuar</button>
+        </div>
+
+        <div class="step" data-step="help">
+          <div class="progress-dots"><div class="dot-step done"></div><div class="dot-step done"></div><div class="dot-step done"></div></div>
+          <div class="q-title">¿Necesitas ayuda para completar tu gestión?</div>
+          <div class="choice-list" id="npsHelpChoices">
+            <div class="choice-pill" data-value="si"><span class="choice-radio"><span class="dot"></span></span><span class="choice-label">Sí, contáctenme</span></div>
+            <div class="choice-pill" data-value="solucionado"><span class="choice-radio"><span class="dot"></span></span><span class="choice-label">No, ya lo solucioné</span></div>
+            <div class="choice-pill" data-value="no"><span class="choice-radio"><span class="dot"></span></span><span class="choice-label">No, ya no lo necesito</span></div>
+          </div>
+          <button class="sk-btn primary" id="npsBtnHelp" disabled>Enviar</button>
+        </div>
+
+        <div class="step" data-step="thanks">
+          <div class="close-screen">
+            <div class="icon-wrap"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <p>¡Gracias por compartir tu opinión! 💚<br>Seguiremos trabajando para hacer tu experiencia cada vez mejor.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CES — transaccional, solo tras retiro/aporte/gestión de portafolio ═══ -->
+  <div class="scrim" id="scrimCes" style="display:none;">
+    <div class="sheet">
+      <div class="sheet-grabber"></div>
+      <div class="sheet-topbar">
+        <span class="sheet-eyebrow">&nbsp;</span>
+        <button class="btn-close" onclick="hideDevice('scrimCes')" aria-label="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+
+        <div class="step active" data-step="ces">
+          <span class="context-tag">Después de: Retiro solicitado</span>
+          <div class="q-title">¿Qué tan fácil fue hacer lo que necesitabas hoy?</div>
+          <div class="score-row" id="cesScoreRow" style="--n:5"></div>
+          <div class="score-anchors"><span>Muy difícil</span><span>Muy fácil</span></div>
+          <button class="sk-btn primary" id="cesBtnScore" disabled>Enviar</button>
+        </div>
+
+        <div class="step" data-step="thanks">
+          <div class="close-screen">
+            <div class="icon-wrap"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <p>¡Gracias! 💚<br>Tu opinión nos ayuda a mejorar esta gestión.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function hideDevice(id){ document.getElementById(id).style.display = "none"; }
+  function showDevice(id){ document.getElementById(id).style.display = "flex"; }
+
+  function buildScale(container, n, onPick){
+    for (var i = 0; i <= n - 1; i++) {
+      (function(val){
+        var b = document.createElement("button");
+        b.className = "score-btn";
+        b.textContent = n === 11 ? val : val + 1;
+        b.addEventListener("click", function(){
+          Array.prototype.forEach.call(container.querySelectorAll("button"), function(x){ x.classList.remove("selected"); });
+          b.classList.add("selected");
+          onPick(b.textContent);
+        });
+        container.appendChild(b);
+      })(i);
+    }
+  }
+
+  function goTo(scope, step, eyebrowMap){
+    document.querySelectorAll('#' + scope + ' .step').forEach(function(el){ el.classList.remove("active"); });
+    document.querySelector('#' + scope + ' .step[data-step="' + step + '"]').classList.add("active");
+    if (eyebrowMap) {
+      var eb = document.getElementById(scope === "scrimNps" ? "npsEyebrow" : null);
+      if (eb) eb.textContent = eyebrowMap[step] || "";
+    }
+  }
+
+  /* ── NPS logic ── */
+  var npsEyebrowMap = { score:"1 de 3", reason:"2 de 3", task:"3 de 3", help:"Ayuda", thanks:"" };
+  buildScale(document.getElementById("npsScoreRow"), 11, function(){
+    document.getElementById("npsBtnScore").disabled = false;
+  });
+  document.getElementById("npsBtnScore").addEventListener("click", function(){ goTo("scrimNps", "reason", npsEyebrowMap); });
+
+  var npsReasonInput = document.getElementById("npsReason");
+  npsReasonInput.addEventListener("input", function(){
+    document.getElementById("npsCharCount").textContent = npsReasonInput.value.length;
+    document.getElementById("npsBtnReason").disabled = npsReasonInput.value.trim().length === 0;
+  });
+  document.getElementById("npsBtnReason").addEventListener("click", function(){ goTo("scrimNps", "task", npsEyebrowMap); });
+
+  var npsTaskAnswer = null;
+  document.querySelectorAll("#npsTaskChoices .choice-pill").forEach(function(pill){
+    pill.addEventListener("click", function(){
+      document.querySelectorAll("#npsTaskChoices .choice-pill").forEach(function(x){ x.classList.remove("selected"); });
+      pill.classList.add("selected");
+      npsTaskAnswer = pill.dataset.value;
+      document.getElementById("npsBtnTask").disabled = false;
+    });
+  });
+  document.getElementById("npsBtnTask").addEventListener("click", function(){
+    goTo("scrimNps", (npsTaskAnswer === "parcial" || npsTaskAnswer === "no") ? "help" : "thanks", npsEyebrowMap);
+  });
+
+  document.querySelectorAll("#npsHelpChoices .choice-pill").forEach(function(pill){
+    pill.addEventListener("click", function(){
+      document.querySelectorAll("#npsHelpChoices .choice-pill").forEach(function(x){ x.classList.remove("selected"); });
+      pill.classList.add("selected");
+      document.getElementById("npsBtnHelp").disabled = false;
+    });
+  });
+  document.getElementById("npsBtnHelp").addEventListener("click", function(){ goTo("scrimNps", "thanks", npsEyebrowMap); });
+
+  /* ── CES logic ── */
+  buildScale(document.getElementById("cesScoreRow"), 5, function(){
+    document.getElementById("cesBtnScore").disabled = false;
+  });
+  document.getElementById("cesBtnScore").addEventListener("click", function(){ goTo("scrimCes", "thanks"); });
+
+  /* ── Harness ── */
+  document.getElementById("btnShowNps").addEventListener("click", function(){
+    this.classList.add("active");
+    document.getElementById("btnShowCes").classList.remove("active");
+    hideDevice("scrimCes"); showDevice("scrimNps");
+    goTo("scrimNps", "score", npsEyebrowMap);
+  });
+  document.getElementById("btnShowCes").addEventListener("click", function(){
+    this.classList.add("active");
+    document.getElementById("btnShowNps").classList.remove("active");
+    hideDevice("scrimNps"); showDevice("scrimCes");
+    goTo("scrimCes", "ces");
+  });
+</script>
+
+</body>
+</html>
