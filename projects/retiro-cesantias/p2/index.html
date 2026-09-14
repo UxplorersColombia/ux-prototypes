@@ -854,6 +854,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
       var resumenMotivo = document.getElementById('resumen-motivo');
       if(resumenMotivo) resumenMotivo.textContent = motivoLabel;
       renderStep3Docs(opt.dataset.doc);
+      specialFlow = !!opt.dataset.doc;
       document.getElementById('step1-continue').disabled = false;
     });
   });
@@ -1000,16 +1001,23 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   }
 
   // Progress bar
+  // Dos posibles secuencias de pasos según el motivo:
+  // - Flujo especial (terminación, vivienda, predial): Motivo, Monto, Documentos, [Cartas empleadores], Destino, Resumen.
+  // - Flujo general (el resto de motivos): Motivo, Documentos, Monto, Destino, Resumen.
+  var specialFlow = true;
   var progressTrack = document.getElementById('progress-track');
   var progressCount = document.getElementById('progress-count');
-  function renderProgress(activeSegments){
+  function renderProgress(step){
+    var seq = specialFlow ? [1,2,3,4,5,6] : [1,3,2,5,6];
+    var position = seq.indexOf(step) + 1;
+    var total = seq.length;
     progressTrack.innerHTML = '';
-    for(var i=0;i<6;i++){
+    for(var i=0;i<total;i++){
       var seg = document.createElement('div');
-      seg.className = 'progress-seg' + (i < activeSegments ? ' filled' : '');
+      seg.className = 'progress-seg' + (i < position ? ' filled' : '');
       progressTrack.appendChild(seg);
     }
-    progressCount.textContent = activeSegments + ' de 6';
+    progressCount.textContent = position + ' de ' + total;
   }
 
   var stepEls = {
@@ -1045,7 +1053,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   });
   document.getElementById('step1-continue').addEventListener('click', function(){
     if(document.getElementById('step1-continue').disabled) return;
-    goToStep(2);
+    goToStep(specialFlow ? 2 : 3);
   });
 
   // STEP 2 — Monto
@@ -1094,12 +1102,12 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
       document.getElementById('opt-total').classList.remove('selected');
       document.getElementById('step2-continue').disabled = true;
     } else {
-      goToStep(1);
+      goToStep(specialFlow ? 1 : 3);
     }
   });
   document.getElementById('step2-continue').addEventListener('click', function(){
     if(document.getElementById('step2-continue').disabled) return;
-    goToStep(3);
+    goToStep(specialFlow ? 3 : 5);
   });
 
   // STEP 3 — Subir archivos (documentos requeridos según el motivo)
@@ -1173,10 +1181,14 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   }
 
   document.getElementById('step3-back').addEventListener('click', function(){
-    goToStep(2);
+    goToStep(specialFlow ? 2 : 1);
   });
   var step4Skipped = false;
   document.getElementById('step3-continue').addEventListener('click', function(){
+    if(!specialFlow){
+      goToStep(2);
+      return;
+    }
     prepareStep3Employers();
     var shortfall = montoSolicitado - CURRENT_EMPLOYER_SALDO;
     if(shortfall <= 0){
@@ -1199,6 +1211,10 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
 
   // STEP 5 — A dónde enviar
   document.getElementById('step5-back').addEventListener('click', function(){
+    if(!specialFlow){
+      goToStep(2);
+      return;
+    }
     goToStep(step4Skipped ? 3 : 4);
   });
   document.getElementById('step5-continue').addEventListener('click', function(){
