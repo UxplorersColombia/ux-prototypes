@@ -432,13 +432,6 @@ footer{text-align:center;font-size:11.5px;color:var(--muted-2);padding:20px}
             </div>
 
             <div class="fields">
-              <div class="field" id="f-monto">
-                <div class="lbl-row">
-                  <label>Monto de tu meta <span class="help-ico" title="Escribe el monto total que quieres alcanzar (por ejemplo, tu retiro o la compra de vivienda).">ⓘ</span></label>
-                  <span class="calc-tag">Calculado</span>
-                </div>
-                <div class="box"><span>$</span><input type="text" id="in-monto" value="50.000.000" oninput="onEdit('monto')"></div>
-              </div>
               <div class="field" id="f-inicial">
                 <div class="lbl-row">
                   <label>Inversión inicial <span class="help-ico" title="El monto que puedes invertir de entrada. Un aporte inicial mayor puede acortar el camino a tu meta.">ⓘ</span></label>
@@ -453,12 +446,12 @@ footer{text-align:center;font-size:11.5px;color:var(--muted-2);padding:20px}
                 </div>
                 <div class="box"><input type="text" id="in-anios" value="10" oninput="onEdit('anios')"><span class="suffix">años</span></div>
               </div>
-              <div class="field" id="f-aporte">
+              <div class="field" id="f-monto">
                 <div class="lbl-row">
-                  <label>Aportes periódicos <span class="help-ico" title="Cuánto y cada cuánto vas a aportar. Aportar de forma constante acelera el logro de tu meta.">ⓘ</span></label>
+                  <label>Monto de tu meta <span class="help-ico" title="Escribe el monto total que quieres alcanzar (por ejemplo, tu retiro o la compra de vivienda).">ⓘ</span></label>
                   <span class="calc-tag">Calculado</span>
                 </div>
-                <div class="box"><span>$</span><input type="text" id="in-aporte" value="416.667" oninput="onEdit('aporte')"><select class="freq" id="in-freq" onchange="onEdit('freq')"><option value="mensual">al mes</option><option value="trimestral">al trimestre</option><option value="semestral">al semestre</option><option value="anual">al año</option></select></div>
+                <div class="box"><span>$</span><input type="text" id="in-monto" value="50.000.000" oninput="onEdit('monto')"></div>
               </div>
               <div class="field" id="f-tasa">
                 <div class="lbl-row">
@@ -467,7 +460,14 @@ footer{text-align:center;font-size:11.5px;color:var(--muted-2);padding:20px}
                 </div>
                 <div class="box"><input type="text" id="in-tasa" value="8" oninput="onEdit('tasa')"><span class="suffix">% E.A.</span></div>
               </div>
-                        </div>
+              <div class="field" id="f-aporte">
+                <div class="lbl-row">
+                  <label>Aportes periódicos <span class="help-ico" title="Cuánto y cada cuánto vas a aportar. Aportar de forma constante acelera el logro de tu meta.">ⓘ</span></label>
+                  <span class="calc-tag">Calculado</span>
+                </div>
+                <div class="box"><span>$</span><input type="text" id="in-aporte" value="416.667" oninput="onEdit('aporte')"><select class="freq" id="in-freq" onchange="onEdit('freq')"><option value="mensual">al mes</option><option value="trimestral">al trimestre</option><option value="semestral">al semestre</option><option value="anual">al año</option></select></div>
+              </div>
+              </div>
             <div class="sim-note">
               <span class="ico">↻</span>
               <div>El campo marcado como <b>Calculado</b> se ajusta solo a partir de los demás. Si escribes en él, el cálculo pasa a otro campo.</div>
@@ -763,7 +763,7 @@ const FREQ = { mensual:12, trimestral:4, semestral:2, anual:1 };
 const FREQ_TXT = { mensual:'al mes', trimestral:'al trimestre', semestral:'al semestre', anual:'al año' };
 
 const state = { entry:'general', proposito:'Para mi retiro',
-  monto:50000000, inicial:0, aporte:416667, freq:'mensual', anios:10, tasa:0.08, solve:'monto' };
+  monto:50000000, inicial:0, aporte:416667, freq:'mensual', anios:10, tasa:0.08, solve:'aporte' };
 
 function fmt(n){ return '$ ' + Math.round(n).toLocaleString('es-CO'); }
 function fmtShort(n){
@@ -898,7 +898,7 @@ function onEdit(which){
   state.tasa    = Math.max(0, parseDec(g('in-tasa').value)/100);
   state.freq    = g('in-freq').value;
   // si editas el campo que se estaba ajustando solo, el candado se pasa a otro
-  if(which === state.solve) state.solve = (which === 'monto') ? 'aporte' : 'monto';
+  if(which === state.solve) state.solve = (which === 'aporte') ? 'monto' : 'aporte';
   recompute();
 }
 
