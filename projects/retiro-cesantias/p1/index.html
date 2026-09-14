@@ -372,7 +372,7 @@
                 <img class="motivo-chevron" alt="" />
               </div>
               <div class="motivo-cat-body">
-                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Terminación el contrato laboral</span></label>
+                <label class="motivo-option" data-doc="terminacion"><span class="radio"><img class="radio-img" /></span><span class="label">Terminación del contrato laboral</span></label>
                 <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Muerte del trabajador</span></label>
                 <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Cambio a salario integral</span></label>
                 <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Sustitución de empleadores</span></label>
@@ -385,9 +385,9 @@
                 <img class="motivo-chevron" alt="" />
               </div>
               <div class="motivo-cat-body">
-                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Mejora o liberación de vivienda</span></label>
-                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Adquisición de vivienda</span></label>
-                <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Pago de Impuesto predial</span></label>
+                <label class="motivo-option" data-doc="vivienda"><span class="radio"><img class="radio-img" /></span><span class="label">Mejora o liberación de vivienda</span></label>
+                <label class="motivo-option" data-doc="vivienda"><span class="radio"><img class="radio-img" /></span><span class="label">Adquisición de vivienda</span></label>
+                <label class="motivo-option" data-doc="predial"><span class="radio"><img class="radio-img" /></span><span class="label">Pago de Impuesto predial</span></label>
                 <label class="motivo-option"><span class="radio"><img class="radio-img" /></span><span class="label">Compra de propiedad accionaria estatal</span></label>
               </div>
             </div>
@@ -492,26 +492,7 @@
                 <span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>
               </div>
             </div>
-            <div class="doc-card">
-              <div class="doc-card-head"><img id="img-file2" alt="" /><span class="name">Carta del empleador actual autorizando el retiro</span></div>
-              <div class="doc-hint">Esta debe incluir:
-                <ul>
-                  <li>Nombre completo y número de identificación del afiliado.</li>
-                  <li>Valor a retirar.</li>
-                  <li>Declaración del empleador confirmando que verificó y vigilará que los recursos se usarán para adquirir, construir, mejorar o liberar vivienda.</li>
-                  <li>Nombre del beneficiario del cheque o cuenta bancaria.</li>
-                  <li>Membrete de la empresa, NIT, firma, nombre y cargo de quien autoriza.</li>
-                </ul>
-              </div>
-              <div class="doc-upload-field" id="doc-pending-2">
-                <div class="doc-upload-box">
-                  <img class="doc-upload-icon-left" id="img-upload2" alt="" />
-                  <span class="doc-upload-text">Arrastra y suelta tu archivo aquí o <span class="link">selecciona un archivo</span></span>
-                  <img class="doc-upload-icon-right" id="img-upload2-action" alt="" />
-                </div>
-                <span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>
-              </div>
-            </div>
+            <div id="extra-docs"></div>
 
             <div class="alert-info" id="employer-covered-msg" style="display:none;background:#ECFDF3;border-color:var(--sk-green);">
               <img id="img-info-covered" alt="" />
@@ -721,11 +702,8 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
   document.getElementById('img-info-covered').src = IMG_INFO_ICON2;
   document.getElementById('img-file1').src = IMG_FILE_ICON;
   document.getElementById('img-file1b').src = IMG_FILE_ICON;
-  document.getElementById('img-file2').src = IMG_FILE_ICON;
   document.getElementById('img-file-emp').src = IMG_FILE_ICON;
   document.getElementById('img-upload1').src = IMG_UPLOAD_GREEN;
-  document.getElementById('img-upload2').src = IMG_UPLOAD_EMPTY;
-  document.getElementById('img-upload2-action').src = IMG_UPLOAD_GREEN;
   document.getElementById('img-info5a').src = IMG_INFO_ICON5;
 
   document.querySelectorAll('.radio-img').forEach(function(img){
@@ -774,6 +752,7 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
       document.getElementById('step3-subtitle').textContent = motivoLabel;
       var resumenMotivo = document.getElementById('resumen-motivo');
       if(resumenMotivo) resumenMotivo.textContent = motivoLabel;
+      renderStep3Docs(opt.dataset.doc);
       document.getElementById('step1-continue').disabled = false;
     });
   });
@@ -1021,18 +1000,75 @@ const IMG_INFO_ICON5 = "data:image/svg+xml;base64,PHN2ZyBwcmVzZXJ2ZUFzcGVjdFJhdG
     goToStep(3);
   });
 
-  // STEP 3 — Subir archivos (+ cesantías repartidas entre empleadores)
-  document.getElementById('doc-pending-2').addEventListener('click', function(){
-    var el = document.getElementById('doc-pending-2');
-    if(el.classList.contains('uploaded')) return;
-    el.classList.add('uploaded');
-    var box = el.querySelector('.doc-upload-box');
-    box.innerHTML =
-      '<img class="doc-upload-icon-left" src="' + IMG_FILE_ICON + '" alt="" />' +
-      '<div class="doc-upload-textblock"><div class="title">Carga exitosa</div><div class="sub">carta_empleador.pdf</div></div>' +
-      '<img class="doc-upload-icon-right" src="' + IMG_UPLOAD_GREEN + '" alt="" />';
-    document.getElementById('doc-counter').textContent = '2/2 documentos cargados';
-  });
+  // STEP 3 — Subir archivos (documentos requeridos según el motivo)
+  var VIVIENDA_BULLETS = [
+    'Nombre completo y número de identificación del afiliado.',
+    'Valor a retirar.',
+    'Declaración del empleador confirmando que verificó y vigilará que los recursos se usarán para adquirir, construir, mejorar o liberar vivienda.',
+    'Nombre del beneficiario del cheque o cuenta bancaria.',
+    'Membrete de la empresa, NIT, firma, nombre y cargo de quien autoriza.'
+  ];
+  var DOC_CONFIGS = {
+    terminacion: { title: 'Carta del empleador informando la desvinculación.', bullets: null, filename: 'carta_empleador.pdf' },
+    vivienda: { title: 'Carta del empleador autorizando el retiro', bullets: VIVIENDA_BULLETS, filename: 'carta_empleador.pdf' },
+    predial: {
+      extra: { title: 'Recibo del impuesto predial y/o valorización', bullets: [
+        'Si el predio no está a nombre del afiliado, adjuntar certificado de tradición y libertad.',
+        'En caso de leasing, anexar certificación bancaria con los titulares.'
+      ], filename: 'recibo_predial.pdf' },
+      title: 'Carta del empleador autorizando el retiro', bullets: VIVIENDA_BULLETS, filename: 'carta_empleador.pdf'
+    }
+  };
+  var DEFAULT_DOC_CONFIG = DOC_CONFIGS.vivienda;
+
+  function buildDocCard(title, bullets, filename){
+    var bulletsHtml = '';
+    if(bullets && bullets.length){
+      bulletsHtml = '<div class="doc-hint">Esta debe incluir:<ul>' +
+        bullets.map(function(b){ return '<li>' + b + '</li>'; }).join('') +
+        '</ul></div>';
+    }
+    return '' +
+      '<div class="doc-card">' +
+        '<div class="doc-card-head"><img src="' + IMG_FILE_ICON + '" alt="" /><span class="name">' + title + '</span></div>' +
+        bulletsHtml +
+        '<div class="doc-upload-field extra-doc-pending" data-filename="' + filename + '">' +
+          '<div class="doc-upload-box">' +
+            '<img class="doc-upload-icon-left" src="' + IMG_UPLOAD_EMPTY + '" alt="" />' +
+            '<span class="doc-upload-text">Arrastra y suelta tu archivo aquí o <span class="link">selecciona un archivo</span></span>' +
+            '<img class="doc-upload-icon-right" src="' + IMG_UPLOAD_GREEN + '" alt="" />' +
+          '</div>' +
+          '<span class="hint">Tamaño Max: 8MB - Formato: PDF / PNG / JPG</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  var totalDocsCount = 2;
+  var uploadedExtraCount = 0;
+  function renderStep3Docs(motivoKey){
+    var cfg = DOC_CONFIGS[motivoKey] || DEFAULT_DOC_CONFIG;
+    var cardsHtml = '';
+    if(cfg.extra) cardsHtml += buildDocCard(cfg.extra.title, cfg.extra.bullets, cfg.extra.filename);
+    cardsHtml += buildDocCard(cfg.title, cfg.bullets, cfg.filename);
+    var extraDocsEl = document.getElementById('extra-docs');
+    extraDocsEl.innerHTML = cardsHtml;
+    totalDocsCount = 1 + (cfg.extra ? 2 : 1);
+    uploadedExtraCount = 0;
+    document.getElementById('doc-counter').textContent = '1/' + totalDocsCount + ' documentos cargados';
+    extraDocsEl.querySelectorAll('.extra-doc-pending').forEach(function(el){
+      el.addEventListener('click', function(){
+        if(el.classList.contains('uploaded')) return;
+        el.classList.add('uploaded');
+        var box = el.querySelector('.doc-upload-box');
+        box.innerHTML =
+          '<img class="doc-upload-icon-left" src="' + IMG_FILE_ICON + '" alt="" />' +
+          '<div class="doc-upload-textblock"><div class="title">Carga exitosa</div><div class="sub">' + el.dataset.filename + '</div></div>' +
+          '<img class="doc-upload-icon-right" src="' + IMG_UPLOAD_GREEN + '" alt="" />';
+        uploadedExtraCount++;
+        document.getElementById('doc-counter').textContent = (1 + uploadedExtraCount) + '/' + totalDocsCount + ' documentos cargados';
+      });
+    });
+  }
 
   document.getElementById('step3-back').addEventListener('click', function(){
     goToStep(2);
