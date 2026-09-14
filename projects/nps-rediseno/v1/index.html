@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rediseño del NPS — Brief de diseño</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600;700&display=swap');
+
+  :root{
+    --ink:#404040; --ink-med:#666666; --ink-subtle:#767676;
+    --surface:#ffffff; --stage:#f7f7f7; --border:#dddddd;
+    --accent:#00c73d; --accent-deep:#03a835; --accent-lime:#8fe000; --accent-tint:rgba(0,199,61,.12);
+    --warn:#b45309; --warn-bg:#fff3e0; --warn-line:rgba(255,174,8,.35);
+    --info:#0369a1; --info-bg:#ebf4ff; --info-line:rgba(0,153,222,.3);
+    --shadow-lg:0 20px 45px -10px rgba(0,0,0,.16),0 6px 16px -6px rgba(0,0,0,.08);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+    --title:'Montserrat',sans-serif; --body:'Open Sans',sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#eef1ee; --ink-med:#b7bdb7; --ink-subtle:#8d938a;
+      --surface:#1c1f1c; --stage:#101210; --border:#2c302c;
+      --accent:#22d968; --accent-deep:#3fe881; --accent-lime:#8fe000; --accent-tint:rgba(34,217,104,.16);
+      --warn:#ffb84d; --warn-bg:rgba(255,174,8,.12); --warn-line:rgba(255,174,8,.4);
+      --info:#5ec2f0; --info-bg:rgba(0,153,222,.14); --info-line:rgba(0,153,222,.4);
+      --shadow-lg:0 20px 50px -10px rgba(0,0,0,.55),0 6px 18px -6px rgba(0,0,0,.35);
+      --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    font-family:var(--body), system-ui, sans-serif;
+    background:var(--surface); color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  h1,h2,h3{ margin:0; font-family:var(--title), sans-serif; text-wrap:balance; }
+  p{ margin:0; }
+  svg{ display:block; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
+
+  /* ── progress bar ── */
+  .progress-track{ position:fixed; top:0; left:0; width:100%; height:3px; z-index:20; background:transparent; }
+  .progress-fill{ height:100%; width:12.5%; background:linear-gradient(90deg,var(--accent),var(--accent-lime)); transition:width .35s ease; }
+
+  /* ── slides: full-viewport panels, no card/frame around them ── */
+  .slide{
+    position:fixed; inset:0; overflow-y:auto;
+    padding:80px 90px; display:flex; flex-direction:column; justify-content:center;
+    opacity:0; pointer-events:none; transform:translateY(14px);
+    transition:opacity .4s ease, transform .4s ease;
+  }
+  .slide.active{ opacity:1; pointer-events:auto; transform:translateY(0); }
+  @media (prefers-reduced-motion:reduce){ .slide{ transition:none; } }
+  .slide-inner{ width:100%; max-width:900px; margin:0 auto; }
+
+  .slide-counter{
+    position:absolute; top:26px; right:30px; z-index:5;
+    font-family:var(--title); font-weight:700; font-size:.72rem;
+    color:var(--ink-subtle); letter-spacing:.03em; font-variant-numeric:tabular-nums;
+  }
+  .logo-ink{ fill:var(--ink); }
+
+  .eyebrow{ font-family:var(--title); font-weight:700; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-deep); margin-bottom:16px; }
+  .slide-title{ font-weight:800; font-size:2.05rem; line-height:1.16; letter-spacing:-.01em; margin-bottom:22px; max-width:20ch; }
+  .lead{ font-size:1.05rem; line-height:1.65; color:var(--ink-med); max-width:58ch; }
+  .hint-inline{ color:var(--ink-subtle); font-size:.92em; }
+
+  /* ── cover / closing ── */
+  .cover{ display:flex; flex-direction:column; justify-content:center; height:100%; gap:14px; padding-top:6px; }
+  .cover-logo svg{ height:32px; width:auto; }
+  .cover-title{ font-weight:800; font-size:2.7rem; line-height:1.08; margin-top:8px; max-width:15ch; }
+  .cover-meta{ margin-top:auto; font-family:var(--title); font-weight:700; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-subtle); }
+
+  /* ── rule badges ── */
+  .rule-badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:30px; }
+  .rule-badge{ font-family:var(--title); font-weight:700; font-size:.76rem; padding:7px 15px; border-radius:999px; letter-spacing:.01em; }
+  .rule-badge.pos{ background:var(--accent-tint); color:var(--accent-deep); border:1px solid rgba(0,199,61,.35); }
+  .rule-badge.fixed{ background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-line); }
+  .rule-badge.neutral{ background:transparent; color:var(--ink-med); border:1px solid var(--border); }
+
+  /* ── lock box ── */
+  .lock-box{ margin-top:26px; border:1.5px solid var(--warn-line); background:var(--warn-bg); border-radius:14px; padding:18px 22px; max-width:54ch; display:flex; flex-direction:column; gap:6px; }
+  .lock-label{ font-family:var(--title); font-weight:700; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--warn); }
+  .lock-box p{ font-size:.95rem; line-height:1.55; color:var(--ink); }
+
+  /* ── compare cards ── */
+  .compare-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:8px; }
+  .compare-card{ border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:16px; }
+  .compare-card.app{ background:linear-gradient(160deg, rgba(0,199,61,.09), rgba(143,224,0,.04)); border:1.5px solid rgba(0,199,61,.35); }
+  .compare-card.portal{ background:var(--stage); border:1.5px dashed var(--border); }
+  .compare-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .compare-head h3{ font-weight:800; font-size:1.1rem; }
+  .compare-tag{ font-family:var(--title); font-weight:700; font-size:.64rem; text-transform:uppercase; letter-spacing:.06em; padding:4px 10px; border-radius:999px; white-space:nowrap; }
+  .compare-card.app .compare-tag{ background:var(--accent); color:#fff; }
+  .compare-card.portal .compare-tag{ background:transparent; color:var(--ink-subtle); border:1px solid var(--border); }
+  .compare-card.nps{ background:linear-gradient(160deg, rgba(0,199,61,.09), rgba(143,224,0,.04)); border:1.5px solid rgba(0,199,61,.35); }
+  .compare-card.ces{ background:var(--info-bg); border:1.5px solid var(--info-line); }
+  .compare-card.nps .compare-tag{ background:var(--accent); color:#fff; }
+  .compare-card.ces .compare-tag{ background:var(--info); color:#fff; }
+
+  /* ── numbered rule list ── */
+  .rule-num-list{ display:flex; flex-direction:column; gap:16px; margin-top:6px; }
+  .rule-num-item{ display:flex; gap:14px; align-items:flex-start; }
+  .rule-num{ flex-shrink:0; width:24px; height:24px; border-radius:50%; background:var(--ink); color:var(--surface); display:flex; align-items:center; justify-content:center; font-family:var(--title); font-weight:800; font-size:.76rem; margin-top:1px; }
+  .rule-num-item p{ font-size:.95rem; line-height:1.6; color:var(--ink); max-width:54ch; }
+  .footnote{ margin-top:24px; font-size:.8rem; color:var(--ink-subtle); font-style:italic; }
+
+  /* ── timeline example ── */
+  .timeline{ display:flex; align-items:flex-start; gap:0; margin-top:28px; position:relative; }
+  .timeline::before{ content:""; position:absolute; top:12px; left:12px; right:12px; height:2px; background:var(--border); }
+  .timeline-node{ flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; }
+  .timeline-dot{ position:relative; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--title); font-weight:800; font-size:.58rem; color:#fff; letter-spacing:.02em; }
+  .timeline-dot.ces{ background:var(--info); }
+  .timeline-dot.nps{ background:var(--accent); }
+  .timeline-dot.loop{ background:var(--surface); color:var(--ink-subtle); border:1.5px dashed var(--border); }
+  .timeline-label{ font-family:var(--title); font-weight:700; font-size:.76rem; color:var(--ink); max-width:11ch; }
+  .timeline-day{ font-size:.68rem; color:var(--ink-subtle); font-variant-numeric:tabular-nums; }
+  .compare-row{ display:flex; flex-direction:column; gap:3px; }
+  .compare-row .k{ font-family:var(--title); font-weight:700; font-size:.64rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-subtle); }
+  .compare-row .v{ font-size:.86rem; color:var(--ink); line-height:1.5; }
+
+  /* ── checklist ── */
+  .check-list{ display:flex; flex-direction:column; gap:18px; margin-top:6px; }
+  .check-item{ display:flex; gap:14px; align-items:flex-start; }
+  .check-mark{ flex-shrink:0; width:22px; height:22px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; margin-top:2px; }
+  .check-mark svg{ width:11px; height:11px; }
+  .check-item p{ font-size:.98rem; line-height:1.6; color:var(--ink); max-width:52ch; }
+
+  /* ── open list ── */
+  .open-list{ display:flex; flex-direction:column; gap:18px; margin-top:6px; }
+  .open-item{ display:flex; gap:14px; align-items:flex-start; }
+  .open-mark{ flex-shrink:0; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--info); color:var(--info); display:flex; align-items:center; justify-content:center; font-family:var(--title); font-weight:800; font-size:.72rem; margin-top:2px; }
+  .open-title{ font-family:var(--title); font-weight:700; font-size:.95rem; color:var(--ink); margin-bottom:3px; }
+  .open-desc{ font-size:.88rem; color:var(--ink-med); line-height:1.55; max-width:50ch; }
+
+  @media (max-width:700px){
+    .slide{ padding:52px 24px 28px; }
+    .slide-title{ font-size:1.6rem; max-width:none; }
+    .cover-title{ font-size:2rem; max-width:none; }
+    .compare-grid{ grid-template-columns:1fr; }
+  }
+
+  /* ── nav ── */
+  .deck-nav{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:10; display:flex; align-items:center; gap:16px; }
+  .nav-arrow{
+    width:40px; height:40px; border-radius:50%; border:1px solid var(--border);
+    background:var(--surface); color:var(--ink); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--shadow-sm); transition:border-color .15s, color .15s;
+  }
+  .nav-arrow svg{ width:16px; height:16px; }
+  .nav-arrow:hover:not(:disabled){ border-color:var(--accent); color:var(--accent-deep); }
+  .nav-arrow:disabled{ opacity:.3; cursor:not-allowed; }
+  .dots{ display:flex; align-items:center; gap:8px; }
+  .dot{ width:7px; height:7px; padding:0; border-radius:50%; border:none; background:var(--border); cursor:pointer; transition:background .2s, transform .2s; }
+  .dot.active{ background:var(--accent); transform:scale(1.5); }
+</style>
+</head>
+<body>
+
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+<main>
+
+    <section class="slide active" data-slide="0">
+      <div class="slide-counter">1 / 8</div>
+      <div class="slide-inner cover">
+        <div class="cover-logo">
+          <svg viewBox="0 0 560 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="logo-ink" d="M124.001 69.0235C105.699 64.0828 105.589 54.8481 105.699 49.2547C105.825 40.2777 116.682 31.9534 129.495 31.9534C141.653 31.9534 154.466 37.2835 154.598 52.1173H137.464C137.338 47.5372 133.437 46.7814 130.56 46.7814C126.642 46.7814 124.024 48.602 124.156 51.3615C124.283 53.1821 125.882 55.0084 129.518 55.9416L139.875 58.6725C154.65 62.6801 156.48 72.4644 156.48 76.3632C156.48 89.2447 142.878 95.3534 130.065 95.3534C117.649 95.3534 104.703 87.9394 104.577 74.4109H121.567C121.699 77.9261 125.595 81.4356 130.589 81.4356C134.616 81.3039 138.068 79.4834 138.068 76.3632C138.068 73.7582 136.498 72.3556 132.056 71.159L124.001 69.0235Z"/>
+            <path class="logo-ink" d="M184.522 94.0023H166.485V0.20755H184.522V49.8959L199.039 33.2472H222.18L196.818 60.0466L227.271 94.0023H204.919L184.522 69.9339V94.0023Z"/>
+            <path class="logo-ink" d="M274.29 87.1092C270.36 92.966 261.217 95.1702 256.511 95.1702C240.919 95.1702 225.384 83.073 225.384 63.5618C225.384 44.0506 240.919 31.9534 256.505 31.9534C260.424 31.9534 269.577 33.2472 274.284 40.0201V33.2472H292.321V94.0023H274.29V87.1092ZM259.514 78.0063C266.994 78.0063 274.29 72.6705 274.29 63.5618C274.29 54.4531 266.965 49.1173 259.514 49.1173C251.931 49.1173 244.216 54.8424 244.216 63.5618C244.216 72.2811 251.931 78.0063 259.514 78.0063Z"/>
+            <path class="logo-ink" d="M327.222 94.0023H309.035V33.2472H327.222V42.0983C330.485 35.9838 337.677 31.9534 344.868 31.9534C358.591 31.9534 367.227 40.4036 367.227 57.7164V94.008H349.04V61.6095C349.04 53.5428 344.592 49.5123 338.453 49.5123C332.044 49.5123 327.211 52.6325 327.211 61.8671L327.222 94.0023Z"/>
+            <path class="logo-ink" d="M427.202 94.0023V86.4623C424.199 92.0557 416.874 95.3019 409.291 95.3019C393.601 95.3019 379.747 82.9471 379.747 63.8137C379.747 44.3025 393.601 31.9476 409.291 31.9476C416.874 31.9476 424.199 35.0678 427.202 40.6613V0.190376H445.245V94.0023H427.202ZM412.691 48.9913C404.976 48.9913 398.566 54.7165 398.566 63.4358C398.566 72.4128 404.976 78.1322 412.691 78.1322C420.275 78.1322 426.811 72.1437 426.811 63.4358C426.811 54.3272 420.148 48.9913 412.691 48.9913Z"/>
+            <path class="logo-ink" d="M470.981 0.190376C477.12 0.190376 482.091 4.77048 482.091 10.7246C482.091 16.6787 477.12 21.3905 470.981 21.3905C464.842 21.3905 459.6 16.7016 459.6 10.7246C459.6 4.74758 464.836 0.190376 470.981 0.190376ZM479.997 93.9794H461.959V33.2473H479.997V93.9794Z"/>
+            <path class="logo-ink" d="M541.963 87.1092C538.039 92.966 528.89 95.1702 524.184 95.1702C508.621 95.1702 493.063 83.073 493.063 63.5618C493.063 44.0506 508.598 31.9534 524.184 31.9534C528.102 31.9534 537.256 33.2472 541.963 40.0201V33.2472H560V94.0023H541.963V87.1092ZM527.187 78.0063C534.667 78.0063 541.963 72.6705 541.963 63.5618C541.963 54.4531 534.638 49.1173 527.187 49.1173C519.604 49.1173 511.889 54.8424 511.889 63.5618C511.889 72.2811 519.604 78.0063 527.187 78.0063Z"/>
+            <path d="M2.42227 31.9362L62.6563 91.8725C63.5667 92.7767 64.7259 93.3922 65.9876 93.6412C67.2493 93.8901 68.5569 93.7614 69.7451 93.2713C70.9334 92.7812 71.949 91.9517 72.6637 90.8875C73.3784 89.8234 73.7601 88.5723 73.7607 87.2924V30.379C73.7592 27.8619 72.7536 25.4484 70.965 23.6686C69.1763 21.8888 66.7508 20.8882 64.2213 20.8867H7.02512C5.73884 20.8872 4.48158 21.2671 3.41214 21.9783C2.3427 22.6894 1.50907 23.7 1.01653 24.8824C0.523999 26.0648 0.394664 27.3659 0.644864 28.6213C0.895064 29.8768 1.51357 31.0303 2.42227 31.9362Z" fill="#00C83C"/>
+            <path d="M4.08505 90.51C12.8017 99.1893 27.7149 93.0462 27.7149 80.7772C27.7149 77.124 26.2565 73.6203 23.6604 71.0371C21.0643 68.4539 17.5433 67.0026 13.8719 67.0026C1.53622 67.0026 -4.63735 81.8421 4.0908 90.5157" fill="#00C83C"/>
+          </svg>
+        </div>
+        <span class="eyebrow">Brief de diseño</span>
+        <h1 class="cover-title">Rediseño del pop-up de NPS</h1>
+        <p class="lead">App y Portal — por qué cambia la forma, y qué se mantiene exactamente igual.</p>
+        <div class="cover-meta">UX Skandia · Equipo de Producto · 10 sep 2026</div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="1">
+      <div class="slide-counter">2 / 8</div>
+      <div class="slide-inner">
+        <span class="eyebrow">El objetivo</span>
+        <h2 class="slide-title">Que se sienta parte del producto, no un plugin externo</h2>
+        <p class="lead">Rediseñar el pop-up de medición de NPS en app y portal para que se sienta parte del producto — sin perder la comparabilidad histórica de la métrica.</p>
+        <div class="rule-badges">
+          <span class="rule-badge pos">El look se rediseña por completo</span>
+          <span class="rule-badge fixed">La métrica no cambia</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="2">
+      <div class="slide-counter">3 / 8</div>
+      <div class="slide-inner">
+        <span class="eyebrow" style="color:var(--warn)">Restricción no negociable</span>
+        <h2 class="slide-title">El núcleo no se toca — el resto sí es negociable</h2>
+        <p class="lead">El score 0–10 y la pregunta de razón son las dos preguntas que definen la métrica: nunca se quitan, solo se puede sumar alrededor. Todo lo demás en el pop-up — como "¿lograste hacer lo que necesitabas?" — es adicional, no núcleo, y sí se puede ajustar.</p>
+        <div class="lock-box">
+          <span class="lock-label">Límite de preguntas adicionales</span>
+          <p>Máximo <strong>1 pregunta adicional</strong> a las 2 del núcleo, para no elevar el abandono. El NPS original tenía 2 (tarea + ayuda) — ya excedía el límite. En este rediseño usamos <strong>0</strong>: queda solo el núcleo.</p>
+        </div>
+        <div class="rule-badges">
+          <span class="rule-badge pos">Núcleo: 2 de 2 intactas</span>
+          <span class="rule-badge neutral">Adicionales: 0 de máx. 1</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="3">
+      <div class="slide-counter">4 / 8</div>
+      <div class="slide-inner">
+        <span class="eyebrow">Alcance diferenciado</span>
+        <h2 class="slide-title">App y Portal juegan con reglas distintas</h2>
+        <div class="compare-grid">
+          <div class="compare-card app">
+            <div class="compare-head"><h3>App</h3><span class="compare-tag">Libertad total</span></div>
+            <div class="compare-row"><span class="k">Libertad de diseño</span><span class="v">Total — rediseño desde cero</span></div>
+            <div class="compare-row"><span class="k">Qué se puede tocar</span><span class="v">Layout, componentes, jerarquía, interacción completa</span></div>
+            <div class="compare-row"><span class="k">Formato</span><span class="v">Pop-up nativo (apificado)</span></div>
+          </div>
+          <div class="compare-card portal">
+            <div class="compare-head"><h3>Portal</h3><span class="compare-tag">Condiciones Qualtrics</span></div>
+            <div class="compare-row"><span class="k">Libertad de diseño</span><span class="v">Restringida a condiciones de Qualtrics</span></div>
+            <div class="compare-row"><span class="k">Qué se puede tocar</span><span class="v">Solo tipografía, imagen/ilustración, banner, color</span></div>
+            <div class="compare-row"><span class="k">Formato</span><span class="v">Pop-up (embed Qualtrics)</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="4">
+      <div class="slide-counter">5 / 8</div>
+      <div class="slide-inner">
+        <span class="eyebrow" style="color:var(--info)">Propuesta · convivencia</span>
+        <h2 class="slide-title">Uno mide la relación, el otro mide el momento</h2>
+        <div class="compare-grid">
+          <div class="compare-card nps">
+            <div class="compare-head"><h3>NPS</h3><span class="compare-tag">Relacional</span></div>
+            <div class="compare-row"><span class="k">Qué mide</span><span class="v">La relación general con Skandia</span></div>
+            <div class="compare-row"><span class="k">Dispara cuando</span><span class="v">Se cumple el cooldown compartido y el usuario <strong>no</strong> tiene una transacción fresca — llena el espacio cuando CES no aplica</span></div>
+          </div>
+          <div class="compare-card ces">
+            <div class="compare-head"><h3>CES</h3><span class="compare-tag">Transaccional</span></div>
+            <div class="compare-row"><span class="k">Qué mide</span><span class="v">Qué tan fácil fue una gestión puntual</span></div>
+            <div class="compare-row"><span class="k">Dispara cuando</span><span class="v">Se cumple el cooldown compartido y el usuario acaba de terminar una gestión clave — retiro de cesantías, solicitud de pensión, aportes</span></div>
+          </div>
+        </div>
+        <div class="lock-box" style="border-color:var(--info-line); background:var(--info-bg); margin-top:22px;">
+          <span class="lock-label" style="color:var(--info)">Cooldown compartido</span>
+          <p><strong>15 días</strong> desde el último pop-up mostrado — sea NPS o CES — antes de poder mostrar el siguiente.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="5">
+      <div class="slide-counter">6 / 8</div>
+      <div class="slide-inner">
+        <span class="eyebrow" style="color:var(--info)">Propuesta · prioridad</span>
+        <h2 class="slide-title">Nunca los dos al mismo tiempo</h2>
+        <div class="rule-num-list">
+          <div class="rule-num-item"><span class="rule-num">1</span><p>Un solo pop-up por sesión — sin importar si es NPS o CES.</p></div>
+          <div class="rule-num-item"><span class="rule-num">2</span><p>Cooldown único de <strong>15 días</strong> desde el último pop-up, sea cual sea su tipo.</p></div>
+          <div class="rule-num-item"><span class="rule-num">3</span><p>Al cumplirse el cooldown: si hay una transacción fresca, dispara <strong>CES</strong>; si no, dispara <strong>NPS</strong>.</p></div>
+          <div class="rule-num-item"><span class="rule-num">4</span><p>Para un usuario activo esto arma un loop natural — se repite solo mientras siga transaccionando y usando el Portal.</p></div>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-node">
+            <span class="timeline-dot ces">CES</span>
+            <span class="timeline-label">Transacción</span>
+            <span class="timeline-day">Día 0</span>
+          </div>
+          <div class="timeline-node">
+            <span class="timeline-dot nps">NPS</span>
+            <span class="timeline-label">Sin transacción</span>
+            <span class="timeline-day">Día 15</span>
+          </div>
+          <div class="timeline-node">
+            <span class="timeline-dot ces">CES</span>
+            <span class="timeline-label">Nueva transacción</span>
+            <span class="timeline-day">Día 30</span>
+          </div>
+          <div class="timeline-node">
+            <span class="timeline-dot loop">···</span>
+            <span class="timeline-label">El loop continúa</span>
+            <span class="timeline-day">&nbsp;</span>
+          </div>
+        </div>
+        <p class="footnote">15 días es el valor de partida — se ajusta con datos reales una vez en producción.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="6">
+      <div class="slide-counter">7 / 8</div>
+      <div class="slide-inner">
+        <span class="eyebrow">Criterios de éxito</span>
+        <h2 class="slide-title">Cómo sabremos que funcionó</h2>
+        <div class="check-list">
+          <div class="check-item">
+            <span class="check-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <p>Look &amp; feel reconocible como Skandia en el primer vistazo.</p>
+          </div>
+          <div class="check-item">
+            <span class="check-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <p>La tasa de respuesta del NPS no baja tras el cambio <span class="hint-inline">(baseline obligatorio antes de lanzar)</span>.</p>
+          </div>
+          <div class="check-item">
+            <span class="check-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <p>Consistencia visual entre app y portal, aunque las capacidades técnicas sean distintas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="7">
+      <div class="slide-counter">8 / 8</div>
+      <div class="slide-inner cover" style="justify-content:center;">
+        <span class="eyebrow">En síntesis</span>
+        <h2 class="slide-title" style="font-size:2.3rem; max-width:16ch;">Verse nuevo. Medir igual.</h2>
+        <p class="lead">El score y la pregunta de razón no cambian. Todo lo demás — layout, tono, color — se adapta a las reglas de cada canal.</p>
+      </div>
+    </section>
+
+  <nav class="deck-nav" aria-label="Navegación de la presentación">
+    <button class="nav-arrow" id="prevBtn" type="button" aria-label="Diapositiva anterior">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-arrow" id="nextBtn" type="button" aria-label="Siguiente diapositiva">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </nav>
+</main>
+
+<script>
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var idx = 0;
+
+  var dotsWrap = document.getElementById('dots');
+  slides.forEach(function(_, i){
+    var b = document.createElement('button');
+    b.className = 'dot' + (i === 0 ? ' active' : '');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Ir a la diapositiva ' + (i + 1));
+    b.addEventListener('click', function(){ go(i); });
+    dotsWrap.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var fill = document.getElementById('progressFill');
+
+  function render(){
+    slides.forEach(function(s, i){ s.classList.toggle('active', i === idx); });
+    dots.forEach(function(d, i){ d.classList.toggle('active', i === idx); });
+    fill.style.width = ((idx + 1) / total * 100) + '%';
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === total - 1;
+  }
+  function go(i){
+    idx = Math.max(0, Math.min(total - 1, i));
+    render();
+  }
+  prevBtn.addEventListener('click', function(){ go(idx - 1); });
+  nextBtn.addEventListener('click', function(){ go(idx + 1); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown'){ go(idx + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ go(idx - 1); e.preventDefault(); }
+    else if (e.key === 'Home'){ go(0); }
+    else if (e.key === 'End'){ go(total - 1); }
+  });
+  render();
+</script>
+
+</body>
+</html>
+
