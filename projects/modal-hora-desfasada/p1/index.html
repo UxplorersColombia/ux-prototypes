@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modal hora desfasada — Skandia</title>
+<!--
+  ══════════════════════════════════════════════════════════════════════════
+  MODAL HORA DESFASADA · p1
+  Aviso de reloj desincronizado en portal web y app. Un toggle cambia entre
+  escritorio y app; cada plataforma muestra sus dos momentos: antes de
+  iniciar sesión (modal / bottom sheet) y ya adentro (alerta persistente).
+
+  DESIGN SYSTEM — tokens copiados 1:1 de colors_and_type.css del repo
+  UxplorersColombia/SkCo.Fidu.DesignSystem.Lib.UX. La anatomía del modal
+  replica el componente vigente de Skandia: card 618 r16, círculo de 80 px
+  #FFF8ED con triángulo #FFAE08, título centrado en un solo tono, cierre en
+  × verde. La alerta reusa la variante warning de sk-alert (fondo #FFF3E0,
+  borde #FFAE08). No existe sk-modal ni sk-bottom-sheet en el catálogo: se
+  compone desde sk-card + scrim + sk-button.
+
+  COPY validado con el panel de Financial Explorer (Carolina, Roberto,
+  Andrés, Patricia). Los cuatro pidieron por unanimidad: la magnitud del
+  desfase ya calculada, la consecuencia concreta en vez de "intermitencias
+  o fallas", un botón que no finja un cierre, y poder cerrar la alerta.
+
+  REGLAS DE NEGOCIO
+  · Fuente de verdad: header Date de la respuesta del login, no el reloj local.
+  · Umbral: <2 min no avisa · 2 min–24 h avisa · ≥24 h usa la variante de fecha.
+  · Nunca bloquea el ingreso.
+  · El atajo "Abrir ajustes" solo existe en Android (android.settings.DATE_SETTINGS);
+    en iOS se reemplaza por la ruta escrita Ajustes › General › Fecha y hora.
+  ══════════════════════════════════════════════════════════════════════════
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* ── Tokens Skandia ─────────────────────────────────────────────────── */
+:root{
+  --primary-d01:#03a835; --primary-00:#00c73d; --primary-l04:#caf9cb; --primary-l05:#f6fcf2;
+  --primarygrey-00:#404040; --primarygrey-l03:#666666;
+  --neutral-00:#ffffff; --neutral-l02:#f7f7f7; --neutral-l03:#e9e9e9; --neutral-l04:#dddddd;
+  --feedback-warning:#ffae08; --feedback-warning-dark:#c97a00;
+  --feedback-warning-bg:#fff3e0; --feedback-warning-bg-soft:#fff8ed;
+  --texts-dark:var(--primarygrey-00); --texts-medium:var(--primarygrey-l03);
+  --bordes-m:16px; --bordes-xl:104px;
+  --title:'Montserrat'; --body:'Open Sans';
+  --shadow-lg:0 12px 32px -8px rgba(0,0,0,.12), 0 4px 8px -2px rgba(0,0,0,.06);
+  --lienzo:#eceeed;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body),'Open Sans',system-ui,sans-serif;background:var(--lienzo);
+  color:var(--texts-dark);-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--title),'Montserrat',sans-serif;font-weight:700;margin:0;text-wrap:balance}
+:focus-visible{outline:3px solid #0099de;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── Barra del prototipo ────────────────────────────────────────────── */
+.barra{
+  position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #dcdfde;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 28px;flex-wrap:wrap;
+}
+.barra h1{font-size:17px}
+.barra p{margin:4px 0 0;font-size:12.5px;color:#7c8481;max-width:64ch;line-height:1.5}
+.toggle{display:flex;gap:3px;background:var(--neutral-l02);border:1px solid var(--neutral-l04);border-radius:999px;padding:3px}
+.toggle button{
+  border:0;background:transparent;font-family:var(--body);font-size:13px;font-weight:700;
+  color:var(--texts-medium);padding:9px 22px;border-radius:999px;cursor:pointer;transition:.15s;
+}
+.toggle button:hover{color:var(--texts-dark)}
+.toggle button[aria-pressed="true"]{background:var(--primary-00);color:#fff}
+
+.lienzo{padding:30px 28px 60px;display:flex;flex-direction:column;gap:34px;align-items:center}
+.paso{display:flex;flex-direction:column;gap:12px;width:100%;align-items:center}
+.rotulo{display:flex;align-items:center;gap:9px;align-self:flex-start;max-width:1320px;width:100%}
+.rotulo .num{
+  width:24px;height:24px;border-radius:50%;background:var(--primary-00);color:#fff;
+  font-family:var(--title);font-weight:700;font-size:12px;display:grid;place-items:center;flex:none;
+}
+.rotulo b{font-family:var(--title);font-size:14px}
+.rotulo span{font-size:12.5px;color:#7c8481}
+
+/* ══ ESCRITORIO ═════════════════════════════════════════════════════ */
+.pantalla{
+  width:100%;max-width:1320px;height:760px;background:#fff;border-radius:12px;overflow:hidden;
+  position:relative;box-shadow:0 18px 44px -20px rgba(0,0,0,.35);border:1px solid #d7dbda;
+}
+.login{display:grid;grid-template-columns:minmax(360px,32.5%) 1fr;height:100%}
+.login-left{padding:34px 40px;display:flex;flex-direction:column;align-items:center;overflow-y:auto}
+.login-inner{width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px;min-height:100%}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--title);font-weight:700;font-size:24px;color:#1d1d1d;justify-content:center}
+.logo svg{width:23px;height:23px;flex:none}
+.hello{text-align:center;margin-top:28px}
+.hello h2{font-size:17px}
+.hello p{font-size:13.5px;margin:9px 0 0;line-height:1.5}
+.field{width:100%;border:1px solid var(--neutral-l04);border-radius:8px;padding:15px 17px;font-size:13.5px;color:var(--texts-medium);background:#fff}
+.link-green{color:var(--primary-d01);font-weight:700;font-size:13.5px;text-align:center;background:none;border:0;cursor:pointer;font-family:var(--body)}
+.legal{font-size:11.5px;color:var(--texts-medium);text-align:center;line-height:1.5;margin:0}
+.legal b{color:var(--primary-d01)}
+.prev{margin-top:auto;border:1px solid var(--primary-l04);background:var(--primary-l05);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:9px}
+.prev strong{font-family:var(--title);font-size:14px}
+.prev p{margin:0;font-size:12px;color:var(--texts-medium);line-height:1.5}
+.login-right{background:linear-gradient(135deg,#2ec94b 0%,#3ed14f 45%,#63dd5e 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:50px}
+.mock{width:200px;height:340px;border-radius:26px;background:#fff;box-shadow:0 22px 46px -14px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:9px;padding:20px 16px}
+.mock i{display:block;height:10px;border-radius:6px;background:#e9e9e9}
+.mock i.w60{width:60%} .mock i.w40{width:40%}
+.mock .chip{height:48px;border-radius:11px;background:var(--primary-l05);border:1px solid var(--primary-l04)}
+.login-right h3{color:#fff;font-size:30px;text-align:center;max-width:18ch;line-height:1.2}
+.login-right p{color:#0d3b18;font-size:16px;margin:0;text-align:center}
+
+.portal{display:grid;grid-template-columns:92px 1fr;height:100%}
+.rail{border-right:1px solid var(--neutral-l03);display:flex;flex-direction:column;align-items:center;gap:26px;padding:20px 0;background:#fff}
+.rail-item{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;color:var(--texts-medium);font-weight:600}
+.rail-item.on{color:var(--primary-d01)}
+.rail-ico{width:25px;height:25px;display:grid;place-items:center;font-size:18px}
+.main{display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:72px;border-bottom:1px solid var(--neutral-l03);display:flex;align-items:center;gap:15px;padding:0 26px;flex:none}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--title);font-weight:700;font-size:17px}
+.brand svg{width:21px;height:21px}
+.sp{flex:1}
+.quick{background:var(--primary-00);color:#fff;border-radius:999px;padding:11px 20px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
+.bell{width:40px;height:40px;border-radius:50%;background:var(--primary-00);display:grid;place-items:center;color:#fff;font-size:16px}
+.avatar{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600}
+.avatar .ini{width:38px;height:38px;border-radius:50%;border:2px solid var(--primary-00);display:grid;place-items:center;font-size:12.5px;font-weight:700;color:var(--primary-d01)}
+.cuerpo{flex:1;overflow-y:auto;padding:22px 26px 40px}
+.promo{background:var(--primary-l05);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.promo strong{font-family:var(--title);font-size:15px}
+.promo p{margin:7px 0 0;font-size:13.5px;color:var(--texts-medium)}
+.tag{background:var(--primary-00);color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:5px 13px;flex:none}
+.logrado{font-family:var(--title);font-weight:700;font-size:24px;margin-bottom:8px}
+.logrado span{color:var(--primary-d01)}
+.sub{font-size:13.5px;color:var(--texts-medium);margin-bottom:18px}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cat{border:1px solid var(--neutral-l03);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:11px;min-height:140px}
+.cat.on{border:2px solid var(--primary-00)}
+.cat-ico{width:42px;height:42px;border-radius:50%;background:var(--primary-l05);display:grid;place-items:center;font-size:19px}
+.cat-name{font-size:14px}
+.cat-amt{font-family:var(--title);font-weight:700;font-size:17px}
+
+/* ══ APP ════════════════════════════════════════════════════════════ */
+.telefonos{display:flex;gap:44px;justify-content:center;flex-wrap:wrap}
+.device{
+  width:390px;height:844px;background:var(--neutral-00);border-radius:42px;position:relative;
+  overflow:hidden;border:9px solid #0f1214;box-shadow:0 20px 50px -18px rgba(0,0,0,.4);flex:none;
+}
+.statusbar{height:46px;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;font-size:13px;font-weight:600}
+.app-login{height:calc(100% - 46px);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,#d8e6d5 0%,#c9dcc6 46%,#fff 46%,#fff 100%)}
+.app-art{flex:1;display:grid;place-items:center;color:#4e6b4f;font-size:12px;font-weight:600;letter-spacing:.14em}
+.app-card{padding:0 26px 34px;display:flex;flex-direction:column;gap:12px}
+.app-card h2{font-size:27px;line-height:1.16}
+.app-card p{margin:0;font-size:14px;color:var(--texts-medium)}
+.row{display:flex;gap:10px;margin-top:6px}
+.row .btn{flex:1}
+.app-home{height:calc(100% - 46px);background:var(--neutral-l02);overflow:hidden}
+.app-top{height:58px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.sq{width:38px;height:38px;border-radius:10px;background:var(--neutral-l02);display:grid;place-items:center}
+.app-scroll{padding:16px;display:flex;flex-direction:column;gap:12px}
+.greet{font-family:var(--title);font-weight:700;font-size:25px}
+.greet span{color:var(--primary-00)}
+.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.card .lbl{font-size:14px;margin-bottom:4px}
+.card .amt{font-family:var(--title);font-weight:700;font-size:26px;color:var(--primary-00)}
+.card .hint{font-size:11.5px;color:var(--texts-medium);margin-top:4px}
+
+/* ══ COMPONENTE · modal y bottom sheet ══════════════════════════════ */
+.scrim{position:absolute;inset:0;background:rgba(20,26,22,.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:10}
+.scrim.abajo{align-items:flex-end;padding:0}
+.sheet{position:relative;width:618px;max-width:100%;background:#fff;border-radius:var(--bordes-m);box-shadow:var(--shadow-lg)}
+.scrim.abajo .sheet{width:100%;border-radius:var(--bordes-m) var(--bordes-m) 0 0}
+.sheet-x{
+  position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:50%;
+  background:transparent;cursor:pointer;display:grid;place-items:center;color:var(--primary-00);
+  font-size:22px;line-height:1;font-family:var(--body);transition:.15s;
+}
+.sheet-x:hover{background:var(--primary-l05);color:var(--primary-d01)}
+.scrim.abajo .sheet-x{top:10px;right:10px}
+.grabber{width:40px;height:4px;border-radius:2px;background:var(--neutral-l04);margin:10px auto 0}
+.sheet-body{padding:32px 32px 20px;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center}
+.scrim.abajo .sheet-body{padding:18px 22px 14px;gap:14px}
+.sheet-ico{width:80px;height:80px;border-radius:50%;background:var(--feedback-warning-bg-soft);display:grid;place-items:center;flex:none}
+.scrim.abajo .sheet-ico{width:64px;height:64px}
+.sheet-ico svg{width:30px;height:26px}
+.scrim.abajo .sheet-ico svg{width:25px;height:21px}
+.sheet h3,.sheet p.desc,.sheet .horas{width:100%;max-width:500px}
+.scrim.abajo .sheet h3,.scrim.abajo .sheet p.desc,.scrim.abajo .sheet .horas{max-width:none}
+.sheet h3{font-size:22px;line-height:1.3;color:var(--texts-dark)}
+.scrim.abajo .sheet h3{font-size:19px}
+.sheet p.desc{margin:0;font-size:13.5px;line-height:1.55;color:var(--texts-medium)}
+.sheet p.desc b{color:var(--texts-dark);font-weight:600}
+/* comparación de horas: contenedor crema con celdas blancas */
+.horas{margin:0;display:flex;gap:6px;background:var(--feedback-warning-bg);border-radius:8px;padding:6px}
+.horas .celda{flex:1;background:#fff;border-radius:6px;padding:7px 12px;display:flex;flex-direction:column;gap:1px;align-items:flex-start}
+.horas .k{font-size:10px;font-weight:600;color:var(--feedback-warning-dark);line-height:1.3}
+.horas .celda.ok .k{color:var(--primary-d01)}
+.horas .v{font-family:var(--title),'Montserrat',sans-serif;font-weight:700;font-size:14px;color:var(--texts-dark);font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.25}
+.sheet-actions{padding:4px 32px 28px}
+.scrim.abajo .sheet-actions{padding:2px 22px 22px}
+.btn{
+  width:100%;border:0;border-radius:var(--bordes-xl);font-family:var(--body);font-weight:700;
+  font-size:14px;padding:13px 22px;cursor:pointer;transition:.15s;line-height:1.2;
+  background:var(--primary-00);color:#fff;
+}
+.btn:hover{background:var(--primary-d01)}
+.btn-sec{background:#fff;color:var(--primary-d01);border:1.5px solid var(--primary-00)}
+.btn-sec:hover{background:var(--primary-l05)}
+
+/* ══ COMPONENTE · alerta ya adentro ═════════════════════════════════ */
+.alerta{
+  position:relative;background:var(--feedback-warning-bg);border:1px solid var(--feedback-warning);
+  border-radius:8px;display:flex;align-items:center;gap:13px;padding:11px 16px 11px 13px;
+}
+.alerta.movil{align-items:flex-start;padding:12px 14px}
+.alerta .ico{flex:none;width:22px;height:19px;color:var(--feedback-warning)}
+.alerta.movil .ico{width:21px;height:18px;margin-top:2px}
+.alerta .txt{font-size:14px;line-height:1.45;color:var(--texts-dark)}
+.alerta.movil .txt{font-size:13px;padding-right:18px}
+.alerta .txt b{display:block;font-weight:700}
+.alerta a{color:var(--texts-dark);font-weight:700;white-space:nowrap;text-decoration:underline;text-underline-offset:2px}
+.alerta .cerrar{
+  margin-left:auto;flex:none;width:30px;height:30px;border:0;border-radius:50%;background:transparent;
+  cursor:pointer;color:var(--feedback-warning-dark);font-size:18px;line-height:1;
+  display:grid;place-items:center;font-family:var(--body);
+}
+.alerta.movil .cerrar{position:absolute;top:6px;right:6px;width:26px;height:26px;font-size:16px;margin:0}
+.alerta .cerrar:hover{background:rgba(201,122,0,.1)}
+.alerta-web{margin-bottom:24px}
+
+/* ══ Notas ══════════════════════════════════════════════════════════ */
+.notas{
+  width:100%;max-width:1320px;background:#fff;border:1px solid #dcdfde;border-radius:12px;
+  padding:20px 22px;display:flex;flex-direction:column;gap:12px;
+}
+.notas h4{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a918e;font-weight:700}
+.notas .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.notas ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:7px}
+.notas li{font-size:12.5px;line-height:1.55;color:#5d6764}
+.notas li b{color:var(--texts-dark)}
+.notas code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;background:var(--neutral-l02);border:1px solid var(--neutral-l03);border-radius:4px;padding:1px 5px}
+@media (max-width:900px){.login{grid-template-columns:1fr}.login-right{display:none}.cats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div>
+    <h1>Modal hora desfasada</h1>
+    <p>El aviso aparece solo cuando el reloj del dispositivo se aleja de la hora del servidor. No bloquea el ingreso y desaparece solo cuando el desfase se corrige.</p>
+  </div>
+  <div class="toggle" role="group" aria-label="Plataforma">
+    <button type="button" data-vista="desk" aria-pressed="true">Escritorio</button>
+    <button type="button" data-vista="app" aria-pressed="false">App</button>
+  </div>
+</header>
+
+<!-- ══════════════════ ESCRITORIO ══════════════════ -->
+<main class="lienzo" id="vista-desk">
+
+  <section class="paso">
+    <div class="rotulo"><span class="num">1</span><b>Antes de iniciar sesión</b><span>Modal sobre el login. Se puede cerrar y entrar igual.</span></div>
+    <div class="pantalla">
+      <div class="login">
+        <div class="login-left">
+          <div class="login-inner">
+            <div class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V9l9-6v6l9-6v12l-9 6v-6l-9 6z" fill="#00c73d"/></svg> skandia</div>
+            <div class="hello"><h2>¡Hola!</h2><p>Te damos la bienvenida al Portal clientes de Skandia</p></div>
+            <div class="field">Usuario</div>
+            <div class="field">Contraseña</div>
+            <button class="link-green" type="button">Crear o recuperar contraseña</button>
+            <button class="btn" type="button">Iniciar sesión</button>
+            <p class="legal">Al ingresar aceptas el <b>Reglamento de uso del Portal Clientes</b></p>
+            <div class="prev">
+              <strong>Portal anterior</strong>
+              <p>Estamos en transición y entendemos que necesitas tiempo para adaptarte. La versión anterior sigue activa.</p>
+              <button class="btn btn-sec" type="button">Ir al portal anterior</button>
+            </div>
+          </div>
+        </div>
+        <div class="login-right">
+          <div class="mock"><i class="w40"></i><i></i><div class="chip"></div><i class="w60"></i><i></i><div class="chip"></div></div>
+          <h3>Entre más inviertes menos pagas en tu declaración</h3>
+          <p>programa aportes recurrentes para avanzar hacia tus metas.</p>
+        </div>
+      </div>
+
+      <div class="scrim" id="scrimWeb">
+        <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="ttlWeb" aria-describedby="descWeb">
+          <button class="sheet-x" type="button" data-cerrar="scrimWeb" aria-label="Cerrar">&times;</button>
+          <div class="sheet-body">
+            <span class="sheet-ico" aria-hidden="true"><svg viewBox="327.3 91.9 23.6 20.3" fill="none"><path d="M349.772 108.918C350.46 110.121 349.6 111.625 348.182 111.625H329.835C328.417 111.625 327.557 110.121 328.202 108.918L337.397 93.2773C337.784 92.6758 338.386 92.375 339.03 92.375C339.632 92.375 340.233 92.6758 340.62 93.2773L349.772 108.918ZM330.264 109.562H347.753L338.987 94.6523L330.264 109.562ZM339.03 105.523C339.761 105.523 340.362 106.125 340.362 106.855C340.362 107.586 339.761 108.188 339.03 108.188C338.257 108.188 337.655 107.586 337.655 106.855C337.655 106.125 338.257 105.523 339.03 105.523ZM337.999 98.9062C337.999 98.3477 338.429 97.875 339.03 97.875C339.589 97.875 340.061 98.3477 340.061 98.9062V103.031C340.061 103.633 339.589 104.062 339.03 104.062C338.429 104.062 337.999 103.633 337.999 103.031V98.9062Z" fill="#FFAE08"/></svg></span>
+            <h3 id="ttlWeb">La hora de tu computador está desfasada</h3>
+            <p class="desc" id="descWeb">Tu reloj tiene <b data-delta>7 minutos</b> de diferencia con la hora oficial de Colombia. Activa el <b>ajuste automático de fecha y hora</b> en tu equipo; hasta que lo corrijas, <b>no podrás confirmar transacciones</b> ni recibir tu clave temporal.</p>
+            <span class="horas">
+              <span class="celda"><span class="k">En tu equipo</span><span class="v" data-reloj-local>—</span></span>
+              <span class="celda ok"><span class="k">Hora oficial</span><span class="v" data-reloj-servidor>—</span></span>
+            </span>
+          </div>
+          <div class="sheet-actions">
+            <button class="btn" type="button" data-cerrar="scrimWeb">Continuar sin ajustar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="paso">
+    <div class="rotulo"><span class="num">2</span><b>Ya adentro</b><span>La alerta queda bajo el encabezado. Al cerrarla vuelve en la siguiente sesión mientras el desfase siga.</span></div>
+    <div class="pantalla">
+      <div class="portal">
+        <aside class="rail">
+          <div class="rail-item on"><span class="rail-ico">🏠</span>Inicio</div>
+          <div class="rail-item"><span class="rail-ico">🔁</span>Transacciones</div>
+          <div class="rail-item"><span class="rail-ico">📊</span>Inversiones</div>
+          <div class="rail-item"><span class="rail-ico">📄</span>Documentos</div>
+          <div class="rail-item"><span class="rail-ico">❓</span>Ayuda</div>
+        </aside>
+        <div class="main">
+          <header class="topbar">
+            <span class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V9l9-6v6l9-6v12l-9 6v-6l-9 6z" fill="#00c73d"/></svg> Portal Clientes</span>
+            <span class="sp"></span>
+            <span class="bell">🔔</span>
+            <span class="quick">⚡ Acciones rápidas</span>
+            <span class="avatar"><span class="ini">VG</span> Hola, Valeria 👋</span>
+          </header>
+          <div class="cuerpo">
+
+            <div class="alerta alerta-web" id="alertaWeb" role="status">
+              <svg class="ico" viewBox="12.8 20 22.2 19.9" fill="none" aria-hidden="true"><path d="M34.7722 36.918C35.4597 38.1211 34.6004 39.625 33.1824 39.625H14.8348C13.4168 39.625 12.5574 38.1211 13.2019 36.918L22.3973 21.2773C22.784 20.6758 23.3855 20.375 24.0301 20.375C24.6316 20.375 25.2332 20.6758 25.6199 21.2773L34.7722 36.918ZM15.2644 37.5625H32.7527L23.9871 22.6523L15.2644 37.5625ZM24.0301 33.5234C24.7605 33.5234 25.3621 34.125 25.3621 34.8555C25.3621 35.5859 24.7605 36.1875 24.0301 36.1875C23.2566 36.1875 22.6551 35.5859 22.6551 34.8555C22.6551 34.125 23.2566 33.5234 24.0301 33.5234ZM22.9988 26.9062C22.9988 26.3477 23.4285 25.875 24.0301 25.875C24.5887 25.875 25.0613 26.3477 25.0613 26.9062V31.0312C25.0613 31.6328 24.5887 32.0625 24.0301 32.0625C23.4285 32.0625 22.9988 31.6328 22.9988 31.0312V26.9062Z" fill="currentColor"/></svg>
+              <span class="txt">
+                <b>Tu reloj tiene <span data-delta>7 minutos</span> de diferencia con la hora oficial</b>
+                Activa el ajuste automático de fecha y hora en tu equipo. Hasta que lo corrijas, no podrás confirmar transacciones ni recibir tu clave temporal.
+              </span>
+              <button class="cerrar" type="button" data-cerrar="alertaWeb" aria-label="Cerrar">&times;</button>
+            </div>
+
+            <div class="promo">
+              <div style="flex:1">
+                <strong>¡Prepara tu declaración de renta!</strong>
+                <p>¡Hola, Valeria!, tu declaración de renta vence el 2026-09-10. Descarga ya tus certificados en el portal o App Skandia.</p>
+              </div>
+              <span class="tag">Interés</span>
+            </div>
+            <div class="logrado">Lo que has logrado: <span>$ 50.144.589,41 COP</span></div>
+            <div class="sub">Selecciona la categoría para ver información de tus contratos 🚀</div>
+            <div class="cats">
+              <div class="cat on"><span class="cat-ico">📈</span><span class="cat-name">Ahorro e Inversión</span><span class="cat-amt">$ 1.266.413,51</span></div>
+              <div class="cat"><span class="cat-ico">🐷</span><span class="cat-name">Pensiones y Cesantías</span><span class="cat-amt">$ 48.878.175,9</span></div>
+              <div class="cat"><span class="cat-ico">🛡️</span><span class="cat-name">Protege lo que más te importa hoy.</span></div>
+              <div class="cat"><span class="cat-ico">💳</span><span class="cat-name">Descubre cómo solicitar un crédito.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ══════════════════ APP ══════════════════ -->
+<main class="lienzo" id="vista-app" hidden>
+  <div class="telefonos">
+
+    <div class="paso" style="width:auto">
+      <div class="rotulo"><span class="num">1</span><b>Antes de entrar</b></div>
+      <div class="device">
+        <div class="statusbar"><span>9:48</span><span>▪▪ ᯤ 🔋</span></div>
+        <div class="app-login">
+          <div class="app-art">LIBÉRATE CON SKANDIA</div>
+          <div class="app-card">
+            <div class="logo" style="font-size:20px;justify-content:flex-start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V9l9-6v6l9-6v12l-9 6v-6l-9 6z" fill="#00c73d"/></svg> skandia</div>
+            <h2>Vive la vida que quieres</h2>
+            <p>Invierte, planea y alcanza tus metas con Skandia.</p>
+            <div class="row">
+              <button class="btn" type="button">Face ID</button>
+              <button class="btn btn-sec" type="button">Contraseña</button>
+            </div>
+          </div>
+        </div>
+        <div class="scrim abajo" id="scrimApp">
+          <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="ttlApp" aria-describedby="descApp">
+            <button class="sheet-x" type="button" data-cerrar="scrimApp" aria-label="Cerrar">&times;</button>
+            <div class="grabber"></div>
+            <div class="sheet-body">
+              <span class="sheet-ico" aria-hidden="true"><svg viewBox="327.3 91.9 23.6 20.3" fill="none"><path d="M349.772 108.918C350.46 110.121 349.6 111.625 348.182 111.625H329.835C328.417 111.625 327.557 110.121 328.202 108.918L337.397 93.2773C337.784 92.6758 338.386 92.375 339.03 92.375C339.632 92.375 340.233 92.6758 340.62 93.2773L349.772 108.918ZM330.264 109.562H347.753L338.987 94.6523L330.264 109.562ZM339.03 105.523C339.761 105.523 340.362 106.125 340.362 106.855C340.362 107.586 339.761 108.188 339.03 108.188C338.257 108.188 337.655 107.586 337.655 106.855C337.655 106.125 338.257 105.523 339.03 105.523ZM337.999 98.9062C337.999 98.3477 338.429 97.875 339.03 97.875C339.589 97.875 340.061 98.3477 340.061 98.9062V103.031C340.061 103.633 339.589 104.062 339.03 104.062C338.429 104.062 337.999 103.633 337.999 103.031V98.9062Z" fill="#FFAE08"/></svg></span>
+              <h3 id="ttlApp">La hora de tu celular está desfasada</h3>
+              <p class="desc" id="descApp">Tu reloj tiene <b data-delta>7 minutos</b> de diferencia con la hora oficial de Colombia. Hasta que lo corrijas, <b>no podrás confirmar transacciones</b> ni recibir tu clave temporal.</p>
+              <span class="horas">
+                <span class="celda"><span class="k">En tu celular</span><span class="v" data-reloj-local>—</span></span>
+                <span class="celda ok"><span class="k">Hora oficial</span><span class="v" data-reloj-servidor>—</span></span>
+              </span>
+            </div>
+            <div class="sheet-actions">
+              <button class="btn" type="button" data-cerrar="scrimApp">Abrir ajustes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="paso" style="width:auto">
+      <div class="rotulo"><span class="num">2</span><b>Ya adentro</b></div>
+      <div class="device">
+        <div class="statusbar"><span>9:48</span><span>▪▪ ᯤ 🔋</span></div>
+        <div class="app-home">
+          <div class="app-top">
+            <span class="sq">☰</span>
+            <span class="logo" style="font-size:18px"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V9l9-6v6l9-6v12l-9 6v-6l-9 6z" fill="#00c73d"/></svg> skandia</span>
+            <span class="sq">🔔</span>
+          </div>
+          <div class="app-scroll">
+            <div class="greet">¡Hola <span>Valeria!</span></div>
+            <div class="alerta movil" id="alertaApp" role="status">
+              <svg class="ico" viewBox="12.8 20 22.2 19.9" fill="none" aria-hidden="true"><path d="M34.7722 36.918C35.4597 38.1211 34.6004 39.625 33.1824 39.625H14.8348C13.4168 39.625 12.5574 38.1211 13.2019 36.918L22.3973 21.2773C22.784 20.6758 23.3855 20.375 24.0301 20.375C24.6316 20.375 25.2332 20.6758 25.6199 21.2773L34.7722 36.918ZM15.2644 37.5625H32.7527L23.9871 22.6523L15.2644 37.5625ZM24.0301 33.5234C24.7605 33.5234 25.3621 34.125 25.3621 34.8555C25.3621 35.5859 24.7605 36.1875 24.0301 36.1875C23.2566 36.1875 22.6551 35.5859 22.6551 34.8555C22.6551 34.125 23.2566 33.5234 24.0301 33.5234ZM22.9988 26.9062C22.9988 26.3477 23.4285 25.875 24.0301 25.875C24.5887 25.875 25.0613 26.3477 25.0613 26.9062V31.0312C25.0613 31.6328 24.5887 32.0625 24.0301 32.0625C23.4285 32.0625 22.9988 31.6328 22.9988 31.0312V26.9062Z" fill="currentColor"/></svg>
+              <span class="txt">
+                <b>Tu reloj tiene <span data-delta>7 minutos</span> de diferencia</b>
+                Hasta que lo corrijas, no podrás confirmar transacciones ni recibir tu clave temporal. <a href="#">Abrir ajustes</a>
+              </span>
+              <button class="cerrar" type="button" data-cerrar="alertaApp" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="card"><div class="lbl">Ahorro e Inversión</div><div class="amt">$ 1.210.161</div><div class="hint">Total del capital + rendimientos</div></div>
+            <div class="card"><div class="lbl">Pensión Obligatoria y Cesantías</div><div class="amt">$ 47.424.033</div><div class="hint">Total del capital + rendimientos</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notas">
+    <h4>Salvedad para iPhone</h4>
+    <div class="grid">
+      <ul>
+        <li>El botón y el enlace <b>Abrir ajustes</b> funcionan en Android con el intent público <code>android.settings.DATE_SETTINGS</code>, que abre directo la pantalla de Fecha y hora.</li>
+        <li>iOS no tiene equivalente: solo permite abrir los ajustes de la propia app, y la ruta a Fecha y hora es API privada que App Review rechaza.</li>
+        <li>En iPhone ese botón y ese enlace se reemplazan por la ruta escrita <b>Ajustes › General › Fecha y hora</b> dentro del mismo párrafo. Todo lo demás es idéntico.</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<!-- ══════════════════ Notas de implementación ══════════════════ -->
+<div class="lienzo" style="padding-top:0">
+  <div class="notas">
+    <h4>Reglas de negocio</h4>
+    <div class="grid">
+      <ul>
+        <li><b>Detección:</b> se compara el reloj local contra la hora del servidor tomada del header <code>Date</code> de la primera respuesta del login, descontando la latencia (RTT/2). Nunca contra el reloj del cliente.</li>
+        <li><b>Umbrales:</b> menos de 2 minutos no dispara nada; entre 2 minutos y 24 horas se muestra el aviso de hora; a partir de 24 horas o con fecha distinta se usa la variante de fecha, que es la que más rompe certificados y tokens.</li>
+        <li><b>Nunca bloquea el ingreso.</b> El riesgo es de fricción, no de seguridad para el cliente.</li>
+      </ul>
+      <ul>
+        <li><b>Frecuencia:</b> el modal aparece una vez por carga del login mientras el desfase persista. La alerta de adentro, una vez por sesión; cerrarla la repliega hasta la sesión siguiente.</li>
+        <li><b>Se retira solo</b> cuando el delta vuelve a estar por debajo del umbral: se reevalúa al recuperar el foco de la ventana y al volver de background en app.</li>
+        <li><b>Analítica:</b> <code>clock_skew_detected</code> con el delta en segundos, plataforma y sistema operativo; <code>clock_skew_dismissed</code> y <code>clock_skew_fixed</code>. El delta en segundos es dato de analítica; en pantalla el cliente solo ve la magnitud redondeada.</li>
+      </ul>
+      <ul>
+        <li><b>Accesibilidad:</b> modal con <code>role="alertdialog"</code>, foco atrapado y devuelto al disparador; Esc equivale a cerrar y se registra como descarte. La alerta usa <code>role="status"</code> para no interrumpir la navegación con lector de pantalla.</li>
+        <li><b>Copy validado</b> con el panel de Financial Explorer: los cuatro perfiles pidieron ver la magnitud del desfase ya calculada y la consecuencia concreta —"no podrás confirmar transacciones"— en lugar de "puedes presentar intermitencias o fallas en el servicio", que leían como advertencia de relleno.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var DESFASE = 7; // minutos de desfase simulados, solo para poblar las horas
+
+  var hora = new Intl.DateTimeFormat('es-CO', {hour:'numeric', minute:'2-digit', hour12:true});
+  function pintar(){
+    var ahora = new Date(), local = new Date(ahora.getTime() + DESFASE*60000);
+    cada('[data-reloj-local]',    function(n){ n.textContent = hora.format(local); });
+    cada('[data-reloj-servidor]', function(n){ n.textContent = hora.format(ahora); });
+    cada('[data-delta]',          function(n){ n.textContent = DESFASE + ' minutos'; });
+  }
+  function cada(sel, fn){ Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
+
+  // Toggle escritorio / app
+  cada('.toggle button', function(b){
+    b.addEventListener('click', function(){
+      cada('.toggle button', function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+      document.getElementById('vista-desk').hidden = b.dataset.vista !== 'desk';
+      document.getElementById('vista-app').hidden  = b.dataset.vista !== 'app';
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+
+  // Cierre de modales y alertas
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-cerrar]');
+    if (!b) return;
+    var destino = document.getElementById(b.dataset.cerrar);
+    if (destino) destino.hidden = true;
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    ['scrimWeb','scrimApp'].forEach(function(id){
+      var n = document.getElementById(id); if (n) n.hidden = true;
+    });
+  });
+
+  pintar(); setInterval(pintar, 30000);
+})();
+</script>
+</body>
+</html>
