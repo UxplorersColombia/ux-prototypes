@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Jubilación — Informe de Validación · Skandia UX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & tokens (Skandia DS) ───────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --green-500: #00c73d;
+      --green-600: #03a835;
+      --green-700: #009a2f;
+      --green-50:  #f6fcf2;
+      --green-100: #caf9cb;
+      --lime-500:  #8fe000;
+      --yellow-400: #ffae08;
+      --yellow-50:  #fff3e0;
+      --red-500:    #e03430;
+      --red-50:     #fff5f4;
+      --blue-500:   #0099de;
+      --blue-50:    #ebf4ff;
+
+      --surface-0:   #ffffff;
+      --surface-50:  #fafafa;
+      --surface-100: #f7f7f7;
+      --surface-200: #e9e9e9;
+      --surface-300: #dddddd;
+      --surface-400: #c5c5c5;
+      --surface-600: #878787;
+      --surface-700: #565656;
+      --surface-800: #404040;
+      --surface-900: #232323;
+
+      --text-primary:   #404040;
+      --text-secondary: #666666;
+      --text-muted:     #878787;
+      --border:         #dddddd;
+
+      --font-body:  'Open Sans', system-ui, sans-serif;
+      --font-head:  'Montserrat', system-ui, sans-serif;
+
+      --radius-sm:  4px;
+      --radius-md:  8px;
+      --radius-lg:  12px;
+      --radius-xl:  16px;
+      --radius-pill: 100px;
+
+      --sk-space-xxs: 4px; --sk-space-xs: 8px; --sk-space-sm: 12px; --sk-space-md: 16px;
+      --sk-space-lg: 24px; --sk-space-xl: 32px; --sk-space-2xl: 48px; --sk-space-3xl: 64px;
+
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+      --shadow-raised: 0 12px 32px rgba(0,0,0,0.10), 0 4px 10px rgba(0,0,0,0.06);
+      --gradient-brand: linear-gradient(135deg, #00c73d, #8fe000);
+
+      /* Paleta de gráficas del DS Skandia — orden fijo, un color por segmento en TODO el informe */
+      --chart-1: #a1dd70; /* Financial Explorer */
+      --chart-2: #a4d7e1; /* Wealth Builders */
+      --chart-3: #60a9a6; /* Family Guardians */
+      --chart-4: #ff9460; /* Capital Investor */
+      --chart-5: #8ba2c1; /* Stability Seekers */
+      --chart-6: #f67e7d; /* estados críticos / bloqueante */
+      --chart-7: #dddfd0; /* neutro */
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--surface-50);
+      line-height: 1.6;
+      padding: 0 20px 80px;
+    }
+
+    .page { max-width: 920px; margin: 0 auto; }
+
+    mark { background: var(--green-100); color: inherit; border-radius: 2px; padding: 0 1px; }
+
+    ::selection { background: var(--green-100); }
+
+    /* ─── Reveal on scroll ───────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* ─── Barra de progreso de lectura ──────────────────────── */
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: var(--gradient-brand); z-index: 60; transition: width 0.1s linear; }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .doc-header { background: var(--surface-900); border-radius: var(--radius-xl); padding: 44px 48px; margin: 40px 0 16px; position: relative; overflow: hidden; }
+    .doc-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--gradient-brand); }
+    .doc-header::after { content: ''; position: absolute; right: -70px; top: -70px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(0,199,61,0.14), rgba(0,199,61,0) 70%); pointer-events: none; }
+
+    .header-eyebrow { font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green-500); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .version-tag { font-size: 10px; letter-spacing: 0.08em; color: #053d15; background: var(--green-500); border-radius: var(--radius-sm); padding: 2px 7px; }
+    .header-title { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: #ffffff; line-height: 1.22; max-width: 680px; position: relative; }
+    .header-subtitle { font-size: 14px; color: rgba(255,255,255,0.72); margin-top: 12px; max-width: 660px; line-height: 1.6; position: relative; }
+    .header-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; position: relative; }
+    .meta-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: var(--radius-pill); padding: 5px 12px; }
+    .meta-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-500); flex-shrink: 0; }
+    .meta-chip.warn .dot { background: var(--yellow-400); }
+    .meta-chip.danger { background: rgba(224,52,48,0.18); border-color: rgba(224,52,48,0.35); }
+    .meta-chip.danger .dot { background: var(--red-500); }
+
+    /* ─── Toolbar sticky ─────────────────────────────────────── */
+    .toolbar { position: sticky; top: 12px; z-index: 50; background: var(--surface-0); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px 16px; margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; box-shadow: var(--shadow-md); }
+    .search-wrap { flex: 1 1 240px; position: relative; display: flex; align-items: center; }
+    .search-wrap svg { position: absolute; left: 12px; width: 14px; height: 14px; stroke: var(--text-muted); pointer-events: none; }
+    #searchInput { width: 100%; font-family: var(--font-body); font-size: 13px; color: var(--text-primary); background: var(--surface-100); border: 1px solid var(--surface-200); border-radius: var(--radius-pill); padding: 8px 36px 8px 34px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    #searchInput:focus { border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(0,199,61,0.15); background: var(--surface-0); }
+    #searchClear { position: absolute; right: 8px; border: none; background: var(--surface-300); color: var(--surface-700); width: 20px; height: 20px; border-radius: 50%; font-size: 11px; line-height: 1; cursor: pointer; display: none; }
+    .search-count { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .toolbar-btn { font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--green-700); background: var(--green-50); border: 1px solid var(--green-100); border-radius: var(--radius-pill); padding: 7px 14px; cursor: pointer; transition: background 0.15s, transform 0.12s cubic-bezier(.34,1.56,.64,1); white-space: nowrap; }
+    .toolbar-btn:hover { background: var(--green-100); }
+    .toolbar-btn:active { transform: scale(0.96); }
+
+    /* ─── TOC ───────────────────────────────────────────────── */
+    .toc { background: var(--surface-0); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px; margin-bottom: 16px; }
+    .toc-title { font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; }
+    .toc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 32px; }
+    .toc-list li a { text-decoration: none; color: var(--text-secondary); font-size: 13px; display: flex; align-items: center; gap: 8px; transition: color 0.15s; border-radius: var(--radius-sm); }
+    .toc-list li a:hover, .toc-list li a.active { color: var(--green-600); font-weight: 600; }
+    .toc-num { font-family: var(--font-head); font-size: 11px; font-weight: 700; color: var(--green-500); min-width: 20px; }
+
+    /* ─── Aside: audiencia / decisión ────────────────────────── */
+    .decision-banner { background: var(--surface-0); border: 1px solid var(--border); border-left: 4px solid var(--surface-900); border-radius: var(--radius-lg); padding: 24px 28px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+    .decision-banner h3 { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .decision-banner p { font-size: 13px; color: var(--text-secondary); }
+
+    /* ─── Sección ───────────────────────────────────────────── */
+    .section { background: var(--surface-0); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 34px 38px; margin-bottom: 16px; box-shadow: var(--shadow-sm); scroll-margin-top: 80px; }
+    .section-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--surface-100); }
+    .section-number { font-family: var(--font-head); font-size: 12px; font-weight: 700; color: var(--green-500); background: var(--green-50); border: 1px solid var(--green-100); border-radius: var(--radius-sm); padding: 4px 8px; min-width: 34px; text-align: center; margin-top: 2px; flex-shrink: 0; }
+    .section-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+    .section-desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .section p + p { margin-top: 10px; }
+    .section h3 { font-family: var(--font-head); font-size: 14.5px; font-weight: 700; color: var(--text-primary); margin-top: 22px; margin-bottom: 10px; }
+    .section h4 { font-family: var(--font-head); font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-top: 18px; margin-bottom: 8px; }
+    .section > ul, .section > ol { padding-left: 20px; margin-top: 8px; }
+    .section > ul li, .section > ol li { margin-bottom: 7px; font-size: 13.5px; color: var(--text-secondary); }
+    .section > ul li::marker { color: var(--green-500); }
+    .section > ol li::marker { color: var(--green-500); font-weight: 700; }
+    .section-anchor-note { font-size: 12px; color: var(--text-muted); }
+
+    /* ─── Callout ───────────────────────────────────────────── */
+    .callout { display: flex; gap: 12px; background: var(--blue-50); border: 1px solid #cfe7f8; border-radius: var(--radius-md); padding: 14px 18px; font-size: 13px; color: var(--text-secondary); margin-top: 16px; }
+    .callout .icon { flex-shrink: 0; font-size: 15px; }
+    .callout-warn { background: var(--yellow-50); border-color: #ffe2b0; }
+    .callout-success { background: var(--green-50); border-color: var(--green-100); }
+    .callout-danger { background: var(--red-50); border-color: #ffd2d0; }
+    .callout-dark { background: var(--surface-900); border-color: var(--surface-900); color: rgba(255,255,255,0.88); }
+    .callout-dark strong { color: #fff; }
+
+    /* ─── Recomendación hero ─────────────────────────────────── */
+    .rec-hero { background: var(--surface-900); border-radius: var(--radius-xl); padding: 30px 34px; margin-top: 18px; position: relative; overflow: hidden; }
+    .rec-hero::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(180deg, var(--yellow-400), var(--red-500)); }
+    .rec-hero-eyebrow { font-family: var(--font-head); font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--yellow-400); margin-bottom: 8px; }
+    .rec-hero h3 { font-family: var(--font-head); font-size: 19px; font-weight: 800; color: #fff; line-height: 1.3; }
+    .rec-hero p { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 8px; max-width: 620px; }
+
+    /* ─── Stats grid / KPI tiles (Doble-marco) ──────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
+    .stat-card { background: var(--surface-50); border: 1px solid var(--surface-200); border-radius: var(--radius-lg); padding: 4px; }
+    .stat-card-inner { background: var(--surface-0); border-radius: calc(var(--radius-lg) - 4px); padding: 16px 16px 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); height: 100%; }
+    .stat-value { font-family: var(--font-head); font-size: 26px; font-weight: 800; color: var(--surface-900); line-height: 1.1; }
+    .stat-value.accent { color: var(--green-600); }
+    .stat-value.warn { color: #b45400; }
+    .stat-label { font-size: 11.5px; color: var(--text-secondary); margin-top: 6px; line-height: 1.4; }
+    .stat-card--accent .stat-card-inner { border-top: 3px solid var(--green-500); }
+    .stat-card--warn .stat-card-inner { border-top: 3px solid var(--yellow-400); }
+    .stat-card--danger .stat-card-inner { border-top: 3px solid var(--red-500); }
+
+    /* ─── Cards de condición (V1/C1/C2/C3/N1) ───────────────── */
+    .cond-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px; }
+    .cond-card { border: 1px solid var(--surface-200); border-radius: var(--radius-lg); padding: 18px 20px; background: var(--surface-0); position: relative; padding-left: 24px; }
+    .cond-card::before { content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 4px; background: var(--surface-400); }
+    .cond-card--verify::before { background: var(--blue-500); }
+    .cond-card--block::before { background: var(--red-500); }
+    .cond-card--biz::before { background: var(--yellow-400); }
+    .cond-tag { font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+    .cond-card--verify .cond-tag { color: #0b6693; }
+    .cond-card--block .cond-tag { color: #b3231f; }
+    .cond-card--biz .cond-tag { color: #8a5800; }
+    .cond-card h4 { font-family: var(--font-head); font-size: 13px; font-weight: 700; margin: 4px 0 6px; color: var(--text-primary); }
+    .cond-card p { font-size: 12.5px; color: var(--text-secondary); }
+
+    /* ─── Acordeones ────────────────────────────────────────── */
+    details.acc { border: 1px solid var(--surface-200); border-radius: var(--radius-md); margin-bottom: 10px; background: var(--surface-0); overflow: hidden; transition: box-shadow 0.15s; }
+    details.acc[open] { box-shadow: var(--shadow-sm); border-color: var(--green-100); }
+    details.acc summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 14px 18px; user-select: none; transition: background 0.15s; }
+    details.acc summary::-webkit-details-marker { display: none; }
+    details.acc summary:hover { background: var(--green-50); }
+    .acc-num { font-family: var(--font-head); font-size: 11px; font-weight: 700; color: var(--surface-0); background: var(--green-500); border-radius: var(--radius-sm); padding: 3px 7px; flex-shrink: 0; min-width: 26px; text-align: center; }
+    .acc-num--blocking { background: var(--red-500); }
+    .acc-num--high { background: var(--yellow-400); color: #5a3d00; }
+    .acc-num--medium { background: var(--surface-600); }
+    .acc-title { font-family: var(--font-head); font-size: 13.5px; font-weight: 700; flex: 1; line-height: 1.35; }
+    .acc-flag { font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; border-radius: var(--radius-pill); padding: 2px 9px; flex-shrink: 0; white-space: nowrap; }
+    .acc-flag--blocking { background: var(--red-50); color: #b3231f; border: 1px solid #ffd2d0; }
+    .acc-flag--high { background: var(--yellow-50); color: #8a5800; border: 1px solid #ffe2b0; }
+    .acc-chevron { flex-shrink: 0; width: 18px; height: 18px; stroke: var(--text-muted); transition: transform 0.2s; }
+    details.acc[open] .acc-chevron { transform: rotate(180deg); }
+    .acc-body { padding: 4px 18px 18px 18px; font-size: 13.5px; color: var(--text-secondary); border-top: 1px dashed var(--surface-200); }
+    .acc-body > *:first-child { margin-top: 12px; }
+    .acc-body p + p, .acc-body p + ul, .acc-body ul + p, .acc-body div.chart + p, .acc-body p + div.chart, .acc-body p + div.table-wrap, .acc-body div.table-wrap + p { margin-top: 10px; }
+    .acc-body ul { padding-left: 20px; }
+    .acc-body li { margin-bottom: 6px; }
+    .acc-body li::marker { color: var(--green-500); }
+    .acc-body strong { color: var(--text-primary); }
+
+    /* ─── Citas ─────────────────────────────────────────────── */
+    blockquote { border-left: 3px solid var(--green-500); background: var(--green-50); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 12px 16px; margin: 12px 0; font-size: 13px; font-style: italic; color: var(--text-secondary); }
+    blockquote.q-neg { border-left-color: var(--red-500); background: var(--red-50); }
+    blockquote.q-neutral { border-left-color: var(--surface-400); background: var(--surface-50); }
+    blockquote .src { display: block; font-style: normal; font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ─── Tablas ────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border); margin-top: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    thead tr { background: var(--surface-100); border-bottom: 2px solid var(--border); }
+    thead th { padding: 10px 14px; text-align: left; font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--text-primary); white-space: nowrap; }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid var(--surface-100); color: var(--text-secondary); vertical-align: top; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-50); }
+    tbody td strong { color: var(--text-primary); }
+    .num-cell { font-family: var(--font-head); font-weight: 700; color: var(--text-primary); text-align: center; white-space: nowrap; }
+    .tag-pill { display: inline-block; font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; border-radius: var(--radius-pill); padding: 2px 9px; white-space: nowrap; }
+    .tag-pill--block { background: var(--red-50); color: #b3231f; }
+    .tag-pill--high { background: var(--yellow-50); color: #8a5800; }
+    .tag-pill--medium { background: var(--surface-100); color: var(--text-secondary); }
+    tr.row-highlight td { background: var(--green-50); font-weight: 600; }
+    tr.row-warn td { background: var(--yellow-50); }
+
+    /* ─── Gráficas ──────────────────────────────────────────── */
+    .chart { background: var(--surface-50); border: 1px solid var(--surface-200); border-radius: var(--radius-md); padding: 18px 20px; margin: 16px 0; }
+    .chart-title { font-family: var(--font-head); font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .chart-note { font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px; }
+    .bar-row { display: grid; grid-template-columns: 150px 1fr 90px; align-items: center; gap: 10px; margin-bottom: 9px; }
+    .bar-row:last-child { margin-bottom: 0; }
+    .bar-label { font-size: 12px; color: var(--text-secondary); text-align: right; line-height: 1.3; }
+    .bar-label strong { color: var(--text-primary); }
+    .bar-track { background: var(--surface-200); border-radius: var(--radius-pill); height: 15px; overflow: hidden; }
+    .bar-fill { display: block; height: 100%; width: 0; border-radius: var(--radius-pill); background: var(--chart-1); transition: width 1s cubic-bezier(0.16,1,0.3,1); }
+    .chart.is-live .bar-fill, .chart-static .bar-fill { width: var(--w); }
+    .bar-value { font-family: var(--font-head); font-size: 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+    .bar-value small { font-weight: 600; color: var(--text-muted); font-size: 10px; }
+    .chart-annot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .chart-annot .swatch { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--surface-300); }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-secondary); }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+    @media (max-width: 560px) { .bar-row { grid-template-columns: 96px 1fr 66px; } .bar-label { font-size: 11px; } }
+
+    /* ─── Checklist "lo que sí funciona" ─────────────────────── */
+    .check-list { list-style: none; display: grid; gap: 10px; margin-top: 16px; }
+    .check-list li { display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; color: var(--text-secondary); padding: 12px 14px; background: var(--green-50); border: 1px solid var(--green-100); border-radius: var(--radius-md); }
+    .check-list li .check-icon { flex-shrink: 0; font-size: 15px; color: var(--green-600); margin-top: 1px; }
+    .check-list li strong { color: var(--text-primary); }
+
+    /* ─── Segmento cards (identidad de color fija) ──────────── */
+    .seg-card { border: 1px solid var(--surface-200); border-left: 5px solid var(--chart-1); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 12px; background: var(--surface-0); }
+    .seg-card--wb { border-left-color: var(--chart-2); }
+    .seg-card--fg { border-left-color: var(--chart-3); }
+    .seg-card--ci { border-left-color: var(--chart-4); }
+    .seg-card--ss { border-left-color: var(--chart-5); }
+    .seg-card h4 { font-family: var(--font-head); font-size: 13px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .seg-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--chart-1); flex-shrink: 0; }
+    .seg-card--wb .seg-dot { background: var(--chart-2); }
+    .seg-card--fg .seg-dot { background: var(--chart-3); }
+    .seg-card--ci .seg-dot { background: var(--chart-4); }
+    .seg-card--ss .seg-dot { background: var(--chart-5); }
+    .seg-card p { font-size: 13px; color: var(--text-secondary); }
+
+    /* ─── Descarga del consolidado en Markdown ──────────────── */
+    .download-card { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; background: var(--surface-900); border-radius: var(--radius-lg); padding: 18px 22px; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .download-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--gradient-brand); }
+    .download-icon { font-size: 22px; flex-shrink: 0; }
+    .download-text { flex: 1 1 320px; }
+    .download-text h3 { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
+    .download-text p { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+    .download-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-download { font-family: var(--font-head); font-size: 11.5px; font-weight: 700; letter-spacing: 0.03em; text-decoration: none; border-radius: var(--radius-pill); padding: 8px 16px; transition: transform 0.12s cubic-bezier(.34,1.56,.64,1), background 0.15s; white-space: nowrap; }
+    .btn-download:hover { transform: translateY(-1px); text-decoration: none; }
+    .btn-download--primary { background: var(--green-500); color: #053d15; }
+    .btn-download--primary:hover { background: var(--lime-500); }
+    .btn-download--ghost { color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.25); }
+    .btn-download--ghost:hover { border-color: var(--green-500); color: var(--green-500); }
+
+    /* ─── Anexos (download-card) ─────────────────────────────── */
+    .annex-group-title { font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin: 22px 0 10px; }
+    .annex-group-title:first-of-type { margin-top: 4px; }
+    .annex-list { display: grid; gap: 8px; }
+    .annex-card { display: flex; align-items: center; gap: 14px; background: var(--surface-50); border: 1px solid var(--surface-200); border-radius: var(--radius-md); padding: 13px 16px; transition: border-color 0.15s, background 0.15s; }
+    .annex-card:hover { border-color: var(--green-200, var(--green-100)); background: var(--green-50); }
+    .annex-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--surface-0); border: 1px solid var(--surface-200); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .annex-text { flex: 1; min-width: 0; }
+    .annex-text h4 { font-family: var(--font-head); font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+    .annex-text p { font-size: 11.5px; color: var(--text-muted); }
+    .annex-link { flex-shrink: 0; font-family: var(--font-head); font-size: 11px; font-weight: 700; color: var(--green-700); text-decoration: none; background: var(--surface-0); border: 1px solid var(--green-100); border-radius: var(--radius-pill); padding: 6px 13px; white-space: nowrap; transition: background 0.15s, transform 0.12s; }
+    .annex-link:hover { background: var(--green-100); transform: translateY(-1px); }
+
+    /* ─── Footer & back-to-top ──────────────────────────────── */
+    .doc-footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 28px 0 0; }
+    #backTop { position: fixed; right: 24px; bottom: 24px; width: 42px; height: 42px; border-radius: 50%; border: none; background: var(--surface-800); color: #fff; font-size: 16px; cursor: pointer; box-shadow: var(--shadow-md); opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.15s cubic-bezier(.34,1.56,.64,1); z-index: 55; }
+    #backTop.visible { opacity: 1; pointer-events: auto; }
+    #backTop:hover { transform: translateY(-3px) scale(1.05); background: var(--green-600); }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      .doc-header { padding: 30px 22px; }
+      .header-title { font-size: 22px; }
+      .section { padding: 24px 20px; }
+      .toc-list { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .cond-grid { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      .toolbar, #backTop, .progress-bar { display: none; }
+      details.acc { border: none; }
+      body { background: #fff; padding: 0; }
+      .section { box-shadow: none; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><style>.bar-fill { width: var(--w) !important; }</style></noscript>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="page">
+
+    <!-- ═══ Header ═══ -->
+    <header class="doc-header">
+      <div class="header-eyebrow">UX · Skandia · Simulador Jubilación</div>
+      <h1 class="header-title">Informe consolidado de validación</h1>
+      <p class="header-subtitle">Evaluación completa del Simulador Jubilación antes de publicarlo en el sitio web público de Skandia: evaluación heurística, investigación y 13 recorridos sintéticos sobre el prototipo real, cubriendo los 5 segmentos comportamentales. Preparado para el equipo de Operaciones como insumo de la decisión de publicación.</p>
+      <div class="header-meta">
+        <span class="meta-chip"><span class="dot"></span>16–17 de septiembre de 2026</span>
+        <span class="meta-chip"><span class="dot"></span>13 sesiones sintéticas</span>
+        <span class="meta-chip"><span class="dot"></span>5 segmentos comportamentales</span>
+        <span class="meta-chip danger"><span class="dot"></span>Recomendación: no publicar aún</span>
+      </div>
+    </header>
+
+    <!-- ═══ Toolbar ═══ -->
+    <div class="toolbar" role="search">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar en el informe… (ej: RPM, aportes voluntarios, accesibilidad)" aria-label="Buscar en el informe">
+        <button id="searchClear" aria-label="Limpiar búsqueda">✕</button>
+      </div>
+      <span class="search-count" id="searchCount"></span>
+      <button class="toolbar-btn" id="expandAll">Expandir todo</button>
+      <button class="toolbar-btn" id="collapseAll">Contraer todo</button>
+    </div>
+
+    <!-- ═══ TOC ═══ -->
+    <nav class="toc" aria-label="Tabla de contenido">
+      <div class="toc-title">Contenido</div>
+      <ul class="toc-list">
+        <li><a href="#s0"><span class="toc-num">00</span>Cómo leer este informe</a></li>
+        <li><a href="#s1"><span class="toc-num">01</span>Resumen ejecutivo</a></li>
+        <li><a href="#s2"><span class="toc-num">02</span>Qué se evaluó y cómo</a></li>
+        <li><a href="#s3"><span class="toc-num">03</span>Metodología del testeo sintético</a></li>
+        <li><a href="#s4"><span class="toc-num">04</span>Recomendación de publicación</a></li>
+        <li><a href="#s5"><span class="toc-num">05</span>Hallazgos bloqueantes</a></li>
+        <li><a href="#s6"><span class="toc-num">06</span>Hallazgos de experiencia</a></li>
+        <li><a href="#s7"><span class="toc-num">07</span>Lo que sí funciona</a></li>
+        <li><a href="#s8"><span class="toc-num">08</span>Resultados por segmento</a></li>
+        <li><a href="#s9"><span class="toc-num">09</span>Accesibilidad y cumplimiento</a></li>
+        <li><a href="#s10"><span class="toc-num">10</span>Qué absorbe Operaciones</a></li>
+        <li><a href="#s11"><span class="toc-num">11</span>Puntos a cerrar antes de publicar</a></li>
+        <li><a href="#s12"><span class="toc-num">12</span>Recomendaciones priorizadas</a></li>
+        <li><a href="#s13"><span class="toc-num">13</span>Alcance y limitaciones</a></li>
+        <li><a href="#s14"><span class="toc-num">14</span>Anexos</a></li>
+      </ul>
+    </nav>
+
+    <!-- ═══ Para quién / decisión ═══ -->
+    <aside class="decision-banner reveal">
+      <h3>Para: equipo de Operaciones · De: equipo de UX</h3>
+      <p>Este informe soporta una única decisión: <strong>publicar o no el Simulador Jubilación en el sitio web público de Skandia</strong>. Consolida evaluación heurística, investigación previa y 13 recorridos sintéticos sobre el prototipo real en UAT.</p>
+    </aside>
+
+    <!-- ═══ Descarga del consolidado en Markdown ═══ -->
+    <aside class="download-card reveal">
+      <span class="download-icon">📄</span>
+      <div class="download-text">
+        <h3>Informe consolidado en formato Markdown</h3>
+        <p>Versión de texto plano de este informe, pensada para <strong>consulta rápida</strong> y para <strong>alimentar herramientas de inteligencia artificial</strong> (asistentes, agentes, NotebookLM…) como contexto del proyecto.</p>
+      </div>
+      <div class="download-actions">
+        <a class="btn-download btn-download--primary" href="anexos/informe-consolidado-operaciones.md" download>⬇ Descargar .md</a>
+        <a class="btn-download btn-download--ghost" href="anexos/informe-consolidado-operaciones.md" target="_blank" rel="noopener">Ver en línea ↗</a>
+      </div>
+    </aside>
+
+    <!-- ═══ 00 Cómo leer este informe ═══ -->
+    <section class="section reveal" id="s0">
+      <div class="section-header">
+        <div class="section-number">00</div>
+        <div>
+          <h2 class="section-title">Cómo leer este informe</h2>
+          <p class="section-desc">El método en tres capas, y el glosario de términos usados a lo largo del análisis</p>
+        </div>
+      </div>
+
+      <h3>El método, en tres capas</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Capa</th><th>Qué se hizo</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Evaluación heurística</strong></td><td>Recorrido completo del flujo por un evaluador en escritorio y móvil, más auditoría automatizada de accesibilidad. Detecta defectos que no requieren usuarios.</td></tr>
+            <tr><td><strong>Investigación</strong></td><td>Evidencia previa de Skandia sobre vocabulario pensional, comportamiento real de clientes en el portal, benchmark de simuladores de la competencia y contexto normativo vigente.</td></tr>
+            <tr><td><strong>Testeo con panel sintético</strong></td><td><strong>13 recorridos</strong> sobre el prototipo real, cubriendo los 5 segmentos comportamentales, con guion estructurado, preguntas por paso y rúbrica de evaluación.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="icon">⚠️</span>
+        <span><strong>Sobre el panel sintético.</strong> Los 13 recorridos se ejecutaron en vivo contra la aplicación real: cada persona navegó el flujo, llenó campos y leyó cifras calculadas por la herramienta. Son <strong>agentes actuando en carácter, no usuarios reales</strong>. Los hallazgos de comprensión y reacción emocional deben leerse como señal direccional; los hallazgos técnicos que se repitieron en varias sesiones independientes ameritan verificación directa por Desarrollo (ver §12).</span>
+      </div>
+
+      <h3>Glosario</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Término</th><th>Qué significa</th></tr></thead>
+          <tbody>
+            <tr><td><strong>RAIS</strong></td><td>Régimen de Ahorro Individual con Solidaridad — administrado por fondos privados (AFP). Los aportes van a una cuenta individual.</td></tr>
+            <tr><td><strong>RPM</strong></td><td>Régimen de Prima Media — administrado por Colpensiones. La mesada se calcula sobre el IBL y las semanas cotizadas, no sobre una cuenta individual.</td></tr>
+            <tr><td><strong>IBL</strong></td><td>Ingreso Base de Liquidación — el salario de referencia sobre el que se calcula la mesada en RPM.</td></tr>
+            <tr><td><strong>Fidelidad</strong></td><td>En el simulador, cuántos meses al año se asume que la persona sigue cotizando (12 / 9 / 6 / 0 meses, o "Propia").</td></tr>
+            <tr><td><strong>Tasa de reemplazo</strong></td><td>Qué porcentaje del último salario representa la mesada proyectada.</td></tr>
+            <tr><td><strong>Mesada</strong></td><td>El pago mensual de pensión proyectado por el simulador.</td></tr>
+            <tr><td><strong>Rúbrica Skandia (1–4)</strong></td><td>Escala de evaluación de UX en cuatro criterios: <em>Sencillez</em> (¿se entiende?), <em>Facilidad</em> (¿se completa sin fricción?), <em>Integralidad</em> (¿conecta con algo más de Skandia?), <em>Memorabilidad</em> (¿se recuerda?).</td></tr>
+            <tr><td><strong>Panel sintético</strong></td><td>Agentes de IA actuando en carácter como personas de cada segmento, navegando el prototipo real. No son usuarios reales — ver nota metodológica arriba.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-success">
+        <span class="icon">📄</span>
+        <span><strong>Estado: informe consolidado v1.</strong> Reúne teardown del prototipo, evaluación heurística, investigación y los 13 recorridos sintéticos en un solo documento de decisión. Los documentos fuente completos están anexados en §14.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 01 Resumen ejecutivo ═══ -->
+    <section class="section reveal" id="s1">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <div>
+          <h2 class="section-title">Resumen ejecutivo</h2>
+          <p class="section-desc">El simulador funciona, pero hay cuatro cosas que conviene resolver antes de exponerlo al público</p>
+        </div>
+      </div>
+
+      <p>El Simulador Jubilación funciona: las 13 personas evaluadas completaron el flujo de punta a punta sin quedar bloqueadas de forma irrecuperable. La estructura de 4 pasos es clara y el nivel de detalle del resultado es sólido. El problema no es que la herramienta no sirva — es que <strong>hay cuatro cosas que conviene resolver antes de exponerla al público</strong>, y tres de ellas son verificables y corregibles en días.</p>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-card-inner"><div class="stat-value">13</div><div class="stat-label">recorridos sintéticos sobre el prototipo real</div></div></div>
+        <div class="stat-card"><div class="stat-card-inner"><div class="stat-value">5</div><div class="stat-label">segmentos comportamentales evaluados</div></div></div>
+        <div class="stat-card stat-card--danger"><div class="stat-card-inner"><div class="stat-value warn">7×</div><div class="stat-label">confirmaciones independientes del bug de Aportes Voluntarios</div></div></div>
+        <div class="stat-card stat-card--danger"><div class="stat-card-inner"><div class="stat-value warn">1 de 13</div><div class="stat-label">personas tenía sus datos de historia laboral a la mano</div></div></div>
+      </div>
+
+      <div class="rec-hero">
+        <div class="rec-hero-eyebrow">Recomendación</div>
+        <h3>No publicar en el estado actual.</h3>
+        <p>No es un "no va". Es un "todavía no": las correcciones bloqueantes son acotadas y no requieren rediseñar la herramienta.</p>
+      </div>
+
+      <h3>Los cuatro hechos que sostienen esa recomendación</h3>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--blocking">1</span><span class="acc-title">Hay que verificar la exactitud del cálculo de prima media</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Tres evaluaciones independientes encontraron síntomas distintos que apuntan a lo mismo: la mesada de RPM parece no usar correctamente las semanas que el usuario declara. Una persona que escribió "0 semanas en RPM" recibió igual una mesada de $11.200.000 en ese régimen. Otra cambió su edad de pensión y la cifra de RPM no se movió un peso. Para una entidad vigilada que publica proyecciones de pensión al público, esto se verifica antes, no después. <a href="#s5">Ver detalle en §5.1 →</a></p>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--blocking">2</span><span class="acc-title">El único mecanismo de conversión no comunica su resultado</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El panel de Aportes Voluntarios — el momento de mayor intención de toda la herramienta — no actualiza la cifra principal al pulsar "Calcular". Se confirmó <strong>7 veces de forma independiente</strong>, en 4 de los 5 segmentos. En 2 sesiones el botón directamente no recalculó nada. <a href="#s5">Ver detalle en §5.2 →</a></p>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--blocking">3</span><span class="acc-title">Prácticamente toda simulación se corre sobre datos estimados</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>De 13 personas, <strong>solo una</strong> tenía a mano las semanas cotizadas y el saldo — un cliente con asesor patrimonial y registros propios. Las demás los estimaron para poder avanzar, o declararon que tendrían que salir del flujo a buscarlos. Esto significa que la mayoría de los resultados que entregue la herramienta se calcularán sobre datos que el propio usuario aproximó.</p>
+          <div class="chart chart-static">
+            <div class="chart-title">¿Tenía la persona sus datos de historia laboral a la mano?</div>
+            <div class="chart-note">13 sesiones sintéticas</div>
+            <div class="bar-row"><span class="bar-label">Los tenía a mano</span><span class="bar-track"><span class="bar-fill" style="--w:8%; background: var(--chart-3);"></span></span><span class="bar-value">1<small>/13</small></span></div>
+            <div class="bar-row"><span class="bar-label">Estimó o no pudo</span><span class="bar-track"><span class="bar-fill" style="--w:92%; background: var(--chart-6);"></span></span><span class="bar-value">12<small>/13</small></span></div>
+          </div>
+          <p><a href="#s6">Ver detalle en §6.1 →</a></p>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--blocking">4</span><span class="acc-title">El flujo no tiene salida hacia Skandia</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Integralidad promedio <strong>1,8 sobre 4</strong>, y <strong>1,0 sobre 4 sin una sola excepción</strong> en el segmento de mayor volumen. Toda persona interesada termina en "Generar PDF" y, si quiere hacer algo con lo que acaba de ver, tiene que buscar el canal por su cuenta. <a href="#s8">Ver detalle en §8 →</a></p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ═══ 02 Qué se evaluó y cómo ═══ -->
+    <section class="section reveal" id="s2">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <div>
+          <h2 class="section-title">Qué se evaluó y cómo</h2>
+          <p class="section-desc">El simulador de 4 pasos, y el método de validación completo</p>
+        </div>
+      </div>
+
+      <h3>La herramienta</h3>
+      <p>Simulador público de pensión en 4 pasos: información personal y del beneficiario → historia laboral (salario, semanas cotizadas en cada régimen, saldo) → edad de pensión y distribución del saldo entre tres fondos → resultado, con comparación entre régimen de ahorro individual (RAIS) y prima media (RPM), escenarios por fidelidad de aporte, panel de aportes voluntarios y generación de PDF.</p>
+
+      <h3>El método, en tres capas</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Capa</th><th>Qué se hizo</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Evaluación heurística</strong></td><td>Recorrido completo del flujo por un evaluador en escritorio y móvil, más auditoría automatizada de accesibilidad. Detecta defectos que no requieren usuarios.</td></tr>
+            <tr><td><strong>Investigación</strong></td><td>Evidencia previa de Skandia sobre vocabulario pensional, comportamiento real de clientes en el portal, benchmark de simuladores de la competencia y contexto normativo vigente.</td></tr>
+            <tr><td><strong>Testeo con panel sintético</strong></td><td><strong>13 recorridos</strong> sobre el prototipo real, cubriendo los 5 segmentos comportamentales, con guion estructurado, preguntas por paso y rúbrica de evaluación.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="icon">⚠️</span>
+        <span><strong>Sobre el panel sintético.</strong> Los 13 recorridos se ejecutaron en vivo contra la aplicación real: cada persona navegó el flujo, llenó campos y leyó cifras calculadas por la herramienta. Son <strong>agentes actuando en carácter, no usuarios reales</strong>. Los hallazgos de comprensión y reacción emocional deben leerse como señal direccional; los hallazgos técnicos que se repitieron en varias sesiones independientes ameritan verificación directa por Desarrollo (ver §12).</span>
+      </div>
+    </section>
+
+    <!-- ═══ 03 Metodología del testeo sintético ═══ -->
+    <section class="section reveal" id="s3">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <div>
+          <h2 class="section-title">Metodología del testeo sintético: quiénes participaron y cómo</h2>
+          <p class="section-desc">Primera vez que Operaciones ve este método — el detalle de los 13 perfiles y por qué son una base confiable</p>
+        </div>
+      </div>
+
+      <h3>Qué es un panel sintético</h3>
+      <p>No es un focus group narrado ni una simulación teórica. Cada una de las 13 sesiones fue un <strong>agente de IA operando el prototipo real del Simulador Jubilación en UAT, actuando en carácter como una persona concreta</strong>: llenó los campos del formulario con los datos que esa persona tendría (o no tendría) a mano, leyó las cifras que la aplicación calculó en vivo, y reaccionó — en su propio lenguaje — tal como se espera que reaccionaría alguien con ese perfil.</p>
+
+      <div class="callout callout-success">
+        <span class="icon">✅</span>
+        <span>Tres cosas sostienen la confiabilidad del método: <strong>(1)</strong> cada persona corresponde a un perfil real de la <strong>Segmentación Comportamental de Skandia 2026 (#UXplorers)</strong>, no a un personaje inventado sin criterio; <strong>(2)</strong> cada sesión operó la <strong>aplicación real</strong> — los números que se citan en este informe son los que el simulador calculó de verdad, no cifras narradas; <strong>(3)</strong> toda cita y cifra reportada fue <strong>verificada contra el texto real de la pantalla</strong> en el momento de la sesión, no reconstruida de memoria.</span>
+      </div>
+
+      <h3>Cómo se armó la muestra</h3>
+      <p>Los 5 segmentos comportamentales de Skandia tienen, cada uno, un panel de 5 personas de referencia definidas de antemano. Por restricción de presupuesto del sprint, la muestra se acotó así:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Segmento</th><th>Personas evaluadas</th><th>Criterio</th></tr></thead>
+          <tbody>
+            <tr class="row-highlight"><td><strong>Financial Explorer</strong></td><td class="num-cell">5 de 5</td><td>Muestra completa — segmento de mayor volumen y mayor ansiedad financiera, prioridad #1 del sprint</td></tr>
+            <tr><td><strong>Wealth Builders</strong></td><td class="num-cell">2 de 5</td><td>Las 2 personas mejor sincronizadas con las preguntas de investigación del segmento</td></tr>
+            <tr><td><strong>Family Guardians</strong></td><td class="num-cell">2 de 5</td><td>ídem</td></tr>
+            <tr><td><strong>Capital Investor</strong></td><td class="num-cell">2 de 5</td><td>ídem</td></tr>
+            <tr><td><strong>Stability Seekers</strong></td><td class="num-cell">2 de 5</td><td>ídem</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="section-anchor-note">En los 4 segmentos acotados, las 2 personas no se eligieron al azar: cada par se seleccionó para poner a prueba, desde ángulos opuestos o complementarios, la hipótesis de investigación específica de ese segmento — el detalle de "por qué esta persona" está en cada tarjeta abajo.</p>
+
+      <h3>Los 13 perfiles</h3>
+
+      <details class="acc" open>
+        <summary><span class="acc-num">FE</span><span class="acc-title">Financial Explorer — 5 personas (muestra completa)</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <div class="seg-card">
+            <h4><span class="seg-dot"></span>Carolina Ramírez — 34 años, contadora</h4>
+            <p>Organizada en su trabajo, pero perdida con sus propias finanzas — le da vergüenza preguntar cosas básicas.</p>
+          </div>
+          <div class="seg-card">
+            <h4><span class="seg-dot"></span>Roberto Martinez — 41 años, ingeniero civil, Barranquilla</h4>
+            <p>10 años como cliente Skandia solo por productos voluntarios (PAC + Fondos Mutuos). Papá de dos hijos, competitivo.</p>
+          </div>
+          <div class="seg-card">
+            <h4><span class="seg-dot"></span>Andrés — 31 años, ingeniero de sistemas, Medellín</h4>
+            <p>"El Técnico Desconectado": un solo producto (FPOB), 4 años sin entrar al portal de Skandia.</p>
+          </div>
+          <div class="seg-card">
+            <h4><span class="seg-dot"></span>Patricia Gómez — 42 años, ejecutiva, segmento Privilegio</h4>
+            <p>El saldo más alto de todo el panel ($138,3M). Sin tiempo, esperando un trato diferenciado que hoy no recibe.</p>
+          </div>
+          <div class="seg-card">
+            <h4><span class="seg-dot"></span>Daniel Osorio — 32 años, técnico de logística, Cali</h4>
+            <p>"El Voluntario a Medias": solo productos voluntarios ($1,2M), sin FPOB, 2 años sin entrar al portal.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num" style="background:var(--chart-2);">WB</span><span class="acc-title">Wealth Builders — 2 de 5 personas</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <div class="seg-card seg-card--wb">
+            <h4><span class="seg-dot"></span>Sofía — 34 años, ejecutiva de marketing digital, Bogotá</h4>
+            <p>Casada, sin hijos. Ahorra sistemáticamente, usa varias apps financieras. <strong>Por qué esta persona:</strong> perfil digital-analítico — aísla si la fricción del simulador es de interfaz o de conocimiento financiero.</p>
+          </div>
+          <div class="seg-card seg-card--wb">
+            <h4><span class="seg-dot"></span>Germán Alonso Restrepo — 41 años, comerciante de insumos agropecuarios, Bucaramanga</h4>
+            <p>Ahorro activo y disciplinado, pero menos digital que un ejecutivo urbano. <strong>Por qué esta persona:</strong> contraste directo con Sofía — misma mentalidad de ahorro, perfil digital opuesto.</p>
+          </div>
+          <p class="section-anchor-note">Quedaron fuera de esta ronda: Andrés el gerente ascendente, Marcela la profesional liberal, Carlos el heredero en transición.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num" style="background:var(--chart-3);">FG</span><span class="acc-title">Family Guardians — 2 de 5 personas</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <div class="seg-card seg-card--fg">
+            <h4><span class="seg-dot"></span>Roberto — 56 años, técnico de mantenimiento industrial</h4>
+            <p>Casado con Marlene hace 28 años. <strong>Por qué esta persona:</strong> el único de los cinco realmente en la edad crítica de decidir sobre su régimen pensional — activa directamente el hallazgo normativo del §9.</p>
+          </div>
+          <div class="seg-card seg-card--fg">
+            <h4><span class="seg-dot"></span>Hernando Restrepo Villegas — 60 años, empresario textil semi-retirado, Medellín</h4>
+            <p>Casado con Marta, patriarca de una familia extensa. <strong>Por qué esta persona:</strong> su rol de proveedor y legado activa la pregunta sobre el dato del beneficiario que se pide y nunca se devuelve.</p>
+          </div>
+          <p class="section-anchor-note">Quedaron fuera de esta ronda: Camilo el padre planificador digital, María Fernanda la ejecutiva protectora Privilegio, Alejandra la madre soltera resiliente.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num" style="background:var(--chart-4);">CI</span><span class="acc-title">Capital Investor — 2 de 5 personas</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <div class="seg-card seg-card--ci">
+            <h4><span class="seg-dot"></span>Jorge — 59 años, ex-vicepresidente financiero</h4>
+            <p>Patrimonio alto, perfil de riesgo bajo — "lo que ya gané no lo vuelvo a arriesgar". <strong>Por qué esta persona:</strong> para quien la pensión obligatoria sí importa — prueba si tolera el rigor de los datos que exige el Paso 2.</p>
+          </div>
+          <div class="seg-card seg-card--ci">
+            <h4><span class="seg-dot"></span>Ricardo Fernández Uribe — 44 años, Vicepresidente de Banca de Inversión</h4>
+            <p>Patrimonio muy alto, poco tiempo disponible. <strong>Por qué esta persona:</strong> el extremo opuesto a Jorge — para quien la pensión obligatoria es marginal frente a su patrimonio total.</p>
+          </div>
+          <p class="section-anchor-note">Quedaron fuera de esta ronda: Andrés el profesional digital activo, Carolina la profesional consolidada, Valentina la joven emergente.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num" style="background:var(--chart-5);">SS</span><span class="acc-title">Stability Seekers — 2 de 5 personas</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <div class="seg-card seg-card--ss">
+            <h4><span class="seg-dot"></span>Eduardo Restrepo — 63 años, ingeniero civil recién jubilado, Medellín</h4>
+            <p>Digitalmente curioso, usa la app de Skandia con regularidad. <strong>Por qué esta persona:</strong> representa la franja que aún tiene una decisión pensional real por delante — el caso más favorable posible para el segmento.</p>
+          </div>
+          <div class="seg-card seg-card--ss">
+            <h4><span class="seg-dot"></span>Jaime Beltrán — 84 años, pensionado hace más de 22 años</h4>
+            <p>Viudo, depende de su hija para trámites digitales. <strong>Por qué esta persona:</strong> caso límite de accesibilidad — si el flujo es operable por él, es operable por cualquiera.</p>
+          </div>
+          <p class="section-anchor-note">Quedaron fuera de esta ronda: Alfonso el pensionado tradicional, Gloria la viuda independiente, Martha la pensionada con familia dependiente.</p>
+        </div>
+      </details>
+
+      <div class="callout callout-warn" style="margin-top:18px;">
+        <span class="icon">⚠️</span>
+        <span><strong>Qué sí y qué no dice este método.</strong> Un panel sintético es una forma rápida y de bajo costo de hacer una primera pasada de validación sobre un prototipo real, con perfiles fundamentados en segmentación real. <strong>No reemplaza el testeo con clientes reales</strong> — los hallazgos de comprensión y reacción emocional son señal direccional para priorizar, no evidencia de campo. Los hallazgos técnicos (cálculos, botones que no responden) sí son directamente verificables porque ocurrieron sobre la aplicación real. Ver el detalle completo de alcance y limitaciones en §13.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 04 Recomendación de publicación ═══ -->
+    <section class="section reveal" id="s4">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <div>
+          <h2 class="section-title">Recomendación de publicación</h2>
+          <p class="section-desc">Qué separa a la herramienta de poder salir a producción</p>
+        </div>
+      </div>
+
+      <div class="rec-hero">
+        <div class="rec-hero-eyebrow">No publicar en el estado actual</div>
+        <h3>Una verificación y tres correcciones acotadas</h3>
+        <p>Más una condición de negocio. Ninguna requiere rediseñar la herramienta.</p>
+      </div>
+
+      <div class="cond-grid">
+        <div class="cond-card cond-card--verify">
+          <span class="cond-tag">Verificación bloqueante</span>
+          <h4>V1 · Exactitud del cálculo de prima media</h4>
+          <p>Antes que cualquier otra cosa. Si el cálculo es correcto y los síntomas se explican por otra razón, se documenta y se cierra. Si no lo es, es la razón más seria para no publicar. Criterio de cierre sugerido: validación con Actuaría de tres casos — historia 100% RAIS, historia mixta, y cambio de edad de pensión sobre el mismo perfil.</p>
+        </div>
+        <div class="cond-card cond-card--block">
+          <span class="cond-tag">Corrección bloqueante</span>
+          <h4>C1 · Aportes Voluntarios debe reflejar su recálculo</h4>
+          <p>En la cifra principal que el usuario está mirando, no solo en un recuadro secundario más abajo.</p>
+        </div>
+        <div class="cond-card cond-card--block">
+          <span class="cond-tag">Corrección bloqueante</span>
+          <h4>C2 · Piso de fecha en 31/12/1969</h4>
+          <p>El campo "fecha en que empezó a cotizar" no acepta fechas anteriores. Excluye por completo a quien empezó a trabajar antes de esa fecha — una porción real de la población objetivo de una herramienta de pensión.</p>
+        </div>
+        <div class="cond-card cond-card--block">
+          <span class="cond-tag">Corrección bloqueante</span>
+          <h4>C3 · "Te faltan N años" no recalcula</h4>
+          <p>Se verificó en cuatro valores distintos (57, 62, 67 y 75 años) al mover el control de edad de pensión: el mensaje se mantuvo idéntico.</p>
+        </div>
+        <div class="cond-card cond-card--biz" style="grid-column: 1 / -1;">
+          <span class="cond-tag">Condición de negocio</span>
+          <h4>N1 · Definir la ruta de atención antes de publicar</h4>
+          <p>Hoy la herramienta genera intención y no la recoge. Quien termina la simulación y quiere actuar no tiene a dónde ir dentro de la pantalla — y quien decida llamar llegará a un canal que no sabe que viene del simulador. Publicar sin resolver esto traslada la demanda a Operaciones sin trazabilidad ni preparación (ver §10).</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="icon">ℹ️</span>
+        <span><strong>Recomendado, no bloqueante.</strong> Las correcciones de experiencia del §6 (el muro de datos del Paso 2, el vocabulario del resultado, el $0 sin explicar) mejoran sustancialmente la herramienta pero no impiden publicarla. Se pueden abordar en una segunda iteración.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 04 Hallazgos bloqueantes ═══ -->
+    <section class="section reveal" id="s5">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <div>
+          <h2 class="section-title">Hallazgos bloqueantes</h2>
+          <p class="section-desc">Defectos de funcionamiento y de exactitud del cálculo</p>
+        </div>
+      </div>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--blocking">5.1</span><span class="acc-title">El cálculo de prima media no parece usar las semanas declaradas</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Tres síntomas distintos, en tres sesiones independientes de segmentos diferentes:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Evidencia</th><th>Qué se observó</th></tr></thead>
+              <tbody>
+                <tr><td><strong>0 semanas declaradas en RPM</strong></td><td>La tabla Resumen mostró una mesada de RPM de <strong>$11.200.000, idéntica en las 5 columnas</strong> de fidelidad — no $0, ni un campo vacío</td></tr>
+                <tr><td><strong>Bajó su edad de pensión de 62 a 60 años</strong></td><td>La mesada de RAIS cambió correctamente; <strong>la de RPM se mantuvo exactamente igual</strong>, pese a que las semanas bajaron</td></tr>
+                <tr><td><strong>Semanas reales en ambos regímenes</strong></td><td>En la fila de RPM, la progresión decrece gradualmente y de pronto cae a <strong>$0</strong> en la última columna, sin explicación</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart">
+            <div class="chart-title">RAIS reacciona al cambio de edad. RPM, no.</div>
+            <div class="chart-note">Misma persona, dos escenarios de edad de pensión (62 vs. 60 años)</div>
+            <div class="bar-row"><span class="bar-label">RAIS · 62 años</span><span class="bar-track"><span class="bar-fill" style="--w:73%; background: var(--chart-1);"></span></span><span class="bar-value">$4.688.387</span></div>
+            <div class="bar-row"><span class="bar-label">RAIS · 60 años</span><span class="bar-track"><span class="bar-fill" style="--w:61%; background: var(--chart-1);"></span></span><span class="bar-value">$3.899.863</span></div>
+            <div class="bar-row"><span class="bar-label">RPM · 62 años</span><span class="bar-track"><span class="bar-fill" style="--w:100%; background: var(--chart-5);"></span></span><span class="bar-value">$6.400.000</span></div>
+            <div class="bar-row"><span class="bar-label">RPM · 60 años</span><span class="bar-track"><span class="bar-fill" style="--w:100%; background: var(--chart-5);"></span></span><span class="bar-value">$6.400.000</span></div>
+            <div class="chart-annot"><span class="swatch" style="background:var(--chart-5);"></span>RPM no se movió un peso pese a menos semanas cotizadas</div>
+          </div>
+
+          <p>La lectura más plausible es que, en modo "Comparación entre los dos regímenes", el cálculo de RPM se hace sobre un escenario hipotético —qué pasaría si toda la carrera hubiera sido en prima media— sin que ningún texto en pantalla lo advierta. Para el usuario, ese número se lee como un resultado real.</p>
+          <blockquote>"El campo de semanas RPM que llené no sirvió para nada, el sistema calculó las semanas por su cuenta."<span class="src">— evaluadora sintética, Wealth Builders</span></blockquote>
+          <div class="callout callout-danger"><span class="icon">🚫</span><span><strong>Por qué es bloqueante:</strong> una proyección de pensión publicada al público por una entidad vigilada debe poder defenderse. Hoy no sabemos si la cifra de RPM es correcta, contrafactual sin etiquetar, o errónea.</span></div>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--blocking">5.2</span><span class="acc-title">El panel de Aportes Voluntarios no comunica su recálculo</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>El hallazgo mejor corroborado de todo el estudio: <strong>7 confirmaciones independientes</strong> en 4 de los 5 segmentos. Se presenta en dos variantes:</p>
+          <ul>
+            <li><strong>En 2 sesiones</strong>, pulsar "Calcular" no cambió absolutamente nada — ni la mesada ni el capital acumulado.</li>
+            <li><strong>En 5 sesiones</strong>, el cálculo sí ocurrió y es correcto, pero el resultado nuevo apareció en un recuadro pequeño más abajo, mientras el círculo grande —lo primero que el usuario mira— se quedó con la cifra vieja.</li>
+          </ul>
+          <p>En ambas variantes el efecto práctico es el mismo: <em>"le di clic y no pasó nada"</em>.</p>
+          <blockquote class="q-neg">"Le pedí explícitamente que sumara plata a mi proyección y la cifra ni se movió un peso. Si esto es lo que se supone que me convence de meter plata extra, hizo justo lo contrario."<span class="src">— evaluador sintético</span></blockquote>
+          <div class="callout callout-danger"><span class="icon">🚫</span><span><strong>Por qué es bloqueante:</strong> es el único punto de la herramienta donde el usuario manifiesta intención de aportar más. Si ahí la herramienta parece rota, se pierde la conversión y se gana desconfianza en el resto de las cifras.</span></div>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--blocking">5.3</span><span class="acc-title">El campo de inicio de cotización tiene un piso fijo en 1969</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Verificado: los años 1960–1968 aparecen deshabilitados; dentro de 1969 solo diciembre está habilitado; dentro de diciembre, solo el día 31. La fecha mínima aceptada es literalmente <strong>31/12/1969</strong>.</p>
+          <p>Cualquier persona que haya empezado a cotizar antes de esa fecha no puede representar su historia laboral real. Para una herramienta de pensión, esto excluye precisamente a quienes están más cerca de pensionarse.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--blocking">5.4</span><span class="acc-title">"Te faltan N años" no responde al control de edad</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Probado en cuatro posiciones del control (57, 62, 67 y 75 años): el mensaje se mantuvo idéntico en los cuatro casos, igual que el bloque de distribución de fondos que depende de ese número. En el caso evaluado —una persona de 84 años ya pensionada— el mensaje decía "Te faltan 1 años".</p>
+          <p>Adicionalmente, el control permite seleccionar edades <strong>por debajo del mínimo legal que el propio texto declara</strong>, sin ninguna advertencia.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ═══ 05 Hallazgos de experiencia ═══ -->
+    <section class="section reveal" id="s6">
+      <div class="section-header">
+        <div class="section-number">06</div>
+        <div>
+          <h2 class="section-title">Hallazgos de experiencia</h2>
+          <p class="section-desc">Fricciones que no bloquean la publicación, pero degradan sustancialmente la herramienta</p>
+        </div>
+      </div>
+
+      <details class="acc" open>
+        <summary><span class="acc-num acc-num--high">6.1</span><span class="acc-title">El Paso 2 pide datos que la gente no tiene</span><span class="acc-flag acc-flag--high">El hallazgo más consistente</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>De las 13 personas evaluadas, <strong>solo una</strong> —un cliente de alto patrimonio con asesor y registros propios— tenía a mano las semanas cotizadas y el saldo. Las demás aproximaron las cifras para poder avanzar, o dijeron explícitamente que tendrían que interrumpir el flujo para ir a buscarlas.</p>
+          <blockquote>"Eso ya sé qué es, lo que no sé es cuántas tengo yo. ¿Y esto de dónde lo saco? ¿Tengo que llamar a alguien?"</blockquote>
+          <blockquote>"Tengo 138 millones ahí y ahora me toca a mí calcular cuántas semanas he cotizado, como si yo fuera la que lleva la contabilidad de Skandia."</blockquote>
+          <p>La ayuda contextual "?" agrava el problema en vez de resolverlo: <strong>explica qué es el dato, no dónde conseguirlo.</strong> Para "semanas cotizadas en RAIS" el texto repite la etiqueta con más palabras.</p>
+          <blockquote class="q-neg">"Eso no es ayuda, es un diccionario."</blockquote>
+
+          <div class="chart">
+            <div class="chart-title">De consultar la historia laboral a resolver el dato del simulador</div>
+            <div class="chart-note">Comportamiento real en el portal de clientes de Skandia · 2.031 personas que consultan su historia laboral</div>
+            <div class="bar-row"><span class="bar-label">Consultan su historia laboral</span><span class="bar-track"><span class="bar-fill" style="--w:100%; background: var(--chart-3);"></span></span><span class="bar-value">100<small>%</small></span></div>
+            <div class="bar-row"><span class="bar-label">Llegan al detalle de semanas</span><span class="bar-track"><span class="bar-fill" style="--w:26%; background: var(--chart-3);"></span></span><span class="bar-value">26<small>%</small></span></div>
+            <div class="bar-row"><span class="bar-label">Descargan el documento</span><span class="bar-track"><span class="bar-fill" style="--w:5%; background: var(--chart-6);"></span></span><span class="bar-value">5<small>%</small></span></div>
+          </div>
+
+          <p><strong>Un dato que matiza la solución obvia:</strong> enlazar a la Historia Laboral no basta. El dato existe, pero está a varios pasos y fragmentado por año. Un enlace traslada el problema; no lo resuelve.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--high">6.2</span><span class="acc-title">El vocabulario del resultado no se decodifica</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>"Tasa de reemplazo", "IBL" y "Fidelidad" no se entendieron en ninguna de las 5 sesiones del segmento de mayor volumen, y solo se decodificaron por deducción en los perfiles más analíticos. <strong>"Tasa de reemplazo" no tiene ícono de ayuda en ninguna parte de la pantalla de resultados</strong> — aparece únicamente como encabezado de columna.</p>
+          <p>Esto conecta con evidencia previa de Skandia: en pruebas anteriores, 4 de 5 usuarios desconocían el concepto de "brecha pensional". El vocabulario técnico pensional ya había fallado antes con clientes reales.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--high">6.3</span><span class="acc-title">Un resultado de $0 sin explicación donde más se ve</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>En la tabla Resumen, la mesada de RPM aparece en $0 en algunos escenarios sin ninguna nota. La explicación <strong>sí existe</strong> ("semanas insuficientes: recibirías indemnización sustitutiva") pero solo en la vista de detalle individual, no en la tabla que la mayoría mira.</p>
+          <blockquote class="q-neg">"¿$0? ¿O sea que si no cotizo nada no me daría nada de nada? Eso asusta, parece que la página se dañó o que de verdad no me van a dar nada."</blockquote>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--high">6.4</span><span class="acc-title">El formulario muestra errores antes de que el usuario lo toque</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Al cargar el Paso 1, el campo de fecha de nacimiento ya aparece en rojo con "Selecciona la fecha de nacimiento" y "Tu edad hoy: 0 años". <strong>Cuatro de cinco personas</strong> del panel principal reaccionaron con alguna variante de <em>"¿ya hice algo mal?"</em> o <em>"¿ya lo dañé y ni he hecho nada?"</em>.</p>
+          <p>Relacionado: los botones "Continuar" y "Simular" solo se habilitan cuando el último campo pierde el foco. Quien escribe el último dato y va directo al botón lo encuentra gris, sin ninguna pista de qué falta.</p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary><span class="acc-num acc-num--high">6.5</span><span class="acc-title">La distribución entre fondos se resuelve al azar</span><svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="acc-body">
+          <p>Se pide repartir los años que faltan entre tres fondos de riesgo, que deben sumar exacto. <strong>Las 5 personas del segmento principal lo resolvieron "a ojo"</strong> para que el contador cuadrara, sin criterio de riesgo real.</p>
+          <blockquote class="q-neutral">"No tengo ni idea de qué fondo es más arriesgado de verdad, solo puse números hasta que cuadró."</blockquote>
+          <p>Incluso los perfiles con formación financiera cuestionaron la unidad: piden años cuando la gente piensa en porcentajes.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ═══ 06 Lo que sí funciona ═══ -->
+    <section class="section reveal" id="s7">
+      <div class="section-header">
+        <div class="section-number">07</div>
+        <div>
+          <h2 class="section-title">Lo que sí funciona</h2>
+          <p class="section-desc">Es importante no sobre-corregir lo que está bien</p>
+        </div>
+      </div>
+
+      <ul class="check-list">
+        <li><span class="check-icon">✅</span><span><strong>El flujo se completa.</strong> Las 13 personas llegaron al resultado. No hay bloqueos irrecuperables.</span></li>
+        <li><span class="check-icon">✅</span><span><strong>La estructura de 4 pasos es clara y memorable.</strong> El indicador de progreso con nombres explícitos ayuda a ubicarse y retomar.</span></li>
+        <li><span class="check-icon">✅</span><span><strong>El nivel de detalle del resultado es sólido.</strong> IBL, capital acumulado, semanas al momento de pensionarse y tabla por escenarios de fidelidad dan trazabilidad real. Un perfil analítico de alto patrimonio calificó la Integralidad en <strong>4 sobre 4</strong> — la nota más alta del estudio — precisamente por esto.</span></li>
+        <li><span class="check-icon">✅</span><span><strong>Las ayudas que cargan son correctas en su contenido.</strong> La de "Estado del Afiliado" y la de "Fidelidad" explican bien lo que explican; el problema es dónde aparecen y qué pregunta responden, no su exactitud.</span></li>
+        <li><span class="check-icon">✅</span><span><strong>El formateo de moneda y la validación de sumas funcionan</strong> una vez se dispara.</span></li>
+        <li><span class="check-icon">✅</span><span><strong>La nota sobre la regla de convergencia entre fondos</strong> fue valorada explícitamente como un gesto de transparencia.</span></li>
+      </ul>
+    </section>
+
+    <!-- ═══ 07 Resultados por segmento ═══ -->
+    <section class="section reveal" id="s8">
+      <div class="section-header">
+        <div class="section-number">08</div>
+        <div>
+          <h2 class="section-title">Resultados por segmento</h2>
+          <p class="section-desc">Rúbrica Skandia (escala 1–4) sobre las 13 sesiones sintéticas</p>
+        </div>
+      </div>
+
+      <div class="chart">
+        <div class="chart-title">Integralidad por segmento — el hallazgo más revelador del estudio</div>
+        <div class="chart-note">Escala 1–4 · "¿conecta con algo más de Skandia?"</div>
+        <div class="bar-row"><span class="bar-label">Financial Explorer</span><span class="bar-track"><span class="bar-fill" style="--w:25%; background: var(--chart-1);"></span></span><span class="bar-value">1,0<small>/4</small></span></div>
+        <div class="bar-row"><span class="bar-label">Wealth Builders</span><span class="bar-track"><span class="bar-fill" style="--w:62.5%; background: var(--chart-2);"></span></span><span class="bar-value">2,5<small>/4</small></span></div>
+        <div class="bar-row"><span class="bar-label">Family Guardians</span><span class="bar-track"><span class="bar-fill" style="--w:50%; background: var(--chart-3);"></span></span><span class="bar-value">2,0<small>/4</small></span></div>
+        <div class="bar-row"><span class="bar-label">Capital Investor</span><span class="bar-track"><span class="bar-fill" style="--w:87.5%; background: var(--chart-4);"></span></span><span class="bar-value">3,5<small>/4</small></span></div>
+        <div class="bar-row"><span class="bar-label">Stability Seekers</span><span class="bar-track"><span class="bar-fill" style="--w:37.5%; background: var(--chart-5);"></span></span><span class="bar-value">1,5<small>/4</small></span></div>
+        <div class="chart-annot"><span class="swatch" style="background:var(--chart-1);"></span>Financial Explorer (mayor volumen) — la nota más baja &nbsp;·&nbsp; <span class="swatch" style="background:var(--chart-4);"></span>Capital Investor (patrimonio alto) — la nota más alta</div>
+      </div>
+
+      <div class="chart">
+        <div class="chart-title">Facilidad por segmento — uniformemente baja</div>
+        <div class="chart-note">Escala 1–4 · ningún segmento supera el 2</div>
+        <div class="bar-row"><span class="bar-label">Financial Explorer</span><span class="bar-track"><span class="bar-fill" style="--w:50%; background: var(--chart-1);"></span></span><span class="bar-value">2,0<small>/4</small></span></div>
+        <div class="bar-row"><span class="bar-label">Wealth Builders</span><span class="bar-track"><span class="bar-fill" style="--w:50%; background: var(--chart-2);"></span></span><span class="bar-value">2,0<small>/4</small></span></div>
+        <div class="bar-row"><span class="bar-label">Family Guardians</span><span class="bar-track"><span class="bar-fill" style="--w:50%; background: var(--chart-3);"></span></span><span class="bar-value">2,0<small>/4</small></span></div>
+        <div class="bar-row"><span class="bar-label">Capital Investor</span><span class="bar-track"><span class="bar-fill" style="--w:50%; background: var(--chart-4);"></span></span><span class="bar-value">2,0<small>/4</small></span></div>
+        <div class="bar-row"><span class="bar-label">Stability Seekers</span><span class="bar-track"><span class="bar-fill" style="--w:50%; background: var(--chart-5);"></span></span><span class="bar-value">2,0<small>/4</small></span></div>
+      </div>
+
+      <p><strong>Facilidad es 2,0 de forma casi uniforme.</strong> No hay un solo segmento que supere el 2 — la fricción de uso es transversal, no un problema de un perfil específico.</p>
+
+      <div class="rec-hero">
+        <div class="rec-hero-eyebrow">Lectura clave</div>
+        <h3>La herramienta sirve mejor al segmento que menos la necesita, y falla más duro en el de mayor volumen.</h3>
+        <p><strong>Capital Investor</strong>, cuyo patrimonio hace que la pensión obligatoria sea marginal, le da <strong>3,5/4</strong> en Integralidad — valoran la trazabilidad y el detalle numérico. <strong>Financial Explorer</strong>, el segmento de mayor volumen y mayor ansiedad financiera, le da <strong>1,0/4 en las cinco personas, sin una sola excepción.</strong></p>
+      </div>
+
+      <h3>Tabla completa</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Segmento</th><th>Personas</th><th>Sencillez</th><th>Facilidad</th><th>Integralidad</th><th>Memorabilidad</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Financial Explorer</strong></td><td class="num-cell">5</td><td class="num-cell">2,2</td><td class="num-cell">2,0</td><td class="num-cell"><strong>1,0</strong></td><td class="num-cell">2,2</td></tr>
+            <tr><td><strong>Wealth Builders</strong></td><td class="num-cell">2</td><td class="num-cell">2,0</td><td class="num-cell">2,0</td><td class="num-cell">2,5</td><td class="num-cell">3,0</td></tr>
+            <tr><td><strong>Family Guardians</strong></td><td class="num-cell">2</td><td class="num-cell">2,5</td><td class="num-cell">2,0</td><td class="num-cell">2,0</td><td class="num-cell">2,0</td></tr>
+            <tr><td><strong>Capital Investor</strong></td><td class="num-cell">2</td><td class="num-cell">2,5</td><td class="num-cell">2,0</td><td class="num-cell"><strong>3,5</strong></td><td class="num-cell">2,5</td></tr>
+            <tr><td><strong>Stability Seekers</strong></td><td class="num-cell">2</td><td class="num-cell">1,5</td><td class="num-cell">2,0</td><td class="num-cell">1,5</td><td class="num-cell">2,0</td></tr>
+            <tr class="row-highlight"><td><strong>Total (13)</strong></td><td class="num-cell"><strong>13</strong></td><td class="num-cell"><strong>2,2</strong></td><td class="num-cell"><strong>2,0</strong></td><td class="num-cell"><strong>1,8</strong></td><td class="num-cell"><strong>2,3</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Lo específico de cada segmento</h3>
+
+      <div class="seg-card">
+        <h4><span class="seg-dot"></span>Financial Explorer — el más afectado por todo</h4>
+        <p>Ninguna de las 5 tenía los datos del Paso 2; ninguna decodificó el vocabulario del resultado; las 5 terminaron preguntando cómo contactar a alguien. Es también donde el panel lateral que muestra "R.A.I.S" resaltado desde el inicio genera más confusión: 4 de 5 no saben en qué régimen están y leyeron ese resaltado como si la herramienta ya se lo estuviera afirmando.</p>
+      </div>
+
+      <div class="seg-card seg-card--wb">
+        <h4><span class="seg-dot"></span>Wealth Builders — desconfían del resultado</h4>
+        <p>Completan el flujo con más soltura, pero desconfían del resultado por una razón concreta: <strong>no se muestran los supuestos</strong> (rentabilidad, inflación) detrás de una cifra que se presenta con precisión de peso exacto.</p>
+        <blockquote style="margin-top:8px;">"¿Con qué rentabilidad me están calculando esto? ¿4%? ¿8%? No lo sé y la cifra parece muy precisa para no decírmelo."</blockquote>
+      </div>
+
+      <div class="seg-card seg-card--fg">
+        <h4><span class="seg-dot"></span>Family Guardians — el desencuentro más claro</h4>
+        <p>El Paso 1 solicita el tipo de beneficiario y despliega un sub-formulario completo con los datos del cónyuge; <strong>el resultado nunca vuelve a mencionarlo.</strong> Ni siquiera se pide el nombre del beneficiario.</p>
+        <blockquote class="q-neg" style="margin-top:8px;">"Les di hasta la fecha de nacimiento de mi esposa y ni la mencionan al final... ¿entonces para qué me la pidieron?"</blockquote>
+      </div>
+
+      <div class="seg-card seg-card--ci">
+        <h4><span class="seg-dot"></span>Capital Investor — el contraste interno más interesante</h4>
+        <p>El perfil conservador cercano a la edad de pensión la valora como "chequeo de piso mínimo" y le da la nota más alta del estudio. El perfil ejecutivo de alto patrimonio la encuentra marginal y la califica de <em>"funcional pero amateur en los detalles que importan"</em>, señalando la fricción de captura y el panel de aportes que no actualiza.</p>
+      </div>
+
+      <div class="seg-card seg-card--ss">
+        <h4><span class="seg-dot"></span>Stability Seekers — le habla en tiempo futuro a gente que ya se pensionó</h4>
+        <p>El resultado dice "si aportas en los próximos años" y "te pensionarías a los 67" a una persona de 63 ya jubilada, y a una de 84 le dice "te faltan 1 años".</p>
+        <blockquote style="margin-top:8px;">"Esto es para el Eduardo de hace tres años, no para el de ahora."</blockquote>
+        <p style="margin-top:8px;">La persona de mayor edad del panel no habría completado el flujo sola: <em>"Yo solo no. Ni de riesgos. Le pediría a mi hija que se siente conmigo."</em> El datepicker le exigió 13 interacciones distintas solo para su fecha de nacimiento.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 08 Accesibilidad y cumplimiento ═══ -->
+    <section class="section reveal" id="s9">
+      <div class="section-header">
+        <div class="section-number">09</div>
+        <div>
+          <h2 class="section-title">Accesibilidad y cumplimiento</h2>
+          <p class="section-desc">Auditoría automatizada, operabilidad para adultos mayores, y el punto normativo a revisar con Legal</p>
+        </div>
+      </div>
+
+      <h3>Auditoría automatizada</h3>
+      <p>Se corrió una auditoría automatizada (axe-core, criterios WCAG 2.0 A y AA) sobre el primer paso:</p>
+      <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 460px;">
+        <div class="stat-card stat-card--danger"><div class="stat-card-inner"><div class="stat-value warn">2</div><div class="stat-label">violaciones serias</div></div></div>
+        <div class="stat-card stat-card--accent"><div class="stat-card-inner"><div class="stat-value accent">26</div><div class="stat-label">reglas aprobadas</div></div></div>
+      </div>
+      <ul style="margin-top: 16px;">
+        <li><strong>Contraste insuficiente en 8 elementos</strong> — incluyendo, de forma notable, <strong>las etiquetas y leyendas de los dos círculos de resultado</strong>. Son los elementos que comunican el resultado principal de la herramienta.</li>
+        <li><strong>Un enlace sin texto discernible</strong> en el pie de página: un lector de pantalla lo anuncia como "enlace" y nada más.</li>
+      </ul>
+
+      <h3>Operabilidad para adultos mayores</h3>
+      <p>Independiente de la auditoría automatizada, el recorrido con el perfil de mayor edad mostró que el selector de fecha es <strong>en la práctica inoperable sin ayuda</strong> para ese usuario. Sumado al piso de fecha de 1969 (§5.3), la herramienta presenta barreras de acceso reales para una porción de la población que sí tiene interés legítimo en una proyección de pensión.</p>
+      <p>Siendo Skandia una entidad vigilada publicando en su sitio público, conviene una revisión formal de accesibilidad antes de salir a producción.</p>
+
+      <h3>Punto normativo a revisar con Legal</h3>
+      <p>La herramienta ofrece como función destacada la comparación entre los dos regímenes pensionales. <strong>La ventana para trasladarse entre regímenes venció el 16 de julio de 2026</strong>, y el nuevo marco del sistema entra en vigencia el 1 de abril de 2027.</p>
+      <p>En el recorrido, una persona en la edad exacta para haberse interesado en ese traslado llegó por sí sola a la conclusión equivocada:</p>
+      <blockquote class="q-neg">"Viendo esto pensaría que sí, que como me sale mejor Prima Media me podría pasar. Pero la pantalla en ningún momento me dice si puedo o no, ni hasta cuándo."</blockquote>
+      <p>Se revisó el texto completo de las pantallas de resultado —las cinco pestañas de escenarios, el resumen, ambas descripciones de régimen y el desplegable de alcance de la proyección— y <strong>no aparece ninguna mención a plazos, traslados ni fechas límite</strong>.</p>
+      <div class="callout">
+        <span class="icon">⚖️</span>
+        <span>Vale la pena señalar que <strong>un competidor ya resolvió esto</strong>: Colfondos declara explícitamente en su simulador qué marco legal aplica al usuario. <strong>Esto no es una decisión de Operaciones sola.</strong> Conviene llevarlo a Legal y Cumplimiento para definir qué advertencia debe llevar la herramienta antes de publicarse.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 09 Qué absorbe Operaciones ═══ -->
+    <section class="section reveal" id="s10">
+      <div class="section-header">
+        <div class="section-number">10</div>
+        <div>
+          <h2 class="section-title">Qué absorbe Operaciones si se publica tal cual</h2>
+          <p class="section-desc">Cada hallazgo tiene una consecuencia operativa concreta</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:34%">Hallazgo</th><th>Qué llega a Operaciones</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Sin ruta de atención</strong> <span class="section-anchor-note">(§4-N1)</span></td><td>Toda persona con intención de actuar tiene que buscar el canal por su cuenta. Llegarán llamadas y mensajes <strong>sin ninguna trazabilidad</strong> de que vienen del simulador — no habrá forma de dimensionar el volumen ni de atribuir la demanda.</td></tr>
+            <tr><td><strong>Cálculo de RPM sin verificar</strong> <span class="section-anchor-note">(§5.1)</span></td><td>Llamadas del tipo <em>"el simulador me dijo que con Colpensiones me daba el doble"</em>. La línea de frente tendría que explicar o defender una cifra cuya exactitud no está confirmada.</td></tr>
+            <tr><td><strong>Datos estimados por el usuario</strong> <span class="section-anchor-note">(§6.1)</span></td><td>Consultas sobre resultados que el cliente cree suyos, calculados sobre cifras que él mismo estimó. Explicar esto por teléfono es incómodo y erosiona confianza.</td></tr>
+            <tr><td><strong>$0 sin explicación</strong> <span class="section-anchor-note">(§6.3)</span></td><td>Llamadas con carga emocional alta — gente asustada creyendo que su pensión será cero, o que el sitio está dañado.</td></tr>
+            <tr><td><strong>Botón de aportes que parece no funcionar</strong> <span class="section-anchor-note">(§5.2)</span></td><td>Reportes de "la página no sirve" justo en el momento de mayor intención comercial. Conversión perdida que además genera ticket.</td></tr>
+            <tr><td><strong>Barreras para adultos mayores</strong> <span class="section-anchor-note">(§5.3, §9)</span></td><td>Demanda de atención asistida: clientes mayores que no pueden completarlo solos y llaman o van a oficina para que alguien lo haga por ellos.</td></tr>
+            <tr><td><strong>Punto normativo abierto</strong> <span class="section-anchor-note">(§9)</span></td><td>Solicitudes de traslado de régimen que ya no son posibles. La línea de frente tendría que dar una mala noticia que la herramienta insinuó como disponible.</td></tr>
+            <tr><td><strong>Datos del beneficiario que no se usan</strong> <span class="section-anchor-note">(§8)</span></td><td>Preguntas sobre por qué se solicitaron datos del cónyuge que luego no aparecen en ningún resultado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-dark" style="margin-top:18px;">
+        <span class="icon">💡</span>
+        <span><strong>El patrón de fondo:</strong> la herramienta genera intención y preguntas, y hoy no tiene forma de recogerlas. Todo lo que no resuelva en pantalla se convierte en volumen de contacto no dimensionado.</span>
+      </div>
+    </section>
+
+    <!-- ═══ 10 Puntos a cerrar antes de publicar ═══ -->
+    <section class="section reveal" id="s11">
+      <div class="section-header">
+        <div class="section-number">11</div>
+        <div>
+          <h2 class="section-title">Puntos a cerrar antes de publicar</h2>
+          <p class="section-desc">Cuatro definiciones que el testeo no puede tomar por el equipo</p>
+        </div>
+      </div>
+
+      <ol>
+        <li><strong>Objetivo y métrica de éxito.</strong> ¿Qué se considera que la herramienta funcionó — simulaciones completadas, contactos generados, aportes voluntarios abiertos? Sin esto no hay forma de saber después si valió la pena, ni de priorizar mejoras.</li>
+        <li><strong>Revisión normativa.</strong> El punto del §9, con Legal y Cumplimiento.</li>
+        <li><strong>Verificación técnica de los cálculos.</strong> Idealmente con Actuaría, al menos para el cálculo de RPM (§5.1). El research valida comprensión, no exactitud — si las cifras estuvieran mal, el testeo solo mide la reacción a un dato incorrecto.</li>
+        <li><strong>Relación con los simuladores que ya existen.</strong> Skandia ya opera simuladores pensionales con audiencia real: el de la app móvil registra <strong>10.013 usuarios únicos</strong> en 17 meses. Conviene definir si el nuevo los reemplaza, los duplica o convive con ellos — y por qué este se publica en el sitio público cuando el uso actual vive en la app.</li>
+      </ol>
+    </section>
+
+    <!-- ═══ 11 Recomendaciones priorizadas ═══ -->
+    <section class="section reveal" id="s12">
+      <div class="section-header">
+        <div class="section-number">12</div>
+        <div>
+          <h2 class="section-title">Recomendaciones priorizadas</h2>
+          <p class="section-desc">17 acciones, ordenadas por criticidad</p>
+        </div>
+      </div>
+
+      <div class="chart">
+        <div class="chart-title">Distribución de las 17 recomendaciones por criticidad</div>
+        <div class="bar-row"><span class="bar-label">Bloqueante</span><span class="bar-track"><span class="bar-fill" style="--w:29%; background: var(--chart-6);"></span></span><span class="bar-value">5</span></div>
+        <div class="bar-row"><span class="bar-label">Alta</span><span class="bar-track"><span class="bar-fill" style="--w:24%; background: var(--yellow-400);"></span></span><span class="bar-value">4</span></div>
+        <div class="bar-row"><span class="bar-label">Media</span><span class="bar-track"><span class="bar-fill" style="--w:47%; background: var(--chart-7);"></span></span><span class="bar-value">8</span></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Acción</th><th>Criticidad</th><th>Tipo</th></tr></thead>
+          <tbody>
+            <tr class="row-warn"><td class="num-cell">1</td><td>Verificar el cálculo de la mesada de RPM con casos controlados</td><td><span class="tag-pill tag-pill--block">Bloqueante</span></td><td>Técnica</td></tr>
+            <tr class="row-warn"><td class="num-cell">2</td><td>Hacer que el panel de Aportes Voluntarios actualice la cifra principal</td><td><span class="tag-pill tag-pill--block">Bloqueante</span></td><td>Técnica</td></tr>
+            <tr class="row-warn"><td class="num-cell">3</td><td>Corregir el piso de fecha de 31/12/1969 en inicio de cotización</td><td><span class="tag-pill tag-pill--block">Bloqueante</span></td><td>Técnica</td></tr>
+            <tr class="row-warn"><td class="num-cell">4</td><td>Corregir "Te faltan N años" para que recalcule con el control de edad</td><td><span class="tag-pill tag-pill--block">Bloqueante</span></td><td>Técnica</td></tr>
+            <tr class="row-warn"><td class="num-cell">5</td><td>Definir la ruta de atención al cierre del flujo (asesor, agendamiento, contacto)</td><td><span class="tag-pill tag-pill--block">Bloqueante</span></td><td>Negocio</td></tr>
+            <tr><td class="num-cell">6</td><td>Revisar con Legal la advertencia sobre marco normativo aplicable</td><td><span class="tag-pill tag-pill--high">Alta</span></td><td>Cumplimiento</td></tr>
+            <tr><td class="num-cell">7</td><td>Reescribir las ayudas "?" para decir <strong>dónde</strong> conseguir cada dato, y anclarlas junto al campo</td><td><span class="tag-pill tag-pill--high">Alta</span></td><td>Experiencia</td></tr>
+            <tr><td class="num-cell">8</td><td>Llevar la explicación del $0 a la tabla Resumen, donde hoy no está</td><td><span class="tag-pill tag-pill--high">Alta</span></td><td>Experiencia</td></tr>
+            <tr><td class="num-cell">9</td><td>Validar el formulario al escribir, no solo al perder el foco</td><td><span class="tag-pill tag-pill--high">Alta</span></td><td>Técnica</td></tr>
+            <tr><td class="num-cell">10</td><td>Quitar el estado de error del campo de fecha antes de la primera interacción</td><td><span class="tag-pill tag-pill--medium">Media</span></td><td>Experiencia</td></tr>
+            <tr><td class="num-cell">11</td><td>Corregir contraste de las etiquetas de los círculos de resultado y el enlace sin nombre</td><td><span class="tag-pill tag-pill--medium">Media</span></td><td>Accesibilidad</td></tr>
+            <tr><td class="num-cell">12</td><td>Exponer los supuestos del cálculo (rentabilidad, inflación) junto al resultado</td><td><span class="tag-pill tag-pill--medium">Media</span></td><td>Confianza</td></tr>
+            <tr><td class="num-cell">13</td><td>Permitir distribuir entre fondos en porcentaje, o mostrar el equivalente</td><td><span class="tag-pill tag-pill--medium">Media</span></td><td>Experiencia</td></tr>
+            <tr><td class="num-cell">14</td><td>Devolver el dato del beneficiario en el resultado, o no pedirlo</td><td><span class="tag-pill tag-pill--medium">Media</span></td><td>Experiencia</td></tr>
+            <tr><td class="num-cell">15</td><td>Ajustar el copy para contemplar a quien ya está pensionado</td><td><span class="tag-pill tag-pill--medium">Media</span></td><td>Experiencia</td></tr>
+            <tr><td class="num-cell">16</td><td>Mejorar el selector de fecha (apertura en década razonable, entrada por teclado)</td><td><span class="tag-pill tag-pill--medium">Media</span></td><td>Accesibilidad</td></tr>
+            <tr><td class="num-cell">17</td><td>Revisión formal de accesibilidad WCAG 2.1 AA antes de producción</td><td><span class="tag-pill tag-pill--medium">Media</span></td><td>Cumplimiento</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ 12 Alcance y limitaciones ═══ -->
+    <section class="section reveal" id="s13">
+      <div class="section-header">
+        <div class="section-number">13</div>
+        <div>
+          <h2 class="section-title">Alcance y limitaciones de este estudio</h2>
+          <p class="section-desc">Para que las conclusiones se usen con la confianza que corresponde</p>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>El panel de testeo es sintético</strong>, no usuarios reales. Los hallazgos de comprensión, emoción e intención son <strong>señal direccional</strong>, no evidencia de campo. Lo que sí es directamente verificable —y se repitió en múltiples sesiones independientes— son los hallazgos técnicos del §5.</li>
+        <li><strong>Los datos de historia laboral usados en cada recorrido son plausibles pero estimados</strong> por cada persona sintética. Las cifras de resultado que aparecen en este informe son las que la herramienta calculó en vivo a partir de esos datos, no cifras de ningún cliente real.</li>
+        <li><strong>La muestra por segmento es desigual</strong>: 5 personas en Financial Explorer (el segmento de mayor volumen, priorizado) y 2 en cada uno de los otros cuatro. Las conclusiones de los segmentos con 2 personas son más frágiles.</li>
+        <li><strong>No se evaluó la audiencia de no-clientes.</strong> Siendo una herramienta del sitio público, su audiencia primaria es gente que aún no es cliente de Skandia. Los 5 segmentos disponibles están construidos sobre la base instalada. Este vacío queda abierto.</li>
+        <li><strong>No se evaluó la exactitud de los cálculos</strong>, solo su comprensión y su coherencia interna. De ahí la recomendación #1.</li>
+        <li><strong>El alcance móvil no está dimensionado.</strong> El defecto de diseño móvil está verificado, pero no se pudo establecer qué proporción de la audiencia del sitio público lo sufriría. La analítica del sitio (Google Analytics ya está cargando en la página) resolvería esto rápidamente.</li>
+      </ul>
+    </section>
+
+    <!-- ═══ 13 Anexos ═══ -->
+    <section class="section reveal" id="s14">
+      <div class="section-header">
+        <div class="section-number">14</div>
+        <div>
+          <h2 class="section-title">Anexos</h2>
+          <p class="section-desc">Los documentos completos de la validación, para quien necesite el detalle</p>
+        </div>
+      </div>
+
+      <p>Este informe consolida el trabajo de validación completo. El detalle vive en los siguientes documentos.</p>
+
+      <div class="annex-group-title">Documentos base</div>
+      <div class="annex-list">
+        <div class="annex-card">
+          <div class="annex-icon">📄</div>
+          <div class="annex-text"><h4>Informe consolidado (este documento, en Markdown)</h4><p>Versión de texto plano, para consulta rápida o como contexto de IA</p></div>
+          <a class="annex-link" href="anexos/informe-consolidado-operaciones.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+        <div class="annex-card">
+          <div class="annex-icon">🧩</div>
+          <div class="annex-text"><h4>Ficha del prototipo</h4><p>Los 4 pasos, cada campo, el modelo de cálculo</p></div>
+          <a class="annex-link" href="anexos/simulador-jubilacion-teardown.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+        <div class="annex-card">
+          <div class="annex-icon">🔍</div>
+          <div class="annex-text"><h4>Evaluación heurística</h4><p>11 hallazgos de usabilidad con severidad, evidencia y recomendación</p></div>
+          <a class="annex-link" href="anexos/simulador-jubilacion-heuristica.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+        <div class="annex-card">
+          <div class="annex-icon">📚</div>
+          <div class="annex-text"><h4>Base de investigación</h4><p>Evidencia previa, benchmark competitivo, contexto normativo e hipótesis</p></div>
+          <a class="annex-link" href="anexos/simulador-jubilacion-research.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+        <div class="annex-card">
+          <div class="annex-icon">📋</div>
+          <div class="annex-text"><h4>Instrumento de testeo</h4><p>Guion de sesión, rúbrica y formato de reporte usados en el testeo</p></div>
+          <a class="annex-link" href="anexos/simulador-jubilacion-instrumento-testeo.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+      </div>
+
+      <div class="annex-group-title">Informes por segmento — los 13 recorridos completos</div>
+      <div class="annex-list">
+        <div class="annex-card">
+          <div class="annex-icon" style="background:var(--chart-1);">👤</div>
+          <div class="annex-text"><h4>Financial Explorer</h4><p>5 personas · Carolina, Roberto, Andrés, Patricia, Daniel</p></div>
+          <a class="annex-link" href="anexos/testeo-financial-explorer.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+        <div class="annex-card">
+          <div class="annex-icon" style="background:var(--chart-2);">👤</div>
+          <div class="annex-text"><h4>Wealth Builders</h4><p>2 personas · Sofía, Germán</p></div>
+          <a class="annex-link" href="anexos/testeo-wealth-builders.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+        <div class="annex-card">
+          <div class="annex-icon" style="background:var(--chart-3);">👤</div>
+          <div class="annex-text"><h4>Family Guardians</h4><p>2 personas · Hernando, Roberto</p></div>
+          <a class="annex-link" href="anexos/testeo-family-guardians.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+        <div class="annex-card">
+          <div class="annex-icon" style="background:var(--chart-4);">👤</div>
+          <div class="annex-text"><h4>Capital Investor</h4><p>2 personas · Jorge, Ricardo</p></div>
+          <a class="annex-link" href="anexos/testeo-capital-investor.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+        <div class="annex-card">
+          <div class="annex-icon" style="background:var(--chart-5);">👤</div>
+          <div class="annex-text"><h4>Stability Seekers</h4><p>2 personas · Eduardo, Jaime</p></div>
+          <a class="annex-link" href="anexos/testeo-stability-seekers.md" target="_blank" rel="noopener">Ver ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="doc-footer">
+      <p>Simulador Jubilación — Informe consolidado de validación · v1 · UX Skandia · 16–17 de septiembre de 2026</p>
+    </footer>
+
+  </div>
+
+  <button id="backTop" aria-label="Volver arriba">↑</button>
+
+  <script>
+    // Barra de progreso
+    const progressBar = document.getElementById('progressBar');
+    const backTop = document.getElementById('backTop');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+      progressBar.style.width = scrolled + '%';
+      backTop.classList.toggle('visible', h.scrollTop > 600);
+    });
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Expandir / contraer todo
+    const allAccs = [...document.querySelectorAll('details.acc')];
+    document.getElementById('expandAll').addEventListener('click', () => allAccs.forEach(d => d.open = true));
+    document.getElementById('collapseAll').addEventListener('click', () => allAccs.forEach(d => d.open = false));
+
+    // Búsqueda simple: resalta secciones/acordeones que contienen el texto
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    const searchCount = document.getElementById('searchCount');
+    const searchableBlocks = [...document.querySelectorAll('.section, details.acc')];
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      searchClear.style.display = q ? 'block' : 'none';
+      if (!q) { searchCount.textContent = ''; searchableBlocks.forEach(b => b.style.outline = ''); return; }
+      let matches = 0;
+      searchableBlocks.forEach(b => {
+        const hit = b.textContent.toLowerCase().includes(q);
+        if (hit && b.tagName === 'DETAILS') { b.open = true; matches++; b.style.outline = '2px solid var(--green-500)'; }
+        else if (hit) { b.style.outline = ''; }
+        else { b.style.outline = ''; }
+      });
+      searchCount.textContent = matches ? matches + ' coincidencia(s)' : 'Sin resultados';
+    });
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchInput.dispatchEvent(new Event('input'));
+      searchInput.focus();
+    });
+
+    // Scrollspy del TOC
+    const tocLinks = [...document.querySelectorAll('.toc-list a')];
+    const sections = tocLinks.map(a => document.querySelector(a.getAttribute('href')));
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const id = '#' + entry.target.id;
+        const link = tocLinks.find(a => a.getAttribute('href') === id);
+        if (!link) return;
+        if (entry.isIntersecting) { tocLinks.forEach(a => a.classList.remove('active')); link.classList.add('active'); }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => s && spy.observe(s));
+
+    // Reveal on scroll (fade-up)
+    const revealEls = [...document.querySelectorAll('.reveal')];
+    const revealer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('in'); revealer.unobserve(entry.target); } });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => revealer.observe(el));
+
+    // Gráficas: activar las barras. Las visibles al cargar se activan de inmediato
+    // (con doble rAF para que la transición de ancho sí se reproduzca); las que
+    // viven dentro de un acordeón cerrado se activan al abrirlo.
+    function activateChart(chart) { chart.classList.add('is-live'); }
+    document.querySelectorAll('.chart').forEach(chart => {
+      if (chart.offsetParent !== null) {
+        requestAnimationFrame(() => requestAnimationFrame(() => activateChart(chart)));
+      }
+    });
+    document.querySelectorAll('details.acc').forEach(d => {
+      d.addEventListener('toggle', () => { if (d.open) d.querySelectorAll('.chart').forEach(activateChart); });
+    });
+  </script>
+</body>
+</html>
