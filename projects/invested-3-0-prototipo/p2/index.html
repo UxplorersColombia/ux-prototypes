@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Invested · Simuladores v1 y v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#00C73D;--green-deep:#007A25;--green-tint:#E8F9EE;--green-soft:#F6FCF2;
+  --ink:#16241B;--text:#233029;--muted:#5E6F64;--line:#DCE8DF;--line-2:#D9D9D9;
+  --paper:#F3F8F4;--surface:#FFFFFF;--r-lg:20px;--r-md:12px;--r-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Montserrat',sans-serif}
+body{background:var(--paper);color:var(--text);padding:28px 20px 60px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.topbar h1{font-size:19px;font-weight:800;color:var(--ink)}
+.topbar p{font-size:13px;color:var(--muted);margin-top:3px;font-family:'Open Sans',sans-serif}
+.switch{display:inline-flex;background:#FAFAFA;border:1px solid var(--line);border-radius:999px;padding:4px}
+.switch button{border:0;background:transparent;padding:9px 18px;border-radius:999px;font-size:13px;font-weight:700;color:#A5A5A5;cursor:pointer;transition:.15s}
+.switch button.on{background:var(--green);color:#fff}
+.card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:20px;margin-bottom:16px}
+.card h2{font-size:18px;font-weight:700;color:var(--ink)}
+.card .sub{font-size:13px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:5px}
+.lbl{font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px}
+.inp{height:42px;border:1px solid var(--line-2);border-radius:var(--r-sm);display:flex;align-items:center;gap:6px;padding:0 14px;background:#fff}
+.inp:focus-within{border:1.5px solid var(--green)}
+.inp input{border:0;outline:0;font:inherit;font-weight:600;font-size:15px;color:var(--text);width:100%;background:transparent}
+.inp input::placeholder{font-weight:400;color:#A5B0A8}
+.inp .pre{font-weight:600;color:var(--muted)}
+.inp .suf{font-size:13px;color:var(--muted);white-space:nowrap}
+.inp select{border:0;outline:0;font:inherit;font-weight:500;font-size:15px;background:transparent;cursor:pointer;width:100%}
+.row{display:flex;gap:24px;flex-wrap:wrap}
+.row>*{flex:1 1 220px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{border:1px solid var(--line-2);background:#fff;border-radius:999px;padding:8px 14px;font-size:13.5px;font-weight:500;color:var(--text);cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--green)}
+.chip.on{border:1.5px solid var(--green);background:var(--green-soft);color:var(--green-deep);font-weight:600}
+.step{margin-top:18px}
+.empty{border:1px dashed var(--line);border-radius:var(--r-md);padding:22px 18px;text-align:center;background:#FBFDFB;margin-top:18px}
+.empty b{display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.empty span{font-size:13px;color:var(--muted);font-family:'Open Sans',sans-serif}
+.reveal{animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.saldo-row{display:flex;align-items:center;gap:14px;padding:10px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--green-soft);cursor:pointer;transition:.2s;margin-top:16px}
+.saldo-row.off{background:#fff}
+.saldo-row .who{flex:1;min-width:0}
+.saldo-row .who b{display:block;font-size:14px;font-weight:600;color:var(--text)}
+.saldo-row .who span{font-size:12.5px;color:var(--muted);font-family:'Open Sans',sans-serif}
+.pill{background:var(--green-tint);border-radius:var(--r-sm);padding:10px 16px;text-align:center;transition:.2s}
+.pill.off{background:#F4F6F5}
+.pill small{display:block;font-size:12px;color:var(--muted)}
+.pill b{font-size:16px;font-weight:800;color:var(--green-deep)}
+.pill.off b{color:var(--muted)}
+.cbx{width:20px;height:20px;border:1.5px solid var(--line-2);border-radius:5px;background:#fff;display:grid;place-items:center;flex:0 0 20px}
+.cbx.on{background:var(--green);border-color:var(--green)}
+.cbx svg{width:12px;height:12px;display:none}.cbx.on svg{display:block}
+.mix{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-top:18px}
+.mix-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mix-head .t{font-size:13px;font-weight:600;color:var(--text)}
+.mix-head .t span{display:block;font-size:12px;color:var(--muted);font-weight:400;font-family:'Open Sans',sans-serif}
+.tag{background:var(--green-tint);color:var(--green-deep);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
+.tag.n{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:500;font-size:12px}
+.slider{margin-top:14px}
+.slider input{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:#E9EFE9;outline:0}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid var(--green);cursor:pointer}
+.slider .ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:6px;font-family:'Open Sans',sans-serif}
+.slider .cur{text-align:center;font-size:12px;font-weight:700;color:var(--green-deep);margin-bottom:4px}
+.res{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--green-soft);margin-top:18px;flex-wrap:wrap}
+.res .k{font-size:13px;font-weight:600;color:var(--text)}
+.res .k span{display:block;font-size:12px;color:var(--muted);font-weight:400;font-family:'Open Sans',sans-serif;margin-top:2px}
+.res .v{font-size:24px;font-weight:800;color:var(--green-deep);white-space:nowrap}
+.legend{display:flex;gap:18px;margin:18px 0 8px;font-size:12px;font-weight:600;flex-wrap:wrap}
+.legend i{display:inline-block;width:16px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.chart{width:100%;height:160px;display:block}
+.stats{display:flex;gap:40px;flex-wrap:wrap;margin-top:12px}
+.stats div span{display:block;font-size:12px;color:var(--muted)}
+.stats div b{font-size:17px;font-weight:700;color:var(--ink)}
+.pie{font-size:11.5px;color:var(--muted);font-family:'Open Sans',sans-serif;text-align:center;margin-top:26px}
+.alerta{display:flex;gap:12px;align-items:flex-start;background:#EBF4FF;border:1px solid #0099DE;
+  border-radius:8px;padding:14px 16px;margin-top:20px}
+.alerta>svg{flex:0 0 24px}
+.alerta .cuerpo{font-size:12.5px;line-height:1.55;color:#404040;font-family:'Open Sans',sans-serif}
+.alerta .cuerpo b{display:block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13.5px;margin-bottom:3px}
+.divider{height:1px;background:var(--line)}
+.opt{display:flex;align-items:center;gap:14px;padding:14px 2px;cursor:pointer}
+.opt .t{flex:1;min-width:0}
+.opt .t b{display:block;font-size:14px;font-weight:600;color:var(--text)}
+.opt .t span{font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif}
+.btns{display:flex;gap:14px;margin-top:20px}
+.btn{flex:1;border:1.5px solid transparent;border-radius:999px;padding:13px;font-weight:700;font-size:14.5px;cursor:pointer}
+.btn.p{background:var(--green);color:#fff}.btn.p:hover{background:var(--green-deep)}
+.btn.p:disabled{background:#D9E5DC;color:#8C9A91;cursor:not-allowed}
+.btn.g{background:transparent;border-color:var(--green);color:var(--green-deep)}
+.hide{display:none}
+.note{font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:10px}
+.help{position:relative;display:inline-flex;vertical-align:middle;margin-left:7px}
+.help>button{border:0;background:transparent;padding:0;cursor:pointer;line-height:0;display:block}
+.tip{position:absolute;left:50%;transform:translateX(-50%);top:28px;width:280px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:12px 14px;font-size:12.5px;font-family:'Open Sans',sans-serif;
+  color:var(--text);line-height:1.5;z-index:30;text-align:left;font-weight:400;cursor:default}
+.tip:before{content:'';position:absolute;top:-6px;left:50%;margin-left:-6px;width:10px;height:10px;background:#fff;
+  border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Simulador de activación · Invest-ED</h1>
+      <p>Dos versiones para comparar comportamiento real. Prototipo interno, datos de ejemplo.</p>
+    </div>
+    <div class="switch">
+      <button id="bv1" class="on" onclick="setVer(1)">Versión 1 · simulador completo</button>
+      <button id="bv2" onclick="setVer(2)">Versión 2 · alineada a producción</button>
+    </div>
+  </div>
+
+  <!-- ============ VERSIÓN 1 ============ -->
+  <section id="v1">
+    <div class="card">
+      <h2>Arma tu simulación</h2>
+      <p class="sub">Cuéntanos tu objetivo y tu plazo: con eso te decimos cuál es tu mezcla y cómo podría rendir.</p>
+
+      <div class="step">
+        <span class="lbl">¿Para qué vas a invertir?</span>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <div class="saldo-row" id="saldoRow" onclick="toggleSaldo(event)">
+        <div class="cbx on" id="saldoCbx"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="who">
+          <b>Sumar el dinero que ya tienes en tu contrato<span class="help" id="helpSaldo"><button type="button" onclick="toggleTip(event)" aria-label="Qué es este saldo"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#0099DE" stroke-width="1.4"/><path d="M6.9 6.9c0-1.15.94-2.05 2.1-2.05s2.1.86 2.1 1.95c0 1-.63 1.4-1.32 1.9-.5.36-.78.72-.78 1.4" stroke="#0099DE" stroke-width="1.4" stroke-linecap="round"/><circle cx="9" cy="13.1" r=".95" fill="#0099DE"/></svg></button></span></b>
+          <span>Potencializar mi inversión · Contrato #100006369833</span>
+        </div>
+        <div class="pill" id="saldoPill"><small>Saldo disponible</small><b>$ 377.717,56</b></div>
+      </div>
+
+      <div class="step">
+        <div class="switch" style="margin-bottom:14px">
+          <button id="m2" class="on" onclick="setModo('meta')">Por la meta que quiero</button>
+          <button id="m1" onclick="setModo('aporte')">Por mi aporte mensual</button>
+        </div>
+        <div class="row">
+          <div>
+            <span class="lbl" id="lblMonto">Monto de tu Meta</span>
+            <div class="inp"><span class="pre">$</span><input id="inMonto" placeholder="Ej: 50.000.000" inputmode="numeric"></div>
+          </div>
+          <div>
+            <span class="lbl">Años para lograrlo</span>
+            <div class="inp"><input id="inAnios" placeholder="Ej: 10" inputmode="numeric"><span class="suf">años</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- vacío mientras falten objetivo y plazo -->
+      <div class="empty" id="emptyA">
+        <b>Aún no podemos calcular tu mezcla</b>
+        <span>Elige tu objetivo y escribe el plazo para conocer tu mezcla, su nivel de riesgo y cómo ha rendido.</span>
+      </div>
+
+      <!-- nivel A: mezcla -->
+      <div id="gateA" class="hide">
+        <div class="mix reveal">
+          <div class="mix-head">
+            <div class="t">Tu mezcla según tu objetivo y tu plazo<span id="mixWhy"></span></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="tag" id="tagMezcla">—</span>
+              <span class="tag n" id="tagRiesgo">—</span>
+            </div>
+          </div>
+          <div class="slider">
+            <div class="cur" id="curTasa">—</div>
+            <input type="range" id="rngTasa" min="65" max="119" step="1" value="80">
+            <div class="ends"><span id="tMin">—</span><span id="tMax">—</span></div>
+          </div>
+          <p class="note">Mueve el control para ver cómo te iría con el rendimiento más bajo o el más alto que ha tenido esta mezcla.</p>
+        </div>
+
+        <!-- vacío mientras no haya monto -->
+        <div class="empty" id="emptyB">
+          <b>Falta un dato para proyectar</b>
+          <span id="emptyBtxt">Escribe cuánto puedes aportar al mes, o incluye el saldo de tu contrato.</span>
+        </div>
+
+        <!-- nivel B: resultado + gráfica -->
+        <div id="gateB" class="hide">
+          <div class="res reveal">
+            <div class="k" id="resK">Meta estimada alcanzada<span id="resSub"></span></div>
+            <div class="v" id="resV">$ 0</div>
+          </div>
+          <div class="legend">
+            <span style="color:var(--green-deep)"><i style="background:var(--green)"></i>Valor estimado futuro</span>
+            <span style="color:#8c8c8c"><i style="background:#8c8c8c"></i>Tus aportes totales</span>
+          </div>
+          <svg class="chart" id="chart" viewBox="0 0 1000 160" preserveAspectRatio="none"></svg>
+          <div class="stats">
+            <div><span>Total aportado</span><b id="stAp">$ 0</b></div>
+            <div><span>Rendimiento estimado</span><b id="stRe">$ 0</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alerta"><svg width="24" height="24" viewBox="12 18 24 24" fill="none" aria-hidden="true"><path d="M24 18C30.6094 18 36 23.3906 36 30C36 36.6562 30.6094 42 24 42C17.3438 42 12 36.6562 12 30C12 23.3906 17.3438 18 24 18ZM24 39.75C29.3438 39.75 33.75 35.3906 33.75 30C33.75 24.6562 29.3438 20.25 24 20.25C18.6094 20.25 14.25 24.6562 14.25 30C14.25 35.3906 18.6094 39.75 24 39.75ZM24 32.25C23.3438 32.25 22.875 31.7812 22.875 31.125V25.125C22.875 24.5156 23.3438 24 24 24C24.6094 24 25.125 24.5156 25.125 25.125V31.125C25.125 31.7812 24.6094 32.25 24 32.25ZM24 33.8438C24.7969 33.8438 25.4531 34.5 25.4531 35.2969C25.4531 36.0938 24.7969 36.75 24 36.75C23.1562 36.75 22.5 36.0938 22.5 35.2969C22.5 34.5 23.1562 33.8438 24 33.8438Z" fill="#0099DE"/></svg><div class="cuerpo"><b>Esta simulación es informativa</b>El rango se basa en la rentabilidad histórica de tu mezcla y es solo una proyección: las rentabilidades pasadas no garantizan resultados futuros ni constituyen una promesa de rentabilidad. Esta simulación es informativa y no es una asesoría ni una recomendación de inversión de Skandia.</div></div>
+    </div>
+    <div class="btns"><button class="btn g">Regresar</button><button class="btn p" id="cta1" disabled>Ver mi mezcla</button></div>
+  </section>
+
+  <!-- ============ VERSIÓN 2 ============ -->
+  <section id="v2" class="hide">
+    <div class="card">
+      <h2>Detalles de tu objetivo</h2>
+      <p class="sub">Define el plazo y cómo vas a avanzar. Con esto armamos tu recomendación.</p>
+      <div class="row" style="margin-top:18px">
+        <div>
+          <span class="lbl">¿En cuánto tiempo te gustaría alcanzar tu objetivo?</span>
+          <div style="display:flex;gap:12px">
+            <div class="inp" style="width:120px"><input id="v2Plazo" placeholder="Ej: 15" inputmode="numeric"></div>
+            <div class="inp" style="width:140px"><select id="v2Unidad"><option>Años</option><option>Meses</option></select></div>
+          </div>
+        </div>
+        <div>
+          <span class="lbl">¿Cómo te gustaría avanzar hacia tu objetivo?</span>
+          <div class="opt" style="padding:0" onclick="v2Toggle('ap',event)">
+            <div class="cbx" id="v2cbAp"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="t"><b>Aportes periódicos mensuales</b></div>
+            <div class="inp" style="width:180px"><span class="pre">$</span><input id="v2Aporte" placeholder="Ej: 100.000" inputmode="numeric"></div>
+          </div>
+        </div>
+      </div>
+      <div class="divider" style="margin:16px 0 0"></div>
+      <div class="opt" onclick="v2Toggle('co',event)">
+        <div class="cbx" id="v2cbCo"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="t"><b>Usar el dinero que ya tienes en el contrato</b><span>Multifund · Potencializar mi inversión · #100006369833</span></div>
+        <div class="pill off" id="v2Pill"><small>Saldo disponible</small><b>$ 377.718</b></div>
+      </div>
+      <div class="empty" id="v2Empty"><b>Aún no hay nada que proyectar</b><span>Escribe el plazo y elige al menos una forma de avanzar hacia tu objetivo.</span></div>
+      <div class="res hide" id="v2Res"><div class="k">Con lo que definiste<span id="v2Sub"></span></div><div class="v" id="v2Val">$ 0</div></div>
+      <div class="alerta"><svg width="24" height="24" viewBox="12 18 24 24" fill="none" aria-hidden="true"><path d="M24 18C30.6094 18 36 23.3906 36 30C36 36.6562 30.6094 42 24 42C17.3438 42 12 36.6562 12 30C12 23.3906 17.3438 18 24 18ZM24 39.75C29.3438 39.75 33.75 35.3906 33.75 30C33.75 24.6562 29.3438 20.25 24 20.25C18.6094 20.25 14.25 24.6562 14.25 30C14.25 35.3906 18.6094 39.75 24 39.75ZM24 32.25C23.3438 32.25 22.875 31.7812 22.875 31.125V25.125C22.875 24.5156 23.3438 24 24 24C24.6094 24 25.125 24.5156 25.125 25.125V31.125C25.125 31.7812 24.6094 32.25 24 32.25ZM24 33.8438C24.7969 33.8438 25.4531 34.5 25.4531 35.2969C25.4531 36.0938 24.7969 36.75 24 36.75C23.1562 36.75 22.5 36.0938 22.5 35.2969C22.5 34.5 23.1562 33.8438 24 33.8438Z" fill="#0099DE"/></svg><div class="cuerpo"><b>Esta simulación es informativa</b>El rango se basa en la rentabilidad histórica de tu mezcla y es solo una proyección: las rentabilidades pasadas no garantizan resultados futuros ni constituyen una promesa de rentabilidad. Esta simulación es informativa y no es una asesoría ni una recomendación de inversión de Skandia.</div></div>
+    </div>
+    <div class="btns"><button class="btn g">Atrás</button><button class="btn p" id="cta2" disabled>Ver recomendación</button></div>
+  </section>
+  <p class="pie">Skandia Administradora de Fondos de Pensiones y Cesantías S.A. — ACCAI S.A. Vigilada por la Superintendencia Financiera de Colombia.</p>
+</div>
+
+<script>
+/* ---------- datos ---------- */
+var SALDO = 377717.56;
+var MEZCLAS = [
+  {max:5,  n:'Cauta',    r:1, min:4.0,  top:7.2},
+  {max:10, n:'Discreta', r:2, min:6.5,  top:11.9},
+  {max:15, n:'Paciente', r:3, min:7.5,  top:13.5},
+  {max:20, n:'Dinámica', r:4, min:8.5,  top:15.5},
+  {max:25, n:'Decidida', r:5, min:9.5,  top:17.5},
+  {max:99, n:'Audaz',    r:6, min:10.5, top:19.5}
+];
+var OBJ = [
+  {t:'Para mi retiro',                 d: 1},
+  {t:'Para la educación de mis hijos', d: 0},
+  {t:'Para comprar vivienda',          d:-1},
+  {t:'Para mi libertad financiera',    d: 1},
+  {t:'Otro objetivo',                  d: 0}
+];
+var S = { modo:'meta', obj:null, saldo:true, aporte:0, meta:0, anios:0, tasaDec:80, tasaLibre:false };
+
+/* ---------- utilidades ---------- */
+function sep(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function money(n){ return '$ ' + sep(n); }
+function num(s){ return parseInt(String(s).replace(/[^\d]/g,''),10) || 0; }
+function pct(v){ return v.toFixed(1).replace('.',',') + '% E.A.'; }
+function show(id,on){ document.getElementById(id).className =
+  document.getElementById(id).className.replace(/\s*\bhide\b/,'') + (on?'':' hide'); }
+function mezclaDe(a,shift){
+  var i=0; while (i<MEZCLAS.length-1 && a>MEZCLAS[i].max) i++;
+  i = Math.max(0, Math.min(MEZCLAS.length-1, i + (shift||0)));
+  return MEZCLAS[i];
+}
+function fv(P0,PMT,tasa,meses){ var r=Math.pow(1+tasa,1/12)-1, g=Math.pow(1+r,meses);
+  return P0*g + (r>0 ? PMT*((g-1)/r) : PMT*meses); }
+function pmtDe(meta,P0,tasa,meses){ var r=Math.pow(1+tasa,1/12)-1, g=Math.pow(1+r,meses);
+  return Math.max(0,(meta - P0*g)/((g-1)/r)); }
+
+/* ---------- chips de objetivo ---------- */
+var cont = document.getElementById('chips');
+OBJ.forEach(function(o,i){
+  var b=document.createElement('button');
+  b.className='chip'; b.textContent=o.t;
+  b.onclick=function(){
+    S.obj=i; S.tasaLibre=false;
+    [].forEach.call(cont.children,function(c,j){ c.className='chip'+(j===i?' on':''); });
+    render();
+  };
+  cont.appendChild(b);
+});
+
+/* ---------- interacción ---------- */
+function setVer(v){
+  show('v1', v===1); show('v2', v===2);
+  document.getElementById('bv1').className = v===1?'on':'';
+  document.getElementById('bv2').className = v===2?'on':'';
+}
+function setModo(m){
+  var el = document.getElementById('inMonto');
+  if (S.modo==='meta') S.meta = num(el.value); else S.aporte = num(el.value);
+  S.modo = m;
+  document.getElementById('m1').className = m==='aporte'?'on':'';
+  document.getElementById('m2').className = m==='meta'?'on':'';
+  document.getElementById('lblMonto').textContent = m==='meta' ? 'Monto de tu Meta' : 'Aporte mensual';
+  el.placeholder = m==='meta' ? 'Ej: 50.000.000' : 'Ej: 350.000';
+  var v = m==='meta' ? S.meta : S.aporte;
+  el.value = v ? sep(v) : '';
+  render();
+}
+function toggleTip(ev){
+  ev.stopPropagation();
+  var h = document.getElementById('helpSaldo'), abierto = h.querySelector('.tip');
+  if (abierto){ abierto.remove(); return; }
+  var t = document.createElement('div');
+  t.className = 'tip';
+  t.onclick = function(e){ e.stopPropagation(); };
+  t.textContent = 'Es el saldo que hoy tienes en tu contrato Multifund. Viene precargado y no se puede editar: '
+    + 'tú decides si lo sumas a esta simulación como punto de partida.';
+  h.appendChild(t);
+}
+document.addEventListener('click', function(){
+  var t = document.querySelector('#helpSaldo .tip'); if (t) t.remove();
+});
+function toggleSaldo(ev){
+  if (ev && ev.target.closest && ev.target.closest('.help')) return;
+  S.saldo=!S.saldo;
+  document.getElementById('saldoCbx').className='cbx'+(S.saldo?' on':'');
+  document.getElementById('saldoRow').className='saldo-row'+(S.saldo?'':' off');
+  document.getElementById('saldoPill').className='pill'+(S.saldo?'':' off');
+  render();
+}
+['inMonto','inAnios'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){
+    var v = num(document.getElementById('inMonto').value);
+    if (S.modo==='meta') S.meta = v; else S.aporte = v;
+    S.anios = Math.min(40, num(document.getElementById('inAnios').value));
+    S.tasaLibre = false;
+    render();
+  });
+});
+document.getElementById('rngTasa').addEventListener('input',function(e){
+  S.tasaDec = +e.target.value; S.tasaLibre = true; render();
+});
+
+/* ---------- gráfica ---------- */
+function dibujar(P0,PMT,tasa,meses,maxRef){
+  var W=1000,H=160,L=74,R=14,TOP=12,BASE=126,PW=W-L-R;
+  var paso=Math.pow(10, Math.floor(Math.log(maxRef)/Math.LN10)-0)/1;
+  var nice=Math.ceil(maxRef/paso)*paso || 1e6;
+  var y=function(v){ return TOP+(BASE-TOP)*(1-v/nice); };
+  var x=function(t){ return L+PW*(t/meses); };
+  var etiqueta=function(v){ return v>=1e6 ? '$'+(v/1e6).toFixed(v/1e6<10?1:0).replace('.',',')+'M' : '$'+sep(v/1000)+'K'; };
+  var s='';
+  for (var i=1;i<=4;i++){ var val=nice*i/4;
+    s+='<line x1="'+L+'" y1="'+y(val).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(val).toFixed(1)+'" stroke="#DCE8DF" stroke-width="1"/>';
+    s+='<text x="'+(L-8)+'" y="'+(y(val)+3).toFixed(1)+'" font-size="9" fill="#5E6F64" text-anchor="end" font-family="Open Sans">'+etiqueta(val)+'</text>';
+  }
+  var pv=[],pa=[],N=40;
+  for (var k=0;k<=N;k++){ var t=meses*k/N;
+    pv.push(x(t).toFixed(1)+','+y(fv(P0,PMT,tasa,t)).toFixed(1));
+    pa.push(x(t).toFixed(1)+','+y(P0+PMT*t).toFixed(1));
+  }
+  s+='<polygon points="'+L+','+BASE+' '+pv.join(' ')+' '+(W-R)+','+BASE+'" fill="#E8F9EE"/>';
+  s+='<polyline points="'+pa.join(' ')+'" fill="none" stroke="#8c8c8c" stroke-width="1.5" stroke-dasharray="6,5"/>';
+  s+='<polyline points="'+pv.join(' ')+'" fill="none" stroke="#00C73D" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  var pasoX=Math.max(1,Math.round(S.anios/5)), marcas=[];
+  for (var a=0;a<S.anios;a+=pasoX) marcas.push(a);
+  marcas.push(S.anios);
+  if (marcas.length>1 && marcas[marcas.length-1]-marcas[marcas.length-2] < pasoX*0.6) marcas.splice(marcas.length-2,1);
+  marcas.forEach(function(a,i){
+    var anc = i===0 ? 'start' : (i===marcas.length-1 ? 'end' : 'middle');
+    s+='<text x="'+x(a*12).toFixed(1)+'" y="'+(BASE+20)+'" font-size="10" fill="#5E6F64" text-anchor="'+anc+'">'
+      + (a===0?'Hoy':a+(a===1?' año':' años')) + '</text>';
+  });
+  document.getElementById('chart').innerHTML=s;
+}
+
+/* ---------- render v1 ---------- */
+function render(){
+  var listoA = (S.obj !== null) && S.anios > 0;
+  show('emptyA', !listoA); show('gateA', listoA);
+  if (!listoA){ document.getElementById('cta1').disabled = true; renderV2(); return; }
+
+  var mz = mezclaDe(S.anios, OBJ[S.obj].d), meses = S.anios*12, P0 = S.saldo?SALDO:0;
+  document.getElementById('tagMezcla').textContent = mz.n;
+  document.getElementById('tagRiesgo').textContent = 'Riesgo '+mz.r+' de 6';
+  document.getElementById('mixWhy').textContent = OBJ[S.obj].t.toLowerCase().replace('para ','Para ')+' en '+S.anios+(S.anios===1?' año':' años');
+  document.getElementById('tMin').textContent = pct(mz.min);
+  document.getElementById('tMax').textContent = pct(mz.top);
+
+  var rng = document.getElementById('rngTasa');
+  rng.min = Math.round(mz.min*10); rng.max = Math.round(mz.top*10);
+  if (!S.tasaLibre) S.tasaDec = Math.round((mz.min+mz.top)*10/2);
+  S.tasaDec = Math.min(+rng.max, Math.max(+rng.min, S.tasaDec));
+  rng.value = S.tasaDec;
+  var tasa = S.tasaDec/1000;
+  document.getElementById('curTasa').textContent = pct(S.tasaDec/10);
+
+  var monto = S.modo==='aporte' ? S.aporte : S.meta;
+  var listoB = monto > 0 || (S.modo==='aporte' && P0 > 0);
+  document.getElementById('emptyBtxt').textContent = S.modo==='aporte'
+    ? 'Escribe cuánto puedes aportar al mes para ver tu proyección.'
+    : 'Escribe el monto de tu meta para saber cuánto necesitas aportar al mes.';
+  show('emptyB', !listoB); show('gateB', listoB);
+  document.getElementById('cta1').disabled = !listoB;
+  if (!listoB){ renderV2(); return; }
+
+  if (S.modo==='aporte'){
+    var vSel=fv(P0,S.aporte,tasa,meses), vMin=fv(P0,S.aporte,mz.min/100,meses), vMax=fv(P0,S.aporte,mz.top/100,meses);
+    var ap=P0+S.aporte*meses;
+    document.getElementById('resK').childNodes[0].nodeValue='Meta estimada alcanzada';
+    document.getElementById('resSub').textContent='Entre '+money(vMin)+' y '+money(vMax)+' según el rendimiento de tu mezcla '+mz.n;
+    document.getElementById('resV').textContent=money(vSel);
+    document.getElementById('stAp').textContent=money(ap);
+    document.getElementById('stRe').textContent=money(Math.max(0,vSel-ap));
+    dibujar(P0,S.aporte,tasa,meses,Math.max(vMax,ap));
+  } else {
+    var pSel=pmtDe(S.meta,P0,tasa,meses), pAlto=pmtDe(S.meta,P0,mz.min/100,meses), pBajo=pmtDe(S.meta,P0,mz.top/100,meses);
+    var ap2=P0+pSel*meses;
+    document.getElementById('resK').childNodes[0].nodeValue='Aporte mensual requerido';
+    document.getElementById('resSub').textContent='Entre '+money(pBajo)+' y '+money(pAlto)+' al mes según el rendimiento de tu mezcla '+mz.n;
+    document.getElementById('resV').textContent=money(pSel);
+    document.getElementById('stAp').textContent=money(ap2);
+    document.getElementById('stRe').textContent=money(Math.max(0,S.meta-ap2));
+    dibujar(P0,pSel,tasa,meses,Math.max(S.meta,ap2));
+  }
+  renderV2();
+}
+
+/* ---------- versión 2 ---------- */
+var V2={ap:false,co:false};
+function v2Toggle(k,ev){
+  if (ev && ev.target.tagName==='INPUT') return;
+  V2[k]=!V2[k];
+  document.getElementById(k==='ap'?'v2cbAp':'v2cbCo').className='cbx'+(V2[k]?' on':'');
+  if(k==='co') document.getElementById('v2Pill').className='pill'+(V2.co?'':' off');
+  renderV2();
+}
+['v2Plazo','v2Aporte'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){
+    if (id==='v2Aporte' && !V2.ap) v2Toggle('ap');
+    renderV2();
+  });
+});
+document.getElementById('v2Unidad').addEventListener('change',renderV2);
+function renderV2(){
+  var n = num(document.getElementById('v2Plazo').value);
+  var meses = document.getElementById('v2Unidad').value==='Años' ? n*12 : n;
+  var PMT = V2.ap ? num(document.getElementById('v2Aporte').value) : 0;
+  var P0  = V2.co ? SALDO : 0;
+  var listo = meses > 0 && (PMT > 0 || P0 > 0);
+  show('v2Empty', !listo); show('v2Res', listo);
+  document.getElementById('cta2').disabled = !listo;
+  if (!listo) return;
+  var anios = Math.max(1, Math.round(meses/12));
+  var mz = mezclaDe(anios, 0);
+  var tasa = (mz.min+mz.top)/200;
+  document.getElementById('v2Sub').textContent =
+    'Mezcla '+mz.n+' · riesgo '+mz.r+' de 6 · rentabilidad histórica entre '+pct(mz.min)+' y '+pct(mz.top);
+  document.getElementById('v2Val').textContent = money(fv(P0,PMT,tasa,meses));
+}
+
+setModo('meta');
+render();
+</script>
+</body>
+</html>
