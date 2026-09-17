@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>¿Con cuánto vas a pensionarte? — Propuesta Simulador Jubilación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   TOKENS — reproducidos de sk-components-angular (SkandiaLight) para este
+   prototipo estático. Ver simulador-jubilacion-propuesta-decisiones.md.
+   ========================================================================== */
+:root{
+  --sk-color-primary:#00c73d;
+  --sk-color-primary-hover:#00b336;
+  --sk-color-primary-active:#009b2e;
+  --sk-color-accent:#16d727;
+  --sk-color-bg:#ffffff;
+  --sk-color-surface:#ffffff;
+  --sk-color-text:#404040;
+  --sk-color-text-muted:#666666;
+  --sk-color-text-inverse:#ffffff;
+  --sk-color-border:#dddddd;
+  --sk-color-border-hover:#b8b8b8;
+  --sk-color-border-focus:#16d727;
+  --sk-color-success:#00a34e;
+  --sk-color-warning:#ffae08;
+  --sk-color-error:#e03430;
+  --sk-color-info:#0099de;
+  --sk-color-disabled:#f7f7f7;
+  --sk-color-disabled-text:#a5a5a5;
+  --sk-color-placeholder:#a5a5a5;
+  --sk-color-success-light:#ecfdf3;
+  --sk-color-success-medium:#87f491;
+  --sk-color-secondary-hover-bg:#caf9cb;
+  --sk-color-tertiary-hover-bg:#f6fcf2;
+  --sk-color-link:#0099de;
+
+  /* Variantes de TEXTO en AA (≥4.5:1) para tokens que fallan como texto sobre
+     blanco (--sk-color-link/-info ~3.18:1, --sk-color-error ~3.90:1) — ver
+     decisiones.md. Los prefix/suffix decorativos ($, %) SÍ usan el token
+     oficial de placeholder: el propio manual de sk-input-number lo permite
+     porque no transmiten información única (§5.3 de esa ficha). */
+  --sk-color-link-text:#006894;
+  --sk-color-error-text:#b3261e;
+  --sk-color-success-text:#0d5a30;
+
+  --sustento-accent:#7B3FA1;
+  --sustento-accent-bg:#f6effa;
+
+  --sk-font-title:'Montserrat', sans-serif;
+  --sk-font-body:'Open Sans', system-ui, sans-serif;
+  --sk-font-weight-regular:400;
+  --sk-font-weight-medium:500;
+  --sk-font-weight-bold:700;
+
+  --sk-space-zero:0; --sk-space-xxs:4px; --sk-space-xs:8px; --sk-space-s:12px; --sk-space-m:16px;
+  --sk-space-l:24px; --sk-space-xl:32px; --sk-space-2xl:40px; --sk-space-3xl:48px;
+  --sk-space-4xl:56px; --sk-space-5xl:64px;
+
+  --sk-shadow-subtle:0 0 2px rgba(68,68,68,.15);
+  --sk-shadow-surface:0 0 2px 0 rgba(61,75,92,.15);
+  --sk-shadow-raised:0 4px 16px rgba(0,0,0,.12);
+  --sk-shadow-overlay:0 8px 24px rgba(0,0,0,.16);
+
+  --sk-radius-s:4px; --sk-radius-m:12px; --sk-radius-l:24px; --sk-radius-pill:999px;
+
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   RESET
+   ========================================================================== */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; font-family:var(--sk-font-body); font-weight:var(--sk-font-weight-regular);
+  color:var(--sk-color-text); background:var(--sk-color-bg); line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{ font-family:var(--sk-font-title); font-weight:var(--sk-font-weight-bold); margin:0; color:var(--sk-color-text); }
+p{ margin:0; }
+button{ font-family:inherit; }
+input,select,textarea{ font-family:inherit; font-size:1rem; }
+ul{ margin:0; padding:0; list-style:none; }
+img{ max-width:100%; display:block; }
+h1,h2,h3{ text-wrap:balance; }
+p{ text-wrap:pretty; }
+
+.visually-hidden{
+  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+/* Cualquier regla de componente (.sk-alert{display:flex}, [style] inline, etc.) gana la
+   cascada sobre el [hidden] del UA por especificidad de origen — sin esto, [hidden] deja de
+   ocultar en cuanto el elemento también matchea una clase que fija su propio display. */
+[hidden]{ display:none !important; }
+.skip-link{
+  position:absolute; left:8px; top:-48px; z-index:200;
+  background:var(--sk-color-primary); color:var(--sk-color-text); padding:12px 20px;
+  border-radius:var(--sk-radius-s); font-weight:var(--sk-font-weight-medium);
+  transition:top .2s ease;
+}
+.skip-link:focus{ top:8px; }
+
+:focus-visible{ outline:3px solid var(--sk-color-primary); outline-offset:2px; border-radius:var(--sk-radius-s); }
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important; scroll-behavior:auto !important;
+  }
+}
+
+/* ==========================================================================
+   LAYOUT BASE
+   ========================================================================== */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:var(--sk-space-m) var(--sk-space-l);
+  border-bottom:1px solid var(--sk-color-border);
+  position:sticky; top:0; background:var(--sk-color-bg); z-index:50;
+}
+.topbar-right{ display:flex; align-items:center; gap:var(--sk-space-m); }
+.proposal-tag{
+  font-size:.8125rem; color:var(--sk-color-text-muted); font-weight:var(--sk-font-weight-medium);
+  background:var(--sk-color-disabled); padding:4px 10px; border-radius:var(--sk-radius-pill);
+}
+
+main{ max-width:1180px; margin:0 auto; padding:0 var(--sk-space-l) var(--sk-space-5xl); }
+
+.hero{ padding:var(--sk-space-3xl) 0 var(--sk-space-xl); max-width:62ch; }
+.hero h1{ font-size:clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem); line-height:1.15; letter-spacing:-.02em; }
+.hero p{ margin-top:var(--sk-space-m); font-size:1.0625rem; color:var(--sk-color-text-muted); }
+
+.simulator-grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap:var(--sk-space-xl); align-items:start; }
+@media (max-width: 1023.98px){ .simulator-grid{ grid-template-columns:1fr; } }
+
+/* ==========================================================================
+   sk-logo — reproducción estática del wordmark (variant="logo" skStyle="color")
+   ========================================================================== */
+.sk-logo{ display:inline-flex; align-items:center; height:32px; vertical-align:middle; }
+.sk-logo svg{ display:block; height:100%; width:auto; }
+
+/* ==========================================================================
+   ZONA DE DATOS
+   ========================================================================== */
+.data-zone{ background:var(--sk-color-surface); min-width:0; }
+.data-zone > h2{ font-size:1.125rem; margin-bottom:var(--sk-space-m); }
+
+.field-group{ display:grid; gap:var(--sk-space-l); padding:var(--sk-space-l) 0; border-bottom:1px solid var(--sk-color-border); }
+.field-group:first-of-type{ padding-top:0; }
+
+.field-hint{ font-size:.8125rem; color:var(--sk-color-text-muted); }
+
+/* --------------------------------------------------------------------------
+   sk-input-number — reproducción: label fijo arriba (NO floating), campo
+   58px (lg), shadow always-on, ring de foco/error, max-width 300px.
+   -------------------------------------------------------------------------- */
+.sk-num-field{ display:inline-flex; flex-direction:column; gap:4px; max-width:none; width:100%; }
+.sk-num-field > label{ font-size:.875rem; font-weight:var(--sk-font-weight-medium); color:var(--sk-color-text); display:flex; align-items:center; gap:6px; }
+.sk-num-box{
+  height:58px; padding:8px 12px; border-radius:8px; background:var(--sk-color-bg);
+  border:1px solid transparent; display:flex; align-items:center; gap:8px;
+  box-shadow:0 0 4px rgba(68,68,68,.15);
+  transition:border-color .12s ease, box-shadow .12s ease;
+}
+.sk-num-box:hover{ border-color:var(--sk-color-primary); }
+.sk-num-box:focus-within{ border-color:var(--sk-color-accent); box-shadow:0 0 4px rgba(68,68,68,.15), 0 0 0 3px rgba(0,199,61,.18); }
+.sk-num-field.is-invalid .sk-num-box{ border-color:var(--sk-color-error); box-shadow:0 0 4px rgba(68,68,68,.15), 0 0 0 3px rgba(224,49,49,.15); }
+.sk-num-affix{ color:var(--sk-color-placeholder); font-size:14px; flex:none; } /* decorativo: excepción documentada, ver sk-input-number §5.3 */
+.sk-num-input{ border:0; outline:0; background:transparent; width:100%; font-size:14px; font-family:var(--sk-font-body); color:var(--sk-color-text); }
+.sk-num-input::placeholder{ color:var(--sk-color-text-muted); opacity:1; }
+.sk-field-narrow{ max-width:none; }
+#manual-fields, #beneficiary-detail{ display:grid; gap:var(--sk-space-m); }
+
+/* --------------------------------------------------------------------------
+   sk-input-text — reproducción: floating label vía :not(:placeholder-shown),
+   box 58px, radius 4→8, max-width 320px.
+   -------------------------------------------------------------------------- */
+.sk-text-field{ display:block; max-width:none; width:100%; }
+.sk-text-field.sk-fluid{ max-width:none; }
+.sk-text-box{
+  height:58px; padding:8px 16px; border-radius:4px; border:1px solid var(--sk-color-border);
+  background:var(--sk-color-bg); display:flex; align-items:center; gap:8px;
+  transition:border-color .12s ease, border-radius .12s ease, box-shadow .12s ease;
+}
+.sk-text-box:hover{ border-color:var(--sk-color-border-hover); }
+.sk-text-inner{ flex:1; position:relative; align-self:stretch; }
+.sk-text-input{
+  position:absolute; inset:0; z-index:1; width:100%; border:0; outline:0; background:transparent;
+  font-size:14px; font-family:var(--sk-font-body); color:var(--sk-color-text);
+  padding:10px 0 0; transition:padding var(--sk-motion-duration-slow,480ms);
+}
+.sk-text-label{
+  position:absolute; z-index:0; left:0; top:50%; transform:translateY(-50%);
+  font-size:14px; line-height:22px; color:var(--sk-color-text-muted); pointer-events:none;
+  transition:all .48s cubic-bezier(.4,0,.2,1);
+}
+.sk-text-input:focus, .sk-text-input:not(:placeholder-shown){ padding-top:20px; }
+.sk-text-input:focus + .sk-text-label, .sk-text-input:not(:placeholder-shown) + .sk-text-label{
+  top:0; transform:translateY(0); font-size:12px; line-height:20px;
+}
+.sk-text-box:has(.sk-text-input:focus){ border-color:var(--sk-color-border-focus); border-radius:8px; }
+.sk-text-box:has(.sk-text-input:not(:placeholder-shown)){ border-radius:8px; }
+.sk-text-action{ background:none; border:0; color:var(--sk-color-text-muted); cursor:pointer; padding:4px; display:flex; z-index:1; }
+.sk-text-action:hover{ color:var(--sk-color-text); }
+
+/* --------------------------------------------------------------------------
+   sk-alert — reproducción: pastel bg por type, icono 32×32, blur backdrop.
+   -------------------------------------------------------------------------- */
+.sk-alert{
+  display:flex; align-items:flex-start; gap:8px; padding:8px; border-radius:8px;
+  border:1px solid transparent; backdrop-filter:blur(4px);
+  animation:sk-alert-up .36s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes sk-alert-up{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
+.sk-alert--info{ background:#ebf4ff; border-color:var(--sk-color-info); }
+.sk-alert--warning{ background:#fff3e0; border-color:var(--sk-color-warning); }
+.sk-alert--success{ background:var(--sk-color-success-light); border-color:var(--sk-color-success-medium); }
+.sk-alert__icon{ width:32px; height:32px; flex:none; display:flex; align-items:center; justify-content:center; }
+.sk-alert__icon svg{ width:18px; height:18px; }
+.sk-alert--info .sk-alert__icon{ color:var(--sk-color-link-text); }
+.sk-alert--warning .sk-alert__icon{ color:#a35a00; }
+.sk-alert--success .sk-alert__icon{ color:var(--sk-color-success-text); }
+.sk-alert__body{ display:flex; flex-direction:column; gap:2px; padding-top:4px; }
+.sk-alert__title{ font-size:14px; font-weight:var(--sk-font-weight-bold); color:var(--sk-color-text); }
+.sk-alert__message{ font-size:14px; line-height:22px; color:var(--sk-color-text); }
+
+/* --------------------------------------------------------------------------
+   sk-select-button — reproducción: grupo segmentado, fluid 100%.
+   -------------------------------------------------------------------------- */
+.sk-select-button{ display:flex; flex-direction:column; gap:8px; width:100%; }
+.sk-sb-group{ display:flex; flex-wrap:wrap; }
+.sk-sb-option{
+  flex:1 1 0; min-width:0; height:40px; margin-left:-1px; position:relative;
+  border:1px solid var(--sk-color-border); background:#fff; color:var(--sk-color-text);
+  font-family:var(--sk-font-body); font-size:.875rem; cursor:pointer; white-space:nowrap;
+  display:flex; align-items:center; justify-content:center; gap:6px; padding:0 10px;
+  transition:background var(--sk-motion-duration-fast,120ms), border-color var(--sk-motion-duration-fast,120ms), color var(--sk-motion-duration-fast,120ms);
+}
+.sk-sb-group .sk-sb-option:first-child{ margin-left:0; border-top-left-radius:8px; border-bottom-left-radius:8px; }
+.sk-sb-group .sk-sb-option:last-child{ border-top-right-radius:8px; border-bottom-right-radius:8px; }
+.sk-sb-option:hover:not([aria-pressed="true"]){ border-color:var(--sk-color-primary); background:var(--sk-color-tertiary-hover-bg); z-index:1; }
+.sk-sb-option[aria-pressed="true"]{ background:var(--sk-color-primary); border-color:var(--sk-color-primary); color:var(--sk-color-text-inverse); z-index:2; }
+.sk-sb-option:focus-visible{ z-index:3; }
+
+/* --------------------------------------------------------------------------
+   sk-badge — reproducción: type=square, style=fill, state=success.
+   -------------------------------------------------------------------------- */
+.sk-badge{
+  display:inline-flex; align-items:center; gap:4px; vertical-align:middle; white-space:nowrap;
+  padding:2px 8px; border-radius:4px; border:1px solid transparent;
+  font-family:var(--sk-font-body); font-weight:500; font-size:.8125rem; line-height:1.4;
+}
+.sk-badge--success{ background:var(--sk-color-accent); color:var(--sk-color-text); }
+.sk-badge svg{ width:11px; height:11px; }
+
+/* --------------------------------------------------------------------------
+   sk-checkbox — reproducción: box 18×18, ring hover/focus, label clickable.
+   -------------------------------------------------------------------------- */
+.sk-checkbox{ display:inline-flex; align-items:center; gap:8px; padding:4px 8px; border-radius:4px; cursor:pointer; }
+.sk-checkbox-hit{ position:relative; width:18px; height:18px; flex:none; }
+.sk-checkbox-input{ position:absolute; inset:0; opacity:0; margin:0; cursor:pointer; z-index:1; }
+.sk-checkbox-box{
+  position:absolute; inset:0; border-radius:4px; border:1.5px solid #c5c5c5; background:var(--sk-color-bg);
+  display:flex; align-items:center; justify-content:center; transition:all var(--sk-motion-duration-fast,120ms);
+}
+.sk-checkbox-input:hover:not(:checked) + .sk-checkbox-box{ border-color:var(--sk-color-primary); box-shadow:0 0 0 7px rgba(0,199,61,.1); }
+.sk-checkbox-input:checked + .sk-checkbox-box{ background:var(--sk-color-primary); border-color:var(--sk-color-primary); }
+.sk-checkbox-input:checked + .sk-checkbox-box::after{ content:''; width:5px; height:9px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg) translate(-1px,-1px); }
+.sk-checkbox-input:focus-visible + .sk-checkbox-box{ box-shadow:0 0 4px rgba(68,68,68,.15), 0 0 0 3px rgba(0,199,61,.3); }
+.sk-checkbox-label{ font-size:.875rem; color:var(--sk-color-text); }
+
+/* Radio cards (perfiles de inversión y otros grupos no cubiertos por select-button) */
+fieldset{ border:0; padding:0; margin:0; display:grid; gap:var(--sk-space-s); }
+legend{ font-size:.9375rem; font-weight:var(--sk-font-weight-medium); padding:0; margin-bottom:2px; }
+.profile-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:var(--sk-space-s); }
+.profile-card{ position:relative; }
+.profile-card input{ position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer; }
+.profile-card-face{ border:1.5px solid var(--sk-color-border); border-radius:var(--sk-radius-m); padding:var(--sk-space-m); display:grid; gap:8px; transition:all .15s ease; height:100%; }
+.profile-card input:checked + .profile-card-face{ border-color:var(--sk-color-primary); background:var(--sk-color-tertiary-hover-bg); }
+.profile-card input:focus-visible + .profile-card-face{ outline:3px solid var(--sk-color-primary); outline-offset:2px; }
+.profile-card-face .name{ font-family:var(--sk-font-title); font-weight:var(--sk-font-weight-bold); font-size:.9375rem; }
+.profile-card-face .desc{ font-size:.8125rem; color:var(--sk-color-text-muted); }
+.profile-bar{ display:flex; height:8px; border-radius:var(--sk-radius-pill); overflow:hidden; margin-top:4px; }
+.profile-bar span:nth-child(1){ background:#f28c28; }
+.profile-bar span:nth-child(2){ background:#f4b400; }
+.profile-bar span:nth-child(3){ background:var(--sk-color-primary); }
+.profile-legend{ display:flex; justify-content:space-between; font-size:.6875rem; color:var(--sk-color-text-muted); }
+.convergence-note{ font-size:.8125rem; color:var(--sk-color-text-muted); }
+
+/* --------------------------------------------------------------------------
+   Slider PrimeNG 21 (p-slider) — reproducción de la estructura real:
+   host .p-slider-root, .p-slider-range, .p-slider-handle, role=slider.
+   -------------------------------------------------------------------------- */
+.p-slider-root{ position:relative; height:6px; border-radius:999px; background:var(--sk-color-border); width:100%; cursor:pointer; touch-action:none; }
+.p-slider-range{ position:absolute; top:0; left:0; height:100%; border-radius:999px; background:var(--sk-color-primary); transition:width var(--sk-motion-duration-fast,120ms) ease; }
+.p-slider-handle{
+  position:absolute; top:50%; width:22px; height:22px; margin-left:-11px; transform:translateY(-50%);
+  border-radius:50%; background:#fff; border:3px solid var(--sk-color-primary); box-shadow:var(--sk-shadow-raised);
+  cursor:grab; transition:left var(--sk-motion-duration-fast,120ms) ease, transform .1s ease;
+}
+.p-slider-handle:active, .p-slider-handle-active{ cursor:grabbing; transform:translateY(-50%) scale(1.12); }
+.p-slider-handle:focus-visible{ outline:3px solid var(--sk-color-primary); outline-offset:3px; }
+.age-slider-value{ display:flex; justify-content:space-between; font-size:.875rem; color:var(--sk-color-text-muted); margin-top:var(--sk-space-s); }
+.age-slider-value strong{ color:var(--sk-color-text); font-size:1.5rem; font-family:var(--sk-font-title); }
+.checkbox-row{ margin-top:var(--sk-space-s); }
+
+/* Botones — sk-button (primary / secondary / tertiary), Montserrat 700, pill */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  height:44px; padding:0 var(--sk-space-l); border-radius:var(--sk-radius-pill);
+  font-family:var(--sk-font-title); font-weight:var(--sk-font-weight-bold); font-size:.9375rem; cursor:pointer;
+  border:1.5px solid transparent; transition:background .12s ease, border-color .12s ease, transform .1s ease, box-shadow .12s ease;
+  white-space:nowrap;
+}
+.btn:not(:disabled):hover{ transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.08); }
+.btn:not(:disabled):active{ transform:translateY(0); box-shadow:none; }
+.btn-primary{ background:var(--sk-color-primary); color:var(--sk-color-text-inverse); }
+.btn-primary:hover{ background:var(--sk-color-primary-hover); }
+.btn-primary:disabled{ background:#e9e9e9; color:var(--sk-color-text-muted); cursor:not-allowed; }
+.btn-secondary{ background:#fff; border-color:var(--sk-color-primary); color:var(--sk-color-primary); }
+.btn-secondary:hover{ background:var(--sk-color-secondary-hover-bg); }
+.btn-secondary:disabled{ background:#fff; border-color:var(--sk-color-text-muted); color:var(--sk-color-text-muted); cursor:not-allowed; }
+.btn-tertiary{ background:none; border-color:transparent; color:var(--sk-color-primary); padding:0 var(--sk-space-s); height:36px; }
+.btn-tertiary:hover{ background:var(--sk-color-disabled); }
+.btn[disabled]{ opacity:.7; cursor:not-allowed; }
+.btn-sm{ height:38px; padding:0 var(--sk-space-m); font-size:.875rem; }
+.btn-fluid{ width:100%; }
+
+.path-row{ display:flex; gap:var(--sk-space-s); flex-wrap:wrap; }
+.inline-note{ background:var(--sk-color-disabled); border-radius:var(--sk-radius-s); padding:var(--sk-space-m); font-size:.9375rem; color:var(--sk-color-text); }
+
+/* Accordions */
+.accordion{ border-bottom:1px solid var(--sk-color-border); }
+.accordion:first-of-type{ border-top:1px solid var(--sk-color-border); }
+.accordion-trigger{
+  width:100%; display:flex; align-items:center; justify-content:space-between; gap:var(--sk-space-m);
+  background:none; border:0; padding:var(--sk-space-l) 0; cursor:pointer; text-align:left;
+}
+.accordion-trigger h3{ font-size:1.0625rem; }
+.accordion-trigger .chev{ flex:none; width:20px; height:20px; color:var(--sk-color-text-muted); transition:transform .25s ease; }
+.accordion-trigger[aria-expanded="true"] .chev{ transform:rotate(180deg); }
+.accordion-body-wrap{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s cubic-bezier(.16,1,.3,1); }
+.accordion-body-wrap.is-open{ grid-template-rows:1fr; }
+.accordion-body{ overflow:hidden; }
+.accordion-body-inner{ padding:6px var(--sk-space-s) var(--sk-space-l); display:grid; gap:var(--sk-space-m); }
+
+/* Ayuda — [skTooltip]: hover+focus, overlay flotante con flecha */
+.tooltip-trigger{
+  width:20px; height:20px; border-radius:50%; border:1.5px solid var(--sk-color-link-text);
+  color:var(--sk-color-link-text); background:transparent; font-size:.75rem; font-weight:var(--sk-font-weight-bold);
+  display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex:none; line-height:1;
+}
+.tooltip-trigger:hover{ background:var(--sk-color-tertiary-hover-bg); }
+.sk-tooltip-overlay{
+  position:fixed; z-index:150; max-width:230px; background:var(--sk-color-text); color:#fff;
+  font-size:.75rem; line-height:1.4; padding:6px 10px; border-radius:6px; box-shadow:var(--sk-shadow-raised);
+  pointer-events:none; opacity:0; transition:opacity .12s ease;
+}
+.sk-tooltip-overlay.is-open{ opacity:1; }
+.sk-tooltip-overlay::after{
+  content:''; position:absolute; left:50%; margin-left:-5px; border:5px solid transparent;
+}
+.sk-tooltip-overlay[data-pos="top"]::after{ top:100%; border-top-color:var(--sk-color-text); }
+.sk-tooltip-overlay[data-pos="bottom"]::after{ bottom:100%; border-bottom-color:var(--sk-color-text); }
+.sk-tooltip-overlay[data-pos="right"]::after{ left:0; top:50%; margin-left:-10px; margin-top:-5px; border-right-color:var(--sk-color-text); }
+
+/* ==========================================================================
+   ZONA DE RESPUESTA
+   ========================================================================== */
+.result-zone{ background:var(--sk-color-success-light); border-radius:var(--sk-radius-l); padding:var(--sk-space-xl); position:sticky; top:88px; box-shadow:var(--sk-shadow-surface); }
+.result-zone > h2{ font-size:1rem; font-weight:var(--sk-font-weight-medium); color:var(--sk-color-text-muted); margin-bottom:4px; }
+
+.result-figure{ margin:var(--sk-space-s) 0 var(--sk-space-m); }
+.result-figure .amount{ font-family:var(--sk-font-title); font-weight:var(--sk-font-weight-bold); font-size:clamp(2.25rem, 1.7rem + 2.2vw, 3.5rem); line-height:1.05; letter-spacing:-.02em; color:#12331f; overflow-wrap:anywhere; }
+.result-figure .amount .sep{ color:var(--sk-color-text-muted); font-weight:var(--sk-font-weight-medium); margin:0 6px; font-size:.6em; }
+.result-figure .amount-suffix{ font-size:1rem; color:var(--sk-color-text); font-weight:var(--sk-font-weight-medium); margin-top:2px; }
+
+.result-empty{ color:var(--sk-color-text-muted); font-size:.9375rem; padding:var(--sk-space-m) 0; }
+.result-block{ display:none; gap:var(--sk-space-l); }
+.result-block.is-visible{ display:grid; }
+.result-line{ font-size:.9375rem; color:var(--sk-color-text); }
+
+.progress-card{ background:rgba(255,255,255,.6); border-radius:var(--sk-radius-m); padding:var(--sk-space-m); display:grid; gap:10px; }
+.progress-card .progress-top{ display:flex; justify-content:space-between; font-size:.875rem; font-weight:var(--sk-font-weight-medium); }
+
+/* sk-progress-bar — reproducción: track 20px, radius pill, label centrado */
+.sk-progress-bar{ width:100%; }
+.sk-progress-bar .p-progressbar{ position:relative; height:20px; background:#e5e7eb; border-radius:999px; overflow:hidden; }
+.sk-progress-bar .p-progressbar-value{ position:absolute; inset:0 auto 0 0; background:var(--sk-color-primary); border-radius:999px; display:flex; align-items:center; justify-content:center; transition:width var(--sk-motion-duration-base,240ms) ease; }
+.sk-progress-bar .p-progressbar-label{ color:var(--sk-color-text); font-size:12px; font-weight:600; line-height:20px; white-space:nowrap; }
+
+.rpm-card{ background:rgba(255,255,255,.6); border-radius:var(--sk-radius-m); padding:var(--sk-space-m); display:grid; gap:6px; }
+.rpm-card h3{ font-size:.9375rem; }
+.rpm-card p{ font-size:.875rem; }
+.rpm-card .verify-note{ font-size:.8125rem; color:var(--sk-color-text-muted); font-style:italic; }
+
+details.assumptions{ background:transparent; }
+details.assumptions summary{ cursor:pointer; font-size:.875rem; font-weight:var(--sk-font-weight-medium); color:var(--sk-color-link-text); list-style:none; display:flex; align-items:center; gap:6px; }
+details.assumptions summary::-webkit-details-marker{ display:none; }
+details.assumptions[open] summary::after{ content:'—'; }
+details.assumptions summary::after{ content:'+'; margin-left:2px; }
+.assumptions-body{ margin-top:8px; font-size:.875rem; color:var(--sk-color-text); display:grid; gap:6px; padding:var(--sk-space-m); background:#fff; border-radius:var(--sk-radius-s); }
+.assumptions-body dl{ display:grid; grid-template-columns:1fr auto; gap:4px 12px; margin:0; }
+.assumptions-body dt{ color:var(--sk-color-text-muted); }
+.assumptions-body dd{ margin:0; text-align:right; font-weight:var(--sk-font-weight-medium); }
+
+.voluntary-card{ background:#fff; border-radius:var(--sk-radius-m); padding:var(--sk-space-m); display:grid; gap:var(--sk-space-m); }
+.voluntary-card h3{ font-size:1rem; }
+.voluntary-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--sk-space-s); }
+@media (max-width:480px){ .voluntary-grid{ grid-template-columns:1fr; } }
+.voluntary-delta{ font-size:.9375rem; background:var(--sk-color-success-light); border-radius:var(--sk-radius-s); padding:var(--sk-space-s) var(--sk-space-m); display:none; }
+.voluntary-delta.is-visible{ display:block; }
+.tax-note{ font-size:.8125rem; color:var(--sk-color-text-muted); }
+
+.cta-row{ display:grid; gap:var(--sk-space-s); }
+.email-inline{ display:none; gap:8px; margin-top:8px; align-items:flex-end; }
+.email-inline.is-open{ display:flex; }
+.email-inline .sk-text-field{ flex:1; max-width:none; }
+.success-banner{ display:none; background:var(--sk-color-success-light); color:var(--sk-color-success-text); border-radius:var(--sk-radius-s); padding:var(--sk-space-s) var(--sk-space-m); font-size:.9375rem; }
+.success-banner.is-visible{ display:block; }
+
+/* ==========================================================================
+   FOOTER — "Sobre esta proyección" siempre visible, sin acordeón, 100% ancho
+   ========================================================================== */
+footer{ border-top:1px solid var(--sk-color-border); margin-top:var(--sk-space-4xl); }
+.footer-inner{ max-width:1180px; margin:0 auto; padding:var(--sk-space-xl) var(--sk-space-l); }
+.legal-block{ width:100%; }
+.legal-block h3{ font-size:.9375rem; margin-bottom:var(--sk-space-s); }
+.legal-block p{ font-size:.875rem; color:var(--sk-color-text-muted); max-width:100%; }
+.legal-block p + p{ margin-top:8px; }
+.legal-block a{ color:var(--sk-color-link-text); }
+.vigilado-row{ display:flex; flex-wrap:wrap; gap:var(--sk-space-l); margin-top:var(--sk-space-l); font-size:.75rem; color:var(--sk-color-text-muted); }
+
+/* ==========================================================================
+   MODAL — sk-modal (asesor + login)
+   ========================================================================== */
+.modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; z-index:100; padding:var(--sk-space-m); }
+.modal-backdrop.is-open{ display:flex; }
+.modal{ background:#fff; border-radius:8px; box-shadow:var(--sk-shadow-overlay); padding:var(--sk-space-xl); max-width:420px; width:100%; display:grid; gap:var(--sk-space-m); animation:sk-modal-in .32s cubic-bezier(.16,1,.3,1) both; }
+@keyframes sk-modal-in{ from{ opacity:0; transform:translateY(8px) scale(.98);} to{ opacity:1; transform:translateY(0) scale(1);} }
+.modal h2{ font-size:1.25rem; }
+.modal-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:var(--sk-space-m); }
+.icon-btn{ background:none; border:0; cursor:pointer; color:var(--sk-color-text-muted); width:32px; height:32px; flex:none; }
+.icon-btn:hover{ color:var(--sk-color-text); }
+.trace-note{ font-size:.8125rem; color:var(--sk-color-text-muted); border-top:1px solid var(--sk-color-border); padding-top:var(--sk-space-m); }
+.modal-centered{ text-align:center; }
+.modal-centered p{ color:var(--sk-color-text-muted); font-size:.9375rem; }
+.modal-fineprint{ font-size:.75rem; color:var(--sk-color-text-muted); text-align:center; }
+.modal-fineprint strong{ color:var(--sk-color-text); font-weight:var(--sk-font-weight-bold); }
+
+/* ==========================================================================
+   MÓVIL
+   ========================================================================== */
+@media (max-width:767.98px){
+  .topbar{ flex-wrap:wrap; row-gap:8px; padding:var(--sk-space-s) var(--sk-space-m); }
+  .topbar-right{ width:100%; justify-content:space-between; }
+  .proposal-tag{ font-size:.75rem; padding:3px 8px; }
+  .sustento-switch-label{ font-size:.75rem; }
+  main{ padding:0 var(--sk-space-m) 0; }
+  .hero{ padding:var(--sk-space-xl) 0 var(--sk-space-m); }
+  .data-zone{ padding-bottom:132px; }
+  .result-zone{
+    position:fixed; left:0; right:0; bottom:0; top:auto; z-index:60;
+    border-radius:var(--sk-radius-l) var(--sk-radius-l) 0 0; box-shadow:var(--sk-shadow-overlay);
+    max-height:46vh; overflow-y:auto; padding:var(--sk-space-m) var(--sk-space-l) var(--sk-space-xl);
+    transition:max-height .35s cubic-bezier(.16,1,.3,1);
+  }
+  .result-zone.is-expanded{ max-height:90vh; }
+  .sheet-handle{ width:100%; display:flex; justify-content:center; padding:6px 0 10px; background:none; border:0; cursor:pointer; }
+  .sheet-handle span{ width:40px; height:4px; border-radius:var(--sk-radius-pill); background:var(--sk-color-border); display:block; }
+  .result-figure .amount{ font-size:1.9rem; }
+  .age-slider-value{ flex-direction:column; align-items:flex-start; gap:4px; }
+  .age-slider-value strong{ font-size:1.25rem; }
+}
+
+/* ==========================================================================
+   CAPA DE SUSTENTO
+   ========================================================================== */
+.sustento-switch{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; }
+.sustento-switch-track{ width:40px; height:22px; border-radius:var(--sk-radius-pill); background:var(--sk-color-border); position:relative; transition:background .2s ease; flex:none; }
+.sustento-switch-track::after{ content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .2s ease; }
+.sustento-switch input{ position:absolute; opacity:0; width:1px; height:1px; }
+.sustento-switch input:checked + .sustento-switch-track{ background:var(--sustento-accent); }
+.sustento-switch input:checked + .sustento-switch-track::after{ transform:translateX(18px); }
+.sustento-switch input:focus-visible + .sustento-switch-track{ outline:3px solid var(--sustento-accent); outline-offset:2px; }
+.sustento-switch-label{ font-size:.8125rem; color:var(--sk-color-text-muted); font-weight:var(--sk-font-weight-medium); }
+
+.marker{ display:none; }
+body.sustento-on .marker{
+  display:flex; align-items:center; justify-content:center; position:absolute; top:-10px; right:-10px; z-index:30;
+  width:28px; height:28px; border-radius:50%; background:var(--sustento-accent); color:#fff;
+  font-family:var(--sk-font-title); font-weight:var(--sk-font-weight-bold); font-size:.8125rem;
+  border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.25); cursor:pointer;
+}
+body.sustento-on .marker:hover, body.sustento-on .marker.is-active{ background:#5c2f7d; }
+.marker-anchor{ position:relative; }
+
+.sustento-panel{
+  position:fixed; right:20px; bottom:20px; width:min(380px, calc(100vw - 40px)); max-height:70vh; overflow-y:auto;
+  background:#fff; border-radius:var(--sk-radius-m); border:2px solid var(--sustento-accent); box-shadow:var(--sk-shadow-overlay);
+  padding:var(--sk-space-l); z-index:120; display:none;
+}
+.sustento-panel.is-open{ display:block; }
+.sustento-panel-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:var(--sk-space-m); margin-bottom:var(--sk-space-s); }
+.sustento-panel-eyebrow{ font-size:.75rem; font-weight:var(--sk-font-weight-bold); color:var(--sustento-accent); text-transform:uppercase; letter-spacing:.04em; }
+.sustento-panel h3{ font-size:1.0625rem; margin-top:2px; }
+.sustento-panel-severity{ display:inline-block; font-size:.75rem; font-weight:var(--sk-font-weight-bold); padding:2px 10px; border-radius:var(--sk-radius-pill); margin-bottom:8px; }
+.sev-critica{ background:#fdecea; color:var(--sk-color-error-text); }
+.sev-alta{ background:#fff4e0; color:#a35a00; }
+.sev-media{ background:#e6f6fc; color:var(--sk-color-link-text); }
+.sev-negocio{ background:var(--sustento-accent-bg); color:var(--sustento-accent); }
+.sustento-panel p{ font-size:.9375rem; margin-bottom:8px; }
+.sustento-panel blockquote{ margin:0 0 8px; padding:8px 12px; border-left:3px solid var(--sustento-accent); background:var(--sustento-accent-bg); font-size:.875rem; font-style:italic; border-radius:0 var(--sk-radius-s) var(--sk-radius-s) 0; }
+.sustento-panel blockquote cite{ display:block; margin-top:4px; font-style:normal; font-size:.75rem; color:var(--sk-color-text-muted); }
+.sustento-panel-source{ font-size:.75rem; color:var(--sk-color-text-muted); border-top:1px solid var(--sk-color-border); padding-top:8px; margin-top:4px; }
+
+.mt-xs{ margin-top:var(--sk-space-xs); }
+.mt-s{ margin-top:var(--sk-space-s); }
+.mt-m{ margin-top:var(--sk-space-m); }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido principal</a>
+
+<header class="topbar">
+  <a href="#" aria-label="Ir al inicio" onclick="return false;">
+    <!-- <sk-logo variant="logo" skStyle="color" /> — reproducción estática con la geometría oficial de logo-paths.ts (sk-components-angular) -->
+    <span class="sk-logo" role="img" aria-label="Skandia">
+      <svg viewBox="0 0 280 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <g clip-path="url(#sk-logo-clip)">
+          <path d="M62.0001 34.4076C52.8491 31.9373 52.7944 27.3199 52.8491 24.5232C52.9124 20.0347 58.3408 15.8726 64.7474 15.8726C70.8261 15.8726 77.2327 18.5376 77.2988 25.9545H68.7318C68.6685 23.6645 66.718 23.2866 65.2796 23.2866C63.3205 23.2866 62.0116 24.1969 62.0778 25.5766C62.1411 26.4869 62.9408 27.4001 64.7589 27.8667L69.9371 29.2321C77.3247 31.2359 78.2395 36.1281 78.2395 38.0775C78.2395 44.5182 71.4388 47.5726 65.0322 47.5726C58.8241 47.5726 52.3514 43.8656 52.2881 37.1013H60.7832C60.8494 38.8589 62.797 40.6137 65.294 40.6137C67.3078 40.5478 69.0338 39.6376 69.0338 38.0775C69.0338 36.775 68.2485 36.0737 66.0276 35.4754L62.0001 34.4076Z" fill="#404040"/>
+          <path d="M92.2609 46.8974H83.2422V0H92.2609V24.8442L99.519 16.5198H111.089L98.4086 29.9195L113.635 46.8974H102.459L92.2609 34.8632V46.8974Z" fill="#404040"/>
+          <path d="M137.144 43.4505C135.179 46.3789 130.608 47.481 128.255 47.481C120.459 47.481 112.691 41.4324 112.691 31.6768C112.691 21.9212 120.459 15.8726 128.252 15.8726C130.211 15.8726 134.788 16.5195 137.141 19.9059V16.5195H146.16V46.897H137.144V43.4505ZM129.756 38.899C133.496 38.899 137.144 36.2311 137.144 31.6768C137.144 27.1224 133.482 24.4545 129.756 24.4545C125.965 24.4545 122.107 27.3171 122.107 31.6768C122.107 36.0365 125.965 38.899 129.756 38.899Z" fill="#404040"/>
+          <path d="M163.611 46.897H154.518V16.5195H163.611V20.945C165.242 17.8878 168.838 15.8726 172.434 15.8726C179.295 15.8726 183.613 20.0977 183.613 28.7541V46.8999H174.52V30.7006C174.52 26.6673 172.296 24.652 169.227 24.652C166.022 24.652 163.605 26.2121 163.605 30.8294L163.611 46.897Z" fill="#404040"/>
+          <path d="M213.601 46.8972V43.1272C212.099 45.9239 208.437 47.547 204.645 47.547C196.8 47.547 189.873 41.3696 189.873 31.8029C189.873 22.0473 196.8 15.8698 204.645 15.8698C208.437 15.8698 212.099 17.4299 213.601 20.2267V-0.00878906H222.622V46.8972H213.601ZM206.345 24.3917C202.488 24.3917 199.283 27.2543 199.283 31.6139C199.283 36.1024 202.488 38.9621 206.345 38.9621C210.137 38.9621 213.405 35.9679 213.405 31.6139C213.405 27.0596 210.074 24.3917 206.345 24.3917Z" fill="#404040"/>
+          <path d="M235.49 -0.00878906C238.56 -0.00878906 241.045 2.28126 241.045 5.25833C241.045 8.23539 238.56 10.5913 235.49 10.5913C232.421 10.5913 229.8 8.24684 229.8 5.25833C229.8 2.26981 232.418 -0.00878906 235.49 -0.00878906ZM239.998 46.8857H230.979V16.5196H239.998V46.8857Z" fill="#404040"/>
+          <path d="M270.981 43.4505C269.019 46.3789 264.445 47.481 262.092 47.481C254.31 47.481 246.531 41.4324 246.531 31.6768C246.531 21.9212 254.299 15.8726 262.092 15.8726C264.051 15.8726 268.628 16.5195 270.981 19.9059V16.5195H280V46.897H270.981V43.4505ZM263.593 38.899C267.333 38.899 270.981 36.2311 270.981 31.6768C270.981 27.1224 267.319 24.4545 263.593 24.4545C259.802 24.4545 255.944 27.3171 255.944 31.6768C255.944 36.0365 259.802 38.899 263.593 38.899Z" fill="#404040"/>
+          <path d="M1.21062 15.8641L31.3276 45.8323C31.7828 46.2844 32.3624 46.5921 32.9933 46.7166C33.6242 46.8411 34.2779 46.7767 34.8721 46.5317C35.4662 46.2866 35.974 45.8719 36.3313 45.3398C36.6887 44.8077 36.8796 44.1822 36.8798 43.5422V15.0855C36.8791 13.827 36.3763 12.6202 35.482 11.7303C34.5876 10.8404 33.3749 10.3401 32.1101 10.3394H3.51204C2.8689 10.3396 2.24027 10.5295 1.70555 10.8851C1.17083 11.2407 0.754015 11.746 0.507748 12.3372C0.261481 12.9284 0.196813 13.5789 0.321913 14.2067C0.447013 14.8344 0.756269 15.4112 1.21062 15.8641Z" fill="#00C73D"/>
+          <path d="M2.04213 45.1511C6.40045 49.4908 13.8571 46.4193 13.8571 40.2848C13.8571 38.4582 13.1278 36.7063 11.8298 35.4147C10.5318 34.1231 8.77124 33.3975 6.93553 33.3975C0.767714 33.3975 -2.31907 40.8172 2.04501 45.154" fill="#00C73D"/>
+        </g>
+        <defs>
+          <clipPath id="sk-logo-clip"><rect width="280" height="47.5472" fill="white"/></clipPath>
+        </defs>
+      </svg>
+    </span>
+  </a>
+  <div class="topbar-right">
+    <span class="proposal-tag">Propuesta de diseño · no publicado</span>
+    <label class="sustento-switch">
+      <input type="checkbox" id="sustento-toggle">
+      <span class="sustento-switch-track" aria-hidden="true"></span>
+      <span class="sustento-switch-label">Ver por qué cambiamos esto</span>
+    </label>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <h1>¿Con cuánto vas a pensionarte?</h1>
+    <p>Con tres datos ya puedes ver un estimado. Ajusta lo que quieras para afinarlo — nada aquí es definitivo hasta que hables con un asesor.</p>
+  </section>
+
+  <div class="simulator-grid">
+
+    <!-- ================= ZONA DE DATOS ================= -->
+    <section class="data-zone" aria-label="Tus datos">
+      <h2 class="visually-hidden">Cuéntanos de ti</h2>
+
+      <div class="field-group marker-anchor">
+        <button class="marker" data-marker="1" aria-label="Ver por qué: el punto de partida">1</button>
+
+        <div class="sk-num-field marker-anchor">
+          <button class="marker" data-marker="2" aria-label="Ver por qué: sin datepicker">2</button>
+          <label for="f-birthYear">¿En qué año naciste?</label>
+          <div class="sk-num-box"><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="f-birthYear" class="sk-num-input" placeholder="1980" autocomplete="off"></div>
+        </div>
+
+        <div class="sk-num-field">
+          <label for="f-salary">¿Cuánto ganas al mes?</label>
+          <div class="sk-num-box"><span class="sk-num-affix">$</span><input type="text" inputmode="numeric" id="f-salary" class="sk-num-input" placeholder="8.000.000" autocomplete="off"></div>
+        </div>
+
+        <div class="sk-num-field">
+          <label for="f-startYear">¿En qué año empezaste a cotizar?</label>
+          <div class="sk-num-box"><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="f-startYear" class="sk-num-input" placeholder="2005" autocomplete="off"></div>
+        </div>
+
+        <p class="field-hint" id="estimate-hint" hidden>Con esto ya tenemos un primer estimado. Sigue afinando abajo si quieres.</p>
+      </div>
+
+      <!-- Afinar con datos reales -->
+      <div class="accordion marker-anchor">
+        <button class="marker" data-marker="5" aria-label="Ver por qué: el muro del paso 2">5</button>
+        <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-precision" id="acc-precision-trigger">
+          <h3>Afinar con tus datos reales</h3>
+          <svg class="chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="accordion-body-wrap" id="acc-precision-wrap">
+          <div class="accordion-body" role="region" id="acc-precision" aria-labelledby="acc-precision-trigger">
+            <div class="accordion-body-inner">
+
+              <div class="sk-alert sk-alert--info" role="status" id="estimate-note" hidden>
+                <span class="sk-alert__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6.5v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <div class="sk-alert__body">
+                  <span class="sk-alert__message">Estimamos <strong id="est-weeks">—</strong> semanas cotizadas y <strong id="est-balance">—</strong> de saldo con lo que nos contaste. Si tienes las cifras exactas, tu proyección se afina.</span>
+                </div>
+              </div>
+
+              <!-- sk-select-button: cómo continuar -->
+              <div class="sk-select-button">
+                <span class="visually-hidden" id="sb-precision-label">Cómo prefieres continuar</span>
+                <div class="sk-sb-group" role="group" aria-labelledby="sb-precision-label" id="sb-precision">
+                  <button type="button" class="sk-sb-option" data-value="client" aria-pressed="false">Soy cliente Skandia</button>
+                  <button type="button" class="sk-sb-option" data-value="manual" aria-pressed="false">Tengo mi historia laboral a mano</button>
+                </div>
+              </div>
+
+              <p id="client-loading" class="field-hint" hidden>Buscando tus datos en Skandia…</p>
+              <div id="client-note" class="sk-alert sk-alert--success" role="status" hidden>
+                <span class="sk-alert__icon" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <div class="sk-alert__body">
+                  <span class="sk-alert__message">Tomamos estas cifras de tu cuenta Skandia. Puedes ajustarlas si algo cambió.
+                    <span class="sk-badge sk-badge--success"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Verificado</span>
+                  </span>
+                </div>
+              </div>
+
+              <div id="manual-fields" hidden>
+                <div class="sk-num-field marker-anchor">
+                  <button class="marker" data-marker="6" aria-label="Ver por qué: ayuda anclada">6</button>
+                  <label for="f-weeksRAIS">Semanas cotizadas en fondos privados (RAIS) <button type="button" class="tooltip-trigger" data-tooltip="La encuentras en tu Historia Laboral de Colpensiones o en el extracto de tu AFP." data-tooltip-pos="right">?</button></label>
+                  <div class="sk-num-box"><input type="text" inputmode="numeric" id="f-weeksRAIS" class="sk-num-input" placeholder="0"></div>
+                </div>
+                <div class="sk-num-field">
+                  <label for="f-weeksRPM">Semanas cotizadas en prima media (RPM) <button type="button" class="tooltip-trigger" data-tooltip="La encuentras en tu Historia Laboral de Colpensiones, sección Semanas cotizadas." data-tooltip-pos="right">?</button></label>
+                  <div class="sk-num-box"><input type="text" inputmode="numeric" id="f-weeksRPM" class="sk-num-input" placeholder="0"></div>
+                </div>
+                <div class="sk-num-field">
+                  <label for="f-balance">Saldo actual en tu cuenta individual <button type="button" class="tooltip-trigger" data-tooltip="Aparece en tu último extracto de aportes, o en tu portal de Skandia." data-tooltip-pos="right">?</button></label>
+                  <div class="sk-num-box"><span class="sk-num-affix">$</span><input type="text" inputmode="numeric" id="f-balance" class="sk-num-input" placeholder="0"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tu familia -->
+      <div class="accordion marker-anchor">
+        <button class="marker" data-marker="9" aria-label="Ver por qué: el beneficiario vuelve">9</button>
+        <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-family" id="acc-family-trigger">
+          <h3>Tu familia</h3>
+          <svg class="chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="accordion-body-wrap" id="acc-family-wrap">
+          <div class="accordion-body" role="region" id="acc-family" aria-labelledby="acc-family-trigger">
+            <div class="accordion-body-inner">
+
+              <div class="sk-select-button">
+                <span class="visually-hidden" id="sb-beneficiary-label">¿Tienes a alguien que dependa de esta pensión?</span>
+                <label class="field-hint" style="display:block;" id="sb-beneficiary-visible-label">¿Tienes a alguien que dependa de esta pensión?</label>
+                <div class="sk-sb-group" role="group" aria-labelledby="sb-beneficiary-label" id="sb-beneficiary">
+                  <button type="button" class="sk-sb-option" data-value="pareja" aria-pressed="false">Pareja o cónyuge</button>
+                  <button type="button" class="sk-sb-option" data-value="hijo" aria-pressed="false">Hijo o hija</button>
+                  <button type="button" class="sk-sb-option" data-value="padres" aria-pressed="false">Padres</button>
+                  <button type="button" class="sk-sb-option" data-value="hermanos" aria-pressed="false">Hermanos</button>
+                </div>
+                <label class="sk-checkbox mt-xs">
+                  <span class="sk-checkbox-hit">
+                    <input type="checkbox" id="f-ben-none" class="sk-checkbox-input" checked>
+                    <span class="sk-checkbox-box" aria-hidden="true"></span>
+                  </span>
+                  <span class="sk-checkbox-label">No, por ahora</span>
+                </label>
+              </div>
+
+              <div id="beneficiary-detail" hidden>
+                <div class="sk-text-field">
+                  <div class="sk-text-box">
+                    <div class="sk-text-inner">
+                      <input type="text" id="f-ben-name" class="sk-text-input" placeholder=" ">
+                      <label for="f-ben-name" class="sk-text-label">Nombre de tu beneficiario o beneficiaria</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sk-num-field sk-field-narrow">
+                  <label for="f-ben-birthYear">Año de nacimiento</label>
+                  <div class="sk-num-box"><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="f-ben-birthYear" class="sk-num-input" placeholder="1982"></div>
+                </div>
+
+                <div class="sk-select-button">
+                  <span class="visually-hidden" id="sb-benstatus-label">Su afiliación está</span>
+                  <label class="field-hint" style="display:block;">Su afiliación está</label>
+                  <div class="sk-sb-group" role="group" aria-labelledby="sb-benstatus-label" id="sb-benstatus">
+                    <button type="button" class="sk-sb-option" data-value="vigente" aria-pressed="true">Vigente</button>
+                    <button type="button" class="sk-sb-option" data-value="novigente" aria-pressed="false">No vigente</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cómo inviertes -->
+      <div class="accordion marker-anchor">
+        <button class="marker" data-marker="10" aria-label="Ver por qué: perfiles en porcentaje">10</button>
+        <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-invest" id="acc-invest-trigger">
+          <h3>Cómo inviertes tu saldo</h3>
+          <svg class="chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="accordion-body-wrap" id="acc-invest-wrap">
+          <div class="accordion-body" role="region" id="acc-invest" aria-labelledby="acc-invest-trigger">
+            <div class="accordion-body-inner">
+              <p class="field-hint">Tu saldo se reparte en tres perfiles de riesgo. Elige el que más se parezca a ti.</p>
+              <fieldset>
+                <legend class="visually-hidden">Perfil de inversión</legend>
+                <div class="profile-cards" id="profile-group">
+                  <label class="profile-card">
+                    <input type="radio" name="profile" value="conservador">
+                    <span class="profile-card-face">
+                      <span class="name">Conservador</span>
+                      <span class="desc">Prioriza cuidar lo que ya tienes.</span>
+                      <span class="profile-bar"><span style="width:15%"></span><span style="width:25%"></span><span style="width:60%"></span></span>
+                      <span class="profile-legend"><span>15%</span><span>25%</span><span>60%</span></span>
+                    </span>
+                  </label>
+                  <label class="profile-card">
+                    <input type="radio" name="profile" value="equilibrado" checked>
+                    <span class="profile-card-face">
+                      <span class="name">Equilibrado</span>
+                      <span class="desc">Un balance entre cuidar y crecer.</span>
+                      <span class="profile-bar"><span style="width:35%"></span><span style="width:35%"></span><span style="width:30%"></span></span>
+                      <span class="profile-legend"><span>35%</span><span>35%</span><span>30%</span></span>
+                    </span>
+                  </label>
+                  <label class="profile-card">
+                    <input type="radio" name="profile" value="crecimiento">
+                    <span class="profile-card-face">
+                      <span class="name">Crecimiento</span>
+                      <span class="desc">Prioriza que tu saldo crezca más.</span>
+                      <span class="profile-bar"><span style="width:55%"></span><span style="width:30%"></span><span style="width:15%"></span></span>
+                      <span class="profile-legend"><span>55%</span><span>30%</span><span>15%</span></span>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+              <p class="convergence-note">Mayor riesgo · Moderado · Conservador, en ese orden. A partir de los 51 años (mujeres) o 57 (hombres), tu saldo se traslada gradualmente al fondo conservador — el simulador lo calcula automáticamente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cuándo te quieres pensionar -->
+      <div class="accordion marker-anchor">
+        <button class="marker" data-marker="13" aria-label="Ver por qué: la edad recalcula todo">13</button>
+        <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-age" id="acc-age-trigger">
+          <h3>Cuándo te quieres pensionar</h3>
+          <svg class="chev" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 7l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="accordion-body-wrap" id="acc-age-wrap">
+          <div class="accordion-body" role="region" id="acc-age" aria-labelledby="acc-age-trigger">
+            <div class="accordion-body-inner">
+
+              <div class="sk-select-button">
+                <span class="visually-hidden" id="sb-legalsex-label">Tu historia pensional aplica para</span>
+                <label class="field-hint" style="display:block;">Tu historia pensional aplica para</label>
+                <div class="sk-sb-group" role="group" aria-labelledby="sb-legalsex-label" id="sb-legalsex">
+                  <button type="button" class="sk-sb-option" data-value="F" aria-pressed="false">Mujer</button>
+                  <button type="button" class="sk-sb-option" data-value="M" aria-pressed="true">Hombre</button>
+                </div>
+              </div>
+              <p class="field-hint">Así calculamos tu edad mínima legal.</p>
+
+              <label class="sk-checkbox checkbox-row">
+                <span class="sk-checkbox-hit">
+                  <input type="checkbox" id="f-alreadyRetired" class="sk-checkbox-input">
+                  <span class="sk-checkbox-box" aria-hidden="true"></span>
+                </span>
+                <span class="sk-checkbox-label">Ya estoy pensionado o pensionada</span>
+              </label>
+
+              <div class="mt-s" id="age-slider-block">
+                <label id="age-slider-label" for="p-slider-retireAge">Edad a la que te quieres pensionar</label>
+                <div class="p-slider-root" id="p-slider-retireAge" style="margin-top:16px;">
+                  <div class="p-slider-range" id="slider-range"></div>
+                  <div class="p-slider-handle" id="slider-handle" role="slider" tabindex="0"
+                       aria-labelledby="age-slider-label" aria-orientation="horizontal"
+                       aria-valuemin="57" aria-valuemax="75" aria-valuenow="62"></div>
+                </div>
+                <div class="age-slider-value">
+                  <span id="age-legal-note">Tu edad mínima legal es 62 años. Te faltan <strong id="age-diff">—</strong> años.</span>
+                  <strong id="age-current">62 años</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ZONA DE RESPUESTA ================= -->
+    <aside class="result-zone" aria-label="Tu proyección" id="result-zone">
+      <button class="sheet-handle" id="sheet-handle" aria-label="Expandir tu proyección" hidden><span></span></button>
+
+      <h2>Tu proyección</h2>
+
+      <div id="result-empty" class="result-empty">Cuéntanos tu año de nacimiento, cuánto ganas y desde cuándo cotizas — la proyección aparece aquí.</div>
+
+      <div class="result-block marker-anchor" id="result-block">
+        <button class="marker" data-marker="7" aria-label="Ver por qué: contraste en la cifra">7</button>
+        <button class="marker" data-marker="8" aria-label="Ver por qué: rango con supuestos" style="right:26px;">8</button>
+        <div class="result-figure">
+          <div class="amount"><span id="res-low">—</span><span class="sep">–</span><span id="res-high">—</span></div>
+          <div class="amount-suffix">millones al mes<span id="res-age-suffix"></span></div>
+        </div>
+        <p class="result-line" id="res-replacement">Esto equivale a cerca del <strong>—%</strong> de lo que ganas hoy.</p>
+
+        <details class="assumptions">
+          <summary>Ver los supuestos de este cálculo</summary>
+          <div class="assumptions-body">
+            <dl>
+              <dt>Rentabilidad real usada</dt><dd>4% a 9% anual</dd>
+              <dt>Inflación estimada</dt><dd>3,5% anual</dd>
+              <dt>Tu perfil de inversión</dt><dd id="assump-profile">Equilibrado</dd>
+              <dt>Densidad de cotización</dt><dd>85% estimada</dd>
+            </dl>
+          </div>
+        </details>
+
+        <div class="progress-card marker-anchor">
+          <div class="progress-top"><span>Semanas cotizadas</span><span><strong id="res-weeks">—</strong> de 1.300</span></div>
+          <div class="sk-progress-bar">
+            <div class="p-progressbar" role="progressbar" aria-label="Semanas cotizadas frente al mínimo de Colpensiones" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="weeks-progressbar">
+              <div class="p-progressbar-value" id="res-weeks-fill" style="width:0%"><span class="p-progressbar-label" id="res-weeks-pct"></span></div>
+            </div>
+          </div>
+          <p class="progress-note">1.300 semanas es el mínimo histórico para pensionarte por prima media (Ley 100).</p>
+
+          <div class="sk-alert sk-alert--info" role="status">
+            <span class="sk-alert__icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6.5v.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <div class="sk-alert__body">
+              <span class="sk-alert__message">El nuevo sistema pensional (Ley 2381) entra en vigencia el 1 de abril de 2027. Esta proyección usa las reglas actuales — para entender cómo te afecta el cambio, un asesor puede orientarte.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rpm-card marker-anchor">
+          <button class="marker" data-marker="9c" aria-label="Ver por qué: sin cifra de RPM sin verificar">9c</button>
+          <h3>Tu situación en prima media (Colpensiones)</h3>
+          <p id="rpm-status">—</p>
+          <p>La opción de trasladarte entre regímenes no está disponible desde julio de 2026.</p>
+          <p class="verify-note">No mostramos un valor en pesos para este régimen todavía: estamos verificando el cálculo con Actuaría antes de publicarlo.</p>
+        </div>
+
+        <p class="result-line" id="res-beneficiary" hidden></p>
+
+        <div class="voluntary-card marker-anchor">
+          <button class="marker" data-marker="12" aria-label="Ver por qué: aportes voluntarios">12</button>
+          <h3>¿Y si aportas un poco más?</h3>
+          <div class="voluntary-grid">
+            <div class="sk-num-field" style="max-width:none;">
+              <label for="f-vol-single">Aporte único hoy</label>
+              <div class="sk-num-box"><span class="sk-num-affix">$</span><input type="text" inputmode="numeric" id="f-vol-single" class="sk-num-input" placeholder="0"></div>
+            </div>
+            <div class="sk-num-field" style="max-width:none;">
+              <label for="f-vol-monthly">Aporte mensual adicional</label>
+              <div class="sk-num-box"><span class="sk-num-affix">$</span><input type="text" inputmode="numeric" id="f-vol-monthly" class="sk-num-input" placeholder="0"></div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-recalc-voluntary" type="button">Ver el efecto en mi mesada</button>
+          <p class="voluntary-delta" id="voluntary-delta"></p>
+          <p class="tax-note">Este aporte también puede ayudarte a pagar menos impuestos. Pregúntale a tu asesor cómo aplica en tu caso.</p>
+        </div>
+      </div>
+
+      <!-- El cierre con CTAs vive fuera de result-block porque siempre está visible una vez hay datos -->
+      <div id="cta-section" hidden>
+        <div class="cta-row marker-anchor mt-m">
+          <button class="marker" data-marker="14" aria-label="Ver por qué: el cierre con acción">14</button>
+          <button class="btn btn-primary" id="btn-advisor" type="button">Hablar con un asesor</button>
+          <button class="btn btn-secondary" id="btn-email-toggle" type="button">Recibir esta proyección por correo</button>
+        </div>
+        <div class="email-inline" id="email-inline">
+          <div class="sk-text-field">
+            <div class="sk-text-box">
+              <div class="sk-text-inner">
+                <input type="email" id="f-email" class="sk-text-input" placeholder=" ">
+                <label for="f-email" class="sk-text-label">Tu correo</label>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-email-send" type="button" disabled>Enviar</button>
+        </div>
+        <p class="success-banner" id="email-success"></p>
+        <div style="text-align:center; margin-top:var(--sk-space-s);">
+          <button class="btn btn-tertiary" id="link-pdf" type="button" icon>
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 15v1a1 1 0 001 1h10a1 1 0 001-1v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Descargar como PDF
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="legal-block">
+      <h3>Sobre esta proyección</h3>
+      <p>Esta es una proyección, no un valor garantizado. Se calcula con los datos que compartes y con los supuestos de rentabilidad e inflación que puedes ver junto al resultado. En ningún caso tu mesada sería inferior al salario mínimo mensual legal vigente.</p>
+      <p><a href="#" onclick="return false;">Conoce las rentabilidades mínimas obligatorias publicadas por la Superintendencia Financiera de Colombia.</a></p>
+    </div>
+    <div class="vigilado-row">
+      <span>VIGILADO · Superintendencia Financiera de Colombia</span>
+      <span>Skandia AFP - ACCAI S.A.</span>
+      <span>Skandia Fiduciaria S.A.</span>
+      <span>Skandia Seguros de Vida S.A.</span>
+      <span>Skandia Valores S.A.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="visually-hidden" aria-live="polite" id="live-announcer"></div>
+
+<!-- ================= MODAL LOGIN (Soy cliente Skandia) ================= -->
+<div class="modal-backdrop" id="modal-login-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-login-title" id="modal-login">
+    <div class="modal-header">
+      <span></span>
+      <button class="icon-btn" id="modal-login-close" aria-label="Cerrar">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-centered">
+      <h2 id="modal-login-title">¡Hola!</h2>
+      <p>Te damos la bienvenida al Portal clientes de Skandia</p>
+    </div>
+
+    <div class="sk-text-field" style="max-width:none;">
+      <div class="sk-text-box">
+        <div class="sk-text-inner">
+          <input type="text" id="f-login-user" class="sk-text-input" placeholder=" " autocomplete="username">
+          <label for="f-login-user" class="sk-text-label">Usuario</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="sk-text-field" style="max-width:none;">
+      <div class="sk-text-box">
+        <div class="sk-text-inner">
+          <input type="password" id="f-login-pass" class="sk-text-input" placeholder=" " autocomplete="current-password">
+          <label for="f-login-pass" class="sk-text-label">Contraseña</label>
+        </div>
+        <button type="button" class="sk-text-action" id="btn-toggle-pass" aria-label="Mostrar contraseña" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M1 10s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <p class="modal-centered"><button type="button" class="btn btn-tertiary" id="btn-recover-pass" style="height:auto;padding:0;color:var(--sk-color-link-text);font-family:var(--sk-font-body);font-weight:400;text-decoration:underline;">Crear o recuperar contraseña</button></p>
+
+    <button class="btn btn-primary btn-fluid" id="btn-login-submit" type="button">Iniciar sesión</button>
+    <p class="success-banner" id="login-error" style="background:#fdecea;color:var(--sk-color-error-text);"></p>
+
+    <p class="modal-fineprint">Al ingresar aceptas el <strong>Reglamento de uso del Portal Clientes</strong></p>
+  </div>
+</div>
+
+<!-- ================= MODAL ASESOR ================= -->
+<div class="modal-backdrop" id="modal-advisor-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-advisor-title" id="modal-advisor">
+    <div class="modal-header">
+      <h2 id="modal-advisor-title">Hablemos de tu proyección</h2>
+      <button class="icon-btn" id="modal-advisor-close" aria-label="Cerrar">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <p style="font-size:.9375rem; color:var(--sk-color-text-muted);">Cuéntanos cómo prefieres que te contactemos. Un asesor de Skandia te escribe con esta simulación a la mano.</p>
+
+    <div class="sk-select-button">
+      <span class="visually-hidden" id="sb-contact-label">¿Cómo prefieres que te contactemos?</span>
+      <label class="field-hint" style="display:block;">¿Cómo prefieres que te contactemos?</label>
+      <div class="sk-sb-group" role="group" aria-labelledby="sb-contact-label" id="sb-contact">
+        <button type="button" class="sk-sb-option" data-value="llamada" aria-pressed="true">Llamada</button>
+        <button type="button" class="sk-sb-option" data-value="whatsapp" aria-pressed="false">WhatsApp</button>
+        <button type="button" class="sk-sb-option" data-value="correo" aria-pressed="false">Correo</button>
+      </div>
+    </div>
+
+    <div class="sk-text-field" style="max-width:none;">
+      <div class="sk-text-box">
+        <div class="sk-text-inner">
+          <input type="text" id="f-contact-value" class="sk-text-input" placeholder=" ">
+          <label for="f-contact-value" class="sk-text-label" id="contact-value-label">¿A qué número te contactamos?</label>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="btn-contact-send" type="button" disabled>Enviar solicitud</button>
+    <p class="success-banner" id="advisor-success"></p>
+    <p class="trace-note">Esta solicitud queda vinculada a tu simulación, para que quien te atienda ya sepa de qué se trata.</p>
+  </div>
+</div>
+
+<!-- ================= PANEL DE SUSTENTO ================= -->
+<div class="sustento-panel" id="sustento-panel" role="dialog" aria-label="Justificación de diseño" aria-modal="false">
+  <div class="sustento-panel-head">
+    <div>
+      <div class="sustento-panel-eyebrow">Por qué cambiamos esto</div>
+      <h3 id="sustento-panel-title">—</h3>
+    </div>
+    <button class="icon-btn" id="sustento-panel-close" aria-label="Cerrar nota">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div id="sustento-panel-body"></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function $(sel, ctx){ return (ctx||document).querySelector(sel); }
+  function $all(sel, ctx){ return Array.prototype.slice.call((ctx||document).querySelectorAll(sel)); }
+
+  function parseNum(str){
+    if (!str) return 0;
+    var n = parseInt(String(str).replace(/[^\d]/g,''), 10);
+    return isNaN(n) ? 0 : n;
+  }
+  function formatInt(n){ return Math.round(n).toLocaleString('es-CO'); }
+  function formatCurrency(n){ return '$ ' + formatInt(n); }
+  function formatMillions(n){ return (n/1000000).toLocaleString('es-CO', {minimumFractionDigits:1, maximumFractionDigits:1}); }
+
+  /* Máscara numérica sin prefijo embebido (el "$" ahora es un affix estático) */
+  function attachCurrencyMask(input){
+    input.addEventListener('input', function(){
+      var raw = parseNum(input.value);
+      input.value = raw ? formatInt(raw) : '';
+      recalcAll();
+    });
+  }
+  function attachIntegerMask(input, maxLen){
+    input.addEventListener('input', function(){
+      var v = input.value.replace(/[^\d]/g,'');
+      if (maxLen) v = v.slice(0, maxLen);
+      input.value = v;
+      recalcAll();
+    });
+  }
+
+  var announceTimer = null;
+  function announce(msg){
+    clearTimeout(announceTimer);
+    announceTimer = setTimeout(function(){ $('#live-announcer').textContent = msg; }, 400);
+  }
+
+  function animateNumber(el, from, to, formatter){
+    if (reduceMotion || from === to){ el.textContent = formatter(to); return; }
+    var start = null, duration = 500;
+    function step(ts){
+      if (!start) start = ts;
+      var progress = Math.min((ts-start)/duration, 1);
+      var eased = 1 - Math.pow(1-progress, 3);
+      el.textContent = formatter(from + (to-from)*eased);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ============================================================
+     ACCORDIONS
+     ============================================================ */
+  $all('.accordion-trigger').forEach(function(trigger){
+    trigger.addEventListener('click', function(){
+      var expanded = trigger.getAttribute('aria-expanded') === 'true';
+      trigger.setAttribute('aria-expanded', String(!expanded));
+      var wrap = document.getElementById(trigger.getAttribute('aria-controls') + '-wrap');
+      if (wrap) wrap.classList.toggle('is-open', !expanded);
+    });
+  });
+
+  /* ============================================================
+     [skTooltip] — reproducción: hover + focus, persistente, Escape
+     ============================================================ */
+  var activeTooltip = null;
+  function createTooltipOverlay(){
+    var el = document.createElement('div');
+    el.className = 'sk-tooltip-overlay';
+    el.setAttribute('role', 'tooltip');
+    el.id = 'sk-tooltip-' + Math.random().toString(36).slice(2, 9);
+    document.body.appendChild(el);
+    return el;
+  }
+  function positionTooltip(overlay, trigger, pos){
+    var r = trigger.getBoundingClientRect();
+    overlay.style.visibility = 'hidden'; overlay.classList.add('is-open');
+    var ow = overlay.offsetWidth, oh = overlay.offsetHeight;
+    overlay.classList.remove('is-open'); overlay.style.visibility = '';
+    var top, left;
+    if (pos === 'right'){
+      top = r.top + r.height/2 - oh/2; left = r.right + 10;
+      if (left + ow > window.innerWidth - 8){ pos = 'top'; }
+    }
+    if (pos === 'top'){
+      top = r.top - oh - 10; left = r.left + r.width/2 - ow/2;
+    } else if (pos === 'bottom'){
+      top = r.bottom + 10; left = r.left + r.width/2 - ow/2;
+    }
+    left = Math.max(8, Math.min(left, window.innerWidth - ow - 8));
+    top = Math.max(8, top);
+    overlay.style.top = top + 'px';
+    overlay.style.left = left + 'px';
+    overlay.setAttribute('data-pos', pos);
+  }
+  function showTooltip(trigger){
+    var text = trigger.getAttribute('data-tooltip');
+    if (!text) return;
+    if (activeTooltip && activeTooltip.trigger !== trigger) hideTooltip(activeTooltip.trigger);
+    var overlay = trigger._skTooltipOverlay || (trigger._skTooltipOverlay = createTooltipOverlay());
+    overlay.textContent = text;
+    var pos = trigger.getAttribute('data-tooltip-pos') || 'top';
+    positionTooltip(overlay, trigger, pos);
+    overlay.classList.add('is-open');
+    trigger.setAttribute('aria-describedby', overlay.id);
+    activeTooltip = { trigger: trigger, overlay: overlay };
+  }
+  function hideTooltip(trigger){
+    if (!trigger._skTooltipOverlay) return;
+    trigger._skTooltipOverlay.classList.remove('is-open');
+    trigger.removeAttribute('aria-describedby');
+    if (activeTooltip && activeTooltip.trigger === trigger) activeTooltip = null;
+  }
+  $all('.tooltip-trigger').forEach(function(trigger){
+    trigger.addEventListener('mouseenter', function(){ showTooltip(trigger); });
+    trigger.addEventListener('mouseleave', function(){ hideTooltip(trigger); });
+    trigger.addEventListener('focus', function(){ showTooltip(trigger); });
+    trigger.addEventListener('blur', function(){ hideTooltip(trigger); });
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && activeTooltip) hideTooltip(activeTooltip.trigger);
+  });
+
+  /* ============================================================
+     sk-select-button — grupo genérico
+     ============================================================ */
+  function initSelectButton(groupId, onSelect){
+    var group = document.getElementById(groupId);
+    if (!group) return;
+    $all('.sk-sb-option', group).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        $all('.sk-sb-option', group).forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
+        btn.setAttribute('aria-pressed', 'true');
+        onSelect(btn.getAttribute('data-value'), btn);
+      });
+    });
+  }
+  function selectButtonValue(groupId){
+    var group = document.getElementById(groupId);
+    if (!group) return null;
+    var pressed = group.querySelector('.sk-sb-option[aria-pressed="true"]');
+    return pressed ? pressed.getAttribute('data-value') : null;
+  }
+
+  /* ============================================================
+     ESTADO Y CÁLCULO (motor sin cambios respecto a la validación previa)
+     ============================================================ */
+  var state = {
+    birthYear:null, salary:0, startYear:null,
+    usePrecise:false, weeksRAIS:null, weeksRPM:null, balance:null,
+    beneficiary:{ type:'ninguno', name:'' },
+    profile:'equilibrado',
+    legalSex:'M', alreadyRetired:false, retireAge:62, retireAgeTouched:false,
+    voluntary:{ single:0, monthly:0 }
+  };
+
+  var LEGAL_MIN_AGE = { M:62, F:57 };
+  var WEEKS_REQUIRED_RPM = 1300;
+  var DENSITY_ESTIMATE = 0.85;
+  var NET_CONTRIBUTION_RATE = 0.115;
+  var RATES = { low:0.04, mid:0.065, high:0.09 };
+
+  var MAX_CONTRIBUTION_YEARS = 50; /* nadie cotiza más de ~50 años; evita que un año inválido dispare un interés compuesto absurdo */
+  function currentYear(){ return new Date().getFullYear(); }
+  function yearsSinceStart(startYear){ return Math.min(MAX_CONTRIBUTION_YEARS, Math.max(0, currentYear()-startYear)); }
+  function estimateWeeks(startYear){ return Math.round(yearsSinceStart(startYear) * 52 * DENSITY_ESTIMATE); }
+  function futureValueMonthly(monthlyDeposit, annualRate, months){
+    if (months <= 0) return 0;
+    var i = annualRate/12;
+    if (i === 0) return monthlyDeposit*months;
+    return monthlyDeposit * ((Math.pow(1+i, months) - 1) / i);
+  }
+  function estimateBalance(salary, startYear, annualRate){
+    var months = yearsSinceStart(startYear) * 12 * DENSITY_ESTIMATE;
+    return futureValueMonthly(salary*NET_CONTRIBUTION_RATE, annualRate, months);
+  }
+  function projectForward(currentBalance, salary, monthsToRetire, annualRate, extraSingle, extraMonthly){
+    var i = annualRate/12;
+    var grown = currentBalance * Math.pow(1+i, monthsToRetire);
+    var futureContribs = futureValueMonthly(salary*NET_CONTRIBUTION_RATE + extraMonthly, annualRate, monthsToRetire);
+    var singleGrown = extraSingle * Math.pow(1+i, monthsToRetire);
+    return grown + futureContribs + singleGrown;
+  }
+  function annuityDivisorMonths(retireAge){ return Math.max(140, 300 - (retireAge-55)*4); }
+  function mesadaFromCapital(capital, retireAge){ return Math.max(capital / annuityDivisorMonths(retireAge), 0); }
+
+  function readInputs(){
+    state.birthYear = parseNum($('#f-birthYear').value) || null;
+    state.salary = parseNum($('#f-salary').value);
+    state.startYear = parseNum($('#f-startYear').value) || null;
+    state.weeksRAIS = $('#f-weeksRAIS').value ? parseNum($('#f-weeksRAIS').value) : null;
+    state.weeksRPM = $('#f-weeksRPM').value ? parseNum($('#f-weeksRPM').value) : null;
+    state.balance = $('#f-balance').value ? parseNum($('#f-balance').value) : null;
+
+    state.beneficiary.type = $('#f-ben-none').checked ? 'ninguno' : (selectButtonValue('sb-beneficiary') || 'ninguno');
+    state.beneficiary.name = $('#f-ben-name').value.trim();
+
+    var profileRadio = document.querySelector('input[name="profile"]:checked');
+    state.profile = profileRadio ? profileRadio.value : 'equilibrado';
+
+    state.legalSex = selectButtonValue('sb-legalsex') || 'M';
+    state.alreadyRetired = $('#f-alreadyRetired').checked;
+
+    state.voluntary.single = parseNum($('#f-vol-single').value);
+    state.voluntary.monthly = parseNum($('#f-vol-monthly').value);
+  }
+
+  function computeProjection(){
+    var age = currentYear() - state.birthYear;
+    var retireAge = state.alreadyRetired ? Math.max(age, LEGAL_MIN_AGE[state.legalSex]) : state.retireAge;
+    var monthsToRetire = state.alreadyRetired ? 0 : Math.min(MAX_CONTRIBUTION_YEARS*12, Math.max(0, (retireAge - age) * 12));
+
+    var weeksNow = (state.usePrecise && state.weeksRAIS != null) ? state.weeksRAIS : estimateWeeks(state.startYear);
+    var weeksRPMNow = (state.usePrecise && state.weeksRPM != null) ? state.weeksRPM : weeksNow;
+    var weeksAtRetirement = Math.round(weeksRPMNow + (monthsToRetire/12) * 52 * DENSITY_ESTIMATE);
+
+    var mesadas = {};
+    ['low','mid','high'].forEach(function(k){
+      var rate = RATES[k];
+      var currentBalance = (state.usePrecise && state.balance != null) ? state.balance : estimateBalance(state.salary, state.startYear, rate);
+      var finalCapital = projectForward(currentBalance, state.salary, monthsToRetire, rate, state.voluntary.single, state.voluntary.monthly);
+      mesadas[k] = mesadaFromCapital(finalCapital, retireAge);
+    });
+
+    var replacementRate = state.salary > 0 ? Math.round((mesadas.mid/state.salary)*100) : 0;
+
+    return { age:age, retireAge:retireAge, weeksNow:weeksNow, weeksAtRetirement:weeksAtRetirement, mesadas:mesadas, replacementRate:replacementRate };
+  }
+
+  function hasMinimumData(){ return !!(state.birthYear && state.salary && state.startYear); }
+
+  var prevLow = 0, prevHigh = 0;
+
+  function render(){
+    readInputs();
+
+    var estW = estimateWeeks(state.startYear || currentYear());
+    var estB = estimateBalance(state.salary, state.startYear || currentYear(), RATES.mid);
+    if (state.startYear) {
+      $('#est-weeks').textContent = formatInt(estW);
+      $('#est-balance').textContent = formatCurrency(estB);
+    }
+
+    var legalMin = LEGAL_MIN_AGE[state.legalSex];
+    var slider = $('#slider-handle');
+    slider.setAttribute('aria-valuemin', legalMin);
+    if (parseInt(slider.getAttribute('aria-valuenow'),10) < legalMin || !state.retireAgeTouched) {
+      slider.setAttribute('aria-valuenow', legalMin);
+    }
+    var retireAgeVal = parseInt(slider.getAttribute('aria-valuenow'),10);
+    renderSlider();
+    $('#age-current').textContent = retireAgeVal + ' años';
+    var faltan = Math.max(0, retireAgeVal - (state.birthYear ? (currentYear()-state.birthYear) : legalMin));
+    $('#age-legal-note').innerHTML = 'Tu edad mínima legal es ' + legalMin + ' años. ' + (faltan > 0 ? ('Te faltan <strong>' + faltan + '</strong> años.') : 'Ya la cumples.');
+    $('#age-slider-block').style.display = state.alreadyRetired ? 'none' : 'block';
+
+    $('#beneficiary-detail').hidden = (state.beneficiary.type === 'ninguno');
+
+    var profileLabels = { conservador:'Conservador', equilibrado:'Equilibrado', crecimiento:'Crecimiento' };
+    $('#assump-profile').textContent = profileLabels[state.profile] || 'Equilibrado';
+
+    if (!hasMinimumData()){
+      $('#result-empty').hidden = false;
+      $('#result-block').classList.remove('is-visible');
+      $('#cta-section').hidden = true;
+      $('#estimate-hint').hidden = true;
+      return;
+    }
+
+    $('#result-empty').hidden = true;
+    $('#result-block').classList.add('is-visible');
+    $('#cta-section').hidden = false;
+    $('#estimate-hint').hidden = false;
+
+    var proj = computeProjection();
+
+    animateNumber($('#res-low'), prevLow, proj.mesadas.low/1000000, function(v){ return v.toLocaleString('es-CO',{minimumFractionDigits:1,maximumFractionDigits:1}); });
+    animateNumber($('#res-high'), prevHigh, proj.mesadas.high/1000000, function(v){ return v.toLocaleString('es-CO',{minimumFractionDigits:1,maximumFractionDigits:1}); });
+    prevLow = proj.mesadas.low/1000000; prevHigh = proj.mesadas.high/1000000;
+
+    $('#res-age-suffix').textContent = state.alreadyRetired ? ', con tu situación actual' : (' al pensionarte a los ' + proj.retireAge + ' años');
+    $('#res-replacement').innerHTML = 'Esto equivale a cerca del <strong>' + proj.replacementRate + '%</strong> de lo que ganas hoy.';
+
+    $('#res-weeks').textContent = formatInt(proj.weeksAtRetirement);
+    var pct = Math.min(100, Math.round((proj.weeksAtRetirement/WEEKS_REQUIRED_RPM)*100));
+    $('#res-weeks-fill').style.width = pct + '%';
+    $('#res-weeks-pct').textContent = pct + '%';
+    $('#weeks-progressbar').setAttribute('aria-valuenow', pct);
+
+    $('#rpm-status').textContent = proj.weeksAtRetirement >= WEEKS_REQUIRED_RPM
+      ? 'Con tus semanas, alcanzarías el mínimo de Colpensiones.'
+      : 'Todavía no alcanzas el mínimo — te faltan ' + formatInt(WEEKS_REQUIRED_RPM - proj.weeksAtRetirement) + ' semanas.';
+
+    if (state.beneficiary.type !== 'ninguno' && state.beneficiary.name){
+      $('#res-beneficiary').hidden = false;
+      $('#res-beneficiary').textContent = 'Registramos a ' + state.beneficiary.name + ' como tu beneficiario o beneficiaria en esta simulación.';
+    } else { $('#res-beneficiary').hidden = true; }
+
+    announce('Proyección actualizada: entre ' + formatMillions(proj.mesadas.low) + ' y ' + formatMillions(proj.mesadas.high) + ' millones al mes.');
+  }
+  function recalcAll(){ render(); }
+
+  /* ============================================================
+     Slider PrimeNG 21 (p-slider) — drag + teclado
+     ============================================================ */
+  var sliderRoot = $('#p-slider-retireAge');
+  var sliderHandle = $('#slider-handle');
+  var sliderRange = $('#slider-range');
+  var sliderDragging = false;
+
+  function sliderGetMin(){ return parseInt(sliderHandle.getAttribute('aria-valuemin'),10); }
+  function sliderGetMax(){ return parseInt(sliderHandle.getAttribute('aria-valuemax'),10); }
+  function sliderClamp(v){
+    var min = sliderGetMin(), max = sliderGetMax();
+    v = Math.round(v);
+    return Math.min(max, Math.max(min, v));
+  }
+  function renderSlider(){
+    var min = sliderGetMin(), max = sliderGetMax();
+    var v = parseInt(sliderHandle.getAttribute('aria-valuenow'),10);
+    var p = ((v-min)/(max-min))*100;
+    p = Math.min(100, Math.max(0, p));
+    sliderRange.style.width = p + '%';
+    sliderHandle.style.left = p + '%';
+  }
+  function sliderValueFromClientX(clientX){
+    var rect = sliderRoot.getBoundingClientRect();
+    var ratio = (clientX - rect.left)/rect.width;
+    var min = sliderGetMin(), max = sliderGetMax();
+    return sliderClamp(min + ratio*(max-min));
+  }
+  function sliderSetValue(v){
+    state.retireAgeTouched = true;
+    sliderHandle.setAttribute('aria-valuenow', String(sliderClamp(v)));
+    recalcAll();
+  }
+  function sliderPointerX(e){
+    if (e.touches && e.touches.length) return e.touches[0].clientX;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+    return e.clientX;
+  }
+  sliderRoot.addEventListener('mousedown', function(e){ sliderDragging = true; sliderHandle.classList.add('p-slider-handle-active'); sliderSetValue(sliderValueFromClientX(sliderPointerX(e))); e.preventDefault(); });
+  sliderRoot.addEventListener('touchstart', function(e){ sliderDragging = true; sliderHandle.classList.add('p-slider-handle-active'); sliderSetValue(sliderValueFromClientX(sliderPointerX(e))); }, {passive:true});
+  window.addEventListener('mousemove', function(e){ if (sliderDragging) sliderSetValue(sliderValueFromClientX(sliderPointerX(e))); });
+  window.addEventListener('touchmove', function(e){ if (sliderDragging) sliderSetValue(sliderValueFromClientX(sliderPointerX(e))); }, {passive:true});
+  window.addEventListener('mouseup', function(){ sliderDragging = false; sliderHandle.classList.remove('p-slider-handle-active'); });
+  window.addEventListener('touchend', function(){ sliderDragging = false; sliderHandle.classList.remove('p-slider-handle-active'); });
+  sliderHandle.addEventListener('keydown', function(e){
+    var v = parseInt(sliderHandle.getAttribute('aria-valuenow'),10);
+    var nv = null;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') nv = v+1;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') nv = v-1;
+    else if (e.key === 'Home') nv = sliderGetMin();
+    else if (e.key === 'End') nv = sliderGetMax();
+    else if (e.key === 'PageUp') nv = v+5;
+    else if (e.key === 'PageDown') nv = v-5;
+    else return;
+    e.preventDefault();
+    sliderSetValue(nv);
+  });
+
+  /* ============================================================
+     LISTENERS de campos
+     ============================================================ */
+  attachIntegerMask($('#f-birthYear'), 4);
+  attachIntegerMask($('#f-startYear'), 4);
+  attachIntegerMask($('#f-ben-birthYear'), 4);
+  attachIntegerMask($('#f-weeksRAIS'), null);
+  attachIntegerMask($('#f-weeksRPM'), null);
+  attachCurrencyMask($('#f-salary'));
+  attachCurrencyMask($('#f-balance'));
+  attachCurrencyMask($('#f-vol-single'));
+  attachCurrencyMask($('#f-vol-monthly'));
+
+  $('#f-ben-name').addEventListener('input', recalcAll);
+  $all('input[name="profile"]').forEach(function(r){ r.addEventListener('change', recalcAll); });
+  $('#f-alreadyRetired').addEventListener('change', recalcAll);
+
+  initSelectButton('sb-beneficiary', function(){ $('#f-ben-none').checked = false; recalcAll(); });
+  $('#f-ben-none').addEventListener('change', function(){
+    if ($('#f-ben-none').checked){
+      $all('.sk-sb-option', $('#sb-beneficiary')).forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
+    }
+    recalcAll();
+  });
+  initSelectButton('sb-benstatus', function(){ recalcAll(); });
+  initSelectButton('sb-legalsex', function(){ recalcAll(); });
+
+  /* Ruta de precisión: manual revela campos; cliente abre el modal de login */
+  initSelectButton('sb-precision', function(value){
+    if (value === 'manual'){
+      $('#estimate-note').hidden = true;
+      $('#manual-fields').hidden = false;
+      state.usePrecise = true;
+      recalcAll();
+    } else if (value === 'client'){
+      openLoginModal();
+    }
+  });
+
+  /* Aportes voluntarios: recalcula la MISMA cifra principal (corrige C1) */
+  $('#btn-recalc-voluntary').addEventListener('click', function(){
+    readInputs();
+    recalcAll();
+    var withVoluntary = computeProjection().mesadas.mid;
+    var savedSingle = state.voluntary.single, savedMonthly = state.voluntary.monthly;
+    state.voluntary.single = 0; state.voluntary.monthly = 0;
+    var withoutVoluntary = computeProjection().mesadas.mid;
+    state.voluntary.single = savedSingle; state.voluntary.monthly = savedMonthly;
+    var delta = withVoluntary - withoutVoluntary;
+    var box = $('#voluntary-delta');
+    if (delta > 0){
+      box.textContent = 'Con este aporte, tu mesada media estimada sube a ' + formatCurrency(Math.round(withVoluntary)) + ' (+' + formatCurrency(Math.round(delta)) + ' al mes).';
+      box.classList.add('is-visible');
+    } else { box.classList.remove('is-visible'); }
+  });
+
+  /* CTA correo */
+  $('#f-email').addEventListener('input', function(){ $('#btn-email-send').disabled = !$('#f-email').value.trim(); });
+  $('#btn-email-toggle').addEventListener('click', function(){ $('#email-inline').classList.toggle('is-open'); });
+  $('#btn-email-send').addEventListener('click', function(){
+    var email = $('#f-email').value.trim();
+    if (!email) { $('#f-email').focus(); return; }
+    var banner = $('#email-success');
+    banner.textContent = 'Te enviamos tu proyección a ' + email + '.';
+    banner.classList.add('is-visible');
+    $('#email-inline').classList.remove('is-open');
+  });
+  $('#link-pdf').addEventListener('click', function(){});
+
+  /* ============================================================
+     Modales — controlador genérico con focus-trap real
+     ============================================================ */
+  function createModalController(backdrop, modal, firstFocusSelector, onClose){
+    var lastFocused = null;
+    function keydown(e){
+      if (e.key === 'Escape'){ close(); return; }
+      if (e.key === 'Tab'){
+        var focusables = $all('input, button, a[href]', modal).filter(function(el){ return !el.disabled && el.offsetParent !== null; });
+        if (!focusables.length) return;
+        var first = focusables[0], last = focusables[focusables.length-1];
+        if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+      }
+    }
+    function open(){
+      lastFocused = document.activeElement;
+      backdrop.classList.add('is-open');
+      var target = (firstFocusSelector && modal.querySelector(firstFocusSelector)) || modal.querySelector('input, button');
+      if (target) target.focus();
+      document.addEventListener('keydown', keydown);
+    }
+    function close(){
+      backdrop.classList.remove('is-open');
+      document.removeEventListener('keydown', keydown);
+      if (lastFocused) lastFocused.focus();
+      if (onClose) onClose();
+    }
+    backdrop.addEventListener('click', function(e){ if (e.target === backdrop) close(); });
+    return { open: open, close: close };
+  }
+
+  var advisorModal = createModalController($('#modal-advisor-backdrop'), $('#modal-advisor'), 'input[type="radio"]');
+  $('#btn-advisor').addEventListener('click', advisorModal.open);
+  $('#modal-advisor-close').addEventListener('click', advisorModal.close);
+
+  initSelectButton('sb-contact', function(value){
+    var labels = { llamada:'¿A qué número te contactamos?', whatsapp:'¿A qué WhatsApp te contactamos?', correo:'¿A qué correo te contactamos?' };
+    $('#contact-value-label').textContent = labels[value];
+  });
+  $('#f-contact-value').addEventListener('input', function(){ $('#btn-contact-send').disabled = !$('#f-contact-value').value.trim(); });
+  $('#btn-contact-send').addEventListener('click', function(){
+    var val = $('#f-contact-value').value.trim();
+    if (!val){ $('#f-contact-value').focus(); return; }
+    $('#advisor-success').textContent = 'Listo. Alguien de Skandia se pondrá en contacto contigo pronto, con esta proyección a la mano.';
+    $('#advisor-success').classList.add('is-visible');
+    setTimeout(advisorModal.close, 1600);
+  });
+
+  /* Modal de login (Soy cliente Skandia) */
+  var loginSucceeded = false;
+  var loginModal = createModalController($('#modal-login-backdrop'), $('#modal-login'), '#f-login-user', function(){
+    if (!loginSucceeded){
+      /* Se regresa del modal sin iniciar sesión: recordamos que puede afinar con la estimación */
+      $('#estimate-note').hidden = false;
+    }
+    loginSucceeded = false;
+  });
+  function openLoginModal(){ $('#login-error').classList.remove('is-visible'); loginModal.open(); }
+  $('#modal-login-close').addEventListener('click', loginModal.close);
+  $('#btn-recover-pass').addEventListener('click', function(){});
+
+  $('#btn-toggle-pass').addEventListener('click', function(){
+    var input = $('#f-login-pass');
+    var showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    $('#btn-toggle-pass').setAttribute('aria-pressed', String(!showing));
+    $('#btn-toggle-pass').setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+  });
+
+  $('#btn-login-submit').addEventListener('click', function(){
+    var user = $('#f-login-user').value.trim();
+    var pass = $('#f-login-pass').value.trim();
+    if (!user || !pass){
+      $('#login-error').textContent = 'Ingresa tu usuario y tu contraseña para continuar.';
+      $('#login-error').classList.add('is-visible');
+      return;
+    }
+    $('#login-error').classList.remove('is-visible');
+    var btn = $('#btn-login-submit');
+    btn.disabled = true; btn.textContent = 'Validando…';
+    setTimeout(function(){
+      btn.disabled = false; btn.textContent = 'Iniciar sesión';
+      loginSucceeded = true;
+      loginModal.close();
+      // Trae los datos "desde Skandia" (mock) y marca verificado
+      $('#estimate-note').hidden = true;
+      $('#manual-fields').hidden = false;
+      $('#f-weeksRAIS').value = '1180';
+      $('#f-weeksRPM').value = '640';
+      $('#f-balance').value = formatInt(186400000);
+      $('#client-note').hidden = false;
+      state.usePrecise = true;
+      recalcAll();
+    }, 800);
+  });
+
+  /* Bottom sheet móvil */
+  var sheetHandle = $('#sheet-handle');
+  var resultZone = $('#result-zone');
+  function updateSheetHandleVisibility(){ sheetHandle.hidden = window.innerWidth >= 768; }
+  updateSheetHandleVisibility();
+  window.addEventListener('resize', updateSheetHandleVisibility);
+  sheetHandle.addEventListener('click', function(){
+    resultZone.classList.toggle('is-expanded');
+    sheetHandle.setAttribute('aria-label', resultZone.classList.contains('is-expanded') ? 'Contraer tu proyección' : 'Expandir tu proyección');
+  });
+
+  /* ============================================================
+     CAPA DE SUSTENTO
+     ============================================================ */
+  var FINDINGS = {
+    '1': { sev:'negocio', title:'De comparar regímenes a responder tu pregunta',
+      body:'<p>El simulador actual enfrenta dos regímenes (RAIS vs. RPM) como si el traslado siguiera abierto. La ventana de traslado cerró el 16 de julio de 2026, y el nuevo sistema (Ley 2381) rige desde el 1 de abril de 2027. La pregunta viva ya no es "¿a cuál me cambio?" sino "¿cómo voy y qué puedo hacer?".</p>',
+      source:'simulador-jubilacion-research.md §3 · Premisa vencida' },
+    '2': { sev:'alta', title:'Un año, no un calendario',
+      body:'<p>El datepicker actual abre en el mes en curso para una fecha que siempre está décadas atrás: más de 550 clics posibles para llegar a 1980. Pedir el año como número elimina el problema — y de paso el piso duro del 31/12/1969.</p>',
+      source:'simulador-jubilacion-heuristica.md · H3 (Alta) · informe-consolidado §4.3 · C2 (bloqueante)' },
+    '5': { sev:'critica', title:'El muro del Paso 2, resuelto con estimación',
+      body:'<p>De 13 personas evaluadas, solo 1 tenía a mano semanas cotizadas y saldo. Aquí la herramienta estima automáticamente y ofrece dos atajos — nadie se bloquea por no tener el dato.</p><blockquote>"Tengo 138 millones ahí y ahora me toca a mí calcular cuántas semanas he cotizado, como si yo fuera la que lleva la contabilidad de Skandia."<cite>— Patricia, Financial Explorer</cite></blockquote>',
+      source:'informe-consolidado-operaciones.md §5.1 · testeo-financial-explorer.md' },
+    '6': { sev:'critica', title:'Ayuda que dice dónde, no qué',
+      body:'<p>La ayuda actual se renderiza al fondo de un sidebar remoto y repite la etiqueta con más palabras. Aquí es un [skTooltip] anclado al propio campo (hover + foco por teclado) que responde dónde conseguir el dato.</p><blockquote>"Eso no es ayuda, es un diccionario."<cite>— Andrés, Financial Explorer</cite></blockquote>',
+      source:'simulador-jubilacion-heuristica.md · H4 (Crítica)' },
+    '7': { sev:'media', title:'Contraste verificado en la cifra principal',
+      body:'<p>La auditoría axe-core encontró contraste insuficiente en los discos RAIS/RPM. Aquí la cifra usa un tono oscuro sobre la superficie de color, verificado sobre el umbral AA.</p>',
+      source:'simulador-jubilacion-heuristica.md · H9 (Alta) · rec. 11' },
+    '8': { sev:'alta', title:'Un rango, no una cifra que promete precisión',
+      body:'<p>El simulador actual muestra dos cifras puntuales sin decir con qué rentabilidad se calculan. Aquí el resultado es un rango con los supuestos visibles.</p><blockquote>"¿Con qué rentabilidad me están calculando esto? No lo sé y la cifra parece muy precisa para no decírmelo."<cite>— Sofía, Wealth Builders</cite></blockquote>',
+      source:'testeo-wealth-builders.md · benchmark Fidelity' },
+    '9c': { sev:'critica', title:'Semanas frente al umbral, no un traslado que ya no existe',
+      body:'<p>Nadie en el flujo actual dice que el traslado cerró en julio de 2026. Aquí la pregunta pasa a ser cuántas semanas te faltan frente al mínimo — y esta propuesta <strong>no muestra una mesada de RPM en pesos</strong> porque ese cálculo no está verificado (V1, bloqueante).</p><blockquote>"La pantalla en ningún momento me dice si puedo o no, ni hasta cuándo."<cite>— Roberto, Family Guardians</cite></blockquote>',
+      source:'testeo-family-guardians.md · informe-consolidado §4.1 (V1) y §8' },
+    '9': { sev:'critica', title:'El beneficiario vuelve, con nombre',
+      body:'<p>El simulador actual pide los datos del beneficiario y nunca los vuelve a mencionar en el resultado. Aquí el nombre reaparece en la proyección.</p><blockquote>"Les di hasta la fecha de nacimiento de mi esposa y ni la mencionan al final."<cite>— Hernando, Family Guardians</cite></blockquote>',
+      source:'testeo-family-guardians.md · HS6 · rec. 14' },
+    '10': { sev:'alta', title:'Porcentaje con apoyo visual, no años que deban sumar exacto',
+      body:'<p>El Paso 3 actual pide repartir años enteros entre tres fondos que deben sumar exacto. Aquí son 3 perfiles predefinidos con el % siempre visible.</p><blockquote>"No tengo ni idea de qué fondo es más arriesgado de verdad, solo puse números hasta que cuadró."<cite>— Daniel, Financial Explorer</cite></blockquote>',
+      source:'informe-consolidado §5.5 · rec. 13' },
+    '12': { sev:'critica', title:'Aportes voluntarios mueven la cifra que estás mirando',
+      body:'<p>El hallazgo mejor corroborado del estudio: 7 confirmaciones independientes en 4 de 5 segmentos. Aquí el mismo número grande de arriba es el que se mueve.</p><blockquote>"Le di clic y no pasó nada."</blockquote>',
+      source:'informe-consolidado-operaciones.md §4.2 (C1, bloqueante)' },
+    '13': { sev:'alta', title:'La edad recalcula todo, y no baja del mínimo legal',
+      body:'<p>"Te faltan N años" no cambiaba al mover el slider, y el control permitía elegir edades por debajo del mínimo legal sin aviso. Aquí el slider (PrimeNG) no puede bajar del mínimo y todo el texto dependiente se recalcula en vivo.</p>',
+      source:'informe-consolidado-operaciones.md §4.4 (C3, bloqueante)' },
+    '14': { sev:'negocio', title:'El flujo cierra en una acción, no en un PDF',
+      body:'<p>Integralidad fue 1,0 sobre 4 sin excepción en el segmento de mayor volumen. Aquí el cierre ofrece hablar con un asesor o recibir la proyección por correo — el PDF queda como acción terciaria.</p><blockquote>"Yo ya llené todo esto, ¿y ahora qué? Aquí no hay ni un botón."<cite>— Roberto, Financial Explorer</cite></blockquote>',
+      source:'simulador-jubilacion-heuristica.md · H8 (Crítica) · informe-consolidado §3-N1' }
+  };
+
+  var sustentoToggle = $('#sustento-toggle');
+  var panel = $('#sustento-panel');
+  var activeMarkerBtn = null;
+
+  sustentoToggle.addEventListener('change', function(){
+    document.body.classList.toggle('sustento-on', sustentoToggle.checked);
+    if (!sustentoToggle.checked) closeSustentoPanel();
+  });
+
+  function openSustentoPanel(id, btn){
+    var f = FINDINGS[id];
+    if (!f) return;
+    $('#sustento-panel-title').textContent = f.title;
+    var sevLabel = { critica:'Crítica', alta:'Alta', media:'Media', negocio:'Hallazgo de negocio' }[f.sev];
+    $('#sustento-panel-body').innerHTML = '<span class="sustento-panel-severity sev-' + f.sev + '">' + sevLabel + '</span>' + f.body + '<p class="sustento-panel-source">Fuente: ' + f.source + '</p>';
+    panel.classList.add('is-open');
+    if (activeMarkerBtn) activeMarkerBtn.classList.remove('is-active');
+    activeMarkerBtn = btn;
+    if (btn) btn.classList.add('is-active');
+  }
+  function closeSustentoPanel(){
+    panel.classList.remove('is-open');
+    if (activeMarkerBtn) activeMarkerBtn.classList.remove('is-active');
+    activeMarkerBtn = null;
+  }
+  $all('.marker').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-marker');
+      if (activeMarkerBtn === btn && panel.classList.contains('is-open')){ closeSustentoPanel(); return; }
+      openSustentoPanel(id, btn);
+    });
+  });
+  $('#sustento-panel-close').addEventListener('click', closeSustentoPanel);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && panel.classList.contains('is-open')) closeSustentoPanel(); });
+
+  /* Estado inicial */
+  renderSlider();
+  render();
+})();
+</script>
+</body>
+</html>
