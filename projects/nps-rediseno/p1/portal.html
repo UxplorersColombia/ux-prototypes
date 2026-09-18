@@ -106,6 +106,25 @@
   .scale-row button:hover{ background:rgba(255,255,255,.18); }
   .scale-row button.sel{ background:#fff; color:var(--primary-d03); font-weight:700; }
 
+  /* ─── Escala de caritas para CES — trazo propio, no emoji del sistema ─── */
+  .face-row{ display:flex; gap:10px; margin-bottom:26px; }
+  .face{
+    flex:1; background:transparent; border:none; padding:6px 2px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:9px;
+    color:rgba(255,255,255,.82); font-family:var(--body); transition:color .15s;
+  }
+  .face-icon{
+    width:46px; height:46px; border-radius:50%;
+    border:1.6px solid currentColor;
+    display:flex; align-items:center; justify-content:center;
+    transition:background-color .15s, border-color .15s, color .15s;
+  }
+  .face-icon svg{ width:30px; height:30px; }
+  .face-label{ font-size:12px; font-weight:600; line-height:1.3; text-align:center; }
+  .face:hover{ color:#fff; }
+  .face.sel{ color:#fff; }
+  .face.sel .face-icon{ background:#fff; border-color:#fff; color:var(--primary-d03); }
+
   .qtextarea{
     width:100%; min-height:70px; background:transparent; border:1px solid #fff;
     color:#fff; font-family:var(--body); font-size:14px; padding:10px; margin-bottom:24px; resize:vertical;
@@ -190,7 +209,7 @@
           <div class="opt" data-v="no">No</div>
         </div>
         <div class="qtext">¿Qué tan fácil fue hacer lo que necesitabas hoy?</div>
-        <div class="scale-row" id="cesScoreRow"></div>
+        <div class="face-row" id="cesScoreRow"></div>
         <div class="spacer"></div>
         <div class="actions"><span class="right"><button class="btn" id="cesBtnScore" disabled>Continuar</button></span></div>
       </div>
@@ -242,7 +261,41 @@
       updateCesBtn();
     });
   });
-  buildScale(document.getElementById('cesScoreRow'), ['Muy Fácil','Fácil','Ni Fácil/Ni Difícil','Difícil','Muy Difícil'], function(){
+  /* Caritas dibujadas a mano en el lenguaje del mural: ojos de punto y boca curva.
+     Van de menor a mayor, igual que la escala del NPS. */
+  var CARAS = [
+    { v:1, label:'Muy difícil',  boca:'M13 28 Q20 21.5 27 28' },
+    { v:2, label:'Difícil',      boca:'M13 27 Q20 23.5 27 27' },
+    { v:3, label:'Ni fácil ni difícil', boca:'M13.5 26 L26.5 26' },
+    { v:4, label:'Fácil',        boca:'M13 25 Q20 28.5 27 25' },
+    { v:5, label:'Muy fácil',    boca:'M13 24 Q20 30.5 27 24' }
+  ];
+
+  function buildCaras(container, onPick){
+    CARAS.forEach(function(c){
+      var b = document.createElement('button');
+      b.className = 'face';
+      b.type = 'button';
+      b.setAttribute('aria-label', c.label);
+      b.innerHTML =
+        '<span class="face-icon">' +
+          '<svg viewBox="0 0 40 40" fill="none" aria-hidden="true">' +
+            '<circle cx="14.5" cy="16" r="1.9" fill="currentColor"/>' +
+            '<circle cx="25.5" cy="16" r="1.9" fill="currentColor"/>' +
+            '<path d="' + c.boca + '" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>' +
+          '</svg>' +
+        '</span>' +
+        '<span class="face-label">' + c.label + '</span>';
+      b.addEventListener('click', function(){
+        Array.prototype.forEach.call(container.querySelectorAll('.face'), function(x){ x.classList.remove('sel'); });
+        b.classList.add('sel');
+        onPick(c.v);
+      });
+      container.appendChild(b);
+    });
+  }
+
+  buildCaras(document.getElementById('cesScoreRow'), function(){
     cesScoreAnswer = true;
     updateCesBtn();
   });

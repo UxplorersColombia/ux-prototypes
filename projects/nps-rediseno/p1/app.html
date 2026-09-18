@@ -152,6 +152,26 @@
   .score-btn.selected{ background:var(--button-brand-default); color:#fff; }
   .score-anchors{ display:flex; justify-content:space-between; font-size:12px; color:var(--texts-medium); font-weight:500; margin-top:4px; margin-bottom:28px; }
 
+  /* ── Escala de caritas para CES — trazo propio, no emoji del sistema ── */
+  .face-row{ display:flex; gap:6px; margin-bottom:28px; }
+  .face{
+    flex:1; background:transparent; border:none; padding:4px 0; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    color:var(--texts-medium); font-family:var(--body);
+    transition:color .15s;
+  }
+  .face-icon{
+    width:44px; height:44px; border-radius:50%;
+    border:1.6px solid currentColor;
+    display:flex; align-items:center; justify-content:center;
+    transition:background-color .15s, border-color .15s, color .15s;
+  }
+  .face-icon svg{ width:28px; height:28px; }
+  .face-label{ font-size:10.5px; font-weight:600; line-height:1.25; text-align:center; }
+  .face:hover{ color:var(--primary-d01); }
+  .face.selected{ color:var(--primary-d01); }
+  .face.selected .face-icon{ background:var(--button-brand-default); border-color:var(--button-brand-default); color:#fff; }
+
   .sk-textarea-wrap{ position:relative; margin-bottom:24px; }
   textarea.sk-textarea{
     width:100%; min-height:120px; resize:vertical;
@@ -315,8 +335,7 @@
         <div class="step" data-step="ces">
           <div class="progress-dots"><div class="dot-step done"></div><div class="dot-step current"></div></div>
           <div class="q-title">¿Qué tan fácil fue hacer lo que necesitabas hoy?</div>
-          <div class="score-row" id="cesScoreRow" style="--n:5"></div>
-          <div class="score-anchors"><span>Muy difícil</span><span>Muy fácil</span></div>
+          <div class="face-row" id="cesScoreRow"></div>
           <button class="sk-btn primary" id="cesBtnScore" disabled>Enviar</button>
         </div>
 
@@ -404,7 +423,41 @@
   });
   document.getElementById("cesBtnTask").addEventListener("click", function(){ goTo("scrimCes", "ces"); });
 
-  buildScale(document.getElementById("cesScoreRow"), 5, function(){
+  /* Caritas dibujadas a mano en el lenguaje del mural: ojos de punto y boca curva.
+     Van de menor a mayor, igual que la escala del NPS. */
+  var CARAS = [
+    { v:1, label:"Muy difícil",  boca:"M13 28 Q20 21.5 27 28" },
+    { v:2, label:"Difícil",      boca:"M13 27 Q20 23.5 27 27" },
+    { v:3, label:"Ni fácil ni difícil", boca:"M13.5 26 L26.5 26" },
+    { v:4, label:"Fácil",        boca:"M13 25 Q20 28.5 27 25" },
+    { v:5, label:"Muy fácil",    boca:"M13 24 Q20 30.5 27 24" }
+  ];
+
+  function buildCaras(container, onPick){
+    CARAS.forEach(function(c){
+      var b = document.createElement("button");
+      b.className = "face";
+      b.type = "button";
+      b.setAttribute("aria-label", c.label);
+      b.innerHTML =
+        '<span class="face-icon">' +
+          '<svg viewBox="0 0 40 40" fill="none" aria-hidden="true">' +
+            '<circle cx="14.5" cy="16" r="1.9" fill="currentColor"/>' +
+            '<circle cx="25.5" cy="16" r="1.9" fill="currentColor"/>' +
+            '<path d="' + c.boca + '" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>' +
+          '</svg>' +
+        '</span>' +
+        '<span class="face-label">' + c.label + '</span>';
+      b.addEventListener("click", function(){
+        Array.prototype.forEach.call(container.querySelectorAll(".face"), function(x){ x.classList.remove("selected"); });
+        b.classList.add("selected");
+        onPick(c.v);
+      });
+      container.appendChild(b);
+    });
+  }
+
+  buildCaras(document.getElementById("cesScoreRow"), function(){
     document.getElementById("cesBtnScore").disabled = false;
   });
   document.getElementById("cesBtnScore").addEventListener("click", function(){ goTo("scrimCes", "thanks"); });
