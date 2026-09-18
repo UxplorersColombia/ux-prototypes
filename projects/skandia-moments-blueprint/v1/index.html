@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blueprint · Skandia Moments — Employee Experience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ==========================================================================
+     Tokens — sk-components-ref v1.6.1 (skill de referencia de sk-components-angular)
+     Esta es una pieza de trabajo estática (sin Angular ni SkThemeService), así
+     que no se consume la lib en runtime — pero los VALORES y NOMBRES de estas
+     variables sí se verificaron contra la skill, no se inventaron:
+       · --sk-color-* : los 24 tokens de SkColorPalette (docs/features/theming.md).
+         Solo se declaran los que este documento usa.
+       · --sk-color-{warning,info,error,success}-light : NO son parte del
+         contrato SkColorPalette — son los 4 literales de pastel que sk-badge y
+         sk-alert reutilizan para el estilo "stroke" (docs/componentes/sk-badge.md
+         §3.Y). Se documentan aparte para no hacerlos pasar por tokens del tema.
+       · --sk-shadow-* : los 4 niveles oficiales (theming.md §8). Se usa
+         --sk-shadow-raised para las tarjetas del lienzo porque, a diferencia de
+         sk-card (que vive en flujo normal de página), estos nodos flotan sobre
+         un canvas — semánticamente "raised", no "surface".
+       · --sk-space-* : la escala de espaciado de layout (theming.md §9),
+         múltiplos de 4. Los componentes sk-* no la consumen por dentro, pero
+         gobierna el layout del consumer — que es exactamente este documento.
+       · --sk-font-title / --sk-font-body : estáticos, sin cambios (theming.md §7).
+     Lo que NO tiene equivalente oficial (colores de carril para RH/FP/Datos,
+     color de líneas de conector) se declara aparte, sin prefijo --sk-color-,
+     y se marca explícitamente como bespoke de este diagrama.
+     ========================================================================== */
+  :root{
+    /* --- sk-color-* oficiales (SkColorPalette, theming.md) --- */
+    --sk-color-primary:#00c73d; --sk-color-primary-hover:#03a835; --sk-color-primary-active:#009a2f;
+    --sk-color-accent:#16d727; /* verde brillante — success de sk-badge/sk-alert */
+    --sk-color-bg:#f2f4f6; --sk-color-surface:#ffffff;
+    --sk-color-text:#404040; --sk-color-text-muted:#666666; --sk-color-text-inverse:#ffffff;
+    --sk-color-border:#dddddd;
+    --sk-color-success:#00a34e; --sk-color-warning:#ffae08; --sk-color-error:#e03430; --sk-color-info:#0099de;
+    --sk-color-secondary-hover-bg:#caf9cb; --sk-color-tertiary-hover-bg:#f6fcf2; /* opcionales v1.3.0 */
+
+    /* --- literales de pastel de sk-badge/sk-alert (NO son --sk-color-* del tema) --- */
+    --sk-color-success-light:#ecfdf3; --sk-color-warning-light:#fff3e0;
+    --sk-color-info-light:#ebf4ff; --sk-color-error-light:#fff5f4;
+
+    /* --- estáticos oficiales --- */
+    --sk-font-title:'Montserrat', sans-serif; --sk-font-body:'Open Sans', system-ui, sans-serif;
+    --sk-shadow-raised:0 4px 16px rgba(0,0,0,.12); --sk-shadow-overlay:0 8px 24px rgba(0,0,0,.16);
+    --sk-space-xs:8px; --sk-space-s:12px; --sk-space-m:16px; --sk-space-l:24px; --sk-space-xl:32px;
+    --sk-space-3xl:48px; --sk-space-4xl:56px; --sk-space-5xl:64px;
+
+    /* --- bespoke de este diagrama: sin token semántico oficial equivalente --- */
+    --lane-rh:#1a5f8f; --lane-rh-bg:#f2f7ff; --lane-rh-border:#cfe3f5;
+    --lane-fp:#5b3fa0; --lane-fp-bg:#f4f2fb; --lane-fp-border:#ddd4f2;
+    --lane-datos:#45536b; --lane-datos-border:#d7dee6;
+    --muted-line:#9aa0ab;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--sk-color-bg); color:var(--sk-color-text); font-family:var(--sk-font-body); overscroll-behavior:none;}
+  h1,h2,h3,h4{font-family:var(--sk-font-title); font-weight:700; margin:0;}
+  p{margin:0;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:80; background:#fff; border-bottom:1px solid var(--sk-color-border);
+    padding:var(--sk-space-m) var(--sk-space-l); display:flex; align-items:center; gap:var(--sk-space-l); flex-wrap:wrap;
+  }
+  .topbar .brand{display:flex; align-items:baseline; gap:10px; font-family:var(--sk-font-title); font-weight:800;}
+  .topbar .brand .mark{color:var(--sk-color-primary); font-size:22px;}
+  .topbar .brand .sub{color:var(--sk-color-text-muted); font-weight:500; font-size:14px;}
+  .topbar .download{
+    margin-left:auto; display:inline-flex; align-items:center; gap:7px; text-decoration:none;
+    color:var(--sk-color-primary-active); font-weight:700; font-size:13.5px; padding:9px 16px;
+    border:1.5px solid var(--sk-color-secondary-hover-bg); border-radius:999px; background:var(--sk-color-tertiary-hover-bg);
+    font-family:var(--sk-font-body);
+  }
+  .topbar .download:hover{background:var(--sk-color-secondary-hover-bg);}
+  .topbar .download svg{width:14px; height:14px; flex:none;}
+  .intro{padding:18px var(--sk-space-l) 4px; max-width:1040px;}
+  .intro h1{font-size:26px; line-height:1.25; margin-bottom:8px;}
+  .intro p{font-size:15px; color:var(--sk-color-text-muted); line-height:1.6;}
+  .intro p + p{margin-top:8px;}
+
+  /* ---------- legend ---------- */
+  .legend{
+    display:flex; flex-wrap:wrap; gap:14px 26px; padding:12px var(--sk-space-l) 18px; font-size:13px; color:var(--sk-color-text-muted);
+  }
+  .legend .item{display:flex; align-items:center; gap:8px;}
+  .legend svg{width:28px; height:14px; flex:none;}
+  .legend .swatch{width:15px; height:15px; border-radius:4px; display:inline-block; flex:none;}
+  .legend .mdot{font-size:13px;}
+
+  /* ---------- canvas viewport (pan & zoom) ---------- */
+  .canvas-viewport{
+    position:relative; overflow:hidden; margin:0 var(--sk-space-l) var(--sk-space-l); border:1px solid var(--sk-color-border);
+    border-radius:16px; background:var(--sk-color-bg); height:calc(100vh - 300px); min-height:460px;
+    cursor:grab; touch-action:none;
+  }
+  .canvas-viewport.dragging{cursor:grabbing;}
+  .canvas-viewport.dragging, .canvas-viewport.dragging *{user-select:none !important;}
+
+  .canvas{
+    position:absolute; top:0; left:0; width:max-content; transform-origin:0 0; will-change:transform;
+    background-image: radial-gradient(circle, #d7dbe0 1.4px, transparent 1.4px);
+    background-size: 26px 26px;
+  }
+  svg.connectors{position:absolute; inset:0; overflow:visible; pointer-events:none;}
+  .edge-label{font-family:var(--sk-font-body); font-weight:700; font-size:12px; fill:var(--sk-color-text-muted);}
+  .edge-label.thesis{fill:var(--sk-color-primary-active); font-weight:800;}
+  .edge-label-bg{fill:var(--sk-color-bg);}
+
+  /* floating controls */
+  .zoom-controls{
+    position:absolute; right:16px; bottom:16px; z-index:20; display:flex; align-items:center; gap:2px;
+    background:#fff; border:1px solid var(--sk-color-border); border-radius:999px; box-shadow:var(--sk-shadow-raised); padding:6px;
+  }
+  .zoom-controls button{
+    width:34px; height:34px; border-radius:50%; border:none; background:transparent;
+    font-family:var(--sk-font-title); font-weight:800; font-size:17px; color:var(--sk-color-text); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+  }
+  .zoom-controls button:hover{background:var(--sk-color-tertiary-hover-bg); color:var(--sk-color-primary-active);}
+  .zoom-controls .zoom-pct{
+    width:54px; text-align:center; font-family:var(--sk-font-title); font-weight:700; font-size:12.5px;
+    color:var(--sk-color-text-muted); cursor:pointer; user-select:none; border:none; background:none;
+  }
+  .zoom-controls .zoom-pct:hover{color:var(--sk-color-primary-active);}
+  .zoom-controls .zdiv{width:1px; height:20px; background:var(--sk-color-border); margin:0 2px;}
+  .zoom-controls button.fit{font-size:14px;}
+
+  .zoom-hint{
+    position:absolute; left:16px; bottom:16px; z-index:20; background:rgba(255,255,255,.94);
+    border:1px solid var(--sk-color-border); border-radius:999px; padding:8px 16px; font-size:12px;
+    color:var(--sk-color-text-muted); display:flex; align-items:center; gap:6px; box-shadow:var(--sk-shadow-raised);
+    flex-wrap:wrap; max-width:60%;
+  }
+  .zoom-hint kbd{
+    background:var(--sk-color-bg); border:1px solid var(--sk-color-border); border-radius:4px; padding:1px 6px;
+    font-family:var(--sk-font-body); font-size:11px; font-weight:700; color:var(--sk-color-text);
+  }
+
+  .grid{
+    position:relative; z-index:1; display:grid;
+    grid-template-columns: 168px repeat(8, minmax(240px,max-content));
+    grid-auto-rows:min-content;
+    column-gap:var(--sk-space-5xl); row-gap:var(--sk-space-4xl);
+    padding:8px 56px 56px 0;
+  }
+
+  /* Las franjas de color por carril se dibujan dentro del propio
+     <svg class="connectors">, como la capa más al fondo — ver drawBands(). */
+
+  .lane-label{
+    grid-column:1; position:sticky; left:0; z-index:5; align-self:stretch;
+    display:flex; align-items:center;
+    background:linear-gradient(90deg, var(--sk-color-bg) 82%, rgba(242,244,246,0));
+    padding:10px var(--sk-space-m) 10px var(--sk-space-l);
+  }
+  .lane-label .tag{
+    font-family:var(--sk-font-title); font-weight:800; font-size:12px; letter-spacing:.03em;
+    padding:8px 14px; border-radius:8px; line-height:1.35; text-align:left;
+  }
+  .lane-label.l-empleado .tag{background:var(--sk-color-tertiary-hover-bg); color:var(--sk-color-primary-active); border:1.5px solid var(--sk-color-secondary-hover-bg);}
+  .lane-label.l-detalle .tag{background:transparent; color:var(--sk-color-text-muted); font-size:11px; border:1.5px dashed var(--sk-color-border);}
+  .lane-label.l-rh .tag{background:var(--lane-rh-bg); color:var(--lane-rh); border:1.5px solid var(--lane-rh-border);}
+  .lane-label.l-fp .tag{background:var(--lane-fp-bg); color:var(--lane-fp); border:1.5px solid var(--lane-fp-border);}
+  .lane-label.l-datos .tag{background:transparent; color:var(--lane-datos); font-size:11px; border:1.5px dashed var(--lane-datos-border);}
+  .lane-label.l-riesgos .tag{background:var(--sk-color-warning-light); color:#8a5a00; border:1.5px solid #ffe2b0;}
+
+  .stage-head{
+    grid-row:1; justify-self:start; align-self:end; font-family:var(--sk-font-title); font-weight:800;
+    font-size:12.5px; letter-spacing:.02em; color:#fff; background:var(--sk-color-text);
+    padding:8px 16px; border-radius:999px; white-space:nowrap;
+  }
+  .stage-head.resolved{background:var(--sk-color-success);}
+  .stage-axis-label{
+    grid-column:1; grid-row:1; align-self:end; padding:0 var(--sk-space-m) 10px var(--sk-space-l);
+    font-family:var(--sk-font-title); font-weight:800; font-size:10.5px; letter-spacing:.06em; color:var(--sk-color-text-muted);
+  }
+
+  /* ---------- node cards ---------- */
+  .node{
+    justify-self:start; align-self:center; background:var(--sk-color-surface); border:1.6px solid var(--sk-color-border);
+    border-radius:8px; box-shadow:var(--sk-shadow-raised); padding:18px 20px; position:relative; z-index:2;
+  }
+  .node.small{width:210px;}
+  .node.medium{width:290px;}
+  .node.wide{width:370px;}
+  .node.system{background:var(--sk-color-bg); border-style:dashed;}
+  .node-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;}
+  .code{font-family:var(--sk-font-title); font-weight:800; font-size:13px; color:var(--sk-color-primary-active); letter-spacing:.02em;}
+  .node-title{font-size:15.5px; margin:-4px 0 10px;}
+  .system-note{font-size:13.5px; color:var(--sk-color-text-muted); line-height:1.55;}
+
+  .parlamento{
+    margin:0; font-size:15.5px; line-height:1.55; color:var(--sk-color-text); font-style:italic;
+    quotes:"“" "”"; padding-left:12px; border-left:3px solid var(--sk-color-secondary-hover-bg);
+  }
+  .parlamento::before{content:open-quote;} .parlamento::after{content:close-quote;}
+  .parl-block{margin-top:12px;}
+  .parl-block:first-of-type{margin-top:0;}
+  .parl-label{display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--sk-color-text-muted); margin-bottom:5px;}
+
+  /* madurez */
+  .maturity{display:inline-flex; align-items:center; gap:5px; font-family:var(--sk-font-title); font-weight:800; font-size:10.5px; letter-spacing:.03em; padding:4px 10px; border-radius:999px;}
+  .maturity.g{background:var(--sk-color-success-light); color:var(--sk-color-success);}
+  .maturity.y{background:var(--sk-color-warning-light); color:#8a5a00;}
+  .maturity.r{background:var(--sk-color-error-light); color:var(--sk-color-error);}
+
+  .b2b-badge{
+    font-family:var(--sk-font-body); font-weight:700; font-size:10.5px; padding:4px 10px; border-radius:6px;
+    background:var(--lane-rh-bg); color:var(--lane-rh); border:1px solid var(--lane-rh-border); white-space:nowrap;
+  }
+
+  .node.rh{border-color:var(--lane-rh); border-width:1.6px;}
+  .node.fp{border-color:var(--lane-fp); border-width:1.6px;}
+  .node.fp.activo{background:var(--lane-fp-bg);}
+  .node.riesgo{border-color:var(--sk-color-error); border-width:2px; background:var(--sk-color-error-light);}
+  .node.riesgo .parl-label{color:var(--sk-color-error);}
+  .node.riesgo-y{border-color:var(--sk-color-warning); border-width:2px; background:var(--sk-color-warning-light);}
+  .node.riesgo-y .parl-label{color:#8a5a00;}
+  .node.resuelto{width:200px; border-color:var(--sk-color-success); border-style:dashed; background:var(--sk-color-success-light);}
+
+  /* decision nodes */
+  .node.decision{
+    width:245px; text-align:center; border-style:dashed; background:#f7f8fc;
+  }
+  .deco-tag{display:block; font-family:var(--sk-font-title); font-weight:800; font-size:10px; letter-spacing:.05em; color:var(--sk-color-text-muted); margin-bottom:8px;}
+  .decision-q{font-size:17px; margin-bottom:12px; color:var(--sk-color-text);}
+  .decision-opts{display:flex; flex-direction:column; gap:7px;}
+  .decision-opts .opt{
+    font-size:12.5px; font-weight:700; padding:7px 10px; border-radius:8px; background:#fff; border:1.3px solid var(--sk-color-border); color:var(--sk-color-text-muted); text-align:left;
+  }
+  .decision-opts .opt.hit{border-color:var(--sk-color-primary); color:var(--sk-color-primary-active); background:var(--sk-color-tertiary-hover-bg);}
+
+  footer{padding:20px var(--sk-space-l) 40px; text-align:center; color:var(--sk-color-text-muted); font-size:13px;}
+  footer code{background:var(--sk-color-bg); padding:2px 6px; border-radius:4px;}
+
+  @media (max-width: 720px){
+    .zoom-hint{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="mark">Skandia Moments</span><span class="sub">blueprint · employee experience · v1</span></div>
+  <a class="download" href="skandia-moments-blueprint.md" download>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M6.5 11.5 12 17l5.5-5.5"/><path d="M4 20h16"/></svg>
+    Descargar blueprint (.md)
+  </a>
+</div>
+
+<div class="intro">
+  <h1>Los 7 momentos, en 3 carriles de actor</h1>
+  <p>Lectura por carriles: qué vive el <strong>empleado</strong>, qué gana <strong>Recursos Humanos</strong>, y cuándo entra el <strong>FP/comercial</strong> — más los datos que lo sostienen y los vacíos que aún no se resuelven. Las etapas 1–3 (Ingreso, Onboarding financiero, Colaborador activo) son Skandia Moments, hoy concepto puro. Las etapas 4–7 ya están resueltas por Siempre Skandia y aparecen aquí condensadas, solo para mostrar la costura.</p>
+  <p>Navega con la rueda del mouse, o mantén <kbd style="background:#fff;border:1px solid var(--sk-color-border);border-radius:4px;padding:1px 6px;font-weight:700;">Espacio</kbd> y arrastra — usa los controles de zoom para acercar el detalle o ver el blueprint completo.</p>
+</div>
+
+<div class="legend">
+  <div class="item"><svg viewBox="0 0 30 14"><line x1="2" y1="7" x2="28" y2="7" stroke="#9aa0ab" stroke-width="2.4"/></svg> flujo secuencial dentro del carril</div>
+  <div class="item"><svg viewBox="0 0 30 14"><line x1="2" y1="7" x2="28" y2="7" stroke="#009a2f" stroke-width="2.6" stroke-dasharray="5 3"/></svg> conexión clave (tesis del proyecto)</div>
+  <div class="item"><span class="swatch" style="border:2px dashed var(--sk-color-border); background:#f7f8fc;"></span> decisión / regla de negocio</div>
+  <div class="item"><span class="maturity g mdot">🟢</span> existe hoy</div>
+  <div class="item"><span class="maturity y mdot">🟡</span> concepto sin validar</div>
+  <div class="item"><span class="maturity r mdot">🔴</span> riesgo alto</div>
+  <div class="item"><span class="swatch" style="background:var(--lane-rh-bg); border:1.5px solid var(--lane-rh-border);"></span> carril Recursos Humanos</div>
+  <div class="item"><span class="swatch" style="background:var(--lane-fp-bg); border:1.5px solid var(--lane-fp-border);"></span> carril FP / comercial</div>
+</div>
+
+<div class="canvas-viewport" id="viewport">
+  <div class="canvas" id="canvas">
+    <svg class="connectors" id="connectors"></svg>
+
+    <div class="grid" id="grid">
+
+      <!-- ============ HEADER: eje de 7 momentos ============ -->
+      <div class="stage-axis-label" style="grid-row:1;">EJE · 7 MOMENTOS</div>
+      <div class="stage-head" style="grid-column:2; grid-row:1;">1 · INGRESO</div>
+      <div class="stage-head" style="grid-column:3; grid-row:1;">2 · ONBOARDING FINANCIERO</div>
+      <div class="stage-head" style="grid-column:4; grid-row:1;">3 · COLABORADOR ACTIVO</div>
+      <div class="stage-head resolved" style="grid-column:6; grid-row:1;">4 · RETIRO 🟢</div>
+      <div class="stage-head resolved" style="grid-column:7; grid-row:1;">5 · SIEMPRE SKANDIA 🟢</div>
+      <div class="stage-head resolved" style="grid-column:8; grid-row:1;">6 · CLIENTE 🟢</div>
+      <div class="stage-head resolved" style="grid-column:9; grid-row:1;">7 · EMBAJADOR 🟢</div>
+
+      <!-- ============ LANE: EMPLEADO ============ -->
+      <div class="lane-label l-empleado" style="grid-row:2;"><span class="tag">EMPLEADO<br>qué vive</span></div>
+
+      <article class="node wide" id="emp-e1" style="grid-column:2; grid-row:2;">
+        <div class="node-head"><span class="code">E1</span><span class="maturity y">🟡 concepto</span></div>
+        <h4 class="node-title">Registro con propósito</h4>
+        <div class="parl-block">
+          <span class="parl-label">hoy</span>
+          <blockquote class="parlamento">Elige un fondo de pensión. Nadie me explicó las modalidades de pensión.</blockquote>
+        </div>
+        <div class="parl-block">
+          <span class="parl-label">con Skandia Moments</span>
+          <blockquote class="parlamento">3 datos obligatorios — salario, género, edad — y correo personal, explicados con transparencia.</blockquote>
+        </div>
+      </article>
+
+      <article class="node wide" id="emp-e2" style="grid-column:3; grid-row:2;">
+        <div class="node-head"><span class="code">E2</span><span class="maturity y">🟡 concepto</span></div>
+        <h4 class="node-title">Onboarding financiero</h4>
+        <div class="parl-block">
+          <span class="parl-label">sesión</span>
+          <blockquote class="parlamento">Coach financiero digital, sin venta directa.</blockquote>
+        </div>
+        <div class="parl-block">
+          <span class="parl-label">diagnóstico</span>
+          <blockquote class="parlamento">Precarga la radiografía con cédula: obligatorio, cesantías. Píldoras de ley 100, pensión, cesantías.</blockquote>
+        </div>
+        <div class="parl-block">
+          <span class="parl-label">salida</span>
+          <blockquote class="parlamento">Ruta de aprendizaje personalizada — Skandia Shaman.</blockquote>
+        </div>
+      </article>
+
+      <article class="node wide" id="emp-e3" style="grid-column:4; grid-row:2;">
+        <div class="node-head"><span class="code">E3</span><span class="maturity y">🟡 concepto</span></div>
+        <h4 class="node-title">Colaborador activo</h4>
+        <div class="parl-block">
+          <span class="parl-label">pulso</span>
+          <blockquote class="parlamento">Recalibración cada ~3 meses.</blockquote>
+        </div>
+        <div class="parl-block">
+          <span class="parl-label">simuladores</span>
+          <blockquote class="parlamento">Objetivo de vida — hijo, maestría, vivienda, exterior — con cifras vía IA.</blockquote>
+        </div>
+      </article>
+
+      <article class="node small resuelto" id="emp-e4" style="grid-column:6; grid-row:2;">
+        <span class="code">E4 🟢</span>
+        <p class="system-note" style="margin-top:6px;">Ya resuelto por Siempre Skandia. El fondo de emergencia (E2–E3) se cobra aquí.</p>
+      </article>
+      <article class="node small resuelto" id="emp-e5" style="grid-column:7; grid-row:2;">
+        <span class="code">E5 🟢</span>
+        <p class="system-note" style="margin-top:6px;">Reconocimiento + comunidad + orientación (15–45 días).</p>
+      </article>
+      <article class="node small resuelto" id="emp-e6" style="grid-column:8; grid-row:2;">
+        <span class="code">E6 🟢</span>
+        <p class="system-note" style="margin-top:6px;">Continuidad coherente con el diagnóstico del día 1.</p>
+      </article>
+      <article class="node small resuelto" id="emp-e7" style="grid-column:9; grid-row:2;">
+        <span class="code">E7 🟢</span>
+        <p class="system-note" style="margin-top:6px;">Comunidad activa, referidos, Boomerang Talent.</p>
+      </article>
+
+      <!-- ============ LANE: DETALLE / EMOCIÓN ============ -->
+      <div class="lane-label l-detalle" style="grid-row:3;"><span class="tag">↳ detalle /<br>emoción</span></div>
+
+      <article class="node medium" id="det-e1" style="grid-column:2; grid-row:3;">
+        <blockquote class="parlamento" style="font-size:14.5px;">A mí nunca nadie… lo que me dijeron fue: elige un fondo de pensión.</blockquote>
+      </article>
+      <article class="node medium" id="det-e2" style="grid-column:3; grid-row:3;">
+        <blockquote class="parlamento" style="font-size:14.5px;">Quiero hacer una charla de impuestos, piensen Skandia — posicionamiento, no venta.</blockquote>
+      </article>
+      <article class="node medium" id="det-e3" style="grid-column:4; grid-row:3;">
+        <blockquote class="parlamento" style="font-size:14.5px;">Llevas un año en la compañía. Eso es lo que has construido — Workiversary.</blockquote>
+      </article>
+
+      <!-- ============ LANE: RECURSOS HUMANOS ============ -->
+      <div class="lane-label l-rh" style="grid-row:4;"><span class="tag">RECURSOS<br>HUMANOS</span></div>
+
+      <article class="node medium rh" id="rh-e1" style="grid-column:2; grid-row:4;">
+        <div class="node-head"><span class="b2b-badge">B2B: Conexión / Presencia</span></div>
+        <p class="system-note">Un paso menos en el checklist de bienvenida.</p>
+      </article>
+
+      <article class="node wide rh" id="rh-e2" style="grid-column:3; grid-row:4;">
+        <div class="node-head"><span class="b2b-badge">B2B: Diagnóstico</span></div>
+        <h4 class="node-title" style="font-size:14px;">Qué gana RH, en orden de fuerza</h4>
+        <div class="parl-block">
+          <span class="parl-label">1 · el argumento más fuerte</span>
+          <p class="system-note"><strong>Mitigación de riesgo laboral</strong> — log de qué se explicó y cuándo, evidencia ante una demanda.</p>
+        </div>
+        <div class="parl-block">
+          <span class="parl-label">2</span>
+          <p class="system-note">Horas de formación obligatoria cubiertas.</p>
+        </div>
+        <div class="parl-block">
+          <span class="parl-label">3</span>
+          <p class="system-note">Adopción digital de la intranet.</p>
+        </div>
+      </article>
+
+      <article class="node medium rh" id="rh-e3" style="grid-column:4; grid-row:4;">
+        <div class="node-head"><span class="b2b-badge">B2B: Comercial / Plataforma RH</span></div>
+        <p class="system-note">Ve el índice agregado y anónimo de su población — nunca el perfil individual.</p>
+      </article>
+
+      <!-- ============ LANE: FP / COMERCIAL ============ -->
+      <div class="lane-label l-fp" style="grid-row:5;"><span class="tag">FP /<br>COMERCIAL</span></div>
+
+      <article class="node small system" id="fp-e1" style="grid-column:2; grid-row:5;">
+        <span class="code">E1</span>
+        <p class="system-note" style="margin-top:6px;">Ausente, por decisión. Garantiza estandarización sin depender de la agencia.</p>
+      </article>
+      <article class="node small system" id="fp-e2" style="grid-column:3; grid-row:5;">
+        <span class="code">E2</span>
+        <p class="system-note" style="margin-top:6px;">Ausente, por decisión. El coach digital no vende.</p>
+      </article>
+
+      <article class="node wide fp activo" id="fp-e3" style="grid-column:4; grid-row:5;">
+        <div class="node-head"><span class="code">E3</span><span class="maturity y">🟡 concepto</span></div>
+        <h4 class="node-title" style="font-size:14.5px;">Aquí sí entra el FP</h4>
+        <p class="system-note">Se activa por: IBC sostenido (3 lecturas al alza) · workiversary · momento de vida declarado.</p>
+      </article>
+
+      <article class="node decision" id="dec-canal" style="grid-column:5; grid-row:5;">
+        <span class="deco-tag">◆ REGLA</span>
+        <h4 class="decision-q">¿Qué canal, según salario?</h4>
+        <div class="decision-opts">
+          <span class="opt">Bajo → SAC / digital</span>
+          <span class="opt">Medio → FP virtual</span>
+          <span class="opt">Alto → contacto humano</span>
+        </div>
+      </article>
+
+      <article class="node small system" id="fp-e4" style="grid-column:6; grid-row:5;">
+        <span class="code">PAC</span>
+        <p class="system-note" style="margin-top:6px;">Solo viable en Ventana 1 (0–10 días) — heredado de Siempre Skandia.</p>
+      </article>
+
+      <!-- ============ LANE: DATOS Y SISTEMAS ============ -->
+      <div class="lane-label l-datos" style="grid-row:6;"><span class="tag">DATOS Y<br>SISTEMAS</span></div>
+
+      <article class="node medium system" id="dat-e1" style="grid-column:2; grid-row:6;">
+        <span class="code">E1</span>
+        <p class="system-note" style="margin-top:6px;">Salario · género · edad · correo personal.</p>
+        <p class="system-note" style="margin-top:6px;"><strong>Define el canal de todas las etapas siguientes.</strong></p>
+      </article>
+      <article class="node medium system" id="dat-e2" style="grid-column:3; grid-row:6;">
+        <span class="code">E2</span>
+        <p class="system-note" style="margin-top:6px;">Cédula → precarga obligatorio + cesantías. Log de contenido visto (fecha/hora).</p>
+      </article>
+      <article class="node medium system" id="dat-e3" style="grid-column:4; grid-row:6;">
+        <span class="code">E3</span>
+        <p class="system-note" style="margin-top:6px;">IBC histórico — el dato ya existe, hoy no llega al FP.</p>
+        <blockquote class="parlamento" style="font-size:13.5px; margin-top:8px;">Hay muchos que piensan que su cliente sigue siendo ese profesional que entró chiquito.</blockquote>
+      </article>
+
+      <article class="node decision" id="dec-ibc" style="grid-column:5; grid-row:6;">
+        <span class="deco-tag">◆ REGLA anti-falso-positivo</span>
+        <h4 class="decision-q">¿3 lecturas de IBC seguidas al alza?</h4>
+        <div class="decision-opts">
+          <span class="opt hit">Sí → alerta al FP</span>
+          <span class="opt">No → puede ser un pago doble, se ignora</span>
+        </div>
+      </article>
+
+      <!-- ============ LANE: VACÍOS Y RIESGOS ============ -->
+      <div class="lane-label l-riesgos" style="grid-row:7;"><span class="tag">VACÍOS Y<br>RIESGOS</span></div>
+
+      <article class="node wide riesgo" id="riesgo-e1" style="grid-column:2; grid-row:7;">
+        <div class="parl-block">
+          <span class="parl-label">#1 · plataforma anfitriona (aplica a E1–E3)</span>
+          <p class="system-note">Skandia People es la intranet de Skandia. En Cemex o Mercado Libre sería otra — ¿N HRIS distintos, o portal propio?</p>
+        </div>
+        <div class="parl-block">
+          <span class="parl-label">#2 · ¿RH acepta la puerta de entrada?</span>
+          <p class="system-note">Sin evidencia. El VP de RH ya lee al FP como alguien que "viene a vender".</p>
+        </div>
+      </article>
+
+      <article class="node medium riesgo-y" id="riesgo-e2" style="grid-column:3; grid-row:7;">
+        <span class="parl-label">#3 · gobernanza del dato</span>
+        <p class="system-note">Declarada como principio, no como regla de sistema. RH ve agregado; el perfil individual queda con el FP.</p>
+      </article>
+
+      <article class="node wide riesgo" id="riesgo-e3" style="grid-column:4; grid-row:7;">
+        <div class="parl-block">
+          <span class="parl-label">#5 · pipeline IBC → FP</span>
+          <p class="system-note">El dato existe; el camino hacia el FP, no.</p>
+        </div>
+        <div class="parl-block">
+          <span class="parl-label">#4 · volumen de población</span>
+          <p class="system-note">El mismo vacío que Siempre Skandia nunca cerró.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <div class="zoom-hint">
+    <span><kbd>Espacio</kbd> + arrastrar, o rueda del mouse</span>
+    <span><kbd>Ctrl</kbd> + rueda = zoom</span>
+    <span><kbd>F</kbd> = ajustar todo</span>
+  </div>
+
+  <div class="zoom-controls">
+    <button id="zoomOutBtn" title="Alejar (−)" aria-label="Alejar">−</button>
+    <span class="zdiv"></span>
+    <button class="zoom-pct" id="zoomPct" title="Restablecer a 100%">100%</button>
+    <span class="zdiv"></span>
+    <button id="zoomInBtn" title="Acercar (+)" aria-label="Acercar">+</button>
+    <span class="zdiv"></span>
+    <button id="fitBtn" class="fit" title="Ajustar todo el blueprint (F)" aria-label="Ajustar todo">⤢</button>
+  </div>
+</div>
+
+<footer>
+  Fuente de verdad y trazabilidad completa: <code>estrategia/skandia-moments-blueprint.md</code> · Origen del análisis: <code>b2link/conocimiento/skandia-moments-brief.md</code> · Journey base (etapas 4–7): <code>experimentos/siempre-skandia/investigacion/siempre-skandia-benchmark-y-propuesta-v2.md</code> · Mecánica visual adaptada de <code>UX_conversacional/host-telefonico-sami/guion-visual-retiro-mfund.html</code> · Equipo UX Skandia
+</footer>
+
+<script>
+(function(){
+  var viewport = document.getElementById('viewport');
+  var canvas = document.getElementById('canvas');
+  var svg = document.getElementById('connectors');
+  var SVGNS = 'http://www.w3.org/2000/svg';
+
+  var EDGES = [
+    // ---- carril EMPLEADO, secuencial ----
+    {from:'emp-e1', to:'emp-e2', dir:'right'},
+    {from:'emp-e2', to:'emp-e3', dir:'right'},
+    {from:'emp-e3', to:'emp-e4', dir:'right', label:'fondo de emergencia se cobra aquí'},
+    {from:'emp-e4', to:'emp-e5', dir:'right'},
+    {from:'emp-e5', to:'emp-e6', dir:'right'},
+    {from:'emp-e6', to:'emp-e7', dir:'right'},
+    // ---- carril RH, secuencial ----
+    {from:'rh-e1', to:'rh-e2', dir:'right'},
+    {from:'rh-e2', to:'rh-e3', dir:'right'},
+    // ---- carril FP, secuencial ----
+    {from:'fp-e1', to:'fp-e2', dir:'right', label:'ausente por decisión'},
+    {from:'fp-e2', to:'fp-e3', dir:'right'},
+    {from:'fp-e3', to:'dec-canal', dir:'right', label:'según salario'},
+    {from:'fp-e3', to:'fp-e4', dir:'right', label:'PAC · Ventana 1'},
+    // ---- carril DATOS, secuencial ----
+    {from:'dat-e1', to:'dat-e2', dir:'right'},
+    {from:'dat-e2', to:'dat-e3', dir:'right'},
+    {from:'dat-e3', to:'dec-ibc', dir:'right', label:'¿3 lecturas al alza?'},
+    // ---- cruces entre carriles (los momentos de verdad) ----
+    {from:'dec-ibc', to:'dec-canal', dir:'up', label:'dispara la alerta'},
+    {from:'dat-e1', to:'fp-e3', dir:'up', label:'el salario define el canal'},
+    {from:'emp-e2', to:'rh-e3', dir:'down', label:'alimenta el índice de bienestar'},
+    {from:'dat-e2', to:'rh-e2', dir:'up', label:'log → evidencia ante riesgo laboral'},
+    // ---- la tesis central del proyecto ----
+    {from:'emp-e2', to:'emp-e5', dir:'right', label:'sin esto, venta oportunista', thesis:true}
+  ];
+
+  // Franjas de color por carril — primera capa del svg, debajo de todo.
+  var LANES = [
+    { selector: '.lane-label.l-empleado', fill: 'rgba(0,199,61,.08)',   accent: '#00c73d' },
+    { selector: '.lane-label.l-detalle',  fill: 'rgba(154,160,171,.08)', accent: '#b7bcc4', dash: '7 5' },
+    { selector: '.lane-label.l-rh',       fill: 'rgba(26,95,143,.08)',  accent: '#4f9fd6' },
+    { selector: '.lane-label.l-fp',       fill: 'rgba(91,63,160,.08)',  accent: '#9a7fd1' },
+    { selector: '.lane-label.l-datos',    fill: 'rgba(69,83,107,.07)',  accent: '#9aa7b8', dash: '4 4' },
+    { selector: '.lane-label.l-riesgos',  fill: 'rgba(255,174,8,.10)',  accent: '#ffae08' }
+  ];
+
+  function drawBands(canvasRect, z, nativeW){
+    LANES.forEach(function(lane){
+      var labelEl = document.querySelector(lane.selector);
+      if (!labelEl) return;
+      var r = labelEl.getBoundingClientRect();
+      var y = (r.top - canvasRect.top) / z;
+      var h = r.height / z;
+
+      var rect = document.createElementNS(SVGNS,'rect');
+      rect.setAttribute('x', -40);
+      rect.setAttribute('y', y);
+      rect.setAttribute('width', nativeW + 80);
+      rect.setAttribute('height', h);
+      rect.setAttribute('rx', 10);
+      rect.setAttribute('fill', lane.fill);
+      svg.appendChild(rect);
+
+      var line = document.createElementNS(SVGNS,'line');
+      line.setAttribute('x1', -40); line.setAttribute('y1', y);
+      line.setAttribute('x2', nativeW + 40); line.setAttribute('y2', y);
+      line.setAttribute('stroke', lane.accent);
+      line.setAttribute('stroke-width', 3);
+      if (lane.dash) line.setAttribute('stroke-dasharray', lane.dash);
+      svg.appendChild(line);
+    });
+  }
+
+  function draw(){
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var z = state.zoom || 1;
+    var w = canvas.offsetWidth, h = canvas.offsetHeight;
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+
+    var canvasRectForBands = canvas.getBoundingClientRect();
+    drawBands(canvasRectForBands, z, w);
+
+    var defs = document.createElementNS(SVGNS,'defs');
+    var marker = document.createElementNS(SVGNS,'marker');
+    marker.setAttribute('id','arrowHead');
+    marker.setAttribute('viewBox','0 0 10 10');
+    marker.setAttribute('refX','8.5'); marker.setAttribute('refY','5');
+    marker.setAttribute('markerWidth','7'); marker.setAttribute('markerHeight','7');
+    marker.setAttribute('orient','auto-start-reverse');
+    var mpath = document.createElementNS(SVGNS,'path');
+    mpath.setAttribute('d','M0,0 L10,5 L0,10 z');
+    mpath.setAttribute('fill','#9aa0ab');
+    marker.appendChild(mpath);
+    defs.appendChild(marker);
+
+    var markerThesis = document.createElementNS(SVGNS,'marker');
+    markerThesis.setAttribute('id','arrowHeadThesis');
+    markerThesis.setAttribute('viewBox','0 0 10 10');
+    markerThesis.setAttribute('refX','8.5'); markerThesis.setAttribute('refY','5');
+    markerThesis.setAttribute('markerWidth','7'); markerThesis.setAttribute('markerHeight','7');
+    markerThesis.setAttribute('orient','auto-start-reverse');
+    var mpathT = document.createElementNS(SVGNS,'path');
+    mpathT.setAttribute('d','M0,0 L10,5 L0,10 z');
+    mpathT.setAttribute('fill','#009a2f');
+    markerThesis.appendChild(mpathT);
+    defs.appendChild(markerThesis);
+    svg.appendChild(defs);
+
+    var canvasRect = canvas.getBoundingClientRect();
+
+    EDGES.forEach(function(edge){
+      var fromEl = document.getElementById(edge.from);
+      var toEl = document.getElementById(edge.to);
+      if (!fromEl || !toEl) return;
+      var a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+      var ax = (a.left - canvasRect.left)/z, ay = (a.top - canvasRect.top)/z, aw = a.width/z, ah = a.height/z;
+      var bx = (b.left - canvasRect.left)/z, by = (b.top - canvasRect.top)/z, bw = b.width/z, bh = b.height/z;
+      var d, sx, sy, ex, ey, midx, midy;
+
+      if (edge.dir === 'right') {
+        sx = ax + aw; sy = ay + ah/2; ex = bx; ey = by + bh/2;
+        d = 'M' + sx + ',' + sy + ' L' + ex + ',' + ey;
+        midx = (sx+ex)/2; midy = sy - 10;
+      } else if (edge.dir === 'down') {
+        sx = ax + aw/2; sy = ay + ah; ex = bx + bw/2; ey = by;
+        if (Math.abs(sx-ex) < 3) {
+          d = 'M' + sx + ',' + sy + ' L' + ex + ',' + ey;
+          midx = sx + 14; midy = (sy+ey)/2;
+        } else {
+          var my = sy + (ey - sy) * 0.5;
+          d = 'M' + sx + ',' + sy + ' L' + sx + ',' + my + ' L' + ex + ',' + my + ' L' + ex + ',' + ey;
+          midx = (sx+ex)/2; midy = my - 10;
+        }
+      } else if (edge.dir === 'up') {
+        sx = ax + aw/2; sy = ay; ex = bx + bw/2; ey = by + bh;
+        var my2 = sy - (sy - ey) * 0.55;
+        d = 'M' + sx + ',' + sy + ' L' + sx + ',' + my2 + ' L' + ex + ',' + my2 + ' L' + ex + ',' + ey;
+        midx = (sx+ex)/2; midy = my2 - 10;
+      }
+
+      var path = document.createElementNS(SVGNS,'path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill','none');
+      path.setAttribute('stroke', edge.thesis ? '#009a2f' : '#9aa0ab');
+      path.setAttribute('stroke-width', edge.thesis ? '2.6' : '2');
+      if (edge.thesis) path.setAttribute('stroke-dasharray','6 4');
+      path.setAttribute('marker-end', edge.thesis ? 'url(#arrowHeadThesis)' : 'url(#arrowHead)');
+      svg.appendChild(path);
+
+      if (edge.label) {
+        var text = document.createElementNS(SVGNS,'text');
+        text.setAttribute('x', midx); text.setAttribute('y', midy);
+        text.setAttribute('text-anchor','middle');
+        text.setAttribute('class', edge.thesis ? 'edge-label thesis' : 'edge-label');
+        text.textContent = edge.label;
+        svg.appendChild(text);
+        var bbox;
+        try { bbox = text.getBBox(); } catch(e){ bbox = {x:midx-30,y:midy-11,width:60,height:14}; }
+        var bg = document.createElementNS(SVGNS,'rect');
+        bg.setAttribute('x', bbox.x - 5); bg.setAttribute('y', bbox.y - 2);
+        bg.setAttribute('width', bbox.width + 10); bg.setAttribute('height', bbox.height + 4);
+        bg.setAttribute('rx', 3);
+        bg.setAttribute('class','edge-label-bg');
+        svg.insertBefore(bg, text);
+      }
+    });
+  }
+
+  // ---------------- pan & zoom (estilo FigJam) ----------------
+  var state = { x: 40, y: 40, zoom: 1 };
+  var MIN_ZOOM = 0.12, MAX_ZOOM = 2.5;
+  var spaceDown = false, isPanning = false, lastX = 0, lastY = 0;
+  var userInteracted = false;
+  var zoomPctEl = document.getElementById('zoomPct');
+
+  function applyTransform(){
+    canvas.style.transform = 'translate(' + state.x + 'px,' + state.y + 'px) scale(' + state.zoom + ')';
+    if (zoomPctEl) zoomPctEl.textContent = Math.round(state.zoom * 100) + '%';
+  }
+
+  function setZoom(newZoom, pivotClientX, pivotClientY){
+    newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+    var vpRect = viewport.getBoundingClientRect();
+    var px = pivotClientX - vpRect.left, py = pivotClientY - vpRect.top;
+    var canvasPX = (px - state.x) / state.zoom;
+    var canvasPY = (py - state.y) / state.zoom;
+    state.zoom = newZoom;
+    state.x = px - canvasPX * state.zoom;
+    state.y = py - canvasPY * state.zoom;
+    applyTransform();
+  }
+
+  function zoomBy(factor){
+    var r = viewport.getBoundingClientRect();
+    setZoom(state.zoom * factor, r.left + r.width/2, r.top + r.height/2);
+  }
+
+  function resetZoom(){
+    var r = viewport.getBoundingClientRect();
+    setZoom(1, r.left + r.width/2, r.top + r.height/2);
+  }
+
+  function fitToScreen(){
+    var vpRect = viewport.getBoundingClientRect();
+    var nativeW = canvas.offsetWidth, nativeH = canvas.offsetHeight;
+    if (!nativeW || !nativeH || !vpRect.width || !vpRect.height) return;
+    var scaleX = (vpRect.width - 64) / nativeW;
+    var scaleY = (vpRect.height - 64) / nativeH;
+    var z = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.min(scaleX, scaleY)));
+    state.zoom = z;
+    state.x = (vpRect.width - nativeW * z) / 2;
+    state.y = (vpRect.height - nativeH * z) / 2;
+    applyTransform();
+  }
+
+  document.getElementById('zoomInBtn').addEventListener('click', function(){ userInteracted = true; zoomBy(1.22); });
+  document.getElementById('zoomOutBtn').addEventListener('click', function(){ userInteracted = true; zoomBy(1/1.22); });
+  document.getElementById('zoomPct').addEventListener('click', function(){ userInteracted = true; resetZoom(); });
+  document.getElementById('fitBtn').addEventListener('click', function(){ userInteracted = true; fitToScreen(); });
+
+  // drag to pan: siempre sobre lienzo vacío; en cualquier lugar si se mantiene Espacio
+  function startPan(clientX, clientY){
+    isPanning = true; lastX = clientX; lastY = clientY;
+    viewport.classList.add('dragging');
+  }
+  function movePan(clientX, clientY){
+    if (!isPanning) return;
+    state.x += (clientX - lastX);
+    state.y += (clientY - lastY);
+    lastX = clientX; lastY = clientY;
+    applyTransform();
+  }
+  function endPan(){
+    if (isPanning) { isPanning = false; viewport.classList.remove('dragging'); }
+  }
+
+  viewport.addEventListener('mousedown', function(e){
+    var onNode = e.target.closest && e.target.closest('.node');
+    if (spaceDown || !onNode) {
+      userInteracted = true;
+      e.preventDefault();
+      startPan(e.clientX, e.clientY);
+    }
+  });
+  window.addEventListener('mousemove', function(e){ movePan(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', endPan);
+  window.addEventListener('blur', endPan);
+
+  // touch: un dedo desplaza el lienzo
+  viewport.addEventListener('touchstart', function(e){
+    if (e.touches.length === 1) {
+      userInteracted = true;
+      startPan(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, {passive:true});
+  viewport.addEventListener('touchmove', function(e){
+    if (e.touches.length === 1 && isPanning) {
+      e.preventDefault();
+      movePan(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, {passive:false});
+  viewport.addEventListener('touchend', endPan);
+
+  // rueda del mouse: desplaza; Ctrl/Cmd + rueda: zoom centrado en el cursor
+  viewport.addEventListener('wheel', function(e){
+    e.preventDefault();
+    userInteracted = true;
+    if (e.ctrlKey || e.metaKey) {
+      var factor = Math.pow(1.0016, -e.deltaY);
+      setZoom(state.zoom * factor, e.clientX, e.clientY);
+    } else {
+      state.x -= e.deltaX;
+      state.y -= e.deltaY;
+      applyTransform();
+    }
+  }, {passive:false});
+
+  // Espacio mantenido = modo mano (estilo FigJam); flechas = navegar; +/-/0/F = zoom
+  window.addEventListener('keydown', function(e){
+    if (e.code === 'Space') {
+      if (!spaceDown) { spaceDown = true; viewport.style.cursor = 'grab'; }
+      e.preventDefault();
+      return;
+    }
+    if (e.key === '+' || e.key === '=') { userInteracted = true; zoomBy(1.18); e.preventDefault(); }
+    else if (e.key === '-' || e.key === '_') { userInteracted = true; zoomBy(1/1.18); e.preventDefault(); }
+    else if (e.key === '0') { userInteracted = true; resetZoom(); e.preventDefault(); }
+    else if (e.key.toLowerCase() === 'f') { userInteracted = true; fitToScreen(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { userInteracted = true; state.y += 90; applyTransform(); e.preventDefault(); }
+    else if (e.key === 'ArrowDown') { userInteracted = true; state.y -= 90; applyTransform(); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { userInteracted = true; state.x += 90; applyTransform(); e.preventDefault(); }
+    else if (e.key === 'ArrowRight') { userInteracted = true; state.x -= 90; applyTransform(); e.preventDefault(); }
+  });
+  window.addEventListener('keyup', function(e){
+    if (e.code === 'Space') { spaceDown = false; viewport.style.cursor = 'grab'; }
+  });
+
+  function init(){
+    draw();
+    fitToScreen();
+  }
+  window.addEventListener('load', init);
+  window.addEventListener('resize', function(){ draw(); });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function(){ draw(); if (!userInteracted) fitToScreen(); });
+  }
+  setTimeout(function(){ draw(); if (!userInteracted) fitToScreen(); }, 450);
+})();
+</script>
+
+</body>
+</html>
