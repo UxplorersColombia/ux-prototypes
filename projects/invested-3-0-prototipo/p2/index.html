@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Invested · Simuladores v1 y v2</title>
+<title>Invested · Flujo de activación</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,65 +12,175 @@
 :root{
   --green:#00C73D;--green-deep:#007A25;--green-tint:#E8F9EE;--green-soft:#F6FCF2;
   --ink:#16241B;--text:#233029;--muted:#5E6F64;--line:#DCE8DF;--line-2:#D9D9D9;
-  --paper:#F3F8F4;--surface:#FFFFFF;--r-lg:20px;--r-md:12px;--r-sm:10px;
+  --paper:#F3F8F4;--surface:#FFFFFF;--azul:#0099DE;--azul-bg:#EBF4FF;
+  --r-lg:20px;--r-md:12px;--r-sm:10px;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Montserrat',sans-serif}
-body{background:var(--paper);color:var(--text);padding:28px 20px 60px;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1120px;margin:0 auto}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
-.topbar h1{font-size:19px;font-weight:800;color:var(--ink)}
-.topbar p{font-size:13px;color:var(--muted);margin-top:3px;font-family:'Open Sans',sans-serif}
-.switch{display:inline-flex;background:#FAFAFA;border:1px solid var(--line);border-radius:999px;padding:4px}
-.switch button{border:0;background:transparent;padding:9px 18px;border-radius:999px;font-size:13px;font-weight:700;color:#A5A5A5;cursor:pointer;transition:.15s}
-.switch button.on{background:var(--green);color:#fff}
-.card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:20px;margin-bottom:16px}
-.card h2{font-size:18px;font-weight:700;color:var(--ink)}
-.card .sub{font-size:13px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:5px}
+body{background:var(--paper);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ---- barra del prototipo ---- */
+.proto{position:sticky;top:0;z-index:60;background:#16241B;color:#fff;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;padding:10px 20px;flex-wrap:wrap}
+.proto b{font-size:13px;font-weight:700}
+.proto small{display:block;font-size:11px;opacity:.65;font-family:'Open Sans',sans-serif;font-weight:400}
+.proto .sw{display:inline-flex;background:rgba(255,255,255,.1);border-radius:999px;padding:3px}
+.proto .sw button{border:0;background:transparent;color:rgba(255,255,255,.55);padding:7px 14px;border-radius:999px;
+  font-size:12px;font-weight:700;cursor:pointer}
+.proto .sw button.on{background:var(--green);color:#fff}
+.proto .re{border:1px solid rgba(255,255,255,.25);background:transparent;color:rgba(255,255,255,.8);
+  border-radius:999px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer}
+
+/* ---- chrome del portal ---- */
+.portal{display:flex;min-height:calc(100vh - 44px)}
+.side{width:88px;flex:0 0 88px;background:#fff;border-right:1px solid var(--line);padding:18px 0;
+  display:flex;flex-direction:column;align-items:center;gap:22px}
+.side .it{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;color:var(--muted);
+  font-family:'Open Sans',sans-serif;cursor:default;width:100%;padding:6px 0}
+.side .it.on{color:var(--green-deep);font-weight:700;background:var(--green-soft)}
+.side .it i{width:20px;height:20px;border-radius:5px;background:#CFE3D6;display:block}
+.side .it.on i{background:var(--green)}
+.side .sp{flex:1}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:flex-end;
+  gap:14px;padding:12px 26px}
+.top .marca{margin-right:auto;font-weight:800;color:var(--green-deep);font-size:16px;letter-spacing:-.3px}
+.top .ar{background:var(--green);color:#fff;border:0;border-radius:999px;padding:9px 16px;font-size:13px;
+  font-weight:700;cursor:default}
+.top .yo{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text)}
+.top .yo .av{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--green);display:grid;place-items:center;
+  font-size:11px;font-weight:700;color:var(--green-deep)}
+.lienzo{padding:26px 34px 60px;max-width:1180px;width:100%;margin:0 auto}
+
+/* ---- tipografia comun ---- */
+h1.tit{font-size:30px;font-weight:800;color:var(--ink);letter-spacing:-.4px}
+h2.sec{font-size:26px;font-weight:700;color:var(--ink)}
+.sub{font-size:15px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:6px;line-height:1.5}
+.miga{font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-bottom:12px}
+.miga b{color:var(--green-deep);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:20px;margin-top:16px}
+.card h3{font-size:17px;font-weight:700;color:var(--ink)}
+.card .sub{font-size:13px;margin-top:5px}
 .lbl{font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px}
-.inp{height:42px;border:1px solid var(--line-2);border-radius:var(--r-sm);display:flex;align-items:center;gap:6px;padding:0 14px;background:#fff}
+.row{display:flex;gap:24px;flex-wrap:wrap}
+.row>*{flex:1 1 220px;min-width:0}
+.hide{display:none!important}
+
+/* ---- controles ---- */
+.inp{height:42px;border:1px solid var(--line-2);border-radius:var(--r-sm);display:flex;align-items:center;gap:6px;
+  padding:0 14px;background:#fff}
 .inp:focus-within{border:1.5px solid var(--green)}
 .inp input{border:0;outline:0;font:inherit;font-weight:600;font-size:15px;color:var(--text);width:100%;background:transparent}
 .inp input::placeholder{font-weight:400;color:#A5B0A8}
 .inp .pre{font-weight:600;color:var(--muted)}
 .inp .suf{font-size:13px;color:var(--muted);white-space:nowrap}
 .inp select{border:0;outline:0;font:inherit;font-weight:500;font-size:15px;background:transparent;cursor:pointer;width:100%}
-.row{display:flex;gap:24px;flex-wrap:wrap}
-.row>*{flex:1 1 220px;min-width:0}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
-.chip{border:1px solid var(--line-2);background:#fff;border-radius:999px;padding:8px 14px;font-size:13.5px;font-weight:500;color:var(--text);cursor:pointer;transition:.15s}
+.chip{border:1px solid var(--line-2);background:#fff;border-radius:999px;padding:8px 14px;font-size:13.5px;
+  font-weight:500;color:var(--text);cursor:pointer;transition:.15s}
 .chip:hover{border-color:var(--green)}
 .chip.on{border:1.5px solid var(--green);background:var(--green-soft);color:var(--green-deep);font-weight:600}
-.step{margin-top:18px}
-.empty{border:1px dashed var(--line);border-radius:var(--r-md);padding:22px 18px;text-align:center;background:#FBFDFB;margin-top:18px}
-.empty b{display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
-.empty span{font-size:13px;color:var(--muted);font-family:'Open Sans',sans-serif}
-.reveal{animation:fade .28s ease}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.saldo-row{display:flex;align-items:center;gap:14px;padding:10px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--green-soft);cursor:pointer;transition:.2s;margin-top:16px}
-.saldo-row.off{background:#fff}
-.saldo-row .who{flex:1;min-width:0}
-.saldo-row .who b{display:block;font-size:14px;font-weight:600;color:var(--text)}
-.saldo-row .who span{font-size:12.5px;color:var(--muted);font-family:'Open Sans',sans-serif}
+.switch{display:inline-flex;background:#FAFAFA;border:1px solid var(--line);border-radius:999px;padding:4px}
+.switch button{border:0;background:transparent;padding:9px 18px;border-radius:999px;font-size:13px;font-weight:700;
+  color:#A5A5A5;cursor:pointer;transition:.15s}
+.switch button.on{background:var(--green);color:#fff}
+.cbx{width:20px;height:20px;border:1.5px solid var(--line-2);border-radius:5px;background:#fff;display:grid;
+  place-items:center;flex:0 0 20px}
+.cbx.on{background:var(--green);border-color:var(--green)}
+.cbx svg{width:12px;height:12px;display:none}.cbx.on svg{display:block}
+.btns{display:flex;gap:14px;margin-top:20px}
+.btn{flex:1;border:1.5px solid transparent;border-radius:999px;padding:13px;font-weight:700;font-size:14.5px;cursor:pointer}
+.btn.p{background:var(--green);color:#fff}.btn.p:hover{background:var(--green-deep)}
+.btn.p:disabled{background:#D9E5DC;color:#8C9A91;cursor:not-allowed}
+.btn.g{background:transparent;border-color:var(--green);color:var(--green-deep)}
+
+/* ---- alerta DS ---- */
+.alerta{display:flex;gap:12px;align-items:flex-start;background:var(--azul-bg);border:1px solid var(--azul);
+  border-radius:8px;padding:14px 16px;margin-top:20px}
+.alerta>svg{flex:0 0 24px}
+.alerta .cuerpo{font-size:12.5px;line-height:1.55;color:#404040;font-family:'Open Sans',sans-serif}
+.alerta .cuerpo b{display:block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13.5px;margin-bottom:3px}
+
+/* ---- ayuda / tooltip ---- */
+.help{position:relative;display:inline-flex;vertical-align:middle;margin-left:7px}
+.help>button{border:0;background:transparent;padding:0;cursor:pointer;line-height:0;display:block}
+.tip{position:absolute;left:50%;transform:translateX(-50%);top:28px;width:290px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:12px 14px;font-size:12.5px;
+  font-family:'Open Sans',sans-serif;color:var(--text);line-height:1.5;z-index:40;text-align:left;font-weight:400;cursor:default}
+.tip b{display:block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;margin-bottom:3px;color:var(--ink)}
+.tip:before{content:'';position:absolute;top:-6px;left:50%;margin-left:-6px;width:10px;height:10px;background:#fff;
+  border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+
+/* ---- progreso ---- */
+.prog{display:flex;gap:6px;margin:14px 0 6px}
+.prog i{height:5px;border-radius:3px;background:#E3EBE5;flex:1}
+.prog i.on{background:var(--green)}
+.paso{font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif}
+
+/* ---- pill / tag ---- */
+.tag{background:var(--green-tint);color:var(--green-deep);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
+.tag.n{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:500;font-size:12px}
 .pill{background:var(--green-tint);border-radius:var(--r-sm);padding:10px 16px;text-align:center;transition:.2s}
 .pill.off{background:#F4F6F5}
 .pill small{display:block;font-size:12px;color:var(--muted)}
 .pill b{font-size:16px;font-weight:800;color:var(--green-deep)}
 .pill.off b{color:var(--muted)}
-.cbx{width:20px;height:20px;border:1.5px solid var(--line-2);border-radius:5px;background:#fff;display:grid;place-items:center;flex:0 0 20px}
-.cbx.on{background:var(--green);border-color:var(--green)}
-.cbx svg{width:12px;height:12px;display:none}.cbx.on svg{display:block}
+.perfil{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:12px;
+  color:var(--muted);cursor:pointer}
+.perfil:hover{border-color:var(--green);color:var(--green-deep)}
+
+/* ---- pantalla de entrada ---- */
+.logro{font-size:24px;font-weight:800;color:var(--ink)}
+.cats{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px}
+.cat{flex:1 1 220px;background:#fff;border:1px solid var(--line-2);border-radius:var(--r-md);padding:16px}
+.cat.on{border:1.5px solid var(--green);background:var(--green-soft)}
+.cat span{font-size:15px;font-weight:600}
+.cat b{display:block;font-size:16px;font-weight:800;color:var(--ink);margin-top:8px}
+.banner{margin-top:18px;background:linear-gradient(90deg,#F6FCF2,#E8F9EE);border:1px solid var(--green);
+  border-radius:var(--r-lg);padding:18px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.banner .txt{flex:1;min-width:240px}
+.banner .kick{font-size:16px;font-weight:800;color:var(--green-deep);letter-spacing:.4px}
+.banner h3{font-size:16px;font-weight:700;color:var(--ink);margin-top:2px}
+.banner p{font-size:13px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:4px;line-height:1.5}
+.banner .mf{font-size:11px;color:var(--green-deep);background:#fff;border:1px solid var(--green);border-radius:999px;
+  padding:4px 10px;font-weight:700;white-space:nowrap}
+.banner button{background:var(--green);color:#fff;border:0;border-radius:999px;padding:13px 24px;font-size:15px;
+  font-weight:700;cursor:pointer}
+.banner button:hover{background:var(--green-deep)}
+.ctr{background:#fff;border:1px solid var(--line-2);border-radius:var(--r-md);padding:16px 18px;margin-top:12px;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.ctr .id{flex:1;min-width:230px}
+.ctr .id b{font-size:16px;font-weight:700;color:var(--ink)}
+.ctr .id span{display:block;font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:3px}
+.ctr .mon{font-size:18px;font-weight:800;color:var(--ink);white-space:nowrap}
+.ctr .ge{font-size:11px;color:var(--green-deep);background:var(--green-tint);border-radius:999px;padding:4px 10px;
+  font-weight:700;white-space:nowrap}
+
+/* ---- simulador ---- */
+.empty{border:1px dashed var(--line);border-radius:var(--r-md);padding:22px 18px;text-align:center;
+  background:#FBFDFB;margin-top:18px}
+.empty b{display:block;font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.empty span{font-size:13px;color:var(--muted);font-family:'Open Sans',sans-serif}
+.reveal{animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.saldo-row{display:flex;align-items:center;gap:14px;padding:10px 16px;border:1px solid var(--line);
+  border-radius:var(--r-md);background:var(--green-soft);cursor:pointer;transition:.2s;margin-top:16px}
+.saldo-row.off{background:#fff}
+.saldo-row .who{flex:1;min-width:0}
+.saldo-row .who b{display:block;font-size:14px;font-weight:600;color:var(--text)}
+.saldo-row .who span{font-size:12.5px;color:var(--muted);font-family:'Open Sans',sans-serif}
 .mix{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-top:18px}
 .mix-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .mix-head .t{font-size:13px;font-weight:600;color:var(--text)}
 .mix-head .t span{display:block;font-size:12px;color:var(--muted);font-weight:400;font-family:'Open Sans',sans-serif}
-.tag{background:var(--green-tint);color:var(--green-deep);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
-.tag.n{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:500;font-size:12px}
 .slider{margin-top:14px}
 .slider input{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:#E9EFE9;outline:0}
-.slider input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid var(--green);cursor:pointer}
-.slider .ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:6px;font-family:'Open Sans',sans-serif}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;
+  border:2.5px solid var(--green);cursor:pointer}
+.slider .ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:6px;
+  font-family:'Open Sans',sans-serif}
 .slider .cur{text-align:center;font-size:12px;font-weight:700;color:var(--green-deep);margin-bottom:4px}
-.res{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--green-soft);margin-top:18px;flex-wrap:wrap}
+.res{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 16px;border:1px solid var(--line);
+  border-radius:var(--r-md);background:var(--green-soft);margin-top:18px;flex-wrap:wrap}
 .res .k{font-size:13px;font-weight:600;color:var(--text)}
 .res .k span{display:block;font-size:12px;color:var(--muted);font-weight:400;font-family:'Open Sans',sans-serif;margin-top:2px}
 .res .v{font-size:24px;font-weight:800;color:var(--green-deep);white-space:nowrap}
@@ -80,212 +190,606 @@ body{background:var(--paper);color:var(--text);padding:28px 20px 60px;-webkit-fo
 .stats{display:flex;gap:40px;flex-wrap:wrap;margin-top:12px}
 .stats div span{display:block;font-size:12px;color:var(--muted)}
 .stats div b{font-size:17px;font-weight:700;color:var(--ink)}
-.pie{font-size:11.5px;color:var(--muted);font-family:'Open Sans',sans-serif;text-align:center;margin-top:26px}
-.alerta{display:flex;gap:12px;align-items:flex-start;background:#EBF4FF;border:1px solid #0099DE;
-  border-radius:8px;padding:14px 16px;margin-top:20px}
-.alerta>svg{flex:0 0 24px}
-.alerta .cuerpo{font-size:12.5px;line-height:1.55;color:#404040;font-family:'Open Sans',sans-serif}
-.alerta .cuerpo b{display:block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13.5px;margin-bottom:3px}
 .divider{height:1px;background:var(--line)}
 .opt{display:flex;align-items:center;gap:14px;padding:14px 2px;cursor:pointer}
 .opt .t{flex:1;min-width:0}
 .opt .t b{display:block;font-size:14px;font-weight:600;color:var(--text)}
 .opt .t span{font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif}
-.btns{display:flex;gap:14px;margin-top:20px}
-.btn{flex:1;border:1.5px solid transparent;border-radius:999px;padding:13px;font-weight:700;font-size:14.5px;cursor:pointer}
-.btn.p{background:var(--green);color:#fff}.btn.p:hover{background:var(--green-deep)}
-.btn.p:disabled{background:#D9E5DC;color:#8C9A91;cursor:not-allowed}
-.btn.g{background:transparent;border-color:var(--green);color:var(--green-deep)}
-.hide{display:none}
-.note{font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:10px}
-.help{position:relative;display:inline-flex;vertical-align:middle;margin-left:7px}
-.help>button{border:0;background:transparent;padding:0;cursor:pointer;line-height:0;display:block}
-.tip{position:absolute;left:50%;transform:translateX(-50%);top:28px;width:280px;background:#fff;border:1px solid var(--line);
-  border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:12px 14px;font-size:12.5px;font-family:'Open Sans',sans-serif;
-  color:var(--text);line-height:1.5;z-index:30;text-align:left;font-weight:400;cursor:default}
-.tip:before{content:'';position:absolute;top:-6px;left:50%;margin-left:-6px;width:10px;height:10px;background:#fff;
-  border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+
+/* ---- paso 2 · mezcla ---- */
+.kpis{display:flex;gap:30px;flex-wrap:wrap;margin-top:8px}
+.kpi b{font-size:22px;font-weight:800;color:var(--green-deep);display:block}
+.kpi span{font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif}
+.barras{display:flex;align-items:flex-end;gap:16px;height:150px;margin-top:16px;
+  border-bottom:1px solid var(--line);padding-bottom:2px}
+.barras .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.barras .b i{width:100%;max-width:58px;background:var(--green);border-radius:5px 5px 0 0;display:block}
+.barras .b em{font-style:normal;font-size:11px;font-weight:700;color:var(--green-deep)}
+.ejex{display:flex;gap:16px;margin-top:6px}
+.ejex span{flex:1;text-align:center;font-size:11px;color:var(--muted);font-family:'Open Sans',sans-serif}
+.tabs{display:inline-flex;gap:4px;background:#F4F7F5;border-radius:999px;padding:4px;margin-top:6px}
+.tabs button{border:0;background:transparent;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:600;
+  color:var(--muted);cursor:pointer}
+.tabs button.on{background:#fff;color:var(--green-deep);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+table.comp{width:100%;border-collapse:collapse;margin-top:14px}
+table.comp th{text-align:left;font-size:13px;font-weight:700;color:var(--text);padding:8px 10px;
+  border-bottom:1px solid var(--line)}
+table.comp th:nth-child(2),table.comp td:nth-child(2),
+table.comp th:nth-child(3),table.comp td:nth-child(3){text-align:right}
+table.comp td{font-size:14px;padding:11px 10px;border-bottom:1px solid #EFF4F0;font-family:'Open Sans',sans-serif}
+table.comp td:first-child{font-weight:600;font-family:'Montserrat',sans-serif}
+.donut{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:8px}
+.donut .lab{font-size:13px}
+.donut .lab b{display:block;font-size:15px;font-weight:700;color:var(--ink)}
+.porq p{font-size:14px;color:var(--text);font-family:'Open Sans',sans-serif;line-height:1.6;margin-top:8px}
+.video{border:0;background:transparent;color:var(--green-deep);font-size:13.5px;font-weight:700;cursor:pointer;
+  margin-top:12px;padding:0}
+
+/* ---- paso 3 · revision ---- */
+.resumen{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
+.resumen>div{flex:1 1 300px;border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px}
+.resumen h4{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.dl{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:12.5px;
+  font-family:'Open Sans',sans-serif;border-bottom:1px solid #F1F5F2}
+.dl:last-child{border-bottom:0}
+.dl span{color:var(--muted)}
+.dl b{font-weight:700;color:var(--text);text-align:right}
+.puntos{counter-reset:p;margin-top:12px}
+.puntos li{list-style:none;display:flex;gap:12px;padding:10px 0;font-size:13.5px;color:var(--text);
+  font-family:'Open Sans',sans-serif;line-height:1.55;border-bottom:1px solid #F1F5F2}
+.puntos li:last-child{border-bottom:0}
+.puntos li:before{counter-increment:p;content:counter(p);flex:0 0 24px;height:24px;border-radius:50%;
+  background:var(--green-tint);color:var(--green-deep);font-weight:800;font-size:12px;display:grid;place-items:center;
+  font-family:'Montserrat',sans-serif}
+.acepta{display:flex;gap:12px;align-items:flex-start;margin-top:16px;cursor:pointer}
+.acepta p{font-size:12.5px;color:var(--muted);font-family:'Open Sans',sans-serif;line-height:1.55}
+.acepta a{color:var(--green-deep);font-weight:700;text-decoration:none}
+.asesor{font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:14px}
+.pie{font-size:11.5px;color:var(--muted);font-family:'Open Sans',sans-serif;text-align:center;margin-top:26px;
+  line-height:1.6}
+
+/* ---- modales ---- */
+.overlay{position:fixed;inset:0;background:rgba(15,28,20,.45);display:grid;place-items:center;z-index:70;padding:24px}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:640px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.25);
+  max-height:90vh;overflow:auto}
+.modal.ancho{max-width:800px}
+.modal .cab{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.modal h3{font-size:22px;font-weight:700;color:var(--ink);line-height:1.3}
+.modal .x{border:0;background:transparent;font-size:18px;color:var(--muted);cursor:pointer;line-height:1}
+.modal .txt{font-size:14.5px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:8px;line-height:1.55}
+.opcion{border:1px solid var(--line-2);border-radius:var(--r-md);padding:14px 16px;margin-top:12px;cursor:pointer;
+  display:flex;align-items:center;gap:14px;transition:.15s}
+.opcion:hover{border-color:var(--green)}
+.opcion.on{border:1.5px solid var(--green);background:var(--green-soft)}
+.opcion .i{flex:1;min-width:0}
+.opcion .i b{font-size:15px;font-weight:700;color:var(--ink)}
+.opcion .i span{display:block;font-size:12px;color:var(--muted);font-family:'Open Sans',sans-serif;margin-top:2px}
+.opcion .d{font-size:12px;color:var(--green-deep);font-weight:700;white-space:nowrap}
+.marco{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-top:14px;background:var(--green-soft)}
+.marco b{font-size:16px;font-weight:700;color:var(--ink)}
+.marco span{font-size:13px;color:var(--muted);font-family:'Open Sans',sans-serif}
+.play{height:190px;border-radius:var(--r-md);background:#16241B;display:grid;place-items:center;margin-top:14px}
+.play div{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.15);display:grid;place-items:center;
+  color:#fff;font-size:20px}
+.exito{text-align:center}
+.exito .ic{width:66px;height:66px;border-radius:50%;background:var(--green-tint);display:grid;place-items:center;
+  margin:0 auto 14px;font-size:30px}
+.exito h3{font-size:24px}
+@media(max-width:820px){ .side{display:none} .lienzo{padding:20px 16px 50px} }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="topbar">
-    <div>
-      <h1>Simulador de activación · Invest-ED</h1>
-      <p>Dos versiones para comparar comportamiento real. Prototipo interno, datos de ejemplo.</p>
-    </div>
-    <div class="switch">
+<div class="proto">
+  <div><b>Invest-ED · Flujo de activación</b><small>Prototipo navegable. Datos de ejemplo, no son cifras reales.</small></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <div class="sw">
       <button id="bv1" class="on" onclick="setVer(1)">Versión 1 · simulador completo</button>
-      <button id="bv2" onclick="setVer(2)">Versión 2 · alineada a producción</button>
+      <button id="bv2" onclick="setVer(2)">Versión 2 · simulador sencillo</button>
     </div>
+    <button class="re" onclick="reiniciar()">Reiniciar flujo</button>
   </div>
+</div>
 
-  <!-- ============ VERSIÓN 1 ============ -->
-  <section id="v1">
-    <div class="card">
-      <h2>Arma tu simulación</h2>
-      <p class="sub">Cuéntanos tu objetivo y tu plazo: con eso te decimos cuál es tu mezcla y cómo podría rendir.</p>
+<div class="portal">
+  <nav class="side">
+    <div class="it on"><i></i>Inicio</div>
+    <div class="it"><i></i>Transacciones</div>
+    <div class="it"><i></i>Inversiones</div>
+    <div class="it"><i></i>Documentos</div>
+    <div class="it"><i></i>Ayuda</div>
+    <div class="sp"></div>
+    <div class="it"><i></i>Salir</div>
+  </nav>
 
-      <div class="step">
-        <span class="lbl">¿Para qué vas a invertir?</span>
-        <div class="chips" id="chips"></div>
-      </div>
+  <div class="main">
+    <header class="top">
+      <span class="marca">skandia</span>
+      <button class="ar">⚡ Acciones rápidas</button>
+      <div class="yo"><span class="av">SG</span>Hola, Juan Nepomuceno… 👋</div>
+    </header>
 
-      <div class="saldo-row" id="saldoRow" onclick="toggleSaldo(event)">
-        <div class="cbx on" id="saldoCbx"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="who">
-          <b>Sumar el dinero que ya tienes en tu contrato<span class="help" id="helpSaldo"><button type="button" onclick="toggleTip(event)" aria-label="Qué es este saldo"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#0099DE" stroke-width="1.4"/><path d="M6.9 6.9c0-1.15.94-2.05 2.1-2.05s2.1.86 2.1 1.95c0 1-.63 1.4-1.32 1.9-.5.36-.78.72-.78 1.4" stroke="#0099DE" stroke-width="1.4" stroke-linecap="round"/><circle cx="9" cy="13.1" r=".95" fill="#0099DE"/></svg></button></span></b>
-          <span>Potencializar mi inversión · Contrato #100006369833</span>
+    <div class="lienzo">
+
+      <!-- ========== 1 · ENTRADA ========== -->
+      <section id="sc-entrada">
+        <div class="logro">Lo que has logrado: $ 2.442.652.191,27 COP</div>
+        <p class="sub">Selecciona la categoría para ver información de tus contratos 🚀</p>
+        <div class="cats">
+          <div class="cat on"><span>Ahorro e Inversión</span><b>$ 1.397.298.191,27</b></div>
+          <div class="cat"><span>Pensiones y Cesantías</span><b>$ 400.344.000,09</b></div>
         </div>
-        <div class="pill" id="saldoPill"><small>Saldo disponible</small><b>$ 377.717,56</b></div>
-      </div>
 
-      <div class="step">
-        <div class="switch" style="margin-bottom:14px">
-          <button id="m2" class="on" onclick="setModo('meta')">Por la meta que quiero</button>
-          <button id="m1" onclick="setModo('aporte')">Por mi aporte mensual</button>
-        </div>
-        <div class="row">
-          <div>
-            <span class="lbl" id="lblMonto">Monto de tu Meta</span>
-            <div class="inp"><span class="pre">$</span><input id="inMonto" placeholder="Ej: 50.000.000" inputmode="numeric"></div>
+        <div class="banner">
+          <div class="txt">
+            <div class="kick">INVEST-ED <span class="mf">✦ Multifund</span></div>
+            <h3>Activa la gestión experta de tus inversiones</h3>
+            <p>Mezcla ajustada a tu perfil y rebalanceada por expertos cuando el mercado cambia.</p>
           </div>
-          <div>
-            <span class="lbl">Años para lograrlo</span>
-            <div class="inp"><input id="inAnios" placeholder="Ej: 10" inputmode="numeric"><span class="suf">años</span></div>
+          <button onclick="abrir('md-contrato')">Conocer y activar</button>
+        </div>
+
+        <h3 style="font-size:16px;font-weight:700;color:var(--ink);margin-top:26px">Contratos en Ahorro e Inversión (5)</h3>
+        <p class="sub" style="font-size:12.5px">Fondo Voluntario de Pensión Skandia Multifund</p>
+
+        <div class="ctr">
+          <div class="id"><b>Potencializar mi inversión</b><span>Saldo total $ 377.717,56 · Contrato 100006369833</span></div>
+          <span class="ge">✦ Gestión experta disponible</span>
+          <span class="mon">$ 377.717,56</span>
+        </div>
+        <div class="ctr">
+          <div class="id"><b>Invertir en finca raíz</b><span>Saldo total $ 376.344.000,09 · Contrato 110000010405</span></div>
+          <span class="mon">$ 132.456.000</span>
+        </div>
+        <div class="ctr">
+          <div class="id"><b>Euro Trip 2026 🏖</b><span>Saldo total $ 376.344.000,09 · Contrato 1112038300436</span></div>
+          <span class="mon">$ 132.456.000</span>
+        </div>
+        <p class="sub" style="font-size:12px">Saldos actualizados al 30 de diciembre de 2025</p>
+      </section>
+
+      <!-- ========== 2 · SIMULADOR ========== -->
+      <section id="sc-sim" class="hide">
+        <p class="miga">Inicio / <b>Activar Invest-ED</b></p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <h1 class="tit">Activar Invest-ED</h1>
+          <button class="perfil" onclick="abrir('md-perfil')">Perfil: Moderado</button>
+        </div>
+        <div class="prog"><i class="on"></i><i></i><i></i></div>
+        <p class="paso">1 de 3 · <span id="simPaso">Definición de tu objetivo</span></p>
+
+        <!-- ---- V1: simulador completo ---- -->
+        <div id="sim-v1">
+          <h2 class="sec" style="margin-top:16px">¿Cuánto quieres lograr y en cuánto tiempo?</h2>
+          <p class="sub">Tú defines el objetivo y el plazo; nosotros calculamos la mezcla y te mostramos cómo podría crecer.</p>
+
+          <div class="card">
+            <h3>Arma tu simulación</h3>
+            <p class="sub">Cuéntanos tu objetivo y tu plazo: con eso te decimos cuál es tu mezcla y cómo podría rendir.</p>
+
+            <div style="margin-top:18px">
+              <span class="lbl">¿Para qué vas a invertir?</span>
+              <div class="chips" id="chips"></div>
+            </div>
+
+            <div class="saldo-row" id="saldoRow" onclick="toggleSaldo(event)">
+              <div class="cbx on" id="saldoCbx"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="who">
+                <b>Sumar el dinero que ya tienes en tu contrato<span class="help" id="helpSaldo"><button type="button" onclick="tipSaldo(event)" aria-label="Qué es este saldo"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#0099DE" stroke-width="1.4"/><path d="M6.9 6.9c0-1.15.94-2.05 2.1-2.05s2.1.86 2.1 1.95c0 1-.63 1.4-1.32 1.9-.5.36-.78.72-.78 1.4" stroke="#0099DE" stroke-width="1.4" stroke-linecap="round"/><circle cx="9" cy="13.1" r=".95" fill="#0099DE"/></svg></button></span></b>
+                <span>Potencializar mi inversión · Contrato #100006369833</span>
+              </div>
+              <div class="pill" id="saldoPill"><small>Saldo disponible</small><b>$ 377.717,56</b></div>
+            </div>
+
+            <div style="margin-top:18px">
+              <div class="switch" style="margin-bottom:14px">
+                <button id="m2" class="on" onclick="setModo('meta')">Por la meta que quiero</button>
+                <button id="m1" onclick="setModo('aporte')">Por mi aporte mensual</button>
+              </div>
+              <div class="row">
+                <div>
+                  <span class="lbl" id="lblMonto">Monto de tu Meta</span>
+                  <div class="inp"><span class="pre">$</span><input id="inMonto" placeholder="Ej: 50.000.000" inputmode="numeric"></div>
+                </div>
+                <div>
+                  <span class="lbl">Años para lograrlo</span>
+                  <div class="inp"><input id="inAnios" placeholder="Ej: 10" inputmode="numeric"><span class="suf">años</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="empty" id="emptyA">
+              <b>Aún no podemos calcular tu mezcla</b>
+              <span>Elige tu objetivo y escribe el plazo para conocer tu mezcla, su nivel de riesgo y cómo ha rendido.</span>
+            </div>
+
+            <div id="gateA" class="hide">
+              <div class="mix reveal">
+                <div class="mix-head">
+                  <div class="t">Tu mezcla según tu objetivo y tu plazo<span id="mixWhy"></span></div>
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <span class="tag" id="tagMezcla">—</span><span class="tag n" id="tagRiesgo">—</span>
+                  </div>
+                </div>
+                <div class="slider">
+                  <div class="cur" id="curTasa">—</div>
+                  <input type="range" id="rngTasa" min="65" max="119" step="1" value="80">
+                  <div class="ends"><span id="tMin">—</span><span id="tMax">—</span></div>
+                </div>
+                <p class="sub" style="font-size:12px">Mueve el control para ver cómo te iría con el rendimiento más bajo o el más alto que ha tenido esta mezcla.</p>
+              </div>
+
+              <div class="empty" id="emptyB">
+                <b>Falta un dato para proyectar</b>
+                <span id="emptyBtxt"></span>
+              </div>
+
+              <div id="gateB" class="hide">
+                <div class="res reveal">
+                  <div class="k" id="resK">Meta estimada alcanzada<span id="resSub"></span></div>
+                  <div class="v" id="resV">$ 0</div>
+                </div>
+                <div class="legend">
+                  <span style="color:var(--green-deep)"><i style="background:var(--green)"></i>Valor estimado futuro</span>
+                  <span style="color:#8c8c8c"><i style="background:#8c8c8c"></i>Tus aportes totales</span>
+                </div>
+                <svg class="chart" id="chart" viewBox="0 0 1000 160" preserveAspectRatio="none"></svg>
+                <div class="stats">
+                  <div><span>Total aportado</span><b id="stAp">$ 0</b></div>
+                  <div><span>Rendimiento estimado</span><b id="stRe">$ 0</b></div>
+                </div>
+              </div>
+            </div>
+            <div id="alertaSim1"></div>
           </div>
         </div>
-      </div>
 
-      <!-- vacío mientras falten objetivo y plazo -->
-      <div class="empty" id="emptyA">
-        <b>Aún no podemos calcular tu mezcla</b>
-        <span>Elige tu objetivo y escribe el plazo para conocer tu mezcla, su nivel de riesgo y cómo ha rendido.</span>
-      </div>
+        <!-- ---- V2: simulador sencillo ---- -->
+        <div id="sim-v2" class="hide">
+          <h2 class="sec" style="margin-top:16px">Detalles de tu objetivo</h2>
+          <p class="sub">Define el plazo y cómo vas a avanzar. Con esto armamos tu recomendación.</p>
 
-      <!-- nivel A: mezcla -->
-      <div id="gateA" class="hide">
-        <div class="mix reveal">
-          <div class="mix-head">
-            <div class="t">Tu mezcla según tu objetivo y tu plazo<span id="mixWhy"></span></div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <span class="tag" id="tagMezcla">—</span>
-              <span class="tag n" id="tagRiesgo">—</span>
+          <div class="card">
+            <div class="row">
+              <div>
+                <span class="lbl">¿En cuánto tiempo te gustaría alcanzar tu objetivo?</span>
+                <div style="display:flex;gap:12px">
+                  <div class="inp" style="width:120px"><input id="v2Plazo" placeholder="Ej: 10" inputmode="numeric"></div>
+                  <div class="inp" style="width:140px"><select id="v2Unidad"><option>Años</option><option>Meses</option></select></div>
+                </div>
+              </div>
+              <div>
+                <span class="lbl">¿Cómo te gustaría avanzar hacia tu objetivo?</span>
+                <div class="opt" style="padding:0" onclick="v2Toggle('ap',event)">
+                  <div class="cbx" id="v2cbAp"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <div class="t"><b>Aportes periódicos mensuales</b></div>
+                  <div class="inp" style="width:180px"><span class="pre">$</span><input id="v2Aporte" placeholder="Ej: 416.667" inputmode="numeric"></div>
+                </div>
+              </div>
+            </div>
+            <div class="divider" style="margin-top:16px"></div>
+            <div class="opt" onclick="v2Toggle('co',event)">
+              <div class="cbx on" id="v2cbCo"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="t"><b>Usar el dinero que ya tienes en el contrato</b><span>Multifund · Potencializar mi inversión · #100006369833</span></div>
+              <div class="pill" id="v2Pill"><small>Saldo disponible</small><b>$ 377.717,56</b></div>
+            </div>
+            <div class="empty" id="v2Empty"><b>Aún no hay nada que proyectar</b><span>Escribe el plazo y elige al menos una forma de avanzar hacia tu objetivo.</span></div>
+            <div class="res hide" id="v2Res"><div class="k">Con lo que definiste<span id="v2Sub"></span></div><div class="v" id="v2Val">$ 0</div></div>
+            <div id="alertaSim2"></div>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="btn g" onclick="ir('entrada')">Regresar</button>
+          <button class="btn p" id="ctaSim" disabled onclick="ir('mezcla')">Ver mi mezcla</button>
+        </div>
+      </section>
+
+      <!-- ========== 3 · TU MEZCLA ========== -->
+      <section id="sc-mezcla" class="hide">
+        <p class="miga">Inicio / <b>Activar Invest-ED</b></p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <h1 class="tit">Activar Invest-ED</h1>
+          <button class="perfil" onclick="abrir('md-perfil')">Perfil: Moderado</button>
+        </div>
+        <div class="prog"><i class="on"></i><i class="on"></i><i></i></div>
+        <p class="paso">2 de 3</p>
+
+        <h2 class="sec" style="margin-top:14px" id="mzTitulo">Esta es tu mezcla</h2>
+        <p class="sub" id="mzBajada"></p>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <span class="tag" id="mzTag">—</span><span class="tag n" id="mzRiesgo">—</span>
+        </div>
+
+        <div class="card">
+          <h3>Rentabilidad histórica y volatilidad</h3>
+          <p class="sub" id="mzVol"></p>
+          <div class="kpis">
+            <div class="kpi"><b id="mzR1">—</b><span>ganancia promedio por año, en el último año</span></div>
+            <div class="kpi"><b id="mzR3">—</b><span>ganancia promedio por año, en los últimos 3 años</span></div>
+          </div>
+          <div class="barras" id="mzBarras"></div>
+          <div class="ejex" id="mzEje"></div>
+          <p class="sub" style="font-size:12.5px;margin-top:14px" id="mzNota"></p>
+        </div>
+
+        <div class="card">
+          <h3>Composición de tu inversión</h3>
+          <div class="tabs">
+            <button id="tbA" class="on" onclick="setTab('activo')">Tipo de activo</button>
+            <button id="tbP" onclick="setTab('portafolio')">Portafolios</button>
+          </div>
+          <div class="donut">
+            <svg width="132" height="132" viewBox="0 0 132 132" id="mzDonut"></svg>
+            <div class="lab">Mezcla<b id="mzDonutN">—</b></div>
+            <div style="flex:1;min-width:280px">
+              <table class="comp">
+                <thead><tr><th id="thCol">Tipo de activo</th><th>Participación</th><th>Monto estimado</th></tr></thead>
+                <tbody id="mzTabla"></tbody>
+              </table>
             </div>
           </div>
-          <div class="slider">
-            <div class="cur" id="curTasa">—</div>
-            <input type="range" id="rngTasa" min="65" max="119" step="1" value="80">
-            <div class="ends"><span id="tMin">—</span><span id="tMax">—</span></div>
-          </div>
-          <p class="note">Mueve el control para ver cómo te iría con el rendimiento más bajo o el más alto que ha tenido esta mezcla.</p>
         </div>
 
-        <!-- vacío mientras no haya monto -->
-        <div class="empty" id="emptyB">
-          <b>Falta un dato para proyectar</b>
-          <span id="emptyBtxt">Escribe cuánto puedes aportar al mes, o incluye el saldo de tu contrato.</span>
+        <div class="card porq">
+          <h3>¿Por qué esta mezcla?</h3>
+          <p id="pq1"></p>
+          <p id="pq2"></p>
+          <button class="video" onclick="abrir('md-video')">▶ Escucha a nuestros expertos explicarlo</button>
+          <div id="alertaMz"></div>
         </div>
 
-        <!-- nivel B: resultado + gráfica -->
-        <div id="gateB" class="hide">
-          <div class="res reveal">
-            <div class="k" id="resK">Meta estimada alcanzada<span id="resSub"></span></div>
-            <div class="v" id="resV">$ 0</div>
+        <div class="btns">
+          <button class="btn g" onclick="ir('sim')">Ajustar mi meta</button>
+          <button class="btn p" onclick="ir('revision')">Siguiente</button>
+        </div>
+      </section>
+
+      <!-- ========== 4 · REVISIÓN Y ACTIVAR ========== -->
+      <section id="sc-revision" class="hide">
+        <p class="miga">Inicio / <b>Activar Invest-ED</b></p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <h1 class="tit">Activar Invest-ED</h1>
+          <button class="perfil" onclick="abrir('md-perfil')">Perfil: Moderado</button>
+        </div>
+        <div class="prog"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+        <p class="paso">3 de 3</p>
+
+        <h2 class="sec" style="margin-top:14px">Última revisión antes de activar</h2>
+        <p class="sub">Confirma los detalles y los términos para activar Invest-ED.</p>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+            <div>
+              <b style="font-size:16px;font-weight:700;color:var(--ink)">Potencializar mi inversión</b>
+              <span class="sub" style="display:block;font-size:12px">Contrato N.º 100006369833 · Programa: Skandia Inversión Plus</span>
+            </div>
+            <div class="pill"><small>Saldo disponible</small><b>$ 377.717,56</b></div>
           </div>
-          <div class="legend">
-            <span style="color:var(--green-deep)"><i style="background:var(--green)"></i>Valor estimado futuro</span>
-            <span style="color:#8c8c8c"><i style="background:#8c8c8c"></i>Tus aportes totales</span>
-          </div>
-          <svg class="chart" id="chart" viewBox="0 0 1000 160" preserveAspectRatio="none"></svg>
-          <div class="stats">
-            <div><span>Total aportado</span><b id="stAp">$ 0</b></div>
-            <div><span>Rendimiento estimado</span><b id="stRe">$ 0</b></div>
+
+          <div class="resumen">
+            <div>
+              <h4>Tu objetivo</h4>
+              <div class="dl"><span>Propósito</span><b id="rvObj">—</b></div>
+              <div class="dl"><span id="rvMontoK">Monto a acumular</span><b id="rvMonto">—</b></div>
+              <div class="dl"><span>Horizonte</span><b id="rvPlazo">—</b></div>
+              <div class="dl"><span id="rvApK">Aporte mensual sugerido</span><b id="rvAp">—</b></div>
+            </div>
+            <div>
+              <h4 id="rvMezclaT">Mezcla</h4>
+              <div id="rvComp"></div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="alerta"><svg width="24" height="24" viewBox="12 18 24 24" fill="none" aria-hidden="true"><path d="M24 18C30.6094 18 36 23.3906 36 30C36 36.6562 30.6094 42 24 42C17.3438 42 12 36.6562 12 30C12 23.3906 17.3438 18 24 18ZM24 39.75C29.3438 39.75 33.75 35.3906 33.75 30C33.75 24.6562 29.3438 20.25 24 20.25C18.6094 20.25 14.25 24.6562 14.25 30C14.25 35.3906 18.6094 39.75 24 39.75ZM24 32.25C23.3438 32.25 22.875 31.7812 22.875 31.125V25.125C22.875 24.5156 23.3438 24 24 24C24.6094 24 25.125 24.5156 25.125 25.125V31.125C25.125 31.7812 24.6094 32.25 24 32.25ZM24 33.8438C24.7969 33.8438 25.4531 34.5 25.4531 35.2969C25.4531 36.0938 24.7969 36.75 24 36.75C23.1562 36.75 22.5 36.0938 22.5 35.2969C22.5 34.5 23.1562 33.8438 24 33.8438Z" fill="#0099DE"/></svg><div class="cuerpo"><b>Esta simulación es informativa</b>El rango se basa en la rentabilidad histórica de tu mezcla y es solo una proyección: las rentabilidades pasadas no garantizan resultados futuros ni constituyen una promesa de rentabilidad. Esta simulación es informativa y no es una asesoría ni una recomendación de inversión de Skandia.</div></div>
+        <div class="card">
+          <h3>Puntos clave sobre el servicio</h3>
+          <ol class="puntos">
+            <li>Nuestros expertos financieros estarán gestionando las inversiones periódicamente de acuerdo con lo que suceda en el mercado, es como tener un asistente que está pendiente de tu dinero.</li>
+            <li>El mercado es incierto, haremos lo posible para que los resultados sean los mejores pero no podremos garantizar una rentabilidad.</li>
+            <li>En cualquier momento tendrás la oportunidad de desactivar nuestra recomendación profesional y no existirá ningún costo adicional a las condiciones que ya vienen aplicando en tu fondo.</li>
+          </ol>
+          <div class="acepta" onclick="toggleAcepta()">
+            <div class="cbx" id="cbAcepta"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <p>Al aceptar, declaras conocer, entender y aprobar todo el contenido presentado. Para ver más detalles de Invest-ED <a href="#" onclick="event.preventDefault();event.stopPropagation()">haz clic aquí</a>.</p>
+          </div>
+          <p class="asesor">¿Necesitas ayuda de un asesor certificado? Llámanos al PBX 6584000 o a la Línea Nacional 01 8000 517 526.</p>
+          <div id="alertaRv"></div>
+        </div>
+
+        <div class="btns">
+          <button class="btn g" onclick="ir('mezcla')">Regresar</button>
+          <button class="btn p" id="ctaActivar" disabled onclick="abrir('md-exito')">Activar Invest-ED</button>
+        </div>
+      </section>
+
+      <p class="pie">Skandia · Sociedad fiduciaria · Cualquier consulta: servicioalcliente@skandia.com.co<br>
+      Vigilado Superintendencia Financiera de Colombia · Miembro Asofondos</p>
     </div>
-    <div class="btns"><button class="btn g">Regresar</button><button class="btn p" id="cta1" disabled>Ver mi mezcla</button></div>
-  </section>
+  </div>
+</div>
 
-  <!-- ============ VERSIÓN 2 ============ -->
-  <section id="v2" class="hide">
-    <div class="card">
-      <h2>Detalles de tu objetivo</h2>
-      <p class="sub">Define el plazo y cómo vas a avanzar. Con esto armamos tu recomendación.</p>
-      <div class="row" style="margin-top:18px">
-        <div>
-          <span class="lbl">¿En cuánto tiempo te gustaría alcanzar tu objetivo?</span>
-          <div style="display:flex;gap:12px">
-            <div class="inp" style="width:120px"><input id="v2Plazo" placeholder="Ej: 15" inputmode="numeric"></div>
-            <div class="inp" style="width:140px"><select id="v2Unidad"><option>Años</option><option>Meses</option></select></div>
-          </div>
-        </div>
-        <div>
-          <span class="lbl">¿Cómo te gustaría avanzar hacia tu objetivo?</span>
-          <div class="opt" style="padding:0" onclick="v2Toggle('ap',event)">
-            <div class="cbx" id="v2cbAp"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div class="t"><b>Aportes periódicos mensuales</b></div>
-            <div class="inp" style="width:180px"><span class="pre">$</span><input id="v2Aporte" placeholder="Ej: 100.000" inputmode="numeric"></div>
-          </div>
-        </div>
-      </div>
-      <div class="divider" style="margin:16px 0 0"></div>
-      <div class="opt" onclick="v2Toggle('co',event)">
-        <div class="cbx" id="v2cbCo"><svg viewBox="0 0 12 12"><path d="M1 6l3.5 3.5L11 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="t"><b>Usar el dinero que ya tienes en el contrato</b><span>Multifund · Potencializar mi inversión · #100006369833</span></div>
-        <div class="pill off" id="v2Pill"><small>Saldo disponible</small><b>$ 377.718</b></div>
-      </div>
-      <div class="empty" id="v2Empty"><b>Aún no hay nada que proyectar</b><span>Escribe el plazo y elige al menos una forma de avanzar hacia tu objetivo.</span></div>
-      <div class="res hide" id="v2Res"><div class="k">Con lo que definiste<span id="v2Sub"></span></div><div class="v" id="v2Val">$ 0</div></div>
-      <div class="alerta"><svg width="24" height="24" viewBox="12 18 24 24" fill="none" aria-hidden="true"><path d="M24 18C30.6094 18 36 23.3906 36 30C36 36.6562 30.6094 42 24 42C17.3438 42 12 36.6562 12 30C12 23.3906 17.3438 18 24 18ZM24 39.75C29.3438 39.75 33.75 35.3906 33.75 30C33.75 24.6562 29.3438 20.25 24 20.25C18.6094 20.25 14.25 24.6562 14.25 30C14.25 35.3906 18.6094 39.75 24 39.75ZM24 32.25C23.3438 32.25 22.875 31.7812 22.875 31.125V25.125C22.875 24.5156 23.3438 24 24 24C24.6094 24 25.125 24.5156 25.125 25.125V31.125C25.125 31.7812 24.6094 32.25 24 32.25ZM24 33.8438C24.7969 33.8438 25.4531 34.5 25.4531 35.2969C25.4531 36.0938 24.7969 36.75 24 36.75C23.1562 36.75 22.5 36.0938 22.5 35.2969C22.5 34.5 23.1562 33.8438 24 33.8438Z" fill="#0099DE"/></svg><div class="cuerpo"><b>Esta simulación es informativa</b>El rango se basa en la rentabilidad histórica de tu mezcla y es solo una proyección: las rentabilidades pasadas no garantizan resultados futuros ni constituyen una promesa de rentabilidad. Esta simulación es informativa y no es una asesoría ni una recomendación de inversión de Skandia.</div></div>
+<!-- ========== MODALES ========== -->
+<div class="overlay hide" id="md-contrato" onclick="fondo(event,'md-contrato')">
+  <div class="modal ancho">
+    <div class="cab"><h3>¿Cuál contrato deseas gestionar?</h3><button class="x" onclick="cerrar('md-contrato')">✕</button></div>
+    <div class="opcion on" id="op-0" onclick="elegirContrato(0)">
+      <div class="i"><b>Potencializar mi inversión</b><span>Ahorro e inversión &nbsp;|&nbsp; #100006369833</span></div>
+      <div class="d">Disponible: $ 377.717,56</div>
     </div>
-    <div class="btns"><button class="btn g">Atrás</button><button class="btn p" id="cta2" disabled>Ver recomendación</button></div>
-  </section>
-  <p class="pie">Skandia Administradora de Fondos de Pensiones y Cesantías S.A. — ACCAI S.A. Vigilada por la Superintendencia Financiera de Colombia.</p>
+    <div class="opcion" id="op-1" onclick="elegirContrato(1)">
+      <div class="i"><b>Ahorro para mi retiro</b><span>Ahorro e inversión &nbsp;|&nbsp; #100006218745</span></div>
+      <div class="d">Disponible: $ 128.450.900</div>
+    </div>
+    <div class="opcion" id="op-2" onclick="elegirContrato(2)">
+      <div class="i"><b>Ahorros</b><span>Ahorro e inversión &nbsp;|&nbsp; #98687687567</span></div>
+      <div class="d">Disponible: $ 2.456.990</div>
+    </div>
+    <div class="btns">
+      <button class="btn g" onclick="cerrar('md-contrato')">Regresar</button>
+      <button class="btn p" onclick="cerrar('md-contrato');ir('sim')">Empezar</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hide" id="md-perfil" onclick="fondo(event,'md-perfil')">
+  <div class="modal">
+    <div class="cab"><h3>¿Quieres actualizar tu perfil de inversionista?</h3><button class="x" onclick="cerrar('md-perfil')">✕</button></div>
+    <p class="txt">Tu perfil define la mezcla que te proponemos. Si tu situación cambió, puedes volver a responder la encuesta.</p>
+    <div class="marco"><b>Tu perfil vigente: Moderado</b><span style="display:block;margin-top:2px">desde el 15 mar 2026</span></div>
+    <p class="txt" style="font-size:13.5px">Responder la encuesta de nuevo toma unos minutos y actualiza tu perfil al terminar.</p>
+    <div class="btns">
+      <button class="btn g" onclick="cerrar('md-perfil')">Aún no, gracias</button>
+      <button class="btn p" onclick="cerrar('md-perfil')">Ir a perfil de inversionista</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hide" id="md-video" onclick="fondo(event,'md-video')">
+  <div class="modal ancho">
+    <div class="cab"><h3>¿Por qué esta recomendación?</h3><button class="x" onclick="cerrar('md-video')">✕</button></div>
+    <p class="txt">Escucha a nuestros expertos explicar por qué esta mezcla es para ti.</p>
+    <div class="play"><div>▶</div></div>
+    <p class="txt" style="font-size:12px">Video de ejemplo — se reemplaza por el contenido real en producción.</p>
+  </div>
+</div>
+
+<div class="overlay hide" id="md-exito" onclick="fondo(event,'md-exito')">
+  <div class="modal exito">
+    <div class="ic">🎉</div>
+    <h3>¡Skandia Invest-ED se ha activado!</h3>
+    <p class="txt">¡Felicidades, Juan Nepomuceno! Has tomado una gran decisión basada en la recomendación profesional.</p>
+    <p class="txt" style="font-size:13.5px">En unos días recibirás un correo con los detalles del cambio en la distribución de tus inversiones.</p>
+    <div class="btns">
+      <button class="btn g" onclick="reiniciar()">Volver al portal</button>
+      <button class="btn p" onclick="reiniciar()">Ir a tu contrato</button>
+    </div>
+  </div>
 </div>
 
 <script>
-/* ---------- datos ---------- */
+/* ============ datos ============ */
 var SALDO = 377717.56;
 var MEZCLAS = [
-  {max:5,  n:'Cauta',    r:1, min:4.0,  top:7.2},
-  {max:10, n:'Discreta', r:2, min:6.5,  top:11.9},
-  {max:15, n:'Paciente', r:3, min:7.5,  top:13.5},
-  {max:20, n:'Dinámica', r:4, min:8.5,  top:15.5},
-  {max:25, n:'Decidida', r:5, min:9.5,  top:17.5},
-  {max:99, n:'Audaz',    r:6, min:10.5, top:19.5}
+  {n:'Cauta',    r:1, min:4.0,  top:7.2,  r1:6.10,  r3:5.40,  vol:'Baja',     comp:[75,15,5,5],   serie:[4.9,6.2,3.1,7.4,5.8,6.1]},
+  {n:'Discreta', r:2, min:6.5,  top:11.9, r1:11.99, r3:10.83, vol:'Media',    comp:[55,20,15,10], serie:[8.4,11.2,-2.1,13.6,10.9,11.99]},
+  {n:'Paciente', r:3, min:7.5,  top:13.5, r1:12.80, r3:11.40, vol:'Media',    comp:[45,15,20,20], serie:[9.1,13.4,-4.2,15.8,11.7,12.8]},
+  {n:'Dinámica', r:4, min:8.5,  top:15.5, r1:14.20, r3:12.60, vol:'Alta',     comp:[35,10,25,30], serie:[10.3,15.8,-7.4,18.9,12.4,14.2]},
+  {n:'Decidida', r:5, min:9.5,  top:17.5, r1:15.70, r3:13.80, vol:'Alta',     comp:[25,5,30,40],  serie:[11.6,18.2,-10.8,22.1,13.5,15.7]},
+  {n:'Audaz',    r:6, min:10.5, top:19.5, r1:17.30, r3:15.10, vol:'Muy alta', comp:[15,5,30,50],  serie:[12.9,21.4,-14.6,26.3,14.8,17.3]}
 ];
-var OBJ = [
-  {t:'Para mi retiro',                 d: 1},
-  {t:'Para la educación de mis hijos', d: 0},
-  {t:'Para comprar vivienda',          d:-1},
-  {t:'Para mi libertad financiera',    d: 1},
-  {t:'Otro objetivo',                  d: 0}
-];
-var S = { modo:'meta', obj:null, saldo:true, aporte:0, meta:0, anios:0, tasaDec:80, tasaLibre:false };
+var LIMITES = [5,10,15,20,25,99];
+var ANIOS_SERIE = ['2020','2021','2022','2023','2024','2025'];
 
-/* ---------- utilidades ---------- */
+var ACTIVOS = [
+  {n:'Renta Fija',                  t:'Préstamos a empresas o al Estado que pagan intereses definidos de antemano. Es la parte más estable de tu mezcla, aunque su valor también puede variar.'},
+  {n:'Liquidez',                    t:'Dinero invertido a muy corto plazo, del que se puede disponer rápido. Es la parte que le da estabilidad y disponibilidad a tu mezcla.'},
+  {n:'Renta Variable Nacional',     t:'Acciones de empresas colombianas. Sube y baja más en el corto plazo, buscando mayor crecimiento en el largo.'},
+  {n:'Renta Variable Internacional',t:'Acciones de empresas de otros países. Aporta crecimiento y reduce la dependencia de un solo mercado.'}
+];
+var PORTAFOLIOS = [
+  {n:'FPV Renta Fija Colombia', t:'Invierte en títulos de deuda emitidos en Colombia por el Gobierno y por empresas, principalmente en pesos.'},
+  {n:'FPV Bonos Globales',      t:'Invierte en títulos de deuda emitidos fuera de Colombia, en distintos países y monedas.'},
+  {n:'FPV Liquidez Colombia',   t:'Invierte en instrumentos de muy corto plazo en Colombia, pensados para mantener el dinero disponible.'},
+  {n:'FPV Acciones Colombia',   t:'Invierte en acciones de empresas listadas en la bolsa colombiana.'},
+  {n:'FPV Acciones Global',     t:'Invierte en acciones de empresas de mercados desarrollados, sobre todo Estados Unidos y Europa.'},
+  {n:'FPV Acciones Emergentes', t:'Invierte en acciones de empresas de economías emergentes, como Asia y Latinoamérica.'}
+];
+var COLORES = ['#007A25','#00C73D','#7BD99B','#C7EDD5'];
+
+var OBJ = [
+  {t:'Para mi retiro',                 corto:'tu retiro',                 d: 1},
+  {t:'Para la educación de mis hijos', corto:'la educación de tus hijos', d: 0},
+  {t:'Para comprar vivienda',          corto:'comprar vivienda',          d:-1},
+  {t:'Para mi libertad financiera',    corto:'tu libertad financiera',    d: 1},
+  {t:'Otro objetivo',                  corto:'tu objetivo',               d: 0}
+];
+
+var S = { ver:1, pantalla:'entrada', modo:'meta', obj:null, saldo:true,
+          aporte:0, meta:0, anios:0, tasaDec:80, tasaLibre:false, acepta:false, tab:'activo' };
+var V2 = { ap:false, co:true };
+
+/* ============ utilidades ============ */
 function sep(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
 function money(n){ return '$ ' + sep(n); }
 function num(s){ return parseInt(String(s).replace(/[^\d]/g,''),10) || 0; }
 function pct(v){ return v.toFixed(1).replace('.',',') + '% E.A.'; }
-function show(id,on){ document.getElementById(id).className =
-  document.getElementById(id).className.replace(/\s*\bhide\b/,'') + (on?'':' hide'); }
-function mezclaDe(a,shift){
-  var i=0; while (i<MEZCLAS.length-1 && a>MEZCLAS[i].max) i++;
-  i = Math.max(0, Math.min(MEZCLAS.length-1, i + (shift||0)));
-  return MEZCLAS[i];
-}
+function pct2(v){ return v.toFixed(2).replace('.',',') + '%'; }
+function $(id){ return document.getElementById(id); }
+function show(id,on){ var e=$(id); if(!e) return; e.className = e.className.replace(/\s*\bhide\b/,'') + (on?'':' hide'); }
 function fv(P0,PMT,tasa,meses){ var r=Math.pow(1+tasa,1/12)-1, g=Math.pow(1+r,meses);
   return P0*g + (r>0 ? PMT*((g-1)/r) : PMT*meses); }
 function pmtDe(meta,P0,tasa,meses){ var r=Math.pow(1+tasa,1/12)-1, g=Math.pow(1+r,meses);
   return Math.max(0,(meta - P0*g)/((g-1)/r)); }
+function mezclaDe(a,shift){
+  var i=0; while (i<LIMITES.length-1 && a>LIMITES[i]) i++;
+  i = Math.max(0, Math.min(MEZCLAS.length-1, i + (shift||0)));
+  return MEZCLAS[i];
+}
+function repartoPortafolios(c){
+  var v = [c[0]*0.64, c[0]*0.36, c[1], c[2], c[3]*0.6, c[3]*0.4].map(Math.round);
+  var dif = 100 - v.reduce(function(a,b){return a+b;},0);
+  var iMax = v.indexOf(Math.max.apply(null, v));
+  v[iMax] += dif;
+  return v;
+}
 
-/* ---------- chips de objetivo ---------- */
-var cont = document.getElementById('chips');
+/* ---- alerta del DS, reutilizada en todo el flujo ---- */
+var ICONO_INFO = '<svg width="24" height="24" viewBox="12 18 24 24" fill="none" aria-hidden="true"><path d="M24 18C30.6094 18 36 23.3906 36 30C36 36.6562 30.6094 42 24 42C17.3438 42 12 36.6562 12 30C12 23.3906 17.3438 18 24 18ZM24 39.75C29.3438 39.75 33.75 35.3906 33.75 30C33.75 24.6562 29.3438 20.25 24 20.25C18.6094 20.25 14.25 24.6562 14.25 30C14.25 35.3906 18.6094 39.75 24 39.75ZM24 32.25C23.3438 32.25 22.875 31.7812 22.875 31.125V25.125C22.875 24.5156 23.3438 24 24 24C24.6094 24 25.125 24.5156 25.125 25.125V31.125C25.125 31.7812 24.6094 32.25 24 32.25ZM24 33.8438C24.7969 33.8438 25.4531 34.5 25.4531 35.2969C25.4531 36.0938 24.7969 36.75 24 36.75C23.1562 36.75 22.5 36.0938 22.5 35.2969C22.5 34.5 23.1562 33.8438 24 33.8438Z" fill="#0099DE"/></svg>';
+function alerta(titulo, cuerpo){
+  return '<div class="alerta">' + ICONO_INFO + '<div class="cuerpo"><b>' + titulo + '</b>' + cuerpo + '</div></div>';
+}
+var AL_SIM = alerta('Esta simulación es informativa',
+  'El rango se basa en la rentabilidad histórica de tu mezcla y es solo una proyección: las rentabilidades pasadas '
++ 'no garantizan resultados futuros ni constituyen una promesa de rentabilidad. Esta simulación es informativa y no '
++ 'es una asesoría ni una recomendación de inversión de Skandia.');
+var AL_MEZCLA = alerta('Los rendimientos pasados no garantizan resultados futuros',
+  'Tus inversiones pueden ganar o perder valor en el camino. Es información que queremos que tengas clara antes de seguir.');
+var AL_REV = alerta('Esto es una recomendación profesional',
+  'La mezcla que ves acá es la recomendación profesional de Skandia para tu perfil y tu objetivo. Al activar Invest-ED '
++ 'aceptas que sea gestionada por nuestros expertos. Skandia no garantiza rentabilidad: son obligaciones de medio y no de resultado.');
+$('alertaSim1').innerHTML = AL_SIM;
+$('alertaSim2').innerHTML = AL_SIM;
+$('alertaMz').innerHTML   = AL_MEZCLA;
+$('alertaRv').innerHTML   = AL_REV;
+
+/* ============ navegación ============ */
+var PANTALLAS = ['entrada','sim','mezcla','revision'];
+function ir(p, sinHash){
+  S.pantalla = p;
+  PANTALLAS.forEach(function(x){ show('sc-'+x, x===p); });
+  if (!sinHash) { try { history.replaceState(null,'','#v'+S.ver+'/'+p); } catch(e){} }
+  if (p==='mezcla')   pintarMezcla();
+  if (p==='revision') pintarRevision();
+  window.scrollTo(0,0);
+}
+function abrir(id){ show(id,true); }
+function cerrar(id){ show(id,false); }
+function fondo(ev,id){ if (ev.target.id===id) cerrar(id); }
+function elegirContrato(i){
+  for (var k=0;k<3;k++) $('op-'+k).className = 'opcion' + (k===i?' on':'');
+}
+function reiniciar(){
+  ['md-contrato','md-perfil','md-video','md-exito'].forEach(function(m){ cerrar(m); });
+  S.obj=null; S.meta=0; S.aporte=0; S.anios=0; S.saldo=true; S.tasaLibre=false; S.acepta=false; S.tab='activo';
+  V2.ap=false; V2.co=true;
+  $('inMonto').value=''; $('inAnios').value=''; $('v2Plazo').value=''; $('v2Aporte').value='';
+  [].forEach.call($('chips').children, function(c){ c.className='chip'; });
+  $('saldoCbx').className='cbx on'; $('saldoRow').className='saldo-row'; $('saldoPill').className='pill';
+  $('v2cbAp').className='cbx'; $('v2cbCo').className='cbx on'; $('v2Pill').className='pill';
+  $('cbAcepta').className='cbx'; $('ctaActivar').disabled=true;
+  setModo('meta'); setTab('activo');
+  ir('entrada');
+}
+function setVer(v){
+  S.ver = v;
+  $('bv1').className = v===1?'on':''; $('bv2').className = v===2?'on':'';
+  show('sim-v1', v===1); show('sim-v2', v===2);
+  $('simPaso').textContent = v===1 ? 'Definición de tu objetivo' : 'Detalles de tu objetivo';
+  render();
+}
+
+/* ============ simulador v1 ============ */
+var cont = $('chips');
 OBJ.forEach(function(o,i){
   var b=document.createElement('button');
   b.className='chip'; b.textContent=o.t;
@@ -296,72 +800,62 @@ OBJ.forEach(function(o,i){
   };
   cont.appendChild(b);
 });
-
-/* ---------- interacción ---------- */
-function setVer(v){
-  show('v1', v===1); show('v2', v===2);
-  document.getElementById('bv1').className = v===1?'on':'';
-  document.getElementById('bv2').className = v===2?'on':'';
-}
 function setModo(m){
-  var el = document.getElementById('inMonto');
+  var el = $('inMonto');
   if (S.modo==='meta') S.meta = num(el.value); else S.aporte = num(el.value);
   S.modo = m;
-  document.getElementById('m1').className = m==='aporte'?'on':'';
-  document.getElementById('m2').className = m==='meta'?'on':'';
-  document.getElementById('lblMonto').textContent = m==='meta' ? 'Monto de tu Meta' : 'Aporte mensual';
-  el.placeholder = m==='meta' ? 'Ej: 50.000.000' : 'Ej: 350.000';
+  $('m1').className = m==='aporte'?'on':''; $('m2').className = m==='meta'?'on':'';
+  $('lblMonto').textContent = m==='meta' ? 'Monto de tu Meta' : 'Aporte mensual';
+  el.placeholder = m==='meta' ? 'Ej: 50.000.000' : 'Ej: 416.667';
   var v = m==='meta' ? S.meta : S.aporte;
   el.value = v ? sep(v) : '';
   render();
 }
-function toggleTip(ev){
+function tipSaldo(ev){
   ev.stopPropagation();
-  var h = document.getElementById('helpSaldo'), abierto = h.querySelector('.tip');
-  if (abierto){ abierto.remove(); return; }
+  var h = $('helpSaldo'), ab = h.querySelector('.tip');
+  if (ab){ ab.remove(); return; }
   var t = document.createElement('div');
-  t.className = 'tip';
-  t.onclick = function(e){ e.stopPropagation(); };
-  t.textContent = 'Es el saldo que hoy tienes en tu contrato Multifund. Viene precargado y no se puede editar: '
-    + 'tú decides si lo sumas a esta simulación como punto de partida.';
+  t.className='tip'; t.onclick=function(e){ e.stopPropagation(); };
+  t.innerHTML = '<b>El saldo de tu contrato</b>Es el dinero que hoy tienes en tu contrato Multifund. Viene precargado '
+    + 'y no se puede editar: tú decides si lo sumas a esta simulación como punto de partida.';
   h.appendChild(t);
 }
-document.addEventListener('click', function(){
-  var t = document.querySelector('#helpSaldo .tip'); if (t) t.remove();
-});
 function toggleSaldo(ev){
   if (ev && ev.target.closest && ev.target.closest('.help')) return;
   S.saldo=!S.saldo;
-  document.getElementById('saldoCbx').className='cbx'+(S.saldo?' on':'');
-  document.getElementById('saldoRow').className='saldo-row'+(S.saldo?'':' off');
-  document.getElementById('saldoPill').className='pill'+(S.saldo?'':' off');
+  $('saldoCbx').className='cbx'+(S.saldo?' on':'');
+  $('saldoRow').className='saldo-row'+(S.saldo?'':' off');
+  $('saldoPill').className='pill'+(S.saldo?'':' off');
   render();
 }
 ['inMonto','inAnios'].forEach(function(id){
-  document.getElementById(id).addEventListener('input',function(){
-    var v = num(document.getElementById('inMonto').value);
+  $(id).addEventListener('input',function(){
+    var v = num($('inMonto').value);
     if (S.modo==='meta') S.meta = v; else S.aporte = v;
-    S.anios = Math.min(40, num(document.getElementById('inAnios').value));
+    S.anios = Math.min(40, num($('inAnios').value));
     S.tasaLibre = false;
     render();
   });
 });
-document.getElementById('rngTasa').addEventListener('input',function(e){
-  S.tasaDec = +e.target.value; S.tasaLibre = true; render();
+$('rngTasa').addEventListener('input',function(e){ S.tasaDec=+e.target.value; S.tasaLibre=true; render(); });
+document.addEventListener('click', function(){
+  var t = document.querySelector('#helpSaldo .tip'); if (t) t.remove();
+  document.querySelectorAll('.comp .tip').forEach(function(x){ x.remove(); });
 });
 
-/* ---------- gráfica ---------- */
-function dibujar(P0,PMT,tasa,meses,maxRef){
-  var W=1000,H=160,L=74,R=14,TOP=12,BASE=126,PW=W-L-R;
-  var paso=Math.pow(10, Math.floor(Math.log(maxRef)/Math.LN10)-0)/1;
-  var nice=Math.ceil(maxRef/paso)*paso || 1e6;
+/* ---- gráfica de proyección ---- */
+function dibujar(P0,PMT,tasa,meses,maxRef,anios){
+  var W=1000,L=74,R=14,TOP=12,BASE=126,PW=W-L-R;
+  var paso = Math.pow(10, Math.floor(Math.log(maxRef)/Math.LN10));
+  var nice = Math.ceil(maxRef/paso)*paso || 1e6;
   var y=function(v){ return TOP+(BASE-TOP)*(1-v/nice); };
   var x=function(t){ return L+PW*(t/meses); };
-  var etiqueta=function(v){ return v>=1e6 ? '$'+(v/1e6).toFixed(v/1e6<10?1:0).replace('.',',')+'M' : '$'+sep(v/1000)+'K'; };
+  var et=function(v){ return v>=1e6 ? '$'+(v/1e6).toFixed(v/1e6<10?1:0).replace('.',',')+'M' : '$'+sep(v/1000)+'K'; };
   var s='';
   for (var i=1;i<=4;i++){ var val=nice*i/4;
     s+='<line x1="'+L+'" y1="'+y(val).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(val).toFixed(1)+'" stroke="#DCE8DF" stroke-width="1"/>';
-    s+='<text x="'+(L-8)+'" y="'+(y(val)+3).toFixed(1)+'" font-size="9" fill="#5E6F64" text-anchor="end" font-family="Open Sans">'+etiqueta(val)+'</text>';
+    s+='<text x="'+(L-8)+'" y="'+(y(val)+3).toFixed(1)+'" font-size="9" fill="#5E6F64" text-anchor="end" font-family="Open Sans">'+et(val)+'</text>';
   }
   var pv=[],pa=[],N=40;
   for (var k=0;k<=N;k++){ var t=meses*k/N;
@@ -371,105 +865,258 @@ function dibujar(P0,PMT,tasa,meses,maxRef){
   s+='<polygon points="'+L+','+BASE+' '+pv.join(' ')+' '+(W-R)+','+BASE+'" fill="#E8F9EE"/>';
   s+='<polyline points="'+pa.join(' ')+'" fill="none" stroke="#8c8c8c" stroke-width="1.5" stroke-dasharray="6,5"/>';
   s+='<polyline points="'+pv.join(' ')+'" fill="none" stroke="#00C73D" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
-  var pasoX=Math.max(1,Math.round(S.anios/5)), marcas=[];
-  for (var a=0;a<S.anios;a+=pasoX) marcas.push(a);
-  marcas.push(S.anios);
-  if (marcas.length>1 && marcas[marcas.length-1]-marcas[marcas.length-2] < pasoX*0.6) marcas.splice(marcas.length-2,1);
+  var pX=Math.max(1,Math.round(anios/5)), marcas=[];
+  for (var a=0;a<anios;a+=pX) marcas.push(a);
+  marcas.push(anios);
+  if (marcas.length>1 && marcas[marcas.length-1]-marcas[marcas.length-2] < pX*0.6) marcas.splice(marcas.length-2,1);
   marcas.forEach(function(a,i){
     var anc = i===0 ? 'start' : (i===marcas.length-1 ? 'end' : 'middle');
     s+='<text x="'+x(a*12).toFixed(1)+'" y="'+(BASE+20)+'" font-size="10" fill="#5E6F64" text-anchor="'+anc+'">'
       + (a===0?'Hoy':a+(a===1?' año':' años')) + '</text>';
   });
-  document.getElementById('chart').innerHTML=s;
+  $('chart').innerHTML=s;
 }
 
-/* ---------- render v1 ---------- */
+/* ---- estado derivado, compartido por todo el flujo ---- */
+function contexto(){
+  if (S.ver===1){
+    if (S.obj===null || !S.anios) return null;
+    var mz = mezclaDe(S.anios, OBJ[S.obj].d), meses = S.anios*12, P0 = S.saldo?SALDO:0;
+    var tasa = S.tasaDec/1000;
+    if (S.modo==='meta'){
+      if (!S.meta) return null;
+      var pmt = pmtDe(S.meta, P0, tasa, meses);
+      return { mz:mz, anios:S.anios, obj:OBJ[S.obj], meta:S.meta, aporte:pmt, base:S.meta, modo:'meta', P0:P0, tasa:tasa };
+    }
+    if (!S.aporte && !P0) return null;
+    var val = fv(P0, S.aporte, tasa, meses);
+    return { mz:mz, anios:S.anios, obj:OBJ[S.obj], meta:val, aporte:S.aporte, base:val, modo:'aporte', P0:P0, tasa:tasa };
+  }
+  var n = num($('v2Plazo').value);
+  var meses2 = $('v2Unidad').value==='Años' ? n*12 : n;
+  var PMT = V2.ap ? num($('v2Aporte').value) : 0;
+  var P02 = V2.co ? SALDO : 0;
+  if (!meses2 || (!PMT && !P02)) return null;
+  var anios2 = Math.max(1, Math.round(meses2/12));
+  var mz2 = mezclaDe(anios2, 0);
+  var tasa2 = (mz2.min + mz2.top)/200;
+  var val2 = fv(P02, PMT, tasa2, meses2);
+  return { mz:mz2, anios:anios2, obj:{t:'Tu objetivo', corto:'tu objetivo'}, meta:val2, aporte:PMT,
+           base:val2, modo:'aporte', P0:P02, tasa:tasa2 };
+}
+
 function render(){
+  if (S.ver===1) renderV1(); else renderV2();
+  var ctx = contexto();
+  $('ctaSim').disabled = !ctx;
+}
+
+function renderV1(){
   var listoA = (S.obj !== null) && S.anios > 0;
   show('emptyA', !listoA); show('gateA', listoA);
-  if (!listoA){ document.getElementById('cta1').disabled = true; renderV2(); return; }
+  if (!listoA) return;
 
   var mz = mezclaDe(S.anios, OBJ[S.obj].d), meses = S.anios*12, P0 = S.saldo?SALDO:0;
-  document.getElementById('tagMezcla').textContent = mz.n;
-  document.getElementById('tagRiesgo').textContent = 'Riesgo '+mz.r+' de 6';
-  document.getElementById('mixWhy').textContent = OBJ[S.obj].t.toLowerCase().replace('para ','Para ')+' en '+S.anios+(S.anios===1?' año':' años');
-  document.getElementById('tMin').textContent = pct(mz.min);
-  document.getElementById('tMax').textContent = pct(mz.top);
+  $('tagMezcla').textContent = mz.n;
+  $('tagRiesgo').textContent = 'Riesgo ' + mz.r + ' de 6';
+  $('mixWhy').textContent = OBJ[S.obj].t + ' en ' + S.anios + (S.anios===1?' año':' años');
+  $('tMin').textContent = pct(mz.min); $('tMax').textContent = pct(mz.top);
 
-  var rng = document.getElementById('rngTasa');
+  var rng = $('rngTasa');
   rng.min = Math.round(mz.min*10); rng.max = Math.round(mz.top*10);
   if (!S.tasaLibre) S.tasaDec = Math.round((mz.min+mz.top)*10/2);
   S.tasaDec = Math.min(+rng.max, Math.max(+rng.min, S.tasaDec));
   rng.value = S.tasaDec;
   var tasa = S.tasaDec/1000;
-  document.getElementById('curTasa').textContent = pct(S.tasaDec/10);
+  $('curTasa').textContent = pct(S.tasaDec/10);
 
   var monto = S.modo==='aporte' ? S.aporte : S.meta;
   var listoB = monto > 0 || (S.modo==='aporte' && P0 > 0);
-  document.getElementById('emptyBtxt').textContent = S.modo==='aporte'
+  $('emptyBtxt').textContent = S.modo==='aporte'
     ? 'Escribe cuánto puedes aportar al mes para ver tu proyección.'
     : 'Escribe el monto de tu meta para saber cuánto necesitas aportar al mes.';
   show('emptyB', !listoB); show('gateB', listoB);
-  document.getElementById('cta1').disabled = !listoB;
-  if (!listoB){ renderV2(); return; }
+  if (!listoB) return;
 
   if (S.modo==='aporte'){
     var vSel=fv(P0,S.aporte,tasa,meses), vMin=fv(P0,S.aporte,mz.min/100,meses), vMax=fv(P0,S.aporte,mz.top/100,meses);
     var ap=P0+S.aporte*meses;
-    document.getElementById('resK').childNodes[0].nodeValue='Meta estimada alcanzada';
-    document.getElementById('resSub').textContent='Entre '+money(vMin)+' y '+money(vMax)+' según el rendimiento de tu mezcla '+mz.n;
-    document.getElementById('resV').textContent=money(vSel);
-    document.getElementById('stAp').textContent=money(ap);
-    document.getElementById('stRe').textContent=money(Math.max(0,vSel-ap));
-    dibujar(P0,S.aporte,tasa,meses,Math.max(vMax,ap));
+    $('resK').childNodes[0].nodeValue='Meta estimada alcanzada';
+    $('resSub').textContent='Entre '+money(vMin)+' y '+money(vMax)+' según el rendimiento de tu mezcla '+mz.n;
+    $('resV').textContent=money(vSel);
+    $('stAp').textContent=money(ap);
+    $('stRe').textContent=money(Math.max(0,vSel-ap));
+    dibujar(P0,S.aporte,tasa,meses,Math.max(vMax,ap),S.anios);
   } else {
     var pSel=pmtDe(S.meta,P0,tasa,meses), pAlto=pmtDe(S.meta,P0,mz.min/100,meses), pBajo=pmtDe(S.meta,P0,mz.top/100,meses);
     var ap2=P0+pSel*meses;
-    document.getElementById('resK').childNodes[0].nodeValue='Aporte mensual requerido';
-    document.getElementById('resSub').textContent='Entre '+money(pBajo)+' y '+money(pAlto)+' al mes según el rendimiento de tu mezcla '+mz.n;
-    document.getElementById('resV').textContent=money(pSel);
-    document.getElementById('stAp').textContent=money(ap2);
-    document.getElementById('stRe').textContent=money(Math.max(0,S.meta-ap2));
-    dibujar(P0,pSel,tasa,meses,Math.max(S.meta,ap2));
+    $('resK').childNodes[0].nodeValue='Aporte mensual requerido';
+    $('resSub').textContent='Entre '+money(pBajo)+' y '+money(pAlto)+' al mes según el rendimiento de tu mezcla '+mz.n;
+    $('resV').textContent=money(pSel);
+    $('stAp').textContent=money(ap2);
+    $('stRe').textContent=money(Math.max(0,S.meta-ap2));
+    dibujar(P0,pSel,tasa,meses,Math.max(S.meta,ap2),S.anios);
   }
-  renderV2();
 }
 
-/* ---------- versión 2 ---------- */
-var V2={ap:false,co:false};
+/* ============ simulador v2 ============ */
 function v2Toggle(k,ev){
   if (ev && ev.target.tagName==='INPUT') return;
   V2[k]=!V2[k];
-  document.getElementById(k==='ap'?'v2cbAp':'v2cbCo').className='cbx'+(V2[k]?' on':'');
-  if(k==='co') document.getElementById('v2Pill').className='pill'+(V2.co?'':' off');
-  renderV2();
+  $(k==='ap'?'v2cbAp':'v2cbCo').className='cbx'+(V2[k]?' on':'');
+  if(k==='co') $('v2Pill').className='pill'+(V2.co?'':' off');
+  render();
 }
 ['v2Plazo','v2Aporte'].forEach(function(id){
-  document.getElementById(id).addEventListener('input',function(){
-    if (id==='v2Aporte' && !V2.ap) v2Toggle('ap');
-    renderV2();
+  $(id).addEventListener('input',function(){
+    if (id==='v2Aporte' && !V2.ap) { V2.ap=true; $('v2cbAp').className='cbx on'; }
+    render();
   });
 });
-document.getElementById('v2Unidad').addEventListener('change',renderV2);
+$('v2Unidad').addEventListener('change',render);
 function renderV2(){
-  var n = num(document.getElementById('v2Plazo').value);
-  var meses = document.getElementById('v2Unidad').value==='Años' ? n*12 : n;
-  var PMT = V2.ap ? num(document.getElementById('v2Aporte').value) : 0;
-  var P0  = V2.co ? SALDO : 0;
-  var listo = meses > 0 && (PMT > 0 || P0 > 0);
-  show('v2Empty', !listo); show('v2Res', listo);
-  document.getElementById('cta2').disabled = !listo;
-  if (!listo) return;
-  var anios = Math.max(1, Math.round(meses/12));
-  var mz = mezclaDe(anios, 0);
-  var tasa = (mz.min+mz.top)/200;
-  document.getElementById('v2Sub').textContent =
-    'Mezcla '+mz.n+' · riesgo '+mz.r+' de 6 · rentabilidad histórica entre '+pct(mz.min)+' y '+pct(mz.top);
-  document.getElementById('v2Val').textContent = money(fv(P0,PMT,tasa,meses));
+  var ctx = contexto();
+  show('v2Empty', !ctx); show('v2Res', !!ctx);
+  if (!ctx) return;
+  $('v2Sub').textContent = 'Mezcla '+ctx.mz.n+' · riesgo '+ctx.mz.r+' de 6 · rentabilidad histórica entre '
+    + pct(ctx.mz.min) + ' y ' + pct(ctx.mz.top);
+  $('v2Val').textContent = money(ctx.meta);
 }
 
+/* ============ pantalla 2 · tu mezcla ============ */
+function setTab(t){
+  S.tab = t;
+  $('tbA').className = t==='activo'?'on':'';
+  $('tbP').className = t==='portafolio'?'on':'';
+  $('thCol').textContent = t==='activo' ? 'Tipo de activo' : 'Portafolio';
+  if (S.pantalla==='mezcla') pintarTabla();
+}
+function pintarTabla(){
+  var ctx = contexto(); if (!ctx) return;
+  var filas = S.tab==='activo'
+    ? ACTIVOS.map(function(a,i){ return { n:a.n, t:a.t, p:ctx.mz.comp[i] }; })
+    : (function(){ var v = repartoPortafolios(ctx.mz.comp);
+        return PORTAFOLIOS.map(function(p,i){ return { n:p.n, t:p.t, p:v[i] }; }); })();
+  $('mzTabla').innerHTML = filas.map(function(f,i){
+    return '<tr><td>' + f.n
+      + '<span class="help"><button type="button" onclick="tipFila(event,' + i + ')" aria-label="Qué es ' + f.n + '">'
+      + '<svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#0099DE" stroke-width="1.4"/>'
+      + '<path d="M6.9 6.9c0-1.15.94-2.05 2.1-2.05s2.1.86 2.1 1.95c0 1-.63 1.4-1.32 1.9-.5.36-.78.72-.78 1.4" stroke="#0099DE" stroke-width="1.4" stroke-linecap="round"/>'
+      + '<circle cx="9" cy="13.1" r=".95" fill="#0099DE"/></svg></button></span></td>'
+      + '<td>' + f.p + '%</td><td>' + money(ctx.base * f.p / 100) + '</td></tr>';
+  }).join('');
+  window.__filas = filas;
+}
+function tipFila(ev,i){
+  ev.stopPropagation();
+  document.querySelectorAll('.comp .tip').forEach(function(x){ x.remove(); });
+  var h = ev.target.closest('.help');
+  if (h.querySelector('.tip')) return;
+  var f = window.__filas[i];
+  var t = document.createElement('div');
+  t.className='tip'; t.onclick=function(e){ e.stopPropagation(); };
+  t.innerHTML = '<b>' + f.n + '</b>' + f.t;
+  h.appendChild(t);
+}
+function donut(comp){
+  var cx=66, cy=66, r=48, w=20, ang=-90, s='';
+  comp.forEach(function(p,i){
+    var barrido = p*3.6;
+    if (barrido <= 0) return;
+    var a0 = ang*Math.PI/180, a1 = (ang+barrido)*Math.PI/180;
+    var x0 = cx+r*Math.cos(a0), y0 = cy+r*Math.sin(a0);
+    var x1 = cx+r*Math.cos(a1), y1 = cy+r*Math.sin(a1);
+    var grande = barrido > 180 ? 1 : 0;
+    s += '<path d="M '+x0.toFixed(2)+' '+y0.toFixed(2)+' A '+r+' '+r+' 0 '+grande+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)
+       + '" fill="none" stroke="'+COLORES[i]+'" stroke-width="'+w+'"/>';
+    ang += barrido;
+  });
+  return s;
+}
+function pintarMezcla(){
+  var ctx = contexto(); if (!ctx) return;
+  var mz = ctx.mz;
+
+  $('mzTitulo').textContent = 'Esta es tu mezcla para ' + ctx.obj.corto;
+  $('mzBajada').textContent = 'Pensada para acompañar ' + ctx.obj.corto + ': '
+    + (ctx.modo==='meta' ? 'acumular ' + money(ctx.meta) : 'llegar a ' + money(ctx.meta))
+    + ' en ' + ctx.anios + (ctx.anios===1?' año':' años') + ' desde tu mezcla ' + mz.n + '.';
+  $('mzTag').textContent = 'Mezcla ' + mz.n;
+  $('mzRiesgo').textContent = 'Riesgo ' + mz.r + '/6';
+  $('mzVol').textContent = 'Volatilidad de la mezcla: ' + mz.vol
+    + ' — es normal ver variaciones en el corto plazo a cambio de mejor potencial en el largo plazo.';
+  $('mzR1').textContent = pct2(mz.r1);
+  $('mzR3').textContent = pct2(mz.r3);
+  $('mzNota').textContent = 'Rentabilidad histórica: ' + pct2(mz.r1) + ' E.A. a 1 año · ' + pct2(mz.r3)
+    + ' E.A. a 3 años. Las rentabilidades pasadas no garantizan resultados futuros.';
+
+  var top = Math.max.apply(null, mz.serie.map(Math.abs));
+  $('mzBarras').innerHTML = mz.serie.map(function(v){
+    var alto = Math.max(4, Math.abs(v)/top*100);
+    return '<div class="b"><em style="color:' + (v<0?'#C0392B':'#007A25') + '">' + pct2(v) + '</em>'
+      + '<i style="height:' + alto.toFixed(0) + '%;background:' + (v<0?'#E8A9A1':'#00C73D') + '"></i></div>';
+  }).join('');
+  $('mzEje').innerHTML = ANIOS_SERIE.map(function(a){ return '<span>'+a+'</span>'; }).join('');
+
+  $('mzDonut').innerHTML = donut(mz.comp);
+  $('mzDonutN').textContent = mz.n;
+  pintarTabla();
+
+  $('pq1').textContent = mz.r <= 2
+    ? 'Tu mezcla prioriza la estabilidad: busca crecer sin exponerte a variaciones fuertes en el camino.'
+    : (mz.r <= 4
+      ? 'Tu mezcla busca crecimiento estable, asumiendo variaciones moderadas en el camino.'
+      : 'Tu mezcla busca el mayor crecimiento posible y por eso asume variaciones fuertes en el camino.');
+  $('pq2').textContent = 'Combinamos crecimiento global con estabilidad local porque tu objetivo es '
+    + ctx.obj.corto + ' y tienes ' + ctx.anios + (ctx.anios===1?' año':' años') + ' para construirlo.';
+}
+
+/* ============ pantalla 3 · revisión ============ */
+function pintarRevision(){
+  var ctx = contexto(); if (!ctx) return;
+  $('rvObj').textContent = ctx.obj.t;
+  $('rvMontoK').textContent = ctx.modo==='meta' ? 'Monto a acumular' : 'Valor estimado al final';
+  $('rvMonto').textContent = money(ctx.meta);
+  $('rvPlazo').textContent = ctx.anios + (ctx.anios===1?' año':' años');
+  $('rvApK').textContent = ctx.modo==='meta' ? 'Aporte mensual sugerido' : 'Aporte mensual';
+  $('rvAp').textContent = ctx.aporte > 0 ? money(ctx.aporte) : 'Sin aportes periódicos';
+  $('rvMezclaT').textContent = 'Mezcla ' + ctx.mz.n;
+  $('rvComp').innerHTML = ACTIVOS.map(function(a,i){
+    return '<div class="dl"><span>' + a.n + '</span><b>' + ctx.mz.comp[i] + '%</b></div>';
+  }).join('');
+}
+function toggleAcepta(){
+  S.acepta = !S.acepta;
+  $('cbAcepta').className = 'cbx' + (S.acepta?' on':'');
+  $('ctaActivar').disabled = !S.acepta;
+}
+
+/* ============ arranque ============ */
+function ejemplo(){
+  if (S.ver===1){
+    S.obj = 0; [].forEach.call($('chips').children, function(c,j){ c.className='chip'+(j===0?' on':''); });
+    S.modo='meta'; S.meta=50000000; S.anios=10; S.tasaLibre=false;
+    $('inMonto').value='50.000.000'; $('inAnios').value='10';
+  } else {
+    V2.ap=true; $('v2cbAp').className='cbx on';
+    $('v2Plazo').value='10'; $('v2Aporte').value='416.667';
+  }
+  render();
+}
+function desdeHash(){
+  var h = (location.hash || '').replace('#','');
+  var partes = h.split('/');
+  var v = partes[0]==='v2' ? 2 : 1;
+  var p = PANTALLAS.indexOf(partes[1]) >= 0 ? partes[1] : 'entrada';
+  setVer(v);
+  // las pantallas posteriores al simulador necesitan datos: se precargan para poder enlazarlas directo
+  if (p==='mezcla' || p==='revision') ejemplo();
+  ir(p, true);
+}
 setModo('meta');
-render();
+setTab('activo');
+window.addEventListener('hashchange', desdeHash);
+desdeHash();
 </script>
 </body>
 </html>
