@@ -33,7 +33,8 @@ function getProjects() {
       const metaPath = path.join(dir, 'meta.json');
       if (!fs.existsSync(metaPath)) return null;
       let meta;
-      try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf-8')); }
+      // replace(/^\uFEFF/, '') : algunos editores guardan meta.json con BOM y JSON.parse lo rechaza
+      try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf-8').replace(/^\uFEFF/, '')); }
       catch (err) {
         console.warn(`  WARNING: meta.json inválido en ${e.name}: ${err.message}`);
         return null;
