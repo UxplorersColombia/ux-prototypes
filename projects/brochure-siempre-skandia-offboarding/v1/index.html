@@ -92,6 +92,38 @@
         insinuar un destino falso en un documento que ya sale a
         colaboradores reales. El único `<a>` con URL real sigue siendo
         el CTA a compensar.com del bloque 6.
+
+     RONDA 3, 2026-09-21 — feedback de Rafa en la sesión de revisión del
+     2026-09-14 (`conocimiento/sesion-ajustes-sk-siempre-14-0926.md`):
+     1. Bloque "Plan Madrina y Chat Bot" (antiguo 02) se ELIMINA por
+        completo — a Rafa "no le gustó" que sonara como un kit de
+        bienvenida con acompañante asignado; ni Madrina ni Chat Bot
+        tienen fecha ni presupuesto. Se reemplaza por un módulo de
+        contacto al cierre del documento con el correo de nómina — 🟡
+        dirección pendiente de confirmar con Cata.
+     2. Pasos 1 ("Confirmación de tu salida") y 2 ("Entrega de equipos
+        tecnológicos") del paso a paso se unifican en uno solo — pedido
+        explícito, más los 2 primeros bullets del bloque "Tu portal
+        Siempre Skandia" (antiguo 04), que decían lo mismo dos veces.
+     3. Se despersonaliza el paso 1: fuera los placeholders `[motivo de
+        renuncia]`/`[XX/XX/XXXX]` — Cata no quiere editar cada copia a
+        mano, el brochure se envía igual a todos.
+     4. Paso "Paz y salvo financiero" gana "y con el equipo de
+        contabilidad"; paso "Contratos a tu cargo" pasa de "equipo de
+        Contratos" a "equipo de Legal" y nombra la plataforma real
+        (Gemini) en vez de "el aplicativo correspondiente".
+     5. "Outplacement Compensar" (bloque 6) cambia a "Subsidio de
+        Desempleo Compensar" en el título — Rafa: "hay mucha gente que
+        no sabe qué es Outplacement".
+     6. Copy del Kit Siempre Skandia se baja de tono — Rafa: presupuesto
+        para ~300 kits confirmado, pero no quiere generar la expectativa
+        de "recibirás un kit" tipo bienvenida; contenido real del kit
+        pendiente de definir esta semana (tabla de presupuesto para
+        Rafa) — 🟡.
+     7. Pase de reducción de texto (pedido: "6 hojas, muy largo") sobre
+        párrafos de pasos, beneficios y cierre — mismo contenido, menos
+        palabras; nada de lo anterior quita secciones además de lo ya
+        señalado en 1 y 2.
      ============================================================ -->
 
 <style>
@@ -128,38 +160,65 @@
   .page{
     width:210mm;min-height:297mm;margin:0 auto 8mm;background:var(--sk-color-bg);
     padding:16mm 15mm 14mm;position:relative;box-shadow:var(--sk-shadow-raised);
-    overflow:hidden; /* recorta el watermark decorativo de la portada, ver .page--cover__mark */
+    overflow:hidden; /* recorta el watermark decorativo, ver .page__watermark */
+    /* RONDA 5 — `isolation:isolate` crea el contexto de stacking LOCAL que
+       `position:relative` con z-index:auto NO crea por sí solo. Sin esto,
+       el `z-index:-1` de `.page__watermark` (hijo directo) se escapa hacia
+       arriba del árbol de stacking y termina pintándose por DEBAJO del
+       propio fondo blanco de `.page` (que es opaco) — invisible del todo,
+       no solo tapado por `.block`. Se detectó muestreando píxeles de la
+       captura de pantalla (visualmente pasaba desapercibido: 6% de
+       opacidad ya es sutil, así que "no se ve" y "se ve mal" lucían
+       igual). Con `isolation:isolate`, el z-index negativo queda acotado
+       a los hijos de ESTA `.page`, entre su fondo y su contenido normal —
+       el comportamiento que sí se pedía. */
+    isolation:isolate;
   }
   /* Franja de color sólido en el borde superior de cada hoja — Javier
      pidió más presencia de color sólido; esta franja repetida da un
-     acento de marca consistente en las 4 páginas sin tocar la
+     acento de marca consistente en las páginas sin tocar la
      legibilidad del contenido. */
   .page::before{
     content:"";position:absolute;top:0;left:0;right:0;height:5mm;background:var(--sk-gradient-brand);
   }
-  /* Portada (página 1): en la primera versión, Header+Hero+Bloque 1
-     vivían en la misma .page — al imprimir, Chrome respetó
-     `break-inside:avoid` en `.block` (bien: nunca corta una tarjeta a la
-     mitad) pero eso empujó el Bloque 1 completo a una 2ª hoja física,
-     dejando una portada "accidental" con solo header+hero. Se vuelve
-     intencional: el header+hero pasan a su propia portada (patrón
-     "Editorial Manifesto" — tipografía grande, casi póster, sin foto
-     inventada) y el documento queda en 4 páginas físicas, no 3.
-     NOTA: se probó centrar el hero con flexbox (`justify-content:center`
-     sobre .page), pero el motor de impresión de Chrome no reserva la
-     altura completa de 297mm para ese cálculo — el hero terminaba
-     encimado sobre el header en el PDF (aunque se veía bien en pantalla).
-     Se resuelve con flujo normal + un margin-top fijo: más robusto entre
-     el preview de pantalla y el PDF impreso. */
-  .page--cover .hero{margin-top:70mm;}
-  /* Marca de agua decorativa de portada — el isotipo (hoja) real de la
-     marca Skandia, recortado del mismo `sk-logo-lockup` que ya usa todo
-     el documento (no es una foto de stock inventada: no hay herramienta
-     de generación de imágenes en este entorno, así que se optó por un
+  /* Portada (página 1), histórico — RONDA 1: header+hero vivían con el
+     Bloque 1 en la misma .page; al imprimir, `break-inside:avoid` en
+     `.block` empujó el Bloque 1 completo a una 2ª hoja física, dejando
+     una portada "accidental" casi vacía. Se separó el header+hero a su
+     propia portada con `.hero{margin-top:70mm}` (centrado tipo
+     "Editorial Manifesto") — el documento quedó en 4 páginas físicas.
+     RONDA 4, 2026-09-21 — Javier pidió volver a fusionarlos (ver nota
+     completa junto al HTML de la página 1). La regla `margin-top:70mm`
+     de abajo ERA la causa raíz del problema de RONDA 1 (no dejaba alto
+     para el Bloque 1), así que se retira por completo en vez de
+     reutilizarla — el hero ahora fluye con el espaciado normal
+     (`margin-bottom` de `.hero`, ver esa regla) pegado al header. */
+  /* Marca de agua decorativa — el isotipo (hoja) real de la marca
+     Skandia, recortado del mismo `sk-logo-lockup` que ya usa todo el
+     documento (no es una foto de stock inventada: no hay herramienta de
+     generación de imágenes en este entorno, así que se optó por un
      activo de marca real y verificado en vez de fabricar una persona
      que no existe). Muy grande, muy pálido, en la esquina — aporta
-     interés visual sin competir con el contenido. */
-  .page--cover__mark{position:absolute;right:-40mm;bottom:-40mm;width:220mm;height:220mm;opacity:.06;pointer-events:none;}
+     interés visual sin competir con el contenido.
+     RONDA 5, 2026-09-21 — Javier pidió 2 cosas: (1) replicar esta marca
+     en las 3 páginas, no solo en la primera — se renombra de
+     `.page--cover__mark` a `.page__watermark` (ya no es exclusiva de
+     "portada": esa noción murió en RONDA 4, ver nota de arriba; el
+     nombre viejo mentía sobre su alcance) y el `<svg>` se repite igual
+     en las 3 `<section class="page">`, mismo patrón que la franja
+     superior de `.page::before`. (2) "el logo de fondo obstruye la
+     lectura del Bloque 1": el motivo real es de stacking, no de
+     opacidad — un elemento `position:absolute` (este watermark) SIEMPRE
+     pinta por encima de contenido normal sin posicionar (`.block`,
+     `.hero`, etc.) aunque esté antes en el DOM y aunque tenga opacity
+     baja, porque las reglas de stacking de CSS separan "in-flow
+     content" de "positioned content" en capas distintas — la capa
+     posicionada gana siempre. `z-index:-1` lo manda a la capa de ATRÁS
+     (`.page` ya es `position:relative`, así que crea su propio contexto
+     de stacking) — con eso, cualquier `.block` (ya con fondo blanco
+     explícito, ver esa regla) lo tapa por completo en vez de dejarlo
+     asomar en las esquinas. */
+  .page__watermark{position:absolute;right:-40mm;bottom:-40mm;width:220mm;height:220mm;opacity:.06;pointer-events:none;z-index:-1;}
   @media print{
     body{background:#fff;}
     .doc{padding:0;}
@@ -204,6 +263,7 @@
 
   /* ================= Tarjeta de sección ================= */
   .block{
+    background:var(--sk-color-bg); /* RONDA 5 — explícito (antes heredaba el blanco de .page por transparencia): pedido de Javier para que la tarjeta tape el watermark, ver nota junto a .page__watermark */
     border:1px solid var(--sk-color-border);border-radius:16px;box-shadow:var(--sk-shadow-surface);
     padding:var(--sk-space-l) var(--sk-space-xl);margin-bottom:var(--sk-space-l);
     break-inside:avoid;
@@ -254,7 +314,16 @@
     content:counter(doc) ". ";font-weight:700;color:var(--sk-color-primary);
   }
 
-  /* ---- Grid 2 columnas (bloque 2 + 3) ---- */
+  /* RONDA 3, 2026-09-21 — `.split-row` se conserva: el bloque "Plan
+     Madrina y Chat Bot" se eliminó, pero al dejar Kit+comunidad a ancho
+     completo la página 3 física medía 304.5mm (297mm es el límite A4) y
+     el PDF ganaba una 5ª hoja en blanco casi vacía (verificado con
+     Playwright, page.pdf() + medición de altura real de cada .page).
+     Kit+comunidad vuelve a emparejarse con Tu portal Siempre Skandia
+     (ambos hablan de "lo que tienes disponible después de irte") — la
+     misma pareja en 2 columnas que ya usaba `.split-row .block{height:
+     100%}` para igualar alturas, ahora sin el bloque Madrina de por
+     medio. Vuelve a 4 páginas físicas. */
   .split-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--sk-space-l);margin-bottom:var(--sk-space-l);}
   .split-row .block{margin-bottom:0;height:100%;}
   .block p.body{font-size:12.5px;line-height:1.6;color:var(--sk-color-text-muted);margin-top:var(--sk-space-s);}
@@ -369,11 +438,31 @@
 <div class="doc">
 
   <!-- ============================================================
-       PÁGINA 1 — Portada (header + hero)
-       ============================================================ -->
-  <section class="page page--cover">
+       PÁGINA 1 — Header + hero + Bloque 1 (paso a paso + documentos)
+       RONDA 4, 2026-09-21 — Javier pidió (pantallazo de referencia)
+       volver a incrustar el header+hero en la misma hoja del Bloque 1,
+       para que el documento quede en 3 páginas físicas, no 4. Esto ya
+       se había intentado en la v1 (ver nota de RONDA 1 más arriba, junto
+       al CSS `.page--cover`) y se revirtió porque `.hero{margin-top:70mm}`
+       — pensado para centrar el hero en una portada vacía — no dejaba
+       espacio para que `.block` (con `break-inside:avoid`) cupiera
+       debajo, así que Chrome empujaba TODO el Bloque 1 a una 2ª hoja
+       física de todos modos (4 páginas igual, pero con una portada
+       "accidental" casi vacía). La diferencia esta vez: se quita ese
+       `margin-top:70mm` (vivía en `.page--cover .hero`, ver ese selector
+       — ya no tiene consumidor) y el hero fluye pegado al header con el
+       espaciado normal, dejando alto real disponible para el Bloque 1.
+       Verificado con Playwright (`page.pdf()` + conteo de páginas del
+       PDF resultante): 3 páginas, sin desborde.
+       RONDA 5, 2026-09-21 — la clase `page--cover` se retira del HTML
+       (quedó sin ningún consumidor en el CSS desde esta misma ronda, ver
+       nota junto a `.page__watermark`); el watermark se replica en las 3
+       páginas, ver esa misma nota para el porqué del `z-index:-1` nuevo
+       (antes se "asomaba" sobre el Bloque 1 — no era un problema de
+       opacidad, era de stacking). -->
+  <section class="page">
 
-    <svg class="page--cover__mark" viewBox="-2 -2 41 41" aria-hidden="true"><use href="#sk-logo-lockup" x="0" y="-10.34" width="280" height="48"></use></svg>
+    <svg class="page__watermark" viewBox="-2 -2 41 41" aria-hidden="true"><use href="#sk-logo-lockup" x="0" y="-10.34" width="280" height="48"></use></svg>
 
     <div class="brand-row">
       <div class="brand-lockup">
@@ -393,17 +482,6 @@
       </div>
     </div>
 
-    <div class="page__footer">
-      <span>Siempre Skandia — Guía de cierre y bienvenida</span>
-      <span>1 / 4</span>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       PÁGINA 2 — Bloque 1 (paso a paso + documentos)
-       ============================================================ -->
-  <section class="page">
-
     <div class="block">
       <div class="block__head">
         <span class="block__badge">01</span>
@@ -411,38 +489,37 @@
       </div>
       <p class="block__sub">Un proceso simple, claro y acompañado en cada momento.</p>
 
+      <!-- RONDA 3, 2026-09-21 — pasos 1+2 unificados en uno solo (pedido de
+           Rafa) y despersonalizados: fuera [motivo de renuncia]/[XX/XX/XXXX],
+           el brochure se envía igual a todos. Pasos 3-6 renumerados a 2-5. -->
       <div class="steps">
         <div class="step">
-          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-envelope"></use></svg></span><h3>1. Confirmación de tu salida</h3></div>
-          <p>Recibimos tu notificación de salida por <strong>[motivo de renuncia]</strong> el día <strong>[XX/XX/XXXX]</strong>. A partir de aquí, iniciamos juntos tu proceso de desvinculación.</p>
+          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-laptop"></use></svg></span><h3>1. Confirmación de tu salida y entrega de equipos</h3></div>
+          <p>Iniciamos juntos tu proceso de desvinculación. <strong>Bogotá:</strong> entrega tus equipos en Skandia, máximo un día después de tu salida.</p>
+          <p><strong>Fuera de Bogotá:</strong> envíalos por Servientrega, pago contra entrega, a Av. 19 #109A-30, Sede Skandia, y comparte tu número de guía.</p>
         </div>
         <div class="step">
-          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-laptop"></use></svg></span><h3>2. Entrega de equipos tecnológicos</h3></div>
-          <p><strong>Si estás en Bogotá:</strong> entrega en las instalaciones de Skandia máximo un día después de tu salida.</p>
-          <p><strong>Si estás fuera de Bogotá:</strong> envía por Servientrega con pago contra entrega a Av. 19 #109A-30, Sede Skandia, Bogotá, y comparte tu número de guía.</p>
+          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-folder"></use></svg></span><h3>2. Entrega de documentación</h3></div>
+          <p>Si tienes carpetas o documentos en Iron Mountain, coordina su entrega antes de tu salida.</p>
         </div>
         <div class="step">
-          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-folder"></use></svg></span><h3>3. Entrega de documentación</h3></div>
-          <p>Si tienes carpetas o documentos asignados en Iron Mountain, te invitamos a coordinar su entrega antes de tu salida.</p>
+          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-shield-check"></use></svg></span><h3>3. Paz y salvo financiero</h3></div>
+          <p>Antes de irte, confirma con el equipo de contabilidad que no tengas valores, giros o anticipos pendientes por legalizar.</p>
         </div>
         <div class="step">
-          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-shield-check"></use></svg></span><h3>4. Paz y salvo financiero</h3></div>
-          <p>Antes de irte, te invitamos a confirmar que no tengas valores, giros o anticipos pendientes por legalizar con la compañía.</p>
+          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-file"></use></svg></span><h3>4. Contratos a tu cargo</h3></div>
+          <p>Si tienes contratos asignados, cuéntale al equipo de Legal para que asigne un nuevo responsable en Gemini.</p>
         </div>
         <div class="step">
-          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-file"></use></svg></span><h3>5. Contratos a tu cargo</h3></div>
-          <p>Si tienes contratos asignados, cuéntale al equipo de Contratos para que asigne un nuevo responsable en el aplicativo correspondiente.</p>
-        </div>
-        <div class="step">
-          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-id-card"></use></svg></span><h3>6. Entrega de accesos</h3></div>
-          <p>El día de tu salida, o máximo un día después, recuerda entregar tu sticker y tarjeta de seguridad al personal de la consola de seguridad.</p>
+          <div class="step__head"><span class="icon-badge"><svg><use href="#pi-id-card"></use></svg></span><h3>5. Entrega de accesos</h3></div>
+          <p>El día de tu salida, o máximo un día después, entrega tu sticker y tarjeta de seguridad en la consola de seguridad.</p>
         </div>
       </div>
 
       <div class="docs-panel">
         <span class="docs-panel__icon icon-badge"><svg><use href="#pi-file"></use></svg></span>
         <div>
-          <p class="lead">Una vez finalices tu proceso de paz y salvo y entrega de puesto de trabajo, recibirás los siguientes documentos:</p>
+          <p class="lead">Al finalizar tu paz y salvo y entrega de puesto, recibirás estos documentos:</p>
           <ol>
             <li>Liquidación de contrato</li>
             <li>Autorización de retiro de cesantías</li>
@@ -458,74 +535,75 @@
 
     <div class="page__footer">
       <span>Siempre Skandia — Guía de cierre y bienvenida</span>
-      <span>2 / 4</span>
+      <span>1 / 3</span>
     </div>
   </section>
 
   <!-- ============================================================
-       PÁGINA 3 — Bloque 2 + 3 (split), Bloque 4 (portal) y Bloque 5
-       (liquidación) — RONDA 2: Bloque 5 se movió aquí desde la página 4
-       porque el panel de contacto comercial nuevo (ver RONDA 2 arriba)
-       hacía que página 4 desbordara a una 5ª hoja física.
-       ============================================================ -->
+       PÁGINA 2 — Bloque 2 (kit+comunidad), Bloque 3 (portal) y Bloque 4
+       (liquidación) — RONDA 2: el bloque de liquidación se movió aquí
+       desde la última página porque el panel de contacto comercial
+       nuevo (ver RONDA 2 arriba) hacía que esa página desbordara a una
+       hoja física adicional.
+       RONDA 3, 2026-09-21 — el antiguo Bloque 02 "Plan Madrina y Chat
+       Bot" se elimina por completo (ver nota de cabecera del archivo);
+       Kit+comunidad vuelve a emparejarse con Tu portal Siempre Skandia
+       en `.split-row` (ver nota junto al CSS `.split-row` — sin la
+       pareja, esta página física desbordaba a una hoja adicional). Se
+       renumeran 03→02, 04→03, 05→04.
+       RONDA 4, 2026-09-21 — renumeración de PÁGINA a "2" (antes "3"):
+       la portada se fusionó con la página del Bloque 1, ver esa nota.
+       RONDA 5, 2026-09-21 — gana `.page__watermark` (ver esa nota, junto
+       al CSS y al HTML de la página 1). -->
   <section class="page">
 
-    <div class="split-row">
-      <div class="block">
-        <div class="block__head">
-          <span class="block__badge">02</span>
-          <h2>Plan Madrina y Chat Bot</h2>
-        </div>
-        <p class="block__sub" style="margin-left:0;max-width:none;">No estás solo en este proceso.</p>
-        <p class="body">Contarás con el acompañamiento de tu Madrina Skandia, quien estará para resolver tus dudas, guiarte y apoyarte en cada paso.</p>
-        <p class="body">Además, tienes a tu disposición nuestro Chat Bot 24/7 en el portal Siempre Skandia, para encontrar respuestas rápidas cuando las necesites.</p>
-        <p class="tagline">Acompañamiento humano y tecnología, siempre contigo.</p>
-        <!-- Botón sin enlace — pedido explícito de Javier, solo para
-             consulta con stakeholders (Gestión Humana define a dónde
-             lleva: ¿ficha de la Madrina?, ¿chat directo?, ¿portal?). -->
-        <div style="margin-top:var(--sk-space-m);"><button type="button" class="cta-btn">Conocer a mi Madrina</button></div>
-      </div>
+    <svg class="page__watermark" viewBox="-2 -2 41 41" aria-hidden="true"><use href="#sk-logo-lockup" x="0" y="-10.34" width="280" height="48"></use></svg>
 
-      <div class="block">
-        <div class="block__head">
-          <span class="block__badge">03</span>
-          <h2>Kit Siempre Skandia y comunidad</h2>
-        </div>
-        <p class="body" style="margin-top:8px;">Recibirás tu Kit Siempre Skandia como símbolo de agradecimiento por hacer parte de nuestra historia, y te invitamos a sumarte a la comunidad Siempre Skandia.</p>
-        <p class="body" style="margin-top:10px;">A través del portal tendrás acceso directo a:</p>
-        <ul class="tick-list">
-          <li><svg><use href="#pi-check"></use></svg>Asesoría financiera personalizada</li>
-          <li><svg><use href="#pi-check"></use></svg>Comunicados importantes</li>
-          <li><svg><use href="#pi-check"></use></svg>Eventos, contenidos y beneficios exclusivos</li>
-          <li><svg><use href="#pi-check"></use></svg>Una red que sigue creciendo contigo</li>
-        </ul>
+    <div class="split-row">
+    <div class="block">
+      <div class="block__head">
+        <span class="block__badge">02</span>
+        <h2>Kit Siempre Skandia y comunidad</h2>
       </div>
+      <!-- Copy bajado de tono (pedido explícito de Rafa: presupuesto
+           confirmado para ~300 kits, pero sin generar expectativa de
+           "recibirás un kit" tipo bienvenida). 🟡 Contenido real del kit
+           pendiente — Cata lo define esta semana con Rafa. -->
+      <p class="body" style="margin-top:8px;">Antes de irte, tenemos un pequeño detalle para ti. También te invitamos a sumarte a la comunidad Siempre Skandia.</p>
+      <p class="body" style="margin-top:10px;">A través de la comunidad tendrás acceso a:</p>
+      <ul class="tick-list">
+        <li><svg><use href="#pi-check"></use></svg>Comunicados importantes</li>
+        <li><svg><use href="#pi-check"></use></svg>Eventos, contenidos y beneficios exclusivos</li>
+        <li><svg><use href="#pi-check"></use></svg>Una red que sigue creciendo contigo</li>
+      </ul>
     </div>
 
     <div class="block">
       <div class="block__head">
-        <span class="block__badge">04</span>
+        <span class="block__badge">03</span>
         <h2>Tu portal Siempre Skandia</h2>
       </div>
       <p class="block__sub">En tu portal encontrarás todo lo que necesitas, siempre disponible para ti:</p>
+      <!-- RONDA 3 — primeros 2 bullets unificados (pedido de Rafa: decían
+           lo mismo dos veces). -->
       <ul class="tick-list" style="margin-top:var(--sk-space-m);">
-        <li><svg><use href="#pi-check"></use></svg>Acceso a tus documentos de retiro y tu liquidación.</li>
-        <li><svg><use href="#pi-check"></use></svg>Visualiza y descarga todos los documentos del paso 1.</li>
+        <li><svg><use href="#pi-check"></use></svg>Visualiza y descarga todos tus documentos de retiro y liquidación.</li>
         <li><svg><use href="#pi-check"></use></svg>Diligencia tu entrevista de retiro y tu encuesta de satisfacción.</li>
-        <li><svg><use href="#pi-check"></use></svg>En un año, accede a tu Certificado de Ingresos y Retenciones y a tu planilla de seguridad social con las novedades de tu retiro.</li>
-        <li><svg><use href="#pi-check"></use></svg>Carga aquí tus documentos de retiro firmados para continuar con el pago de tu liquidación.</li>
+        <li><svg><use href="#pi-check"></use></svg>En un año, accede a tu Certificado de Ingresos y Retenciones y a tu planilla de seguridad social.</li>
+        <li><svg><use href="#pi-check"></use></svg>Carga tus documentos firmados para continuar con el pago de tu liquidación.</li>
       </ul>
       <!-- Botón sin enlace — pedido explícito de Javier, solo para
            consulta con stakeholders (pendiente la URL real del portal). -->
       <div style="margin-top:var(--sk-space-m);"><button type="button" class="cta-btn">Ingresar al portal</button></div>
     </div>
+    </div>
 
     <div class="block">
       <div class="block__head">
-        <span class="block__badge">05</span>
+        <span class="block__badge">04</span>
         <h2>Transforma tu liquidación en tu futuro</h2>
       </div>
-      <p class="block__sub">En Skandia puedes elegir que tu liquidación de contrato se consigne en un producto de ahorro o inversión, con beneficios tributarios:</p>
+      <p class="block__sub">Elige que tu liquidación se consigne en un producto de ahorro o inversión, con beneficios tributarios:</p>
 
       <div class="product-row">
         <div class="product">
@@ -549,68 +627,89 @@
       <!-- Botón sin enlace — pedido explícito de Javier: espacio para
            quien quiera contacto comercial sobre estas opciones, solo
            para consulta con stakeholders (define el canal/destino real:
-           ¿Financial Planner asignado?, ¿línea comercial?, ¿formulario?). -->
+           ¿Financial Planner asignado?, ¿línea comercial?, ¿formulario?).
+           🟡 RONDA 3 — en la sesión del 2026-09-14 Rafa pidió el link de
+           WhatsApp del asesor (posiblemente Juan José) para este espacio;
+           Cata lo confirma esta semana. Sigue sin href hasta entonces. -->
       <div class="contact-panel">
-        <p><strong>¿Prefieres hablar con un asesor?</strong> Podemos ponerte en contacto con un Financial Planner para revisar estas opciones antes de decidir.</p>
+        <p><strong>¿Prefieres hablar con un asesor?</strong> Te ponemos en contacto con un Financial Planner.</p>
         <button type="button" class="cta-btn">Hablar con un asesor</button>
       </div>
     </div>
 
     <div class="page__footer">
       <span>Siempre Skandia — Guía de cierre y bienvenida</span>
-      <span>3 / 4</span>
+      <span>2 / 3</span>
     </div>
   </section>
 
   <!-- ============================================================
-       PÁGINA 4 — Bloque 6 (Outplacement) y cierre
+       PÁGINA 3 — Bloque 5 (Subsidio de Desempleo) y cierre
+       RONDA 4, 2026-09-21 — renumeración de PÁGINA a "3" (antes "4"),
+       ver nota de RONDA 4 junto a la primera página.
+       RONDA 5, 2026-09-21 — gana `.page__watermark` (ver esa nota, junto
+       al CSS y al HTML de la página 1).
        ============================================================ -->
   <section class="page">
 
+    <svg class="page__watermark" viewBox="-2 -2 41 41" aria-hidden="true"><use href="#sk-logo-lockup" x="0" y="-10.34" width="280" height="48"></use></svg>
+
     <div class="block">
       <div class="block__head">
-        <span class="block__badge">06</span>
-        <h2>Outplacement Compensar: un apoyo para tu próximo paso</h2>
+        <span class="block__badge">05</span>
+        <!-- RONDA 3, 2026-09-21 — "Outplacement" sale del título: Rafa dijo
+             que el término no se reconoce. El cuerpo ya decía "Subsidio de
+             Desempleo de Compensar", solo faltaba el título. -->
+        <h2>Subsidio de Desempleo Compensar: un apoyo para tu próximo paso</h2>
       </div>
-      <p class="block__sub">Como parte de tu proceso de desvinculación, puedes acceder al Subsidio de Desempleo de Compensar: un beneficio que te brinda acompañamiento y herramientas para volver al mundo laboral.</p>
+      <p class="block__sub">Accede al Subsidio de Desempleo de Compensar: acompañamiento y herramientas para volver al mundo laboral.</p>
 
       <div class="benefit-row">
         <div class="benefit">
           <span class="icon-badge"><svg><use href="#pi-compass"></use></svg></span>
           <h3>Acompañamiento integral</h3>
-          <p>Orientación laboral personalizada para fortalecer tu perfil y tus habilidades.</p>
+          <p>Orientación personalizada para fortalecer tu perfil.</p>
         </div>
         <div class="benefit">
           <span class="icon-badge"><svg><use href="#pi-book"></use></svg></span>
           <h3>Capacitación y formación</h3>
-          <p>Cursos y talleres virtuales para potenciar tus competencias.</p>
+          <p>Cursos y talleres virtuales para tus competencias.</p>
         </div>
         <div class="benefit">
           <span class="icon-badge"><svg><use href="#pi-briefcase"></use></svg></span>
           <h3>Bolsa de empleo</h3>
-          <p>Acceso a vacantes exclusivas y alianzas con empresas.</p>
+          <p>Vacantes exclusivas y alianzas con empresas.</p>
         </div>
         <div class="benefit">
           <span class="icon-badge"><svg><use href="#pi-wallet"></use></svg></span>
           <h3>Apoyo económico</h3>
-          <p>Subsidio económico mensual mientras encuentras tu próxima oportunidad.</p>
+          <p>Subsidio mensual mientras encuentras tu próxima oportunidad.</p>
         </div>
         <div class="benefit">
           <span class="icon-badge"><svg><use href="#pi-mobile"></use></svg></span>
           <h3>Fácil y 100% digital</h3>
-          <p>Todo el proceso lo puedes realizar desde la comodidad de tu hogar.</p>
+          <p>Todo el proceso, desde la comodidad de tu hogar.</p>
         </div>
       </div>
 
+      <!-- 🟡 RONDA 3, 2026-09-21 — Cata dijo en la sesión del 2026-09-14
+           que esta URL "no era" la correcta; va a revisar el link real de
+           Compensar. Queda funcional tal cual hasta que la confirme —
+           ver PRD §6. -->
       <div class="access-panel">
-        <p><strong>¿Cómo acceder?</strong> Ingresa a compensar.com/subsidio/subsidio-de-desempleo y sigue los pasos para aplicar. Tienes hasta 12 meses después de tu desvinculación para hacerlo.</p>
-        <a href="https://www.compensar.com/subsidio/subsidio-de-desempleo" target="_blank" rel="noopener">Ir a compensar.com</a>
+        <p><strong>¿Cómo acceder?</strong> Ingresa a compensar.com/subsidio/subsidio-de-desempleo. Tienes hasta 12 meses después de tu salida.</p>
+        <a href="https://corporativo.compensar.com/subsidio/subsidio-de-desempleo" target="_blank" rel="noopener">Ir a compensar.com</a>
       </div>
     </div>
 
     <div class="closing">
       <p class="thanks">Gracias por ser parte de esta historia.</p>
       <p class="body">Siempre Skandia es más que un programa: es una comunidad que sigue contigo, hoy y siempre.</p>
+      <!-- RONDA 3, 2026-09-21 — reemplaza el bloque "Plan Madrina" eliminado
+           (ver nota de cabecera): un contacto simple, sin generar la
+           expectativa de un acompañante asignado. 🟡 Cata confirma la
+           dirección real de nómina. -->
+      <p class="body" style="margin-top:var(--sk-space-m);">¿Alguna duda? Escríbenos a <strong>nomina@skandia.com.co</strong>.</p>
       <div class="brand-lockup">
         <span class="brand-lockup__kicker">Siempre</span>
         <svg viewBox="0 0 280 48" aria-label="Skandia"><use href="#sk-logo-lockup"></use></svg>
@@ -619,7 +718,7 @@
 
     <div class="page__footer">
       <span>Siempre Skandia — Guía de cierre y bienvenida</span>
-      <span>4 / 4</span>
+      <span>3 / 3</span>
     </div>
   </section>
 
