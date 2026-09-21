@@ -29,12 +29,12 @@
      completo (nunca antes documentado en content.md) y corrigió la
      tarjeta de Apoyo: subtítulo "Outplacement" (jerga interna) →
      "Acompañamiento profesional" (lenguaje de usuario). Las otras 4
-     tarjetas (Mi dinero, Mis documentos, Comunidad, Novedades) quedaron
+     tarjetas (Mi liquidación, Mis documentos, Comunidad, Novedades) quedaron
      aprobadas tal cual estaban — verificadas letra por letra contra v5.
   3. [obs-003] wf6 Outplacement — las tarjetas "Hoja de vida" y
      "Entrevistas" ya no repiten la misma descripción genérica; cada una
      tiene copy propio formalizado por Kiki.
-  4. [obs-004] wf2 Mi dinero — el SLA ("— hasta 3 días hábiles") vuelve al
+  4. [obs-004] wf2 Mi liquidación — el SLA ("— hasta 3 días hábiles") vuelve al
      texto VISIBLE de las etiquetas "Paz y salvo en revisión" y
      "Liquidación solicitada", no solo a un tooltip. Se quitaron los dos
      íconos/tooltip de SLA que existían en esas etapas — quedaban
@@ -185,14 +185,14 @@
      toast de confirmación de subida; ahora hay sk-badge "Disponible desde
      el [fecha]" / "En preparación", sk-button secondary "Descargar", y un
      error de descarga (content.md v4, módulo Mis documentos).
-  B. wf2 "Mi dinero" ya NO incluye firma digital — la firma es presencial,
+  B. wf2 "Mi liquidación" ya NO incluye firma digital — la firma es presencial,
      fuera del portal. La línea de progreso pasa de 6 a 5 etapas
      (se elimina "Documentos enviados, pendiente de tu firma"). Harvey dejó
      EXPLÍCITAMENTE sin resolver (PRD §6, decisión #13) qué pasa
      visualmente en el tramo entre "Liquidación solicitada" y "Pago
      realizado" — no se inventó aquí una etapa de "firma presencial": se
      usa tal cual el microcopy de contexto que Kiki definió para ese tramo
-     (content.md v4, módulo Mi dinero), como texto de apoyo, no como un
+     (content.md v4, módulo Mi liquidación), como texto de apoyo, no como un
      nodo más del stepper.
 
   Siete ajustes de implementación directa de Rachel (sin cambio de
@@ -425,6 +425,21 @@
     --sk-color-bg:#ffffff; --sk-color-surface:#ffffff;
     --sk-color-border:#dddddd; --sk-color-border-hover:#00c73d; --sk-color-border-focus:#16d727;
     --sk-color-disabled:#f7f7f7; --sk-color-disabled-text:#a5a5a5; --sk-color-placeholder:#a5a5a5;
+    /* RONDA 34, 2026-09-21 — `--background-secundaria`: NO es un token real
+       de `SkColorPalette` (no existe en `sk-components-angular` ni en el
+       brandbook, se verificó antes de agregarlo) — es local de este
+       prototipo, mismo trato que `--primary-l01`/`--stroke-brand` más
+       abajo. Javier pidió reemplazar el blanco de fondo de página
+       (`--sk-color-bg`) por el valor de `--sk-color-disabled` (#f7f7f7):
+       se alias a esa variable (no un hex duplicado) para que quede una
+       sola fuente si `--sk-color-disabled` cambia. Aplica SOLO al fondo
+       de página/chrome (`.app-shell`, `.side-rail`, `.mobile-topbar`) —
+       las superficies (`.sk-card`, `.wf1-hero`, `.wf1-progress-card`,
+       campos de formulario, `.nav-drawer`) siguen en `--sk-color-bg`
+       blanco a propósito, para que las tarjetas blancas destaquen sobre
+       el nuevo fondo gris — mismo patrón que el pantallazo de Lovable de
+       Javier (fondo gris claro + tarjetas blancas). */
+    --background-secundaria:var(--sk-color-disabled);
     /* — opcionales (v1.3.0), con default documentado — */
     --sk-color-success-light:#ecfdf3; --sk-color-success-medium:#87f491; --sk-color-link:#0099de;
     --sk-color-secondary-hover-bg:#caf9cb; --sk-color-tertiary-hover-bg:#f6fcf2;
@@ -606,14 +621,14 @@
      hamburguesa que abre `.nav-drawer` a pantalla completa;
      `.app-shell` vuelve a columna.
      ============================================================ */
-  .app-shell{min-height:100vh;display:flex;flex-direction:row;background:var(--sk-color-bg);}
+  .app-shell{min-height:100vh;display:flex;flex-direction:row;background:var(--background-secundaria);}
 
   /* --- Rail lateral (desktop) --- */
   .side-rail{
     display:flex;flex-direction:column;flex:0 0 auto;
     width:240px;padding:var(--sk-space-l) var(--sk-space-m);
     border-right:1px solid var(--sk-color-border);
-    background:var(--sk-color-bg);
+    background:var(--background-secundaria);
     position:sticky;top:0;align-self:flex-start;height:100vh;
     transition:width var(--sk-motion-duration-base) var(--sk-motion-ease-standard);
   }
@@ -667,7 +682,7 @@
     display:none;align-items:center;justify-content:space-between;gap:var(--sk-space-m);
     padding:0 var(--sk-space-m);height:56px;
     border-bottom:1px solid var(--sk-color-border);
-    background:var(--sk-color-bg);
+    background:var(--background-secundaria);
     position:sticky;top:0;z-index:20;
   }
   .mobile-topbar.is-hidden{display:none !important;}
@@ -783,6 +798,28 @@
   .gate-modal-close{position:absolute;top:8px;right:8px;z-index:1;}
   body.gate-modal-open{overflow:hidden;}
 
+  /* RONDA 30, 2026-09-21 — módulo "Documentos por firmar" (wf3) pasa de
+     carga de foto/escaneo a firma electrónica en línea. Ver
+     `investigacion/siempre-skandia-firma-electronica-propuesta.md`: esta
+     ronda prototipa la EXPERIENCIA (ver + firmar sin salir del portal),
+     no el mecanismo real de firma — esa decisión (firma electrónica
+     simple in-house vs. proveedor) sigue pendiente de Legal/TI.
+     `#docModal` reusa el shell visual `.gate-modal-overlay/-panel/-close`
+     de arriba (genérico, sin nada específico de "gate") pero es un modal
+     independiente y SIEMPRE descartable — nunca es un paso obligatorio
+     como wf4/wf5. Un solo modal para los 7 documentos: openDocModal(key)
+     decide qué tarjeta está en juego y en qué sub-vista abrir (ver /
+     firmar), igual que wf4Panel/wf5Panel se reparentan dentro de
+     #gateModalBody más arriba. */
+  .doc-preview__page{
+    border:1px solid var(--sk-color-border);border-radius:8px;
+    padding:var(--sk-space-l);background:var(--sk-color-surface);
+  }
+  .doc-preview__kicker{font-size:.75rem;color:var(--sk-color-text-muted);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px;}
+  .doc-preview__title{font-weight:700;font-size:1.0625rem;margin:0 0 12px;}
+  .doc-preview__body{font-size:.875rem;color:var(--sk-color-text);margin:0 0 8px;}
+  .sign-doc-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
   /* --- Contenido: fila en desktop (rail + main), columna en mobile --- */
   .app-main{flex:1;min-width:0;display:flex;flex-direction:column;}
 
@@ -827,6 +864,15 @@
   .sk-breadcrumb__separator{color:var(--sk-color-text-muted);}
 
   main#screens{flex:1;width:100%;max-width:960px;margin:0 auto;padding:var(--sk-space-xl) var(--sk-space-xl) 64px;}
+  /* RONDA 32, 2026-09-21 — Javier probó una redistribución del home en
+     Lovable (hero + "Tu progreso" lado a lado, ver nota junto a
+     `.wf1-top-row`) que necesita más ancho del que 960px permite para
+     verse como el ejemplo. Se amplía SOLO Inicio (clase `.is-wf1`, la
+     alterna `showScreen()` en el <script>) — un cambio del `max-width`
+     global habría ensanchado wf2..wf8 de paso, fuera de lo pedido
+     ("la parte inferior... puede quedar igual"). 1280px: deja aire a los
+     lados incluso en portátiles de 1366px con el rail de 240px puesto. */
+  main#screens.is-wf1{max-width:1280px;}
   .screen{display:none;}
   /* Entrada al cambiar de pantalla — solo opacity+translateY (sin blur,
      más liviano en un contenedor grande) vía transición con clase
@@ -1144,7 +1190,7 @@
      esas reglas se dejaron intactas a propósito, ver nota junto a ellas
      más abajo.
      Retirados por pedido de Javier (ronda de feedback visual):
-     `.sk-card--priority` (borde verde en Mi dinero/Mis documentos — ya
+     `.sk-card--priority` (borde verde en Mi liquidación/Mis documentos — ya
      no se usa en ningún elemento) y `.sk-card--accent`/`--comercial`
      (acento de color en Novedades — las tarjetas de Novedades ahora
      siguen la misma estructura ícono+título+texto que Apoyo, sin
@@ -1421,50 +1467,14 @@
   .sk-selectbutton.is-invalid button{border-color:var(--sk-color-error);}
   .sk-selectbutton--scale button{flex:0 0 auto;min-width:42px;}
 
-  /* ============================================================
-     FALLBACK sk-file-upload — RONDA 17, 2026-09-08. Primer uso real en
-     este archivo (módulo "Documentos por firmar", wf3). Confirmado contra
-     `sk-file-upload.md`: `mode('advanced'|'basic')`, aquí SIEMPRE
-     `basic` (un botón, sin drag-and-drop) porque cada documento es un
-     control independiente dentro de una tarjeta angosta — un dropzone
-     grande x7 no cabe razonablemente. `label`/`hint`/`accept`/
-     `maxFileSize`/`errorMessage` son props reales; `chooseLabel` es el
-     texto del botón. La ficha aclara que el componente es "emit-only"
-     (selecciona/valida, no sube por red) — coherente con este prototipo,
-     que solo simula el estado resultante (subido/rechazado), nunca hace
-     una petición real. "Sin Figma dedicado" (nota propia de la ficha):
-     este fallback es genuinamente provisional, no una re-derivación de un
-     spec visual confirmado como el resto de los componentes de este
-     archivo. -->
-  .sk-file-upload{display:block;}
-  .sk-file-upload__basic{display:flex;align-items:center;gap:var(--sk-space-s);flex-wrap:wrap;}
-  /* El label hace de botón real (asociado al <input type=file hidden> por
-     `for`) — mismo look que .sk-btn--secondary, sin duplicar CSS. `.sk-btn`
-     es `width:100%` por defecto (pensado para CTAs de ancho de columna);
-     acá necesita ancho de contenido, como "Descargar" en las tarjetas de
-     descarga (que lo logra con `style="width:auto"` inline) — aquí va
-     por clase, no inline, porque son 7 instancias repetidas. */
-  .sk-file-upload__choose{cursor:pointer;width:auto;}
-  .sk-file-upload__input{
-    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
-    clip:rect(0,0,0,0);white-space:nowrap;border:0;
-  }
-  .sk-file-upload__filename{font-size:.8125rem;color:var(--sk-color-text);word-break:break-all;}
-  .sk-file-upload__remove{
-    flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;
-    background:none;border:none;border-radius:6px;color:var(--sk-color-text-muted);cursor:pointer;
-  }
-  /* [hidden] tiene la misma especificidad que una clase — sin esto, el
-     `display:flex` de arriba gana por orden de aparición y el botón
-     "Quitar" queda visible incluso con el atributo `hidden` puesto. */
-  .sk-file-upload__remove[hidden]{display:none;}
-  .sk-file-upload__remove:hover{background:var(--sk-color-disabled);}
-  .sk-file-upload__remove:focus-visible{outline:2px solid var(--sk-color-primary);outline-offset:2px;}
-  .sk-file-upload__remove .pi{font-size:14px;}
-  .sk-file-upload__hint{font-size:.75rem;color:var(--sk-color-text-muted);margin:6px 0 0;}
-  .sk-file-upload__error{font-size:.8125rem;color:var(--sk-color-error);margin:6px 0 0;display:none;}
-  .sk-file-upload.is-invalid .sk-file-upload__error{display:block;}
-  .sk-file-upload.is-invalid .sk-file-upload__hint{display:none;}
+  /* FALLBACK sk-file-upload — RONDA 17, 2026-09-08, retirado en RONDA 30
+     (2026-09-21): el módulo "Documentos por firmar" (wf3) que lo
+     consumía pasó de carga de archivo a firma electrónica en línea (ver
+     esa pantalla y `investigacion/siempre-skandia-firma-electronica-
+     propuesta.md`). Sin otro consumidor en el archivo — se retira el CSS
+     completo en vez de dejarlo huérfano. Si un módulo futuro vuelve a
+     necesitar carga de archivo real, la ficha `sk-file-upload.md` sigue
+     siendo la referencia (mode 'basic', componente "emit-only"). */
 
   /* ============================================================
      FALLBACK sk-progress-bar — RONDA 5 corrige el nombre del tag real
@@ -1574,27 +1584,151 @@
      brochure en sí mismo solo se envía a quien sale por Ruta 1 (dato ya
      confirmado en esta conversación). Ruta 3 tampoco: su arco es sobrio/
      acompañante, nunca celebratorio (content.md, "Arcos narrativos").
-     Extenderlo a otras rutas sería una decisión de tono nueva, no algo
-     que este pedido cubra. */
+     RONDA 27, 2026-09-21 — reactivado (ya no display:none): Rafa pidió en
+     la sesión del 2026-09-14 "banners e imágenes" para que el portal se
+     vea menos plano — pedido general, no específico de Ruta 1, así que
+     Ruta 2/3 ganan su propio banner (`.wf1-banner`, más abajo) en vez de
+     extender ESTE hero celebratorio, que sigue reservado a Ruta 1 por la
+     misma regla de tono de arriba (no se tocó, solo se reactivó). Gana
+     además `.wf1-hero__photo`: un placeholder de imagen 🟡 (proporción y
+     encuadre reales, relleno gráfico de marca) — Mercadeo/Gestión Humana
+     lo reemplaza por una foto real embebida como data-URI antes de
+     producción; hasta entonces no hay licencia para usar una foto de
+     stock ni la del brochure impreso.
+     RONDA 31, 2026-09-21 — reemplazado por RONDA 32 (ver abajo): se había
+     probado una variante "hero-section-9" (gradiente + acciones + stats +
+     collage de 3 fotos placeholder). Javier hizo su propio ejercicio de
+     redistribución en Lovable y pidió adoptar ESA distribución en su
+     lugar — queda solo esta nota como rastro, el CSS de esa variante ya
+     no existe (histórico completo en el backup
+     `portal-siempre-skandia-prototipo.backup-20260921-151454.html`).
+     RONDA 32, 2026-09-21 — hero reconstruido sobre la distribución que
+     Javier probó en Lovable para Inicio (pantallazo compartido en la
+     conversación): tarjeta CLARA de 2 columnas (contenido + imagen real),
+     ya no el bloque de `--sk-gradient-brand` a ancho completo. Junto a
+     `.wf1-top-row`, además gana un panel "Tu progreso" (ver esa nota).
+     - Fondo: se abandona `--sk-gradient-brand` por la receta real de
+       `.sk-card` (línea ~1148: `--sk-color-bg` + borde `--sk-color-border`
+       + `--sk-shadow-surface`) — ya no hay texto blanco sobre gradiente,
+       así que también se retiran las inversiones de color de
+       `.sk-btn--primary/--secondary` que eso exigía (RONDA 31).
+     - Imagen: antes placeholder 🟡 (sin licencia para foto de stock).
+       Javier entregó la ilustración real de campaña, misma familia visual
+       verde/marca que el resto del portal — se usa directo, sin flag de
+       pendiente. `.webp` (RONDA 33: Javier entregó la versión optimizada,
+       reemplaza el `.png` de 1.8MB de RONDA 32). `object-position:right`
+       porque el propio archivo trae espacio negativo a la izquierda (las
+       2 figuras están a la derecha); así se prioriza que ambas queden
+       visibles al recortar con `object-fit:cover` en vez de partir la
+       composición por la mitad.
+       RONDA 33 — `mask-image` en vez de un recorte duro: Javier pidió NO
+       cortar el inicio (borde izquierdo) de la imagen, sino difuminarlo,
+       como en su referencia de Lovable. `object-fit:cover` sigue
+       recortando igual (sigue haciendo falta para llenar el contenedor
+       sin dejar huecos), pero el borde donde antes se veía un corte recto
+       ahora se desvanece a transparente — revela el mismo `--sk-color-bg`
+       blanco de `.wf1-hero__content` detrás, así que el empalme es
+       continuo, no una línea visible.
+     - Acciones: "Ver mi proceso" (antes "Ir a mi liquidación") apunta al
+       mismo destino `wf2`, wording tomado del pantallazo de Javier;
+       "Mis documentos" apunta a `wf3` (antes el 2do CTA iba a Comunidad/
+       wf7 — Comunidad ya tiene su propio tile en "Tu proceso" más abajo,
+       y el pantallazo de Javier prioriza Documentos, no Comunidad, como
+       2da acción del hero). Ambos con las clases reales del DS
+       (`.sk-btn--primary`/`--secondary`), sin overrides — sobre fondo
+       claro no hace falta invertir color.
+     - Stats/galería de 3 fotos de RONDA 31 se retiran (no estaban en la
+       distribución que Javier pidió adoptar). */
   .wf1-hero{
-    background:var(--sk-gradient-brand);border-radius:16px;
-    padding:var(--sk-space-l);margin-bottom:var(--sk-space-l);
-    color:var(--sk-color-text-inverse);
-    display:flex;align-items:center;gap:var(--sk-space-l);
+    background:var(--sk-color-bg);border:1px solid var(--sk-color-border);
+    box-shadow:var(--sk-shadow-surface);border-radius:16px;overflow:hidden;
+    display:flex;align-items:stretch;
   }
-  .wf1-hero__mark{width:64px;height:64px;flex-shrink:0;opacity:.9;}
+  .wf1-hero__content{flex:1 1 55%;min-width:0;padding:var(--sk-space-l);}
   .wf1-hero__eyebrow{
     font-family:var(--sk-font-title);font-weight:700;font-size:.8125rem;
-    letter-spacing:.03em;text-transform:uppercase;opacity:.85;margin:0 0 6px;
+    letter-spacing:.03em;text-transform:uppercase;color:var(--sk-color-primary);margin:0 0 10px;
   }
-  .wf1-hero__title{font-family:var(--sk-font-title);font-weight:700;font-size:1.5rem;line-height:1.3;margin:0 0 8px;}
-  .wf1-hero__body{font-size:1rem;line-height:1.5;margin:0;max-width:56ch;}
+  .wf1-hero__title{font-family:var(--sk-font-title);font-weight:700;font-size:1.75rem;line-height:1.3;margin:0 0 10px;color:var(--sk-color-text);}
+  .wf1-hero__body{font-size:1rem;line-height:1.5;margin:0 0 var(--sk-space-l);max-width:48ch;color:var(--sk-color-text);}
+  .wf1-hero__actions{display:flex;flex-wrap:wrap;gap:12px;}
+  .wf1-hero__image{flex:1 1 45%;min-width:180px;}
+  .wf1-hero__image img{
+    width:100%;height:100%;min-height:240px;object-fit:cover;object-position:right center;display:block;
+    -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 20%);
+    mask-image:linear-gradient(to right, transparent 0%, #000 20%);
+  }
+  @media (max-width:768px){
+    .wf1-hero{flex-direction:column;}
+    .wf1-hero__image img{min-height:180px;}
+  }
   @media (max-width:480px){
-    .wf1-hero{flex-direction:column;align-items:flex-start;padding:var(--sk-space-m);}
-    .wf1-hero__mark{width:40px;height:40px;}
+    .wf1-hero__content{padding:var(--sk-space-m);}
   }
 
-  /* Tarjetas destacadas de wf1 (Mi dinero + Mis documentos) — mismo
+  /* RONDA 32, 2026-09-21 — fila superior de Inicio (Ruta 1): hero +
+     panel "Tu progreso", lado a lado, distribución tomada del ejercicio
+     de Javier en Lovable. Requiere el contenedor ancho de
+     `main#screens.is-wf1` (ver esa nota) para no verse apretado.
+     "Tu progreso" NO es contenido nuevo inventado: reusa la MISMA fuente
+     de verdad que ya existía (el stepper de 6 etapas de wf2 y la barra
+     `wf1MoneyFill` de la tarjeta "Mi liquidación", ambos alimentados por
+     `renderStage()`/el slider QA "Etapa Mi liquidación") — ver
+     `syncStepperDots()` en el <script>. El pantallazo de Javier traía 4
+     pasos de ejemplo inventados por Lovable ("Notificación recibida",
+     etc.); acá son versiones CORTAS de las 6 etapas reales del MPO que ya
+     usa `#wf2StepperFull` (RONDA 17), no un proceso nuevo — evita
+     divergir de la fuente ya aprobada por negocio. Solo Ruta 1: este
+     panel vive dentro del `.variant[data-r="r1"]`, que nunca usa la
+     variante reducida de 3 etapas (esa es exclusiva de Ruta 3), así que
+     `renderStage()` no necesita una rama `isReduced` para este panel. */
+  .wf1-top-row{display:flex;gap:var(--sk-space-l);align-items:stretch;margin-bottom:var(--sk-space-l);}
+  .wf1-top-row .wf1-hero{flex:1 1 62%;margin-bottom:0;}
+  .wf1-progress-card{
+    flex:1 1 38%;min-width:260px;
+    background:var(--sk-color-bg);border:1px solid var(--sk-color-border);
+    box-shadow:var(--sk-shadow-surface);border-radius:16px;padding:var(--sk-space-l);
+  }
+  .wf1-progress-card__head{display:flex;align-items:center;justify-content:space-between;gap:var(--sk-space-s);margin-bottom:var(--sk-space-m);}
+  .wf1-progress-card__eyebrow{
+    font-family:var(--sk-font-title);font-weight:700;font-size:.8125rem;
+    letter-spacing:.03em;text-transform:uppercase;color:var(--sk-color-text-muted);margin:0;
+  }
+  .wf1-progress-card__pct{margin:0 0 8px;line-height:1;}
+  .wf1-progress-card__pct-num{font-family:var(--sk-font-title);font-weight:700;font-size:2.5rem;color:var(--sk-color-text);}
+  .wf1-progress-card__pct-suffix{font-size:.9375rem;color:var(--sk-color-text-muted);margin-left:2px;}
+  .wf1-progress-card .sk-progressbar{height:8px;margin-bottom:var(--sk-space-l);}
+  .wf1-progress-card .sk-progressbar__label{display:none;} /* barra fina — el % grande de arriba ya lo comunica, sin duplicarlo dentro de 8px de alto */
+  .wf1-progress-card__steps{list-style:none;margin:0;padding:0;}
+  @media (max-width:768px){
+    .wf1-top-row{flex-direction:column;}
+    .wf1-top-row .wf1-hero{margin-bottom:0;}
+  }
+
+  /* RONDA 27, 2026-09-21 — banner sobrio de wf1 para Ruta 2 y Ruta 3: mismo
+     pedido de "banners e imágenes" que el hero de arriba, pero sin
+     gradiente ni copy celebratorio — respeta la misma regla de tono
+     (content.md, "Ruta 2 no puede celebrar"; Ruta 3 es sobria/
+     acompañante). Superficie neutra (`--sk-color-surface` + borde), no
+     `--sk-gradient-brand`. */
+  .wf1-banner{
+    background:var(--sk-color-surface);border:1px solid var(--sk-color-border);
+    border-radius:16px;padding:var(--sk-space-m);margin-bottom:var(--sk-space-l);
+    display:flex;align-items:center;gap:var(--sk-space-m);
+  }
+  .wf1-banner__photo{
+    flex-shrink:0;width:72px;height:72px;border-radius:10px;
+    border:1.5px dashed var(--sk-color-border);
+    background:repeating-linear-gradient(135deg, rgba(0,0,0,.03) 0 8px, rgba(0,0,0,.01) 8px 16px);
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-size:.625rem;line-height:1.2;color:var(--sk-color-text-muted);padding:6px;
+  }
+  .wf1-banner__body{font-size:.875rem;line-height:1.4;color:var(--sk-color-text-muted);margin:0;}
+  @media (max-width:480px){
+    .wf1-banner{flex-direction:column;align-items:flex-start;}
+  }
+
+  /* Tarjetas destacadas de wf1 (Mi liquidación + Mis documentos) — mismo
      mecanismo de flex-wrap que .hub-grid, contenedor propio porque llevan
      tipografía sk-card__header/__subheader (grande), no hub-tile__title/
      __sub (compacta). Decisión de Javier, 2026-09-02. */
@@ -1687,6 +1821,50 @@
      data-route / data-route-group en <body> (ver JS applyRoute()) */
   .variant{display:none;}
   .placeholder-note{font-size:.75rem;color:#a05a00;background:#fff9ec;border:1px dashed #e0b04d;border-radius:6px;padding:8px 10px;margin-top:8px;}
+
+  /* RONDA 27, 2026-09-21 — footer de cierre. Reemplaza el hueco que deja
+     Novedades oculta (ver nota junto a #wf8): "contenido mínimo
+     controlable" que la sesión del 2026-09-14 propuso como alternativa —
+     redes de Skandia + contacto, sin depender de Mercadeo. Vive como
+     hermano de <main id="screens"> dentro de .app-main, así que aparece
+     debajo del contenido en las 9 pantallas salvo wf0 (apagado en
+     showScreen(), mismo mecanismo que el side-rail).
+     RONDA 28, 2026-09-21 — Cata confirmó las 4 redes reales y el correo
+     de contacto; se retira "Portal de clientes Skandia" (sin URL
+     confirmada, no formaba parte de lo pedido) y el layout pasa de una
+     fila de 2 pills de texto a: eyebrow + fila de íconos de red social +
+     línea de ayuda con el correo.
+     RONDA 29, 2026-09-21 — Javier: los 3 segmentos apilados (columna)
+     hacían crecer el footer en vertical y quedaban pegados a la
+     izquierda del ancho completo de .app-main. Pasa a una sola fila
+     centrada (`flex-wrap:wrap` solo como red de seguridad en viewports
+     angostos, no como comportamiento esperado en desktop) — se quita
+     `max-width:640px` (ya no aplica: una fila centrada debe usar el
+     ancho real del contenedor, no un ancho fijo angosto) y se centra
+     con `justify-content:center` + `text-align:center` (fallback para
+     el `<a>` de ayuda si en algún viewport angosto queda solo en su
+     propia línea). */
+  .app-footer{
+    margin:var(--sk-space-xl,48px) 0 var(--sk-space-l) 0;
+    padding-top:var(--sk-space-m);border-top:1px solid var(--sk-color-border);
+    display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center;
+    gap:var(--sk-space-m);text-align:center;
+  }
+  .app-footer__label{font-size:.75rem;color:var(--sk-color-text-muted);margin:0;white-space:nowrap;}
+  .app-footer__socials{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sk-space-s);}
+  .app-footer__social{
+    display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;
+    border-radius:50%;background:var(--sk-color-tertiary-hover-bg);color:var(--sk-color-primary);
+    flex-shrink:0;
+    transition:background var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
+               color var(--sk-motion-duration-fast) var(--sk-motion-ease-standard);
+  }
+  .app-footer__social svg{width:18px;height:18px;}
+  .app-footer__social:hover{background:var(--sk-color-primary);color:#fff;}
+  .app-footer__social:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,199,61,.3);}
+  .app-footer__help{font-size:.875rem;color:var(--sk-color-text-muted);margin:0;white-space:nowrap;}
+  .app-footer__help a{color:var(--sk-color-primary);font-weight:600;text-decoration:none;}
+  .app-footer__help a:hover{text-decoration:underline;}
 </style>
 </head>
 <body data-route="r2" data-route-group="r2" data-notif="none" data-ventana1="false" data-outlevel="general">
@@ -1772,6 +1950,23 @@
   <symbol id="pi-times" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M6 6l12 12"/><path d="M18 6L6 18"/>
   </symbol>
+  <!-- RONDA 28, 2026-09-21 — 4 íconos de red social para el footer de
+       cierre (ver #appFooter), mismo estilo de trazo (24x24, stroke
+       currentColor) que el resto del sprite — no son logos oficiales a
+       color, son la versión lineal consistente con el lenguaje visual
+       ya establecido en este archivo. -->
+  <symbol id="pi-linkedin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4V9h4v1.5A5.98 5.98 0 0 1 16 8Z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+  </symbol>
+  <symbol id="pi-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/>
+  </symbol>
+  <symbol id="pi-youtube" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 12c0-2.4-.2-4-.5-5.1a2.8 2.8 0 0 0-2-2C17.8 4.5 12 4.5 12 4.5s-5.8 0-7.5.4a2.8 2.8 0 0 0-2 2C2.2 8 2 9.6 2 12s.2 4 .5 5.1a2.8 2.8 0 0 0 2 2c1.7.4 7.5.4 7.5.4s5.8 0 7.5-.4a2.8 2.8 0 0 0 2-2c.3-1.1.5-2.7.5-5.1Z"/><path d="M10 8.7 15.3 12 10 15.3Z"/>
+  </symbol>
+  <symbol id="pi-facebook" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15.5 3h-2A4.5 4.5 0 0 0 9 7.5v3H6.5v4H9v6.5h4V14.5h2.7l.6-4H13v-2.5a1 1 0 0 1 1-1h2.5Z"/>
+  </symbol>
   <!-- RONDA 15 — logotipo Skandia como symbol reutilizable: antes solo
        existía inline (una vez, dentro de .top-nav). El rail lateral, la
        barra mobile y el drawer necesitan el mismo lockup 3 veces más; en
@@ -1841,29 +2036,37 @@
       <select id="qaScreen">
         <option value="wf0">wf0 · Acceso</option>
         <option value="wf1">wf1 · Inicio</option>
-        <option value="wf2">wf2 · Mi dinero</option>
+        <option value="wf2">wf2 · Mi liquidación</option>
         <option value="wf3">wf3 · Mis documentos</option>
         <option value="wf4">wf4 · Entrevista de retiro</option>
         <option value="wf5">wf5 · Encuesta de satisfacción</option>
-        <option value="wf6">wf6 · Outplacement</option>
+        <option value="wf6">wf6 · Apoyo para tu próximo paso</option>
         <option value="wf7">wf7 · Comunidad</option>
-        <option value="wf8">wf8 · Novedades</option>
+        <option value="wf8" id="qaScreenWf8Option" class="v-novedades">wf8 · Novedades</option>
       </select>
     </div>
     <!-- RONDA 22 — se quita el selector manual "Notificación activa en
          Inicio (wf1)": Javier pidió dejar de simularlo a mano ahora que
          Entrevista/Encuesta son un beneficio real que se va a incluir.
          renderWf1Notif() (ver <script>) ya calcula esto solo, a partir de
-         esta misma etapa de "Mi dinero" — es la regla que el PRD siempre
+         esta misma etapa de "Mi liquidación" — es la regla que el PRD siempre
          documentó (wf4/wf5, "Transición") pero que antes solo vivía en
          este selector manual, nunca conectada al dato real. -->
     <div class="qa-field">
-      <label for="qaStage">Etapa Mi dinero (wf2): <span id="qaStageLabel">1</span></label>
+      <label for="qaStage">Etapa Mi liquidación (wf2): <span id="qaStageLabel">1</span></label>
       <input type="range" id="qaStage" min="0" max="4" value="0" step="1">
     </div>
     <div class="qa-field">
       <label for="qaVentana">Días desde notificación (wf8, Ruta 2): <span id="qaVentanaLabel">0</span></label>
       <input type="range" id="qaVentana" min="0" max="20" value="0" step="1">
+    </div>
+    <!-- RONDA 27, 2026-09-21 — Novedades se oculta por defecto (pedido de Rafa,
+         sesión 2026-09-14, complejidad operativa de contenido real). Este
+         checkbox es el único punto de entrada para volver a verla completa en
+         la demo — ver applyNovedadesVisibility() en el <script>. -->
+    <div class="qa-field checkline">
+      <input type="checkbox" id="qaShowNovedades">
+      <label for="qaShowNovedades">wf8 — mostrar Novedades (2.0, oculta por defecto)</label>
     </div>
     <div class="qa-field checkline">
       <input type="checkbox" id="qaOutExec">
@@ -1882,8 +2085,8 @@
       <label for="qaDocsEmpty">wf3 — simular sin documentos disponibles</label>
     </div>
     <div class="qa-field checkline">
-      <input type="checkbox" id="qaUploadError">
-      <label for="qaUploadError">wf3 — simular archivo rechazado en la próxima carga</label>
+      <input type="checkbox" id="qaSignError">
+      <label for="qaSignError">wf3 — simular error al firmar el próximo documento</label>
     </div>
     <div class="qa-field checkline">
       <input type="checkbox" id="qaHideReviewerNotes" checked>
@@ -1934,11 +2137,17 @@
     </div>
     <div class="nav-drawer__links">
       <button class="nav-item sk-interactive" data-nav="wf1"><i class="pi pi-home"><svg><use href="#pi-home"></use></svg></i><span class="nav-item__label">Inicio</span></button>
-      <button class="nav-item sk-interactive" data-nav="wf2"><i class="pi pi-wallet"><svg><use href="#pi-wallet"></use></svg></i><span class="nav-item__label">Mi dinero</span></button>
+      <button class="nav-item sk-interactive" data-nav="wf2"><i class="pi pi-wallet"><svg><use href="#pi-wallet"></use></svg></i><span class="nav-item__label">Mi liquidación</span></button>
       <button class="nav-item sk-interactive" data-nav="wf3"><i class="pi pi-file"><svg><use href="#pi-file"></use></svg></i><span class="nav-item__label">Documentos</span></button>
+      <!-- RONDA 27, 2026-09-21 — punto de entrada permanente a Entrevista/Encuesta,
+           además del banner de wf1 (ver nota junto a #wf1Notif). `data-nav-group`
+           (no `data-nav`): el destino es dinámico (wf4 o wf5 según qué esté
+           pendiente), así que queda fuera del wiring genérico por `data-nav` y usa
+           su propio listener — ver pendingEntrevistaTarget() en el <script>. -->
+      <button class="nav-item sk-interactive" data-nav-group="wf4 wf5"><i class="pi pi-comment"><svg><use href="#pi-comment"></use></svg></i><span class="nav-item__label">Encuesta</span></button>
       <button class="nav-item v-community sk-interactive" data-nav="wf7"><i class="pi pi-users"><svg><use href="#pi-users"></use></svg></i><span class="nav-item__label">Comunidad</span></button>
       <button class="nav-item v-outplacement sk-interactive" data-nav="wf6"><i class="pi pi-compass"><svg><use href="#pi-compass"></use></svg></i><span class="nav-item__label">Apoyo</span></button>
-      <button class="nav-item sk-interactive" data-nav="wf8"><i class="pi pi-megaphone"><svg><use href="#pi-megaphone"></use></svg></i><span class="nav-item__label">Novedades</span></button>
+      <button class="nav-item v-novedades sk-interactive" data-nav="wf8"><i class="pi pi-megaphone"><svg><use href="#pi-megaphone"></use></svg></i><span class="nav-item__label">Novedades</span></button>
     </div>
   </nav>
 
@@ -1959,6 +2168,64 @@
     </div>
   </div>
 
+  <!-- RONDA 30, 2026-09-21 — modal de "ver documento / firmar documento"
+       (wf3, módulo Documentos por firmar). Reusa el shell visual
+       `.gate-modal-overlay/-panel/-close` de arriba (genérico, sin nada
+       propio de "gate") pero es un modal aparte, SIEMPRE descartable
+       (✕, Escape, click fuera — ver openDocModal()/closeDocModal() en el
+       <script>), nunca un paso obligatorio como wf4/wf5. Un solo modal
+       para los 7 documentos: 2 sub-vistas (#docModalView / #docModalSign)
+       que se alternan según en qué paso está la persona, igual que
+       wf4Panel/wf5Panel se reparentan dentro de #gateModalBody arriba —
+       aquí no hace falta reparentar nada porque el contenido de cada
+       documento se rellena por JS (título, vista previa), no vive
+       duplicado en el DOM 7 veces. -->
+  <div class="gate-modal-overlay" id="docModal" role="dialog" aria-modal="true" aria-label="Documento">
+    <div class="gate-modal-panel" id="docModalPanel" style="width:var(--sk-modal-width-medium);">
+      <button type="button" class="nav-drawer__close-btn gate-modal-close sk-interactive" id="docModalCloseBtn" aria-label="Cerrar">
+        <i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i>
+      </button>
+
+      <div id="docModalView">
+        <p class="sk-caption muted" style="margin:0 0 4px;">Vista previa</p>
+        <h2 class="sk-h2" id="docModalViewTitle" style="margin:0 0 var(--sk-space-m);"></h2>
+        <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="margin-bottom:var(--sk-space-m);"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Vista previa de ejemplo — el contenido real lo genera Nómina a partir de la plantilla parametrizada (ver `investigacion/siempre-skandia-firma-electronica-propuesta.md`).</span></p>
+        <div class="doc-preview__page">
+          <p class="doc-preview__kicker">Skandia — Documento de retiro</p>
+          <p class="doc-preview__title" id="docModalPreviewTitle"></p>
+          <p class="doc-preview__body">Para: <strong>Laura Gómez</strong> — C.C. [número de documento]</p>
+          <p class="doc-preview__body">[Contenido del documento, generado automáticamente a partir de tus datos de retiro.]</p>
+        </div>
+        <div class="row-between content-gap" style="margin-top:var(--sk-space-m);">
+          <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" id="docModalCloseFromView" style="width:auto;">Cerrar</button></sk-button>
+          <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" id="docModalGoSign" style="width:auto;">Firmar documento</button></sk-button>
+        </div>
+      </div>
+
+      <div id="docModalSign" style="display:none;">
+        <h2 class="sk-h2" id="docModalSignTitle" style="margin:0 0 6px;"></h2>
+        <p class="sk-body muted content-gap" style="margin-top:0;">Estás por firmar este documento electrónicamente. Queda asociado a tu sesión verificada y a la fecha y hora de hoy.<span class="placeholder-note" style="display:inline" data-audience="reviewer"> 🟡 mecanismo de firma sin confirmar — ver investigación citada arriba y PRD §6</span></p>
+        <sk-input-text><div class="sk-field"><div class="sk-field__box is-floating"><span class="sk-field__label">Nombre completo</span><input type="text" id="docModalSignName" value="Laura Gómez"></div></div></sk-input-text>
+        <sk-checkbox style="display:block;margin-top:var(--sk-space-m);">
+          <label class="sk-checkbox-row">
+            <input type="checkbox" id="docModalSignConsent">
+            <span class="sk-body">He leído este documento y acepto firmarlo electrónicamente.</span>
+          </label>
+        </sk-checkbox>
+        <div id="docModalSignError" style="display:none;margin-top:var(--sk-space-m);">
+          <div class="sk-alert sk-callout" data-type="error" data-variant="error" data-audience="user">
+            <i class="pi pi-exclamation-triangle"><svg><use href="#pi-exclamation-triangle"></use></svg></i>
+            <div class="sk-alert__body"><p class="sk-alert__msg">No pudimos registrar tu firma. Intenta de nuevo.</p></div>
+          </div>
+        </div>
+        <div class="row-between content-gap" style="margin-top:var(--sk-space-m);">
+          <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" id="docModalBackToView" style="width:auto;">Atrás</button></sk-button>
+          <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" id="docModalConfirmSign" style="width:auto;" disabled>Firmar documento</button></sk-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <nav class="side-rail" id="sideRail">
     <div class="side-rail__brand">
       <svg class="side-rail__logo" viewBox="0 0 280 48" aria-label="Skandia"><use href="#sk-logo-lockup"></use></svg>
@@ -1972,11 +2239,12 @@
     </div>
     <div class="side-rail__links">
       <button class="nav-item sk-interactive" data-nav="wf1"><i class="pi pi-home"><svg><use href="#pi-home"></use></svg></i><span class="nav-item__label">Inicio</span></button>
-      <button class="nav-item sk-interactive" data-nav="wf2"><i class="pi pi-wallet"><svg><use href="#pi-wallet"></use></svg></i><span class="nav-item__label">Mi dinero</span></button>
+      <button class="nav-item sk-interactive" data-nav="wf2"><i class="pi pi-wallet"><svg><use href="#pi-wallet"></use></svg></i><span class="nav-item__label">Mi liquidación</span></button>
       <button class="nav-item sk-interactive" data-nav="wf3"><i class="pi pi-file"><svg><use href="#pi-file"></use></svg></i><span class="nav-item__label">Documentos</span></button>
+      <button class="nav-item sk-interactive" data-nav-group="wf4 wf5"><i class="pi pi-comment"><svg><use href="#pi-comment"></use></svg></i><span class="nav-item__label">Encuesta</span></button>
       <button class="nav-item v-community sk-interactive" data-nav="wf7"><i class="pi pi-users"><svg><use href="#pi-users"></use></svg></i><span class="nav-item__label">Comunidad</span></button>
       <button class="nav-item v-outplacement sk-interactive" data-nav="wf6"><i class="pi pi-compass"><svg><use href="#pi-compass"></use></svg></i><span class="nav-item__label">Apoyo</span></button>
-      <button class="nav-item sk-interactive" data-nav="wf8"><i class="pi pi-megaphone"><svg><use href="#pi-megaphone"></use></svg></i><span class="nav-item__label">Novedades</span></button>
+      <button class="nav-item v-novedades sk-interactive" data-nav="wf8"><i class="pi pi-megaphone"><svg><use href="#pi-megaphone"></use></svg></i><span class="nav-item__label">Novedades</span></button>
     </div>
   </nav>
 
@@ -2116,38 +2384,125 @@
                calibrado de tono para PANTALLA (vs. brochure impreso) no
                ha pasado por Kiki todavía — mismo criterio que el resto de
                copy nueva de este archivo.
-               RONDA 24, 2026-09-09 — oculto "por ahora" a pedido de
-               Javier: lo revisará con los stakeholders en una sesión
-               posterior antes de dejarlo visible de nuevo. No se borra —
-               solo display:none en el hero y en su flag de revisor. -->
-          <div class="wf1-hero" style="display:none;">
-            <svg class="wf1-hero__mark" viewBox="-2 -2 41 41" aria-hidden="true"><use href="#sk-logo-lockup" x="0" y="-10.34" width="280" height="48"></use></svg>
-            <div>
-              <p class="wf1-hero__eyebrow">Siempre Skandia</p>
-              <p class="wf1-hero__title">No es un adiós. Es el inicio de nuevas historias, juntos.</p>
-              <p class="wf1-hero__body">Cada etapa cuenta. Gracias por ser parte de esta historia — Siempre Skandia es más que un programa, es una comunidad que sigue contigo, hoy y siempre.</p>
+               RONDA 27, 2026-09-21 — reactivado (ver nota junto al CSS
+               `.wf1-hero`): Rafa pidió más recurso visual en la sesión del
+               2026-09-14. Gana `.wf1-hero__photo`, placeholder 🟡 a
+               reemplazar por Mercadeo/Gestión Humana.
+               RONDA 32, 2026-09-21 — reconstruido sobre la distribución que
+               Javier probó en Lovable (hero claro de 2 columnas + panel
+               "Tu progreso" al lado, ver nota completa junto al CSS
+               `.wf1-hero`/`.wf1-top-row`). Eyebrow/título/cuerpo NO
+               cambian (mismo copy de RONDA 23); la foto placeholder se
+               reemplaza por la ilustración real que entregó Javier. -->
+          <div class="wf1-top-row">
+            <div class="wf1-hero">
+              <div class="wf1-hero__content">
+                <p class="wf1-hero__eyebrow">Siempre Skandia</p>
+                <p class="wf1-hero__title">No es un adiós. Es el inicio de nuevas historias, juntos.</p>
+                <p class="wf1-hero__body">Cada etapa cuenta. Gracias por ser parte de esta historia — Siempre Skandia es más que un programa, es una comunidad que sigue contigo, hoy y siempre.</p>
+                <div class="wf1-hero__actions">
+                  <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-goto="wf2" style="width:auto;">Ver mi proceso</button></sk-button>
+                  <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-goto="wf3" style="width:auto;">Mis documentos</button></sk-button>
+                </div>
+              </div>
+              <div class="wf1-hero__image">
+                <img src="siempre-skandia-welcome.webp" alt="">
+              </div>
+            </div>
+            <div class="wf1-progress-card">
+              <div class="wf1-progress-card__head">
+                <p class="wf1-progress-card__eyebrow">Tu progreso</p>
+                <span class="sk-badge sk-badge--success sk-badge--stroke" id="wf1ProgressBadge">Paso 1 de 6</span>
+              </div>
+              <p class="wf1-progress-card__pct"><span class="wf1-progress-card__pct-num"><span id="wf1ProgressPct">0</span>%</span> <span class="wf1-progress-card__pct-suffix">completado</span></p>
+              <sk-progress-bar><div class="sk-progressbar"><div class="sk-progressbar__fill" id="wf1ProgressFill" style="width:0%"><span class="sk-progressbar__label"></span></div></div></sk-progress-bar>
+              <ul class="stepper-sim wf1-progress-card__steps" id="wf1ProgressSteps">
+                <li data-idx="0"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Notificación recibida</p></div></li>
+                <li data-idx="1"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Liquidación solicitada</p></div></li>
+                <li data-idx="2"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos en preparación</p></div></li>
+                <li data-idx="3"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos por firmar</p></div></li>
+                <li data-idx="4"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Paz y salvo en revisión</p></div></li>
+                <li data-idx="5"><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Pago realizado</p></div></li>
+              </ul>
             </div>
           </div>
-          <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:none;margin-top:6px;margin-bottom:var(--sk-space-m);"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Copy del hero adaptado del brochure "Siempre Skandia" (portada) compartido por los stakeholders — pendiente de calibrar tono de pantalla y confirmar wording final con Kiki.</span></p>
-          <h1 class="sk-display">Hola, [Nombre]. Gracias por tu paso por Skandia.</h1>
-          <p class="sk-body content-gap" style="margin-top:8px;">Aquí tienes todo tu proceso de salida, y también un espacio para seguir cerca si quieres.</p>
+          <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="margin-top:6px;margin-bottom:var(--sk-space-m);"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Copy del hero (eyebrow/título/cuerpo) adaptado del brochure "Siempre Skandia" (portada) compartido por los stakeholders — pendiente de calibrar tono de pantalla y confirmar wording final con Kiki. Panel "Tu progreso": las 6 etapas son la misma fuente ya aprobada del stepper de wf2 (RONDA 17), solo en versión corta para caber en el panel — pendiente de que Kiki confirme el acortado.</span></p>
+          <!-- RONDA 33, 2026-09-21 — Javier acortó el saludo (antes repetía
+               el "gracias" del hero, justo arriba) y lo bajó a estilo h4
+               bold (`.sk-h2`, token real `--supporting-title-h4-bold-18px`
+               — el nombre de la clase no coincide con el del token, ver
+               nota junto a `.sk-h2` en el CSS; es la clase correcta para
+               "h4 bold" en este archivo). Se mantiene la etiqueta <h1>
+               (semántica de encabezado principal de la pantalla, nadie
+               pidió tocar eso) — solo cambia el tamaño/peso visual. -->
+          <h1 class="sk-h2">Hola, [Nombre].</h1>
+          <p class="sk-body content-gap" style="margin-top:8px;">Todo tu proceso en un mismo lugar</p>
         </div>
         <div class="variant" data-r="r2">
+          <!-- RONDA 27, 2026-09-21 — banner sobrio (ver nota CSS `.wf1-banner`):
+               mismo pedido de recurso visual que el hero de Ruta 1, pero sin
+               gradiente ni tono celebratorio — content.md prohíbe "módulo
+               festivo" en Ruta 2. -->
+          <div class="wf1-banner">
+            <div class="wf1-banner__photo">🟡 Foto pendiente</div>
+            <p class="wf1-banner__body">Siempre Skandia te acompaña en este proceso, con la misma claridad de siempre.</p>
+          </div>
           <h1 class="sk-display">Hola, [Nombre]. Aquí tienes tu proceso de salida.</h1>
           <p class="sk-body content-gap" style="margin-top:8px;">Todo lo que necesitas revisar y entregar está aquí, en un solo lugar.</p>
         </div>
         <div class="variant" data-r="r3c">
+          <div class="wf1-banner">
+            <div class="wf1-banner__photo">🟡 Foto pendiente</div>
+            <p class="wf1-banner__body">Siempre Skandia te acompaña en este proceso, con calma y claridad.</p>
+          </div>
           <h1 class="sk-display">Hola, [Nombre]. Este es tu espacio para cerrar tu proceso con Skandia.</h1>
           <p class="sk-body content-gap" style="margin-top:8px;">Aquí encuentras la información de tu proceso de retiro en un solo lugar.</p>
           <!-- REVISOR: subtítulo sugerido — content.md no definía uno para esta variante (Ruta 3, colaborador/pensión). Texto propuesto, pendiente de confirmar wording con Kiki antes de dar por definitivo. -->
         </div>
         <div class="variant" data-r="r3b">
+          <div class="wf1-banner">
+            <div class="wf1-banner__photo">🟡 Foto pendiente</div>
+            <p class="wf1-banner__body">Siempre Skandia acompaña este proceso, con calma y claridad.</p>
+          </div>
           <h1 class="sk-display">Te damos la bienvenida. Este portal reúne la información del proceso de [Nombre del colaborador] con Skandia.</h1>
           <p class="sk-body content-gap" style="margin-top:8px;">Aquí puedes revisar, con calma, la información de este proceso.</p>
           <!-- REVISOR: subtítulo sugerido — content.md no definía uno para esta variante (Ruta 3, beneficiario/fallecimiento). El wording evita a propósito conjugar sobre el colaborador fallecido, para no anticipar la decisión de Legal/Comunicaciones sobre tiempos verbales y cómo nombrarlo (PRD §6, decisión 11) — ese matiz sigue sin resolver y necesita validación de Legal, no solo de Kiki, antes de producción. -->
         </div>
 
-        <!-- Tarjetas destacadas — Mi dinero y Mis documentos, siempre
+        <!-- Notificación contextual de Entrevista / Encuesta (RONDA 22:
+             calculada sola por renderWf1Notif() a partir de la etapa real
+             de "Mi liquidación" — antes se elegía a mano con el selector QA
+             "qaNotif", ya retirado; ver nota junto a renderWf1Notif()) — a
+             petición de Javier (2026-09-02): ocupa el 100%
+             del ancho de contenido (antes max-width:520px) y usa
+             --sk-gradient-brand (RONDA 5: renombrado desde --estilos-degrade;
+             confirmado como token real de marca en sk-components-angular,
+             fuera de SkColorPalette) en vez de fondo blanco, para que un
+             recordatorio con acción
+             pendiente (entrevista o encuesta) destaque de las tarjetas
+             informativas de alrededor. Ver overrides de texto/botón junto
+             a .sk-card en el bloque <style>.
+             RONDA 27, 2026-09-21 — sube por encima de las tarjetas
+             destacadas (antes iba debajo): en la sesión del 2026-09-14 a
+             Rafa se le pasó por completo esta tarjeta al revisar la demo
+             ("se pierde al final de la página"), porque antes solo
+             aparecía desde una etapa avanzada del proceso y más abajo en
+             el layout. renderWf1Notif() (ver <script>) también cambió: ya
+             no depende de la etapa de "Mi liquidación", se muestra
+             siempre que la entrevista o la encuesta sigan pendientes. -->
+        <div id="wf1Notif" style="display:none;">
+          <sk-card>
+            <div class="sk-card wf1-notif-card">
+              <p class="sk-card__header" id="wf1NotifTitle">Tu entrevista de retiro</p>
+              <p class="sk-card__subheader" id="wf1NotifSub">Nos ayuda a entender tu experiencia en Skandia. Te toma unos minutos.</p>
+              <sk-button>
+                <button class="sk-btn sk-btn--secondary sk-interactive" id="wf1NotifGo" style="width:auto;">Responder</button>
+              </sk-button>
+            </div>
+          </sk-card>
+        </div>
+
+        <!-- Tarjetas destacadas — Mi liquidación y Mis documentos, siempre
              visibles en las 3 rutas (decisión de Javier, 2026-09-02: son lo
              más importante en las 3 rutas). Copy literal, el mismo que
              tenían como módulos del hub (content.md v5) — solo cambia la
@@ -2157,8 +2512,8 @@
         <div class="wf1-featured">
           <button class="hub-tile sk-card sk-card--clickable sk-interactive" data-goto="wf2">
             <i class="pi pi-wallet"><svg><use href="#pi-wallet"></use></svg></i>
-            <p class="sk-card__header">Mi dinero</p>
-            <p class="sk-card__subheader">En qué va tu liquidación</p>
+            <p class="sk-card__header">Mi liquidación</p>
+            <p class="sk-card__subheader">Revisa el avance de tu proceso</p>
             <sk-progress-bar><div class="sk-progressbar"><div class="sk-progressbar__fill" id="wf1MoneyFill" style="width:0%"><span class="sk-progressbar__label"></span></div></div></sk-progress-bar>
             <p class="sk-caption" id="wf1MoneyLabel" style="margin:0;"></p>
           </button>
@@ -2174,43 +2529,25 @@
           </button>
         </div>
 
-        <!-- Notificación contextual de Entrevista / Encuesta (RONDA 22:
-             calculada sola por renderWf1Notif() a partir de la etapa real
-             de "Mi dinero" — antes se elegía a mano con el selector QA
-             "qaNotif", ya retirado; ver nota junto a renderWf1Notif()) — a
-             petición de Javier (2026-09-02): ocupa el 100%
-             del ancho de contenido (antes max-width:520px) y usa
-             --sk-gradient-brand (RONDA 5: renombrado desde --estilos-degrade;
-             confirmado como token real de marca en sk-components-angular,
-             fuera de SkColorPalette) en vez de fondo blanco, para que un
-             recordatorio con acción
-             pendiente (entrevista o encuesta) destaque de las tarjetas
-             informativas de alrededor. Ver overrides de texto/botón junto
-             a .sk-card en el bloque <style>. -->
-        <div id="wf1Notif" style="display:none;">
-          <sk-card>
-            <div class="sk-card wf1-notif-card">
-              <p class="sk-card__header" id="wf1NotifTitle">Tu entrevista de retiro</p>
-              <p class="sk-card__subheader" id="wf1NotifSub">Nos ayuda a entender tu experiencia en Skandia. Te toma unos minutos.</p>
-              <sk-button>
-                <button class="sk-btn sk-btn--secondary sk-interactive" id="wf1NotifGo" style="width:auto;">Responder</button>
-              </sk-button>
-            </div>
-          </sk-card>
-        </div>
-
         <hr class="divider">
         <p class="sk-h2 content-gap">Tu proceso</p>
 
         <!-- Hub de módulos secundarios — visibilidad dinámica por ruta (CSS
              por data-route-group; regla wf1: un módulo oculto para una ruta
              NO existe como ítem, nunca se muestra deshabilitado/con
-             candado). Mi dinero y Mis documentos se promovieron arriba
+             candado). Mi liquidación y Mis documentos se promovieron arriba
              (decisión de Javier, 2026-09-02) — su copy no cambió, solo su
              posición. Corrección v5 (obs-002, revisión de Kiki): Kiki
              formalizó este hub completo en content.md, incluida la tarjeta
              de Apoyo con su subtítulo "Acompañamiento profesional"
-             (lenguaje de usuario, ya no la jerga interna "Outplacement"). -->
+             (lenguaje de usuario, ya no la jerga interna "Outplacement").
+             RONDA 27, 2026-09-21 — Novedades gana `.v-novedades`: se oculta
+             por defecto (ver applyNovedadesVisibility() en el <script>),
+             pedido de Rafa en la sesión del 2026-09-14 por la complejidad
+             operativa de mantener contenido real (necesita a Mercadeo/
+             Comunicaciones). No se borra — vuelve completa con el toggle
+             QA "Mostrar Novedades (2.0)", pensada para retomarse cuando el
+             portal tenga tracción. -->
         <div class="hub-grid">
           <button class="hub-tile v-community sk-card sk-card--clickable sk-interactive" data-goto="wf7">
             <i class="pi pi-users"><svg><use href="#pi-users"></use></svg></i>
@@ -2222,7 +2559,7 @@
             <p class="hub-tile__title">Apoyo para tu próximo paso</p>
             <p class="hub-tile__sub">Acompañamiento profesional</p>
           </button>
-          <button class="hub-tile sk-card sk-card--clickable sk-interactive" data-goto="wf8">
+          <button class="hub-tile v-novedades sk-card sk-card--clickable sk-interactive" data-goto="wf8">
             <i class="pi pi-megaphone"><svg><use href="#pi-megaphone"></use></svg></i>
             <p class="hub-tile__title">Novedades</p>
             <p class="hub-tile__sub">Lo que pasa en Skandia y en tu proceso</p>
@@ -2282,8 +2619,8 @@
          corresponde.
     ============================================================ -->
     <section class="screen" data-screen="wf2">
-      <nav class="sk-breadcrumb" aria-label="Breadcrumb"><ol class="sk-breadcrumb__list"><li><a class="sk-breadcrumb__link" href="#wf1" data-goto="wf1">Inicio</a></li><li><span class="sk-breadcrumb__separator" aria-hidden="true">/</span><span class="sk-breadcrumb__link sk-breadcrumb__link--active" aria-current="page">Mi dinero</span></li></ol></nav>
-      <h1 class="sk-display">En qué va tu dinero</h1>
+      <nav class="sk-breadcrumb" aria-label="Breadcrumb"><ol class="sk-breadcrumb__list"><li><a class="sk-breadcrumb__link" href="#wf1" data-goto="wf1">Inicio</a></li><li><span class="sk-breadcrumb__separator" aria-hidden="true">/</span><span class="sk-breadcrumb__link sk-breadcrumb__link--active" aria-current="page">Mi liquidación</span></li></ol></nav>
+      <h1 class="sk-display">En qué va tu liquidación</h1>
       <p class="sk-body muted content-gap" style="margin-top:6px;">Aquí puedes ver en qué etapa está tu liquidación, actualizada el <strong>28 ago. 2026</strong>.</p>
 
       <!-- Resumen visual de avance (auditoría /impeccable, hallazgo #5) —
@@ -2308,10 +2645,14 @@
           <li data-idx="2"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos en preparación</p></div></li>
           <li data-idx="3"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div>
             <p class="stepper-sim__label">Documentos pendientes de tu firma</p>
+            <!-- RONDA 30, 2026-09-21 — vuelve a decir "Firmar" (no "Subir"):
+                 el módulo de wf3 pasó de carga de foto/escaneo a firma
+                 electrónica en línea (ver esa pantalla y la investigación
+                 citada ahí). Es un cambio de rumbo real, no un descuido. -->
             <div class="stepper-sim__note" id="wf2UploadNote"></div>
             <div style="margin-top:8px;">
               <sk-button style="display:inline-block;">
-                <button class="sk-btn sk-btn--secondary sk-interactive" data-goto="wf3" style="width:auto;">Subir mis documentos</button>
+                <button class="sk-btn sk-btn--secondary sk-interactive" data-goto="wf3" style="width:auto;">Firmar mis documentos</button>
               </sk-button>
             </div>
           </div></li>
@@ -2352,173 +2693,133 @@
          CARGA a DESCARGA (Nómina prepara retiro/CIR/planillas, el
          colaborador descarga).
          RONDA 17, 2026-09-08 (PRD/content.md v3/v6): tras reunión con
-         stakeholders del proyecto, Javier reinstala la carga — pero
-         SEGMENTADA, no como antes de la ronda 3. Esta pantalla ahora
-         tiene DOS módulos con propósitos distintos:
-           1) "Documentos por firmar" (nuevo) — 7 documentos que el
-              colaborador firma en PAPEL, presencial (sin cambio ahí:
-              PRD v2/content.md v4 sobre la firma se mantienen intactos),
-              y sube como foto/escaneo para que el proceso avance. Este
-              bloque GATEA el stepper de wf2 (ver la nueva etapa
-              "Documentos pendientes de tu firma"). Reemplaza la tarjeta
-              genérica "Documento de retiro" de la ronda 3.
+         stakeholders del proyecto, Javier reinstala un segundo módulo,
+         "Documentos por firmar" — en ese momento, como carga de foto/
+         escaneo de un documento firmado en papel.
+         RONDA 30, 2026-09-21 — ese mecanismo de carga se reemplaza por
+         firma electrónica EN el portal (ver
+         `investigacion/siempre-skandia-firma-electronica-propuesta.md`):
+         Rafa cuestionó en la sesión del 2026-09-14 por qué la persona
+         tendría que descargar, firmar fuera e subir de vuelta algo que
+         ya recibió del portal. Esta ronda prototipa "ver documento +
+         firmar" (modal `#docModal`, ver nota junto a su CSS); el
+         mecanismo real de firma (electrónica simple in-house, PSC
+         certificado, o reusar el que ya usa el portal de clientes de
+         Skandia para retiro de cesantías) sigue sin decidir — depende de
+         Legal/TI, no de este prototipo. Esta pantalla sigue con DOS
+         módulos de propósito distinto:
+           1) "Documentos por firmar" — 7 documentos que la persona ve y
+              firma electrónicamente sin salir del portal. Sigue
+              gateando el stepper de wf2 ("Documentos pendientes de tu
+              firma"). Reemplaza el módulo de carga de la RONDA 17.
            2) "Documentos disponibles para descargar" (sin cambio) — CIR
               y Planillas, tal cual la ronda 3 los dejó.
-         Componente nuevo: sk-file-upload (modo basic, un archivo por
-         documento) — primer uso real en este archivo, ver fallback CSS
-         "RONDA 17" más arriba. Sin candado, sello "seguro" ni ícono de
-         cifrado en ningún módulo (restricción explícita, sin cambio).
+         Sin candado, sello "seguro" ni ícono de cifrado en ningún
+         módulo (restricción explícita, sin cambio).
          🔴→🟡 la sección de descarga no pasa a producción sin validación
-         Legal/Seguridad de la Información (PRD v2 §2) — la sección de
-         carga no agrega ni reduce ese riesgo regulatorio (son documentos
-         administrativos del proceso de retiro, no CIR/ingresos).
+         Legal/Seguridad de la Información (PRD v2 §2) — el módulo de
+         firma no agrega ni reduce ese riesgo regulatorio (son documentos
+         administrativos del proceso de retiro, no CIR/ingresos), pero sí
+         necesita su propia validación de Legal sobre el mecanismo de
+         firma (PRD §6, decisión nueva — ver investigación citada arriba).
     ============================================================ -->
     <section class="screen" data-screen="wf3">
       <div class="flag-banner sk-callout" data-variant="warning" data-audience="reviewer">
         <i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i>
-        <p><strong>Pantalla no final.</strong> CIR y planillas de seguridad social son datos sensibles sin lineamiento confirmado de Legal/Seguridad de la Información. No pasa a producción hasta esa validación, y ese riesgo ahora queda acoplado a la fortaleza del mecanismo de autenticación de wf0 (PRD v2 §2/§6, decisión 1). Por eso ningún elemento visual de esta pantalla usa candado, sello "seguro" ni ícono de cifrado. Además (RONDA 17): tipo/tamaño de archivo aceptado para la carga y qué pasa si Nómina rechaza un documento después de subido son decisiones pendientes #14/#15 del PRD, sin confirmar por TI/Nómina.</p>
+        <p><strong>Pantalla no final.</strong> CIR y planillas de seguridad social son datos sensibles sin lineamiento confirmado de Legal/Seguridad de la Información. No pasa a producción hasta esa validación, y ese riesgo ahora queda acoplado a la fortaleza del mecanismo de autenticación de wf0 (PRD v2 §2/§6, decisión 1). Por eso ningún elemento visual de esta pantalla usa candado, sello "seguro" ni ícono de cifrado. El mecanismo real de firma electrónica del módulo de abajo tampoco está confirmado — ver `investigacion/siempre-skandia-firma-electronica-propuesta.md` y PRD §6.</p>
       </div>
 
       <nav class="sk-breadcrumb" aria-label="Breadcrumb"><ol class="sk-breadcrumb__list"><li><a class="sk-breadcrumb__link" href="#wf1" data-goto="wf1">Inicio</a></li><li><span class="sk-breadcrumb__separator" aria-hidden="true">/</span><span class="sk-breadcrumb__link sk-breadcrumb__link--active" aria-current="page">Mis documentos</span></li></ol></nav>
       <h1 class="sk-display">Tus documentos</h1>
-      <p class="sk-body muted content-gap" style="margin-top:6px;">Firma y sube los documentos que lo necesitan, y descarga los que Skandia ya preparó para ti.</p>
+      <p class="sk-body muted content-gap" style="margin-top:6px;">Firma los documentos que lo necesitan sin salir del portal, y descarga los que Skandia ya preparó para ti.</p>
 
       <!-- ============================================================
-           MÓDULO 1 (nuevo, RONDA 17) — Documentos por firmar. Carga real:
-           el usuario elige un archivo por documento (sk-file-upload modo
-           basic); el prototipo simula el resultado (subido/rechazado),
-           nunca hace una petición de red real (igual que el resto del
-           archivo no tiene backend).
+           MÓDULO 1 — Documentos por firmar. RONDA 30: ver documento +
+           firmar electrónicamente, todo dentro de #docModal (definido
+           más abajo, junto a #gateModal). Nada de esto hace una petición
+           de red real (igual que el resto del archivo no tiene backend)
+           — el estado "firmado" es simulado y vive en el DOM/JS.
            ============================================================ -->
       <p class="sk-h2 content-gap">Documentos por firmar</p>
-      <p class="sk-body muted content-gap" style="margin-top:2px;">Firma estos documentos y sube una foto o el escaneo de cada uno para continuar tu proceso.</p>
+      <p class="sk-body muted content-gap" style="margin-top:2px;">Revisa y firma electrónicamente cada documento — no necesitas descargarlo, imprimirlo ni volver a subirlo.</p>
       <p class="sk-caption" id="wf3UploadCountLabel" style="margin:4px 0 var(--sk-space-m);"></p>
 
       <div class="card-grid" id="wf3UploadList">
         <sk-card>
-          <div class="sk-card" data-upload-doc="liquidacion">
+          <div class="sk-card" data-sign-doc="liquidacion" data-sign-label="Liquidación de contrato">
             <p class="sk-label-strong" style="margin:0 0 6px;">Liquidación de contrato</p>
-            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-upload-badge>Pendiente de subir</span>
-            <div class="sk-file-upload" style="margin-top:10px;" data-upload-widget>
-              <sk-file-upload>
-                <div class="sk-file-upload__basic">
-                  <input type="file" id="wf3Up-liquidacion" class="sk-file-upload__input" accept=".pdf,image/*" data-upload-input>
-                  <label class="sk-btn sk-btn--secondary sk-interactive sk-file-upload__choose" for="wf3Up-liquidacion">Elegir archivo</label>
-                  <span class="sk-file-upload__filename" data-upload-filename></span>
-                  <button type="button" class="sk-file-upload__remove" data-upload-remove aria-label="Quitar archivo" hidden><i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i></button>
-                </div>
-                <p class="sk-file-upload__hint" data-upload-hint>PDF o imagen, máx. 5 MB</p>
-                <p class="sk-file-upload__error" role="alert" data-upload-error></p>
-              </sk-file-upload>
+            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
+            <div class="sign-doc-actions" style="margin-top:10px;">
+              <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
+              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
+            <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
         </sk-card>
         <sk-card>
-          <div class="sk-card" data-upload-doc="cesantias">
+          <div class="sk-card" data-sign-doc="cesantias" data-sign-label="Autorización de retiro de cesantías">
             <p class="sk-label-strong" style="margin:0 0 6px;">Autorización de retiro de cesantías</p>
-            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-upload-badge>Pendiente de subir</span>
-            <div class="sk-file-upload" style="margin-top:10px;" data-upload-widget>
-              <sk-file-upload>
-                <div class="sk-file-upload__basic">
-                  <input type="file" id="wf3Up-cesantias" class="sk-file-upload__input" accept=".pdf,image/*" data-upload-input>
-                  <label class="sk-btn sk-btn--secondary sk-interactive sk-file-upload__choose" for="wf3Up-cesantias">Elegir archivo</label>
-                  <span class="sk-file-upload__filename" data-upload-filename></span>
-                  <button type="button" class="sk-file-upload__remove" data-upload-remove aria-label="Quitar archivo" hidden><i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i></button>
-                </div>
-                <p class="sk-file-upload__hint" data-upload-hint>PDF o imagen, máx. 5 MB</p>
-                <p class="sk-file-upload__error" role="alert" data-upload-error></p>
-              </sk-file-upload>
+            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
+            <div class="sign-doc-actions" style="margin-top:10px;">
+              <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
+              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
+            <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
         </sk-card>
         <sk-card>
-          <div class="sk-card" data-upload-doc="certificacion">
+          <div class="sk-card" data-sign-doc="certificacion" data-sign-label="Carta de certificación laboral">
             <p class="sk-label-strong" style="margin:0 0 6px;">Carta de certificación laboral</p>
-            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-upload-badge>Pendiente de subir</span>
-            <div class="sk-file-upload" style="margin-top:10px;" data-upload-widget>
-              <sk-file-upload>
-                <div class="sk-file-upload__basic">
-                  <input type="file" id="wf3Up-certificacion" class="sk-file-upload__input" accept=".pdf,image/*" data-upload-input>
-                  <label class="sk-btn sk-btn--secondary sk-interactive sk-file-upload__choose" for="wf3Up-certificacion">Elegir archivo</label>
-                  <span class="sk-file-upload__filename" data-upload-filename></span>
-                  <button type="button" class="sk-file-upload__remove" data-upload-remove aria-label="Quitar archivo" hidden><i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i></button>
-                </div>
-                <p class="sk-file-upload__hint" data-upload-hint>PDF o imagen, máx. 5 MB</p>
-                <p class="sk-file-upload__error" role="alert" data-upload-error></p>
-              </sk-file-upload>
+            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
+            <div class="sign-doc-actions" style="margin-top:10px;">
+              <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
+              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
+            <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
         </sk-card>
         <sk-card>
-          <div class="sk-card" data-upload-doc="autorizacion-pago">
+          <div class="sk-card" data-sign-doc="autorizacion-pago" data-sign-label="Autorización de pago">
             <p class="sk-label-strong" style="margin:0 0 6px;">Autorización de pago</p>
-            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-upload-badge>Pendiente de subir</span>
-            <div class="sk-file-upload" style="margin-top:10px;" data-upload-widget>
-              <sk-file-upload>
-                <div class="sk-file-upload__basic">
-                  <input type="file" id="wf3Up-autorizacion-pago" class="sk-file-upload__input" accept=".pdf,image/*" data-upload-input>
-                  <label class="sk-btn sk-btn--secondary sk-interactive sk-file-upload__choose" for="wf3Up-autorizacion-pago">Elegir archivo</label>
-                  <span class="sk-file-upload__filename" data-upload-filename></span>
-                  <button type="button" class="sk-file-upload__remove" data-upload-remove aria-label="Quitar archivo" hidden><i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i></button>
-                </div>
-                <p class="sk-file-upload__hint" data-upload-hint>PDF o imagen, máx. 5 MB</p>
-                <p class="sk-file-upload__error" role="alert" data-upload-error></p>
-              </sk-file-upload>
+            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
+            <div class="sign-doc-actions" style="margin-top:10px;">
+              <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
+              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
+            <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
         </sk-card>
         <sk-card>
-          <div class="sk-card" data-upload-doc="examenes">
+          <div class="sk-card" data-sign-doc="examenes" data-sign-label="Carta de autorización de exámenes de retiro">
             <p class="sk-label-strong" style="margin:0 0 6px;">Carta de autorización de exámenes de retiro</p>
-            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-upload-badge>Pendiente de subir</span>
-            <div class="sk-file-upload" style="margin-top:10px;" data-upload-widget>
-              <sk-file-upload>
-                <div class="sk-file-upload__basic">
-                  <input type="file" id="wf3Up-examenes" class="sk-file-upload__input" accept=".pdf,image/*" data-upload-input>
-                  <label class="sk-btn sk-btn--secondary sk-interactive sk-file-upload__choose" for="wf3Up-examenes">Elegir archivo</label>
-                  <span class="sk-file-upload__filename" data-upload-filename></span>
-                  <button type="button" class="sk-file-upload__remove" data-upload-remove aria-label="Quitar archivo" hidden><i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i></button>
-                </div>
-                <p class="sk-file-upload__hint" data-upload-hint>PDF o imagen, máx. 5 MB</p>
-                <p class="sk-file-upload__error" role="alert" data-upload-error></p>
-              </sk-file-upload>
+            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
+            <div class="sign-doc-actions" style="margin-top:10px;">
+              <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
+              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
+            <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
         </sk-card>
         <sk-card>
-          <div class="sk-card" data-upload-doc="paz-y-salvo">
+          <div class="sk-card" data-sign-doc="paz-y-salvo" data-sign-label="Formato de paz y salvo">
             <p class="sk-label-strong" style="margin:0 0 6px;">Formato de paz y salvo</p>
-            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-upload-badge>Pendiente de subir</span>
-            <div class="sk-file-upload" style="margin-top:10px;" data-upload-widget>
-              <sk-file-upload>
-                <div class="sk-file-upload__basic">
-                  <input type="file" id="wf3Up-paz-y-salvo" class="sk-file-upload__input" accept=".pdf,image/*" data-upload-input>
-                  <label class="sk-btn sk-btn--secondary sk-interactive sk-file-upload__choose" for="wf3Up-paz-y-salvo">Elegir archivo</label>
-                  <span class="sk-file-upload__filename" data-upload-filename></span>
-                  <button type="button" class="sk-file-upload__remove" data-upload-remove aria-label="Quitar archivo" hidden><i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i></button>
-                </div>
-                <p class="sk-file-upload__hint" data-upload-hint>PDF o imagen, máx. 5 MB</p>
-                <p class="sk-file-upload__error" role="alert" data-upload-error></p>
-              </sk-file-upload>
+            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
+            <div class="sign-doc-actions" style="margin-top:10px;">
+              <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
+              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
+            <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
         </sk-card>
         <sk-card>
-          <div class="sk-card" data-upload-doc="entrega-puesto">
+          <div class="sk-card" data-sign-doc="entrega-puesto" data-sign-label="Formato de entrega de puesto de trabajo">
             <p class="sk-label-strong" style="margin:0 0 6px;">Formato de entrega de puesto de trabajo</p>
-            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-upload-badge>Pendiente de subir</span>
-            <div class="sk-file-upload" style="margin-top:10px;" data-upload-widget>
-              <sk-file-upload>
-                <div class="sk-file-upload__basic">
-                  <input type="file" id="wf3Up-entrega-puesto" class="sk-file-upload__input" accept=".pdf,image/*" data-upload-input>
-                  <label class="sk-btn sk-btn--secondary sk-interactive sk-file-upload__choose" for="wf3Up-entrega-puesto">Elegir archivo</label>
-                  <span class="sk-file-upload__filename" data-upload-filename></span>
-                  <button type="button" class="sk-file-upload__remove" data-upload-remove aria-label="Quitar archivo" hidden><i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i></button>
-                </div>
-                <p class="sk-file-upload__hint" data-upload-hint>PDF o imagen, máx. 5 MB</p>
-                <p class="sk-file-upload__error" role="alert" data-upload-error></p>
-              </sk-file-upload>
+            <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
+            <div class="sign-doc-actions" style="margin-top:10px;">
+              <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
+              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
+            <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
         </sk-card>
       </div>
@@ -2526,11 +2827,11 @@
       <div id="wf3UploadDoneMsg" style="display:none;max-width:640px;margin-top:var(--sk-space-m);">
         <div class="sk-alert sk-callout" data-type="success" data-variant="success" data-audience="user">
           <i class="pi pi-check-circle"><svg><use href="#pi-check-circle"></use></svg></i>
-          <div class="sk-alert__body"><p class="sk-alert__msg">Ya subiste los 7 documentos. Nómina los recibirá para continuar tu proceso.</p></div>
+          <div class="sk-alert__body"><p class="sk-alert__msg">Ya firmaste los 7 documentos. Nómina los recibirá para continuar tu proceso.</p></div>
         </div>
       </div>
 
-      <p class="sk-caption content-gap" style="margin-top:var(--sk-space-m);">Estos documentos quedan guardados en tu portal de Skandia.</p>
+      <p class="sk-caption content-gap" style="margin-top:var(--sk-space-m);">Tus documentos firmados quedan guardados en tu portal de Skandia.</p>
 
       <hr class="divider" style="margin:var(--sk-space-l) 0;">
 
@@ -2685,6 +2986,9 @@
          alerta). Resultado (tras RONDA 26): Grupo 1 = 11 preguntas/9
          pasos, Grupo 2 = 13 preguntas/9 pasos (antes: 5 pasos genéricos,
          reducidos de un benchmark de 9 preguntas — ver content.md v2).
+         RONDA 27, 2026-09-21 — se elimina la pregunta de carga de
+         trabajo en los 2 grupos (ver nota junto al paso 6): Grupo 1 baja
+         a 10 preguntas/9 pasos, Grupo 2 a 12 preguntas/9 pasos.
          Todo el copy se tradujo de "usted" a "tú" y se reescribió para
          evitar participios con género referidos a la persona ("se sintió
          reconocido" → "sentiste que tu trabajo fue reconocido") — pasado
@@ -2730,15 +3034,15 @@
           <p class="sk-h2 content-gap">Compensación</p>
           <div class="variant" data-r="r1 r3c">
             <p class="sk-body content-gap">¿Consideras que tu compensación era competitiva frente al mercado?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Muy de acuerdo</label></fieldset></sk-radio-group>
-            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Sentiste que tu trabajo fue reconocido como se merecía?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Muy de acuerdo</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Muy de acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-competitiva-g1">Muy en desacuerdo</label></fieldset></sk-radio-group>
+            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Sentiste que tu trabajo fue reconocido?</p>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Muy de acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-reconocido-g1">Muy en desacuerdo</label></fieldset></sk-radio-group>
           </div>
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Consideras que tu compensación era acorde con tus responsabilidades?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Muy de acuerdo</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Muy de acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-acorde-g2">Muy en desacuerdo</label></fieldset></sk-radio-group>
             <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Sentiste que los resultados de tu trabajo fueron reconocidos?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Muy de acuerdo</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Muy de acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-comp-resultados-g2">Muy en desacuerdo</label></fieldset></sk-radio-group>
           </div>
         </div>
 
@@ -2747,7 +3051,7 @@
           <p class="sk-h2 content-gap">Relación con el líder</p>
           <div class="variant" data-r="r1 r3c">
             <p class="sk-body content-gap">¿Cómo calificarías la comunicación con tu líder?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Muy mala</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Muy buena</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Muy buena</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Muy mala</label></fieldset></sk-radio-group>
             <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Tu líder apoyó tu desarrollo y desempeño?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-lider-apoyo-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-apoyo-g1">No</label></fieldset></sk-radio-group>
           </div>
@@ -2755,7 +3059,7 @@
             <p class="sk-body content-gap">¿Recibías retroalimentación clara sobre tu desempeño?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-lider-retro-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-retro-g2">No</label></fieldset></sk-radio-group>
             <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Cómo calificarías el trato que recibiste de tus líderes?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Muy malo</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Muy bueno</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Muy bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Muy malo</label></fieldset></sk-radio-group>
           </div>
         </div>
 
@@ -2764,11 +3068,11 @@
           <p class="sk-h2 content-gap">Relación con compañeros</p>
           <div class="variant" data-r="r1 r3c">
             <p class="sk-body content-gap">¿Cómo calificarías tu relación con tu equipo, incluido el apoyo que recibiste cuando lo necesitaste?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Muy mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Muy buena</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Muy buena</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-g1">Muy mala</label></fieldset></sk-radio-group>
           </div>
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Cómo fue la colaboración con tu equipo?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Muy mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Muy buena</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Muy buena</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-companeros-colab-g2">Muy mala</label></fieldset></sk-radio-group>
             <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Hubo conflictos que afectaran tu trabajo diario?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-conflictos-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-conflictos-g2">No</label></fieldset></sk-radio-group>
           </div>
@@ -2779,11 +3083,11 @@
           <p class="sk-h2 content-gap">Ambiente laboral y cultura</p>
           <div class="variant" data-r="r1 r3c">
             <p class="sk-body content-gap">¿Cómo describirías el ambiente laboral de la compañía?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Muy malo</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Muy bueno</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Muy bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-ambiente-g1">Muy malo</label></fieldset></sk-radio-group>
           </div>
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Cómo calificarías el clima laboral de la compañía?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Muy malo</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Muy bueno</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Muy bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Muy malo</label></fieldset></sk-radio-group>
             <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Sentiste que tus inquietudes o sugerencias eran escuchadas?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-escuchado-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-escuchado-g2">No</label></fieldset></sk-radio-group>
           </div>
@@ -2798,23 +3102,27 @@
           </div>
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Los beneficios que recibiste cumplieron tus expectativas?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Muy de acuerdo</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Muy de acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-expectativas-g2">Muy en desacuerdo</label></fieldset></sk-radio-group>
           </div>
         </div>
 
-        <!-- Paso 6 — Carga laboral -->
+        <!-- Paso 6 — Equilibrio y recursos (RONDA 27, 2026-09-21 — encabezado y contenido
+             cambiaron: "¿Consideras que tu carga de trabajo era razonable?" (G1) y "¿La carga
+             laboral era adecuada para el cargo que ocupabas?" (G2) se eliminan por pedido de
+             Rafa (riesgo de interpretación regulatoria, Ministerio de Trabajo) — ver sesión
+             2026-09-14. Se elimina en los DOS grupos, no solo en G1: el mismo riesgo aplica,
+             y G2 (terminación con/sin justa causa) es la ruta más sensible. El paso ya no
+             comparte tema entre rutas (G1 queda con equilibrio vida-trabajo, G2 con
+             herramientas de trabajo), así que el encabezado pasa a uno neutral que cubre
+             ambas preguntas restantes. -->
         <div class="wf4-step" data-step="6">
-          <p class="sk-h2 content-gap">Carga laboral</p>
+          <p class="sk-h2 content-gap">Equilibrio y recursos</p>
           <div class="variant" data-r="r1 r3c">
-            <p class="sk-body content-gap">¿Consideras que tu carga de trabajo era razonable?</p>
-            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-carga-razonable-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-carga-razonable-g1">No</label></fieldset></sk-radio-group>
-            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Lograste mantener equilibrio entre tu trabajo y tu vida personal?</p>
+            <p class="sk-body content-gap">¿Lograste mantener equilibrio entre tu trabajo y tu vida personal?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-equilibrio-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-equilibrio-g1">No</label></fieldset></sk-radio-group>
           </div>
           <div class="variant" data-r="r2">
-            <p class="sk-body content-gap">¿La carga laboral era adecuada para el cargo que ocupabas?</p>
-            <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-carga-adecuada-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-carga-adecuada-g2">No</label></fieldset></sk-radio-group>
-            <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Contabas con las herramientas necesarias para cumplir tus funciones?</p>
+            <p class="sk-body content-gap">¿Contabas con las herramientas necesarias para cumplir tus funciones?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-herramientas-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-herramientas-g2">No</label></fieldset></sk-radio-group>
           </div>
         </div>
@@ -2824,7 +3132,7 @@
           <p class="sk-h2 content-gap">Desarrollo profesional</p>
           <div class="variant" data-r="r1 r3c">
             <p class="sk-body content-gap">¿Sentiste que tuviste oportunidades de aprendizaje y crecimiento en la compañía?</p>
-            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Muy de acuerdo</label></fieldset></sk-radio-group>
+            <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Muy de acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf4-desarrollo-g1">Muy en desacuerdo</label></fieldset></sk-radio-group>
           </div>
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Las capacitaciones que recibiste fueron útiles para tu rol?</p>
@@ -2921,7 +3229,7 @@
       <div id="wf5Steps">
         <div class="wf5-step" data-step="0">
           <p class="sk-body content-gap">¿Qué tan claro fue el proceso de salida desde el día que informaste tu retiro?</p>
-          <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Muy confuso</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Confuso</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Regular</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Claro</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Muy claro</label></fieldset></sk-radio-group>
+          <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Muy claro</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Claro</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Regular</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Confuso</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Muy confuso</label></fieldset></sk-radio-group>
         </div>
         <div class="wf5-step" data-step="1">
           <p class="sk-body content-gap">¿En algún momento el proceso tomó más tiempo del esperado?</p>
@@ -2935,9 +3243,13 @@
         </div>
         <div class="wf5-step" data-step="2">
           <p class="sk-body content-gap">¿Tu padrino/madrina<span class="placeholder-note" style="display:inline" data-audience="reviewer">🟡 propuesta sin confirmar por Kiki: "(tu acompañante asignado durante el proceso de salida)"</span> resolvió tus dudas?</p>
-          <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Muy en desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Muy de acuerdo</label></fieldset></sk-radio-group>
+          <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Muy de acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">De acuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Neutral</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">En desacuerdo</label><label class="sk-radio-row"><input type="radio" name="wf5-padrino">Muy en desacuerdo</label></fieldset></sk-radio-group>
         </div>
         <div class="wf5-step" data-step="3">
+          <!-- RONDA 27, 2026-09-21 — pedido de Rafa "escalas positivas primero" se aplicó a los
+               Likert de 5 puntos (wf4 y wf5), NO a este NPS: es un indicador estándar (0-10,
+               "Nada probable" → "Muy probable") y darle vuelta rompe su comparabilidad con
+               otras mediciones de NPS de Skandia. Queda ascendente a propósito. -->
           <p class="sk-body content-gap">Del 0 al 10, ¿qué tan probable es que le hables bien de Skandia a un conocido?</p>
           <sk-select-button>
           <div class="sk-selectbutton sk-selectbutton--scale">
@@ -3124,11 +3436,25 @@
     </section>
 
     <!-- ============================================================
-         wf7 — COMUNIDAD SIEMPRE SKANDIA (sin cambios de contenido en esta
-         ronda — solo íconos reemplazados, ver ajuste 3).
+         wf7 — COMUNIDAD SIEMPRE SKANDIA
+         RONDA 27, 2026-09-21 — pedido de Rafa (sesión 2026-09-14): al ser
+         datos personales que Skandia sigue tratando DESPUÉS de terminado
+         el vínculo laboral, "Unirme a la comunidad" necesita autorización
+         explícita de tratamiento de datos antes de habilitarse — igual en
+         las 2 variantes (Ruta 1 y Ruta 3). El ingreso tampoco es
+         automático: Gestión Humana aprueba cada solicitud manualmente
+         antes de enviar la invitación al grupo, así que el clic no
+         enlaza directo a WhatsApp — deja un estado de "solicitud
+         enviada" (ver JS, sección "wf7 — Comunidad").
+         El checkbox reusa el fallback `<sk-checkbox>`/`.sk-checkbox-row`
+         ya construido en este archivo (ver bloque "FALLBACK sk-checkbox /
+         sk-radio-group" en el <style>, confirmado contra sk-checkbox.md)
+         — primer consumo real, hasta ahora solo existía el CSS.
+         🟡 El texto de autorización necesita validación de Legal, no solo
+         de contenido — ver PRD §6.
          Ruta 1: prioridad alta. Ruta 3: versión sobria. Ruta 2: NO existe
          como ítem de menú (ni oculto con candado — no está, punto).
-         Componente: sk-card · sk-button skType="primary"/"tertiary"
+         Componente: sk-card · sk-checkbox · sk-button skType="primary"/"tertiary"
     ============================================================ -->
     <section class="screen" data-screen="wf7">
       <div style="max-width:560px;">
@@ -3137,14 +3463,42 @@
         <h1 class="sk-display">Sigue siendo parte de Siempre Skandia</h1>
         <p class="sk-body muted content-gap" style="margin-top:6px;">Una comunidad de personas que también pasaron por Skandia — contenido, novedades y espacio para seguir en contacto.</p>
         <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>Alcance real (referidos, eventos, Boomerang Talent) aún no confirmado para el lanzamiento de noviembre.</span><!-- PRD §6, decisión 10 --></p>
-        <sk-button style="display:block;margin:var(--sk-space-m) 0;max-width:340px;"><button class="sk-btn sk-btn--primary sk-interactive" style="width:100%;">Unirme a la comunidad</button></sk-button>
-        <p class="sk-caption">Puedes salir de la comunidad cuando quieras, sin que afecte nada de tu proceso.</p>
+        <div id="wf7JoinBlock-r1">
+          <sk-checkbox style="display:block;margin-top:var(--sk-space-m);max-width:340px;">
+            <label class="sk-checkbox-row">
+              <input type="checkbox" id="wf7Consent-r1">
+              <span class="sk-body">Autorizo el tratamiento de mis datos personales para hacer parte de la comunidad Siempre Skandia.<span class="placeholder-note" style="display:inline" data-audience="reviewer">🟡 texto pendiente de validación de Legal</span></span>
+            </label>
+          </sk-checkbox>
+          <sk-button style="display:block;margin:var(--sk-space-s,8px) 0 0;max-width:340px;"><button class="sk-btn sk-btn--primary sk-interactive" id="wf7JoinBtn-r1" style="width:100%;" disabled>Unirme a la comunidad</button></sk-button>
+          <p class="sk-caption">Puedes salir de la comunidad cuando quieras, sin que afecte nada de tu proceso.</p>
+        </div>
+        <div id="wf7JoinDone-r1" style="display:none;">
+          <div class="sk-alert sk-callout" data-type="success" data-variant="success" data-audience="user" style="margin-top:var(--sk-space-m);max-width:340px;">
+            <i class="pi pi-check-circle"><svg><use href="#pi-check-circle"></use></svg></i>
+            <div class="sk-alert__body"><p class="sk-alert__msg">¡Listo! Tu solicitud quedó registrada. Te escribiremos pronto con los detalles para unirte al grupo.</p></div>
+          </div>
+        </div>
       </div>
 
       <div class="variant" data-rg="r3">
         <h1 class="sk-display">Si quieres, puedes seguir en contacto</h1>
         <p class="sk-body muted content-gap" style="margin-top:6px;">Sin ninguna obligación. Solo si te interesa mantenerte al tanto.</p>
-        <sk-button style="display:inline-block;margin-top:var(--sk-space-m);"><button class="sk-btn sk-btn--tertiary sk-interactive">Unirme a la comunidad</button></sk-button>
+        <div id="wf7JoinBlock-r3">
+          <sk-checkbox style="display:block;margin-top:var(--sk-space-m);max-width:340px;">
+            <label class="sk-checkbox-row">
+              <input type="checkbox" id="wf7Consent-r3">
+              <span class="sk-body">Autorizo el tratamiento de mis datos personales para hacer parte de la comunidad Siempre Skandia.<span class="placeholder-note" style="display:inline" data-audience="reviewer">🟡 texto pendiente de validación de Legal</span></span>
+            </label>
+          </sk-checkbox>
+          <sk-button style="display:inline-block;margin-top:var(--sk-space-s,8px);"><button class="sk-btn sk-btn--tertiary sk-interactive" id="wf7JoinBtn-r3" disabled>Unirme a la comunidad</button></sk-button>
+        </div>
+        <div id="wf7JoinDone-r3" style="display:none;">
+          <div class="sk-alert sk-callout" data-type="success" data-variant="success" data-audience="user" style="margin-top:var(--sk-space-m);max-width:340px;">
+            <i class="pi pi-check-circle"><svg><use href="#pi-check-circle"></use></svg></i>
+            <div class="sk-alert__body"><p class="sk-alert__msg">¡Listo! Tu solicitud quedó registrada. Te escribiremos pronto con los detalles para unirte al grupo.</p></div>
+          </div>
+        </div>
       </div>
       </div>
     </section>
@@ -3202,13 +3556,27 @@
           </div>
         </div>
       </div>
-      <!-- REVISOR: regla de fecha de aparición resuelta en el PRD §4.0 — reutiliza la fecha de notificación de Mi dinero (wf2). -->
+      <!-- REVISOR: regla de fecha de aparición resuelta en el PRD §4.0 — reutiliza la fecha de notificación de Mi liquidación (wf2). -->
       <div id="wf8ComercialHidden" style="display:none;">
         <p class="placeholder-note sk-callout" data-variant="warning" data-audience="user">Sin contenido comercial todavía. Vuelve a revisar más adelante (hoy: <span id="wf8Days">0</span> días desde tu notificación).</p>
       </div>
     </section>
 
   </main>
+
+  <!-- RONDA 28, 2026-09-21 — footer de cierre (ver nota CSS .app-footer).
+       Redes y correo confirmados por Cata — ya no son placeholder. Oculto
+       en wf0 vía showScreen() (mismo patrón que el side-rail/topbar). -->
+  <footer class="app-footer" id="appFooter">
+    <p class="app-footer__label">Sigamos en contacto</p>
+    <div class="app-footer__socials">
+      <a class="app-footer__social" href="https://www.linkedin.com/company/skandia-colombia" target="_blank" rel="noopener" aria-label="Skandia en LinkedIn" title="LinkedIn"><svg><use href="#pi-linkedin"></use></svg></a>
+      <a class="app-footer__social" href="https://www.instagram.com/skandiacol" target="_blank" rel="noopener" aria-label="Skandia en Instagram" title="Instagram"><svg><use href="#pi-instagram"></use></svg></a>
+      <a class="app-footer__social" href="https://www.youtube.com/@SkandiaColombiaSK" target="_blank" rel="noopener" aria-label="Skandia en YouTube" title="YouTube"><svg><use href="#pi-youtube"></use></svg></a>
+      <a class="app-footer__social" href="https://www.facebook.com/SkandiaCol" target="_blank" rel="noopener" aria-label="Skandia en Facebook" title="Facebook"><svg><use href="#pi-facebook"></use></svg></a>
+    </div>
+    <p class="app-footer__help">¿Alguna duda? Escríbenos a <a href="mailto:nomina@skandia.com.co">nomina@skandia.com.co</a>.</p>
+  </footer>
   </div>
 
 
@@ -3310,6 +3678,11 @@
   /* ---------- Navegación entre pantallas ---------- */
   function showScreen(id){
     state.screen = id;
+    // RONDA 32 — Inicio gana un contenedor más ancho (ver nota junto a
+    // `main#screens.is-wf1` en el CSS): toggle por pantalla, no un cambio
+    // global de `main#screens`, para no ensanchar de paso wf2..wf8 (fuera
+    // de pedido).
+    document.getElementById('screens').classList.toggle('is-wf1', id === 'wf1');
     // .is-shown también se limpia acá: si no, una pantalla revisitada ya
     // la tendría puesta desde la vez anterior y la entrada no se vería
     // (saltaría directo al estado final en vez de animar).
@@ -3331,10 +3704,17 @@
     // borrados del DOM) por el del menú lateral nuevo.
     document.getElementById('sideRail').classList.toggle('is-hidden', isLogin);
     document.getElementById('mobileTopbar').classList.toggle('is-hidden', isLogin);
+    document.getElementById('appFooter').style.display = isLogin ? 'none' : '';
     if (isLogin && closeDrawer) closeDrawer();
 
     document.querySelectorAll('.nav-item[data-nav]').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-nav') === id);
+    });
+    // RONDA 27 — ítem "Entrevista y encuesta": no tiene destino fijo (ver
+    // pendingEntrevistaTarget() más abajo), así que se marca activo cuando
+    // la pantalla actual es cualquiera de las dos que cubre.
+    document.querySelectorAll('.nav-item[data-nav-group]').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-nav-group').split(' ').indexOf(id) > -1);
     });
 
     // Los formularios paginados (wf4/wf5) siempre reinician en la pregunta 1
@@ -3362,6 +3742,14 @@
   document.querySelectorAll('.nav-item[data-nav]').forEach(function(el){
     el.addEventListener('click', function(){ showScreen(el.getAttribute('data-nav')); });
   });
+  // RONDA 27 — "Entrevista y encuesta": destino dinámico, entrevista primero
+  // porque gatea "Mis documentos" (Gate 1); si ya está hecha, va a la encuesta.
+  function pendingEntrevistaTarget(){
+    return !state.gates.interviewDone ? 'wf4' : 'wf5';
+  }
+  document.querySelectorAll('[data-nav-group]').forEach(function(el){
+    el.addEventListener('click', function(){ showScreen(pendingEntrevistaTarget()); });
+  });
 
   /* ---------- Gates obligatorios de encuesta — mecanismo del modal ----------
      Gate 1: entrevista de retiro (wf4) obligatoria antes de ver "Mis
@@ -3377,14 +3765,22 @@
   var wf5PanelHome = wf5Panel.parentNode;
   var gateModal = document.getElementById('gateModal');
   var gateModalBody = document.getElementById('gateModalBody');
+  // RONDA 30 — declarado aquí (no solo dentro de la sección wf3 más abajo)
+  // porque setAppInert() necesita excluirlo igual que a gateModal.
+  var docModal = document.getElementById('docModal');
   var gateLastFocused = null;
 
   // Todo lo demás en .app-shell queda inerte mientras el modal está abierto
-  // — excepto el propio #gateModal, que vive como hijo de .app-shell.
+  // — excepto el propio modal que está abierto (#gateModal o, desde RONDA
+  // 30, #docModal), que vive como hijo de .app-shell. Los dos modales son
+  // mutuamente excluyentes en la práctica (docModal solo se abre desde
+  // wf3, después de pasar el Gate 1 de gateModal), pero se excluyen ambos
+  // siempre por seguridad — dejar inerte un modal cerrado no causa ningún
+  // problema (ya está con pointer-events:none/opacity:0).
   function setAppInert(isInert){
     var shell = document.querySelector('.app-shell');
     Array.prototype.forEach.call(shell.children, function(child){
-      if (child === gateModal) return;
+      if (child === gateModal || child === docModal) return;
       if (isInert){ child.setAttribute('inert',''); child.setAttribute('aria-hidden','true'); }
       else { child.removeAttribute('inert'); child.removeAttribute('aria-hidden'); }
     });
@@ -3623,14 +4019,17 @@
   /* ---------- wf1 — notificación contextual ----------
      RONDA 22, 2026-09-09 — antes esto se elegía a mano con el selector QA
      "qaNotif" (retirado); Javier pidió automatizarlo con el avance real de
-     "Mi dinero" (qaStage), tal como el PRD siempre lo documentó (wf4/wf5,
+     "Mi liquidación" (qaStage), tal como el PRD siempre lo documentó (wf4/wf5,
      "Transición") pero nunca estaba realmente conectado al dato.
-     Ruta 1/Ruta 2 (stepper completo, 6 etapas — ver reorden RONDA 22 más
-     arriba): Entrevista aparece en "Documentos en preparación"/"Documentos
-     pendientes de tu firma" (idx 2-3), antes de "Paz y salvo en revisión"
-     (idx 4); Encuesta aparece en "Pago realizado" (idx 5). Cualquiera de
-     las dos se apaga sola si ya se completó (state.gates), sin esperar a
-     que cambie la etapa.
+     RONDA 27, 2026-09-21 — se quita la condición de etapa (`stage >= 2 &&
+     stage <= 3` / `stage >= 5`): en la sesión del 2026-09-14 Rafa dijo que
+     esta tarjeta "se pierde al final de la página" porque solo aparecía
+     desde una etapa avanzada del proceso. Ahora se muestra siempre que
+     falte completar la entrevista o la encuesta, sin importar en qué
+     etapa de "Mi liquidación" esté la persona — coherente con que también
+     subió por encima de las tarjetas destacadas (ver nota junto a
+     #wf1Notif) y con el nuevo ítem de menú "Entrevista y encuesta"
+     (pendingEntrevistaTarget(), más arriba).
      Ruta 3 (grupo r3, colaborador Y beneficiario): oculto por completo,
      sin excepción. El PRD deja EXPLÍCITAMENTE pendiente de definir cómo
      mapea esto a la variante reducida de 3 etapas genéricas (no hay un
@@ -3642,21 +4041,18 @@
      Gate 1 (evaluateWf3Gates, más abajo) ahora sí incluye a r3c. Son 2
      decisiones distintas: Gate 1 depende de si el guion de la Entrevista
      aplica a ese interlocutor (sí, para r3c); este aviso depende de si
-     hay una etapa de "Mi dinero" desde la cual calcular CUÁNDO mostrarlo
+     hay una etapa de "Mi liquidación" desde la cual calcular CUÁNDO mostrarlo
      (no, para todo r3) — ese segundo problema no se resolvió, así que
      r3c sigue sin ver el aviso opcional aunque sí reciba el Gate 1
      obligatorio al entrar a "Mis documentos". No confundir una exclusión
      con la otra en una futura revisión.
-     Antes de esta ronda solo bloqueaba r3b (beneficiario); r3c (colaborador, pensión) en
-     la práctica ya mostraba "Ninguna" siempre porque esa era la opción por
-     defecto del selector retirado, así que este cambio no quita nada que
-     un usuario real llegara a ver. */
+     Si ambas siguen pendientes a la vez, prioriza la entrevista — es la
+     que gatea "Mis documentos" (Gate 1). */
   function renderWf1Notif(){
     var box = document.getElementById('wf1Notif');
     if (routeGroup(state.route) === 'r3'){ box.style.display = 'none'; return; }
-    var stage = parseInt(document.getElementById('qaStage').value, 10);
-    var showEntrevista = !state.gates.interviewDone && stage >= 2 && stage <= 3;
-    var showEncuesta = !state.gates.surveyDone && stage >= 5;
+    var showEntrevista = !state.gates.interviewDone;
+    var showEncuesta = !state.gates.surveyDone;
     if (showEntrevista){
       box.style.display = 'block';
       document.getElementById('wf1NotifTitle').textContent = 'Tu entrevista de retiro';
@@ -3672,12 +4068,27 @@
     }
   }
 
-  /* ---------- wf2 — Mi dinero: stepper simulado (6 etapas — RONDA 17
+  /* ---------- wf2 — Mi liquidación: stepper simulado (6 etapas — RONDA 17
      agrega "Documentos pendientes de tu firma", resuelve decisión
      pendiente #13 del PRD; Ruta 3 sigue con su variante reducida de 3
      etapas genéricas, sin cambio — restricción explícita del PRD wf2,
      "nunca los nombres del MPO en Ruta 3", y subir 7 documentos con
      nombre propio es exactamente ese tipo de detalle) ---------- */
+  // RONDA 32 — antes este loop vivía una sola vez, inline, dentro de
+  // renderStage() (solo para el stepper de wf2). Se extrae para poder
+  // sincronizar TAMBIÉN el panel "Tu progreso" del home (Ruta 1) contra la
+  // misma lista `stage/idx`, sin duplicar la lógica de done/active/pending.
+  function syncStepperDots(list, stage){
+    list.forEach(function(li){
+      var idx = parseInt(li.getAttribute('data-idx'),10);
+      var dot = li.querySelector('.stepper-sim__dot');
+      li.classList.remove('done','active','pending');
+      if (idx < stage){ li.classList.add('done'); dot.textContent = '✓'; }
+      else if (idx === stage){ li.classList.add('active'); dot.textContent = String(idx+1); }
+      else { li.classList.add('pending'); dot.textContent = String(idx+1); }
+    });
+  }
+
   function renderStage(){
     var group = routeGroup(state.route);
     var stageInput = document.getElementById('qaStage');
@@ -3688,14 +4099,14 @@
 
     var stage = parseInt(stageInput.value,10);
     var list = isReduced ? document.querySelectorAll('#wf2StepperReduced li') : document.querySelectorAll('#wf2StepperFull li');
-    list.forEach(function(li){
-      var idx = parseInt(li.getAttribute('data-idx'),10);
-      var dot = li.querySelector('.stepper-sim__dot');
-      li.classList.remove('done','active','pending');
-      if (idx < stage){ li.classList.add('done'); dot.textContent = '✓'; }
-      else if (idx === stage){ li.classList.add('active'); dot.textContent = String(idx+1); }
-      else { li.classList.add('pending'); dot.textContent = String(idx+1); }
-    });
+    syncStepperDots(list, stage);
+    // Panel "Tu progreso" (home, Ruta 1) — vive solo dentro de
+    // `.variant[data-r="r1"]`, que nunca es la ruta reducida, así que
+    // siempre sincroniza contra las 6 etapas completas (mismo `stage` que
+    // el stepper de wf2 de arriba, una sola fuente de verdad).
+    syncStepperDots(document.querySelectorAll('#wf1ProgressSteps li'), stage);
+    var wf1ProgressBadge = document.getElementById('wf1ProgressBadge');
+    if (wf1ProgressBadge) wf1ProgressBadge.textContent = 'Paso ' + (stage+1) + ' de ' + (isReduced ? 3 : 6);
 
     // Auditoría /impeccable (hallazgos #1/#5) — resumen visual de avance,
     // misma fuente de verdad (stage/total) que ya usa qaStageLabel arriba.
@@ -3709,20 +4120,26 @@
     if (wf2ProgressLabel) wf2ProgressLabel.textContent = (stage+1) + ' / ' + total;
     setSkProgressFill('wf1MoneyFill', pct);
     if (wf1MoneyLabel) wf1MoneyLabel.textContent = (stage+1) + ' / ' + total;
+    // Panel "Tu progreso" — mismo pct, tercera vista del mismo dato.
+    setSkProgressFill('wf1ProgressFill', pct);
+    var wf1ProgressPct = document.getElementById('wf1ProgressPct');
+    if (wf1ProgressPct) wf1ProgressPct.textContent = pct;
 
     if (!isReduced){
-      // RONDA 17 — nota dinámica de la etapa "Documentos pendientes de tu
-      // firma" (idx 2): lee el conteo REAL de documentos subidos en wf3
-      // (renderUploadSummary la mantiene actualizada en window.__uploadCount),
-      // no un valor fijo — si el revisor sube documentos en wf3 y vuelve
-      // acá, ve el conteo real, sin depender de dónde esté el slider QA.
-      var uploaded = (typeof window.__uploadCount === 'number') ? window.__uploadCount : 0;
-      document.getElementById('wf2UploadNote').textContent = uploaded + ' de 7 documentos subidos';
+      // RONDA 17, actualizada RONDA 30 — nota dinámica de la etapa
+      // "Documentos pendientes de tu firma" (idx 2): lee el conteo REAL de
+      // documentos firmados en wf3 (updateSignSummary() la mantiene
+      // actualizada en window.__signCount, antes __uploadCount cuando el
+      // mecanismo era carga de archivo), no un valor fijo — si el revisor
+      // firma documentos en wf3 y vuelve acá, ve el conteo real, sin
+      // depender de dónde esté el slider QA.
+      var signed = (typeof window.__signCount === 'number') ? window.__signCount : 0;
+      document.getElementById('wf2UploadNote').textContent = signed + ' de 7 documentos firmados';
       // CTA "Ver mis documentos": relevante desde que hay documentos en
       // preparación en adelante (idx >= 2 desde RONDA 22 — antes idx 1,
       // reordenado junto con "Liquidación solicitada", ver nota arriba) —
       // conveniencia adicional a la etapa 3, que ya tiene su propio CTA
-      // "Subir mis documentos".
+      // "Firmar mis documentos" (RONDA 30 — antes "Subir mis documentos").
       document.getElementById('wf2DocsCta').style.display = (stage >= 2) ? 'block' : 'none';
     }
   }
@@ -3776,71 +4193,149 @@
     });
   });
 
-  /* ---------- wf3 — Documentos por firmar (carga — RONDA 17) ----------
-     `sk-file-upload` es "emit-only" por spec (`sk-file-upload.md` §"Cuándo
-     usarlo"): selecciona/valida el archivo, pero la subida real la hace el
-     consumer. Este prototipo no tiene backend en ningún módulo, así que
-     "subir" aquí es simular el estado resultante (subido/rechazado) a
-     partir del archivo elegido — nunca una petición de red real. */
-  window.__uploadCount = 0;
-  function updateUploadSummary(){
-    var ready = document.querySelectorAll('#wf3UploadList [data-upload-badge].sk-badge--success').length;
-    window.__uploadCount = ready;
+  /* ---------- wf3 — Documentos por firmar (firma electrónica — RONDA 30) ----------
+     RONDA 17 tenía esto como carga de archivo (`sk-file-upload`, "emit-
+     only": selecciona/valida, la subida real la hace el consumer). RONDA
+     30 lo reemplaza por "ver documento + firmar" dentro de #docModal —
+     ver la nota de cabecera de wf3 y
+     `investigacion/siempre-skandia-firma-electronica-propuesta.md`. Sigue
+     sin backend real en ningún módulo de este archivo: "firmar" aquí es
+     simular el estado resultante, nunca una petición de red. */
+  window.__signCount = 0;
+  // Evita repetir los 7 nombres de documento en JS — ya viven una sola vez
+  // en el HTML de cada tarjeta (`data-sign-label`).
+  var DOC_SIGN_LABELS = {};
+  document.querySelectorAll('#wf3UploadList [data-sign-doc]').forEach(function(card){
+    DOC_SIGN_LABELS[card.getAttribute('data-sign-doc')] = card.getAttribute('data-sign-label');
+  });
+  var currentSignDoc = null; // key del documento abierto en #docModal ahora mismo
+  var docLastFocused = null;
+
+  function updateSignSummary(){
+    var ready = document.querySelectorAll('#wf3UploadList [data-sign-badge].sk-badge--success').length;
+    window.__signCount = ready;
     var label = document.getElementById('wf3UploadCountLabel');
-    if (label) label.textContent = ready + ' de 7 documentos subidos';
+    if (label) label.textContent = ready + ' de 7 documentos firmados';
     var doneMsg = document.getElementById('wf3UploadDoneMsg');
     if (doneMsg) doneMsg.style.display = (ready === 7) ? 'block' : 'none';
-    // Mantiene sincronizada la nota de la etapa 2 de wf2 (RONDA 17) sin
-    // esperar a que el revisor mueva el slider de etapa — misma fuente de
-    // verdad (window.__uploadCount) que lee renderStage().
+    // Mantiene sincronizada la nota de la etapa 3 de wf2 sin esperar a que
+    // el revisor mueva el slider de etapa — misma fuente de verdad
+    // (window.__signCount) que lee renderStage().
     var wf2Note = document.getElementById('wf2UploadNote');
-    if (wf2Note) wf2Note.textContent = ready + ' de 7 documentos subidos';
+    if (wf2Note) wf2Note.textContent = ready + ' de 7 documentos firmados';
   }
-  function setUploadState(card, docState, filename){
-    var badge = card.querySelector('[data-upload-badge]');
-    var widget = card.querySelector('[data-upload-widget]');
-    var filenameEl = card.querySelector('[data-upload-filename]');
-    var removeBtn = card.querySelector('[data-upload-remove]');
-    var errorEl = card.querySelector('[data-upload-error]');
-    badge.classList.remove('sk-badge--success','sk-badge--warning','sk-badge--error');
-    widget.classList.toggle('is-invalid', docState === 'rechazado');
+
+  function setSignState(card, docState){
+    var badge = card.querySelector('[data-sign-badge]');
+    var meta = card.querySelector('[data-sign-meta]');
+    var viewBtn = card.querySelector('[data-sign-view]');
+    var signBtn = card.querySelector('[data-sign-open]');
+    badge.classList.remove('sk-badge--success','sk-badge--warning');
     if (docState === 'pendiente'){
       badge.classList.add('sk-badge--warning');
-      badge.textContent = 'Pendiente de subir';
-      filenameEl.textContent = '';
-      removeBtn.hidden = true;
-    } else if (docState === 'subido'){
+      badge.textContent = 'Pendiente de firmar';
+      meta.style.display = 'none';
+      meta.textContent = '';
+      if (viewBtn) viewBtn.textContent = 'Ver documento';
+      // sk-button (custom element) envuelve al <button>: hay que ocultar el
+      // padre, no solo el botón, o el wrapper deja un hueco vacío.
+      if (signBtn) signBtn.closest('sk-button').style.display = '';
+    } else if (docState === 'firmado'){
       badge.classList.add('sk-badge--success');
-      badge.textContent = 'Subido — a la espera de que Nómina lo reciba';
-      filenameEl.textContent = filename || '';
-      removeBtn.hidden = false;
-    } else if (docState === 'rechazado'){
-      badge.classList.add('sk-badge--error');
-      badge.textContent = 'Pendiente de subir';
-      filenameEl.textContent = '';
-      removeBtn.hidden = true;
-      errorEl.textContent = 'No pudimos procesar este archivo. Verifica que sea un PDF o una imagen de máximo 5 MB e intenta de nuevo.';
+      badge.textContent = 'Firmado';
+      meta.style.display = 'block';
+      meta.textContent = 'Firmado el ' + new Date().toLocaleDateString('es-CO', {day:'numeric', month:'short', year:'numeric'});
+      if (viewBtn) viewBtn.textContent = 'Ver documento firmado';
+      // Ya no hay nada que firmar — solo queda "Ver documento firmado".
+      if (signBtn) signBtn.closest('sk-button').style.display = 'none';
     }
-    updateUploadSummary();
+    updateSignSummary();
   }
-  document.querySelectorAll('#wf3UploadList [data-upload-doc]').forEach(function(card){
-    var input = card.querySelector('[data-upload-input]');
-    var removeBtn = card.querySelector('[data-upload-remove]');
-    input.addEventListener('change', function(){
-      if (!input.files || !input.files.length) return;
-      var simulateReject = document.getElementById('qaUploadError').checked;
-      if (simulateReject){
-        setUploadState(card, 'rechazado');
-      } else {
-        setUploadState(card, 'subido', input.files[0].name);
-      }
-      input.value = ''; // permite re-elegir el mismo archivo si se simula rechazo dos veces seguidas
-    });
-    removeBtn.addEventListener('click', function(){
-      setUploadState(card, 'pendiente');
-    });
+
+  /* ---------- #docModal — ver documento / firmar (compartido por los 7) ----------
+     Mismo criterio de accesibilidad que #gateModal (inert en el resto de
+     .app-shell, foco atrapado dentro del panel, foco devuelto al cerrar) —
+     ver setAppInert() y gateFocusableEls() más arriba — pero SIEMPRE
+     descartable (nunca un gate obligatorio), así que no hay distinción
+     entre "completar" y "declinar" como en closeGateModal/declineGateModal:
+     un solo closeDocModal(). */
+  function docFocusableEls(){
+    return Array.prototype.slice.call(document.getElementById('docModalPanel').querySelectorAll(
+      'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+    )).filter(function(el){ return el.offsetParent !== null; });
+  }
+  function showDocModalStep(step){
+    document.getElementById('docModalView').style.display = (step === 'view') ? 'block' : 'none';
+    document.getElementById('docModalSign').style.display = (step === 'sign') ? 'block' : 'none';
+  }
+  function openDocModal(key, startOnView){
+    currentSignDoc = key;
+    var label = DOC_SIGN_LABELS[key] || '';
+    document.getElementById('docModalViewTitle').textContent = label;
+    document.getElementById('docModalPreviewTitle').textContent = label;
+    document.getElementById('docModalSignTitle').textContent = 'Firmar: ' + label;
+    document.getElementById('docModalSignConsent').checked = false;
+    document.getElementById('docModalConfirmSign').disabled = true;
+    document.getElementById('docModalSignError').style.display = 'none';
+    showDocModalStep(startOnView ? 'view' : 'sign');
+    docLastFocused = document.activeElement;
+    setAppInert(true);
+    document.body.classList.add('gate-modal-open');
+    docModal.classList.add('is-open');
+    var firstField = docFocusableEls()[0];
+    if (firstField) firstField.focus();
+  }
+  function closeDocModal(){
+    if (!currentSignDoc) return;
+    docModal.classList.remove('is-open');
+    document.body.classList.remove('gate-modal-open');
+    setAppInert(false);
+    currentSignDoc = null;
+    if (docLastFocused && typeof docLastFocused.focus === 'function') docLastFocused.focus();
+  }
+  document.getElementById('docModalCloseBtn').addEventListener('click', closeDocModal);
+  document.getElementById('docModalCloseFromView').addEventListener('click', closeDocModal);
+  document.getElementById('docModalGoSign').addEventListener('click', function(){ showDocModalStep('sign'); });
+  document.getElementById('docModalBackToView').addEventListener('click', function(){ showDocModalStep('view'); });
+  // Click en el fondo oscuro (nunca en el panel blanco) — mismo criterio
+  // que gateModal/.drawer-overlay.
+  docModal.addEventListener('click', function(e){ if (e.target === docModal) closeDocModal(); });
+  docModal.addEventListener('keydown', function(e){
+    if (!currentSignDoc) return;
+    if (e.key === 'Escape'){ e.preventDefault(); closeDocModal(); return; }
+    if (e.key !== 'Tab') return;
+    var els = docFocusableEls();
+    if (!els.length) return;
+    var first = els[0], last = els[els.length - 1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
   });
-  updateUploadSummary();
+  document.getElementById('docModalSignConsent').addEventListener('change', function(){
+    document.getElementById('docModalConfirmSign').disabled = !this.checked;
+  });
+  document.getElementById('docModalConfirmSign').addEventListener('click', function(){
+    if (!currentSignDoc) return;
+    // Toggle QA "simular error al firmar" — mismo propósito de prueba que
+    // el antiguo "simular archivo rechazado" de RONDA 17, ajustado al
+    // nuevo mecanismo (no hay archivo que rechazar, hay una firma que
+    // puede fallar al registrarse).
+    var simulateError = document.getElementById('qaSignError').checked;
+    if (simulateError){
+      document.getElementById('docModalSignError').style.display = 'block';
+      return;
+    }
+    var card = document.querySelector('#wf3UploadList [data-sign-doc="' + currentSignDoc + '"]');
+    setSignState(card, 'firmado');
+    closeDocModal();
+  });
+
+  document.querySelectorAll('#wf3UploadList [data-sign-doc]').forEach(function(card){
+    var key = card.getAttribute('data-sign-doc');
+    card.querySelector('[data-sign-view]').addEventListener('click', function(){ openDocModal(key, true); });
+    card.querySelector('[data-sign-open]').addEventListener('click', function(){ openDocModal(key, false); });
+    setSignState(card, 'pendiente');
+  });
+  updateSignSummary();
 
   /* ---------- wf4 — Entrevista (paginado) ----------
      RONDA 25 — todos los pasos aplican a las 3 rutas incluidas (r1/r2/
@@ -3957,6 +4452,42 @@
     document.getElementById('wf6Exec').style.display = exec ? 'block' : 'none';
   });
 
+  /* RONDA 27, 2026-09-21 — Novedades oculta por defecto (pedido de Rafa,
+     complejidad operativa de contenido real). `.v-novedades` marca los 4
+     puntos de entrada (ítems de rail/drawer, tarjeta del hub, opción del
+     selector QA); la sección wf8 en sí no necesita tocarse — sin ítem de
+     menú ni tarjeta, no hay forma de llegar ahí en el flujo normal, solo
+     queda alcanzable saltando a mano desde el selector QA (por eso ese
+     selector también se oculta). Mismo patrón que qaOutExec de arriba:
+     un checkbox, un atributo en <body>, visibilidad resuelta por CSS/JS
+     sobre la clase, nunca eliminando el DOM. */
+  function applyNovedadesVisibility(){
+    var show = document.getElementById('qaShowNovedades').checked;
+    document.querySelectorAll('.v-novedades').forEach(function(el){
+      el.style.display = show ? '' : 'none';
+    });
+  }
+  document.getElementById('qaShowNovedades').addEventListener('change', applyNovedadesVisibility);
+
+  /* ---------- wf7 — Comunidad: checkbox de tratamiento de datos ----------
+     RONDA 27, 2026-09-21 — mismo cableado para las 2 variantes (Ruta 1 y
+     Ruta 3): el botón arranca disabled y solo se habilita con el checkbox
+     marcado; al hacer clic, el bloque de acción se reemplaza por el
+     estado de confirmación (no hay ingreso automático — ver comentario de
+     cabecera de wf7). */
+  ['r1','r3'].forEach(function(suffix){
+    var consent = document.getElementById('wf7Consent-' + suffix);
+    var joinBtn = document.getElementById('wf7JoinBtn-' + suffix);
+    var joinBlock = document.getElementById('wf7JoinBlock-' + suffix);
+    var joinDone = document.getElementById('wf7JoinDone-' + suffix);
+    if (!consent || !joinBtn) return;
+    consent.addEventListener('change', function(){ joinBtn.disabled = !consent.checked; });
+    joinBtn.addEventListener('click', function(){
+      joinBlock.style.display = 'none';
+      joinDone.style.display = 'block';
+    });
+  });
+
   /* ---------- wf8 — Ventana 1 (Ruta 2) ---------- */
   function renderVentana1(){
     var days = parseInt(document.getElementById('qaVentana').value,10);
@@ -3990,6 +4521,10 @@
   // Init para que el estado "limpio" se vea desde la primera carga, sin
   // depender de que alguien haga clic primero.
   document.body.setAttribute('data-hide-reviewer-notes', document.getElementById('qaHideReviewerNotes').checked ? 'true' : 'false');
+  // Mismo motivo que el toggle de arriba: aplica el estado "Novedades oculta"
+  // ya en el Init, para que la primera carga no muestre el ítem un instante
+  // y lo esconda después.
+  applyNovedadesVisibility();
 
   /* ---------- Init ---------- */
   // Ajuste 6, ronda 3: arranca en Ruta 1 SOLO para que la primera vista de
