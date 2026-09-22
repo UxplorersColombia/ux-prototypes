@@ -1678,10 +1678,33 @@
      pasos de ejemplo inventados por Lovable ("Notificación recibida",
      etc.); acá son versiones CORTAS de las 6 etapas reales del MPO que ya
      usa `#wf2StepperFull` (RONDA 17), no un proceso nuevo — evita
-     divergir de la fuente ya aprobada por negocio. Solo Ruta 1: este
-     panel vive dentro del `.variant[data-r="r1"]`, que nunca usa la
-     variante reducida de 3 etapas (esa es exclusiva de Ruta 3), así que
-     `renderStage()` no necesita una rama `isReduced` para este panel. */
+     divergir de la fuente ya aprobada por negocio.
+     RONDA 35, 2026-09-21 — Javier pidió replicar esta MISMA estructura
+     (hero + `.wf1-top-row` + panel "Tu progreso") en Ruta 2, Ruta 3
+     retiro (r3c) y Ruta 3 fallecimiento (r3b) — antes solo Ruta 1 la
+     tenía, las otras 3 usaban `.wf1-banner` (ver esa regla, retirada:
+     sin consumidor). Por qué esto NO viola "Ruta 2/3 no pueden
+     celebrar" (content.md, regla que sí sigue vigente): lo que hacía
+     celebratorio al hero viejo era el fondo `--sk-gradient-brand` a
+     ancho completo + copy festivo del brochure — ambos ya se habían
+     retirado en RONDA 32 a favor de una tarjeta clara neutra (misma
+     receta que `.sk-card`). Esta ronda solo extiende esa tarjeta NEUTRA
+     — sin gradiente, sin copy nuevo — a las otras 3 rutas; el copy de
+     cada una es el mismo que ya existía en su `.wf1-banner` (sobrio para
+     r2, acompañante para r3c/r3b), solo redistribuido entre el título/
+     cuerpo del hero y el saludo de abajo — ver el HTML de cada variante
+     para el detalle exacto de qué frase fue a cada slot.
+     Ahora SÍ hace falta la rama `isReduced`: r1/r2 comparten el flujo
+     completo de 6 etapas, r3c/r3b comparten el flujo genérico reducido
+     de 3 (mismo criterio que ya regía `#wf2StepperFull`/`#wf2StepperReduced`
+     — nunca los nombres del MPO en Ruta 3). Cada ruta tiene su propio
+     juego de IDs (`wf1ProgressStepsR2`, `...R3c`, `...R3b` — Ruta 1
+     conserva los IDs originales sin sufijo) porque las 4 tarjetas
+     coexisten en el DOM a la vez (solo una visible según `.variant`), así
+     que un solo ID no alcanza. `updateHomeProgress()` en el <script>
+     hace el trabajo por instancia, con el total correcto (6 o 3) fijo
+     por tarjeta — nunca lee la ruta actualmente activa, así que cada
+     tarjeta queda internamente consistente aunque esté oculta. */
   .wf1-top-row{display:flex;gap:var(--sk-space-l);align-items:stretch;margin-bottom:var(--sk-space-l);}
   .wf1-top-row .wf1-hero{flex:1 1 62%;margin-bottom:0;}
   .wf1-progress-card{
@@ -1705,28 +1728,10 @@
     .wf1-top-row .wf1-hero{margin-bottom:0;}
   }
 
-  /* RONDA 27, 2026-09-21 — banner sobrio de wf1 para Ruta 2 y Ruta 3: mismo
-     pedido de "banners e imágenes" que el hero de arriba, pero sin
-     gradiente ni copy celebratorio — respeta la misma regla de tono
-     (content.md, "Ruta 2 no puede celebrar"; Ruta 3 es sobria/
-     acompañante). Superficie neutra (`--sk-color-surface` + borde), no
-     `--sk-gradient-brand`. */
-  .wf1-banner{
-    background:var(--sk-color-surface);border:1px solid var(--sk-color-border);
-    border-radius:16px;padding:var(--sk-space-m);margin-bottom:var(--sk-space-l);
-    display:flex;align-items:center;gap:var(--sk-space-m);
-  }
-  .wf1-banner__photo{
-    flex-shrink:0;width:72px;height:72px;border-radius:10px;
-    border:1.5px dashed var(--sk-color-border);
-    background:repeating-linear-gradient(135deg, rgba(0,0,0,.03) 0 8px, rgba(0,0,0,.01) 8px 16px);
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    font-size:.625rem;line-height:1.2;color:var(--sk-color-text-muted);padding:6px;
-  }
-  .wf1-banner__body{font-size:.875rem;line-height:1.4;color:var(--sk-color-text-muted);margin:0;}
-  @media (max-width:480px){
-    .wf1-banner{flex-direction:column;align-items:flex-start;}
-  }
+  /* RONDA 27, 2026-09-21 — banner sobrio de wf1 para Ruta 2 y Ruta 3:
+     histórico, retirado en RONDA 35 (ver nota junto a `.wf1-top-row`) —
+     las 4 rutas usan ahora la misma tarjeta `.wf1-hero`/`.wf1-top-row`,
+     sin gradiente, así que este componente se quedó sin consumidor. */
 
   /* Tarjetas destacadas de wf1 (Mi liquidación + Mis documentos) — mismo
      mecanismo de flex-wrap que .hub-grid, contenedor propio porque llevan
@@ -2439,34 +2444,146 @@
           <p class="sk-body content-gap" style="margin-top:8px;">Todo tu proceso en un mismo lugar</p>
         </div>
         <div class="variant" data-r="r2">
-          <!-- RONDA 27, 2026-09-21 — banner sobrio (ver nota CSS `.wf1-banner`):
+          <!-- RONDA 27, 2026-09-21 — banner sobrio, ver nota CSS `.wf1-banner`
+               (retirada en RONDA 35 — sin consumidor, ver más abajo):
                mismo pedido de recurso visual que el hero de Ruta 1, pero sin
                gradiente ni tono celebratorio — content.md prohíbe "módulo
-               festivo" en Ruta 2. -->
-          <div class="wf1-banner">
-            <div class="wf1-banner__photo">🟡 Foto pendiente</div>
-            <p class="wf1-banner__body">Siempre Skandia te acompaña en este proceso, con la misma claridad de siempre.</p>
+               festivo" en Ruta 2.
+               RONDA 35, 2026-09-21 — misma estructura de Ruta 1 (ver nota
+               completa junto al CSS `.wf1-top-row`): tarjeta clara +
+               panel "Tu progreso", ya no `.wf1-banner`. Copy 100% reusado,
+               solo redistribuido — el título del hero es la frase que
+               antes vivía en `.wf1-banner__body`; el saludo de abajo es
+               el `<h1>` que ya existía, solo bajado a `.sk-h2` (mismo
+               tamaño que Ruta 1, RONDA 33). Nada nuevo: la regla de tono
+               de arriba sigue intacta porque lo que la violaría era el
+               gradiente + copy festivo, ya retirados desde RONDA 32. -->
+          <div class="wf1-top-row">
+            <div class="wf1-hero">
+              <div class="wf1-hero__content">
+                <p class="wf1-hero__eyebrow">Siempre Skandia</p>
+                <p class="wf1-hero__title">Siempre Skandia te acompaña en este proceso, con la misma claridad de siempre.</p>
+                <p class="wf1-hero__body">Todo lo que necesitas revisar y entregar está aquí, en un solo lugar.</p>
+                <div class="wf1-hero__actions">
+                  <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-goto="wf2" style="width:auto;">Ver mi proceso</button></sk-button>
+                  <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-goto="wf3" style="width:auto;">Mis documentos</button></sk-button>
+                </div>
+              </div>
+              <div class="wf1-hero__image">
+                <img src="banner-ruta-2-salida-no-elegida.webp" alt="">
+              </div>
+            </div>
+            <div class="wf1-progress-card">
+              <div class="wf1-progress-card__head">
+                <p class="wf1-progress-card__eyebrow">Tu progreso</p>
+                <span class="sk-badge sk-badge--success sk-badge--stroke" id="wf1ProgressBadgeR2">Paso 1 de 6</span>
+              </div>
+              <p class="wf1-progress-card__pct"><span class="wf1-progress-card__pct-num"><span id="wf1ProgressPctR2">0</span>%</span> <span class="wf1-progress-card__pct-suffix">completado</span></p>
+              <sk-progress-bar><div class="sk-progressbar"><div class="sk-progressbar__fill" id="wf1ProgressFillR2" style="width:0%"><span class="sk-progressbar__label"></span></div></div></sk-progress-bar>
+              <ul class="stepper-sim wf1-progress-card__steps" id="wf1ProgressStepsR2">
+                <li data-idx="0"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Notificación recibida</p></div></li>
+                <li data-idx="1"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Liquidación solicitada</p></div></li>
+                <li data-idx="2"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos en preparación</p></div></li>
+                <li data-idx="3"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos por firmar</p></div></li>
+                <li data-idx="4"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Paz y salvo en revisión</p></div></li>
+                <li data-idx="5"><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Pago realizado</p></div></li>
+              </ul>
+            </div>
           </div>
-          <h1 class="sk-display">Hola, [Nombre]. Aquí tienes tu proceso de salida.</h1>
-          <p class="sk-body content-gap" style="margin-top:8px;">Todo lo que necesitas revisar y entregar está aquí, en un solo lugar.</p>
+          <!-- RONDA 36, 2026-09-21 — Javier pidió la misma disposición de
+               título+entradilla de Ruta 1 (2 líneas: `<h1>` corto + `<p>`
+               más claro debajo), no un único `<h1>` con la frase completa
+               (RONDA 35). Se parte la MISMA frase que ya había en el
+               punto donde ya traía su propio punto seguido — cero copy
+               nuevo, solo 2 elementos en vez de 1. -->
+          <h1 class="sk-h2">Hola, [Nombre].</h1>
+          <p class="sk-body content-gap" style="margin-top:8px;">Aquí tienes tu proceso de salida.</p>
         </div>
         <div class="variant" data-r="r3c">
-          <div class="wf1-banner">
-            <div class="wf1-banner__photo">🟡 Foto pendiente</div>
-            <p class="wf1-banner__body">Siempre Skandia te acompaña en este proceso, con calma y claridad.</p>
+          <!-- RONDA 35 — ver nota completa junto a la variante r2 de arriba
+               (misma estructura, mismo criterio de redistribución de
+               copy). -->
+          <div class="wf1-top-row">
+            <div class="wf1-hero">
+              <div class="wf1-hero__content">
+                <p class="wf1-hero__eyebrow">Siempre Skandia</p>
+                <p class="wf1-hero__title">Siempre Skandia te acompaña en este proceso, con calma y claridad.</p>
+                <!-- REVISOR: pendiente de confirmar wording con Kiki (Ruta 3, colaborador/pensión) — content.md no definía este texto, ver histórico junto al <h1> de abajo. -->
+                <p class="wf1-hero__body">Aquí encuentras la información de tu proceso de retiro en un solo lugar.</p>
+                <div class="wf1-hero__actions">
+                  <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-goto="wf2" style="width:auto;">Ver mi proceso</button></sk-button>
+                  <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-goto="wf3" style="width:auto;">Mis documentos</button></sk-button>
+                </div>
+              </div>
+              <div class="wf1-hero__image">
+                <img src="banner-ruta-3-pension.webp" alt="">
+              </div>
+            </div>
+            <div class="wf1-progress-card">
+              <div class="wf1-progress-card__head">
+                <p class="wf1-progress-card__eyebrow">Tu progreso</p>
+                <span class="sk-badge sk-badge--success sk-badge--stroke" id="wf1ProgressBadgeR3c">Paso 1 de 3</span>
+              </div>
+              <p class="wf1-progress-card__pct"><span class="wf1-progress-card__pct-num"><span id="wf1ProgressPctR3c">0</span>%</span> <span class="wf1-progress-card__pct-suffix">completado</span></p>
+              <sk-progress-bar><div class="sk-progressbar"><div class="sk-progressbar__fill" id="wf1ProgressFillR3c" style="width:0%"><span class="sk-progressbar__label"></span></div></div></sk-progress-bar>
+              <!-- 3 etapas genéricas (mismo texto que `#wf2StepperReduced`,
+                   RONDA 17): el MPO no mapea pensión, así que Ruta 3 nunca
+                   usa los nombres reales del flujo de 6 etapas. -->
+              <ul class="stepper-sim wf1-progress-card__steps" id="wf1ProgressStepsR3c">
+                <li data-idx="0"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">El proceso está en curso</p></div></li>
+                <li data-idx="1"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos recibidos</p></div></li>
+                <li data-idx="2"><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Pago realizado</p></div></li>
+              </ul>
+            </div>
           </div>
-          <h1 class="sk-display">Hola, [Nombre]. Este es tu espacio para cerrar tu proceso con Skandia.</h1>
-          <p class="sk-body content-gap" style="margin-top:8px;">Aquí encuentras la información de tu proceso de retiro en un solo lugar.</p>
+          <!-- RONDA 36 — misma disposición título+entradilla de Ruta 1, ver
+               nota junto a r2 más arriba. -->
+          <h1 class="sk-h2">Hola, [Nombre].</h1>
+          <p class="sk-body content-gap" style="margin-top:8px;">Este es tu espacio para cerrar tu proceso con Skandia.</p>
           <!-- REVISOR: subtítulo sugerido — content.md no definía uno para esta variante (Ruta 3, colaborador/pensión). Texto propuesto, pendiente de confirmar wording con Kiki antes de dar por definitivo. -->
         </div>
         <div class="variant" data-r="r3b">
-          <div class="wf1-banner">
-            <div class="wf1-banner__photo">🟡 Foto pendiente</div>
-            <p class="wf1-banner__body">Siempre Skandia acompaña este proceso, con calma y claridad.</p>
+          <!-- RONDA 35 — ver nota completa junto a la variante r2 de arriba
+               (misma estructura, mismo criterio de redistribución de
+               copy). El wording sigue siendo el mismo texto ya aprobado
+               como pendiente — ver el REVISOR más abajo sobre por qué no
+               se reformuló nada aquí. -->
+          <div class="wf1-top-row">
+            <div class="wf1-hero">
+              <div class="wf1-hero__content">
+                <p class="wf1-hero__eyebrow">Siempre Skandia</p>
+                <p class="wf1-hero__title">Siempre Skandia acompaña este proceso, con calma y claridad.</p>
+                <p class="wf1-hero__body">Aquí puedes revisar, con calma, la información de este proceso.</p>
+                <div class="wf1-hero__actions">
+                  <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-goto="wf2" style="width:auto;">Ver mi proceso</button></sk-button>
+                  <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-goto="wf3" style="width:auto;">Mis documentos</button></sk-button>
+                </div>
+              </div>
+              <div class="wf1-hero__image">
+                <img src="banner-ruta-3-fallecimiento.webp" alt="">
+              </div>
+            </div>
+            <div class="wf1-progress-card">
+              <div class="wf1-progress-card__head">
+                <p class="wf1-progress-card__eyebrow">Tu progreso</p>
+                <span class="sk-badge sk-badge--success sk-badge--stroke" id="wf1ProgressBadgeR3b">Paso 1 de 3</span>
+              </div>
+              <p class="wf1-progress-card__pct"><span class="wf1-progress-card__pct-num"><span id="wf1ProgressPctR3b">0</span>%</span> <span class="wf1-progress-card__pct-suffix">completado</span></p>
+              <sk-progress-bar><div class="sk-progressbar"><div class="sk-progressbar__fill" id="wf1ProgressFillR3b" style="width:0%"><span class="sk-progressbar__label"></span></div></div></sk-progress-bar>
+              <ul class="stepper-sim wf1-progress-card__steps" id="wf1ProgressStepsR3b">
+                <li data-idx="0"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">El proceso está en curso</p></div></li>
+                <li data-idx="1"><div class="stepper-sim__line"></div><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Documentos recibidos</p></div></li>
+                <li data-idx="2"><div class="stepper-sim__dot"></div><div><p class="stepper-sim__label">Pago realizado</p></div></li>
+              </ul>
+            </div>
           </div>
-          <h1 class="sk-display">Te damos la bienvenida. Este portal reúne la información del proceso de [Nombre del colaborador] con Skandia.</h1>
-          <p class="sk-body content-gap" style="margin-top:8px;">Aquí puedes revisar, con calma, la información de este proceso.</p>
-          <!-- REVISOR: subtítulo sugerido — content.md no definía uno para esta variante (Ruta 3, beneficiario/fallecimiento). El wording evita a propósito conjugar sobre el colaborador fallecido, para no anticipar la decisión de Legal/Comunicaciones sobre tiempos verbales y cómo nombrarlo (PRD §6, decisión 11) — ese matiz sigue sin resolver y necesita validación de Legal, no solo de Kiki, antes de producción. -->
+          <!-- RONDA 36 — misma disposición título+entradilla de Ruta 1, ver
+               nota junto a r2 más arriba. División en la misma frontera
+               de oración que ya traía el texto (sin tocar el wording
+               sensible, ver REVISOR debajo). -->
+          <h1 class="sk-h2">Te damos la bienvenida.</h1>
+          <p class="sk-body content-gap" style="margin-top:8px;">Este portal reúne la información del proceso de [Nombre del colaborador] con Skandia.</p>
+          <!-- REVISOR: subtítulo sugerido — content.md no definía uno para esta variante (Ruta 3, beneficiario/fallecimiento). El wording evita a propósito conjugar sobre el colaborador fallecido, para no anticipar la decisión de Legal/Comunicaciones sobre tiempos verbales y cómo nombrarlo (PRD §6, decisión 11) — ese matiz sigue sin resolver y necesita validación de Legal, no solo de Kiki, antes de producción. RONDA 35: se conserva textual, sin reformular, precisamente por este matiz sin resolver. -->
         </div>
 
         <!-- Notificación contextual de Entrevista / Encuesta (RONDA 22:
@@ -4089,6 +4206,27 @@
     });
   }
 
+  // RONDA 35 — un panel "Tu progreso" por ruta (antes solo existía el de
+  // Ruta 1, con IDs sin sufijo). `total` queda FIJO por instancia (6 para
+  // r1/r2, 3 para r3c/r3b) en vez de leer el `isReduced` global de
+  // renderStage(): así cada tarjeta es internamente consistente con su
+  // propia ruta aunque esté oculta (`.variant[data-r]` con display:none)
+  // en el momento en que se llama — se corrige sola en cuanto esa ruta
+  // se vuelve visible, porque applyRoute() siempre reinvoca renderStage().
+  // `Math.min(stage, total-1)` evita un dato fuera de rango si `stage`
+  // viene de una ruta con más etapas que esta tarjeta (ej. viendo Ruta 1
+  // con stage=5, una tarjeta reducida de 3 no debe mostrar "6/3").
+  function updateHomeProgress(suffix, stage, total){
+    var cappedStage = Math.min(stage, total - 1);
+    syncStepperDots(document.querySelectorAll('#wf1ProgressSteps' + suffix + ' li'), cappedStage);
+    var badge = document.getElementById('wf1ProgressBadge' + suffix);
+    if (badge) badge.textContent = 'Paso ' + (cappedStage + 1) + ' de ' + total;
+    var pct = Math.round(((cappedStage + 1) / total) * 100);
+    setSkProgressFill('wf1ProgressFill' + suffix, pct);
+    var pctEl = document.getElementById('wf1ProgressPct' + suffix);
+    if (pctEl) pctEl.textContent = pct;
+  }
+
   function renderStage(){
     var group = routeGroup(state.route);
     var stageInput = document.getElementById('qaStage');
@@ -4100,13 +4238,14 @@
     var stage = parseInt(stageInput.value,10);
     var list = isReduced ? document.querySelectorAll('#wf2StepperReduced li') : document.querySelectorAll('#wf2StepperFull li');
     syncStepperDots(list, stage);
-    // Panel "Tu progreso" (home, Ruta 1) — vive solo dentro de
-    // `.variant[data-r="r1"]`, que nunca es la ruta reducida, así que
-    // siempre sincroniza contra las 6 etapas completas (mismo `stage` que
-    // el stepper de wf2 de arriba, una sola fuente de verdad).
-    syncStepperDots(document.querySelectorAll('#wf1ProgressSteps li'), stage);
-    var wf1ProgressBadge = document.getElementById('wf1ProgressBadge');
-    if (wf1ProgressBadge) wf1ProgressBadge.textContent = 'Paso ' + (stage+1) + ' de ' + (isReduced ? 3 : 6);
+    // Paneles "Tu progreso" del home — las 4 rutas, ver nota RONDA 35
+    // junto a `updateHomeProgress()`. `stage` es el mismo dato para las 4
+    // (una sola fuente, un solo slider QA); cada llamada fija su propio
+    // `total` según a qué grupo pertenece esa ruta (r1/r2 → 6, r3c/r3b → 3).
+    updateHomeProgress('', stage, 6);
+    updateHomeProgress('R2', stage, 6);
+    updateHomeProgress('R3c', stage, 3);
+    updateHomeProgress('R3b', stage, 3);
 
     // Auditoría /impeccable (hallazgos #1/#5) — resumen visual de avance,
     // misma fuente de verdad (stage/total) que ya usa qaStageLabel arriba.
@@ -4120,10 +4259,8 @@
     if (wf2ProgressLabel) wf2ProgressLabel.textContent = (stage+1) + ' / ' + total;
     setSkProgressFill('wf1MoneyFill', pct);
     if (wf1MoneyLabel) wf1MoneyLabel.textContent = (stage+1) + ' / ' + total;
-    // Panel "Tu progreso" — mismo pct, tercera vista del mismo dato.
-    setSkProgressFill('wf1ProgressFill', pct);
-    var wf1ProgressPct = document.getElementById('wf1ProgressPct');
-    if (wf1ProgressPct) wf1ProgressPct.textContent = pct;
+    // (Los 4 paneles "Tu progreso" del home ya se actualizaron arriba,
+    // vía updateHomeProgress() — no se repite aquí.)
 
     if (!isReduced){
       // RONDA 17, actualizada RONDA 30 — nota dinámica de la etapa
