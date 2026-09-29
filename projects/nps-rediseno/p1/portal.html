@@ -22,15 +22,6 @@
   }
   svg{ display:block; }
 
-  .harness{
-    position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:90;
-    display:flex; gap:6px; background:rgba(20,20,20,.9); padding:5px; border-radius:8px;
-  }
-  .harness button{
-    font-family:var(--body); font-weight:700; font-size:12px; color:#cfd6cf;
-    background:transparent; border:none; border-radius:6px; padding:7px 16px; cursor:pointer;
-  }
-  .harness button.active{ background:var(--primary-00); color:#fff; }
 
   /* ═══ Lienzo: detrás se ve el Portal Clientes real — el intercept de Qualtrics
      aparece flotando encima de la página, no sobre una imagen de marca ═══ */
@@ -151,6 +142,8 @@
     background:var(--primary-00); border:none; border-radius:4px; padding:10px 26px; cursor:pointer;
   }
   .btn:hover{ background:var(--primary-d01); }
+  .btn.ghost{ background:transparent; color:var(--primary-d03); border:1.5px solid var(--primary-00); }
+  .btn.ghost:hover{ background:var(--primary-l05); }
   .btn[disabled]{ background:var(--stroke-light); color:#9a9a9a; cursor:not-allowed; }
 
   .thanks-text{ font-family:var(--body); font-weight:700; font-size:16px; color:var(--texts-dark); text-align:center; line-height:1.7; padding:20px 0; }
@@ -162,11 +155,6 @@
 </style>
 </head>
 <body>
-
-<div class="harness">
-  <button class="active" id="btnShowNps">Disparo: NPS</button>
-  <button id="btnShowCes">Disparo: CES (tras retiro)</button>
-</div>
 
 <div class="stage">
   <div class="stage-bg" aria-hidden="true">
@@ -182,9 +170,9 @@
       <img class="brand-logo" src="assets/skandia-logo.svg" alt="Skandia">
     </div>
 
-    <!-- ═══════════ NPS: 2 preguntas ═══════════ -->
-    <div id="blockNps" style="display:contents;">
-      <div class="step active" data-step="score">
+    <!-- ═══════════ Encuesta unica: NPS + experiencia ═══════════ -->
+    <div id="survey">
+      <div class="step active" data-step="nps">
         <div class="headline">Tu opinión nos ayuda a mejorar nuestro Portal.</div>
         <div class="qtext">¿Qué tan probable es que nos recomiendes a un familiar, amigo o compañero de trabajo?</div>
         <div class="scale-anchors"><span>Nada Probable</span><span>Muy Probable</span></div>
@@ -192,20 +180,13 @@
         <div class="qtext">¿Qué fue lo principal que influyó en tu calificación?</div>
         <textarea class="qtextarea" placeholder=""></textarea>
         <div class="spacer"></div>
-        <div class="actions"><span class="right"><button class="btn" id="npsBtnScore" disabled>Continuar</button></span></div>
+        <div class="actions"><span class="right"><button class="btn" id="btnPaso1" disabled>Continuar</button></span></div>
       </div>
 
-      <div class="step" data-step="thanks">
-        <div class="thanks-text">¡Gracias por compartir tu opinión! 💚<br>Seguiremos trabajando para hacer tu experiencia cada vez mejor.</div>
-      </div>
-    </div>
-
-    <!-- ═══════════ CES: 2 preguntas ═══════════ -->
-    <div id="blockCes" style="display:none;">
-      <div class="step active" data-step="ces">
+      <div class="step" data-step="experiencia">
         <div class="headline">Tu opinión nos ayuda a mejorar nuestro Portal.</div>
         <div class="qtext">¿Lograste hacer lo que necesitabas hoy?</div>
-        <div class="list" id="cesTaskChoices">
+        <div class="list" id="taskChoices">
           <div class="opt" data-v="si">Sí</div>
           <div class="opt" data-v="parcial">Parcialmente</div>
           <div class="opt" data-v="no">No</div>
@@ -213,11 +194,14 @@
         <div class="qtext">¿Qué tan fácil fue hacer lo que necesitabas hoy?</div>
         <div class="face-row" id="cesScoreRow"></div>
         <div class="spacer"></div>
-        <div class="actions"><span class="right"><button class="btn" id="cesBtnScore" disabled>Continuar</button></span></div>
+        <div class="actions">
+          <button class="btn ghost" id="btnAtras">Atrás</button>
+          <button class="btn" id="btnEnviar" disabled>Enviar</button>
+        </div>
       </div>
 
       <div class="step" data-step="thanks">
-        <div class="thanks-text">¡Gracias! 💚<br>Tu opinión nos ayuda a mejorar esta gestión.</div>
+        <div class="thanks-text">¡Gracias por compartir tu opinión! 💚<br>Seguiremos trabajando para hacer tu experiencia cada vez mejor.</div>
       </div>
     </div>
 
@@ -227,11 +211,12 @@
 </div>
 
 <script>
-  function goTo(block, step){
-    document.querySelectorAll('#' + block + ' .step').forEach(function(el){ el.classList.remove('active'); });
-    document.querySelector('#' + block + ' .step[data-step="' + step + '"]').classList.add('active');
+  function goTo(step){
+    document.querySelectorAll('#survey .step').forEach(function(el){ el.classList.remove('active'); });
+    document.querySelector('#survey .step[data-step="' + step + '"]').classList.add('active');
   }
 
+  /* ── NPS: escala 0 a 10 ── */
   function buildScale(container, labels, onPick){
     labels.forEach(function(label){
       var b = document.createElement('button');
@@ -246,23 +231,26 @@
   }
 
   buildScale(document.getElementById('npsScoreRow'), ['0','1','2','3','4','5','6','7','8','9','10'], function(){
-    document.getElementById('npsBtnScore').disabled = false;
+    document.getElementById('btnPaso1').disabled = false;
   });
-  document.getElementById('npsBtnScore').addEventListener('click', function(){ goTo('blockNps','thanks'); });
+  document.getElementById('btnPaso1').addEventListener('click', function(){ goTo('experiencia'); });
+  document.getElementById('btnAtras').addEventListener('click', function(){ goTo('nps'); });
 
-  var cesTaskAnswer = null;
-  var cesScoreAnswer = null;
-  function updateCesBtn(){
-    document.getElementById('cesBtnScore').disabled = !(cesTaskAnswer && cesScoreAnswer);
+  /* ── Experiencia: logro de la gestion + facilidad ── */
+  var taskAnswer = null;
+  var cesAnswer = null;
+  function updateEnviar(){
+    document.getElementById('btnEnviar').disabled = !(taskAnswer && cesAnswer);
   }
-  document.querySelectorAll('#cesTaskChoices .opt').forEach(function(opt){
+  document.querySelectorAll('#taskChoices .opt').forEach(function(opt){
     opt.addEventListener('click', function(){
-      document.querySelectorAll('#cesTaskChoices .opt').forEach(function(x){ x.classList.remove('sel'); });
+      document.querySelectorAll('#taskChoices .opt').forEach(function(x){ x.classList.remove('sel'); });
       opt.classList.add('sel');
-      cesTaskAnswer = opt.dataset.v;
-      updateCesBtn();
+      taskAnswer = opt.dataset.v;
+      updateEnviar();
     });
   });
+
   /* Caritas dibujadas a mano en el lenguaje del mural: ojos de punto y boca curva.
      Van de menor a mayor, igual que la escala del NPS. */
   var CARAS = [
@@ -297,28 +285,12 @@
     });
   }
 
-  buildCaras(document.getElementById('cesScoreRow'), function(){
-    cesScoreAnswer = true;
-    updateCesBtn();
+  buildCaras(document.getElementById('cesScoreRow'), function(v){
+    cesAnswer = v;
+    updateEnviar();
   });
-  document.getElementById('cesBtnScore').addEventListener('click', function(){ goTo('blockCes','thanks'); });
+  document.getElementById('btnEnviar').addEventListener('click', function(){ goTo('thanks'); });
 
-  document.getElementById('btnShowNps').addEventListener('click', function(){
-    this.classList.add('active');
-    document.getElementById('btnShowCes').classList.remove('active');
-    document.getElementById('blockCes').style.display = 'none';
-    document.getElementById('blockNps').style.display = 'contents';
-    document.getElementById('modalShell').style.display = 'flex';
-    goTo('blockNps','score');
-  });
-  document.getElementById('btnShowCes').addEventListener('click', function(){
-    this.classList.add('active');
-    document.getElementById('btnShowNps').classList.remove('active');
-    document.getElementById('blockNps').style.display = 'none';
-    document.getElementById('blockCes').style.display = 'contents';
-    document.getElementById('modalShell').style.display = 'flex';
-    goTo('blockCes','ces');
-  });
   document.getElementById('modalClose').addEventListener('click', function(){
     document.getElementById('modalShell').style.display = 'none';
   });
