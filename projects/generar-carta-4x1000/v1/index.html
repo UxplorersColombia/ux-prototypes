@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  PROTOTIPO DE DISCUSIÓN — Modal "Generar carta 4x1000" · Portal Contigo
+  ----------------------------------------------------------------------------
+  Base         : Pantallazos aportados por Isa (flujo ya construido en el
+                 portal). Este archivo lo reconstruye como prototipo estático
+                 para poder discutir/iterar el detalle visual e interacción.
+  Estado       : PRE-PRD. No hay research de Mike, content file de Kiki ni
+                 PRD de Harvey para este flujo específico. TODO EL MICROCOPY
+                 que no viene literal de los pantallazos es PLACEHOLDER.
+
+  Canal        : DESKTOP. Portal Contigo es el portal de asesores internos.
+
+  Librería     : sk-components-angular v1.6.1 (la que consume desarrollo).
+                 Es una lib Angular, así que este HTML estático REPLICA sus
+                 specs visuales (fichas docs/componentes/sk-*.md) con tokens
+                 --sk-*. Cada bloque lleva un comentario "Componente destino"
+                 con el selector y los inputs reales de la lib.
+                 Íconos: PrimeIcons (pi pi-*), igual que la lib.
+                 Fuentes: sk-fonts.css del Blob corporativo.
+
+  Brechas (la lib no lo cubre — componente propio o decisión pendiente):
+    · sk-input-select no tiene opciones deshabilitadas ni template de
+      opción → la opción "DAVIVIENDA · Muy pronto" no es posible tal cual.
+    · No existe radio-card → la card de cuenta es un "radio-card custom"
+      (la ficha de sk-radio lo sugiere así).
+    · Los pasos numerados no son sk-stepper (ese es un wizard de un panel
+      a la vez) → encabezados propios.
+    · sk-modal: con closable=true la X cierra; con closable=false no hay X.
+      Una X visible que no hace nada (pedido de Isa) no existe en la lib.
+    · Ancho 960px > size large (800px) → override de --sk-modal-width-large.
+  ============================================================================
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generar carta 4x1000 — Portal Contigo</title>
+
+<link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-fonts.css">
+<link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/prime-icons/primeicons.css">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOKENS — runtime vars de sk-components-angular (SkThemeService, tema light)
+   y tokens de espaciado/sombra de styles/sk-tokens. Valores de las fichas.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --sk-color-primary:#00c73d;
+  --sk-color-primary-hover:#03a835;
+  --sk-color-primary-active:#009a2f;
+  --sk-color-accent:#16d727;
+  --sk-color-bg:#ffffff;
+  --sk-color-surface:#ffffff;
+  --sk-color-text:#404040;
+  --sk-color-text-muted:#666666;
+  --sk-color-text-inverse:#ffffff;
+  --sk-color-border:#dddddd;
+  --sk-color-border-hover:#00c73d;
+  --sk-color-border-focus:#16d727;
+  --sk-color-success:#00a34e;
+  --sk-color-success-light:#ecfdf3;
+  --sk-color-warning:#ffae08;
+  --sk-color-error:#e03430;
+  --sk-color-info:#0099de;
+  --sk-color-info-light:#ebf4ff;   /* Background-Info-light del DS */
+  --sk-color-link:#0099de;
+  --sk-color-disabled:#f7f7f7;
+  --sk-color-disabled-text:#a5a5a5;
+  --sk-color-placeholder:#a5a5a5;
+  --sk-color-secondary-hover-bg:#caf9cb;
+  --sk-color-tertiary-hover-bg:#f6fcf2;
+
+  --sk-font-title:'Montserrat',sans-serif;
+  --sk-font-body:'Open Sans',sans-serif;
+  --sk-font-weight-regular:400;
+  --sk-font-weight-medium:500;
+  --sk-font-weight-bold:700;
+
+  --sk-space-xxs:4px; --sk-space-xs:8px; --sk-space-s:12px; --sk-space-m:16px;
+  --sk-bordes-l:32px;   /* Bordes-L del DS (Tokens/size-&-spacing.css) */
+  --sk-space-l:24px; --sk-space-xl:32px; --sk-space-2xl:40px; --sk-space-3xl:48px;
+
+  --sk-shadow-subtle:0 0 2px rgba(68,68,68,.15);
+  --sk-shadow-overlay:0 8px 24px rgba(0,0,0,.16);
+  /* Sombra "SK2" de Figma (no está en la lib) */
+  --sk2-shadow:0 0 6px 0 rgba(61,75,92,.15);
+
+  --sk-motion-duration-fast:120ms;
+  --sk-motion-duration-base:240ms;
+  --sk-motion-ease-standard:cubic-bezier(.2,0,0,1);
+  --sk-motion-ease-spring:cubic-bezier(.34,1.56,.64,1);
+
+  /* sk-modal — override del ancho large (960 > 800 por las dos columnas) */
+  --sk-modal-width-large:960px;
+  --sk-modal-mask-bg:rgba(255,255,255,.94);   /* override del token público: #FFFFFF al 94% (decisión de Isa; default de la lib rgba(0,0,0,.4)) */
+}
+
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:var(--sk-font-body);
+  background:var(--sk-color-disabled);
+  color:var(--sk-color-text);
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition:none!important;animation:none!important;} }
+
+/* Títulos de sección: Auxiliary Title/H6 Bold 14px (Montserrat 700 14/22) */
+.sk-title-h6{font-family:var(--sk-font-title);font-size:.875rem;font-weight:var(--sk-font-weight-bold);line-height:1.375rem;margin:0;color:var(--sk-color-text);}
+.sk-body{font-size:.875rem;line-height:1.375rem;margin:0;}
+.sk-caption{font-size:.75rem;line-height:1.25rem;color:var(--sk-color-text-muted);}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BACKDROP — recreación mínima de Portal Contigo detrás del modal, solo para
+   dar contexto visual. No es el alcance del prototipo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.app-shell{display:flex;min-height:100vh;}
+.app-sidebar{width:220px;background:var(--sk-color-bg);border-right:1px solid var(--sk-color-border);padding:var(--sk-space-l) var(--sk-space-m);flex-shrink:0;display:flex;flex-direction:column;}
+.app-sidebar nav a{display:flex;align-items:center;gap:var(--sk-space-xs);padding:var(--sk-space-s) var(--sk-space-xs);color:var(--sk-color-text);text-decoration:none;font-size:.875rem;font-weight:var(--sk-font-weight-medium);}
+.app-sidebar nav a.active{color:var(--sk-color-primary-active);}
+.app-sidebar .last-login{margin-top:auto;padding:var(--sk-space-s) var(--sk-space-xs);color:var(--sk-color-text-muted);font-size:.75rem;}
+.app-main{flex:1;padding:var(--sk-space-xl);}
+.app-topbar-card{max-width:320px;margin-left:auto;background:var(--sk-color-tertiary-hover-bg);border-radius:8px;padding:var(--sk-space-l);text-align:right;}
+.app-topbar-card .amount{font-family:var(--sk-font-title);font-size:1.5rem;font-weight:var(--sk-font-weight-bold);line-height:2rem;margin-top:var(--sk-space-xxs);}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Componente destino: <sk-modal size="large" title="Generar carta 4x1000">
+   Layout fijo de la ficha: radius 8px · max-height 85dvh (body scrollea) ·
+   header 24/24/16 · body 0 24 · máscara rgba(0,0,0,.4) · --sk-shadow-overlay.
+   Encabezado centrado con descripción + alerta → <ng-template skModalHeader>.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sk-modal-mask{
+  position:fixed;inset:0;background:var(--sk-modal-mask-bg);
+  display:flex;align-items:center;justify-content:center;padding:var(--sk-space-m);z-index:100;
+}
+.sk-modal{
+  background:var(--sk-color-bg);border-radius:8px;
+  width:100%;max-width:min(var(--sk-modal-width-large), calc(100vw - 32px));max-height:85dvh;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:var(--sk-shadow-overlay);
+}
+.sk-modal__header{padding:var(--sk-space-l) var(--sk-space-l) var(--sk-space-m);position:relative;text-align:center;}
+/* Título: Meta Title/H5 Bold 16px (Montserrat 700 16/24) — decisión de Isa.
+   La ficha de sk-modal usa Open Sans Bold 18/26 → requiere skModalHeader custom. */
+.sk-modal__title{font-family:var(--sk-font-title);font-size:1rem;font-weight:var(--sk-font-weight-bold);line-height:1.5rem;margin:0;color:var(--sk-color-text);}
+.sk-modal__desc{color:var(--sk-color-text-muted);margin:var(--sk-space-xs) auto 0;max-width:640px;font-size:.875rem;line-height:1.375rem;}
+.sk-modal__header .sk-alert{margin-top:var(--sk-space-m);text-align:left;}
+.sk-modal__close{
+  position:absolute;top:var(--sk-space-m);right:var(--sk-space-m);
+  width:32px;height:32px;border:none;background:transparent;color:var(--sk-color-primary);   /* verde brand (decisión de Isa) */
+  font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;
+}
+.sk-modal__close:focus-visible{outline:2px solid var(--sk-color-border-focus);outline-offset:2px;}
+.sk-modal__body{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--sk-space-xl);
+  padding:var(--sk-space-xs) var(--sk-space-l) var(--sk-space-l);overflow-y:auto;
+}
+@media (max-width:767.98px){.sk-modal__body{grid-template-columns:1fr;}}
+/* Ficha: fullscreen < 576px */
+@media (max-width:575.98px){
+  .sk-modal-mask{padding:0;}
+  .sk-modal{max-width:100dvw;max-height:100dvh;height:100dvh;border-radius:0;}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Componente destino: <sk-alert type="info" [closable]="false" title message>
+   radius 8 · padding 8 · gap 8 · icon box 32×32 con pi pi-info-circle 18px ·
+   título 14/22 bold · mensaje 14/22 regular · role="status" (info).
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sk-alert{
+  display:flex;align-items:center;gap:var(--sk-space-xs);padding:var(--sk-space-xs);
+  border-radius:8px;border:1px solid var(--sk-color-info);background:#ebf4ff;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+}
+.sk-alert__icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--sk-color-info);font-size:18px;}
+.sk-alert__title,.sk-alert__message{margin:0;font-size:.875rem;line-height:1.375rem;color:var(--sk-color-text);}
+.sk-alert__title{font-weight:var(--sk-font-weight-bold);}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Pasos numerados — COMPONENTE PROPIO (sk-stepper es un wizard, no aplica)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.step-title{display:flex;align-items:center;gap:var(--sk-space-xs);margin-bottom:var(--sk-space-m);}
+.step-badge{
+  width:24px;height:24px;border-radius:50%;background:var(--sk-color-primary);color:var(--sk-color-text-inverse);
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:var(--sk-font-weight-bold);flex-shrink:0;
+}
+.step-block{margin-bottom:var(--sk-space-xl);}
+.step-block:last-child{margin-bottom:0;}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Componente destino: <sk-input-select label [options] [(value)]>
+   Réplica de docs/componentes/sk-input-select.md §3.Y y §4 (v1.6.1):
+   · host block · max-width 320px
+   · __box role="combobox" · 58px · padding 8px 16px
+   · estados del box (tabla §4.1):
+       default  1px --sk-color-border · radius 4px
+       hover    1px --sk-color-border-hover · radius 4px
+       focus    1px --sk-color-border-focus · radius 8px (teclado, cerrado)
+       open     1px --sk-color-border-focus · radius 8px · chevron 180° spring 240ms
+       fill     borde transparente · radius 8px · 0 0 2px rgba(68,68,68,.15)
+       disabled borde transparente · radius 8px · --sk-color-disabled
+   · label flotante 12/20 muted + valor 14/22 (floating = open || hasValue)
+   · popover: ancho = trigger, min 240px, padding 8px, appendTo body
+   · transición: 120ms standard (color/sombra), 240ms spring (chevron/label)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sk-input-select{display:block;position:relative;max-width:320px;}
+/* Override de layout (desarrollo-frontend §4 · paso 2: clase propia en el host).
+   La lib no expone input fluid; se registra en docs/feedback-sk-components-angular.md. */
+.sk-input-select--fluid{max-width:none;}
+
+.sk-input-select__box{
+  display:flex;align-items:center;gap:var(--sk-space-xs);
+  height:58px;padding:8px 16px;cursor:pointer;
+  border:1px solid var(--sk-color-border);border-radius:4px;
+  background:var(--sk-color-bg);color:var(--sk-color-text);
+  transition:border-color var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
+             border-radius var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
+             box-shadow var(--sk-motion-duration-fast) var(--sk-motion-ease-standard);
+}
+.sk-input-select__box:focus{outline:none;}
+/* Fill: con valor, cerrado */
+.sk-input-select--floating:not(.sk-input-select--open):not(.sk-input-select--error):not(.sk-input-select--disabled) .sk-input-select__box{
+  border-color:transparent;border-radius:8px;box-shadow:var(--sk-shadow-subtle);
+}
+/* Hover (sin disabled/error/open) */
+.sk-input-select:not(.sk-input-select--open):not(.sk-input-select--disabled):not(.sk-input-select--error) .sk-input-select__box:hover{
+  border-color:var(--sk-color-border-hover);
+}
+/* Focus teclado (cerrado) y Open */
+.sk-input-select:not(.sk-input-select--disabled) .sk-input-select__box:focus-visible,
+.sk-input-select--open .sk-input-select__box{
+  border-color:var(--sk-color-border-focus);border-radius:8px;box-shadow:none;
+}
+.sk-input-select--error .sk-input-select__box{border-color:var(--sk-color-error);border-radius:8px;box-shadow:var(--sk-shadow-subtle);}
+.sk-input-select--disabled .sk-input-select__box{border-color:transparent;border-radius:8px;background:var(--sk-color-disabled);cursor:not-allowed;}
+
+.sk-input-select__inner{position:relative;flex:1;min-width:0;height:100%;}
+.sk-input-select__label{
+  position:absolute;left:0;top:50%;transform:translateY(-50%);
+  font-size:.875rem;line-height:1.375rem;color:var(--sk-color-text-muted);pointer-events:none;
+  transition:top var(--sk-motion-duration-base) var(--sk-motion-ease-spring),
+             transform var(--sk-motion-duration-base) var(--sk-motion-ease-spring),
+             font-size var(--sk-motion-duration-base) var(--sk-motion-ease-spring);
+}
+.sk-input-select--floating .sk-input-select__label{top:0;transform:none;font-size:.75rem;line-height:1.25rem;}
+.sk-input-select__value{
+  position:absolute;left:0;right:0;bottom:0;
+  font-size:.875rem;line-height:1.375rem;color:var(--sk-color-text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sk-input-select:not(.sk-input-select--floating) .sk-input-select__value{display:none;}
+.sk-input-select__icon{flex-shrink:0;color:var(--sk-color-text-muted);font-size:.875rem;}
+.sk-input-select__icon--right{transition:transform var(--sk-motion-duration-base) var(--sk-motion-ease-spring);}
+.sk-input-select--open .sk-input-select__icon--right{transform:rotate(180deg);}
+
+/* Popover (p-popover appendTo body) + sk-listbox variant="single" */
+.sk-input-select__popover{
+  position:fixed;z-index:1100;min-width:240px;
+  background:var(--sk-color-bg);border-radius:4px;box-shadow:var(--sk-shadow-overlay);padding:8px;
+  opacity:1;transform:translateY(0);
+  transition:opacity var(--sk-motion-duration-base) var(--sk-motion-ease-spring),
+             transform var(--sk-motion-duration-base) var(--sk-motion-ease-spring);
+}
+.sk-input-select__popover[hidden]{display:none;}
+.sk-input-select__popover.is-entering{opacity:0;transform:translateY(-4px);}
+.sk-listbox__list{list-style:none;margin:0;padding:0;max-height:200px;overflow-y:auto;}  /* scrollHeight 200px */
+.sk-listbox__option{
+  display:flex;align-items:center;gap:var(--sk-space-xs);
+  min-height:40px;padding:8px;border-radius:4px;cursor:pointer;
+  font-size:.875rem;line-height:1.375rem;color:var(--sk-color-text);
+}
+.sk-listbox__option:hover{background:var(--sk-color-disabled);}
+.sk-listbox__option[aria-selected="true"]{background:rgba(0,199,61,.08);}
+.sk-listbox__option:focus{outline:none;}
+.sk-listbox__option:focus-visible{box-shadow:inset 0 0 0 2px rgba(0,199,61,.3);}
+/* BRECHA: SkListboxOption no tiene `disabled` ni template de opción → la
+   opción deshabilitada con pill "Muy pronto" no existe en la lib. */
+.sk-listbox__option[aria-disabled="true"]{color:var(--sk-color-disabled-text);cursor:not-allowed;}
+.sk-listbox__option[aria-disabled="true"]:hover{background:none;}
+.chip-soon{
+  display:inline-flex;align-items:center;padding:var(--sk-space-xxs) var(--sk-space-s);border-radius:100px;
+  background:#ebf4ff;color:var(--sk-color-info);
+  font-size:.75rem;font-weight:var(--sk-font-weight-bold);line-height:1.25rem;white-space:nowrap;
+}
+.holder-info{margin:var(--sk-space-s) 0 0;color:var(--sk-color-text-muted);font-size:.875rem;line-height:1.375rem;}
+.holder-info strong{color:var(--sk-color-text);font-weight:var(--sk-font-weight-bold);}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Radio — Componente destino: <sk-radio> (dentro de <sk-radio-group>)
+   box 18×18 · borde 2px #adb5bd → seleccionado: relleno + borde primary y
+   punto blanco 8×8 · focus ring 0 0 0 7px rgba(0,199,61,.2).
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sk-radio-input{
+  appearance:none;width:18px;height:18px;border-radius:50%;margin:0;flex-shrink:0;
+  border:2px solid #adb5bd;background:var(--sk-color-bg);
+  display:grid;place-content:center;cursor:pointer;
+  transition:background var(--sk-motion-duration-fast),border-color var(--sk-motion-duration-fast);
+}
+.sk-radio-input::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--sk-color-text-inverse);transform:scale(0);transition:transform 240ms cubic-bezier(.34,1.56,.64,1);}
+.sk-radio-input:checked{border-color:var(--sk-color-primary);background:var(--sk-color-primary);}
+.sk-radio-input:checked::after{transform:scale(1);}
+.sk-radio-input:hover{border-color:var(--sk-color-primary);}
+.sk-radio-input:checked:hover{border-color:var(--sk-color-primary-hover);background:var(--sk-color-primary-hover);}
+.sk-radio-input:focus-visible{outline:none;box-shadow:0 0 0 7px rgba(0,199,61,.2);}
+.sk-radio-input:disabled{border-color:var(--sk-color-border);background:var(--sk-color-disabled);cursor:not-allowed;}
+
+/* Radio-card de cuenta — COMPONENTE PROPIO ("radio-card custom", ficha sk-radio) */
+.account-option{
+  display:flex;align-items:center;gap:var(--sk-space-s);
+  border:1px solid var(--sk-color-border);border-radius:8px;
+  padding:var(--sk-space-m);cursor:pointer;
+  transition:border-color var(--sk-motion-duration-fast),background var(--sk-motion-duration-fast);
+}
+.account-option:hover{border-color:var(--sk-color-border-hover);background:rgba(0,199,61,.06);}
+.account-option:has(input:checked){border-color:var(--sk-color-primary);background:var(--sk-color-tertiary-hover-bg);}
+.account-option.is-disabled{cursor:not-allowed;opacity:.4;}
+.account-title{font-size:.875rem;font-weight:var(--sk-font-weight-bold);line-height:1.375rem;}
+.account-bank{color:var(--sk-color-text-muted);font-size:.75rem;line-height:1.25rem;}
+.account-list{display:flex;flex-direction:column;gap:var(--sk-space-xs);}
+.account-actions{margin-left:auto;display:flex;align-items:center;gap:var(--sk-space-xxs);flex-shrink:0;}
+/* Componente destino: <sk-button skType="tertiary" icon="pi pi-pencil|pi pi-trash" ariaLabel> */
+.account-edit-btn,.account-delete-btn{
+  width:32px;height:32px;border-radius:50%;border:none;background:transparent;
+  font-size:.875rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.account-edit-btn{color:var(--sk-color-primary);}
+.account-delete-btn{color:var(--sk-color-error);}
+.account-edit-btn:hover,.account-delete-btn:hover{background:var(--sk-color-tertiary-hover-bg);}
+.account-edit-btn:focus-visible,.account-delete-btn:focus-visible{outline:2px solid var(--sk-color-border-focus);outline-offset:2px;}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Chip "Predeterminada" — spec de Isa (Figma):
+   layout inline-flex · padding Size-XS 8px · center · gap Size-S 12px
+   estilo radius Bordes-L 32px · fondo Background-Info-light #EBF4FF (sin borde)
+   (antes #F6FCF2: se fundía con el fondo de la card seleccionada)
+   BRECHA: ningún componente de la lib calza (sk-badge square = radius 4 +
+   borde; sk-chip es interactivo) → componente propio o variante nueva.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sk-badge{
+  display:inline-flex;padding:var(--sk-space-xs);align-items:center;gap:var(--sk-space-s);
+  border-radius:var(--sk-bordes-l);background:var(--sk-color-info-light);color:var(--sk-color-text);
+  font-size:.875rem;font-weight:var(--sk-font-weight-medium);line-height:1.375rem;white-space:nowrap;margin-left:auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Componente destino: <sk-button skType="primary|secondary|tertiary" size>
+   Pill siempre · Montserrat 700.
+   SIN ANIMACIÓN (decisión de Isa): sin lift, sin sombra y sin transición en
+   hover/active. La lib aplica translateY(-1px) + 0 4px 12px rgba(0,0,0,.08)
+   con 120ms → requiere override en el consumer. El cambio de color de
+   fondo en hover se mantiene, instantáneo. Alto/padding: aproximados al
+   preset PrimeNG (la ficha no los fija).
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sk-button{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--sk-space-xs);
+  border-radius:999px;border:1px solid transparent;cursor:pointer;white-space:nowrap;
+  font-family:var(--sk-font-title);font-weight:var(--sk-font-weight-bold);
+  font-size:1rem;line-height:1.5rem;padding:8px 20px;
+  transition:none;
+}
+.sk-button--small{font-size:.875rem;line-height:1.375rem;padding:6px 14px;}
+.sk-button:focus-visible{outline:2px solid var(--sk-color-border-focus);outline-offset:2px;}
+.sk-button--primary{background:var(--sk-color-primary);color:var(--sk-color-text-inverse);}
+.sk-button--primary:not(:disabled):hover{background:var(--sk-color-primary-hover);}
+.sk-button--secondary{background:var(--sk-color-bg);border-color:var(--sk-color-primary);color:var(--sk-color-primary);}
+.sk-button--secondary:not(:disabled):hover{background:var(--sk-color-secondary-hover-bg);}
+.sk-button--tertiary{background:transparent;color:var(--sk-color-primary);}
+.sk-button--tertiary:not(:disabled):hover{background:var(--sk-color-tertiary-hover-bg);}
+.sk-button--primary:disabled{background:#e9e9e9;border-color:#e9e9e9;color:var(--sk-color-text-muted);cursor:not-allowed;}
+.sk-button--tertiary:disabled{color:var(--sk-color-disabled-text);cursor:not-allowed;}
+.sk-button[hidden]{display:none;}
+/* Icon-only: cuadrado → círculo (rounded) */
+.sk-button--icon{padding:0;width:36px;height:36px;font-size:1rem;}
+
+/* Formulario agregar cuenta */
+.add-account-form{
+  /* Mismo estilo de card que "Carta 4x1000": radius 16 · fondo blanco · sombra SK2 · sin borde */
+  margin-top:var(--sk-space-m);border-radius:16px;background:var(--sk-color-bg);box-shadow:var(--sk2-shadow);padding:var(--sk-space-l);
+  display:flex;flex-direction:column;gap:var(--sk-space-l);
+}
+.add-account-form[hidden]{display:none;}
+#addAccountToggle{margin-top:var(--sk-space-s);}
+
+/* Componente destino: <sk-radio-group label="Tipo de cuenta" skDirection="row"> */
+.sk-radio-group{border:none;margin:0;padding:0;}
+.sk-radio-group legend{padding:0;margin-bottom:var(--sk-space-xxs);font-size:.875rem;line-height:1.375rem;font-weight:var(--sk-font-weight-bold);color:var(--sk-color-text);}
+.sk-radio-group__options{display:flex;flex-wrap:wrap;gap:var(--sk-space-xs);}
+/* sk-radio: wrapper padding 8 · radius 5 · gap 8 · label 16/24 */
+.sk-radio{display:flex;align-items:center;gap:var(--sk-space-xs);padding:var(--sk-space-xs);border-radius:5px;cursor:pointer;font-size:1rem;line-height:1.5rem;color:var(--sk-color-text);}
+.sk-radio:hover{background:rgba(0,199,61,.06);}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Componente destino: <sk-input-text label="Número de cuenta" inputmode="numeric">
+   box 58px · padding 8px 16px · max-width 320px · label flotante: en reposo
+   centrado 14/22 muted, flota arriba 12/20 con focus o valor · borde 1px
+   #ddd → hover #00c73d → focus #16d727 (radius 4 → 8) · con valor: borde
+   transparente + --sk-shadow-subtle · error #e03430.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sk-input-text{max-width:320px;}
+/* [fluid]="true" de la lib: quita el max-width de 320px */
+.sk-input-text--fluid{max-width:none;}
+.sk-input-text__box{
+  position:relative;height:58px;padding:8px 16px;
+  border:1px solid var(--sk-color-border);border-radius:4px;background:var(--sk-color-bg);
+  transition:border-color var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
+             border-radius var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
+             box-shadow var(--sk-motion-duration-fast) var(--sk-motion-ease-standard);
+}
+.sk-input-text__box:hover{border-color:var(--sk-color-border-hover);}
+.sk-input-text__box:focus-within{border-color:var(--sk-color-border-focus);border-radius:8px;}
+.sk-input-text__box:has(input:not(:placeholder-shown)):not(:focus-within){border-color:transparent;border-radius:8px;box-shadow:var(--sk-shadow-subtle);}
+.sk-input-text__box.is-error{border-color:var(--sk-color-error);border-radius:8px;}
+.sk-input-text__box input{
+  position:absolute;inset:0;width:100%;height:100%;border:none;outline:none;background:transparent;
+  padding:20px 16px 0;font-family:inherit;font-size:.875rem;line-height:1.375rem;color:var(--sk-color-text);
+}
+.sk-input-text__box label{
+  position:absolute;left:16px;top:50%;transform:translateY(-50%);pointer-events:none;
+  font-size:.875rem;line-height:1.375rem;color:var(--sk-color-text-muted);
+  transition:top 480ms var(--sk-motion-ease-standard),transform 480ms var(--sk-motion-ease-standard),
+             font-size 480ms var(--sk-motion-ease-standard),line-height 480ms var(--sk-motion-ease-standard);
+}
+.sk-input-text__box input:focus + label,
+.sk-input-text__box input:not(:placeholder-shown) + label{top:8px;transform:none;font-size:.75rem;line-height:1.25rem;}
+
+/* Componente destino: <sk-checkbox label="…" formControlName>
+   box 18×18 · radius 4 · borde 1.5px #c5c5c5 · marcado #00c73d · label 14/22 ·
+   wrapper padding 4px 8px. */
+.sk-checkbox{display:flex;align-items:flex-start;gap:var(--sk-space-xs);padding:4px 8px;cursor:pointer;font-size:.875rem;line-height:1.375rem;color:var(--sk-color-text);}
+.sk-checkbox input{
+  appearance:none;width:18px;height:18px;border-radius:4px;flex-shrink:0;margin:2px 0 0;
+  border:1.5px solid #c5c5c5;background:var(--sk-color-bg);cursor:pointer;display:grid;place-content:center;
+}
+.sk-checkbox input:checked{background:var(--sk-color-primary);border-color:var(--sk-color-primary);}
+.sk-checkbox input:checked::after{content:"\e909";font-family:"primeicons";font-size:.625rem;color:var(--sk-color-text-inverse);}
+.sk-checkbox input:focus-visible{outline:2px solid var(--sk-color-border-focus);outline-offset:2px;}
+
+/* sk-field-footer (error del formulario) */
+.sk-field-error{margin:0;font-size:.75rem;line-height:1.25rem;color:var(--sk-color-error);display:none;}
+
+.form-actions{display:flex;gap:var(--sk-space-xs);align-items:center;justify-content:flex-end;}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Componente destino: <sk-input-number prefix="$" locale="es-CO" [(value)]>
+   size lg (default) 58px · padding 8px 12px · radius 8 · max-width 300px ·
+   borde transparente + sombra always-on 0 0 4px · hover #00c73d ·
+   focus #16d727 + anillo 0 0 0 3px rgba(0,199,61,.18) · prefix #a5a5a5.
+   Fuente Open Sans 14/22 como la ficha (no monoespaciada: la mono del DS es
+   para cifras en tablas). tabular-nums mantiene los dígitos alineados.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sk-input-number{
+  display:flex;align-items:center;gap:var(--sk-space-xs);max-width:300px;height:58px;
+  padding:8px 12px;border:1px solid transparent;border-radius:8px;background:var(--sk-color-bg);
+  box-shadow:0 0 4px rgba(68,68,68,.15);
+  transition:border-color var(--sk-motion-duration-fast),box-shadow var(--sk-motion-duration-fast);
+}
+.sk-input-number:hover{border-color:var(--sk-color-border-hover);}
+.sk-input-number:focus-within{border-color:var(--sk-color-border-focus);box-shadow:0 0 4px rgba(68,68,68,.15),0 0 0 3px rgba(0,199,61,.18);}
+/* Override del consumer al ancho de la columna (ficha §8.8) */
+.sk-input-number--fluid{max-width:none;}
+.sk-input-number__prefix{color:var(--sk-color-placeholder);font-size:.875rem;}
+.sk-input-number input{
+  border:none;outline:none;width:100%;height:100%;background:transparent;
+  font-family:var(--sk-font-body);font-size:.875rem;line-height:1.375rem;color:var(--sk-color-text);font-variant-numeric:tabular-nums;
+}
+.sk-input-number input::placeholder{color:var(--sk-color-placeholder);}
+
+/* Vista previa — COMPONENTE PROPIO (sk-textarea readonly se vería como campo) */
+.preview-title{margin-bottom:var(--sk-space-m);}
+.preview-box{
+  min-height:200px;border:1px solid var(--sk-color-border);border-radius:8px;
+  padding:var(--sk-space-l);color:var(--sk-color-text-muted);font-size:.875rem;line-height:1.375rem;
+  background:var(--sk-color-disabled);white-space:pre-wrap;
+}
+.preview-box.has-content{color:var(--sk-color-text);text-align:left;background:var(--sk-color-bg);}
+.preview-box.placeholder{display:flex;align-items:center;justify-content:center;text-align:center;}
+
+.preview-actions{
+  /* Spec de Isa (Figma): flex · center · gap 16px · align-self stretch */
+  display:flex;align-items:center;gap:var(--sk-space-m);align-self:stretch;
+  /* Card de Figma: radius 16 · fondo Secondary/Neutral-00 · sombra SK2 (sin borde).
+     SK2 no existe en sk-components-angular (la más cercana es --sk-shadow-surface) → token local. */
+  border-radius:16px;background:var(--sk-color-bg);box-shadow:var(--sk2-shadow);
+  padding:var(--sk-space-xs) var(--sk-space-xs) var(--sk-space-xs) var(--sk-space-m);margin-top:var(--sk-space-m);
+}
+.preview-actions span{flex:1 0 0;font-size:.875rem;font-weight:var(--sk-font-weight-bold);line-height:1.375rem;color:var(--sk-color-text);}
+.preview-actions .icons{display:flex;gap:var(--sk-space-xxs);}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     Backdrop — Portal Contigo (contexto visual únicamente)
+     ════════════════════════════════════════════════════════════════════════ -->
+<div class="app-shell" id="appShell">
+  <aside class="app-sidebar">
+    <nav>
+      <a href="#"><i class="pi pi-file" aria-hidden="true"></i> Informes</a>
+      <a href="#" class="active"><i class="pi pi-briefcase" aria-hidden="true"></i> Comercial</a>
+      <a href="#"><i class="pi pi-wrench" aria-hidden="true"></i> Operativo</a>
+    </nav>
+    <div class="last-login">
+      Último login:<br>September 16, 2026
+      <div style="margin-top:var(--sk-space-l);"><i class="pi pi-power-off" aria-hidden="true"></i> Cerrar sesión</div>
+    </div>
+  </aside>
+  <main class="app-main">
+    <div class="app-topbar-card">
+      <div class="sk-caption">Crédito preaprobado</div>
+      <div class="amount">$157,100,000.00</div>
+    </div>
+  </main>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     Modal — Generar carta 4x1000
+     Componente destino: <sk-modal [(visible)]="open" size="large">
+                           <ng-template skModalHeader>…</ng-template>
+     ════════════════════════════════════════════════════════════════════════ -->
+<div class="sk-modal-mask" id="modalOverlay">
+  <div class="sk-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+    <div class="sk-modal__header">
+      <h2 class="sk-modal__title" id="modalTitle">Generar carta 4x1000</h2>
+      <p class="sk-modal__desc">La carta se generará con la información seleccionada. Verifica que los datos sean correctos en cada paso.</p>
+
+      <!-- Componente destino:
+           <sk-alert type="info" [closable]="false"
+                     title="Solo cuentas de Bancolombia"
+                     message="Por ahora, esta funcionalidad solo está disponible para cuentas Bancolombia. Pronto añadiremos otros bancos." /> -->
+      <div class="sk-alert" role="status">
+        <span class="sk-alert__icon" aria-hidden="true"><i class="pi pi-info-circle"></i></span>
+        <div>
+          <p class="sk-alert__title">Solo cuentas de Bancolombia</p>
+          <p class="sk-alert__message">Por ahora, esta funcionalidad solo está disponible para cuentas Bancolombia. Pronto añadiremos otros bancos.</p>
+        </div>
+      </div>
+
+      <!-- BRECHA: la X de sk-modal siempre cierra (closable=true) o no existe
+           (closable=false). Aquí se deja visible e inerte por decisión de Isa. -->
+      <button type="button" class="sk-modal__close" id="closeModal" aria-label="Cerrar">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="sk-modal__body">
+      <!-- Columna izquierda: formulario -->
+      <div>
+
+        <!-- Paso 1 — Contrato -->
+        <div class="step-block">
+          <div class="step-title">
+            <span class="step-badge" aria-hidden="true">1</span>
+            <h3 class="sk-title-h6">Selecciona el contrato</h3>
+          </div>
+          <!-- Componente destino:
+               <sk-input-select class="contrato-select" label="Contrato"
+                                [options]="contratos()" [(value)]="contratoId" />
+               contratos: SkListboxOption[] = [{ label: '100004672717 - MFUND', value: '100004672717' }, …] -->
+          <div class="sk-input-select sk-input-select--fluid sk-input-select--floating" data-sk-select>
+            <div class="sk-input-select__box" id="contractTrigger" role="combobox" tabindex="0"
+                 aria-haspopup="listbox" aria-expanded="false" aria-controls="contractList" aria-labelledby="contractLabel">
+              <div class="sk-input-select__inner">
+                <label class="sk-input-select__label" id="contractLabel">Contrato</label>
+                <span class="sk-input-select__value">100004672717 - MFUND</span>
+              </div>
+              <i class="pi pi-chevron-down sk-input-select__icon sk-input-select__icon--right" aria-hidden="true"></i>
+            </div>
+            <div class="sk-input-select__popover" hidden>
+              <ul class="sk-listbox__list" id="contractList" role="listbox" aria-labelledby="contractLabel">
+                <li role="option" class="sk-listbox__option" aria-selected="true" tabindex="-1" data-holder="Nombre261336 Apellido261336" data-doc="1031132858">100004672717 - MFUND</li>
+                <li role="option" class="sk-listbox__option" aria-selected="false" tabindex="-1" data-holder="Nombre118420 Apellido118420" data-doc="43897215">100004698213 - MFUND</li>
+              </ul>
+            </div>
+          </div>
+          <p class="holder-info" id="holderInfo">
+            Titular: <strong id="holderName">Nombre261336 Apellido261336</strong><br>
+            Documento: <strong id="holderDoc">1031132858</strong>
+          </p>
+        </div>
+
+        <!-- Paso 2 — Cuenta bancaria -->
+        <div class="step-block">
+          <div class="step-title">
+            <span class="step-badge" aria-hidden="true">2</span>
+            <h3 class="sk-title-h6">Selecciona una cuenta bancaria (Bancolombia)</h3>
+          </div>
+
+          <!-- Radio-card custom (no existe en la lib) con el radio de sk-radio -->
+          <div class="account-list" id="accountList" role="radiogroup" aria-label="Cuenta bancaria">
+            <label class="account-option">
+              <input type="radio" class="sk-radio-input" name="account" value="8201" checked>
+              <div>
+                <div class="account-title">Cuenta de Ahorros •••• 8201</div>
+                <div class="account-bank">BANCOLOMBIA</div>
+              </div>
+              <!-- Componente destino: <sk-badge state="success" style="stroke" type="square">Predeterminada</sk-badge> -->
+              <span class="sk-badge">Predeterminada</span>
+            </label>
+          </div>
+
+          <!-- Componente destino: <sk-button skType="tertiary" size="small" icon="pi pi-plus" label="Agregar cuenta"> -->
+          <button type="button" class="sk-button sk-button--tertiary sk-button--small" id="addAccountToggle">
+            <i class="pi pi-plus" aria-hidden="true"></i> Agregar cuenta
+          </button>
+
+          <!-- Formulario para añadir cuenta bancaria. El cliente debe ser titular
+               de la cuenta que registra (regla de negocio, no solo de UI). -->
+          <div class="add-account-form" id="addAccountForm" hidden>
+            <!-- Componente destino: <sk-input-select label="Banco" [options]="bancos()" [(value)]="banco" />
+                 BRECHA: sk-listbox no tiene opciones deshabilitadas ni template
+                 de opción, así que "DAVIVIENDA · Muy pronto" no se puede tal cual. -->
+            <div class="sk-input-select sk-input-select--fluid sk-input-select--floating" data-sk-select>
+              <div class="sk-input-select__box" id="bankTrigger" role="combobox" tabindex="0"
+                   aria-haspopup="listbox" aria-expanded="false" aria-controls="bankList" aria-labelledby="bankLabel">
+                <div class="sk-input-select__inner">
+                  <label class="sk-input-select__label" id="bankLabel">Banco</label>
+                  <span class="sk-input-select__value">BANCOLOMBIA</span>
+                </div>
+                <i class="pi pi-chevron-down sk-input-select__icon sk-input-select__icon--right" aria-hidden="true"></i>
+              </div>
+              <div class="sk-input-select__popover" hidden>
+                <ul class="sk-listbox__list" id="bankList" role="listbox" aria-labelledby="bankLabel">
+                  <li role="option" class="sk-listbox__option" aria-selected="true" tabindex="-1">BANCOLOMBIA</li>
+                  <li role="option" class="sk-listbox__option" aria-selected="false" aria-disabled="true" tabindex="-1">DAVIVIENDA <span class="chip-soon">Muy pronto</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Componente destino: <sk-radio-group label="Tipo de cuenta" skDirection="row">
+                                       <sk-radio value="Ahorros" label="Ahorros" /> … -->
+            <fieldset class="sk-radio-group">
+              <legend>Tipo de cuenta</legend>
+              <div class="sk-radio-group__options">
+                <label class="sk-radio">
+                  <input type="radio" class="sk-radio-input" name="newAccountType" value="Ahorros" checked>
+                  Ahorros
+                </label>
+                <label class="sk-radio">
+                  <input type="radio" class="sk-radio-input" name="newAccountType" value="Corriente">
+                  Corriente
+                </label>
+              </div>
+            </fieldset>
+
+            <!-- Componente destino: <sk-input-text label="Número de cuenta" inputmode="numeric" [fluid]="true"> -->
+            <div class="sk-input-text sk-input-text--fluid">
+              <div class="sk-input-text__box">
+                <input type="text" inputmode="numeric" id="newAccountNumber" placeholder=" " maxlength="20">
+                <label for="newAccountNumber">Número de cuenta</label>
+              </div>
+            </div>
+
+            <!-- Componente destino: <sk-checkbox label="El cliente confirma que es el titular de esta cuenta bancaria."> -->
+            <label class="sk-checkbox">
+              <input type="checkbox" id="newAccountTitular">
+              <span>El cliente confirma que es el titular de esta cuenta bancaria.</span>
+            </label>
+
+            <p class="sk-field-error" id="addAccountError" role="alert">
+              Ingresa un número de cuenta válido y confirma que eres el titular de la cuenta.
+            </p>
+
+            <!-- Ficha sk-modal/sk-button: Cancelar (tertiary, reversible) antes de la acción afirmativa (primary) -->
+            <div class="form-actions">
+              <button type="button" class="sk-button sk-button--tertiary sk-button--small" id="cancelAddAccount">Cancelar</button>
+              <button type="button" class="sk-button sk-button--primary sk-button--small" id="saveAccountBtn">Guardar cuenta</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Paso 3 — Monto -->
+        <div class="step-block">
+          <div class="step-title">
+            <span class="step-badge" aria-hidden="true">3</span>
+            <h3 class="sk-title-h6" id="amountTitle">Ingresa el valor del aporte (Opcional)</h3>
+          </div>
+          <!-- Componente destino: <sk-input-number class="monto-input" prefix="$" locale="es-CO" [(value)]="monto">
+               Full-width: la ficha (§8.8) indica sobrescribir el max-width del host desde fuera (.monto-input { max-width: none }). -->
+          <div class="sk-input-number sk-input-number--fluid">
+            <span class="sk-input-number__prefix" aria-hidden="true">$</span>
+            <input type="text" inputmode="numeric" id="amountInput" placeholder="0" aria-labelledby="amountTitle">
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: vista previa -->
+      <div>
+        <h3 class="sk-title-h6 preview-title">Vista previa de la carta</h3>
+        <div class="preview-box placeholder" id="previewBox">
+          Completa el contrato, la cuenta y el monto para ver la vista previa.
+        </div>
+
+        <div class="preview-actions" id="previewActions">
+          <span>Carta 4x1000</span>
+          <!-- Componente destino: <sk-button skType="tertiary" icon="pi pi-…" ariaLabel="…"> (icon-only) -->
+          <div class="icons">
+            <button type="button" class="sk-button sk-button--tertiary sk-button--icon" id="downloadBtn" aria-label="Descargar carta" disabled>
+              <i class="pi pi-download" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="sk-button sk-button--tertiary sk-button--icon" id="whatsappBtn" aria-label="Enviar carta por WhatsApp" disabled>
+              <i class="pi pi-whatsapp" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="sk-button sk-button--tertiary sk-button--icon" id="emailBtn" aria-label="Enviar carta por correo" disabled>
+              <i class="pi pi-envelope" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var holderName = document.getElementById('holderName');
+  var holderDoc = document.getElementById('holderDoc');
+  var amountInput = document.getElementById('amountInput');
+  var previewBox = document.getElementById('previewBox');
+  var previewActions = document.getElementById('previewActions');
+  var downloadBtn = document.getElementById('downloadBtn');
+  var whatsappBtn = document.getElementById('whatsappBtn');
+  var emailBtn = document.getElementById('emailBtn');
+
+  // Réplica de sk-input-select (§5.2 de la ficha):
+  // · Enter / Space / ArrowDown sobre el box → abre/cierra · Escape → cierra.
+  // · Popover appendTo body: posición fija bajo el trigger, ancho = trigger (mín. 240).
+  // · Dentro del listbox: flechas navegan, Enter/Space seleccionan.
+  // · El popover no atrapa el foco: cierra con click fuera o Escape.
+  function initCustomSelect(triggerId, listId, onSelect){
+    var trigger = document.getElementById(triggerId);
+    var host = trigger.closest('[data-sk-select]');
+    var popover = host.querySelector('.sk-input-select__popover');
+    var list = document.getElementById(listId);
+    var valueEl = trigger.querySelector('.sk-input-select__value');
+    var options = Array.prototype.slice.call(list.querySelectorAll('[role="option"]'));
+    document.body.appendChild(popover);   // appendTo="body"
+
+    function enabledOptions(){
+      return options.filter(function(o){ return o.getAttribute('aria-disabled') !== 'true'; });
+    }
+    function position(){
+      var r = trigger.getBoundingClientRect();
+      popover.style.left = r.left + 'px';
+      popover.style.width = Math.max(r.width, 240) + 'px';
+      // Como p-popover: si no cabe debajo del trigger, abre hacia arriba.
+      var h = popover.offsetHeight;
+      var below = window.innerHeight - r.bottom - 4;
+      popover.style.top = (h > below && r.top - 4 > below ? r.top - 4 - h : r.bottom + 4) + 'px';
+    }
+    function isOpen(){ return !popover.hidden; }
+    function close(){
+      if (!isOpen()) return;
+      popover.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+      host.classList.remove('sk-input-select--open');
+    }
+    function open(){
+      popover.classList.add('is-entering');
+      popover.hidden = false;
+      position();
+      requestAnimationFrame(function(){ popover.classList.remove('is-entering'); });
+      trigger.setAttribute('aria-expanded', 'true');
+      host.classList.add('sk-input-select--open');
+      var current = list.querySelector('[aria-selected="true"]') || enabledOptions()[0];
+      if (current) current.focus({ preventScroll: true });
+    }
+    function selectItem(item){
+      if (item.getAttribute('aria-disabled') === 'true') return;
+      options.forEach(function(o){ o.setAttribute('aria-selected', 'false'); });
+      item.setAttribute('aria-selected', 'true');
+      valueEl.textContent = item.firstChild.textContent.trim();
+      host.classList.add('sk-input-select--floating');
+      close();
+      trigger.focus({ preventScroll: true });
+      onSelect(item);
+    }
+
+    trigger.addEventListener('click', function(e){
+      e.stopPropagation();
+      if (isOpen()) close(); else open();
+    });
+    trigger.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (isOpen()) close(); else open();
+      }
+      if (e.key === 'Escape') close();
+    });
+    options.forEach(function(item){
+      item.addEventListener('click', function(e){ e.stopPropagation(); selectItem(item); });
+      item.addEventListener('keydown', function(e){
+        var enabled = enabledOptions();
+        var i = enabled.indexOf(item);
+        if (e.key === 'ArrowDown') { e.preventDefault(); (enabled[i + 1] || enabled[0]).focus({ preventScroll: true }); }
+        if (e.key === 'ArrowUp') { e.preventDefault(); (enabled[i - 1] || enabled[enabled.length - 1]).focus({ preventScroll: true }); }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectItem(item); }
+        if (e.key === 'Escape' || e.key === 'Tab') { close(); trigger.focus(); }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if (!trigger.contains(e.target) && !popover.contains(e.target)) close();
+    });
+    // El popover vive en body: sigue al trigger cuando el modal hace scroll y
+    // se cierra si el trigger sale del área visible del modal o cambia el tamaño.
+    window.addEventListener('resize', close);
+    document.addEventListener('scroll', function(e){
+      if (!isOpen() || popover.contains(e.target)) return;
+      var r = trigger.getBoundingClientRect();
+      var area = trigger.closest('.sk-modal__body').getBoundingClientRect();
+      if (r.bottom < area.top || r.top > area.bottom) close(); else position();
+    }, true);
+
+    return {
+      getSelected: function(){ return list.querySelector('[aria-selected="true"]'); }
+    };
+  }
+
+  var contractControl = initCustomSelect('contractTrigger', 'contractList', function(item){
+    holderName.textContent = item.dataset.holder;
+    holderDoc.textContent = item.dataset.doc;
+    renderPreview();
+  });
+  initCustomSelect('bankTrigger', 'bankList', function(){});
+
+  // Agregar cuenta bancaria
+  var accountList = document.getElementById('accountList');
+  var addAccountToggle = document.getElementById('addAccountToggle');
+  var addAccountForm = document.getElementById('addAccountForm');
+  var newAccountNumber = document.getElementById('newAccountNumber');
+  var newAccountTitular = document.getElementById('newAccountTitular');
+  var addAccountError = document.getElementById('addAccountError');
+  var accountSeq = 0;
+  var editingLabel = null;
+
+  function resetAddAccountForm(){
+    newAccountNumber.value = '';
+    newAccountTitular.checked = false;
+    addAccountError.style.display = 'none';
+    newAccountNumber.parentElement.classList.remove('is-error');
+    document.querySelector('input[name="newAccountType"][value="Ahorros"]').checked = true;
+  }
+  function showAddAccountForm(){
+    addAccountForm.hidden = false;
+    addAccountToggle.hidden = true;
+  }
+  function hideAddAccountForm(){
+    addAccountForm.hidden = true;
+    addAccountToggle.hidden = false;
+    editingLabel = null;
+    resetAddAccountForm();
+  }
+  addAccountToggle.addEventListener('click', function(){
+    editingLabel = null;
+    showAddAccountForm();
+  });
+  document.getElementById('cancelAddAccount').addEventListener('click', hideAddAccountForm);
+
+  // Editar o eliminar una cuenta ya guardada.
+  accountList.addEventListener('click', function(e){
+    var editBtn = e.target.closest('.account-edit-btn');
+    if (editBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      editingLabel = editBtn.closest('.account-option');
+      newAccountNumber.value = editingLabel.dataset.digits;
+      newAccountTitular.checked = true;
+      document.querySelector('input[name="newAccountType"][value="' + editingLabel.dataset.tipo + '"]').checked = true;
+      showAddAccountForm();
+      return;
+    }
+
+    var deleteBtn = e.target.closest('.account-delete-btn');
+    if (deleteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      var label = deleteBtn.closest('.account-option');
+      var wasChecked = label.querySelector('input[type="radio"]').checked;
+      label.remove();
+      if (wasChecked) {
+        var firstOption = accountList.querySelector('input[type="radio"]:not(:disabled)');
+        if (firstOption) firstOption.checked = true;
+      }
+      renderPreview();
+    }
+  });
+
+  function maskAccountNumber(digits){
+    if (digits.length <= 4) return '#' + digits;
+    return '#' + '*'.repeat(digits.length - 4) + digits.slice(-4);
+  }
+
+  document.getElementById('saveAccountBtn').addEventListener('click', function(){
+    var digits = newAccountNumber.value.replace(/[^0-9]/g, '');
+    var isValid = digits.length >= 6 && newAccountTitular.checked;
+    addAccountError.style.display = isValid ? 'none' : 'block';
+    newAccountNumber.parentElement.classList.toggle('is-error', digits.length < 6);
+    if (!isValid) return;
+
+    var tipo = document.querySelector('input[name="newAccountType"]:checked').value;
+    var titleText = 'Cuenta de ' + tipo + ' ' + maskAccountNumber(digits);
+
+    if (editingLabel) {
+      editingLabel.dataset.digits = digits;
+      editingLabel.dataset.tipo = tipo;
+      editingLabel.querySelector('.account-title').textContent = titleText;
+    } else {
+      accountSeq++;
+      var label = document.createElement('label');
+      label.className = 'account-option';
+      label.dataset.digits = digits;
+      label.dataset.tipo = tipo;
+      label.innerHTML =
+        '<input type="radio" class="sk-radio-input" name="account" value="new' + accountSeq + '">' +
+        '<div>' +
+          '<div class="account-title">' + titleText + '</div>' +
+          '<div class="account-bank">BANCOLOMBIA</div>' +
+        '</div>' +
+        '<div class="account-actions">' +
+          '<button type="button" class="account-edit-btn" aria-label="Editar cuenta">' +
+            '<i class="pi pi-pencil" aria-hidden="true"></i>' +
+          '</button>' +
+          '<button type="button" class="account-delete-btn" aria-label="Eliminar cuenta">' +
+            '<i class="pi pi-trash" aria-hidden="true"></i>' +
+          '</button>' +
+        '</div>';
+      accountList.appendChild(label);
+      label.querySelector('input').checked = true;
+    }
+    renderPreview();
+    hideAddAccountForm();
+  });
+
+  function formatCurrency(n){
+    return new Intl.NumberFormat('es-CO').format(n);
+  }
+  function parseAmount(raw){
+    var digits = raw.replace(/[^0-9]/g,'');
+    return digits ? parseInt(digits, 10) : 0;
+  }
+
+  amountInput.addEventListener('input', function(){
+    var value = parseAmount(amountInput.value);
+    amountInput.value = value ? formatCurrency(value) : '';
+    renderPreview();
+  });
+
+  function getSelectedAccountLabel(){
+    var checked = document.querySelector('.account-option input[type="radio"]:checked');
+    if (!checked) return null;
+    return checked.closest('.account-option').querySelector('.account-title').firstChild.textContent.trim();
+  }
+
+  function todayEs(){
+    var d = new Date();
+    var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return d.getDate() + ' de ' + meses[d.getMonth()] + ' de ' + d.getFullYear();
+  }
+
+  function buildLetterText(){
+    var opt = contractControl.getSelected();
+    var contrato = opt.textContent.trim();
+    var titular = opt.dataset.holder;
+    var documento = opt.dataset.doc;
+    var cuenta = getSelectedAccountLabel();
+    var monto = parseAmount(amountInput.value);
+
+    return "Bogotá, " + todayEs() + "\n\n" +
+      "Señores\nBANCOLOMBIA S.A.\n\n" +
+      "Asunto: Solicitud de exención del Gravamen a los Movimientos Financieros (4x1000)\n\n" +
+      "Yo, " + titular + ", identificado con documento de identidad No. " + documento +
+      ", titular de la " + cuenta + ", solicito de manera respetuosa que la transferencia " +
+      "por valor de $" + formatCurrency(monto) + " con destino al contrato " + contrato +
+      " de Skandia sea marcada como exenta del Gravamen a los Movimientos Financieros, " +
+      "de acuerdo con lo establecido en el artículo 879 del Estatuto Tributario para " +
+      "traslados a cuentas de fondos de inversión colectiva y fondos de pensiones voluntarias.\n\n" +
+      "Agradezco su gestión.\n\nCordialmente,\n" + titular;
+  }
+
+  function renderPreview(){
+    var monto = parseAmount(amountInput.value);
+    var ready = monto > 0 && !!getSelectedAccountLabel();
+    var allButtons = [downloadBtn, whatsappBtn, emailBtn];
+
+    if (!ready){
+      previewBox.textContent = 'Completa el contrato, la cuenta y el monto para ver la vista previa.';
+      previewBox.classList.add('placeholder');
+      previewBox.classList.remove('has-content');
+      previewActions.classList.remove('is-ready');
+      allButtons.forEach(function(b){ b.disabled = true; });
+      return;
+    }
+
+    previewBox.textContent = buildLetterText();
+    previewBox.classList.remove('placeholder');
+    previewBox.classList.add('has-content');
+    previewActions.classList.add('is-ready');
+    allButtons.forEach(function(b){ b.disabled = false; });
+  }
+
+  downloadBtn.addEventListener('click', function(){
+    var blob = new Blob([buildLetterText()], {type:'text/plain;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'carta-4x1000.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  whatsappBtn.addEventListener('click', function(){
+    window.open('https://wa.me/?text=' + encodeURIComponent(buildLetterText()), '_blank');
+  });
+  emailBtn.addEventListener('click', function(){
+    window.location.href = 'mailto:?subject=' + encodeURIComponent('Carta 4x1000') +
+      '&body=' + encodeURIComponent(buildLetterText());
+  });
+
+  renderPreview();
+})();
+</script>
+
+</body>
+</html>
