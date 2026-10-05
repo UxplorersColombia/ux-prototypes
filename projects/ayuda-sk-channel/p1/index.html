@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SK Channel · Contenido sugerido</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde:#00c73d; --verde-osc:#007a26; --verde-lima:#8fe000; --verde-suave:#f1fbef;
+    --texto:#232323; --texto-2:#404040; --gris:#666666; --gris-3:#8c8c8c;
+    --linea:#dddddd; --linea-2:#ededed; --fondo:#f4f4f4; --blanco:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--fondo);font-family:'Open Sans',sans-serif;color:var(--texto);-webkit-font-smoothing:antialiased}
+  button{font-family:inherit}
+
+  /* ---------- Estructura del portal ---------- */
+  .portal{display:flex;min-height:100vh}
+  .rail{width:88px;flex:0 0 88px;background:var(--blanco);border-right:1px solid var(--linea);display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 0 24px;position:sticky;top:0;height:100vh}
+  .rail .iso{width:40px;height:40px;margin-bottom:16px}
+  .nav-it{width:72px;padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:8px;border-radius:12px;cursor:pointer;color:var(--texto-2);border:1px solid transparent;background:none;font-size:12px;line-height:14px;text-align:center}
+  .nav-it:hover{color:var(--verde)}
+  .nav-it.on{background:var(--verde-suave);border-color:#caf9cb;color:var(--verde-osc);font-weight:700}
+
+  .zona{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{height:72px;background:var(--blanco);border-bottom:1px solid var(--linea);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:5}
+  .topbar .logo{height:32px}
+  .acciones-top{display:flex;align-items:center;gap:8px}
+
+  .btn-ico{position:relative;width:40px;height:40px;border-radius:50%;border:none;background:transparent;color:var(--texto-2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,color .15s}
+  .btn-ico:hover{background:var(--verde-suave);color:var(--verde-osc)}
+  .btn-ico:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
+  .btn-ico .punto{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--verde);box-shadow:0 0 0 2px var(--blanco)}
+  /* Tooltip */
+  .btn-ico[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--texto);color:#fff;font-size:12px;font-weight:600;white-space:nowrap;padding:4px 8px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .15s}
+  .btn-ico[data-tip]:hover::after,.btn-ico[data-tip]:focus-visible::after{opacity:1}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--verde-suave);color:var(--verde-osc);font-family:'Montserrat';font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-left:8px}
+  .sep-v{width:1px;height:24px;background:var(--linea);margin:0 8px}
+
+  main{padding:32px;max-width:1120px;width:100%}
+  .miga{font-size:13px;color:var(--gris-3);margin:0 0 8px}
+  h1{font-family:'Montserrat';font-weight:800;font-size:28px;margin:0 0 8px}
+  .bajada{font-size:15px;color:var(--gris);margin:0 0 24px;line-height:24px}
+  .seccion{display:none}
+  .seccion.on{display:block}
+
+  /* Bloques genéricos de contenido */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(256px,1fr));gap:16px}
+  .tarjeta{background:var(--blanco);border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+  .tarjeta .etq{font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--gris-3);margin:0 0 8px}
+  .tarjeta h3{font-family:'Montserrat';font-weight:700;font-size:17px;margin:0 0 16px}
+  .tarjeta .cifra{font-family:'Montserrat';font-weight:800;font-size:24px;color:var(--verde-osc)}
+  .tarjeta .pie{font-size:13px;color:var(--gris);margin-top:8px}
+  .fila{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--linea-2);font-size:14px}
+  .fila:last-child{border-bottom:none}
+  .fila b{font-weight:600}
+  .fila span{color:var(--gris)}
+  .barra{height:8px;border-radius:100px;background:var(--linea-2);overflow:hidden;margin-top:8px}
+  .barra i{display:block;height:100%;background:var(--verde)}
+  .chip{display:inline-block;font-size:12px;font-weight:700;color:var(--verde-osc);background:var(--verde-suave);border-radius:100px;padding:4px 8px}
+
+  /* ---------- Modal SK Channel ---------- */
+  .velo{position:fixed;inset:0;background:rgba(35,35,35,.48);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+  .velo.on{opacity:1;pointer-events:auto}
+  .modal{width:100%;max-width:880px;max-height:calc(100vh - 48px);overflow:auto;background:var(--blanco);border-radius:24px;box-shadow:0 24px 56px -16px rgba(0,0,0,.32);transform:translateY(16px);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+  .velo.on .modal{transform:translateY(0)}
+  .m-head{display:flex;align-items:flex-start;gap:16px;padding:32px 32px 24px}
+  .m-marca{width:48px;height:48px;border-radius:12px;background:linear-gradient(150deg,var(--verde-lima),var(--verde));color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .m-tit{flex:1;min-width:0}
+  .m-tit .eyebrow{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--verde-osc);margin:0 0 4px}
+  .m-tit h2{font-family:'Montserrat';font-weight:800;font-size:22px;line-height:1.25;margin:0 0 8px}
+  .m-tit p{margin:0;font-size:14px;color:var(--gris);line-height:21px}
+  .cerrar{width:40px;height:40px;border-radius:50%;border:none;background:var(--fondo);color:var(--texto-2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  .cerrar:hover{background:var(--linea-2)}
+  .cerrar:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
+
+  .cursos{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:0 32px}
+  .curso{display:flex;flex-direction:column;border:1px solid var(--linea-2);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;transition:box-shadow .15s,transform .15s,border-color .15s}
+  .curso:hover{box-shadow:0 8px 24px -8px rgba(0,0,0,.16);transform:translateY(-2px);border-color:#caf9cb}
+  .curso:focus-visible{outline:2px solid var(--verde);outline-offset:2px}
+  .portada{height:120px;position:relative;display:flex;align-items:center;justify-content:center;color:#fff}
+  .portada .play{position:absolute;right:16px;bottom:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--verde-osc);display:flex;align-items:center;justify-content:center}
+  .portada .dur{position:absolute;left:16px;bottom:16px;font-size:12px;font-weight:700;background:rgba(0,0,0,.32);border-radius:100px;padding:4px 8px}
+  .c-cuerpo{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .c-cuerpo h3{font-family:'Montserrat';font-weight:700;font-size:16px;line-height:1.3;margin:0}
+  .c-cuerpo p{margin:0;font-size:13px;color:var(--gris);line-height:19px;flex:1}
+  .c-curso{font-size:12px;color:var(--gris-3)}
+  .c-curso b{color:var(--texto-2);font-weight:600}
+  .c-ver{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;color:var(--verde-osc);margin-top:8px}
+
+  .m-pie{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 32px 32px;margin-top:24px;border-top:1px solid var(--linea-2);flex-wrap:wrap}
+  .m-pie .legal{font-size:12px;color:var(--gris-3);line-height:18px;max-width:400px;margin:0}
+  .btn-prim{display:inline-flex;align-items:center;gap:8px;background:var(--verde);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:16px 24px;border-radius:100px;white-space:nowrap}
+  .btn-prim:hover{background:#03a835}
+  .btn-prim:focus-visible{outline:2px solid var(--verde-osc);outline-offset:2px}
+
+  /* ---------- Móvil ---------- */
+  @media (max-width:800px){
+    .rail{position:fixed;bottom:0;top:auto;left:0;right:0;width:100%;height:auto;flex-direction:row;justify-content:space-around;padding:8px 8px 16px;border-right:none;border-top:1px solid var(--linea);z-index:6;gap:0}
+    .rail .iso{display:none}
+    .nav-it{width:auto;flex:1;font-size:11px;padding:8px 0}
+    .nav-it.solo-desk{display:none}
+    .topbar{padding:0 16px;height:64px}
+    .topbar .logo{height:24px}
+    .sep-v,.btn-ico.solo-desk{display:none}
+    main{padding:24px 16px 120px}
+    h1{font-size:24px}
+
+    .velo{align-items:flex-end;padding:0}
+    .modal{max-width:none;border-radius:24px 24px 0 0;max-height:88vh;transform:translateY(100%)}
+    .m-head{padding:24px 16px 16px}
+    .m-tit h2{font-size:19px}
+    .cursos{grid-template-columns:1fr;padding:0 16px;gap:16px}
+    .curso{flex-direction:row}
+    .portada{width:96px;height:auto;min-height:120px;flex-shrink:0}
+    .portada .dur,.portada .play{display:none}
+    .c-cuerpo p{display:none}
+    .m-pie{padding:16px 16px 24px;margin-top:16px;flex-direction:column-reverse;align-items:stretch}
+    .btn-prim{justify-content:center}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="portal">
+
+  <!-- Menú lateral -->
+  <nav class="rail" aria-label="Menú principal">
+    <button class="nav-it" data-sec="inicio">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 2l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.5z"/><path d="M9 22V12h6v10"/></svg>
+      Inicio
+    </button>
+    <button class="nav-it" data-sec="contratos">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+      Contratos
+    </button>
+    <button class="nav-it" data-sec="inversiones">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+      Inversiones
+    </button>
+    <button class="nav-it" data-sec="transacciones">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg>
+      Transacciones
+    </button>
+    <button class="nav-it solo-desk" data-sec="documentos">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      Documentos
+    </button>
+    <button class="nav-it" data-sec="perfil">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      Perfil
+    </button>
+  </nav>
+
+  <div class="zona">
+    <!-- Barra superior: aquí vive el botón de SK Channel -->
+    <header class="topbar">
+      <img class="logo" src="assets/brand/logo-color.svg" alt="Skandia">
+      <div class="acciones-top">
+        <button class="btn-ico" id="btnChannel" data-tip="SK Channel" aria-label="Abrir SK Channel: contenido educativo sugerido" aria-haspopup="dialog">
+          <!-- Pantalla con play + birrete: "aprender en video" -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="13" rx="2.5"/><path d="M10 8.2v4.6l4-2.3z" fill="currentColor"/><path d="M8 21h8"/></svg>
+          <span class="punto" aria-hidden="true"></span>
+        </button>
+        <button class="btn-ico solo-desk" data-tip="Notificaciones" aria-label="Notificaciones">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        </button>
+        <button class="btn-ico solo-desk" data-tip="Ayuda" aria-label="Ayuda">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        </button>
+        <span class="sep-v"></span>
+        <span class="avatar" aria-label="Valeria">VG</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- Inicio -->
+      <section class="seccion" id="sec-inicio">
+        <p class="miga">Portal clientes</p>
+        <h1>Hola, Valeria</h1>
+        <p class="bajada">Este es el resumen de tus productos con Skandia.</p>
+        <div class="grid">
+          <div class="tarjeta"><p class="etq">Saldo total</p><div class="cifra">$184.320.500</div><p class="pie">Actualizado hoy, 8:00 a. m.</p></div>
+          <div class="tarjeta"><p class="etq">Rentabilidad del año</p><div class="cifra">+7,8 %</div><p class="pie">Rentabilidad pasada no garantiza rentabilidad futura.</p></div>
+          <div class="tarjeta"><p class="etq">Próximo aporte</p><div class="cifra">$1.500.000</div><p class="pie">Débito automático · 15 de octubre</p></div>
+        </div>
+      </section>
+
+      <!-- Contratos -->
+      <section class="seccion" id="sec-contratos">
+        <p class="miga">Inicio / Contratos</p>
+        <h1>Tus contratos</h1>
+        <p class="bajada">Consulta el saldo y el detalle de cada producto.</p>
+        <div class="grid">
+          <div class="tarjeta"><p class="etq">Pensión voluntaria · Multifund</p><h3>Contrato 0012-4587</h3><div class="cifra">$96.410.200</div><p class="pie">Meta: vivienda 2029 · 64 %</p><div class="barra"><i style="width:64%"></i></div></div>
+          <div class="tarjeta"><p class="etq">Pensión obligatoria</p><h3>Contrato 0098-1120</h3><div class="cifra">$62.880.000</div><p class="pie">Semanas cotizadas: 812</p></div>
+          <div class="tarjeta"><p class="etq">Cesantías</p><h3>Contrato 0045-7731</h3><div class="cifra">$11.230.300</div><p class="pie">Último abono: febrero 2026</p></div>
+          <div class="tarjeta"><p class="etq">Fondo de inversión colectiva</p><h3>Contrato 0310-0042</h3><div class="cifra">$13.800.000</div><p class="pie">Perfil: moderado</p></div>
+        </div>
+      </section>
+
+      <!-- Inversiones -->
+      <section class="seccion" id="sec-inversiones">
+        <p class="miga">Inicio / Inversiones</p>
+        <h1>Tus inversiones</h1>
+        <p class="bajada">Así está distribuido tu portafolio de pensión voluntaria.</p>
+        <div class="tarjeta">
+          <div class="fila"><b>Renta fija Colombia</b><span>42 %</span></div>
+          <div class="fila"><b>Acciones internacionales</b><span>28 %</span></div>
+          <div class="fila"><b>Mezcla Dinámica</b><span>18 %</span></div>
+          <div class="fila"><b>Liquidez</b><span>12 %</span></div>
+        </div>
+      </section>
+
+      <!-- Transacciones -->
+      <section class="seccion" id="sec-transacciones">
+        <p class="miga">Inicio / Transacciones</p>
+        <h1>Aportes y retiros</h1>
+        <p class="bajada">Haz movimientos y revisa tu historial.</p>
+        <div class="tarjeta">
+          <div class="fila"><b>Aporte mensual</b><span>+$1.500.000 · 15 sep</span></div>
+          <div class="fila"><b>Retiro parcial</b><span>−$4.000.000 · 2 ago</span></div>
+          <div class="fila"><b>Aporte extraordinario</b><span>+$10.000.000 · 20 jun</span></div>
+        </div>
+      </section>
+
+      <!-- Documentos -->
+      <section class="seccion" id="sec-documentos">
+        <p class="miga">Inicio / Documentos</p>
+        <h1>Documentos y certificados</h1>
+        <p class="bajada">Descarga tus extractos y certificados tributarios.</p>
+        <div class="tarjeta">
+          <div class="fila"><b>Certificado tributario 2025</b><span class="chip">Disponible</span></div>
+          <div class="fila"><b>Extracto septiembre 2026</b><span>PDF</span></div>
+          <div class="fila"><b>Extracto agosto 2026</b><span>PDF</span></div>
+        </div>
+      </section>
+
+      <!-- Perfil -->
+      <section class="seccion" id="sec-perfil">
+        <p class="miga">Inicio / Perfil</p>
+        <h1>Tu perfil</h1>
+        <p class="bajada">Tus datos y tu perfil de inversionista.</p>
+        <div class="grid">
+          <div class="tarjeta"><p class="etq">Perfil de riesgo</p><div class="cifra">Moderado</div><p class="pie">Actualizado: marzo 2026</p></div>
+          <div class="tarjeta"><p class="etq">Datos de contacto</p><h3>valeria@correo.com</h3><p class="pie">Celular terminado en 4471</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Modal SK Channel -->
+<div class="velo" id="velo">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitulo" aria-describedby="mBajada">
+    <div class="m-head">
+      <div class="m-marca" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="13" rx="2.5"/><path d="M10 8.2v4.6l4-2.3z" fill="currentColor"/><path d="M8 21h8"/></svg>
+      </div>
+      <div class="m-tit">
+        <p class="eyebrow">SK Channel</p>
+        <h2 id="mTitulo"></h2>
+        <p id="mBajada"></p>
+      </div>
+      <button class="cerrar" id="btnCerrar" aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="cursos" id="cursos"></div>
+    <div class="m-pie">
+      <p class="legal">Contenido educativo. No constituye una recomendación profesional de inversión.</p>
+      <a class="btn-prim" href="https://channel.skandia.com.co/cursos" target="_blank" rel="noopener">
+        Ver todos los cursos en SK Channel
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Cursos reales del catálogo de SK Channel (skill skandia-negocio-ampliado, 2026-07-28)
+  const BASE = 'https://channel.skandia.com.co/course/';
+  const CURSOS = {
+    detox:     { nombre:'Detox Financiero', mod:'6 módulos', url:BASE+'detox-financiero', color:['#8fe000','#00c73d'], ico:'leaf' },
+    mesa:      { nombre:'Diseñar Riqueza: Mesa Redonda', mod:'6 módulos', url:BASE+'mesa-redonda', color:['#00c73d','#007a26'], ico:'target' },
+    tax:       { nombre:'Master Tax', mod:'3 módulos', url:BASE+'master-tax', color:['#0099de','#005f8c'], ico:'doc' },
+    clase1:    { nombre:'Tu Clase sobre Inversiones 1', mod:'5 clases', url:BASE+'tu-clase-sobre-inversiones', color:['#00b5a5','#007a6e'], ico:'book' },
+    clase2:    { nombre:'Tu Clase sobre Inversiones 2', mod:'4 módulos', url:BASE+'tu-clase-sobre-renta-fija-vs-renta-variable', color:['#00b5a5','#00566b'], ico:'chart' },
+    intl:      { nombre:'Inversiones Internacionales', mod:'5 módulos', url:BASE+'inversiones-internacionales', color:['#3d7bff','#1d3fa8'], ico:'globe' },
+    moneycon:  { nombre:'MoneyCon · Libérate', mod:'3 charlas', url:BASE+'moneycon', color:['#ff8a3d','#d1491b'], ico:'mic' },
+    tarjetazo: { nombre:'Cómo sacarle provecho al Tarjetazo', mod:'6 módulos', url:BASE+'sacarle-provecho-al-tarjetazo', color:['#9b5cff','#5a2bb3'], ico:'card' },
+    infantil:  { nombre:'Educación Financiera Infantil', mod:'4 módulos', url:BASE+'educacion-financiera-infantil', color:['#ffb800','#d18800'], ico:'heart' }
+  };
+
+  // Tres sugerencias por sección: título = beneficio para el cliente, curso = de dónde sale.
+  const SUGERENCIAS = {
+    inicio: {
+      titulo:'Aprende algo nuevo sobre tu dinero',
+      bajada:'Tres contenidos para empezar, elegidos según tus productos.',
+      items:[
+        ['clase1','Entiende cómo funciona el dinero','Las bases que nadie nos enseñó en el colegio: inflación, riesgo y por qué invertir.'],
+        ['detox','Ordena tus finanzas este mes','La regla 50/20/30 y cómo armar tu fondo de emergencia.'],
+        ['moneycon','Suelta el estrés financiero','Charlas cortas para tener una relación más tranquila con el dinero.']
+      ]
+    },
+    contratos: {
+      titulo:'Saca más provecho de tus contratos',
+      bajada:'Contenido sugerido porque estás revisando tus contratos.',
+      items:[
+        ['detox','Cómo potenciar tus ahorros','El interés compuesto explicado paso a paso y cómo ponerlo a trabajar a tu favor.'],
+        ['mesa','Cómo lograr tus metas','Arma un portafolio que responda a lo que quieres lograr, no al revés.'],
+        ['tax','Ahorra y paga menos impuestos','Cómo la pensión voluntaria puede ayudarte a planear tu declaración de renta.']
+      ]
+    },
+    inversiones: {
+      titulo:'Invierte con más criterio',
+      bajada:'Contenido sugerido porque estás revisando tus inversiones.',
+      items:[
+        ['clase2','Renta fija o variable: cuál va contigo','Cómo elegir activos según tu perfil de riesgo y tus plazos.'],
+        ['intl','Diversifica fuera de Colombia','Qué cambia al invertir en otras monedas y cómo evaluarlo.'],
+        ['mesa','Cuándo y cómo rebalancear','Qué hacer cuando tu portafolio se aleja de lo que planeaste.']
+      ]
+    },
+    transacciones: {
+      titulo:'Antes de mover tu dinero',
+      bajada:'Contenido sugerido porque estás en aportes y retiros.',
+      items:[
+        ['detox','Arma tu fondo de emergencia','Para que un imprevisto no te obligue a retirar tu ahorro de largo plazo.'],
+        ['tax','Lo que pasa con los impuestos al retirar','Qué revisar antes de un retiro para no perder beneficios tributarios.'],
+        ['tarjetazo','Usa tu tarjeta de crédito a tu favor','Cómo leer el extracto, evitar errores comunes y salir de deudas.']
+      ]
+    },
+    documentos: {
+      titulo:'Usa tus documentos a tu favor',
+      bajada:'Contenido sugerido porque estás en documentos y certificados.',
+      items:[
+        ['tax','Declara renta sin miedo','Topes, deducciones y cómo usar tu certificado tributario.'],
+        ['intl','Inversiones afuera también se declaran','Obligaciones tributarias de tener activos en el exterior.'],
+        ['detox','Haz de los impuestos una estrategia','El módulo de estrategia tributaria para planear el próximo año.']
+      ]
+    },
+    perfil: {
+      titulo:'Conócete como inversionista',
+      bajada:'Contenido sugerido porque estás revisando tu perfil.',
+      items:[
+        ['clase1','Qué significa tu perfil de riesgo','Cómo se define y por qué importa en cada decisión.'],
+        ['moneycon','Descubre qué tipo de inversionista eres','La charla Wealth Hunters sobre perfiles y hábitos.'],
+        ['infantil','Enseña a tus hijos a manejar el dinero','Una relación sana con el dinero desde los 4 años.']
+      ]
+    }
+  };
+
+  const ICONOS = {
+    leaf:'<path d="M5 19c0-8 6-14 15-14 0 9-6 15-14 15"/><path d="M5 19 13 11"/>',
+    target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
+    doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
+    book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>',
+    chart:'<path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/>',
+    globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+    mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/>',
+    card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>',
+    heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>'
+  };
+
+  let seccion = 'contratos';
+  const velo = document.getElementById('velo');
+  const btnChannel = document.getElementById('btnChannel');
+
+  function irA(sec){
+    seccion = sec;
+    document.querySelectorAll('.seccion').forEach(s => s.classList.toggle('on', s.id === 'sec-' + sec));
+    document.querySelectorAll('.nav-it').forEach(b => {
+      const on = b.dataset.sec === sec;
+      b.classList.toggle('on', on);
+      on ? b.setAttribute('aria-current','page') : b.removeAttribute('aria-current');
+    });
+    window.scrollTo(0,0);
+  }
+
+  function pintarModal(){
+    const s = SUGERENCIAS[seccion];
+    document.getElementById('mTitulo').textContent = s.titulo;
+    document.getElementById('mBajada').textContent = s.bajada;
+    document.getElementById('cursos').innerHTML = s.items.map(([id, titulo, desc]) => {
+      const c = CURSOS[id];
+      return `<a class="curso" href="${c.url}" target="_blank" rel="noopener">
+        <div class="portada" style="background:linear-gradient(140deg,${c.color[0]},${c.color[1]})">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[c.ico]}</svg>
+          <span class="dur">${c.mod}</span>
+          <span class="play" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg></span>
+        </div>
+        <div class="c-cuerpo">
+          <h3>${titulo}</h3>
+          <p>${desc}</p>
+          <span class="c-curso">Curso: <b>${c.nombre}</b></span>
+          <span class="c-ver">Ver curso
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </div>
+      </a>`;
+    }).join('');
+  }
+
+  function abrir(){
+    pintarModal();
+    velo.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    btnChannel.querySelector('.punto')?.remove(); // el indicador desaparece tras la primera apertura
+    document.getElementById('btnCerrar').focus();
+  }
+  function cerrar(){
+    velo.classList.remove('on');
+    document.body.style.overflow = '';
+    btnChannel.focus();
+  }
+
+  document.querySelectorAll('.nav-it').forEach(b => b.addEventListener('click', () => irA(b.dataset.sec)));
+  btnChannel.addEventListener('click', abrir);
+  document.getElementById('btnCerrar').addEventListener('click', cerrar);
+  velo.addEventListener('click', e => { if (e.target === velo) cerrar(); });
+  document.addEventListener('keydown', e => {
+    if (!velo.classList.contains('on')) return;
+    if (e.key === 'Escape') cerrar();
+    if (e.key === 'Tab') { // foco atrapado dentro del modal
+      const f = velo.querySelectorAll('button, a[href]');
+      const primero = f[0], ultimo = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+    }
+  });
+
+  irA('contratos');
+</script>
+</body>
+</html>
