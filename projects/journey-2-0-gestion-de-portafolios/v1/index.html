@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ciclo de Gestión Consciente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --green:#00C73D; --green-d:#03A835; --green-txt:#007C26; --green-l:#ECFDF3;
+    --blue:#0099DE; --blue-txt:#0077AE; --blue-l:#EBF4FF;
+    --amber:#FFAE08; --amber-txt:#8A5A00; --amber-l:#FFF3E0;
+    --red:#E03430; --red-txt:#C2281F; --red-l:#FFF5F4;
+    --ink:#2B2B29; --ink-2:#5A5853; --ink-3:#8A887F;
+    --paper:#F7F6F2; --surface:#FFFFFF; --line:#E7E4DC;
+    --mont:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --os:'Open Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --shadow: 0 1px 2px rgba(43,43,41,.06), 0 8px 24px -12px rgba(43,43,41,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --ink:#F1EFE9; --ink-2:#C7C4BA; --ink-3:#938F82;
+      --paper:#17160F; --surface:#211F17; --line:#332F23;
+      --green-l:#0E2417; --blue-l:#0E1E2B; --amber-l:#2A2010; --red-l:#2A1513;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --ink:#F1EFE9; --ink-2:#C7C4BA; --ink-3:#938F82;
+    --paper:#17160F; --surface:#211F17; --line:#332F23;
+    --green-l:#0E2417; --blue-l:#0E1E2B; --amber-l:#2A2010; --red-l:#2A1513;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.55);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--os);-webkit-font-smoothing:antialiased;padding-block:40px 64px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+  .eyebrow{font:700 11.5px var(--mont);letter-spacing:.12em;text-transform:uppercase;color:var(--green-txt)}
+  h1{font:800 clamp(26px,4vw,38px)/1.18 var(--mont);margin:10px 0 14px;text-wrap:balance;color:var(--ink)}
+  .lede{font-size:15.5px;line-height:1.65;color:var(--ink-2);max-width:68ch;margin:0 0 6px}
+  .lede b{color:var(--ink);font-weight:700}
+
+  .marco{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .marco span{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--os);color:var(--ink-2);
+    background:var(--surface);border:1px solid var(--line);border-radius:100px;padding:6px 12px}
+  .marco svg{width:13px;height:13px;flex:0 0 auto}
+
+  .leyenda{display:flex;flex-wrap:wrap;gap:18px;margin:26px 0 8px;padding:16px 18px;background:var(--surface);
+    border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  .leyenda-grupo{display:flex;flex-direction:column;gap:8px}
+  .leyenda-grupo b{font:700 10.5px var(--mont);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+  .leyenda-fila{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)}
+  .leyenda-fila svg{width:15px;height:15px;flex:0 0 auto;color:var(--ink-2)}
+  .leyenda-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+
+  /* ───────── Línea de tiempo ───────── */
+  .timeline{position:relative;margin-top:36px;padding-left:34px}
+  .timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--line)}
+
+  .momento{position:relative;margin-bottom:28px}
+  .momento:last-child{margin-bottom:0}
+  .punto{position:absolute;left:-34px;top:2px;width:20px;height:20px;border-radius:50%;background:var(--surface);
+    border:2.5px solid var(--ink-3);display:flex;align-items:center;justify-content:center}
+  .momento.trigger .punto{border-color:var(--amber)}
+  .momento.accion .punto{border-color:var(--green)}
+  .momento.loop .punto{border-color:var(--blue)}
+
+  .tarjeta{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .tarjeta-cab{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+  .tarjeta-cab .tit{display:flex;flex-direction:column;gap:3px}
+  .tarjeta-cab .fase{font:700 10.5px var(--mont);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+  .tarjeta-cab h2{font:700 17px var(--mont);margin:0;color:var(--ink)}
+  .disparador{display:inline-flex;align-items:center;gap:6px;font:700 11.5px var(--os);color:var(--amber-txt);
+    background:var(--amber-l);border:1px solid rgba(255,174,8,.35);border-radius:100px;padding:5px 11px;white-space:nowrap}
+  .disparador.riesgo{color:var(--red-txt);background:var(--red-l);border-color:rgba(224,52,48,.3)}
+  .disparador svg{width:13px;height:13px;flex:0 0 auto}
+  .emocion{font-style:italic;font-size:12px;color:var(--ink-3)}
+
+  .cols{display:grid;grid-template-columns:repeat(3,1fr)}
+  @media (max-width:760px){ .cols{grid-template-columns:1fr} }
+  .col{padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+  .col + .col{border-left:1px solid var(--line)}
+  @media (max-width:760px){ .col + .col{border-left:none;border-top:1px solid var(--line)} }
+  .col-h{display:flex;align-items:center;gap:7px;font:700 11px var(--mont);letter-spacing:.06em;text-transform:uppercase}
+  .col-h svg{width:15px;height:15px;flex:0 0 auto}
+  .col.cliente .col-h{color:var(--green-txt)}
+  .col.sistema .col-h{color:var(--ink-2)}
+  .col.asesor .col-h{color:var(--blue-txt)}
+  .col p{margin:0;font-size:13px;line-height:1.55;color:var(--ink-2)}
+  .col p b{color:var(--ink);font-weight:700}
+  .canal-fila{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2)}
+  .canal-fila svg{width:14px;height:14px;flex:0 0 auto;color:var(--ink-3)}
+  .vacio{color:var(--ink-3);font-size:12.5px;font-style:italic}
+
+  .mini-preview{margin-top:4px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .mini-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .mini-num{font:800 18px var(--mont);color:var(--ink);font-variant-numeric:tabular-nums}
+  .mini-trend{font:700 11px var(--os);color:var(--green-txt)}
+  .mini-chart{width:100%;height:34px;display:block;margin:4px 0}
+  .mini-mix{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .mini-donut{width:28px;height:28px;border-radius:50%;flex:0 0 auto;background:conic-gradient(var(--green) 0 60%, #8FE000 60% 100%)}
+  .mini-mix span{font-size:11px;color:var(--ink-3)}
+
+  .nota-reg{margin-top:4px;font-size:11.5px;color:var(--ink-3);line-height:1.5;border-top:1px dashed var(--line);padding-top:8px}
+
+  /* ───────── Bucle de cierre ───────── */
+  .bucle{position:relative;margin-top:8px;padding:18px 20px;background:var(--blue-l);border:1px solid rgba(0,153,222,.3);
+    border-radius:14px;display:flex;align-items:center;gap:14px}
+  .bucle svg{width:26px;height:26px;flex:0 0 auto;color:var(--blue-txt)}
+  .bucle p{margin:0;font-size:13px;color:var(--ink-2);line-height:1.5}
+  .bucle b{color:var(--blue-txt)}
+
+  footer{margin-top:40px;padding-top:22px;border-top:1px solid var(--line)}
+  footer p{font-size:12px;color:var(--ink-3);line-height:1.6;max-width:70ch;margin:0 0 8px}
+  footer b{color:var(--ink-2)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <span class="eyebrow">Journey map · Gestión de portafolios</span>
+  <h1>Ciclo de gestión consciente</h1>
+  <p class="lede">Para clientes <b>Financial Explorer</b> — personas que ya tienen un portafolio con Skandia pero no entienden bien sus finanzas ni lo revisan por iniciativa propia. El objetivo no es un rediseño de pantallas: es un <b>ciclo con dos protagonistas</b>, el cliente y su asesor, que convierte el silencio ("nunca he entrado a gestionar") en un hábito de revisión mensual, con avisos que llegan a tiempo y en lenguaje simple.</p>
+  <p class="lede">El asesor no es un canal más: es quien cierra el loop. Cuando el sistema detecta que un cliente nunca gestionó o que está perdiendo rentabilidad sin reaccionar, el asesor recibe la misma alerta que el cliente — por su propio portal, WhatsApp o correo — para poder hacer seguimiento humano antes de que el silencio se vuelva costumbre.</p>
+
+  <div class="marco">
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> 7 momentos, 1 ciclo recurrente</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg> Cliente</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Sistema y canales</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 00-16 0"/><circle cx="12" cy="8" r="4"/><path d="M15 3.5a4 4 0 010 7"/></svg> Asesor</span>
+  </div>
+
+  <div class="leyenda">
+    <div class="leyenda-grupo">
+      <b>Canales</b>
+      <div class="leyenda-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> Notificación push (app)</div>
+      <div class="leyenda-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.5 8.6 8.6 0 01-4-1L3 20l1.1-5a8.4 8.4 0 01-1-4 8.5 8.5 0 018.5-8.5 8.4 8.4 0 018.4 8.5z"/></svg> WhatsApp</div>
+      <div class="leyenda-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Correo</div>
+      <div class="leyenda-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Portal de asesores</div>
+    </div>
+    <div class="leyenda-grupo">
+      <b>Tipo de momento</b>
+      <div class="leyenda-fila"><span class="leyenda-dot" style="background:var(--ink-3)"></span> Estado / punto de partida</div>
+      <div class="leyenda-fila"><span class="leyenda-dot" style="background:var(--amber)"></span> Disparador automático</div>
+      <div class="leyenda-fila"><span class="leyenda-dot" style="background:var(--green)"></span> Acción del cliente</div>
+      <div class="leyenda-fila"><span class="leyenda-dot" style="background:var(--blue)"></span> Cierre de ciclo</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <!-- M0 -->
+    <div class="momento">
+      <div class="punto"></div>
+      <div class="tarjeta">
+        <div class="tarjeta-cab">
+          <div class="tit"><span class="fase">Momento 0 · Punto de partida</span><h2>El cliente tiene portafolio, pero nunca ha entrado a gestionar</h2></div>
+          <span class="emocion">Indiferencia — "esto no es para mí"</span>
+        </div>
+        <div class="cols">
+          <div class="col cliente">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg> Cliente</div>
+            <p>Ya tiene un producto vinculado (ej. Pensión Voluntaria) y nunca ha abierto "Gestionar portafolios". No sabe qué significa ni qué puede ganar o perder por no hacerlo.</p>
+          </div>
+          <div class="col sistema">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Sistema</div>
+            <p>Marca la fecha de vinculación como el día 0 del conteo <b>"nunca gestionado"</b>. Este conteo es lo que hoy no existe en ningún lado.</p>
+          </div>
+          <div class="col asesor">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 00-16 0"/><circle cx="12" cy="8" r="4"/><path d="M15 3.5a4 4 0 010 7"/></svg> Asesor</div>
+            <p class="vacio">Sin visibilidad todavía — este es exactamente el punto ciego que el journey cierra.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M1 -->
+    <div class="momento trigger">
+      <div class="punto"></div>
+      <div class="tarjeta">
+        <div class="tarjeta-cab">
+          <div class="tit"><span class="fase">Momento 1 · Día 30</span><h2>Primera vez sin gestionar</h2></div>
+          <span class="disparador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> Disparador: 30 días desde la vinculación sin abrir "Gestionar portafolios"</span>
+        </div>
+        <div class="cols">
+          <div class="col cliente">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg> Cliente recibe</div>
+            <p><b>"Aún no has revisado cómo están invertidos tus ahorros."</b> Mensaje corto, sin jerga, con un botón directo a Gestionar portafolios.</p>
+            <div class="canal-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> Push app</div>
+            <div class="canal-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.5 8.6 8.6 0 01-4-1L3 20l1.1-5a8.4 8.4 0 01-1-4 8.5 8.5 0 018.5-8.5 8.4 8.4 0 018.4 8.5z"/></svg> WhatsApp</div>
+            <div class="canal-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Correo</div>
+          </div>
+          <div class="col sistema">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Rama: "no sé cómo"</div>
+            <p>Si el cliente abre la notificación pero no continúa, la misma pantalla ofrece un <b>video corto</b>: "Cómo gestionar tu portafolio en 3 pasos". No reemplaza la acción, la destraba.</p>
+          </div>
+          <div class="col asesor">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 00-16 0"/><circle cx="12" cy="8" r="4"/><path d="M15 3.5a4 4 0 010 7"/></svg> Asesor recibe</div>
+            <p><b>"Tu cliente [Nombre] no ha gestionado su portafolio desde que se vinculó hace 30 días."</b> Con botón "Hacer seguimiento" o "Marcar contactado".</p>
+            <div class="canal-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Portal de asesores</div>
+            <div class="canal-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 01-8.9 8.5 8.6 8.6 0 01-4-1L3 20l1.1-5a8.4 8.4 0 01-1-4 8.5 8.5 0 018.5-8.5 8.4 8.4 0 018.4 8.5z"/></svg> WhatsApp (opcional)</div>
+            <div class="canal-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Correo (opcional)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M2 -->
+    <div class="momento accion">
+      <div class="punto"></div>
+      <div class="tarjeta">
+        <div class="tarjeta-cab">
+          <div class="tit"><span class="fase">Momento 2 · Primera gestión</span><h2>El cliente gestiona por primera vez</h2></div>
+          <span class="emocion">Alivio — "no era tan difícil"</span>
+        </div>
+        <div class="cols">
+          <div class="col cliente">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg> Cliente</div>
+            <p>Entra a Gestionar portafolios: elige "que Skandia decida por ti" o ajustar él mismo, en lenguaje simple y sin perfil técnico de por medio.</p>
+            <div class="mini-preview">
+              <div class="mini-top"><span class="mini-num">+6,4%</span><span class="mini-trend">▲ último año</span></div>
+              <svg class="mini-chart" viewBox="0 0 200 34" preserveAspectRatio="none"><polyline points="0,26 25,24 50,27 75,20 100,22 125,16 150,18 175,10 200,8" fill="none" stroke="#00C73D" stroke-width="2"/></svg>
+              <div class="mini-mix"><span class="mini-donut"></span><span>60% Renta Fija · 40% Acciones</span></div>
+            </div>
+          </div>
+          <div class="col sistema">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Sistema</div>
+            <p>Cierra el conteo <b>"nunca gestionado"</b> de Momento 1. La próxima medida es "cuándo fue su última gestión", no "si alguna vez gestionó".</p>
+          </div>
+          <div class="col asesor">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 00-16 0"/><circle cx="12" cy="8" r="4"/><path d="M15 3.5a4 4 0 010 7"/></svg> Asesor</div>
+            <p>Su tarea de seguimiento se cierra sola: <b>"[Nombre] ya gestionó su portafolio."</b> Ya no necesita llamar por este motivo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3 -->
+    <div class="momento">
+      <div class="punto"></div>
+      <div class="tarjeta">
+        <div class="tarjeta-cab">
+          <div class="tit"><span class="fase">Momento 3 · Cada mes, para todos</span><h2>"Así te fue este mes"</h2></div>
+          <span class="emocion">Curiosidad — pequeño hábito, no una alarma</span>
+        </div>
+        <div class="cols">
+          <div class="col cliente">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg> Cliente recibe</div>
+            <p><b>"Ganaste $340.000 este mes (+1,1%). Estás invertido en Renta Fija y Acciones Colombia."</b> Mismo resumen simple sin importar si sube o baja — construye consciencia, no solo reacción.</p>
+            <div class="canal-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> Push app (canal preferido)</div>
+          </div>
+          <div class="col sistema">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Sistema</div>
+            <p>Recurrente, el mismo día de cada mes. Es la base que detecta el Momento 4 si la cifra es negativa de forma sostenida.</p>
+          </div>
+          <div class="col asesor">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 00-16 0"/><circle cx="12" cy="8" r="4"/><path d="M15 3.5a4 4 0 010 7"/></svg> Asesor</div>
+            <p class="vacio">Sin alerta individual — ve el agregado en su dashboard de cartera (Momento 6).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M4 -->
+    <div class="momento trigger">
+      <div class="punto"></div>
+      <div class="tarjeta">
+        <div class="tarjeta-cab">
+          <div class="tit"><span class="fase">Momento 4 · Alerta de rendimiento</span><h2>El cliente está perdiendo rentabilidad y no reacciona</h2></div>
+          <span class="disparador riesgo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.5 17a2 2 0 001.7 3h15.6a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg> Disparador: rentabilidad negativa sostenida sin ajustes en el portafolio</span>
+        </div>
+        <div class="cols">
+          <div class="col cliente">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg> Cliente recibe</div>
+            <p><b>"Tu portafolio ha perdido valor en los últimos meses y no lo has revisado."</b> Acompañado de un video: <b>por qué diversificar y revisar seguido</b>, y por qué los mercados cambian — no es un error tuyo, es parte de invertir.</p>
+          </div>
+          <div class="col sistema">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Contenido</div>
+            <p>Video educativo corto (no una recomendación profesional): marcado como contenido informativo, con el disclaimer estándar de Skandia.</p>
+          </div>
+          <div class="col asesor">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 00-16 0"/><circle cx="12" cy="8" r="4"/><path d="M15 3.5a4 4 0 010 7"/></svg> Asesor recibe</div>
+            <p>La misma alerta, en paralelo: <b>"[Nombre] está perdiendo rentabilidad y no ha ajustado su portafolio en 3 meses."</b> Mismo patrón de seguimiento que Momento 1.</p>
+            <div class="canal-fila"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Portal · WhatsApp · Correo</div>
+          </div>
+        </div>
+        <div class="nota-reg" style="padding:0 20px 16px">Nota regulatoria: el video y la notificación son contenido informativo, no asesoría. Si el asesor, en su llamada, llega a dar una recomendación profesional, esa conversación debe quedar registrada como tal — mismo protocolo que ya existe para el deber de asesoría (Decreto 1239 de 2024 · Circular Externa 014 de 2025 SFC).</div>
+      </div>
+    </div>
+
+    <!-- M5 -->
+    <div class="momento accion">
+      <div class="punto"></div>
+      <div class="tarjeta">
+        <div class="tarjeta-cab">
+          <div class="tit"><span class="fase">Momento 5 · Gestiona de nuevo</span><h2>El cliente ajusta su portafolio</h2></div>
+          <span class="emocion">Control — "ahora sé en qué estoy y por qué"</span>
+        </div>
+        <div class="cols">
+          <div class="col cliente">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg> Cliente</div>
+            <p>Ve, en el mismo lenguaje simple: cuánto rentó cada portafolio, en qué está invertido y su mezcla general — con detalle opcional ("ver cartera modelo completa") para quien ya sabe más. Mismo patrón validado en el prototipo p4.</p>
+          </div>
+          <div class="col sistema">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Sistema</div>
+            <p>Confirma el cambio con la misma línea de tiempo de estado ("enviada → en validación → aplicada") que ya usa Gestionar portafolios.</p>
+          </div>
+          <div class="col asesor">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 00-16 0"/><circle cx="12" cy="8" r="4"/><path d="M15 3.5a4 4 0 010 7"/></svg> Asesor</div>
+            <p>Su alerta de Momento 4 se cierra sola, igual que en Momento 2: <b>"[Nombre] ya ajustó su portafolio."</b></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M6 -->
+    <div class="momento loop">
+      <div class="punto"></div>
+      <div class="tarjeta">
+        <div class="tarjeta-cab">
+          <div class="tit"><span class="fase">Momento 6 · Vista del asesor</span><h2>Un solo lugar para priorizar a quién llamar</h2></div>
+        </div>
+        <div class="cols">
+          <div class="col cliente">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg> Cliente</div>
+            <p class="vacio">Sigue recibiendo su resumen mensual (Momento 3) — el ciclo continúa sin que tenga que hacer nada distinto.</p>
+          </div>
+          <div class="col sistema">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Sistema</div>
+            <p>Agrega todas las banderas (nunca gestionó, perdiendo rentabilidad, al día) en un solo tablero.</p>
+          </div>
+          <div class="col asesor">
+            <div class="col-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 00-16 0"/><circle cx="12" cy="8" r="4"/><path d="M15 3.5a4 4 0 010 7"/></svg> Asesor</div>
+            <p>Ve su cartera completa de clientes con estado (al día / nunca gestionó / perdiendo rentabilidad) para decidir a quién llamar primero, sin esperar una alerta puntual.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bucle">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 10-3.5 7.1"/><path d="M21 5v6h-6"/></svg>
+    <p>El ciclo no termina en Momento 6: <b>vuelve a Momento 3</b> cada mes. El objetivo no es resolver una alerta una sola vez, sino sostener el hábito de revisar — para el cliente y para el asesor.</p>
+  </div>
+
+  <footer>
+    <p><b>Segmento:</b> Financial Explorer (57% de la base Skandia) — personas que ya tienen un producto pero no se relacionan con él desde un plan, solo "desde el producto". Su driver de recomendación es la guía y el acompañamiento que reduce incertidumbre, no el resultado financiero en sí.</p>
+    <p><b>De dónde vienen los patrones de "gestionar":</b> rentabilidad en lenguaje simple con detalle expandible, mezcla de activos con cartera modelo opcional, y línea de tiempo de confirmación — ya validados en el prototipo interactivo <b>p4</b> de Gestión de Portafolios 2.0, inspirados en los patrones de Fidelity (app mejor calificada para inversionistas principiantes, NerdWallet 2026).</p>
+    <p><b>Pendiente de validar con negocio/legal:</b> la ventana exacta de "rentabilidad negativa sostenida" que dispara el Momento 4, el canal preferido por defecto para cada notificación, y el copy final del video educativo — debe pasar por el mismo checklist de disclaimers del deber de asesoría antes de producción.</p>
+  </footer>
+
+</div>
+</body>
+</html>
