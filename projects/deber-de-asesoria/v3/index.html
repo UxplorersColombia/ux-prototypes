@@ -435,6 +435,12 @@
 
         <!-- ═══ WF-07a · TARJETAS ═══ -->
         <section hidden="{{ h.wf07a }}" class="skpop">
+          <div style="background:#f7f7f7;border-radius:14px;padding:18px;margin-bottom:16px">
+            <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:4px">¡Ya casi terminamos!</div>
+            <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">Cuéntanos cómo te identificas para definir tu perfil de inversionista.</p>
+            <div style="font-size:12px;font-weight:700;color:#232323;margin-bottom:6px">90%</div>
+            <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:90%;background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div><sk-icon name="check-circle-2" size="18" style="color:#00c73d;flex:none"></sk-icon></div>
+          </div>
           
           <h1 style="font-family:Montserrat,sans-serif;font-weight:700;font-size:{{ perfilH1Size }};line-height:1.2;color:#232323;margin:0 0 14px">¿Con qué descripción te identificas más?</h1>
           <div style="display:flex;flex-direction:{{ perfilHeadDir }};align-items:{{ perfilHeadAlign }};justify-content:space-between;gap:18px;margin:0 0 20px">
@@ -797,8 +803,8 @@
             <div style="background:#f7f7f7;border-radius:14px;padding:18px;margin-bottom:16px">
               <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:16px;color:#232323;margin-bottom:4px">¡Último paso!</div>
               <p style="font-size:13px;color:#666;line-height:1.4;margin:0 0 12px">Ya tienes creado tu contrato, solo nos queda realizar tu primer aporte.</p>
-              <div style="font-size:12px;font-weight:700;color:#232323;margin-bottom:6px">85%</div>
-              <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:85%;background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div><sk-icon name="check-circle-2" size="18" style="color:#00c73d;flex:none"></sk-icon></div>
+              <div style="font-size:12px;font-weight:700;color:#232323;margin-bottom:6px">95%</div>
+              <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:#e3e7ea;border-radius:100px;overflow:hidden"><div style="height:100%;width:95%;background:linear-gradient(90deg,#00c73d,#8fe000);border-radius:100px"></div></div><sk-icon name="check-circle-2" size="18" style="color:#00c73d;flex:none"></sk-icon></div>
             </div>
             <div style="background:#fff;border:1px solid #e3e7ea;border-radius:16px;padding:16px">
               <div style="font-family:Montserrat,sans-serif;font-weight:700;font-size:15px;color:#232323">Realiza tu primer aporte</div>
@@ -1173,7 +1179,7 @@ class Component extends DCLogic {
       viewMode:'mobile',
       landingH:'1700px',
       screen:'wf00', prev:[], ruta:null, meta:null, cart:[], veh:'FVP', cierreVeh:null, variante:null, upgraded:false,
-      perfil:null, perfilNivel:0, perfilVariante:null, desviado:false,
+      perfil:null, perfilNivel:0, perfilVariante:null, desviado:false, vincDone:false,
       simProducto:'cat12', simPlazo:24, simResult:null, simTitle:'Simula tu dinero',
       medio:null, ficPend:[], ficName:'',
       trz:[], trzOpen:false, modals:{}, toast:'',
@@ -1240,7 +1246,7 @@ class Component extends DCLogic {
         nombre: lead.nombre || '', correo: lead.correo || '',
         cedula: lead.doc || '', cel: (lead.cel||'').replace(/^\+\d+\s*/,''),
         pais: ((lead.cel||'').match(/^\+\d+/)||['+57'])[0], ok:true })
-    }, ()=>{ this.go('wf07a'); if(this.enterCart) this.enterCart(); });
+    }, ()=>{ this.go('wf10'); if(this.enterCart) this.enterCart(); });
   };
   componentDidUpdate(){
     if(this._lastScreen!==this.state.screen){ this._lastScreen=this.state.screen; if(this.mainRef.current) this.mainRef.current.scrollTop=0; }
@@ -1320,7 +1326,7 @@ class Component extends DCLogic {
   iniciarOtroProceso = ()=>{
     const otro = this.state.cierreVeh==='FVP' ? 'FIC' : 'FVP';
     this.trz('da_segundo_proceso_iniciado',{vehiculo:otro});
-    this.setState({veh:otro, cart:[], prev:[], perfil:null, perfilNivel:0, variante:null, upgraded:false, screen:'wf04'},()=>this.showToast(otro==='FIC'?'Empecemos tu proceso de Inversión Colectiva':'Empecemos tu proceso de Fondo Voluntario'));
+    this.setState({veh:otro, cart:[], prev:[], perfil:null, perfilNivel:0, variante:null, upgraded:false, vincDone:false, screen:'wf04'},()=>this.showToast(otro==='FIC'?'Empecemos tu proceso de Inversión Colectiva':'Empecemos tu proceso de Fondo Voluntario'));
   };
 
   addToCart = (id, montoSim)=>{
@@ -1434,6 +1440,10 @@ class Component extends DCLogic {
   leadOk = ()=>{ const l=this.leadData(); return l.nombre.trim().length>1 && /\S+@\S+\.\S+/.test(l.correo) && l.cedula.trim().length>4 && l.cel.trim().length>6 && l.ok; };
   startPerfilamiento = ()=>{
     if(!this.leadOk()) return;
+    if(!this.state.vincDone){ this.go('wf10'); return; }
+    this.beginPerfil();
+  };
+  beginPerfil = ()=>{
     if(this.state.variante==='preguntas'){ if(this.state.upgraded){ this.go('wf07trans'); } else { this.setState({qIdx:0,qAns:[0,0,0,0]}); this.go('wf07b'); } }
     else this.go('wf07a');
   };
@@ -1459,7 +1469,7 @@ class Component extends DCLogic {
     if(this.maxRiesgo()>this.state.perfilNivel){
       this.trz('da_desviacion_shown',{perfil:this.state.perfil,composicion:this.state.cart.map(c=>c.id),nivel_exceso:this.maxRiesgo()-this.state.perfilNivel});
       this.setState(s=>({desvMsg:'La mezcla que armaste tiene más riesgo del que refleja tu perfil ('+s.perfil+').', modals:{...s.modals,m09:true}}));
-    } else this.go('wf10');
+    } else if(this.state.vincDone) this.vConfirm(); else this.go('wf10');
   };
   openM09 = ()=> this.setState(s=>({desvMsg:s.desvMsg||'La mezcla que armaste tiene más riesgo del que refleja tu perfil.', modals:{...s.modals,m09:true}}));
   desvAjustar = ()=>{ this.trz('da_desviacion_decision',{decision:'ajustar'}); this.closeModal('m09'); this.go('wf06'); };
@@ -1530,7 +1540,7 @@ class Component extends DCLogic {
   backdropMasesor = (e)=>{ if(e.target===e.currentTarget) this.closeMasesor(); };
 
   selectDoc = ()=>{ this.setState({docSelected:true}); this.trz('da_vinculacion_documento_adjuntado',{tipo:this.state.docType}); };
-  finalizarTraslado = ()=>{ this.trz('da_vinculacion_documentacion_completada'); this.vConfirm(); };
+  finalizarTraslado = ()=>{ this.trz('da_vinculacion_documentacion_completada'); this.setState({vincDone:true}, ()=>{ if(this.state.perfilNivel) this.vConfirm(); else this.beginPerfil(); }); };
   vConfirm = ()=>{
     const fvps=this.state.cart.filter(c=>this.CAT[c.id].v==='FVP');
     if(fvps.length) this.trz('da_vinculacion_completed',{vehiculo:'FVP',contratos:fvps.map(c=>c.id)});
@@ -2027,7 +2037,7 @@ class Component extends DCLogic {
       openProgramar:this.openProgramar, closeProgramar:this.closeProgramar, backdropProgramar:this.backdropProgramar,
       hidePagoError:this.hidePagoError, confirmAporte:this.confirmAporte, descargarResumen:this.descargarResumen,
       resetAll:this.resetAll,
-      goWf10:()=>this.go('wf10'),
+      goWf10:()=>(this.state.vincDone?this.vConfirm():this.go('wf10')),
       goWf00:()=>this.go('wf00'),
       caminoRecomendacion:this.caminoRecomendacion, caminoSolo:this.caminoSolo,
       recoAceptar:this.recoDecision('aceptada'), recoRechazar:this.recoDecision('rechazada'),
