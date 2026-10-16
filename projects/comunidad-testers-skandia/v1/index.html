@@ -5,44 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Comunidad de testers Skandia</title>
 
+  <!-- 1. Fuentes + tipografía de tags nativos -->
   <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-fonts.css">
   <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-typography.css">
+  <!-- 2. Íconos (peer obligatorio, el bundle no los trae) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7/primeicons.css">
+  <!-- 3. Componentes sk-* (30 custom elements + tema Skandia) -->
   <script src="https://skcostgblobresources.blob.core.windows.net/skco-lib-components/sk-components-elements.js"></script>
 
   <style>
-    /* ── Tokens estáticos que el bundle NO define (espejo de sk-tokens.scss). NO BORRAR. ── */
+    /* ══ 1. TOKENS QUE EL BUNDLE NO DEFINE. NO BORRAR. ══
+       Los 24 colores --sk-color-* los aplica el bundle al arrancar. Aquí va el resto de Foundations
+       (sk-tokens v1.6/2.0: espaciado, grid, sombras, tipografía, gradiente) y, abajo, los tokens del
+       catálogo de UX que NO tienen --sk-* (se escriben con su nombre de UX). */
     :root {
+      /* Espaciado (1:1 con --size-* de UX) */
       --sk-space-zero: 0; --sk-space-xxs: 4px; --sk-space-xs: 8px; --sk-space-s: 12px; --sk-space-m: 16px;
       --sk-space-l: 24px; --sk-space-xl: 32px; --sk-space-2xl: 40px; --sk-space-3xl: 48px;
       --sk-space-4xl: 56px; --sk-space-5xl: 64px;
-      --sk-radius-sm: 4px; --sk-radius-md: 8px; --sk-radius-lg: 12px; --sk-radius-pill: 9999px;
-      --sk-shadow-subtle: 0 0 2px rgba(68, 68, 68, 0.15);
-      --sk-shadow-surface: 0 0 2px 0 rgba(61, 75, 92, 0.15);
-      --sk-shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.12);
-      --sk-shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.16);
+      /* Grid de página (1:1 con --grid-* de UX). Fronteras: móvil < 768 · tablet 768–1023.98 · desktop ≥ 1024 */
+      --sk-grid-mobile-columns: 4;  --sk-grid-mobile-gutter: 16px;  --sk-grid-mobile-margin: 16px;
+      --sk-grid-tablet-columns: 8;  --sk-grid-tablet-gutter: 24px;  --sk-grid-tablet-margin: 32px;
+      --sk-grid-desktop-columns: 12; --sk-grid-desktop-gutter: 24px; --sk-grid-desktop-margin: 90px;
+      /* Sombras: una por rol, sin one-offs */
+      --sk-shadow-subtle: 0 0 2px rgba(68, 68, 68, 0.15);       /* inputs */
+      --sk-shadow-surface: 0 0 2px 0 rgba(61, 75, 92, 0.15);    /* tarjetas, acordeón, superficies propias */
+      --sk-shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.12);       /* elevación media (toast) */
+      --sk-shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.16);      /* modales, popovers, paneles flotantes */
+      /* Tipografía */
       --sk-font-title: 'Montserrat', sans-serif;
       --sk-font-body: 'Open Sans', system-ui, sans-serif;
       --sk-font-weight-regular: 400; --sk-font-weight-medium: 500; --sk-font-weight-bold: 700;
+      /* Marca */
       --sk-gradient-brand: linear-gradient(135deg, #00c73d 0%, #8fe000 100%);
-      --sk-control-height: 48px; --sk-control-height-sm: 40px;
+
+      /* Catálogo UX sin token en la librería (nombre de UX; si pasa a producción, pedir el token) */
+      /* Radios de UX. La librería no publica radios: cada componente trae el suyo. */
+      --bordes-s: 4px; --bordes-m: 16px; --bordes-l: 32px; --bordes-xl: 104px;
+      /* Fondos suaves de feedback (los mismos que usa sk-alert) */
+      --background-warning-light: #fff3e0; --background-info-light: #ebf4ff; --background-error-light: #fff5f4;
+      /* Neutros y secundaria */
+      --background-secundaria: #f7f7f7; --background-grey-medium: #b7b7b7; --background-black: #232323;
+      --stroke-grey-medium: #c5c5c5;
+      --texts-secundaria: #29806d; --texts-complementary: #4ae6c3;
+      --button-secundaria-default: #29806d; --button-secundaria-hover: #1d594c;
+      --button-secundaria-secondary-hover: #ccfdf2; --button-secundaria-tertiary-hover: #edfefa;
+      /* Ilustración */
+      --illustration-01: #00f0e0; --illustration-02: #45e39e; --illustration-03: #45ad00; --illustration-04: #ffae08;
+      /* Gráficas: usar en orden c01, c02, c03… */
+      --charts-c01: #a1dd70; --charts-c02: #a4d7e1; --charts-c03: #60a9a6; --charts-c04: #ff9460; --charts-c05: #8ba2c1;
+      --charts-c06: #f67e7d; --charts-c07: #dddfd0; --charts-c08: #6a7491; --charts-c09: #de423e; --charts-c10: #95dbb7;
+      --charts-c11: #ffbf9f; --charts-c12: #bc6995; --charts-c13: #d9d052; --charts-c14: #d6c09c; --charts-c15: #fecd72;
+      --charts-c16: #cba1d2; --charts-c17: #c5d8a4; --charts-c18: #368cb5; --charts-c19: #00f59f; --charts-c20: #f50cc9;
+      --charts-c21: #83a488; --charts-c22: #fcf9c6; --charts-c23: #b2f9fc; --charts-c24: #bf9078; --charts-c25: #9eb23b;
+      --charts-c26: #73777b; --charts-c27: #ffe2e2; --charts-c28: #36d6e0; --charts-c29: #aba09d; --charts-c30: #b5d1ff;
+      --charts-c31: #ecffb5; --charts-c32: #6f32c6; --charts-c33: #1f6feb; --charts-c34: #2e8b57; --charts-c35: #f4b400;
+      --charts-c36: #ff5a5f; --charts-c37: #7b3fa1; --charts-c38: #1abc9c; --charts-c39: #f28c28; --charts-c40: #4f6d8a;
     }
 
-    /* ── Colores de gráficas (guía sk-components · foundations). Se asignan en orden fijo, sin ciclar. ── */
-    :root {
-      --charts-c01: #a1dd70; --charts-c02: #a4d7e1; --charts-c03: #60a9a6; --charts-c04: #ff9460;
-      --charts-c05: #8ba2c1; --charts-c06: #f67e7d; --charts-c07: #dddfd0; --charts-c08: #6a7491;
-      --charts-c09: #de423e; --charts-c10: #95dbb7; --charts-c11: #ffbf9f; --charts-c12: #bc6995;
-      --charts-c13: #d9d052; --charts-c14: #d6c09c; --charts-c15: #fecd72; --charts-c16: #cba1d2;
-      --charts-c17: #c5d8a4; --charts-c18: #368cb5; --charts-c19: #00f59f; --charts-c20: #f50cc9;
-      --charts-c21: #83a488; --charts-c22: #fcf9c6; --charts-c23: #b2f9fc; --charts-c24: #bf9078;
-      --charts-c25: #9eb23b; --charts-c26: #73777b; --charts-c27: #ffe2e2; --charts-c28: #36d6e0;
-      --charts-c29: #aba09d; --charts-c30: #b5d1ff; --charts-c31: #ecffb5; --charts-c32: #6f32c6;
-      --charts-c33: #1f6feb; --charts-c34: #2e8b57; --charts-c35: #f4b400; --charts-c36: #ff5a5f;
-      --charts-c37: #7b3fa1; --charts-c38: #1abc9c; --charts-c39: #f28c28; --charts-c40: #4f6d8a;
-    }
-
-    /* ── Ancho completo. NO BORRAR. ── */
+    /* ══ 2. ANCHO COMPLETO. NO BORRAR. ══
+       Los componentes que ocupan espacio horizontal llenan SIEMPRE su contenedor (el bundle los limita a
+       300–480 px o los deja "inline"). El ancho real lo decide el layout, nunca el componente.
+       Excepción puntual: atributo data-ancho="auto" (no uses class: el componente la reescribe). */
     :root :is(sk-input-text, sk-input-number, sk-input-select, sk-textarea, sk-date-picker, sk-date-range-picker,
               sk-file-upload, sk-listbox, sk-form-field, sk-select-button, sk-button, sk-paginator, sk-stepper,
               sk-table, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) {
@@ -59,125 +83,159 @@
     :root sk-select-button:not([data-ancho="auto"]) .p-togglebutton { flex: 1 1 0; min-width: 0; justify-content: center; }
     :root sk-form-field :is(input, select, textarea) { width: 100%; box-sizing: border-box; }
 
-    /* ══ Capa editorial minimalista (solo tokens --sk-*) ══ */
-    body { background: var(--sk-color-bg); color: var(--sk-color-text); }
-    .page { max-width: 960px; margin: 0 auto; padding: var(--sk-space-2xl) var(--sk-space-m) calc(var(--sk-space-5xl) * 2);
-      display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sk-space-5xl); }
-    @media (min-width: 768px) { .page { padding-top: var(--sk-space-4xl); } }
-    .topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sk-space-m); }
+    /* ══ 3. LAYOUT DE PÁGINA (grid de UX) ══ */
+    body { background: var(--sk-color-bg, #fff); }
+    .page { box-sizing: border-box; padding-inline: var(--sk-grid-mobile-margin); padding-block: var(--sk-space-l) var(--sk-space-5xl);
+            display: grid; gap: var(--sk-space-l); }
+    /* Grid de 4/8/12 columnas con el gutter de UX. Hijos: data-col="3|4|6|8|12" (columnas en desktop); en tablet y móvil se reacomodan.
+       Atributo y no clase: los sk-* reescriben su class. */
+    .sk-grid { display: grid; grid-template-columns: repeat(var(--sk-grid-mobile-columns), minmax(0, 1fr)); gap: var(--sk-space-m) var(--sk-grid-mobile-gutter); }
+    .sk-grid > * { grid-column: 1 / -1; min-width: 0; }
+    @media (min-width: 768px) {
+      .page { padding-inline: var(--sk-grid-tablet-margin); }
+      .sk-grid { grid-template-columns: repeat(var(--sk-grid-tablet-columns), minmax(0, 1fr)); column-gap: var(--sk-grid-tablet-gutter); }
+      .sk-grid > :is([data-col="3"], [data-col="4"], [data-col="6"]) { grid-column: span 4; }
+    }
+    @media (min-width: 1024px) {
+      .page { padding-inline: var(--sk-grid-desktop-margin); }
+      .sk-grid { grid-template-columns: repeat(var(--sk-grid-desktop-columns), minmax(0, 1fr)); column-gap: var(--sk-grid-desktop-gutter); }
+      .sk-grid > [data-col="3"] { grid-column: span 3; } .sk-grid > [data-col="4"] { grid-column: span 4; }
+      .sk-grid > [data-col="6"] { grid-column: span 6; } .sk-grid > [data-col="8"] { grid-column: span 8; }
+    }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--sk-space-m); }
+
+    /* ══ 4. REEMPLAZOS DE COMPONENTES QUE EL BUNDLE NO REGISTRA (acordeón y tooltip, de la plantilla) ══ */
+    .sk-acc-r { display: flex; flex-direction: column; gap: 8px; }
+    .sk-acc-r summary { display: flex; align-items: center; gap: 8px; padding: 16px 24px; border-radius: 4px; list-style: none; cursor: pointer;
+      background: var(--sk-color-surface); box-shadow: var(--sk-shadow-surface); color: var(--sk-color-text); font: 700 14px/22px var(--sk-font-body); }
+    .sk-acc-r summary::-webkit-details-marker { display: none; }
+    .sk-acc-r summary::after { content: '\e902'; font-family: 'primeicons'; font-size: 16px; margin-left: auto; transition: transform var(--sk-motion-duration-base, .24s) var(--sk-motion-ease-standard, ease); }
+    .sk-acc-r details[open] > summary { border-radius: 4px 4px 0 0; background: var(--sk-color-primary); color: var(--sk-color-text-inverse); box-shadow: 0 0 4px rgba(0, 0, 0, .15); }
+    .sk-acc-r details[open] > summary::after { transform: rotate(180deg); }
+    .sk-acc-r summary:focus-visible { outline: 2px solid var(--sk-color-primary); outline-offset: 2px; }
+    .sk-acc-r details > :not(summary) { margin: 0; padding: 24px; border: 1px solid var(--sk-color-border); border-top: 0; border-radius: 0 0 4px 4px;
+      background: var(--sk-color-surface); color: var(--sk-color-text); font-size: 14px; }
+    .sk-tip { position: absolute; z-index: 1100; max-width: 260px; padding: 8px 12px; border-radius: 8px; pointer-events: none;
+      background: var(--sk-color-text); color: var(--sk-color-text-inverse); box-shadow: 0 2px 8px rgba(0, 0, 0, .16);
+      font: 400 13px/1.4 var(--sk-font-body); }
+    .sk-tip::after { content: ''; position: absolute; left: var(--x, 50%); transform: translateX(-50%); border: 6px solid transparent; }
+    .sk-tip[data-pos="top"]::after { top: 100%; border-top-color: var(--sk-color-text); }
+    .sk-tip[data-pos="bottom"]::after { bottom: 100%; border-bottom-color: var(--sk-color-text); }
+    @media (prefers-reduced-motion: reduce) { .sk-acc-r summary::after { transition: none; } }
+
+    /* ══ 5. CAPA EDITORIAL DEL INFORME (solo tokens; tipografía por tags nativos: aquí solo cambia el peso) ══ */
+    .page { max-width: 1280px; margin-inline: auto; grid-template-columns: minmax(0, 1fr); gap: 0; padding-block: var(--sk-space-2xl) calc(var(--sk-space-5xl) * 2); }
+    .topbar { flex-wrap: wrap; padding-bottom: var(--sk-space-4xl); }
     [hidden] { display: none !important; }
-    .muted { color: var(--sk-color-text-muted); }
+    h1, h2, h3, p { margin-block: 0; }
 
-    .eyebrow { margin: 0; font-family: var(--sk-font-body); font-size: .75rem; font-weight: var(--sk-font-weight-bold);
-      letter-spacing: .08em; text-transform: uppercase; color: var(--sk-color-text-muted); }
-    .hero { display: grid; gap: var(--sk-space-m); }
-    .hero h1 { margin: 0; font-size: clamp(2rem, 5.2vw, 3.25rem); line-height: 1.1; letter-spacing: -0.03em; max-width: 18ch; }
-    .hero .lead { margin: 0; font-size: 1.125rem; line-height: 1.6; color: var(--sk-color-text-muted); }
+    .eyebrow { display: block; font-weight: var(--sk-font-weight-bold); letter-spacing: .08em; text-transform: uppercase; color: var(--sk-color-text-muted); }
+    .eyebrow .n { color: var(--sk-color-primary-active); margin-right: var(--sk-space-xs); }
+    .hero { display: grid; gap: var(--sk-space-m); padding-bottom: var(--sk-space-xl); }
+    /* EXCEPCIÓN acordada: el título principal conserva su tamaño de display (la escala nativa de h1 es 32/40) */
+    .hero h1 { font-size: clamp(2rem, 4.6vw, 3rem); line-height: 1.08; letter-spacing: -0.035em; }
+    .hero .lead, .sec-head p, .muted { color: var(--sk-color-text-muted); }
 
-    section.block { display: grid; gap: var(--sk-space-l); border-top: 1px solid var(--sk-color-border); padding-top: var(--sk-space-l); }
-    .sec-head { display: grid; gap: var(--sk-space-s); }
-    .sec-head h2 { margin: 0; font-size: clamp(1.5rem, 3.2vw, 2rem); line-height: 1.2; letter-spacing: -0.02em; }
-    .sec-head p { margin: 0; line-height: 1.6; color: var(--sk-color-text-muted); }
-    .sec-head p.eyebrow { line-height: 1.2; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sk-space-m); }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sk-space-m); }
-    .grid-2 > sk-card, .grid-3 > sk-card { height: 100%; }
-    @media (max-width: 1023.98px) { .grid-3 { grid-template-columns: 1fr; } }
-    @media (max-width: 767.98px) { .grid-2 { grid-template-columns: 1fr; } }
-
-    /* franja de cifras: líneas de 1px, sin cajas ni sombras */
-    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--sk-color-border);
-      border: 1px solid var(--sk-color-border); border-radius: var(--sk-radius-lg); overflow: hidden; }
-    .kpi { background: var(--sk-color-bg); padding: var(--sk-space-l); display: grid; gap: var(--sk-space-xs); align-content: start; }
-    .kpi b { font-family: var(--sk-font-title); font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1; letter-spacing: -0.03em;
-      font-weight: var(--sk-font-weight-medium); color: var(--sk-color-text); font-variant-numeric: tabular-nums; }
-    .kpi span { font-size: .875rem; line-height: 1.5; color: var(--sk-color-text-muted); }
-    @media (max-width: 1023.98px) { .kpis { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 479.98px) { .kpi { padding: var(--sk-space-m); } }
-
-    /* ── Gráficos: paleta semántica del bundle (var(--sk-color-*)) ── */
-    .viz {
-      --c-1: var(--charts-c01);   /* serie 1 */
-      --c-2: var(--charts-c02);   /* serie 2 */
-      --c-3: var(--charts-c03);   /* serie 3 */
-      --c-4: var(--charts-c04);   /* serie 4 */
-      --c-none: var(--charts-c07);      /* sin dato */
-      --c-none-bar: var(--charts-c29);  /* barra atenuada */
-      display: grid; gap: var(--sk-space-m); padding-top: var(--sk-space-xs);
+    .intro { display: grid; gap: var(--sk-space-l); padding-bottom: var(--sk-space-5xl); }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--sk-color-border); border-bottom: 1px solid var(--sk-color-border); }
+    .kpi { padding: var(--sk-space-l) var(--sk-space-l) var(--sk-space-l) 0; display: grid; gap: var(--sk-space-xs); align-content: start; }
+    .kpi + .kpi { border-left: 1px solid var(--sk-color-border); padding-left: var(--sk-space-l); }
+    .kpi h1 { font-weight: var(--sk-font-weight-medium); white-space: nowrap; }
+    .kpi h1 small { font-weight: var(--sk-font-weight-regular); color: var(--sk-color-text-muted); }
+    .kpi small { color: var(--sk-color-text-muted); }
+    @media (max-width: 1023.98px) {
+      .kpis { grid-template-columns: 1fr 1fr; }
+      .kpi:nth-child(odd) { border-left: 0; padding-left: 0; }
+      .kpi:nth-child(even) { padding-left: var(--sk-space-l); }
+      .kpi:nth-child(n+3) { border-top: 1px solid var(--sk-color-border); }
     }
-    .legend { display: flex; flex-wrap: wrap; gap: var(--sk-space-xs) var(--sk-space-m); font-size: .8125rem; color: var(--sk-color-text-muted); }
-    .legend i { display: inline-block; box-sizing: border-box; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; border: 1px solid rgba(64, 64, 64, .15); vertical-align: -1px; }
-    .note { margin: 0; font-size: .8125rem; line-height: 1.55; color: var(--sk-color-text-muted); max-width: 64ch; }
+    @media (max-width: 479.98px) {
+      .kpis { grid-template-columns: 1fr; }
+      .kpi, .kpi:nth-child(even) { border-left: 0; padding: var(--sk-space-m) 0; }
+      .kpi + .kpi { border-top: 1px solid var(--sk-color-border); }
+    }
 
-    .hbars { display: grid; gap: var(--sk-space-s); }
-    .hbar { display: grid; grid-template-columns: minmax(120px, 230px) 1fr minmax(84px, auto); gap: var(--sk-space-s); align-items: center; font-size: .875rem; }
-    .hbar .name { color: var(--sk-color-text); line-height: 1.35; }
-    .hbar .track { height: 12px; border-left: 1px solid var(--sk-color-border); }
-    .hbar .fill { height: 12px; border-radius: 0 4px 4px 0; background: var(--c-1); min-width: 2px; transition: opacity .2s; }
+    /* bandas de ancho completo: título en 4 columnas, contenido en 8 */
+    .band { position: relative; padding-block: var(--sk-space-5xl); background: var(--band-bg);
+      box-shadow: 0 0 0 100vmax var(--band-bg); clip-path: inset(0 -100vmax); }
+    .band-green { --band-bg: var(--sk-color-tertiary-hover-bg); }
+    .band-blue { --band-bg: var(--background-info-light); }
+    .band-white { --band-bg: var(--sk-color-bg); }
+    .sec-head { display: grid; gap: var(--sk-space-s); align-content: start; }
+    .band-body { display: grid; gap: var(--sk-space-m); }
+    @media (min-width: 1024px) { .band .sec-head { position: sticky; top: var(--sk-space-l); align-self: start; } }
+    section.plain { display: grid; gap: var(--sk-space-l); padding-top: var(--sk-space-5xl); }
+    .tail { display: grid; gap: var(--sk-space-xl); padding-top: var(--sk-space-5xl); }
+    .band sk-card, .band .sk-grid > sk-card { height: 100%; }
+
+    /* ── Gráficos: tokens --charts-cNN en orden fijo ── */
+    .viz { --c-1: var(--charts-c01); --c-2: var(--charts-c02); --c-3: var(--charts-c03); --c-4: var(--charts-c04);
+      --c-none: var(--charts-c07); --c-none-bar: var(--charts-c29);
+      display: grid; gap: var(--sk-space-m); padding-top: var(--sk-space-xs); }
+    .legend { display: flex; flex-wrap: wrap; gap: var(--sk-space-xs) var(--sk-space-m); color: var(--sk-color-text-muted); }
+    .legend i { display: inline-block; box-sizing: border-box; width: 12px; height: 12px; border-radius: var(--bordes-s); margin-right: 6px; border: 1px solid var(--sk-color-border); vertical-align: -1px; }
+    .note { display: block; color: var(--sk-color-text-muted); }
+
+    .hbars { display: grid; gap: var(--sk-space-m); }
+    .hbar { display: grid; gap: 6px; }
+    .hrow { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sk-space-m); }
+    .hrow .name { color: var(--sk-color-text); }
+    .hrow .val { color: var(--sk-color-text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .hrow .val b { color: var(--sk-color-text); font-weight: var(--sk-font-weight-bold); }
+    .hbar .track { height: 8px; border-radius: var(--bordes-s); background: var(--sk-color-disabled); overflow: hidden; }
+    .hbar .fill { height: 8px; border-radius: var(--bordes-s); background: var(--c-1); min-width: 2px; transform-origin: left;
+      transition: transform .9s cubic-bezier(.16, 1, .3, 1) calc(var(--d, 0) * 50ms + 200ms), opacity .2s; }
     .hbar:hover .fill { opacity: .8; }
-    .hbar .val { color: var(--sk-color-text-muted); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .hbar .val b { color: var(--sk-color-text); font-weight: var(--sk-font-weight-bold); }
     .hbar.dim .fill { background: var(--c-none-bar); }
-    @media (max-width: 599.98px) {
-      .hbar { grid-template-columns: 1fr auto; row-gap: var(--sk-space-xs); }
-      .hbar .track { grid-column: 1 / -1; grid-row: 2; }
-    }
 
     .sbar { display: flex; gap: 2px; height: 28px; }
-    .sbar > div { display: flex; align-items: center; justify-content: center; font-size: .8125rem; font-weight: var(--sk-font-weight-bold);
-      min-width: 0; overflow: hidden; transition: opacity .2s; }
+    .sbar > div { display: flex; align-items: center; justify-content: center; font-weight: var(--sk-font-weight-bold); min-width: 0; overflow: hidden; transition: opacity .2s; }
     .sbar > div:hover { opacity: .85; }
-    .sbar > div:first-child { border-radius: 4px 0 0 4px; }
-    .sbar > div:last-child { border-radius: 0 4px 4px 0; }
-    .sbar > div:only-child { border-radius: 4px; }
+    .sbar > div:first-child { border-radius: var(--bordes-s) 0 0 var(--bordes-s); }
+    .sbar > div:last-child { border-radius: 0 var(--bordes-s) var(--bordes-s) 0; }
+    .sbar > div:only-child { border-radius: var(--bordes-s); }
     .sbar.thin { height: 22px; }
-    .srow { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: var(--sk-space-s); align-items: center; font-size: .875rem; }
-    @media (max-width: 599.98px) { .srow { grid-template-columns: 1fr; gap: var(--sk-space-xxs); } }
+    .srow { display: grid; gap: 6px; }
 
     .cols { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--sk-space-s); align-items: end; height: 210px; border-bottom: 1px solid var(--sk-color-border); padding-top: 22px; }
-    .col { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
-    .col .tot { text-align: center; font-size: .8125rem; font-weight: var(--sk-font-weight-bold); color: var(--sk-color-text); padding-bottom: 4px; font-variant-numeric: tabular-nums; }
-    .col .seg { min-height: 2px; transition: opacity .2s; }
+    .col { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+    .col .tot { text-align: center; font-weight: var(--sk-font-weight-bold); color: var(--sk-color-text); padding-bottom: 4px; font-variant-numeric: tabular-nums; }
+    .col .seg { width: min(100%, 64px); min-height: 2px; transform-origin: bottom;
+      transition: transform .9s cubic-bezier(.16, 1, .3, 1) calc(var(--d, 0) * 70ms + 200ms), opacity .2s; }
     .col .seg:hover { opacity: .85; }
     .col .seg + .seg { margin-top: 2px; }
-    .col .seg.top { border-radius: 4px 4px 0 0; }
-    .col-x { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--sk-space-s); text-align: center; font-size: .8125rem; color: var(--sk-color-text-muted); margin-top: var(--sk-space-xs); }
-    @media (max-width: 479.98px) { .col-x { font-size: .6875rem; gap: var(--sk-space-xxs); } .cols { gap: var(--sk-space-xs); } }
+    .col .seg.top { border-radius: var(--bordes-s) var(--bordes-s) 0 0; }
+    .col-x { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--sk-space-s); text-align: center; color: var(--sk-color-text-muted); margin-top: var(--sk-space-xs); }
+    @media (max-width: 479.98px) { .cols, .col-x { gap: var(--sk-space-xs); } }
+    .reveal:not(.in) .hbar .fill { transform: scaleX(0); }
+    .reveal:not(.in) .col .seg { transform: scaleY(0); }
 
-    #tip { position: fixed; z-index: 50; pointer-events: none; background: var(--sk-color-text); color: var(--sk-color-text-inverse); padding: 6px 10px;
-      border-radius: var(--sk-radius-md); font-size: .8125rem; max-width: 260px; opacity: 0; transition: opacity .1s; }
-    #tip.on { opacity: 1; }
-    [data-tip] { cursor: default; }
-    [data-tip]:focus-visible { outline: 2px solid var(--sk-color-border-focus); outline-offset: 2px; }
+    /* lectura final: filas asimétricas (4 + 8 columnas), sin tarjetas */
+    .lrows { display: grid; }
+    .lrow { padding: var(--sk-space-l) 0; border-top: 1px solid var(--sk-color-border); }
+    .lrow:last-child { border-bottom: 1px solid var(--sk-color-border); }
+    .lrow.accent { background: var(--sk-color-tertiary-hover-bg); border-radius: var(--bordes-m); border-top-color: transparent; padding: var(--sk-space-l); margin-top: -1px; }
+    .lrow.accent + .lrow { border-top-color: transparent; }
+    @media (min-width: 768px) { .lrow.accent { margin-inline: calc(var(--sk-space-l) * -1); } }
+    .lhead { display: flex; align-items: flex-start; gap: var(--sk-space-s); }
+    .lhead i { margin-top: 4px; color: var(--sk-color-primary-active); }
+    ul.clean { margin: 0; padding-left: 1.1em; display: grid; gap: var(--sk-space-s); font-weight: var(--sk-font-weight-medium); line-height: 1.5; }
 
-    /* lectura final */
-    .card-title { display: flex; align-items: center; gap: var(--sk-space-xs); font-family: var(--sk-font-title); font-weight: var(--sk-font-weight-bold); margin: 0 0 var(--sk-space-m); }
-    .card-title i { color: var(--sk-color-primary-active); }
-    ul.clean { margin: 0; padding-left: 1.1em; display: grid; gap: var(--sk-space-s); line-height: 1.55; font-size: .9375rem; }
+    footer.nota { display: grid; gap: var(--sk-space-xs); color: var(--sk-color-text-muted); }
 
-    /* acordeón plano: solo líneas */
-    .sk-acc { border: 0; border-top: 1px solid var(--sk-color-border); border-bottom: 1px solid var(--sk-color-border); border-radius: 0; background: transparent; }
-    .sk-acc summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;
-      padding: var(--sk-space-m) 0; font-family: var(--sk-font-title); font-weight: var(--sk-font-weight-bold); color: var(--sk-color-text); }
-    .sk-acc summary::-webkit-details-marker { display: none; }
-    .sk-acc summary::after { content: '\e902'; font-family: 'primeicons'; transition: transform .2s; }
-    .sk-acc[open] summary::after { transform: rotate(180deg); }
-    .sk-acc > :not(summary) { margin: 0 0 var(--sk-space-m); }
-    .sk-acc summary:focus-visible { outline: 2px solid var(--sk-color-border-focus); outline-offset: 2px; }
-
-    footer.nota { display: grid; gap: var(--sk-space-xs); font-size: .8125rem; line-height: 1.6; color: var(--sk-color-text-muted); }
-    footer.nota b { color: var(--sk-color-text); }
-
-    /* entrada suave al hacer scroll (solo opacity + transform) */
+    /* entrada escalonada (solo opacity + transform) */
     .reveal { opacity: 0; transform: translateY(12px);
       transition: opacity .6s cubic-bezier(.16, 1, .3, 1) calc(var(--i, 0) * 80ms), transform .6s cubic-bezier(.16, 1, .3, 1) calc(var(--i, 0) * 80ms); }
     .reveal.in { opacity: 1; transform: none; }
-    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .reveal:not(.in) .hbar .fill, .reveal:not(.in) .col .seg { transform: none; }
+      .hbar .fill, .col .seg { transition: none; }
+    }
   </style>
 </head>
 <body>
   <main id="app" class="page"></main>
-  <div id="tip" role="tooltip"></div>
 
   <template id="ui">
     <header class="topbar">
@@ -186,144 +244,170 @@
     </header>
 
     <div class="hero reveal">
-      <p class="eyebrow">Investigación UX · Comunidad de testers</p>
+      <small class="eyebrow">Investigación UX · Comunidad de testers</small>
       <h1>Quiénes son las personas que prueban nuestros prototipos</h1>
       <p class="lead">Aquí encuentras cómo está compuesta la comunidad de 217 personas que prueban prototipos en Useberry, para que sepas a quién representan sus resultados.</p>
     </div>
 
-    <div class="reveal" style="display:grid;gap:var(--sk-space-l)">
-      <sk-alert type="info" title="En resumen" closable="false"
+    <div class="intro">
+      <sk-alert class="reveal" type="info" title="En resumen" closable="false"
         message="La comunidad reúne sobre todo a personas de 25 a 44 años, clientes de Skandia y con buena autonomía digital. De cada persona conocemos poco: solo 1 de cada 3 tiene su edad registrada. Por eso las cifras sirven como orientación y todavía no permiten hablar de una muestra representativa."></sk-alert>
 
-      <div class="kpis" aria-label="Cifras clave">
-        <div class="kpi"><b>217</b><span>personas en la comunidad</span></div>
-        <div class="kpi"><b>80%</b><span>son clientes de Skandia (115 de las 144 que lo informan)</span></div>
-        <div class="kpi"><b>37 años</b><span>edad mediana (69 personas con edad registrada)</span></div>
-        <div class="kpi"><b>97%</b><span>se sienten cómodas con lo digital (35 de las 36 que lo informan)</span></div>
+      <div class="kpis reveal" aria-label="Cifras clave">
+        <div class="kpi"><h1 role="presentation">217</h1><small>personas en la comunidad</small></div>
+        <div class="kpi"><h1 role="presentation">80%</h1><small>son clientes de Skandia (115 de las 144 que lo informan)</small></div>
+        <div class="kpi"><h1 role="presentation">37<small> años</small></h1><small>edad mediana (69 personas con edad registrada)</small></div>
+        <div class="kpi"><h1 role="presentation">97%</h1><small>se sienten cómodas con lo digital (35 de las 36 que lo informan)</small></div>
       </div>
     </div>
 
-    <section class="block reveal">
-      <div class="sec-head">
-        <p class="eyebrow">01 · Datos disponibles</p>
-        <h2>Conocemos poco del perfil de cada persona</h2>
-        <p>Cada barra muestra cuántas de las 217 personas tienen ese dato registrado. Las cifras del resto del informe se calculan sobre quienes sí lo tienen.</p>
-      </div>
-      <sk-card header="Datos registrados por persona" subheader="Porcentaje de las 217 personas">
-        <div class="viz" id="g-cobertura"></div>
-      </sk-card>
-    </section>
-
-    <section class="block reveal">
-      <div class="sec-head">
-        <p class="eyebrow">02 · Quiénes son</p>
-        <h2>La mayoría son clientes de entre 25 y 44 años</h2>
-        <p>7 de cada 10 personas con edad registrada están en ese rango. Hay pocas de 55 años o más.</p>
-      </div>
-      <div class="grid-2">
-        <sk-card header="¿Son clientes de Skandia?" subheader="217 personas">
-          <div class="viz" id="g-cliente"></div>
-        </sk-card>
-        <sk-card header="Estado de las invitaciones" subheader="217 personas">
-          <div class="viz" id="g-invit"></div>
-        </sk-card>
-      </div>
-      <sk-card header="Edad y relación con Skandia" subheader="69 personas con edad registrada · edad media 39,3 años · mediana 37">
-        <div class="viz" id="g-edad"></div>
-      </sk-card>
-    </section>
-
-    <section class="block reveal">
-      <div class="sec-head">
-        <p class="eyebrow">03 · Productos</p>
-        <h2>Inversión y pensión obligatoria son los productos más frecuentes</h2>
-        <p>Cada persona pudo mencionar varios productos. Casi 3 de cada 10 mencionan más de uno.</p>
-      </div>
-      <sk-card header="Productos que las personas dicen tener" subheader="65 personas con producto registrado · lo que cada persona declara">
-        <div class="viz" id="g-prod"></div>
-      </sk-card>
-    </section>
-
-    <section class="block reveal">
-      <div class="sec-head">
-        <p class="eyebrow">04 · Segmento y perfil</p>
-        <h2>Tres segmentos comerciales, cada uno con su rango de edad</h2>
-        <p>Privilegio se concentra entre 35 y 54 años y Joven Pro entre 25 y 34. Finanzas Personales reúne edades más variadas.</p>
-      </div>
-      <div class="grid-2">
-        <sk-card header="Segmento y edad dentro de cada uno" subheader="39 personas con segmento · 28 con edad registrada">
-          <div class="viz" id="g-seg"></div>
-        </sk-card>
-        <sk-card header="Perfil" subheader="16 personas con perfil asignado">
-          <div class="viz" id="g-perfil"></div>
-        </sk-card>
+    <section class="band band-green">
+      <div class="sk-grid">
+        <div class="sec-head reveal" data-col="4">
+          <small class="eyebrow"><span class="n">01</span>· Datos disponibles</small>
+          <h2>Conocemos poco del perfil de cada persona</h2>
+          <p>Cada barra muestra cuántas de las 217 personas tienen ese dato registrado. Las cifras del resto del informe se calculan sobre quienes sí lo tienen.</p>
+        </div>
+        <div class="band-body" data-col="8">
+          <sk-card class="reveal" header="Datos registrados por persona" subheader="Porcentaje de las 217 personas">
+            <div class="viz" id="g-cobertura"></div>
+          </sk-card>
+        </div>
       </div>
     </section>
 
-    <section class="block reveal">
-      <div class="sec-head">
-        <p class="eyebrow">05 · Género y comodidad digital</p>
-        <h2>Casi todas las personas se sienten cómodas con lo digital</h2>
-        <p>35 de las 36 personas que respondieron dicen usar bien las herramientas digitales. El género está registrado en 1 de cada 6 personas.</p>
-      </div>
-      <div class="grid-2">
-        <sk-card header="Género" subheader="36 personas">
-          <div class="viz" id="g-genero"></div>
-        </sk-card>
-        <sk-card header="Comodidad con herramientas digitales" subheader="36 personas · lo que cada persona declara">
-          <div class="viz" id="g-comod"></div>
-        </sk-card>
+    <section class="band band-blue">
+      <div class="sk-grid">
+        <div class="sec-head reveal" data-col="4">
+          <small class="eyebrow"><span class="n">02</span>· Quiénes son</small>
+          <h2>La mayoría son clientes de entre 25 y 44 años</h2>
+          <p>7 de cada 10 personas con edad registrada están en ese rango. Hay pocas de 55 años o más.</p>
+        </div>
+        <div class="band-body" data-col="8">
+          <div class="sk-grid">
+            <sk-card class="reveal" data-col="6" header="¿Son clientes de Skandia?" subheader="217 personas">
+              <div class="viz" id="g-cliente"></div>
+            </sk-card>
+            <sk-card class="reveal" data-col="6" header="Estado de las invitaciones" subheader="217 personas">
+              <div class="viz" id="g-invit"></div>
+            </sk-card>
+          </div>
+          <sk-card class="reveal" header="Edad y relación con Skandia" subheader="69 personas con edad registrada · edad media 39,3 años · mediana 37">
+            <div class="viz" id="g-edad"></div>
+          </sk-card>
+        </div>
       </div>
     </section>
 
-    <section class="block reveal">
-      <div class="sec-head">
-        <p class="eyebrow">06 · Cómo leer los resultados</p>
+    <section class="band band-white">
+      <div class="sk-grid">
+        <div class="sec-head reveal" data-col="4">
+          <small class="eyebrow"><span class="n">03</span>· Productos</small>
+          <h2>Inversión y pensión obligatoria son los productos más frecuentes</h2>
+          <p>Cada persona pudo mencionar varios productos. Casi 3 de cada 10 mencionan más de uno.</p>
+        </div>
+        <div class="band-body" data-col="8">
+          <sk-card class="reveal" header="Productos que las personas dicen tener" subheader="65 personas con producto registrado · lo que cada persona declara">
+            <div class="viz" id="g-prod"></div>
+          </sk-card>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-green">
+      <div class="sk-grid">
+        <div class="sec-head reveal" data-col="4">
+          <small class="eyebrow"><span class="n">04</span>· Segmento y perfil</small>
+          <h2>Tres segmentos comerciales, cada uno con su rango de edad</h2>
+          <p>Privilegio se concentra entre 35 y 54 años y Joven Pro entre 25 y 34. Finanzas Personales reúne edades más variadas.</p>
+        </div>
+        <div class="band-body" data-col="8">
+          <div class="sk-grid">
+            <sk-card class="reveal" data-col="6" header="Segmento y edad dentro de cada uno" subheader="39 personas con segmento · 28 con edad registrada">
+              <div class="viz" id="g-seg"></div>
+            </sk-card>
+            <sk-card class="reveal" data-col="6" header="Perfil" subheader="16 personas con perfil asignado">
+              <div class="viz" id="g-perfil"></div>
+            </sk-card>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-blue">
+      <div class="sk-grid">
+        <div class="sec-head reveal" data-col="4">
+          <small class="eyebrow"><span class="n">05</span>· Género y comodidad digital</small>
+          <h2>Casi todas las personas se sienten cómodas con lo digital</h2>
+          <p>35 de las 36 personas que respondieron dicen usar bien las herramientas digitales. El género está registrado en 1 de cada 6 personas.</p>
+        </div>
+        <div class="band-body" data-col="8">
+          <div class="sk-grid">
+            <sk-card class="reveal" data-col="6" header="Género" subheader="36 personas">
+              <div class="viz" id="g-genero"></div>
+            </sk-card>
+            <sk-card class="reveal" data-col="6" header="Comodidad con herramientas digitales" subheader="36 personas · lo que cada persona declara">
+              <div class="viz" id="g-comod"></div>
+            </sk-card>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="plain">
+      <div class="sec-head reveal">
+        <small class="eyebrow"><span class="n">06</span>· Cómo leer los resultados</small>
         <h2>Qué sabemos, qué aún no sabemos y qué sigue</h2>
         <p>Úsalo como guía antes de presentar o interpretar los resultados de Useberry.</p>
       </div>
-      <div class="grid-3">
-        <sk-card>
-          <p class="card-title"><i class="pi pi-check-circle"></i>Lo que sí sabemos</p>
-          <ul class="clean">
-            <li>7 de cada 10 personas con edad registrada tienen entre 25 y 44 años.</li>
-            <li>4 de cada 5 son clientes, entre quienes respondieron.</li>
-            <li>Inversión es el producto más mencionado (43%), seguido de pensión obligatoria (31%).</li>
-            <li>35 de 36 personas se sienten cómodas con lo digital.</li>
-          </ul>
-        </sk-card>
-        <sk-card>
-          <p class="card-title"><i class="pi pi-search"></i>Lo que aún no sabemos</p>
-          <ul class="clean">
-            <li>Con tan pocas personas de 55 años o más (8 de 69), los resultados todavía no reflejan a clientes mayores ni a quienes usan poco los canales digitales.</li>
-            <li>Género, segmento y perfil tienen entre 16 y 39 personas: sirven para orientarnos.</li>
-            <li>No hay personas registradas en los segmentos Elite, Wealth ni Corporativo.</li>
-            <li>La base no incluye ingresos, saldos, ciudad ni nivel educativo.</li>
-          </ul>
-        </sk-card>
-        <sk-card>
-          <p class="card-title"><i class="pi pi-arrow-right"></i>Próximos pasos</p>
-          <ul class="clean">
-            <li><b>Completar el perfil.</b> 148 personas no tienen edad registrada y la columna de solicitud de datos está vacía en toda la base.</li>
-            <li><b>Invitar a más personas</b> de 55 años o más y a no clientes de 35 años o más.</li>
-            <li><b>Unificar los campos</b> de producto y segmento, que hoy llegan en texto libre.</li>
-            <li><b>Indicar en cada informe</b> de Useberry a quién representan los resultados: personas adultas jóvenes, clientes y con buena autonomía digital.</li>
-          </ul>
-        </sk-card>
+      <div class="lrows">
+        <article class="lrow reveal">
+          <div class="sk-grid">
+            <div class="lhead" data-col="4"><i class="pi pi-check-circle"></i><h3>Lo que sí sabemos</h3></div>
+            <ul class="clean" data-col="8">
+              <li>7 de cada 10 personas con edad registrada tienen entre 25 y 44 años.</li>
+              <li>4 de cada 5 son clientes, entre quienes respondieron.</li>
+              <li>Inversión es el producto más mencionado (43%), seguido de pensión obligatoria (31%).</li>
+              <li>35 de 36 personas se sienten cómodas con lo digital.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="lrow reveal">
+          <div class="sk-grid">
+            <div class="lhead" data-col="4"><i class="pi pi-search"></i><h3>Lo que aún no sabemos</h3></div>
+            <ul class="clean" data-col="8">
+              <li>Con tan pocas personas de 55 años o más (8 de 69), los resultados todavía no reflejan a clientes mayores ni a quienes usan poco los canales digitales.</li>
+              <li>Género, segmento y perfil tienen entre 16 y 39 personas: sirven para orientarnos.</li>
+              <li>No hay personas registradas en los segmentos Elite, Wealth ni Corporativo.</li>
+              <li>La base no incluye ingresos, saldos, ciudad ni nivel educativo.</li>
+            </ul>
+          </div>
+        </article>
+        <article class="lrow accent reveal">
+          <div class="sk-grid">
+            <div class="lhead" data-col="4"><i class="pi pi-arrow-right"></i><h3>Próximos pasos</h3></div>
+            <ul class="clean" data-col="8">
+              <li><b>Completar el perfil.</b> 148 personas no tienen edad registrada y la columna de solicitud de datos está vacía en toda la base.</li>
+              <li><b>Invitar a más personas</b> de 55 años o más y a no clientes de 35 años o más.</li>
+              <li><b>Unificar los campos</b> de producto y segmento, que hoy llegan en texto libre.</li>
+              <li><b>Indicar en cada informe</b> de Useberry a quién representan los resultados: personas adultas jóvenes, clientes y con buena autonomía digital.</li>
+            </ul>
+          </div>
+        </article>
       </div>
     </section>
 
-    <section class="reveal" style="display:grid;gap:var(--sk-space-xl)">
-      <details class="sk-acc">
-        <summary>Ver los datos en una tabla</summary>
-        <sk-table id="datos" responsive-layout="stack" striped></sk-table>
-      </details>
+    <section class="tail reveal">
+      <!-- Reemplazo de sk-accordion (plantilla 1.1.0) -->
+      <div class="sk-acc-r">
+        <details name="datos"><summary>Ver los datos en una tabla</summary><sk-table id="datos" responsive-layout="stack" striped></sk-table></details>
+      </div>
 
       <footer class="nota">
-        <b>Cómo se calcularon las cifras</b>
-        <span>Fuente: base de la comunidad de testers (hoja Usuarios, 217 registros, archivo del 9 de julio de 2026). Se excluyeron las hojas de prueba y las de personal interno.</span>
-        <span>Los porcentajes se calculan sobre las personas que tienen el dato. Los productos se agruparon a partir de texto libre, con las erratas corregidas, y suman más de 65 porque una persona puede mencionar varios. 2 personas indicaron «referidos», que no es un producto y no se grafica.</span>
-        <span>Este informe solo contiene datos agregados. No incluye nombres, correos, celulares ni información que permita identificar a alguien.</span>
+        <small class="eyebrow">Cómo se calcularon las cifras</small>
+        <small>Fuente: base de la comunidad de testers (hoja Usuarios, 217 registros, archivo del 9 de julio de 2026). Se excluyeron las hojas de prueba y las de personal interno.</small>
+        <small>Los porcentajes se calculan sobre las personas que tienen el dato. Los productos se agruparon a partir de texto libre, con las erratas corregidas, y suman más de 65 porque una persona puede mencionar varios. 2 personas indicaron «referidos», que no es un producto y no se grafica.</small>
+        <small>Este informe solo contiene datos agregados. No incluye nombres, correos, celulares ni información que permita identificar a alguien.</small>
       </footer>
     </section>
   </template>
@@ -334,13 +418,13 @@
       const $ = (s) => ui.querySelector(s);
       const pct = (n, t) => Math.round((n / t) * 100);
       const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-      const tip = (t) => `data-tip="${esc(t)}" tabindex="0"`;
+      const tip = (t) => `data-tip="${esc(t)}"`;
 
       /* Colores de gráfica = tokens --charts-cNN. [fondo, tinta del número] */
       const C = {
-        p: ['var(--c-1)', 'var(--sk-color-text)'],         // serie 1
-        i: ['var(--c-2)', 'var(--sk-color-text)'],         // serie 2
-        n: ['var(--c-none)', 'var(--sk-color-text)'],      // sin dato
+        p: ['var(--c-1)', 'var(--sk-color-text)'],     // serie 1
+        i: ['var(--c-2)', 'var(--sk-color-text)'],     // serie 2
+        n: ['var(--c-none)', 'var(--sk-color-text)'],  // sin dato
       };
 
       /* ── Datos agregados (solo conteos) ── */
@@ -361,19 +445,18 @@
       };
 
       const hbars = (rows, total, opts = {}) =>
-        `<div class="hbars">${rows.map(([name, n]) => {
+        `<div class="hbars">${rows.map(([name, n], i) => {
           const max = opts.max || Math.max(...rows.map((r) => r[1]));
-          return `<div class="hbar ${opts.dim && opts.dim(name) ? 'dim' : ''}" ${tip(`${name}: ${n} de ${total} (${pct(n, total)}%)`)}>
-            <span class="name">${esc(name)}</span>
-            <div class="track"><div class="fill" style="width:${(n / max) * 100}%"></div></div>
-            <span class="val"><b>${n}</b> · ${pct(n, total)}%</span></div>`;
+          return `<div class="hbar ${opts.dim && opts.dim(name) ? 'dim' : ''}" style="--d:${i}" ${tip(`${name}: ${n} de ${total} (${pct(n, total)}%)`)}>
+            <small class="hrow"><span class="name">${esc(name)}</span><span class="val"><b>${n}</b> · ${pct(n, total)}%</span></small>
+            <div class="track"><div class="fill" style="width:${(n / max) * 100}%"></div></div></div>`;
         }).join('')}</div>`;
 
       const sbar = (parts, total, thin) =>
-        `<div class="sbar ${thin ? 'thin' : ''}" role="img" aria-label="${esc(parts.map((p) => `${p[0]} ${p[1]}`).join(', '))}">${parts.filter((p) => p[1] > 0).map(([name, n, [bg, ink]]) =>
-          `<div style="flex:${n};background:${bg};color:${ink}" ${tip(`${name}: ${n} de ${total} (${pct(n, total)}%)`)}>${n / total > 0.07 ? n : ''}</div>`).join('')}</div>`;
-      const legend = (items) => `<div class="legend">${items.map(([name, n, bg]) => `<span><i style="background:${bg}"></i>${esc(name)}${n != null ? ` · ${n}` : ''}</span>`).join('')}</div>`;
-      const note = (t) => `<p class="note">${t}</p>`;
+        `<small class="sbar ${thin ? 'thin' : ''}" role="img" aria-label="${esc(parts.map((p) => `${p[0]} ${p[1]}`).join(', '))}">${parts.filter((p) => p[1] > 0).map(([name, n, [bg, ink]]) =>
+          `<div style="flex:${n};background:${bg};color:${ink}" ${tip(`${name}: ${n} de ${total} (${pct(n, total)}%)`)}>${n / total > 0.07 ? n : ''}</div>`).join('')}</small>`;
+      const legend = (items) => `<small class="legend">${items.map(([name, n, bg]) => `<span><i style="background:${bg}"></i>${esc(name)}${n != null ? ` · ${n}` : ''}</span>`).join('')}</small>`;
+      const note = (t) => `<small class="note">${t}</small>`;
 
       /* 01 · Datos disponibles */
       $('#g-cobertura').innerHTML = hbars(D.cobertura, D.n, { max: D.n });
@@ -390,11 +473,11 @@
       $('#g-edad').innerHTML = legend([['Cliente', 52, 'var(--c-1)'], ['No cliente', 17, 'var(--c-2)']]) +
         `<div><div class="cols">${D.bandas.map((b, i) => {
           const si = D.edadSi[i], no = D.edadNo[i], tot = si + no;
-          return `<div class="col"><div class="tot">${tot}</div>
+          return `<div class="col" style="--d:${i}"><small class="tot">${tot}</small>
             ${no ? `<div class="seg top" style="height:${colH(no)}px;background:var(--c-2)" ${tip(`${b}: ${no} no clientes`)}></div>` : ''}
             ${si ? `<div class="seg ${no ? '' : 'top'}" style="height:${colH(si)}px;background:var(--c-1)" ${tip(`${b}: ${si} clientes`)}></div>` : ''}</div>`;
         }).join('')}</div>
-        <div class="col-x">${D.bandas.map((b) => `<span>${b}</span>`).join('')}</div></div>` +
+        <small class="col-x">${D.bandas.map((b) => `<span>${b}</span>`).join('')}</small></div>` +
         note('El 70% (48 de 69) tiene entre 25 y 44 años y solo 8 personas tienen 55 años o más. Las personas que no son clientes se concentran entre 25 y 34 años (13 de 17).');
 
       /* 03 · Productos */
@@ -403,12 +486,11 @@
 
       /* 04 · Segmento y perfil (rangos de edad = series 1 a 4) */
       const rampBg = ['var(--c-1)', 'var(--c-2)', 'var(--c-3)', 'var(--c-4)'];
-      const rampInk = ['var(--sk-color-text)', 'var(--sk-color-text)', 'var(--sk-color-text)', 'var(--sk-color-text)'];
       $('#g-seg').innerHTML = legend(D.segBandas.map((b, i) => [b, null, rampBg[i]])) +
         `<div style="display:grid;gap:var(--sk-space-m)">${D.seg.map(([name, nTot, bands]) => {
           const nAge = bands.reduce((a, b) => a + b, 0);
-          return `<div class="srow"><span>${esc(name)}<br><span class="note">${nTot} personas · edad en ${nAge}</span></span>
-            ${sbar(bands.map((n, i) => [`${name}, ${D.segBandas[i]}`, n, [rampBg[i], rampInk[i]]]), nAge, true)}</div>`;
+          return `<div class="srow"><small>${esc(name)} · ${nTot} personas · edad en ${nAge}</small>
+            ${sbar(bands.map((n, i) => [`${name}, ${D.segBandas[i]}`, n, [rampBg[i], 'var(--sk-color-text)']]), nAge, true)}</div>`;
         }).join('')}</div>`;
       $('#g-perfil').innerHTML = hbars(D.perfil, 16, { max: 16 }) +
         note('Solo el 7% de la comunidad tiene un perfil asignado.');
@@ -431,32 +513,58 @@
       add('Género', D.genero.map((r) => [r[0], r[1]]), 36);
       add('Comodidad digital', D.comod, 36);
       $('#datos').columns = [
-        { field: 'grupo', header: 'Indicador' }, { field: 'categoria', header: 'Categoría' },
-        { field: 'n', header: 'Personas', align: 'right' }, { field: 'pct', header: '% de la base', align: 'right' }, { field: 'base', header: 'Base', align: 'right' },
+        { field: 'grupo', header: 'Indicador', width: '28%' }, { field: 'categoria', header: 'Categoría', width: '36%' },
+        { field: 'n', header: 'Personas', align: 'right', width: '12%' }, { field: 'pct', header: '% de la base', align: 'right', width: '14%' }, { field: 'base', header: 'Base', align: 'right', width: '10%' },
       ];
       $('#datos').value = filas;
       $('#datos').pageSize = 10;
 
-      /* ── Tooltip ── */
-      const tipEl = document.getElementById('tip');
-      const place = (x, y) => { tipEl.style.left = Math.min(x + 12, innerWidth - 270) + 'px'; tipEl.style.top = Math.max(y - 38, 8) + 'px'; };
-      document.addEventListener('mouseover', (e) => { const t = e.target.closest('[data-tip]'); if (t) { tipEl.textContent = t.dataset.tip; tipEl.classList.add('on'); place(e.clientX, e.clientY); } });
-      document.addEventListener('mousemove', (e) => { if (e.target.closest('[data-tip]')) place(e.clientX, e.clientY); });
-      document.addEventListener('mouseout', (e) => { if (e.target.closest('[data-tip]')) tipEl.classList.remove('on'); });
-      document.addEventListener('focusin', (e) => { const t = e.target.closest('[data-tip]'); if (t) { const r = t.getBoundingClientRect(); tipEl.textContent = t.dataset.tip; tipEl.classList.add('on'); place(r.left + r.width / 2, r.top); } });
-      document.addEventListener('focusout', () => tipEl.classList.remove('on'));
-
       /* ── Montar ── */
       document.getElementById('app').append(ui);
+      iniciarAcordeones();
+      iniciarTooltips();
 
-      /* Entrada suave por scroll (IntersectionObserver) */
+      /* Entrada escalonada por scroll: el retraso depende de la posición entre hermanos */
       const reveals = [...document.querySelectorAll('.reveal')];
-      reveals.forEach((el, i) => el.style.setProperty('--i', Math.min(i, 3)));
+      const seen = new Map();
+      reveals.forEach((el) => { const k = el.parentElement; const i = seen.get(k) || 0; seen.set(k, i + 1); el.style.setProperty('--i', Math.min(i, 3)); });
       if ('IntersectionObserver' in window) {
         const io = new IntersectionObserver((entries) => entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { threshold: 0.08 });
         reveals.forEach((el) => io.observe(el));
       } else { reveals.forEach((el) => el.classList.add('in')); }
     });
+
+    // ══ Comportamiento de los reemplazos (de la plantilla 1.1.0; no editar) ══
+    function iniciarAcordeones() {
+      document.querySelectorAll('.sk-acc-r').forEach((g) => g.addEventListener('keydown', (e) => {
+        const heads = [...g.querySelectorAll(':scope > details > summary')], i = heads.indexOf(document.activeElement); if (i < 0) return;
+        const destino = { ArrowDown: heads[(i + 1) % heads.length], ArrowUp: heads[(i - 1 + heads.length) % heads.length], Home: heads[0], End: heads[heads.length - 1] }[e.key];
+        if (destino) { e.preventDefault(); destino.focus(); }
+      }));
+    }
+    function iniciarTooltips() {
+      let tip, dueno;
+      const ocultar = () => { if (tip) { tip.remove(); dueno?.removeAttribute('aria-describedby'); tip = dueno = null; } };
+      const mostrar = (el) => {
+        const texto = el.dataset.tip; if (!texto) return; ocultar(); dueno = el;
+        tip = document.createElement('div'); tip.className = 'sk-tip'; tip.id = 'sk-tip-activo'; tip.role = 'tooltip'; tip.textContent = texto;
+        document.body.append(tip); el.setAttribute('aria-describedby', tip.id);
+        const r = el.getBoundingClientRect(), t = tip.getBoundingClientRect(), gap = 10;
+        const arriba = r.top - t.height - gap >= 0; tip.dataset.pos = arriba ? 'top' : 'bottom';
+        const left = Math.min(Math.max(8, r.left + r.width / 2 - t.width / 2), innerWidth - t.width - 8);
+        tip.style.left = left + scrollX + 'px';
+        tip.style.top = (arriba ? r.top - t.height - gap : r.bottom + gap) + scrollY + 'px';
+        tip.style.setProperty('--x', (r.left + r.width / 2 - left) + 'px');
+      };
+      document.querySelectorAll('[data-tip]').forEach((el) => {
+        if (!el.matches('sk-button, sk-link, a, button, input, [tabindex]')) el.tabIndex = 0;
+        el.addEventListener('mouseenter', () => mostrar(el)); el.addEventListener('mouseleave', ocultar);
+        el.addEventListener('focusin', () => mostrar(el)); el.addEventListener('focusout', ocultar);
+      });
+      document.addEventListener('keydown', (e) => e.key === 'Escape' && ocultar());
+      addEventListener('scroll', ocultar, { passive: true });
+      addEventListener('resize', ocultar);
+    }
   </script>
 </body>
 </html>
