@@ -1,0 +1,132 @@
+/* Marca empleadora Skandia — capa editorial ("revista de recortes").
+   Solo maqueta de página y decoración propia, escrita con tokens. Los controles son componentes sk-*. */
+
+:root {
+  /* Catálogo UX sin token en la librería: lima del marcador y del estallido (DESIGN.md) */
+  --marca-lima: #8fe000;
+}
+
+body {
+  margin: 0;
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--background-secundaria);
+  background-image: radial-gradient(var(--sk-color-border) 0.65px, transparent 0.65px);
+  background-size: 16px 16px;
+  color: var(--sk-color-text);
+  font-family: var(--sk-font-body);
+}
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+#app > main { flex: 1; }
+
+/* ── Contenedor ── */
+.contenedor { box-sizing: border-box; width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: var(--sk-grid-mobile-margin); }
+@media (min-width: 768px) { .contenedor { padding-inline: var(--sk-grid-tablet-margin); } }
+.pagina { padding-block: var(--sk-space-xl) var(--sk-space-5xl); display: grid; gap: var(--sk-space-l); align-content: start; position: relative; z-index: 1; }
+.angosto { box-sizing: border-box; width: 100%; max-width: 780px; margin-inline: auto; display: grid; gap: var(--sk-space-l); }
+
+/* ── Cabecera y pie ── */
+.cabecera { position: relative; z-index: 40; background: var(--background-secundaria); border-bottom: 1px solid var(--sk-color-border); }
+.cabecera .contenedor { height: 64px; display: flex; align-items: center; justify-content: space-between; gap: var(--sk-space-m); }
+.cabecera a { text-decoration: none; }
+.cabecera nav { display: flex; align-items: center; gap: var(--sk-space-l); }
+.nav-link { font: var(--sk-font-weight-medium) 14px/22px var(--sk-font-title); color: var(--sk-color-text); }
+.nav-link:hover { color: var(--background-black); }
+.nav-pill { font: var(--sk-font-weight-bold) 14px/22px var(--sk-font-title); color: var(--sk-color-primary-active);
+  background: var(--sk-color-secondary-hover-bg); border: 1px solid var(--sk-color-primary); border-radius: var(--bordes-xl);
+  padding: var(--sk-space-xxs) var(--sk-space-m); box-shadow: var(--sk-shadow-subtle); }
+@media (max-width: 767.98px) { .cabecera nav .nav-link { display: none; } }
+
+.pie { background: var(--background-black); color: var(--sk-color-text-inverse); }
+.pie .contenedor { display: flex; align-items: center; justify-content: space-between; gap: var(--sk-space-m); padding-block: var(--sk-space-l); flex-wrap: wrap; }
+.pie .pie-marca { display: flex; align-items: center; gap: var(--sk-space-m); }
+.pie small, .pie span { color: var(--sk-color-text-inverse); }
+
+/* ── Decoración editorial ── */
+.esquina-cruzada { position: absolute; top: 64px; right: 0; width: 320px; height: 320px; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--sk-color-text) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--sk-color-text) 5%, transparent) 1px, transparent 1px);
+  background-size: 14px 14px; }
+@media (max-width: 767.98px) { .esquina-cruzada { display: none; } }
+
+/* Resaltador lima detrás de la palabra clave del titular */
+.marcador { position: relative; display: inline-block; z-index: 1; padding-inline: var(--sk-space-xxs); }
+.marcador::before { content: ""; position: absolute; inset: 14% -6px 2px -6px; z-index: -1; background: var(--marca-lima); opacity: 0.9;
+  border-radius: 4px 6px 3px 5px; transform: rotate(-1deg) skewX(-3deg); }
+/* Subrayado de marcador verde bajo los títulos de sección */
+.subrayado { position: relative; display: inline-block; }
+.subrayado::after { content: ""; position: absolute; left: 0; bottom: -8px; width: 58px; height: 5px; border-radius: 3px;
+  background: var(--sk-color-primary); transform: rotate(-0.8deg); }
+h1 .ligero, h2 .ligero { font-weight: var(--sk-font-weight-regular); }
+.meta { color: var(--sk-color-text-muted); font-weight: var(--sk-font-weight-bold); margin: 0; }
+
+/* Papel: superficie blanca con sombra de tarjeta */
+.papel { background: var(--sk-color-surface); border: 1px solid var(--sk-color-border); border-radius: var(--bordes-s); box-shadow: var(--sk-shadow-raised); }
+.divisor { border: 0; border-top: 1px dashed var(--sk-color-border); margin: 0; }
+
+/* Fila de acción final alineada a la derecha (4 columnas del final en tablet/desktop) */
+@media (min-width: 768px) { .sk-grid > [data-fin] { grid-column: -5 / -1; } }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Ritmo vertical de titulares y textos de bloque */
+.titulo { display: grid; gap: var(--sk-space-s); }
+.titulo > *, .sk-rg > h5, .sk-rg > p { margin: 0; }
+
+/* ── Barra de filtros horizontal ── */
+.filtros-fija { position: relative; z-index: 30; padding-block: var(--sk-space-xs); }
+@media (min-width: 1024px) { .filtros-fija { position: sticky; top: 0; pointer-events: none; } .filtros-fija .papel { pointer-events: auto; } }
+.barra-filtros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sk-space-s); align-items: center; padding: var(--sk-space-s) var(--sk-space-m); }
+.barra-filtros > :first-child, .barra-filtros > :last-child { grid-column: 1 / -1; }
+@media (min-width: 1024px) {
+  .barra-filtros { grid-template-columns: 1.3fr repeat(4, minmax(0, 1fr)) auto; }
+  .barra-filtros > :first-child, .barra-filtros > :last-child { grid-column: auto; }
+}
+
+/* ── Titular con óvalo de marcador ── */
+.ovalo { position: relative; display: inline-block; padding-inline: var(--sk-space-s); }
+.ovalo svg { position: absolute; inset: -12px -20px; width: calc(100% + 40px); height: calc(100% + 24px); pointer-events: none; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.ovalo .trazo-1 { stroke: var(--sk-color-primary); stroke-width: 4.5; opacity: 0.9; stroke-dasharray: 700; stroke-dashoffset: 0; animation: dibujar 1.1s ease-out both; }
+.ovalo .trazo-2 { stroke: var(--marca-lima); stroke-width: 2.5; opacity: 0.6; }
+@keyframes dibujar { from { stroke-dashoffset: 700; } to { stroke-dashoffset: 0; } }
+
+/* ── Contador y títulos de grupo ── */
+.contador { display: inline-block; justify-self: start; padding: var(--sk-space-xs) var(--sk-space-m); background: var(--sk-color-surface);
+  border: 1px solid var(--sk-color-border); border-radius: var(--bordes-s); box-shadow: var(--sk-shadow-subtle);
+  font: var(--sk-font-weight-bold) 12px/20px var(--sk-font-title); letter-spacing: 0.08em; text-transform: uppercase; }
+.grupo { display: grid; gap: var(--sk-space-l); margin-top: var(--sk-space-l); }
+.grupo > h2 { margin: 0 0 var(--sk-space-xs); justify-self: start; }
+
+/* ── Tarjeta de vacante "carpeta de papel" ── */
+.carpeta { display: grid; gap: var(--sk-space-s); align-content: start; padding: var(--sk-space-l); transition: transform 0.2s ease; }
+.carpeta h3, .carpeta p { margin: 0; }
+.carpeta:nth-child(odd) { transform: rotate(-0.8deg); }
+.carpeta:nth-child(even) { transform: rotate(0.8deg); }
+.carpeta:hover { transform: rotate(0); }
+.etiquetas { display: flex; flex-wrap: wrap; gap: var(--sk-space-xs); }
+.carpeta .accion { margin-top: var(--sk-space-xs); }
+
+.ovalo { margin-top: var(--sk-space-xs); }
+.titulo p { margin-top: var(--sk-space-xs); }
+
+/* ── Ficha de vacante ── */
+.ficha { align-items: start; }
+.ficha-cuerpo { padding: var(--sk-space-xl); display: grid; gap: var(--sk-space-l); transform: rotate(-0.2deg); }
+.ficha-cuerpo section { display: grid; gap: var(--sk-space-m); }
+.ficha-cuerpo h2, .ficha-cuerpo p, .ficha-cuerpo ul { margin: 0; }
+.lista-puntos { padding-left: var(--sk-space-m); display: grid; gap: var(--sk-space-s); }
+.lista-puntos li::marker { color: var(--sk-color-primary); font-size: 1.2em; }
+.aviso-aplicar { display: grid; gap: var(--sk-space-m); padding: var(--sk-space-l); position: relative;
+  background: var(--sk-color-secondary-hover-bg); border: 1px solid var(--sk-color-primary); border-radius: var(--bordes-s); box-shadow: var(--sk-shadow-surface); }
+.aviso-aplicar h3, .aviso-aplicar p { margin: 0; }
+.aviso-aplicar .flecha { justify-self: end; width: 40px; height: 32px; fill: none; stroke: var(--sk-color-primary-active); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+@media (min-width: 1024px) { .aviso-aplicar { position: sticky; top: 96px; } }
+sk-breadcrumb { display: block; }
+
+/* ── Confirmación ── */
+.pagina.centrado { align-content: center; }
+.confirmacion { padding: var(--sk-space-2xl); display: grid; gap: var(--sk-space-l); justify-items: start; max-width: 960px; margin-inline: auto; width: 100%; box-sizing: border-box; }
+.confirmacion h1, .confirmacion p { margin: 0; }
+.sello-check { display: grid; place-items: center; width: 64px; height: 64px; border-radius: var(--bordes-xl); background: var(--sk-color-primary); color: var(--sk-color-text-inverse); font-size: 28px; }

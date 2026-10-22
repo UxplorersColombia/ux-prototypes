@@ -1,0 +1,119 @@
+/* Base del sistema de diseño Skandia para prototipos HTML (sk-elements-html).
+   Tokens que el bundle no define + capa de ancho completo + grid de UX. No editar: se copia de la plantilla de la skill. */
+:root {
+  /* Espaciado (1:1 con --size-* de UX) */
+  --sk-space-zero: 0; --sk-space-xxs: 4px; --sk-space-xs: 8px; --sk-space-s: 12px; --sk-space-m: 16px;
+  --sk-space-l: 24px; --sk-space-xl: 32px; --sk-space-2xl: 40px; --sk-space-3xl: 48px;
+  --sk-space-4xl: 56px; --sk-space-5xl: 64px;
+  /* Grid de página (1:1 con --grid-* de UX). Fronteras: móvil < 768 · tablet 768–1023.98 · desktop ≥ 1024 */
+  --sk-grid-mobile-columns: 4;  --sk-grid-mobile-gutter: 16px;  --sk-grid-mobile-margin: 16px;
+  --sk-grid-tablet-columns: 8;  --sk-grid-tablet-gutter: 24px;  --sk-grid-tablet-margin: 32px;
+  --sk-grid-desktop-columns: 12; --sk-grid-desktop-gutter: 24px; --sk-grid-desktop-margin: 90px;
+  /* Sombras: una por rol, sin one-offs */
+  --sk-shadow-subtle: 0 0 2px rgba(68, 68, 68, 0.15);       /* inputs */
+  --sk-shadow-surface: 0 0 2px 0 rgba(61, 75, 92, 0.15);    /* tarjetas, acordeón, superficies propias */
+  --sk-shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.12);       /* elevación media (toast) */
+  --sk-shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.16);      /* modales, popovers, paneles flotantes */
+  /* Tipografía */
+  --sk-font-title: 'Montserrat', sans-serif;
+  --sk-font-body: 'Open Sans', system-ui, sans-serif;
+  --sk-font-weight-regular: 400; --sk-font-weight-medium: 500; --sk-font-weight-bold: 700;
+  /* Marca */
+  --sk-gradient-brand: linear-gradient(135deg, #00c73d 0%, #8fe000 100%);
+
+  /* Catálogo UX sin token en la librería (nombre de UX; si pasa a producción, pedir el token) */
+  /* Radios de UX. La librería no publica radios: cada componente trae el suyo. */
+  --bordes-s: 4px; --bordes-m: 16px; --bordes-l: 32px; --bordes-xl: 104px;
+  /* Fondos suaves de feedback (los mismos que usa sk-alert) */
+  --background-warning-light: #fff3e0; --background-info-light: #ebf4ff; --background-error-light: #fff5f4;
+  /* Neutros y secundaria */
+  --background-secundaria: #f7f7f7; --background-grey-medium: #b7b7b7; --background-black: #232323;
+  --stroke-grey-medium: #c5c5c5;
+  --texts-secundaria: #29806d; --texts-complementary: #4ae6c3;
+  --button-secundaria-default: #29806d; --button-secundaria-hover: #1d594c;
+  --button-secundaria-secondary-hover: #ccfdf2; --button-secundaria-tertiary-hover: #edfefa;
+  /* Ilustración */
+  --illustration-01: #00f0e0; --illustration-02: #45e39e; --illustration-03: #45ad00; --illustration-04: #ffae08;
+  /* Gráficas: usar en orden c01, c02, c03… */
+  --charts-c01: #a1dd70; --charts-c02: #a4d7e1; --charts-c03: #60a9a6; --charts-c04: #ff9460; --charts-c05: #8ba2c1;
+  --charts-c06: #f67e7d; --charts-c07: #dddfd0; --charts-c08: #6a7491; --charts-c09: #de423e; --charts-c10: #95dbb7;
+  --charts-c11: #ffbf9f; --charts-c12: #bc6995; --charts-c13: #d9d052; --charts-c14: #d6c09c; --charts-c15: #fecd72;
+  --charts-c16: #cba1d2; --charts-c17: #c5d8a4; --charts-c18: #368cb5; --charts-c19: #00f59f; --charts-c20: #f50cc9;
+  --charts-c21: #83a488; --charts-c22: #fcf9c6; --charts-c23: #b2f9fc; --charts-c24: #bf9078; --charts-c25: #9eb23b;
+  --charts-c26: #73777b; --charts-c27: #ffe2e2; --charts-c28: #36d6e0; --charts-c29: #aba09d; --charts-c30: #b5d1ff;
+  --charts-c31: #ecffb5; --charts-c32: #6f32c6; --charts-c33: #1f6feb; --charts-c34: #2e8b57; --charts-c35: #f4b400;
+  --charts-c36: #ff5a5f; --charts-c37: #7b3fa1; --charts-c38: #1abc9c; --charts-c39: #f28c28; --charts-c40: #4f6d8a;
+}
+
+/* ══ 2. ANCHO COMPLETO. NO BORRAR. ══
+   Los componentes que ocupan espacio horizontal llenan SIEMPRE su contenedor (el bundle los limita a
+   300–480 px o los deja "inline"). El ancho real lo decide el layout, nunca el componente.
+   Excepción puntual: atributo data-ancho="auto" (no uses class: el componente la reescribe). */
+:root :is(sk-input-text, sk-input-number, sk-input-select, sk-textarea, sk-date-picker, sk-date-range-picker,
+          sk-file-upload, sk-listbox, sk-form-field, sk-select-button, sk-button, sk-paginator, sk-stepper,
+          sk-table, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) {
+  width: 100%; max-width: none; min-width: 0; box-sizing: border-box;
+}
+:root :is(sk-input-text, sk-input-select, sk-date-picker, sk-date-range-picker, sk-listbox, sk-form-field,
+          sk-button, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) { display: block; }
+:root :is(sk-input-number, sk-textarea, sk-file-upload):not([data-ancho="auto"]) { display: flex; }
+:root :is(.sk-input-select, .sk-listbox, .p-select, .p-listbox, .p-datepicker, .p-inputnumber, .p-fileupload) { width: 100%; max-width: none; }
+:root sk-button:not([data-ancho="auto"]):not([label]) { display: inline-block; width: auto; }
+:root sk-button:not([data-ancho="auto"])[label] .p-button { width: 100%; justify-content: center; }
+:root sk-select-button:not([data-ancho="auto"]) { display: flex; }
+:root sk-select-button:not([data-ancho="auto"]) .p-selectbutton { display: flex; width: 100%; }
+:root sk-select-button:not([data-ancho="auto"]) .p-togglebutton { flex: 1 1 0; min-width: 0; justify-content: center; }
+:root sk-form-field :is(input, select, textarea) { width: 100%; box-sizing: border-box; }
+
+/* ══ 3. LAYOUT DE PÁGINA (grid de UX) ══ */
+body { background: var(--sk-color-bg, #fff); }
+.page { box-sizing: border-box; padding-inline: var(--sk-grid-mobile-margin); padding-block: var(--sk-space-l) var(--sk-space-5xl);
+        display: grid; gap: var(--sk-space-l); }
+/* Grid de 4/8/12 columnas con el gutter de UX. Hijos: data-col="3|4|6|8|12" (columnas en desktop); en tablet y móvil se reacomodan.
+   Atributo y no clase: los sk-* reescriben su class. */
+.sk-grid { display: grid; grid-template-columns: repeat(var(--sk-grid-mobile-columns), minmax(0, 1fr)); gap: var(--sk-space-m) var(--sk-grid-mobile-gutter); }
+.sk-grid > * { grid-column: 1 / -1; min-width: 0; }
+@media (min-width: 768px) {
+  .page { padding-inline: var(--sk-grid-tablet-margin); }
+  .sk-grid { grid-template-columns: repeat(var(--sk-grid-tablet-columns), minmax(0, 1fr)); column-gap: var(--sk-grid-tablet-gutter); }
+  .sk-grid > :is([data-col="3"], [data-col="4"], [data-col="6"]) { grid-column: span 4; }
+}
+@media (min-width: 1024px) {
+  .page { padding-inline: var(--sk-grid-desktop-margin); }
+  .sk-grid { grid-template-columns: repeat(var(--sk-grid-desktop-columns), minmax(0, 1fr)); column-gap: var(--sk-grid-desktop-gutter); }
+  .sk-grid > [data-col="3"] { grid-column: span 3; } .sk-grid > [data-col="4"] { grid-column: span 4; }
+  .sk-grid > [data-col="6"] { grid-column: span 6; } .sk-grid > [data-col="8"] { grid-column: span 8; }
+}
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--sk-space-m); }
+.stack { display: grid; gap: var(--sk-space-l); }
+/* Grupo de botones: columnas iguales; en móvil se apilan con la acción principal (la última en el HTML) arriba. */
+.actions { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--sk-space-s); }
+/* Pie de tarjeta (el slot #footer de sk-card no existe en HTML): fila de acciones con gap de 8 px */
+.card-footer { display: flex; gap: var(--sk-space-xs); }
+.card-footer > * { flex: 1 1 0; }
+@media (max-width: 767.98px) {
+  .actions { grid-auto-flow: row; }
+  .actions > :last-child { order: -1; }
+}
+
+/* Grupo de radios (sk-radio-group) */
+.sk-rg { display: grid; gap: 4px; }
+.sk-rg__label { font: 600 14px/22px var(--sk-font-body); color: var(--sk-color-text); }
+.sk-rg [role="radiogroup"] { display: flex; flex-direction: column; align-items: flex-start; }
+.sk-rg[data-dir="row"] [role="radiogroup"] { flex-direction: row; flex-wrap: wrap; column-gap: 16px; }
+.sk-rg__help, .sk-rg__error { margin: 0; font: 400 12px/20px var(--sk-font-body); }
+.sk-rg__help { color: var(--sk-color-text-muted); }
+.sk-rg__error { color: var(--sk-color-error); }
+
+/* Acordeón (sk-accordion). Un solo panel abierto: mismo name en todos los <details> del grupo. */
+.sk-acc-r { display: flex; flex-direction: column; gap: 8px; }
+.sk-acc-r summary { display: flex; align-items: center; gap: 8px; padding: 16px 24px; border-radius: 4px; list-style: none; cursor: pointer;
+  background: var(--sk-color-surface); box-shadow: var(--sk-shadow-surface); color: var(--sk-color-text); font: 700 14px/22px var(--sk-font-body); }
+.sk-acc-r summary::-webkit-details-marker { display: none; }
+.sk-acc-r summary::after { content: '\e902'; font-family: 'primeicons'; font-size: 16px; margin-left: auto; transition: transform var(--sk-motion-duration-base, .24s) var(--sk-motion-ease-standard, ease); }
+.sk-acc-r details[open] > summary { border-radius: 4px 4px 0 0; background: var(--sk-color-primary); color: var(--sk-color-text-inverse); box-shadow: 0 0 4px rgba(0, 0, 0, .15); }
+.sk-acc-r details[open] > summary::after { transform: rotate(180deg); }
+.sk-acc-r summary:focus-visible { outline: 2px solid var(--sk-color-primary); outline-offset: 2px; }
+.sk-acc-r details > :not(summary) { margin: 0; padding: 24px; border: 1px solid var(--sk-color-border); border-top: 0; border-radius: 0 0 4px 4px;
+  background: var(--sk-color-surface); color: var(--sk-color-text); font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .sk-acc-r summary::after { transition: none; } }

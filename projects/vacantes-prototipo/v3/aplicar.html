@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aplicar a Asesor Pensional — Skandia</title>
+
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-fonts.css">
+  <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-typography.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7/primeicons.css">
+  <script src="https://skcostgblobresources.blob.core.windows.net/skco-lib-components/sk-components-elements.js"></script>
+  <link rel="stylesheet" href="sk-base.css">
+  <link rel="stylesheet" href="editorial.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <template id="ui">
+    <header class="cabecera">
+      <div class="contenedor">
+        <a href="index.html" aria-label="Skandia, ir al inicio"><sk-logo sk-style="negro" decorativo style="height: 32px"></sk-logo></a>
+        <nav aria-label="Principal">
+          <a class="nav-link" href="index.html#beneficios">Beneficios</a>
+          <a class="nav-link" href="index.html#equipos">Equipos</a>
+          <a class="nav-link" href="index.html#como-aplicar">Cómo aplicar</a>
+          <a class="nav-pill" href="vacantes.html">Vacantes</a>
+        </nav>
+      </div>
+    </header>
+    <div class="esquina-cruzada" aria-hidden="true"></div>
+
+    <main class="contenedor pagina">
+      <section class="titulo">
+        <div><sk-button id="volver" label="Volver a la vacante" sk-type="tertiary" icon="pi pi-arrow-left" data-ancho="auto"></sk-button></div>
+        <h1><span class="ligero">Aplicar a</span> <span class="marcador">Asesor Pensional</span></h1>
+        <p class="meta">Ventas · Bogotá · Híbrido</p>
+      </section>
+
+      <div class="angosto">
+        <sk-alert type="info" message="No necesitas crear una cuenta para aplicar. Solo completa este formulario." closable="false"></sk-alert>
+
+        <sk-card>
+          <div class="stack">
+            <div class="sk-grid">
+              <sk-input-text data-col="6" id="nombre" label="Nombre completo" placeholder="Tu nombre completo" required></sk-input-text>
+              <sk-input-text data-col="6" id="documento" label="Número de documento" placeholder="Ej. 1234567890" inputmode="numeric" required></sk-input-text>
+              <sk-input-text data-col="6" id="telefono" label="Teléfono de contacto" placeholder="Ej. 300 123 4567" type="tel" required></sk-input-text>
+              <sk-input-text data-col="6" id="correo" label="Correo electrónico" placeholder="nombre@ejemplo.com" type="email" required></sk-input-text>
+              <sk-input-text data-col="6" id="ciudad" label="Ciudad donde vives" placeholder="Ej. Bogotá" required></sk-input-text>
+              <sk-input-text data-col="6" id="aspiracion" label="Aspiración salarial" placeholder="COP $" inputmode="numeric"
+                help-text="Opcional — nos ayuda a alinear expectativas desde el inicio."></sk-input-text>
+            </div>
+
+            <hr class="divisor">
+
+            <div class="sk-rg" id="discapacidad" data-dir="row">
+              <h5 id="discapacidad-label">¿Te encuentras en condición de discapacidad?</h5>
+              <p class="sk-rg__help" id="discapacidad-ayuda">Esta información es opcional y confidencial; nos ayuda a brindarte los ajustes que necesites durante el proceso de selección.</p>
+              <div role="radiogroup" aria-labelledby="discapacidad-label" aria-describedby="discapacidad-ayuda">
+                <sk-radio name="discapacidad" value="si" label="Sí"></sk-radio>
+                <sk-radio name="discapacidad" value="no" label="No" selected-value="no"></sk-radio>
+                <sk-radio name="discapacidad" value="prefiero" label="Prefiero no decirlo"></sk-radio>
+              </div>
+            </div>
+
+            <hr class="divisor">
+
+            <sk-file-upload id="cv" label="Hoja de vida (PDF)" hint="Formato PDF, máx. 5 MB" accept=".pdf,application/pdf"
+              choose-label="Adjuntar hoja de vida"></sk-file-upload>
+
+            <sk-checkbox id="autoriza" required
+              label="Autorizo a Skandia el tratamiento de mis datos personales, según la Política de Protección de Datos, para el proceso de selección."></sk-checkbox>
+
+            <div class="sk-grid">
+              <sk-button data-fin id="enviar" label="Enviar aplicación" type="submit"></sk-button>
+            </div>
+          </div>
+        </sk-card>
+      </div>
+    </main>
+
+    <footer class="pie">
+      <div class="contenedor">
+        <div class="pie-marca"><sk-logo sk-style="blanco" decorativo style="height: 32px"></sk-logo></div>
+        <small>Skandia Colombia</small>
+      </div>
+    </footer>
+  </template>
+
+  <script>
+    customElements.whenDefined('sk-button').then(() => {
+      const ui = document.importNode(document.getElementById('ui').content, true);
+      const $ = (s) => ui.querySelector(s);
+
+      // Datos complejos: antes de montar
+      $('#volver').addEventListener('skClick', () => (location.href = 'vacante.html'));
+      $('#cv').maxFileSize = 5 * 1024 * 1024;
+
+      // Grupo de radios: sincroniza todos los del mismo name
+      ui.querySelectorAll('.sk-rg sk-radio').forEach((r) =>
+        r.addEventListener('selectedValueChange', (e) => {
+          document.querySelectorAll(`sk-radio[name="${r.getAttribute('name')}"]`).forEach((o) => (o.selectedValue = e.detail));
+        }));
+
+      // Limpia el error de cada campo al corregirlo
+      ui.querySelectorAll('sk-input-text').forEach((c) => c.addEventListener('valueChange', () => { if (c.value) c.errorMessage = ''; }));
+      $('#autoriza').addEventListener('checkedChange', (e) => { if (e.detail) $('#autoriza').errorMessage = ''; });
+
+      // Validación al enviar; solo avanza si todo está completo
+      const reglas = [
+        ['nombre', 'Escribe tu nombre completo'],
+        ['documento', 'Escribe tu número de documento'],
+        ['telefono', 'Escribe un teléfono de contacto'],
+        ['correo', 'Escribe tu correo electrónico'],
+        ['ciudad', 'Escribe la ciudad donde vives'],
+      ];
+      $('#enviar').addEventListener('skClick', () => {
+        let ok = true;
+        reglas.forEach(([id, msg]) => {
+          const c = document.getElementById(id), v = (c.value || '').trim();
+          let error = v ? '' : msg;
+          if (id === 'correo' && v && !/^\S+@\S+\.\S+$/.test(v)) error = 'Revisa el formato: nombre@ejemplo.com';
+          c.errorMessage = error;
+          if (error) ok = false;
+        });
+        const aut = document.getElementById('autoriza');
+        aut.errorMessage = aut.checked ? '' : 'Debes aceptar la autorización para continuar.';
+        if (!aut.checked) ok = false;
+        if (ok) location.href = 'confirmacion.html';
+        else window.skElements.toast.error('Revisa el formulario', 'Hay campos por completar.');
+      });
+
+      document.getElementById('app').append(ui);
+      // sk-input-number toma el foco al montarse; aquí no se usa, pero se conserva la guarda de la plantilla
+      setTimeout(() => document.activeElement?.closest?.('sk-input-number') && document.activeElement.blur(), 0);
+    });
+  </script>
+</body>
+</html>
