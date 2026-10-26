@@ -17,6 +17,7 @@ Tipo de proyecto: IDENTIFICAR
 - La comunidad se habilita solo para la Ruta 1 (salida elegida).
 - La entrevista y la encuesta ya están en el prototipo del portal, se responden antes de descargar los documentos y la entrevista pide "Cuéntanos más" ante una respuesta desfavorable.
 - Se suma una línea de WhatsApp corporativa de nómina y se aclara que todo el desarrollo es interno.
+- Se incorporan los datos del equipo de Nómina sobre los productos de las 802 personas retiradas entre 2023 y 2026 (sección C.1).
 - El PAC de desvinculación, las dos ventanas de contacto y la conexión con B2Link se reservan para la v2.0. El informe conserva ese análisis como respaldo.
 
 ## Resumen ejecutivo
@@ -260,7 +261,7 @@ A diferencia de los dos tiers anteriores, esta sección no puntúa un producto n
 
 ### C.1 · Capacidad instalada hoy
 
-**Proceso de retiro.** La operación ya está en parte automatizada: las cartas y los documentos de liquidación se generan solos y los paz y salvos se aprueban con Power Automate. La experiencia de cara a la persona sigue siendo manual y empírica: contacto por WhatsApp desde celulares personales, con el riesgo de perder el historial cuando alguien del equipo cambia de rol, y por correo personal porque el colaborador pierde el acceso al correo corporativo. El proceso completo toma hasta 10 días desde la renuncia hasta el pago de la liquidación. No hay portal en producción: el prototipo ya está construido y faltan tres frentes técnicos (acceso con correo personal, firma electrónica y alojamiento), que se resuelven con desarrollo interno. Rafa gestiona además una línea de WhatsApp corporativa de nómina.
+**Proceso de retiro.** La operación ya está en parte automatizada: las cartas y los documentos de liquidación se generan solos y los paz y salvos se aprueban con Power Automate. La experiencia de cara a la persona sigue siendo manual y empírica: contacto por WhatsApp desde celulares personales, con el riesgo de perder el historial cuando alguien del equipo cambia de rol, y por correo personal porque el colaborador pierde el acceso al correo corporativo. El proceso completo toma hasta 10 días desde la renuncia hasta el pago de la liquidación. No hay portal en producción: el prototipo ya está construido y faltan tres frentes técnicos (acceso con correo personal, firma electrónica y alojamiento), que se resuelven con desarrollo interno. Además, ya hay una línea de WhatsApp corporativa de nómina con número asignado.
 
 **Reconocimiento.** Existe de forma parcial: se hacen gestos en retiros por pensión y en otros casos notables, pero no para todas las personas. Para ampliarlo hay presupuesto para cerca de 300 unidades del Kit Siempre Skandia (cinco opciones entre $5.000 y $22.000 por unidad) y un momento de reconocimiento en la oficina de nómina; el contenido final del kit está por definir. El kit se plantea como reconocimiento a la trayectoria, no como incentivo para retener. Se sigue explorando una vía "más tecnológica" (carta personalizada, video).
 
@@ -271,6 +272,19 @@ A diferencia de los dos tiers anteriores, esta sección no puntúa un producto n
 **Diferenciación por tipo de salida.** Existen 8 tipos administrativos (fallecimiento, justa causa, mutuo acuerdo, período de prueba, renuncia voluntaria, sin justa causa, terminación de contrato, terminación por pensión) sin ninguna ruta de experiencia diferenciada entre ellos.
 
 **Medición.** La encuesta de retiro actual tiene 26 preguntas; 18 de ellas (69%) evalúan cultura, beneficios o al líder directo. Cero preguntas sobre el proceso de retiro, cero sobre transición financiera, cero indicador cuantitativo tipo NPS o eNPS. Es, en la práctica, una encuesta de clima laboral aplicada tarde — lo que explica la baja tasa de respuesta. Por eso puntúa 1 y no 0: la encuesta existe, pero no se aplica a todas las personas y no está estructurada como indicador.
+
+#### Productos de las personas retiradas, 2023–2026
+
+Datos del equipo de Nómina (26 de octubre de 2026), que reporta 802 colaboradores retirados entre 2023 y 2026. Se cuentan productos, no personas: una persona puede tener varios. Con los 5 productos cada uno, el total posible es 4.010: 1.104 (27,5 %) siguen activos y 2.906 (72,5 %) nunca se tuvieron o están cancelados. En la tabla, "com." es fuerza comercial, "adm." es área administrativa, FPOB es pensión obligatoria y MFUND es pensión voluntaria.
+
+| Producto | Activos com. | Activos adm. | Activos total | Nunca o canc. com. | Nunca o canc. adm. | Nunca o canc. total |
+|---|---|---|---|---|---|---|
+| FPOB | 161 | 287 | **448** | 170 | 182 | **352** |
+| MFUND | 99 | 102 | **201** | 234 | 365 | **599** |
+| Cesantías | 159 | 229 | **388** | 173 | 245 | **418** |
+| CREA | 16 | 4 | **20** | 316 | 465 | **781** |
+| CREA Patrimonio | 31 | 16 | **47** | 302 | 454 | **756** |
+| **Total productos** | **466** | **638** | **1.104** | **1.195** | **1.711** | **2.906** |
 
 #### Lectura de capacidad actual
 
@@ -663,12 +677,12 @@ Frente a sus propios empleados, Skandia ocupa dos roles a la vez — quien los e
 - ¿El calendario de noviembre se diseña esperando la disponibilidad del PAC y del outplacement digital, o se diseña independiente de ellos?
 - ¿Es viable pedir de nuevo los indicadores de rotación, ahora acotados a un dato agregado sin riesgo de sensibilidad?
 - ¿Qué presupuesto y qué responsable tiene el Territorio C (comunidad), más allá del Kit Siempre Skandia, que ya cuenta con presupuesto para ~300 unidades?
-- ¿Cuántas personas que se retiraron entre 2023 y 2026 no conservan ningún producto con Skandia? Es el dato que dimensiona el reto real de retención: el total de retiros menos las 802 personas que sí conservan productos.
+- ¿Cuántas de las 802 personas retiradas entre 2023 y 2026 conservan al menos un producto con Skandia? Los datos de Nómina cuentan productos (1.104 activos de 4.010 posibles), no personas; el dato por persona dimensiona el reto real de retención.
 - ¿Dónde se aloja el portal (servidor de la universidad o arquitectura de Skandia), cómo se accede con correo personal y qué módulo de firma electrónica se usa?
 
 ## Limitaciones de este documento
 
-- **Sin indicadores de rotación ni total de retiros 2023–2026**, no se dimensiona el impacto del proyecto en volumen de clientes retenidos. Se sabe que 802 personas retiradas conservan 1.104 productos activos, pero no cuántas se fueron sin ninguno.
+- **Sin indicadores de rotación**, no se dimensiona el impacto del proyecto en volumen de clientes retenidos. Nómina entregó los productos de las 802 personas retiradas entre 2023 y 2026 (1.104 activos de 4.010 posibles), pero no cuántas personas conservan al menos uno.
 - **Las capacidades de B2Link (índice, PAC, fondo de emergencia, outplacement, Skandia Moments) están en ideación o en construcción, sin fechas comprometidas.** El diseño de Siempre Skandia no debe volverse dependiente de ellas.
 - **`s/d` es un resultado, no un vacío.** Que la mayoría de los referentes de alumni no publique nada sobre orientación financiera, y que los productos financieros no publiquen nada sobre comunidad, es en sí mismo el hallazgo central de este benchmark.
 - **El Tier B tiene solo dos referentes.** La búsqueda de productos financieros de transición con presencia pública propia en Colombia fue limitada — la mayoría de estos seguros se distribuyen de forma "invisible", empaquetados dentro de una tarjeta de crédito o un banco.
