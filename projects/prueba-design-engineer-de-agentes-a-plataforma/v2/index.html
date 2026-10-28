@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>De agentes a plataforma · Prueba técnica Design Engineer · Skandia</title>
+  <meta name="description" content="Diseña y construye la primera versión de una plataforma donde cualquier persona de Skandia, sin saber de UX ni de IA, llegue con una necesidad y salga con un resultado útil." />
+  <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-fonts.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7.0.0/primeicons.css">
+  <style>
+    /* ============ Tokens Skandia (sk-components) ============ */
+    :root {
+      --sk-color-primary: #00c73d;
+      --sk-color-primary-hover: #03a835;
+      --sk-color-primary-active: #009a2f;
+      --sk-color-accent: #16d727;
+      --sk-color-bg: #ffffff;
+      --sk-color-surface: #ffffff;
+      --sk-color-text: #404040;
+      --sk-color-text-muted: #666666;
+      --sk-color-text-inverse: #ffffff;
+      --sk-color-border: #dddddd;
+      --sk-color-border-focus: #16d727;
+      --sk-color-success: #00a34e;
+      --sk-color-warning: #ffae08;
+      --sk-color-error: #e03430;
+      --sk-color-info: #0099de;
+      --sk-color-disabled: #f7f7f7;
+      --sk-color-secondary-hover-bg: #caf9cb;
+      --sk-color-tertiary-hover-bg: #f6fcf2;
+      --sk-font-title: "Montserrat", sans-serif;
+      --sk-font-body: "Open Sans", system-ui, sans-serif;
+      --sk-shadow-subtle: 0 0 2px rgba(68, 68, 68, 0.15);
+      --sk-shadow-surface: 0 0 2px 0 rgba(61, 75, 92, 0.15);
+      --sk-shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.12);
+      --sk-shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.16);
+      --p-border-radius-md: 6px;
+      --p-border-radius-lg: 8px;
+      --sk-space-xxs: 4px; --sk-space-xs: 8px; --sk-space-s: 12px; --sk-space-m: 16px; --sk-space-l: 24px;
+      --sk-space-xl: 32px; --sk-space-2xl: 40px; --sk-space-3xl: 48px; --sk-space-4xl: 56px; --sk-space-5xl: 64px;
+      --sk-grid-mobile-margin: 16px; --sk-grid-tablet-margin: 32px; --sk-grid-desktop-margin: 90px;
+      --sk-grid-desktop-columns: 12; --sk-grid-desktop-gutter: 24px;
+      --sk-motion-duration-fast: 120ms; --sk-motion-duration-base: 320ms; --sk-motion-duration-slow: 480ms;
+      --sk-motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+      --sk-motion-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ============ Base ============ */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body { font-family: var(--sk-font-body); background: var(--sk-color-bg); color: var(--sk-color-text); -webkit-font-smoothing: antialiased; }
+    svg { display: block; }
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    dt, dd { margin: 0; }
+
+    /* ============ sk-button · sk-tag · sk-accordion (API de sk-components) ============ */
+    /* Texto gris de marca sobre verde para cumplir AA (blanco sobre verde da 2,2:1) */
+    .sk-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--sk-space-xs);
+      border-radius: 999px; font-family: var(--sk-font-title); font-weight: 700; font-size: 16px; text-decoration: none;
+      border: 2px solid transparent; cursor: pointer;
+      transition: background-color var(--sk-motion-duration-fast) var(--sk-motion-ease-standard),
+        border-color var(--sk-motion-duration-fast) var(--sk-motion-ease-standard);
+    }
+    .sk-button--large { min-height: 48px; padding: 0 var(--sk-space-l); }
+    .sk-button--primary { background: var(--sk-color-primary); color: var(--sk-color-text); }
+    .sk-button--primary:hover { background: var(--sk-color-accent); }
+    .sk-button--secondary { background: var(--sk-color-surface); border-color: var(--sk-color-primary); color: var(--sk-color-text); }
+    .sk-button--secondary:hover { background: var(--sk-color-secondary-hover-bg); }
+    .sk-button:focus-visible { outline: 3px solid var(--sk-color-text); outline-offset: 3px; box-shadow: 0 0 0 6px var(--sk-color-border-focus); }
+
+    .sk-tag {
+      display: inline-flex; align-items: center; gap: var(--sk-space-xs); border-radius: 999px;
+      font-family: var(--sk-font-body); font-weight: 700; color: var(--sk-color-text);
+      background: var(--sk-color-surface); border: 1px solid currentColor;
+    }
+    .sk-tag--large { font-size: 16px; padding: var(--sk-space-xxs) var(--sk-space-m); }
+    .sk-tag--success { border-color: var(--sk-color-success); }
+    .sk-tag--success .pi { color: var(--sk-color-success); }
+
+    .sk-accordion { display: grid; gap: var(--sk-space-xs); }
+    .sk-accordion__panel { background: var(--sk-color-surface); box-shadow: var(--sk-shadow-surface); border-radius: var(--p-border-radius-lg); }
+    .sk-accordion__header {
+      width: 100%; display: flex; justify-content: space-between; align-items: center; gap: var(--sk-space-m);
+      padding: var(--sk-space-m) var(--sk-space-l); text-align: left; background: none; border: 0; cursor: pointer;
+      font-family: var(--sk-font-title); font-weight: 700; font-size: 16px; color: var(--sk-color-text); border-radius: var(--p-border-radius-lg);
+    }
+    .sk-accordion__header .pi { color: var(--sk-color-primary-active); transition: transform var(--sk-motion-duration-base) var(--sk-motion-ease-emphasized); }
+    .sk-accordion__panel.is-open .pi-chevron-down { transform: rotate(180deg); }
+    .sk-accordion__header:focus-visible { outline: 3px solid var(--sk-color-border-focus); outline-offset: 2px; }
+    .sk-accordion__content { padding: 0 var(--sk-space-l) var(--sk-space-l); }
+
+    /* ============ MO · RETO — "El recorrido como paisaje" ============ */
+    .mo-reto {
+      --trail-x: 20px;
+      --pad-x: 44px;
+      --pad-r: var(--sk-grid-mobile-margin);
+      --sec-pad: 88px;
+      --ink: var(--sk-color-text);
+      --t-giant: clamp(52px, 11vw, 168px);
+      --t-big: clamp(40px, 7.4vw, 112px);
+      font-family: var(--sk-font-body);
+      color: var(--ink);
+      background: var(--sk-color-bg);
+      overflow-x: clip;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    @media (min-width: 768px) {
+      .mo-reto { --trail-x: 40px; --pad-x: 88px; --pad-r: var(--sk-grid-tablet-margin); --sec-pad: 120px; }
+    }
+    @media (min-width: 1024px) {
+      .mo-reto { --trail-x: 52px; --pad-x: 132px; --pad-r: var(--sk-grid-desktop-margin); --sec-pad: 160px; }
+    }
+    .mo-reto *, .mo-reto *::before, .mo-reto *::after { box-sizing: border-box; }
+    .mo-reto h1, .mo-reto h2, .mo-reto h3 { font-family: var(--sk-font-title); font-weight: 700; margin: 0; }
+    .mo-reto p, .mo-reto ul, .mo-reto ol, .mo-reto dl, .mo-reto dd, .mo-reto blockquote { margin: 0; padding: 0; }
+    .mo-reto ul, .mo-reto ol { list-style: none; }
+
+    .mo-wrap { padding-left: var(--pad-x); padding-right: var(--pad-r); max-width: 1600px; position: relative; }
+
+    /* ---------- Header ---------- */
+    .mo-header { position: sticky; top: 0; z-index: 20; background: var(--sk-color-surface); box-shadow: var(--sk-shadow-subtle); }
+    .mo-header__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--sk-space-m); padding: var(--sk-space-s) var(--pad-r) var(--sk-space-s) var(--sk-grid-mobile-margin); }
+    @media (min-width: 768px) { .mo-header__inner { padding-left: var(--pad-r); } }
+    .mo-header__logo { height: 28px; width: auto; flex: none; }
+    .mo-header__logo--mark { display: none; }
+    .mo-header__label { font-size: 14px; font-weight: 700; line-height: 1.2; text-align: right; }
+    @media (max-width: 767px) {
+      .mo-header__inner { gap: var(--sk-space-s); padding-top: var(--sk-space-xs); padding-bottom: var(--sk-space-xs); }
+      .mo-header__logo--word { display: none; }
+      .mo-header__logo--mark { display: block; height: 26px; }
+      .mo-header__label { white-space: nowrap; }
+    }
+    @media (max-width: 374px) {
+      .mo-header__label { white-space: normal; max-width: 18ch; text-wrap: balance; }
+    }
+
+    /* ---------- Trail (the continuous path) ---------- */
+    .mo-hero, .mo-stop { position: relative; }
+    .mo-trail { position: absolute; left: var(--trail-x); top: 0; bottom: 0; width: 6px; margin-left: -3px; pointer-events: none; z-index: 1; }
+    .mo-trail::before, .mo-trail::after { content: ""; position: absolute; inset: 0; border-radius: 3px; }
+    .mo-trail::before { background: var(--trail); opacity: 0.22; }
+    .mo-trail::after { background: var(--trail); transform-origin: top; transform: scaleY(var(--p, 1)); }
+    .mo-js .mo-trail::after { transform: scaleY(var(--p, 0)); }
+
+    .mo-marker { position: absolute; z-index: 2; left: var(--trail-x); top: calc(var(--sec-pad) + 8px); width: 30px; height: 30px; margin-left: -15px; border-radius: 50%; background: var(--trail); box-shadow: 0 0 0 6px var(--bg); }
+    .mo-marker--arrow { width: 56px; height: 56px; margin-left: -28px; top: calc(var(--sec-pad) - 4px); background: var(--sk-color-primary); display: grid; place-items: center; }
+    .mo-marker__arrow { width: 26px; height: auto; }
+    .mo-tone-green .mo-marker--arrow { background: var(--sk-color-text); }
+
+    /* ---------- Tones (full-bleed colour) ---------- */
+    .mo-tone-white { --bg: var(--sk-color-bg); --trail: var(--sk-color-primary-active); background: var(--bg); }
+    .mo-tone-mint { --bg: var(--sk-color-tertiary-hover-bg); --trail: var(--sk-color-primary-active); background: var(--bg); }
+    .mo-tone-soft { --bg: var(--sk-color-secondary-hover-bg); --trail: var(--sk-color-text); background: var(--bg); }
+    .mo-tone-green { --bg: var(--sk-color-primary); --trail: var(--sk-color-text-inverse); background: var(--bg); }
+    .mo-tone-green .mo-stop__num { color: var(--sk-color-text); }
+    .mo-tone-gray { --bg: var(--sk-color-text); --trail: var(--sk-color-primary); --ink: var(--sk-color-text-inverse); background: var(--bg); color: var(--ink); }
+
+    .mo-stop { padding: var(--sec-pad) 0; }
+    .mo-stop__head { display: flex; align-items: baseline; gap: var(--sk-space-m); margin-bottom: var(--sk-space-xl); }
+    .mo-stop__num { font-family: var(--sk-font-title); font-weight: 700; font-size: clamp(40px, 6vw, 88px); line-height: 0.8; letter-spacing: -0.05em; color: var(--trail); }
+    .mo-tone-white .mo-stop__num, .mo-tone-mint .mo-stop__num { color: var(--sk-color-primary-active); }
+    .mo-eyebrow { font-family: var(--sk-font-title); font-weight: 700; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    .mo-h2 { line-height: 0.95; letter-spacing: -0.045em; text-wrap: balance; }
+    .mo-h2--giant { font-size: var(--t-giant); }
+    .mo-h2--big { font-size: var(--t-big); max-width: 14ch; }
+    .mo-h3 { font-size: clamp(24px, 3vw, 36px); letter-spacing: -0.02em; margin: var(--sk-space-5xl) 0 var(--sk-space-l); }
+    .mo-lede { font-size: clamp(18px, 2vw, 24px); line-height: 1.45; max-width: 36ch; }
+    .mo-body { font-size: 16px; max-width: 60ch; }
+    @media (min-width: 1024px) { .mo-body { font-size: 18px; } }
+
+    /* ---------- Hero ---------- */
+    .mo-hero { --bg: var(--sk-color-primary); --trail: var(--sk-color-text-inverse); background: var(--bg); min-height: calc(100svh - 52px); display: flex; align-items: flex-end; overflow: hidden; padding: var(--sk-space-5xl) 0; }
+    .mo-hero__mark { position: absolute; right: -14vw; bottom: -34vh; width: min(72vw, 960px); transform: translateY(calc(var(--hy, 0) * 0.18px)) rotate(-8deg); }
+    .mo-hero__mark svg { width: 100%; height: auto; display: block; }
+    .mo-hero__dot { position: absolute; width: clamp(64px, 9vw, 150px); aspect-ratio: 1; border-radius: 50%; background: var(--sk-color-text); right: 4vw; top: 4vh; transform: translateY(calc(var(--hy, 0) * -0.08px)); }
+    @media (max-width: 767px) { .mo-hero__mark { right: -36vw; bottom: -12vh; width: 110vw; } .mo-hero__dot { right: 6vw; top: 4vh; width: 64px; } }
+    .mo-hero__inner { position: relative; z-index: 2; width: 100%; }
+    .mo-hero__pre { margin-bottom: var(--sk-space-l); }
+    .mo-hero__title { font-size: clamp(48px, 13.4vw, 220px); line-height: 0.84; letter-spacing: -0.06em; }
+    .mo-hero__l1, .mo-hero__l2 { display: block; }
+    .mo-hero__l2 { padding-left: 0.6em; }
+    @media (max-width: 767px) { .mo-hero__l2 { padding-left: 0; } }
+    .mo-hero__foot { display: grid; gap: var(--sk-space-xl); margin-top: var(--sk-space-3xl); }
+    @media (min-width: 1024px) { .mo-hero__foot { grid-template-columns: 1.1fr 1fr; align-items: end; gap: var(--sk-space-5xl); } }
+    .mo-hero__lede { font-size: clamp(18px, 2vw, 26px); line-height: 1.4; font-weight: 500; max-width: 34ch; }
+    .mo-hero__cta { display: grid; gap: var(--sk-space-l); justify-items: start; }
+    .mo-hero__note { display: flex; gap: var(--sk-space-s); font-size: 16px; max-width: 46ch; }
+    .mo-hero__note .pi { margin-top: 4px; }
+
+    /* ---------- Parada 1: scattered stations & cast ---------- */
+    .mo-p1-intro { display: grid; gap: var(--sk-space-xl); }
+    @media (min-width: 1024px) { .mo-p1-intro { gap: var(--sk-space-2xl); } .mo-p1-intro .mo-lede { max-width: 38ch; justify-self: end; } }
+    .mo-scatter-wrap { margin: var(--sk-space-4xl) calc(var(--pad-r) * -1) var(--sk-space-4xl) 0; overflow: hidden; }
+    .mo-scatter { width: 100%; min-width: 640px; height: auto; display: block; }
+    @media (max-width: 767px) { .mo-scatter-wrap { overflow-x: hidden; } .mo-scatter { width: 170%; margin-left: -10%; } }
+
+    .mo-cast { display: grid; gap: var(--sk-space-5xl); }
+    .mo-cast__item { position: relative; max-width: 620px; padding-top: var(--sk-space-l); border-top: 3px dashed var(--sk-color-border); }
+    @media (min-width: 1024px) {
+      .mo-cast { gap: var(--sk-space-3xl); }
+      .mo-cast__item { max-width: min(560px, 50%); }
+      .mo-cast__item--1 { margin-left: 0; }
+      .mo-cast__item--2 { margin-left: 50%; margin-top: -80px; }
+      .mo-cast__item--3 { margin-left: 4%; }
+      .mo-cast__item--4 { margin-left: 50%; margin-top: -80px; }
+      .mo-cast__item--5 { margin-left: 22%; }
+    }
+    .mo-cast__idx { position: absolute; top: -18px; left: 0; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--sk-color-text); color: var(--sk-color-text-inverse); font-family: var(--sk-font-title); font-weight: 700; font-size: 16px; }
+    .mo-cast__title { display: flex; flex-direction: column; gap: var(--sk-space-xs); margin-bottom: var(--sk-space-m); }
+    .mo-cast__cap { font-size: 16px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sk-color-text-muted); }
+    .mo-cast__agent { font-size: clamp(64px, 10vw, 148px); line-height: 0.85; letter-spacing: -0.06em; }
+    .mo-cast__item--5 .mo-cast__cap { font-size: clamp(36px, 5vw, 64px); line-height: 0.95; letter-spacing: -0.04em; text-transform: none; color: var(--sk-color-text); }
+    .mo-cast__does { font-size: 18px; margin-bottom: var(--sk-space-m); max-width: 44ch; }
+    .mo-cast__io { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sk-space-s); }
+    .mo-cast__io > div { display: flex; flex-wrap: wrap; gap: 6px; padding: var(--sk-space-xs) var(--sk-space-m); border-radius: 999px; background: var(--sk-color-tertiary-hover-bg); box-shadow: var(--sk-shadow-surface); font-size: 14px; }
+    .mo-cast__io dt { font-weight: 700; }
+    .mo-cast__io .pi { color: var(--sk-color-primary-active); }
+
+    .mo-p1-outro { display: grid; gap: var(--sk-space-3xl); margin-top: var(--sk-space-5xl); }
+    .mo-bottleneck { font-family: var(--sk-font-title); font-weight: 700; font-size: clamp(26px, 3.6vw, 52px); line-height: 1.12; letter-spacing: -0.03em; max-width: 24ch; padding: var(--sk-space-2xl); margin-left: calc(var(--pad-x) * -0.4); background: var(--sk-color-secondary-hover-bg); border-radius: 0 120px 120px 0; }
+    .mo-bottleneck strong { background: var(--sk-color-primary); padding: 0 0.15em; border-radius: 6px; }
+    @media (min-width: 1024px) { .mo-bottleneck { margin-left: 18%; } }
+
+    /* ---------- Parada 2: the chain ---------- */
+    .mo-p2 { padding-bottom: calc(var(--sec-pad) * 1.2); }
+    .mo-p2__title { font-size: clamp(48px, 10vw, 160px); max-width: 11ch; line-height: 0.92; }
+    .mo-p2__strike { color: var(--sk-color-primary); }
+    .mo-p2__intro { font-size: clamp(20px, 2.4vw, 30px); max-width: 30ch; margin-top: var(--sk-space-2xl); }
+    .mo-chain { display: grid; margin-top: var(--sk-space-5xl); }
+    @media (min-width: 1024px) { .mo-chain { grid-template-columns: 1fr 300px; gap: var(--sk-space-5xl); } }
+    .mo-chain__steps { display: grid; }
+    .mo-chain__step { position: relative; padding: var(--sk-space-3xl) 0 var(--sk-space-3xl) var(--sk-space-2xl); border-left: 4px solid color-mix(in oklab, var(--sk-color-text-inverse) 25%, transparent); transition: border-color var(--sk-motion-duration-slow) var(--sk-motion-ease-emphasized); }
+    .mo-chain__step.is-on { border-left-color: var(--sk-color-primary); }
+    @media (min-width: 1024px) { .mo-chain__step { min-height: 72vh; display: flex; flex-direction: column; justify-content: center; border-left: 0; padding-left: 0; } }
+    .mo-chain__n { font-family: var(--sk-font-title); font-weight: 700; font-size: 18px; display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 3px solid currentColor; margin-bottom: var(--sk-space-l); }
+    .mo-chain__word { font-size: clamp(56px, 13vw, 200px); line-height: 0.85; letter-spacing: -0.06em; color: color-mix(in oklab, var(--sk-color-text-inverse) 62%, var(--sk-color-text)); transition: color var(--sk-motion-duration-slow) var(--sk-motion-ease-emphasized), transform var(--sk-motion-duration-slow) var(--sk-motion-ease-emphasized); }
+    .mo-chain__step.is-on .mo-chain__word { color: var(--sk-color-primary); }
+    .mo-chain__text { font-size: clamp(18px, 2vw, 26px); line-height: 1.4; max-width: 34ch; margin-top: var(--sk-space-l); }
+    .mo-chain__rail { display: none; }
+    @media (min-width: 1024px) { .mo-chain__rail { display: block; } }
+    .mo-chain__sticky { position: sticky; top: 14vh; height: 72vh; }
+    .mo-chain-svg { width: 100%; height: 100%; overflow: visible; }
+    .mo-chain-ghost { fill: none; stroke: color-mix(in oklab, var(--sk-color-text-inverse) 25%, transparent); stroke-width: 6; stroke-dasharray: 2 14; stroke-linecap: round; }
+    .mo-chain-seg { fill: none; stroke: var(--sk-color-primary); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 1; }
+    .mo-chain-seg--1 { stroke-dashoffset: calc(1 - var(--s1, 1)); }
+    .mo-chain-seg--2 { stroke-dashoffset: calc(1 - var(--s2, 1)); }
+    .mo-chain-seg--3 { stroke-dashoffset: calc(1 - var(--s3, 1)); }
+    .mo-chain-node { fill: var(--sk-color-text); stroke: var(--sk-color-primary); stroke-width: 6; transition: fill var(--sk-motion-duration-base); }
+    .mo-chain[data-step="1"] .mo-chain-node--1, .mo-chain[data-step="2"] .mo-chain-node--1, .mo-chain[data-step="2"] .mo-chain-node--2,
+    .mo-chain[data-step="3"] .mo-chain-node { fill: var(--sk-color-primary); }
+    g.mo-chain-node--3 { stroke: none; fill: color-mix(in oklab, var(--sk-color-text-inverse) 25%, transparent); }
+    .mo-chain[data-step="3"] g.mo-chain-node--3 { fill: var(--sk-color-primary); }
+    .mo-chain-check circle { fill: var(--sk-color-text); stroke: var(--sk-color-text-inverse); stroke-width: 4; }
+    .mo-chain-check rect { fill: var(--sk-color-text-inverse); }
+    .mo-chain__human { position: absolute; right: -8px; top: calc(495 / 640 * 100% - 14px); font-size: 24px; color: var(--sk-color-text-inverse); }
+
+    /* ---------- Parada 3: people ---------- */
+    .mo-people { display: grid; gap: var(--sk-space-xl); margin-top: var(--sk-space-4xl); }
+    .mo-person { background: var(--sk-color-surface); border-radius: 32px; padding: var(--sk-space-xl); box-shadow: var(--sk-shadow-raised); display: grid; gap: var(--sk-space-l); align-content: start; }
+    .mo-person__who { display: flex; gap: var(--sk-space-m); align-items: center; }
+    .mo-person__who > div { display: grid; gap: var(--sk-space-s); justify-items: start; }
+    .mo-person__name { font-size: 18px; line-height: 1.3; }
+    .mo-person__quote { font-family: var(--sk-font-title); font-weight: 700; font-size: clamp(22px, 2.4vw, 32px); line-height: 1.2; letter-spacing: -0.02em; }
+    .mo-person--a .mo-person__quote { font-size: clamp(28px, 4vw, 60px); line-height: 1.05; letter-spacing: -0.035em; }
+    .mo-person__gap { display: flex; gap: var(--sk-space-s); font-size: 16px; color: var(--sk-color-text-muted); }
+    .mo-person__gap .pi { margin-top: 4px; color: var(--sk-color-primary-active); }
+    .mo-avatar { width: 72px; height: 72px; flex: none; }
+    .mo-person--a .mo-avatar { width: 96px; height: 96px; }
+    .mo-avatar__bg { fill: var(--sk-color-secondary-hover-bg); }
+    .mo-avatar__head { fill: var(--sk-color-text); }
+    .mo-avatar__body { fill: var(--sk-color-primary); }
+    .mo-avatar--b .mo-avatar__body { fill: var(--sk-color-text-muted); }
+    .mo-avatar--c .mo-avatar__bg { fill: var(--sk-color-tertiary-hover-bg); }
+    .mo-avatar--c .mo-avatar__body { fill: var(--sk-color-primary-active); }
+    .mo-avatar__dot { fill: var(--sk-color-primary); stroke: var(--sk-color-surface); stroke-width: 3; }
+    @media (min-width: 1024px) {
+      .mo-people { grid-template-columns: repeat(12, 1fr); gap: var(--sk-grid-desktop-gutter); }
+      .mo-person--a { grid-column: 1 / span 8; grid-row: 1 / span 2; padding: var(--sk-space-5xl); border-radius: 48px; }
+      .mo-person--b { grid-column: 8 / span 5; grid-row: 2 / span 2; margin-top: 60px; z-index: 1; }
+      .mo-person--c { grid-column: 3 / span 5; grid-row: 3 / span 2; margin-top: -40px; }
+    }
+    .mo-p3-note { margin-top: var(--sk-space-4xl); max-width: 48ch; }
+
+    /* ---------- Parada 4: views ---------- */
+    .mo-views { position: relative; margin-top: var(--sk-space-4xl); }
+    .mo-views__wave, .mo-session__wave { display: none; }
+    .mo-views__list { display: grid; gap: var(--sk-space-3xl); position: relative; }
+    .mo-view__n { font-family: var(--sk-font-title); font-weight: 700; font-size: clamp(96px, 14vw, 220px); line-height: 0.8; letter-spacing: -0.06em; color: var(--sk-color-primary-active); display: block; }
+    .mo-view__t { font-size: clamp(28px, 3.2vw, 44px); letter-spacing: -0.03em; margin: var(--sk-space-m) 0; }
+    @media (min-width: 1024px) {
+      .mo-views__list { grid-template-columns: repeat(3, 1fr); gap: var(--sk-space-3xl); }
+      .mo-view:nth-child(2) { margin-top: 120px; }
+      .mo-view:nth-child(3) { margin-top: 40px; }
+      .mo-views__wave, .mo-session__wave { display: block; position: absolute; left: -2%; width: 104%; height: 140px; top: 70px; }
+      .mo-views__wave path, .mo-session__wave path { fill: none; stroke: var(--sk-color-secondary-hover-bg); stroke-width: 14; stroke-linecap: round; }
+    }
+    .mo-states { display: grid; gap: var(--sk-space-m); }
+    @media (min-width: 768px) { .mo-states { grid-template-columns: 1fr 1fr; gap: var(--sk-space-l) var(--sk-space-3xl); } }
+    .mo-states li { display: flex; gap: var(--sk-space-m); font-size: 16px; padding: var(--sk-space-l) 0; border-top: 2px solid var(--sk-color-border); }
+    .mo-states .pi { font-size: 24px; color: var(--sk-color-primary-active); flex: none; }
+
+    /* ---------- Parada 5: AI ---------- */
+    .mo-ai { display: grid; gap: var(--sk-space-xl); margin-top: var(--sk-space-4xl); }
+    .mo-ai li { display: flex; gap: var(--sk-space-m); font-size: 18px; max-width: 62ch; }
+    .mo-ai .pi { font-size: 24px; flex: none; margin-top: 2px; }
+    .mo-ai__lead { font-family: var(--sk-font-title); font-weight: 700; font-size: clamp(24px, 3vw, 40px) !important; line-height: 1.2; letter-spacing: -0.02em; max-width: 30ch !important; }
+    @media (min-width: 1024px) { .mo-ai { grid-template-columns: repeat(2, 1fr); gap: var(--sk-space-2xl) var(--sk-space-5xl); } .mo-ai__lead { grid-column: 1 / -1; } .mo-ai li:nth-child(even) { transform: translateY(32px); } }
+
+    /* ---------- Parada 6 ---------- */
+    .mo-p6 { display: grid; gap: var(--sk-space-3xl); }
+    @media (min-width: 1024px) { .mo-p6 { grid-template-columns: 5fr 7fr; } .mo-p6__title { font-size: clamp(56px, 8vw, 128px); position: sticky; top: 120px; align-self: start; max-width: 5ch; } }
+    .mo-deliver { display: grid; gap: var(--sk-space-l); }
+    .mo-deliver > li { display: flex; gap: var(--sk-space-m); font-size: 18px; }
+    .mo-deliver .pi { font-size: 24px; color: var(--sk-color-primary-active); flex: none; }
+    .mo-deliver__acc { display: block !important; }
+    .mo-decisions { list-style: decimal !important; padding-left: var(--sk-space-l) !important; display: grid; gap: var(--sk-space-s); font-size: 16px; }
+
+    /* ---------- Parada 7 ---------- */
+    .mo-dims { display: grid; margin-top: var(--sk-space-4xl); border-top: 2px solid color-mix(in oklab, var(--sk-color-text-inverse) 30%, transparent); }
+    .mo-dim { display: grid; gap: var(--sk-space-s); min-width: 0; padding: var(--sk-space-xl) 0; border-bottom: 2px solid color-mix(in oklab, var(--sk-color-text-inverse) 30%, transparent); }
+    .mo-dim__pct { font-family: var(--sk-font-title); font-weight: 700; font-size: clamp(64px, 8vw, 128px); line-height: 0.85; letter-spacing: -0.06em; color: var(--sk-color-primary); max-width: 100%; }
+    .mo-dim__name { font-size: 20px; line-height: 1.25; overflow-wrap: break-word; }
+    .mo-dim__text { font-size: 16px; overflow-wrap: break-word; }
+    @media (min-width: 1024px) {
+      .mo-dims { grid-template-columns: repeat(5, minmax(0, 1fr)); border-bottom: 2px solid color-mix(in oklab, var(--sk-color-text-inverse) 30%, transparent); }
+      .mo-dim { border-bottom: 0; padding: var(--sk-space-xl) var(--sk-space-m) var(--sk-space-3xl); border-left: 2px solid color-mix(in oklab, var(--sk-color-text-inverse) 30%, transparent); align-content: start; }
+      .mo-dim:first-child { border-left: 0; padding-left: 0; }
+      .mo-dim__pct { font-size: clamp(44px, 4vw, 72px); }
+      .mo-dim__name { font-size: 18px; }
+    }
+    .mo-notevaluated { margin-top: var(--sk-space-3xl); }
+    .mo-notevaluated .mo-h3 { color: var(--sk-color-primary); }
+    .mo-notevaluated ul { display: flex; flex-wrap: wrap; gap: var(--sk-space-s); }
+    .mo-notevaluated li { display: flex; align-items: center; gap: var(--sk-space-s); font-size: 16px; padding: var(--sk-space-s) var(--sk-space-l); border-radius: 999px; border: 2px solid color-mix(in oklab, var(--sk-color-text-inverse) 40%, transparent); }
+
+    /* ---------- Parada 8 ---------- */
+    .mo-p8__title { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0 var(--sk-space-l); margin-bottom: var(--sk-space-2xl); }
+    .mo-p8__big { font-size: clamp(140px, 26vw, 400px); line-height: 0.78; letter-spacing: -0.07em; color: var(--sk-color-primary-active); }
+    .mo-p8__rest { font-size: clamp(32px, 4.6vw, 72px); line-height: 1; letter-spacing: -0.04em; max-width: 10ch; padding-bottom: 0.2em; }
+    .mo-session { position: relative; margin: var(--sk-space-4xl) 0; }
+    .mo-session__list { display: grid; gap: var(--sk-space-l); position: relative; }
+    .mo-session__list li { display: flex; align-items: center; gap: var(--sk-space-m); font-family: var(--sk-font-title); font-weight: 700; font-size: 20px; }
+    .mo-session__dot { width: 64px; height: 64px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--sk-color-text); color: var(--sk-color-text-inverse); }
+    .mo-session__dot .pi { font-size: 24px; }
+    @media (min-width: 1024px) {
+      .mo-session__wave { top: 0; height: 100px; }
+      .mo-session__list { grid-template-columns: repeat(4, 1fr); }
+      .mo-session__list li { flex-direction: column; align-items: flex-start; }
+      .mo-session__list li:nth-child(even) { margin-top: 48px; }
+    }
+    .mo-p8__ready { display: flex; gap: var(--sk-space-s); align-items: center; font-weight: 700; }
+    .mo-p8__ready .pi { color: var(--sk-color-primary-active); font-size: 20px; }
+
+    /* ---------- Descargas ---------- */
+    .mo-reto .mo-dl__list { list-style: none; padding: 0; margin: var(--sk-space-5xl) 0 0; display: grid; gap: var(--sk-space-3xl); }
+    .mo-dl__item { display: grid; gap: var(--sk-space-m); justify-items: start; align-content: start; padding-top: var(--sk-space-l); border-top: 6px solid var(--sk-color-primary); min-width: 0; }
+    .mo-dl__item .mo-h3 { margin: 0; }
+    .mo-dl__item--kit { border-top-color: var(--sk-color-text); }
+    .mo-dl__glyph { font-size: 40px; color: var(--sk-color-primary-active); line-height: 1; }
+    .mo-dl__glyph .pi { font-size: 40px; }
+    .mo-dl__item--kit .mo-dl__glyph { color: var(--sk-color-text); }
+    .mo-dl__help { display: flex; gap: var(--sk-space-xs); font-size: 14px; line-height: 1.5; max-width: 52ch; color: var(--sk-color-text-muted); }
+    .mo-dl__help .pi { margin-top: 3px; color: var(--sk-color-primary-active); }
+    .mo-dl__note { display: flex; gap: var(--sk-space-xs); align-items: center; margin-top: var(--sk-space-3xl); color: var(--sk-color-text); }
+    @media (min-width: 768px) { .mo-dl__list { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--sk-space-4xl); } .mo-dl__item--kit { margin-top: var(--sk-space-4xl); } }
+
+    /* ---------- Cierre ---------- */
+    .mo-close { overflow: hidden; padding-bottom: calc(var(--sec-pad) * 1.4); }
+    .mo-rules { display: grid; gap: var(--sk-space-3xl); margin-top: var(--sk-space-4xl); position: relative; z-index: 2; }
+    .mo-rules li { display: grid; grid-template-columns: auto 1fr; gap: var(--sk-space-l); align-items: start; }
+    .mo-rules__n { font-family: var(--sk-font-title); font-weight: 700; font-size: clamp(88px, 12vw, 180px); line-height: 0.8; letter-spacing: -0.06em; color: var(--sk-color-text); }
+    .mo-rules p { font-family: var(--sk-font-title); font-weight: 700; font-size: clamp(22px, 2.8vw, 38px); line-height: 1.2; letter-spacing: -0.02em; max-width: 26ch; padding-top: 0.2em; }
+    @media (min-width: 1024px) { .mo-rules { grid-template-columns: 1fr 1fr; } .mo-rules li:nth-child(2) { margin-top: 140px; } }
+    .mo-close__end { position: absolute; right: -6vw; bottom: -10vh; width: clamp(220px, 34vw, 520px); opacity: 0.95; }
+    .mo-close__end svg { width: 100%; height: auto; display: block; }
+    @media (max-width: 767px) { .mo-close__end { opacity: 0.35; } }
+
+    /* ---------- Footer ---------- */
+    .mo-footer { background: var(--sk-color-text); color: var(--sk-color-text-inverse); padding: var(--sk-space-3xl) 0; }
+    .mo-footer__inner { display: flex; flex-wrap: wrap; gap: var(--sk-space-l); align-items: center; justify-content: space-between; }
+    .mo-footer__logo { height: 32px; width: auto; }
+    .mo-footer p { font-weight: 700; }
+
+    /* ---------- Reveal motion ---------- */
+    .mo-js .mo-reveal { opacity: 0; transform: translateY(40px); transition: opacity var(--sk-motion-duration-slow) var(--sk-motion-ease-emphasized), transform 900ms var(--sk-motion-ease-emphasized); }
+    .mo-js .mo-reveal.is-in { opacity: 1; transform: none; }
+    .mo-reto :focus-visible { outline: 3px solid var(--sk-color-border-focus); outline-offset: 3px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mo-reto *, .mo-reto *::before, .mo-reto *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      .mo-reto .mo-reveal { opacity: 1 !important; transform: none !important; }
+      .mo-reto .mo-trail::after { transform: none !important; }
+      .mo-hero__mark { transform: rotate(-8deg) !important; }
+      .mo-hero__dot { transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Logo oficial Skandia: piezas reutilizables -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <path id="sk-arrow" d="M1.21062 15.8641L31.3276 45.8323C31.7828 46.2844 32.3624 46.5921 32.9933 46.7166C33.6242 46.8411 34.2779 46.7767 34.8721 46.5317C35.4662 46.2866 35.974 45.8719 36.3313 45.3398C36.6887 44.8077 36.8796 44.1822 36.8798 43.5422V15.0855C36.8791 13.827 36.3763 12.6202 35.482 11.7303C34.5876 10.8404 33.3749 10.3401 32.1101 10.3394H3.51204C2.8689 10.3396 2.24027 10.5295 1.70555 10.8851C1.17083 11.2407 0.754015 11.746 0.507748 12.3372C0.261481 12.9284 0.196813 13.5789 0.321913 14.2067C0.447013 14.8344 0.756269 15.4112 1.21062 15.8641Z"/>
+      <path id="sk-dot" d="M2.04213 45.1511C6.40045 49.4908 13.8571 46.4193 13.8571 40.2848C13.8571 38.4582 13.1278 36.7063 11.8298 35.4147C10.5318 34.1231 8.77124 33.3975 6.93553 33.3975C0.767714 33.3975 -2.31907 40.8172 2.04501 45.154"/>
+      <g id="sk-word">
+        <path d="M62.0001 34.4076C52.8491 31.9373 52.7944 27.3199 52.8491 24.5232C52.9124 20.0347 58.3408 15.8726 64.7474 15.8726C70.8261 15.8726 77.2327 18.5376 77.2988 25.9545H68.7318C68.6685 23.6645 66.718 23.2866 65.2796 23.2866C63.3205 23.2866 62.0116 24.1969 62.0778 25.5766C62.1411 26.4869 62.9408 27.4001 64.7589 27.8667L69.9371 29.2321C77.3247 31.2359 78.2395 36.1281 78.2395 38.0775C78.2395 44.5182 71.4388 47.5726 65.0322 47.5726C58.8241 47.5726 52.3514 43.8656 52.2881 37.1013H60.7832C60.8494 38.8589 62.797 40.6137 65.294 40.6137C67.3078 40.5478 69.0338 39.6376 69.0338 38.0775C69.0338 36.775 68.2485 36.0737 66.0276 35.4754L62.0001 34.4076Z"/>
+        <path d="M92.2609 46.8974H83.2422V0H92.2609V24.8442L99.519 16.5198H111.089L98.4086 29.9195L113.635 46.8974H102.459L92.2609 34.8632V46.8974Z"/>
+        <path d="M137.144 43.4505C135.179 46.3789 130.608 47.481 128.255 47.481C120.459 47.481 112.691 41.4324 112.691 31.6768C112.691 21.9212 120.459 15.8726 128.252 15.8726C130.211 15.8726 134.788 16.5195 137.141 19.9059V16.5195H146.16V46.897H137.144V43.4505ZM129.756 38.899C133.496 38.899 137.144 36.2311 137.144 31.6768C137.144 27.1224 133.482 24.4545 129.756 24.4545C125.965 24.4545 122.107 27.3171 122.107 31.6768C122.107 36.0365 125.965 38.899 129.756 38.899Z"/>
+        <path d="M163.611 46.897H154.518V16.5195H163.611V20.945C165.242 17.8878 168.838 15.8726 172.434 15.8726C179.295 15.8726 183.613 20.0977 183.613 28.7541V46.8999H174.52V30.7006C174.52 26.6673 172.296 24.652 169.227 24.652C166.022 24.652 163.605 26.2121 163.605 30.8294L163.611 46.897Z"/>
+        <path d="M213.601 46.8972V43.1272C212.099 45.9239 208.437 47.547 204.645 47.547C196.8 47.547 189.873 41.3696 189.873 31.8029C189.873 22.0473 196.8 15.8698 204.645 15.8698C208.437 15.8698 212.099 17.4299 213.601 20.2267V-0.00878906H222.622V46.8972H213.601ZM206.345 24.3917C202.488 24.3917 199.283 27.2543 199.283 31.6139C199.283 36.1024 202.488 38.9621 206.345 38.9621C210.137 38.9621 213.405 35.9679 213.405 31.6139C213.405 27.0596 210.074 24.3917 206.345 24.3917Z"/>
+        <path d="M235.49 -0.00878906C238.56 -0.00878906 241.045 2.28126 241.045 5.25833C241.045 8.23539 238.56 10.5913 235.49 10.5913C232.421 10.5913 229.8 8.24684 229.8 5.25833C229.8 2.26981 232.418 -0.00878906 235.49 -0.00878906ZM239.998 46.8857H230.979V16.5196H239.998V46.8857Z"/>
+        <path d="M270.981 43.4505C269.019 46.3789 264.445 47.481 262.092 47.481C254.31 47.481 246.531 41.4324 246.531 31.6768C246.531 21.9212 254.299 15.8726 262.092 15.8726C264.051 15.8726 268.628 16.5195 270.981 19.9059V16.5195H280V46.897H270.981V43.4505ZM263.593 38.899C267.333 38.899 270.981 36.2311 270.981 31.6768C270.981 27.1224 267.319 24.4545 263.593 24.4545C259.802 24.4545 255.944 27.3171 255.944 31.6768C255.944 36.0365 259.802 38.899 263.593 38.899Z"/>
+      </g>
+    </defs>
+  </svg>
+
+  <div class="mo-reto" id="mo-reto">
+    <header class="mo-header">
+      <div class="mo-header__inner">
+        <svg class="mo-header__logo mo-header__logo--word" viewBox="0 0 280 48" fill="none" role="img" aria-label="Skandia">
+          <use href="#sk-word" fill="var(--sk-color-text)"/><use href="#sk-arrow" fill="var(--sk-color-primary)"/><use href="#sk-dot" fill="var(--sk-color-primary)"/>
+        </svg>
+        <svg class="mo-header__logo mo-header__logo--mark" viewBox="0 0 37 48" fill="none" role="img" aria-label="Skandia">
+          <use href="#sk-arrow" fill="var(--sk-color-primary)"/><use href="#sk-dot" fill="var(--sk-color-primary)"/>
+        </svg>
+        <p class="mo-header__label">Equipo UX · Prueba técnica Design Engineer</p>
+      </div>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section class="mo-hero" data-trail aria-labelledby="hero-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-hero__mark" aria-hidden="true">
+          <svg viewBox="0 0 37 48" fill="none"><use href="#sk-arrow" fill="var(--sk-color-text-inverse)"/></svg>
+        </div>
+        <div class="mo-hero__dot" aria-hidden="true"></div>
+        <div class="mo-wrap mo-hero__inner">
+          <p class="mo-eyebrow mo-hero__pre">Prueba técnica · Design Engineer</p>
+          <h1 id="hero-h" class="mo-hero__title">
+            <span class="mo-hero__l1">De agentes</span>
+            <span class="mo-hero__l2">a plataforma</span>
+          </h1>
+          <div class="mo-hero__foot">
+            <p class="mo-hero__lede">Diseña y construye la primera versión de una plataforma donde cualquier persona de Skandia, sin saber de UX ni de IA, llegue con una necesidad y salga con un resultado útil.</p>
+            <div class="mo-hero__cta">
+              <button type="button" class="sk-button sk-button--secondary sk-button--large" id="ir-al-reto"><span>Conoce el reto</span><i class="pi pi-arrow-down" aria-hidden="true"></i></button>
+              <p class="mo-hero__note"><i class="pi pi-info-circle" aria-hidden="true"></i><span>Todo lo que necesitas está en esta página y en el kit que recibes. Evaluamos tus decisiones a partir de esa información.</span></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PARADA 1 -->
+      <section id="parada-1" class="mo-stop mo-tone-white" data-trail aria-labelledby="parada-1-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--dot" aria-hidden="true"></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><span class="mo-stop__num" aria-hidden="true">01</span><p class="mo-eyebrow">Parada 1 · El punto de partida</p></div>
+          <div class="mo-p1-intro">
+            <h2 id="parada-1-h" class="mo-h2 mo-h2--giant mo-reveal">Lo que ya existe</h2>
+            <p class="mo-lede mo-reveal">En el último año, el equipo UX de Skandia construyó un conjunto de capacidades con IA que ya usa en su trabajo diario.</p>
+          </div>
+          <div class="mo-scatter-wrap mo-reveal">
+            <svg class="mo-scatter" viewBox="0 0 1200 340" aria-hidden="true" focusable="false">
+              <path id="mo-run" d="M120 200 C 200 60, 300 40, 360 90 C 430 150, 520 300, 600 230 C 680 160, 760 40, 840 110 C 920 180, 1000 280, 1080 210 C 1140 160, 1100 300, 900 290 C 700 280, 400 320, 200 280 C 100 260, 60 230, 120 200" fill="none" stroke="var(--sk-color-text-muted)" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"/>
+              <g transform="translate(120 200)">
+                <path d="M-30 -24 q-30 -30 -70 -14" fill="none" stroke="var(--sk-color-primary-active)" stroke-width="6" stroke-linecap="round"/>
+                <circle r="42" fill="var(--sk-color-surface)" stroke="var(--sk-color-text)" stroke-width="4"/>
+                <circle r="11" fill="none" stroke="var(--sk-color-text)" stroke-width="4"/>
+                <path d="M8 8 L17 17" stroke="var(--sk-color-text)" stroke-width="5" stroke-linecap="round"/>
+              </g>
+              <g transform="translate(360 90)">
+                <path d="M30 20 q40 30 70 10" fill="none" stroke="var(--sk-color-primary-active)" stroke-width="6" stroke-linecap="round"/>
+                <circle r="42" fill="var(--sk-color-surface)" stroke="var(--sk-color-text)" stroke-width="4"/>
+                <g stroke="var(--sk-color-text)" stroke-width="4" stroke-linecap="round"><path d="M-14 -9 H14"/><path d="M-14 0 H8"/><path d="M-14 9 H2"/></g>
+              </g>
+              <g transform="translate(600 230)">
+                <path d="M-30 -24 q-30 -30 -70 -14" fill="none" stroke="var(--sk-color-primary-active)" stroke-width="6" stroke-linecap="round"/>
+                <circle r="42" fill="var(--sk-color-surface)" stroke="var(--sk-color-text)" stroke-width="4"/>
+                <g fill="var(--sk-color-text)"><rect x="-15" y="-15" width="12" height="12" rx="3"/><rect x="3" y="-15" width="12" height="12" rx="3"/><rect x="-15" y="3" width="30" height="12" rx="3"/></g>
+              </g>
+              <g transform="translate(840 110)">
+                <path d="M30 20 q40 30 70 10" fill="none" stroke="var(--sk-color-primary-active)" stroke-width="6" stroke-linecap="round"/>
+                <circle r="42" fill="var(--sk-color-surface)" stroke="var(--sk-color-text)" stroke-width="4"/>
+                <g fill="none" stroke="var(--sk-color-text)" stroke-width="4"><rect x="-15" y="-13" width="20" height="26" rx="4"/><rect x="-3" y="-8" width="18" height="22" rx="4" fill="var(--sk-color-primary)"/></g>
+              </g>
+              <g transform="translate(1080 210)">
+                <path d="M-30 -24 q-30 -30 -70 -14" fill="none" stroke="var(--sk-color-primary-active)" stroke-width="6" stroke-linecap="round"/>
+                <circle r="42" fill="var(--sk-color-surface)" stroke="var(--sk-color-text)" stroke-width="4"/>
+                <g fill="var(--sk-color-text)"><circle cx="-16" cy="-4" r="4"/><circle cx="-8" cy="6" r="4"/><circle cx="0" cy="-4" r="4"/><circle cx="8" cy="6" r="4"/><circle cx="16" cy="-4" r="4"/></g>
+              </g>
+              <!-- Persona del equipo UX que corre entre estaciones -->
+              <g id="mo-runner">
+                <g id="mo-runner-pose">
+                  <g transform="translate(0 -30)">
+                    <circle cx="0" cy="-22" r="8" fill="var(--sk-color-text)"/>
+                    <path d="M-9 -12 Q0 -16 9 -12 L7 6 L-7 6 Z" fill="var(--sk-color-primary)" stroke="var(--sk-color-text)" stroke-width="3" stroke-linejoin="round"/>
+                    <path d="M-4 6 L-12 22 M4 6 L12 20" stroke="var(--sk-color-text)" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M-8 -8 L-18 2 M8 -8 L18 -14" stroke="var(--sk-color-text)" stroke-width="4" stroke-linecap="round"/>
+                  </g>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <ol class="mo-cast">
+            <li class="mo-cast__item mo-cast__item--1 mo-reveal">
+              <span class="mo-cast__idx" aria-hidden="true">1</span>
+              <h3 class="mo-cast__title"><span class="mo-cast__cap">Investigación</span><span class="mo-cast__agent">Mike</span></h3>
+              <p class="mo-cast__does">Cruza investigación cualitativa, datos cuantitativos y benchmarking externo.</p>
+              <dl class="mo-cast__io"><div><dt>Recibe:</dt><dd>una pregunta de negocio</dd></div><i class="pi pi-arrow-right" aria-hidden="true"></i><div><dt>Entrega:</dt><dd>síntesis de hallazgos con fuentes</dd></div></dl>
+            </li>
+            <li class="mo-cast__item mo-cast__item--2 mo-reveal">
+              <span class="mo-cast__idx" aria-hidden="true">2</span>
+              <h3 class="mo-cast__title"><span class="mo-cast__cap">Contenido</span><span class="mo-cast__agent">Kiki</span></h3>
+              <p class="mo-cast__does">Define la arquitectura de mensajes y el microcopy según la guía de voz.</p>
+              <dl class="mo-cast__io"><div><dt>Recibe:</dt><dd>hallazgos + objetivo</dd></div><i class="pi pi-arrow-right" aria-hidden="true"></i><div><dt>Entrega:</dt><dd>estrategia de contenido y textos</dd></div></dl>
+            </li>
+            <li class="mo-cast__item mo-cast__item--3 mo-reveal">
+              <span class="mo-cast__idx" aria-hidden="true">3</span>
+              <h3 class="mo-cast__title"><span class="mo-cast__cap">Estrategia</span><span class="mo-cast__agent">Harvey</span></h3>
+              <p class="mo-cast__does">Clasifica el riesgo, define la arquitectura de información y la estructura del flujo.</p>
+              <dl class="mo-cast__io"><div><dt>Recibe:</dt><dd>hallazgos + contenido</dd></div><i class="pi pi-arrow-right" aria-hidden="true"></i><div><dt>Entrega:</dt><dd>documento de producto (PRD)</dd></div></dl>
+            </li>
+            <li class="mo-cast__item mo-cast__item--4 mo-reveal">
+              <span class="mo-cast__idx" aria-hidden="true">4</span>
+              <h3 class="mo-cast__title"><span class="mo-cast__cap">Prototipado</span><span class="mo-cast__agent">Rachel</span></h3>
+              <p class="mo-cast__does">Construye pantallas con el Design System.</p>
+              <dl class="mo-cast__io"><div><dt>Recibe:</dt><dd>PRD</dd></div><i class="pi pi-arrow-right" aria-hidden="true"></i><div><dt>Entrega:</dt><dd>prototipo navegable</dd></div></dl>
+            </li>
+            <li class="mo-cast__item mo-cast__item--5 mo-reveal">
+              <span class="mo-cast__idx" aria-hidden="true">5</span>
+              <h3 class="mo-cast__title"><span class="mo-cast__cap">Validación sintética</span></h3>
+              <p class="mo-cast__does">Simula la reacción de 5 perfiles de cliente de un segmento.</p>
+              <dl class="mo-cast__io"><div><dt>Recibe:</dt><dd>prototipo o mensaje + segmento</dd></div><i class="pi pi-arrow-right" aria-hidden="true"></i><div><dt>Entrega:</dt><dd>informe de reacciones</dd></div></dl>
+            </li>
+          </ol>
+          <div class="mo-p1-outro">
+            <p class="mo-body mo-reveal">Hoy cada capacidad funciona como un agente separado. Una persona del equipo UX es quien decide cuál usar, pasa el resultado de uno al siguiente, revisa la calidad y decide cuándo seguir.</p>
+            <p class="mo-bottleneck mo-reveal">Por eso el resto de la compañía (producto, comercial, mercadeo, cumplimiento) solo puede usarlas pidiéndoselo al equipo UX, que se volvió un <strong>cuello de botella</strong>.</p>
+            <p class="mo-body mo-reveal">El kit trae el contrato de cada capacidad (entradas, salidas, duración típica, si necesita revisión humana) y respuestas de ejemplo para simularlas.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PARADA 2 -->
+      <section id="parada-2" class="mo-stop mo-tone-gray mo-p2" data-trail aria-labelledby="parada-2-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--arrow" aria-hidden="true"><svg class="mo-marker__arrow" viewBox="0 0 37 48" fill="none"><use href="#sk-arrow" fill="var(--sk-color-text-inverse)"/></svg></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><span class="mo-stop__num" aria-hidden="true">02</span><p class="mo-eyebrow">Parada 2 · El reto</p></div>
+          <h2 id="parada-2-h" class="mo-h2 mo-p2__title mo-reveal">No es poner cada agente <span class="mo-p2__strike">detrás de un botón</span></h2>
+          <p class="mo-p2__intro mo-reveal">Es que la plataforma haga lo que hoy hace la persona del equipo UX:</p>
+          <div class="mo-chain" id="mo-chain" data-step="0">
+            <ol class="mo-chain__steps">
+              <li class="mo-chain__step"><span class="mo-chain__n" aria-hidden="true">1</span><h3 class="mo-chain__word">Encuadrar</h3><p class="mo-chain__text">Convertir una necesidad vaga en un encargo claro y preguntar lo que falta en vez de adivinar.</p></li>
+              <li class="mo-chain__step"><span class="mo-chain__n" aria-hidden="true">2</span><h3 class="mo-chain__word">Orquestar</h3><p class="mo-chain__text">Proponer qué capacidades encadenar y en qué orden, y pasar el contexto de una a otra.</p></li>
+              <li class="mo-chain__step"><span class="mo-chain__n" aria-hidden="true">3</span><h3 class="mo-chain__word">Controlar</h3><p class="mo-chain__text">Saber cuándo una salida necesita revisión humana antes de seguir, y dejar claro qué es evidencia real y qué es generado o sintético.</p></li>
+            </ol>
+            <div class="mo-chain__rail" aria-hidden="true">
+              <div class="mo-chain__sticky">
+                <svg class="mo-chain-svg" viewBox="0 0 240 640" aria-hidden="true" focusable="false">
+                  <path class="mo-chain-ghost" d="M120 70 C 20 150, 220 230, 120 310 C 30 380, 210 420, 120 470 M120 520 L120 590"/>
+                  <path class="mo-chain-seg mo-chain-seg--1" pathLength="1" d="M120 70 C 20 150, 220 230, 120 310"/>
+                  <path class="mo-chain-seg mo-chain-seg--2" pathLength="1" d="M120 310 C 30 380, 210 420, 120 470"/>
+                  <path class="mo-chain-seg mo-chain-seg--3" pathLength="1" d="M120 520 L120 590"/>
+                  <circle class="mo-chain-node mo-chain-node--1" cx="120" cy="70" r="20"/>
+                  <circle class="mo-chain-node mo-chain-node--2" cx="120" cy="310" r="20"/>
+                  <g class="mo-chain-check" transform="translate(120 495)"><circle r="26"/><rect x="-9" y="-11" width="6" height="22" rx="2"/><rect x="3" y="-11" width="6" height="22" rx="2"/></g>
+                  <g class="mo-chain-node mo-chain-node--3" transform="translate(103 584) scale(0.95)"><use href="#sk-arrow"/></g>
+                </svg>
+                <i class="pi pi-user mo-chain__human"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PARADA 3 -->
+      <section id="parada-3" class="mo-stop mo-tone-soft" data-trail aria-labelledby="parada-3-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--dot" aria-hidden="true"></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><span class="mo-stop__num" aria-hidden="true">03</span><p class="mo-eyebrow">Parada 3 · Para quién</p></div>
+          <h2 id="parada-3-h" class="mo-h2 mo-h2--big mo-reveal">Tres personas, un flujo completo</h2>
+          <ul class="mo-people">
+            <li class="mo-person mo-person--a mo-reveal">
+              <div class="mo-person__who">
+                <svg class="mo-avatar mo-avatar--a" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><circle cx="48" cy="48" r="48" class="mo-avatar__bg"/><circle cx="48" cy="38" r="15" class="mo-avatar__head"/><path d="M18 92 C 22 66, 74 66, 78 92 Z" class="mo-avatar__body"/><circle cx="74" cy="22" r="8" class="mo-avatar__dot"/></svg>
+                <div>
+                  <h3 class="mo-person__name">Persona A · Product Owner de un producto de inversión</h3>
+                  <span class="sk-tag sk-tag--success sk-tag--large"><i class="pi pi-check-circle" aria-hidden="true"></i>Construye para esta persona</span>
+                </div>
+              </div>
+              <blockquote class="mo-person__quote">"Quiero saber si vale la pena un simulador de aportes antes de pedirle un sprint a desarrollo"</blockquote>
+              <p class="mo-person__gap"><i class="pi pi-question-circle" aria-hidden="true"></i>No sabe qué es un PRD ni cómo se valida un concepto</p>
+            </li>
+            <li class="mo-person mo-person--b mo-reveal">
+              <div class="mo-person__who">
+                <svg class="mo-avatar mo-avatar--b" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><circle cx="48" cy="48" r="48" class="mo-avatar__bg"/><circle cx="48" cy="38" r="15" class="mo-avatar__head"/><path d="M18 92 C 22 66, 74 66, 78 92 Z" class="mo-avatar__body"/></svg>
+                <h3 class="mo-person__name">Persona B · Ejecutivo comercial</h3>
+              </div>
+              <blockquote class="mo-person__quote">"Necesito explicarle un producto nuevo a clientes que están por pensionarse"</blockquote>
+              <p class="mo-person__gap"><i class="pi pi-question-circle" aria-hidden="true"></i>No sabe qué capacidad usar ni qué es un segmento</p>
+            </li>
+            <li class="mo-person mo-person--c mo-reveal">
+              <div class="mo-person__who">
+                <svg class="mo-avatar mo-avatar--c" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><circle cx="48" cy="48" r="48" class="mo-avatar__bg"/><circle cx="48" cy="38" r="15" class="mo-avatar__head"/><path d="M18 92 C 22 66, 74 66, 78 92 Z" class="mo-avatar__body"/></svg>
+                <h3 class="mo-person__name">Persona C · Analista de cumplimiento</h3>
+              </div>
+              <blockquote class="mo-person__quote">"Tengo que revisar que un flujo comunique bien los riesgos antes de que salga"</blockquote>
+              <p class="mo-person__gap"><i class="pi pi-question-circle" aria-hidden="true"></i>Necesita saber de dónde sale cada afirmación</p>
+            </li>
+          </ul>
+          <p class="mo-lede mo-p3-note mo-reveal">Construye el flujo completo para A. Para B y C, explica en DECISIONES.md cómo los atendería tu plataforma sin pantallas nuevas. Si necesitas pantallas nuevas para ellos, también es una respuesta válida, pero justifícala.</p>
+        </div>
+      </section>
+
+      <!-- PARADA 4 -->
+      <section id="parada-4" class="mo-stop mo-tone-white" data-trail aria-labelledby="parada-4-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--dot" aria-hidden="true"></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><span class="mo-stop__num" aria-hidden="true">04</span><p class="mo-eyebrow">Parada 4 · Alcance</p></div>
+          <h2 id="parada-4-h" class="mo-h2 mo-h2--giant mo-reveal">Máximo tres vistas</h2>
+          <div class="mo-views">
+            <svg class="mo-views__wave" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M0 60 C 150 0, 250 120, 400 60 S 650 0, 800 60 S 1050 120, 1200 60"/></svg>
+            <ol class="mo-views__list">
+              <li class="mo-view mo-reveal"><span class="mo-view__n" aria-hidden="true">1</span><h3 class="mo-view__t">Encargo</h3><p class="mo-body">La persona describe su necesidad, la plataforma pide lo que falta y propone un plan de capacidades que la persona puede editar.</p></li>
+              <li class="mo-view mo-reveal"><span class="mo-view__n" aria-hidden="true">2</span><h3 class="mo-view__t">Ejecución</h3><p class="mo-body">El avance del plan, las salidas intermedias y al menos un punto de revisión humana (aprobar, ajustar o rehacer).</p></li>
+              <li class="mo-view mo-reveal"><span class="mo-view__n" aria-hidden="true">3</span><h3 class="mo-view__t">Resultado</h3><p class="mo-body">El entregable consolidado, con trazabilidad (qué capacidad produjo qué, con qué evidencia, qué es sintético) y el siguiente paso sugerido.</p></li>
+            </ol>
+          </div>
+          <h3 class="mo-h3 mo-reveal">Estados que no pueden faltar</h3>
+          <ul class="mo-states">
+            <li class="mo-reveal"><i class="pi pi-question-circle" aria-hidden="true"></i><span>La necesidad es ambigua y la plataforma pide precisión en vez de adivinar.</span></li>
+            <li class="mo-reveal"><i class="pi pi-shield" aria-hidden="true"></i><span>El encargo trae datos sensibles de clientes (por ejemplo, una cédula o un nombre con su saldo): la plataforma los detecta y no los envía.</span></li>
+            <li class="mo-reveal"><i class="pi pi-clock" aria-hidden="true"></i><span>Una capacidad falla o se demora más de lo esperado.</span></li>
+            <li class="mo-reveal"><i class="pi pi-replay" aria-hidden="true"></i><span>La persona rechaza una salida intermedia y pide un ajuste.</span></li>
+            <li class="mo-reveal"><i class="pi pi-eye" aria-hidden="true"></i><span>El resultado tiene evidencia débil (pocas fuentes o solo usuarios sintéticos) y se comunica sin esconderlo.</span></li>
+            <li class="mo-reveal"><i class="pi pi-check-circle" aria-hidden="true"></i><span>Éxito.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- PARADA 5 -->
+      <section id="parada-5" class="mo-stop mo-tone-green" data-trail aria-labelledby="parada-5-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--dot" aria-hidden="true"></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><span class="mo-stop__num" aria-hidden="true">05</span><p class="mo-eyebrow">Parada 5 · La IA dentro del producto</p></div>
+          <h2 id="parada-5-h" class="mo-h2 mo-h2--giant mo-reveal">Al menos una capacidad real</h2>
+          <ul class="mo-ai">
+            <li class="mo-ai__lead mo-reveal">Al menos una capacidad debe estar conectada a un LLM real de punta a punta. Tú eliges cuál y lo justificas. Sugerencia: el encuadre (necesidad → encargo + plan) es donde más se nota la inteligencia de la plataforma, pero no es obligatorio.</li>
+            <li class="mo-reveal"><i class="pi pi-sitemap" aria-hidden="true"></i>La salida de esa capacidad debe ser estructurada y validada (un esquema que tu interfaz consume), no texto pegado en pantalla.</li>
+            <li class="mo-reveal"><i class="pi pi-file" aria-hidden="true"></i>Las demás capacidades pueden usar las respuestas simuladas del kit.</li>
+            <li class="mo-reveal"><i class="pi pi-sliders-h" aria-hidden="true"></i>Usa el proveedor y el modelo que quieras, con tu propia cuenta. No evaluamos qué tan bueno es el modelo. Una capa gratuita o un modelo local son válidos. Evaluamos cómo lo integras, cómo lo diriges y cómo manejas cuando falla.</li>
+            <li class="mo-reveal"><i class="pi pi-lock" aria-hidden="true"></i>Nunca subas tu llave de API al repositorio. La URL desplegada puede correr en modo simulado; la capacidad real la muestras en la defensa o en un video de máximo 3 minutos.</li>
+            <li class="mo-reveal"><i class="pi pi-shield" aria-hidden="true"></i>Usa solo los datos sintéticos del kit. No pongas datos reales de Skandia ni de clientes en ningún servicio de IA externo.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- PARADA 6 -->
+      <section id="parada-6" class="mo-stop mo-tone-white" data-trail aria-labelledby="parada-6-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--dot" aria-hidden="true"></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><span class="mo-stop__num" aria-hidden="true">06</span><p class="mo-eyebrow">Parada 6 · Qué entregas</p></div>
+          <div class="mo-p6">
+            <h2 id="parada-6-h" class="mo-h2 mo-h2--giant mo-p6__title mo-reveal">Qué entregas</h2>
+            <ul class="mo-deliver">
+              <li class="mo-reveal"><i class="pi pi-globe" aria-hidden="true"></i><span>La implementación funcionando y una URL de preview desplegada (Vercel, Netlify o StackBlitz).</span></li>
+              <li class="mo-reveal"><i class="pi pi-history" aria-hidden="true"></i><span>El repositorio con un historial de commits legible.</span></li>
+              <li class="mo-deliver__acc mo-reveal">
+                <div class="sk-accordion">
+                  <div class="sk-accordion__panel is-open">
+                    <button type="button" class="sk-accordion__header" aria-expanded="true" aria-controls="acc-decisiones" id="acc-decisiones-btn">
+                      <span>DECISIONES.md, de máximo una página y con estas cinco secciones:</span>
+                      <i class="pi pi-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div id="acc-decisiones" class="sk-accordion__content">
+                      <ol class="mo-decisions">
+                        <li>Decisiones de diseño y qué descartaste.</li>
+                        <li>Cómo modelaste las capacidades (el contrato que usa tu interfaz) y qué extendiste del Design System: token, variante o componente nuevo, y por qué.</li>
+                        <li>Dónde se equivocó la IA, tanto la que usaste para construir como la capacidad real dentro del producto, y qué corregiste.</li>
+                        <li>Cómo atendería la plataforma a las personas B y C.</li>
+                        <li>Qué dejaste fuera y qué harías con dos días más.</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="mo-reveal"><i class="pi pi-comments" aria-hidden="true"></i><span>El log o la transcripción de tus sesiones de IA (obligatorio).</span></li>
+              <li class="mo-reveal"><i class="pi pi-images" aria-hidden="true"></i><span>Exploración visual en Figma o capturas, opcional. Diseñar directamente en código no se penaliza.</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- PARADA 7 -->
+      <section id="parada-7" class="mo-stop mo-tone-gray" data-trail aria-labelledby="parada-7-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--dot" aria-hidden="true"></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><span class="mo-stop__num" aria-hidden="true">07</span><p class="mo-eyebrow">Parada 7 · Cómo evaluamos</p></div>
+          <h2 id="parada-7-h" class="mo-h2 mo-h2--big mo-reveal">Cinco dimensiones, el mismo peso</h2>
+          <ol class="mo-dims">
+            <li class="mo-dim mo-reveal"><span class="mo-dim__pct">20%</span><h3 class="mo-dim__name">Craft de interacción y pulido</h3><p class="mo-dim__text">Transiciones entre pasos, streaming, estados de carga y error, el punto de revisión.</p></li>
+            <li class="mo-dim mo-reveal"><span class="mo-dim__pct">20%</span><h3 class="mo-dim__name">Criterio dirigiendo la IA</h3><p class="mo-dim__text">Tu log de IA y la capacidad real: prompt, esquema, validación y manejo de fallas.</p></li>
+            <li class="mo-dim mo-reveal"><span class="mo-dim__pct">20%</span><h3 class="mo-dim__name">Pensamiento de sistemas y Design System</h3><p class="mo-dim__text">Cómo modelaste las capacidades y qué extendiste del Design System.</p></li>
+            <li class="mo-dim mo-reveal"><span class="mo-dim__pct">20%</span><h3 class="mo-dim__name">Confianza y control para no expertos</h3><p class="mo-dim__text">Trazabilidad, señal de evidencia, manejo de datos sensibles y lenguaje sin jerga.</p></li>
+            <li class="mo-dim mo-reveal"><span class="mo-dim__pct">20%</span><h3 class="mo-dim__name">Comunicación, autonomía y ambigüedad</h3><p class="mo-dim__text">DECISIONES.md, cómo resolviste B y C y la sesión en vivo.</p></li>
+          </ol>
+          <div class="mo-notevaluated mo-reveal">
+            <h3 class="mo-h3">Lo que no evaluamos</h3>
+            <ul>
+              <li><i class="pi pi-minus-circle" aria-hidden="true"></i>La calidad del modelo o del proveedor que elijas.</li>
+              <li><i class="pi pi-minus-circle" aria-hidden="true"></i>Usar un modelo pequeño, local o gratuito.</li>
+              <li><i class="pi pi-minus-circle" aria-hidden="true"></i>Que la URL desplegada corra en modo simulado.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- PARADA 8 -->
+      <section id="parada-8" class="mo-stop mo-tone-mint" data-trail aria-labelledby="parada-8-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--dot" aria-hidden="true"></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><span class="mo-stop__num" aria-hidden="true">08</span><p class="mo-eyebrow">Parada 8 · Sesión en vivo</p></div>
+          <h2 id="parada-8-h" class="mo-h2 mo-p8__title mo-reveal"><span class="mo-p8__big">60</span><span class="mo-p8__rest">minutos sobre lo que construiste</span></h2>
+          <p class="mo-lede mo-reveal">Después de tu entrega nos reunimos contigo para que nos muestres tu trabajo y conversemos sobre tus decisiones.</p>
+          <div class="mo-session">
+            <svg class="mo-session__wave" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M0 60 C 150 0, 250 120, 400 60 S 650 0, 800 60 S 1050 120, 1200 60"/></svg>
+            <ol class="mo-session__list">
+              <li class="mo-reveal"><span class="mo-session__dot"><i class="pi pi-desktop" aria-hidden="true"></i></span><span>Nos muestras tu entrega.</span></li>
+              <li class="mo-reveal"><span class="mo-session__dot"><i class="pi pi-comments" aria-hidden="true"></i></span><span>Conversamos sobre tus decisiones.</span></li>
+              <li class="mo-reveal"><span class="mo-session__dot"><i class="pi pi-code" aria-hidden="true"></i></span><span>Trabajamos juntos sobre tu código.</span></li>
+              <li class="mo-reveal"><span class="mo-session__dot"><i class="pi pi-question-circle" aria-hidden="true"></i></span><span>Haces tus preguntas al equipo.</span></li>
+            </ol>
+          </div>
+          <p class="mo-body mo-p8__ready mo-reveal"><i class="pi pi-wrench" aria-hidden="true"></i>Ten tu entorno de desarrollo y tus herramientas de IA listos.</p>
+        </div>
+      </section>
+
+      <!-- DESCARGAS -->
+      <section id="descargas" class="mo-stop mo-tone-white mo-downloads" data-trail aria-labelledby="descargas-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--dot" aria-hidden="true"></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><p class="mo-eyebrow">Descargas</p></div>
+          <h2 id="descargas-h" class="mo-h2 mo-h2--big mo-reveal">Llévate la prueba y el kit</h2>
+          <ul class="mo-dl__list">
+            <li class="mo-dl__item mo-reveal">
+              <span class="mo-dl__glyph" aria-hidden="true"><i class="pi pi-file"></i></span>
+              <h3 class="mo-h3">La prueba completa</h3>
+              <p class="mo-body">Todo lo de esta página en un documento, con la lista para revisar antes de entregar.</p>
+              <a class="sk-button sk-button--primary sk-button--large" href="prueba-design-engineer.md" download="prueba-design-engineer.md"><span>Descargar la prueba</span><i class="pi pi-download" aria-hidden="true"></i></a>
+            </li>
+            <li class="mo-dl__item mo-dl__item--kit mo-reveal">
+              <span class="mo-dl__glyph" aria-hidden="true"><i class="pi pi-box"></i></span>
+              <h3 class="mo-h3">El kit</h3>
+              <p class="mo-body">Catálogo de capacidades con respuestas simuladas, encargos de ejemplo, fichas de las personas, componentes del Design System y guía de voz.</p>
+              <a class="sk-button sk-button--primary sk-button--large" href="kit-plataforma.zip" download="kit-plataforma.zip"><span>Descargar el kit</span><i class="pi pi-download" aria-hidden="true"></i></a>
+              <p class="mo-dl__help"><i class="pi pi-info-circle" aria-hidden="true"></i><span>Si Windows bloquea algún archivo al descomprimir: clic derecho sobre <strong>kit-plataforma.zip</strong> → Propiedades → marca Desbloquear → Aceptar, y vuelve a descomprimir.</span></p>
+            </li>
+          </ul>
+          <p class="mo-body mo-dl__note mo-reveal"><i class="pi pi-lock" aria-hidden="true"></i>El kit es confidencial. No lo publiques ni lo compartas.</p>
+        </div>
+      </section>
+
+      <!-- CIERRE -->
+      <section id="reglas" class="mo-stop mo-tone-green mo-close" data-trail aria-labelledby="reglas-h">
+        <div class="mo-trail" aria-hidden="true"></div>
+        <div class="mo-marker mo-marker--arrow" aria-hidden="true"><svg class="mo-marker__arrow" viewBox="0 0 37 48" fill="none"><use href="#sk-arrow" fill="var(--sk-color-text-inverse)"/></svg></div>
+        <div class="mo-wrap">
+          <div class="mo-stop__head mo-reveal"><p class="mo-eyebrow">Cierre · Reglas</p></div>
+          <h2 id="reglas-h" class="mo-h2 mo-h2--giant mo-reveal">Dos reglas</h2>
+          <ol class="mo-rules">
+            <li class="mo-reveal"><span class="mo-rules__n" aria-hidden="true">1</span><p>Usar IA es obligatorio y debes declararlo. No usarla es una señal negativa, y usarla sin criterio también.</p></li>
+            <li class="mo-reveal"><span class="mo-rules__n" aria-hidden="true">2</span><p>El trabajo es tuyo. Skandia no usará tu entrega para construir la plataforma real sin un acuerdo explícito contigo.</p></li>
+          </ol>
+          <div class="mo-close__end" aria-hidden="true">
+            <svg viewBox="0 0 37 48" fill="none"><use href="#sk-arrow" fill="var(--sk-color-text-inverse)"/><use href="#sk-dot" fill="var(--sk-color-text-inverse)"/></svg>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mo-footer">
+      <div class="mo-wrap mo-footer__inner">
+        <svg class="mo-footer__logo" viewBox="0 0 280 48" fill="none" role="img" aria-label="Skandia">
+          <use href="#sk-word" fill="var(--sk-color-text-inverse)"/><use href="#sk-arrow" fill="var(--sk-color-text-inverse)"/><use href="#sk-dot" fill="var(--sk-color-text-inverse)"/>
+        </svg>
+        <p>Equipo UX · Skandia</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.getElementById("mo-reto");
+      var chain = document.getElementById("mo-chain");
+      var steps = chain.querySelectorAll(".mo-chain__step");
+      var runner = document.getElementById("mo-runner");
+      var pose = document.getElementById("mo-runner-pose");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var reveals = root.querySelectorAll(".mo-reveal");
+      var trails = root.querySelectorAll("[data-trail]");
+
+      function setStep(n) {
+        chain.setAttribute("data-step", String(n));
+        steps.forEach(function (s, i) { s.classList.toggle("is-on", n >= i + 1); });
+      }
+
+      // Acordeón (SkAccordion): abre y cierra el panel
+      var accBtn = document.getElementById("acc-decisiones-btn");
+      var accPanel = document.getElementById("acc-decisiones");
+      accBtn.addEventListener("click", function () {
+        var open = accBtn.getAttribute("aria-expanded") !== "true";
+        accBtn.setAttribute("aria-expanded", String(open));
+        accPanel.hidden = !open;
+        accBtn.parentElement.classList.toggle("is-open", open);
+      });
+
+      // "Conoce el reto" lleva a la Parada 1
+      document.getElementById("ir-al-reto").addEventListener("click", function () {
+        var r = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        document.getElementById("parada-1").scrollIntoView({ behavior: r ? "auto" : "smooth", block: "start" });
+      });
+
+      root.classList.add("mo-js");
+
+      if (reduce) {
+        // Sin movimiento: todo visible, camino completo y la persona quieta junto al camino
+        reveals.forEach(function (r) { r.classList.add("is-in"); });
+        trails.forEach(function (t) { t.style.setProperty("--p", "1"); });
+        chain.style.setProperty("--s1", "1");
+        chain.style.setProperty("--s2", "1");
+        chain.style.setProperty("--s3", "1");
+        setStep(3);
+        runner.setAttribute("transform", "translate(480 300)");
+        return;
+      }
+
+      // La persona del equipo UX corre entre las estaciones
+      var motion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+      motion.setAttribute("dur", "16s");
+      motion.setAttribute("repeatCount", "indefinite");
+      motion.setAttribute("rotate", "0");
+      var mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
+      mpath.setAttribute("href", "#mo-run");
+      motion.appendChild(mpath);
+      pose.parentNode.appendChild(motion);
+
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } });
+      }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+      reveals.forEach(function (r) { io.observe(r); });
+
+      var clamp = function (v) { return Math.min(1, Math.max(0, v)); };
+      var raf = 0;
+      function update() {
+        raf = 0;
+        var vh = window.innerHeight;
+        root.style.setProperty("--hy", String(Math.min(window.scrollY, vh)));
+        trails.forEach(function (t) {
+          var r = t.getBoundingClientRect();
+          t.style.setProperty("--p", clamp((vh * 0.7 - r.top) / r.height).toFixed(3));
+        });
+        var c = chain.getBoundingClientRect();
+        var p = clamp((vh * 0.55 - c.top) / c.height);
+        chain.style.setProperty("--s1", clamp(p * 3).toFixed(3));
+        chain.style.setProperty("--s2", clamp(p * 3 - 1).toFixed(3));
+        chain.style.setProperty("--s3", clamp(p * 3 - 2).toFixed(3));
+        setStep(p <= 0 ? 0 : Math.min(3, Math.floor(p * 3) + 1));
+      }
+      function onScroll() { if (!raf) raf = requestAnimationFrame(update); }
+      update();
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+    })();
+  </script>
+</body>
+</html>
