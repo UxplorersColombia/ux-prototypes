@@ -6,13 +6,6 @@ Este documento tiene todo lo que necesitas para hacer la prueba. Va acompañado 
 
 Todo lo que necesitas está en este documento y en el kit. Evaluamos tus decisiones a partir de esa información.
 
-> **Fechas y contacto**
-> - Recibes la prueba: [fecha]
-> - Entregas: [fecha y hora límite]
-> - Canal de entrega: [correo o formulario]
-> - Sesión en vivo: [se agenda contigo]
-> - Contacto: [nombre y correo]
-
 ---
 
 ## 1. Lo que ya existe
