@@ -1,0 +1,1725 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radiografía de empresa · Contigo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* ==========================================================================
+   Radiografía de empresa · Portal Contigo — prototipo (vista director comercial)
+
+   El asesor busca la empresa en el buscador de Contigo y llega a esta ficha.
+   Marco, tarjetas y pestañas tomados de la ficha de cliente actual
+   (PAC Contigo/capturas) y de PAC Contigo/prototipo-ficha-empresa.html.
+
+   Paso 1: encabezado + pestaña Resumen + pestaña Productos (se conserva).
+   Las demás pestañas se alinean en los pasos siguientes.
+
+   Tokens de SkCo.Fidu.DesignSystem.Lib.UX. Contigo es light-only.
+   ========================================================================== */
+
+:root {
+  --primary-d01: #03a835;
+  --primary-00: #00c73d;
+  --primary-l04: #caf9cb;
+  --primary-l05: #f6fcf2;
+
+  --primarygrey-d04: #232323;
+  --primarygrey-00: #404040;
+  --primarygrey-l03: #666666;
+  --primarygrey-l04: #878787;
+  --primarygrey-l05: #a5a5a5;
+
+  --neutral-00: #ffffff;
+  --neutral-l01: #fafafa;
+  --neutral-l02: #f7f7f7;
+  --neutral-l03: #e9e9e9;
+  --neutral-l04: #dddddd;
+  --neutral-l05: #c5c5c5;
+
+  --secondarybluecomplementary-d02: #42ccae;
+  --secondarybluecomplementary-l05: #edfefa;
+
+  --feedback-info-dark: #0099de;
+  --feedback-info-light: #ebf4ff;
+  --feedback-warning-dark: #ffae08;
+  --feedback-warning-light: #fff3e0;
+  --feedback-success-light: #ecfdf3;
+  --feedback-error-dark: #e03430;
+  --feedback-success-dark: #16d727;
+
+  --texts-dark: var(--primarygrey-00);
+  --texts-strong: var(--primarygrey-d04);
+  --texts-medium: var(--primarygrey-l03);
+  --texts-light: var(--primarygrey-l05);
+  --texts-brand: var(--primary-00);
+  --texts-white: var(--neutral-00);
+
+  --icon-neutral: var(--primarygrey-00);
+  --icon-neutral-2: var(--primarygrey-l03);
+
+  /* Quién gestiona: una sola convención para toda la radiografía */
+  /* Paleta de gráficas del sistema (--charts-* → --extras-*) */
+  --charts-c01: #a1dd70;
+  --charts-c02: #a4d7e1;
+  --charts-c03: #60a9a6;
+  --charts-c04: #ff9460;
+  --charts-c05: #8ba2c1;
+  --charts-c07: #dddfd0;
+  --charts-c08: #6a7491;
+  --charts-c12: #bc6995;
+  --charts-c18: #368cb5;
+
+  --gestion-dueno: var(--charts-c01);
+  --gestion-agencia: var(--charts-c02);
+  --gestion-otras: var(--charts-c07);
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+
+  --font-heading: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Open Sans', 'Segoe UI', system-ui, sans-serif;
+
+  --radius-card: 12px;
+  --radius-pill: 999px;
+  --rail-w: 56px;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--neutral-00);
+  color: var(--texts-dark);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: inherit; }
+svg { display: block; flex: none; }
+:focus-visible { outline: 2px solid var(--primary-00); outline-offset: 2px; border-radius: 4px; }
+.num { font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+
+.app { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); min-height: 100vh; }
+
+/* ── Riel ─────────────────────────────────────────────────────────────────── */
+.rail {
+  border-right: 1px solid var(--neutral-l03);
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--space-2); padding: 22px 0;
+}
+.rail-btn {
+  width: 40px; height: 40px; display: grid; place-items: center;
+  background: none; border: 0; border-radius: 8px; color: var(--primary-00);
+}
+.rail-btn--menu { color: var(--primary-00); }
+.rail-btn:hover { background: var(--primary-l05); }
+.rail-chev { color: var(--primary-00); margin-top: -14px; }
+
+/* ── Barra superior ───────────────────────────────────────────────────────── */
+.topbar {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: 16px var(--space-3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+.brand { display: flex; border: 1px solid var(--primary-00); border-radius: 6px; overflow: hidden; flex: none; }
+.brand-mark { width: 60px; height: 46px; display: grid; place-items: center; background: var(--primary-l05); }
+.brand-mark--brand { background: var(--primary-00); }
+.search {
+  flex: 1 1 auto; max-width: 540px; display: flex; align-items: center; gap: 10px;
+  height: 38px; padding: 0 var(--space-2);
+  border: 1px solid var(--neutral-l04); border-radius: 4px; color: var(--texts-light);
+}
+.search input { flex: 1; border: 0; outline: 0; background: transparent; font: 400 14px/1 var(--font-body); color: var(--texts-dark); }
+.search input::placeholder { color: var(--texts-light); }
+.quick {
+  display: flex; align-items: center; gap: var(--space-1); margin-left: auto;
+  background: none; border: 0; padding: var(--space-1);
+  color: var(--texts-dark); font-size: 15px; white-space: nowrap;
+}
+.quick svg { color: var(--primary-00); }
+.bell {
+  position: relative; width: 34px; height: 34px; border: 0; border-radius: 50%;
+  background: var(--primary-00); color: var(--texts-white); display: grid; place-items: center; flex: none;
+}
+.bell-badge {
+  position: absolute; top: -4px; right: -6px; min-width: 18px; height: 14px; padding: 0 4px;
+  border-radius: var(--radius-pill); background: var(--feedback-error-dark);
+  color: var(--texts-white); font: 700 9px/14px var(--font-body); text-align: center;
+}
+.user { display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 4px; text-align: left; flex: none; }
+.user-avatar {
+  width: 48px; height: 48px; border-radius: 50%; flex: none;
+  display: grid; place-items: center;
+  background: var(--primary-l05); color: var(--primary-d01);
+  font: 700 15px/1 var(--font-heading);
+  box-shadow: 0 0 0 2px var(--neutral-00), 0 0 0 4px #b9a6f2;
+}
+.user-name { display: block; font: 700 15px/1.25 var(--font-heading); color: var(--texts-strong); }
+.user-role { display: block; font: 400 12px/1.4 var(--font-body); color: var(--texts-dark); }
+.user > svg { color: var(--primary-00); }
+
+.main { padding: var(--space-3) var(--space-4) 0; max-width: 1400px; }
+
+/* ── Migas y franja de identidad ──────────────────────────────────────────── */
+.crumbs { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+.back { background: none; border: 0; padding: 4px; color: var(--primary-00); display: grid; place-items: center; }
+.crumbs-path { font-size: 13px; color: var(--texts-dark); }
+.crumbs-path a { text-decoration: none; }
+.crumbs-path a:hover { text-decoration: underline; color: var(--texts-brand); }
+.crumbs-current { color: var(--primary-d01); font-weight: 700; }
+
+.page-head { margin-bottom: var(--space-2); }
+.page-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.page-title { margin: 0; font: 700 24px/1.3 var(--font-heading); color: var(--texts-dark); }
+.chip-grey {
+  padding: 5px 12px; border-radius: var(--radius-pill);
+  background: var(--neutral-l02); border: 1px solid var(--neutral-l03);
+  color: var(--texts-dark); font: 600 13px/1.3 var(--font-body); white-space: nowrap;
+}
+.page-desc { margin: 8px 0 0; font: 400 16px/1.5 var(--font-body); color: var(--texts-dark); }
+
+.identity {
+  display: inline-flex; align-items: center; flex-wrap: wrap; gap: 12px 20px;
+  padding: 12px var(--space-1);
+  background: var(--neutral-l02); border-radius: 6px;
+  margin-bottom: var(--space-4);
+}
+.identity-name { font: 700 15px/1.2 var(--font-heading); color: var(--texts-dark); }
+.chip {
+  padding: 4px 10px; border-radius: var(--radius-pill);
+  background: var(--primary-l05); color: var(--texts-dark);
+  font-size: 12.5px; white-space: nowrap;
+}
+.identity-item { display: flex; align-items: center; gap: 7px; color: var(--texts-dark); font-size: 13px; white-space: nowrap; }
+.identity-item svg { color: var(--icon-neutral); }
+
+/* ── Tarjetas (patrón de la ficha de cliente) ─────────────────────────────── */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); margin-bottom: var(--space-4); }
+/* Card del sistema: radio 16, fondo Neutral-00 y sombra SK1 */
+.kpi {
+  position: relative;
+  display: flex; padding: 12px 16px;
+  flex-direction: column; justify-content: center; align-items: flex-start;
+  gap: 8px; flex: 1 0 0; align-self: stretch; min-width: 0;
+  border-radius: 16px;
+  background: var(--neutral-00);
+  box-shadow: 0 0 4px 0 rgba(61, 75, 92, 0.15);
+}
+.kpi-icon { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; flex: none; margin-bottom: 4px; }
+.kpi-icon--savings { background: var(--primary-l05); color: var(--primary-00); }
+.kpi-icon--retire  { background: var(--feedback-info-light); color: var(--feedback-info-dark); }
+.kpi-icon--insure  { background: var(--secondarybluecomplementary-l05); color: var(--secondarybluecomplementary-d02); }
+.kpi-icon--people  { background: var(--primary-l05); color: var(--primary-00); }
+.kpi-label { font: 400 14px/1.3 var(--font-body); color: var(--texts-dark); display: flex; align-items: center; gap: 7px; }
+.tip { background: none; border: 0; padding: 0; color: var(--feedback-info-dark); display: grid; place-items: center; }
+/* Tooltip: Open Sans, máx. 280px, role="tooltip". Abre con hover y con foco de teclado. */
+.tip-wrap { position: relative; display: inline-flex; }
+.tooltip {
+  position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+  z-index: 10; width: max-content; max-width: 280px;
+  padding: 12px 14px; border-radius: 8px;
+  background: var(--primarygrey-d04); color: var(--texts-white);
+  font: 400 14px/1.45 var(--font-body); text-align: left;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  opacity: 0; visibility: hidden; transition: opacity 150ms ease, visibility 150ms ease;
+}
+.tooltip b { font-weight: 700; }
+.tooltip::after {
+  content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 6px solid transparent; border-top-color: var(--primarygrey-d04);
+}
+.tip-wrap:hover .tooltip, .tip:focus-visible + .tooltip { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .tooltip { transition: none; } }
+.kpi-value { font: 700 17px/1.2 var(--font-body); color: var(--texts-strong); }
+.kpi-value--lead { font: 700 25px/1.15 var(--font-heading); color: var(--texts-brand); letter-spacing: -0.01em; }
+.kpi-value--big { font: 700 25px/1.15 var(--font-heading); color: var(--texts-strong); letter-spacing: -0.01em; }
+.kpi-sub { font: 400 13px/1.35 var(--font-body); color: var(--texts-medium); }
+.kpi-strong { font: 700 16px/1.2 var(--font-body); color: var(--texts-strong); }
+
+.kpi-metrics { display: flex; gap: 6px; margin-top: auto; padding-top: 6px; align-self: stretch; }
+.metric {
+  flex: 1 1 0; min-width: 0;
+  background: var(--neutral-l02); border-radius: 6px; padding: 7px 10px;
+  text-align: center;
+}
+.metric-label { font: 700 12px/1.3 var(--font-body); color: var(--texts-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.metric-value { font: 400 12px/1.4 var(--font-body); color: var(--texts-dark); white-space: nowrap; }
+.metric-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+
+/* ── Pestañas tipo carpeta (como la ficha actual) ─────────────────────────── */
+.tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; padding: 0 8px; }
+.tab {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 10px;
+  border: 0; border-radius: 12px 12px 0 0;
+  background: var(--neutral-l02); color: var(--texts-dark);
+  /* Auxiliary Title / H6 Bold 14px: Montserrat 700, 14px, interlineado 22px */
+  font: 700 14px/22px var(--font-heading); letter-spacing: 0; white-space: nowrap;
+}
+.tab svg { color: var(--icon-neutral); }
+.tab:hover { color: var(--primary-d01); }
+.tab[aria-selected="true"] { background: var(--primary-00); color: var(--texts-white); font-weight: 700; }
+.tab[aria-selected="true"] svg { color: var(--texts-white); }
+
+.panel {
+  border: 1px solid var(--neutral-l03); border-radius: 0 0 var(--radius-card) var(--radius-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  padding: var(--space-3);
+  min-height: 420px;
+}
+
+/* ── Pestaña Resumen ──────────────────────────────────────────────────────── */
+.notice {
+  padding: 16px 20px; border-radius: 8px;
+  background: var(--feedback-info-light);
+  margin-bottom: var(--space-3);
+}
+.notice-row { display: flex; align-items: center; gap: 14px; }
+.notice-icon { color: var(--feedback-info-dark); }
+.notice-text { flex: 1; min-width: 0; }
+.notice-title { margin: 0; font: 700 14.5px/1.4 var(--font-body); color: var(--texts-strong); }
+.notice-desc { margin: 2px 0 0; font-size: 13.5px; color: var(--texts-dark); }
+.link { background: none; border: 0; padding: 0; color: var(--feedback-info-dark); font-weight: 700; font-size: 13.5px; text-decoration: underline; white-space: nowrap; }
+
+.scope { margin: 14px 0 0 36px; }
+.scope-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 40px; }
+.scope-title { margin: 0 0 8px; font: 700 13.5px/1.3 var(--font-body); color: var(--texts-strong); }
+.scope-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.scope-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; color: var(--texts-dark); }
+.scope-list svg { margin-top: 2px; }
+.scope-yes svg { color: var(--primary-d01); }
+.scope-no svg { color: var(--icon-neutral-2); }
+.scope-note { margin: 14px 0 0; padding-top: 12px; border-top: 1px dashed var(--neutral-l05); font-size: 13px; color: var(--texts-dark); }
+
+.kpis--panel { margin-bottom: var(--space-3); }
+
+.legend-inline { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--texts-dark); }
+.legend-inline span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.sw--dueno { background: var(--gestion-dueno); }
+.sw--agencia { background: var(--gestion-agencia); }
+.sw--otras { background: var(--gestion-otras); }
+.sw--vacio { background: var(--neutral-00); box-shadow: inset 0 0 0 1px var(--neutral-l04); }
+
+.card { border-radius: 16px; background: var(--neutral-00); box-shadow: 0 0 4px 0 rgba(61, 75, 92, 0.15); padding: 20px 24px; }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); flex-wrap: wrap; margin-bottom: 18px; }
+.card-title { margin: 0; font: 700 16px/1.3 var(--font-heading); color: var(--texts-strong); }
+.card-title small { font: 400 14px/1.3 var(--font-body); color: var(--texts-medium); margin-left: 6px; }
+.card-meta { font-size: 13.5px; color: var(--texts-dark); }
+.card-meta b { font-weight: 700; }
+
+.route { position: relative; padding-top: 26px; }
+.route-bar { display: flex; height: 16px; border-radius: var(--radius-pill); overflow: hidden; background: var(--neutral-l02); box-shadow: inset 0 0 0 1px var(--neutral-l03); }
+.route-seg { height: 100%; }
+.route-mark { position: absolute; top: 0; bottom: -6px; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
+.route-mark-label { font: 700 12px/1 var(--font-body); white-space: nowrap; margin-bottom: 6px; }
+.route-mark-line { flex: 1; width: 2px; border-radius: 2px; }
+/* Hoy: etiqueta a la izquierda de su línea; Meta: a la derecha. Así no se pisan. */
+.route-mark--hoy { align-items: flex-end; transform: translateX(calc(-100% + 1px)); }
+.route-mark--meta { align-items: flex-start; transform: translateX(-1px); }
+.route-mark--hoy .route-mark-label { color: var(--texts-strong); }
+.route-mark--hoy .route-mark-line { background: var(--texts-strong); }
+.route-mark--meta .route-mark-label { color: var(--primary-d01); }
+.route-mark--meta .route-mark-line { background: var(--primary-d01); }
+.route-scale { position: relative; height: 16px; margin-top: 8px; font-size: 12px; color: var(--texts-medium); }
+.route-scale span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.route-scale span:first-child { transform: none; }
+.route-scale span:last-child { transform: translateX(-100%); }
+.route-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); flex-wrap: wrap; margin: 18px 0 16px; padding-top: 14px; border-top: 1px solid var(--neutral-l03); }
+.route-goal { font-size: 13.5px; color: var(--texts-dark); }
+.route-goal b { font-weight: 700; color: var(--texts-strong); }
+
+/* Resumen: productos a la izquierda y ruta en el lugar del Monitor Contigo */
+.resumen-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); align-items: start; }
+.products { display: flex; flex-direction: column; gap: 12px; }
+.block-title { margin: 0; font: 700 16px/1.3 var(--font-heading); color: var(--texts-strong); }
+.products--route { align-self: stretch; }
+.products--route > .card-body { flex: 1; }
+.resumen-grid .route-foot { flex-direction: column; align-items: flex-start; }
+
+/* Resumen aligerado: productos sin cards anidadas, ruta en una barra de un color */
+.products--slim .acc { gap: 0; }
+.products--slim .acc-card { box-shadow: none; border-radius: 0; padding: 14px 0; }
+.products--slim .acc-card:first-child { border-top: 0; padding-top: 4px; }
+.products--slim .acc-body { gap: 16px; margin-top: 14px; }
+.product--slim { padding: 10px 10px 10px 12px; border-radius: 0 8px 8px 0; }
+.product--slim:hover { background: var(--primary-l05); }
+.product-row { display: flex; align-items: center; gap: 10px; }
+.product--slim .product-name { flex: 1; font-size: 14px; }
+.product-amount { font: 700 14px/1.3 var(--font-body); color: var(--texts-strong); }
+.product--slim .product-meta { display: block; margin-top: 2px; font-size: 12px; color: var(--texts-medium); }
+
+.ruta-simple { display: flex; flex-direction: column; gap: 14px; }
+.ruta-nums { display: flex; align-items: baseline; justify-content: space-between; font-size: 14px; color: var(--texts-medium); }
+.ruta-big { font: 700 28px/1 var(--font-heading); color: var(--primary-00); margin-right: 4px; }
+.ruta-goal-num { color: var(--texts-dark); }
+.ruta-goal-num b { font: 700 18px/1 var(--font-heading); color: var(--texts-strong); }
+.ruta-track { position: relative; height: 12px; border-radius: var(--radius-pill); background: var(--neutral-l03); }
+.ruta-fill { position: absolute; inset: 0 auto 0 0; border-radius: var(--radius-pill); background: var(--primary-00); }
+.ruta-target { position: absolute; top: -5px; bottom: -5px; width: 3px; border-radius: 2px; background: var(--texts-strong); transform: translateX(-50%); }
+.ruta-text { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--texts-dark); }
+.ruta-text b { font-weight: 700; }
+
+/* Alerta informativa (azul) */
+.info-alert { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; background: var(--feedback-info-light); }
+.info-alert svg { color: var(--feedback-info-dark); flex: none; }
+.info-alert p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--texts-dark); }
+.info-alert b { font-weight: 700; }
+
+/* ── Pestaña Productos (se conserva de la ficha actual) ──────────────────── */
+.panel--products { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); align-items: start; }
+.acc { display: flex; flex-direction: column; gap: var(--space-2); }
+.acc-card { border-radius: 16px; background: var(--neutral-00); box-shadow: 0 0 4px 0 rgba(61, 75, 92, 0.15); padding: 16px 18px; }
+.acc-head { display: flex; align-items: center; gap: 12px; width: 100%; background: none; border: 0; padding: 0; text-align: left; }
+.acc-title { font: 700 15px/1.3 var(--font-heading); color: var(--texts-dark); flex: 1; }
+.acc-chev { color: var(--primary-00); display: grid; place-items: center; }
+.acc-body { margin-top: var(--space-2); display: flex; flex-direction: column; gap: 22px; }
+.product { display: block; width: 100%; text-align: left; background: none; border: 0; border-left: 2px solid var(--primary-00); padding: 2px 10px 2px 12px; margin-left: 4px; }
+.product-head { display: flex; align-items: center; gap: var(--space-1); flex-wrap: wrap; }
+.product-name { font: 700 14.5px/1.3 var(--font-body); color: var(--texts-strong); }
+.chip-plan { padding: 3px 10px; border-radius: var(--radius-pill); background: var(--primary-l05); font-size: 12.5px; color: var(--texts-dark); }
+.product-chev { color: var(--primary-00); }
+.product-meta { margin-top: 6px; font-size: 12.5px; color: var(--texts-dark); }
+.product-meta b { font-weight: 700; }
+
+.monitor { background: #ebfcf6; border-radius: var(--radius-card); padding: var(--space-3); display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+.monitor-head { align-self: stretch; }
+.monitor-title { margin: 0 0 6px; font: 700 18px/1.3 var(--font-heading); color: var(--texts-strong); }
+.monitor-desc { margin: 0; font-size: 14px; color: var(--texts-dark); }
+.donut { width: 240px; height: 240px; }
+.donut circle { fill: none; stroke-width: 40; }
+.legend { display: flex; flex-direction: column; gap: 8px; }
+.legend-row { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--texts-dark); }
+.legend-row b { font-weight: 700; font-size: 12px; }
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 46px; padding: 0 20px;
+  border: 1px solid var(--primary-00); border-radius: var(--radius-pill);
+  background: var(--neutral-00); color: var(--primary-00);
+  font: 700 18px/1 var(--font-heading);
+}
+.btn-secondary:hover { background: var(--primary-l05); }
+
+/* Cajitas de desglose: el valor puede ocupar dos líneas para que siempre quepa */
+.kpi-metrics .metric { padding: 8px 6px; }
+.kpi-metrics .metric-label { overflow: visible; text-overflow: clip; }
+.kpi-metrics .metric-value { white-space: normal; font-weight: 700; color: var(--texts-strong); }
+.metric-sub { font: 400 11.5px/1.35 var(--font-body); color: var(--texts-medium); }
+
+/* Desglose de las cards del Resumen: una línea por grupo, como en Lovable */
+.kpi-breakdown { list-style: none; margin: auto 0 0; padding: 8px 0 0; align-self: stretch; display: flex; flex-direction: column; gap: 6px; }
+.kpi-breakdown li { display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 1.4; color: var(--texts-dark); }
+.kpi-breakdown .sw { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.kpi-breakdown b { font-weight: 700; color: var(--texts-strong); }
+
+/* ── Pestaña Gestión del dueño ────────────────────────────────────────────── */
+.owner {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: 16px 20px; margin-bottom: var(--space-3);
+  border-radius: 16px; background: var(--neutral-00); box-shadow: 0 0 4px 0 rgba(61, 75, 92, 0.15);
+}
+.owner-avatar {
+  width: 48px; height: 48px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  background: var(--primary-l05); color: var(--primary-d01); font: 700 16px/1 var(--font-heading);
+}
+.owner-info { flex: 1; min-width: 0; }
+.owner-name { margin: 0; font: 700 18px/1.3 var(--font-heading); color: var(--texts-strong); }
+.owner-meta { margin: 2px 0 0; font-size: 14px; color: var(--texts-dark); }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  padding: 4px 12px; border-radius: var(--radius-pill);
+  font: 600 13px/1.4 var(--font-body); color: var(--texts-dark);
+}
+.tag--warning { background: var(--feedback-warning-light); box-shadow: inset 0 0 0 1px var(--feedback-warning-dark); }
+.tag--warning svg { color: var(--feedback-warning-dark); }
+.tag--success { background: var(--feedback-success-light); box-shadow: inset 0 0 0 1px var(--primary-00); }
+.tag--neutral { background: var(--neutral-l02); box-shadow: inset 0 0 0 1px var(--neutral-l04); }
+
+/* Card con advertencia: card normal; solo el valor va en warning, con su ícono (patrón de Contigo) */
+.kpi-value--warning { display: inline-flex; align-items: center; gap: 8px; color: var(--feedback-warning-dark); }
+.kpi-of { font: 600 16px/1 var(--font-body); color: var(--texts-medium); }
+
+.owner-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-3); margin-bottom: var(--space-4); }
+.card-sub { margin: 2px 0 0; font-size: 13px; color: var(--texts-medium); }
+.card-foot { margin: 34px 0 0; font-size: 12px; color: var(--texts-medium); }
+
+.bars { display: flex; justify-content: space-around; align-items: flex-end; gap: var(--space-3); height: 250px; padding-top: 10px; border-bottom: 1px solid var(--neutral-l04); }
+.bar-col { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 96px; }
+.bar { display: flex; flex-direction: column; width: 72px; border-radius: 6px 6px 0 0; overflow: hidden; }
+.seg { display: grid; place-items: center; }
+.seg--dueno { background: var(--gestion-dueno); }
+.seg--agencia { background: var(--gestion-agencia); }
+.seg--otras { background: var(--gestion-otras); }
+.seg-val { font: 700 12px/1 var(--font-body); color: var(--texts-strong); }
+.bar-total { font: 700 15px/1 var(--font-body); color: var(--texts-strong); }
+.bar-year { font: 700 14px/1 var(--font-body); color: var(--texts-dark); margin-bottom: -26px; }
+
+.owner-side { display: flex; flex-direction: column; gap: var(--space-2); }
+.reading { padding: 16px 20px; border-radius: 16px; background: var(--feedback-warning-light); box-shadow: inset 0 0 0 1px var(--feedback-warning-dark); }
+.reading-title { margin: 0 0 6px; display: flex; align-items: center; gap: 8px; font: 700 15px/1.3 var(--font-heading); color: var(--texts-strong); }
+.reading-title svg { color: var(--feedback-warning-dark); }
+.reading-text { margin: 0; font-size: 14px; line-height: 1.55; color: var(--texts-dark); }
+.reading-text b { font-weight: 700; }
+
+.actions { display: flex; flex-direction: column; gap: 12px; }
+.btn-primary, .btn-outline { height: 48px; width: 100%; border-radius: var(--radius-pill); font: 700 14px/1 var(--font-body); }
+.btn-primary { border: 0; background: var(--primary-00); color: var(--texts-white); }
+.btn-primary:hover { background: var(--primary-d01); }
+.btn-outline { border: 1px solid var(--primary-00); background: var(--neutral-00); color: var(--primary-d01); }
+.btn-outline:hover { background: var(--primary-l05); }
+.actions-note { margin: 0; font-size: 12.5px; color: var(--texts-medium); }
+
+.block-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.block-sub { font-size: 13.5px; color: var(--texts-medium); }
+/* Tabla con el patrón de Contigo: encabezados en cajitas grises, filas con línea divisoria */
+.table-wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 15px; color: var(--texts-dark); }
+.table thead th { padding: 0 4px 10px; }
+.table thead th:first-child { padding-left: 0; }
+.table thead th:last-child { padding-right: 0; }
+.th {
+  display: block; padding: 12px 14px; border-radius: 8px;
+  background: var(--neutral-l02); text-align: center; white-space: nowrap;
+  font: 700 15px/1.3 var(--font-body); color: var(--primarygrey-l02, #565656);
+}
+.table tbody th, .table tbody td { padding: 14px; border-bottom: 1px solid var(--neutral-l04); white-space: nowrap; }
+.table tbody th { text-align: left; font-weight: 400; padding-left: 0; }
+.table .c { text-align: center; }
+.table tbody td:last-child { text-align: center; }
+.who { display: flex; align-items: center; gap: 12px; }
+.who .sw { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.who b { display: flex; align-items: center; gap: 6px; font-weight: 400; color: var(--texts-dark); }
+.who small { display: block; font-size: 12px; color: var(--texts-medium); }
+.row-agg > * { color: var(--texts-medium); }
+
+/* ── Modal: Crear plan de acción (Dialog: radio 16, cierre con X) ─────────── */
+.overlay {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(255, 255, 255, 0.94);
+  display: grid; place-items: center; padding: var(--space-3);
+  overflow-y: auto;
+}
+.modal {
+  width: 100%; max-width: 560px;
+  border-radius: 16px; background: var(--neutral-00);
+  box-shadow: 0 0 4px 0 rgba(61, 75, 92, 0.15), 0 12px 32px -8px rgba(0, 0, 0, 0.12);
+  padding: var(--space-3);
+}
+.modal-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.modal-title { margin: 0; font: 700 20px/1.3 var(--font-heading); color: var(--texts-strong); }
+.modal-close { width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: var(--icon-neutral); display: grid; place-items: center; }
+.modal-close:hover { background: var(--neutral-l02); }
+.modal-desc { margin: 6px 0 var(--space-3); font-size: 14px; color: var(--texts-dark); }
+.modal-desc b { font-weight: 700; }
+.modal-body { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.goals { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.goals-title { padding: 0; margin-bottom: 10px; font: 700 15px/1.3 var(--font-heading); color: var(--texts-strong); }
+.goal {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 16px;
+  padding: 12px 16px; border-radius: 12px; background: var(--neutral-l02);
+}
+.goal.is-off { opacity: 0.55; }
+.goal-check { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--texts-dark); cursor: pointer; }
+.goal-check b { font-weight: 700; color: var(--texts-strong); }
+.goal-check input { width: 18px; height: 18px; accent-color: var(--primary-00); margin: 0; flex: none; }
+.goal-edit { display: flex; align-items: center; gap: 6px; }
+.goal-affix { font-size: 14px; color: var(--texts-dark); white-space: nowrap; }
+.goal-input {
+  width: 84px; height: 48px; padding: 0 10px; text-align: right;
+  border: 1px solid var(--neutral-l04); border-radius: 8px; background: var(--neutral-00);
+  font: 700 16px/1 var(--font-body); color: var(--texts-strong);
+}
+.goal-input:focus { outline: 0; border: 2px solid var(--primary-00); padding: 0 9px; }
+.goal-input:disabled { background: var(--neutral-l03); }
+.goal-calc { grid-column: 1 / -1; margin: 0; padding-left: 28px; font-size: 12.5px; color: var(--texts-medium); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.goal-calc .edited { color: var(--texts-dark); font-weight: 600; }
+.goal-calc button { border: 0; background: none; padding: 0; color: var(--feedback-info-dark); font-size: 12.5px; font-weight: 700; text-decoration: underline; }
+
+.field { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.field-label { padding: 0; font: 700 14px/1.3 var(--font-body); color: var(--texts-strong); }
+.opt { font-weight: 400; color: var(--texts-medium); }
+.field textarea {
+  width: 100%; resize: vertical; min-height: 84px; padding: 12px 14px;
+  border: 1px solid var(--neutral-l04); border-radius: 8px;
+  font: 400 14px/1.5 var(--font-body); color: var(--texts-dark);
+}
+.field textarea:focus { outline: 0; border: 2px solid var(--primary-00); padding: 11px 13px; }
+
+.segmented { display: inline-flex; padding: 4px; gap: 4px; border-radius: var(--radius-pill); background: var(--neutral-l02); align-self: flex-start; }
+.segmented label { cursor: pointer; }
+.segmented input { position: absolute; opacity: 0; pointer-events: none; }
+.segmented span { display: block; padding: 8px 18px; border-radius: var(--radius-pill); font: 600 14px/1 var(--font-body); color: var(--texts-dark); }
+.segmented input:checked + span { background: var(--primary-00); color: var(--texts-white); }
+.segmented input:focus-visible + span { outline: 2px solid var(--primary-00); outline-offset: 2px; }
+
+.tag--info { background: var(--feedback-info-light); box-shadow: inset 0 0 0 1px var(--feedback-info-dark); }
+
+/* Confirmación del plan enviado */
+.sent { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 8px 0 0; }
+.sent:focus { outline: none; }
+.sent-icon { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--feedback-success-light); color: var(--primary-00); }
+.sent-title { margin: 4px 0 0; font: 700 20px/1.3 var(--font-heading); color: var(--texts-strong); }
+.sent-desc { margin: 0; font-size: 14px; color: var(--texts-dark); max-width: 440px; }
+.sent-desc b { font-weight: 700; }
+.sent-summary { align-self: stretch; text-align: left; padding: 14px 18px; border-radius: 12px; background: var(--neutral-l02); margin: 4px 0 8px; }
+.sent-summary-title { margin: 0 0 8px; font: 700 14px/1.3 var(--font-body); color: var(--texts-strong); }
+.sent-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--texts-dark); }
+.sent-edited { font-size: 12px; color: var(--texts-medium); }
+.sent .btn-primary { align-self: stretch; height: 30px; font-family: var(--font-heading); }
+
+/* Modal informativa de la vista gerencial */
+.page-title-row .tip svg { width: 24px; height: 24px; }
+.info-scope { margin-bottom: var(--space-3); }
+.info-scope .scope-cols { gap: 16px 32px; }
+.btn-small { width: 100%; height: 30px; font-family: var(--font-heading); }
+
+.modal-note { margin: 0; font-size: 12.5px; color: var(--texts-medium); }
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+
+/* ── Pestaña Clientes ─────────────────────────────────────────────────────── */
+.block-title--space { margin-bottom: 12px; }
+.block-head--space { justify-content: space-between; align-items: center; }
+.block-meta { font-size: 14px; color: var(--texts-dark); }
+.block-meta b { font: 700 18px/1 var(--font-heading); color: var(--texts-strong); }
+.block + .clients-grid { margin-top: var(--space-3); }
+.clients-grid > .card { align-self: stretch; }
+
+.oport { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: var(--space-4); align-items: center; }
+.oport-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+.stat { display: flex; flex-direction: column; gap: 6px; }
+.stat-brand { color: var(--primary-00); }
+.stat-muted { color: var(--texts-medium); }
+.oport-bar { display: flex; flex-direction: column; gap: 12px; }
+.oport-bar-head { display: flex; align-items: baseline; justify-content: space-between; }
+
+.stack { display: flex; height: 32px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--neutral-l04); }
+.stack-seg { display: flex; align-items: center; min-width: 0; padding: 0 8px; }
+.stack-empty { background: var(--neutral-00); }
+.stack-val { font: 700 12px/1 var(--font-body); color: var(--texts-strong); white-space: nowrap; }
+.stack-val--muted { font-weight: 400; color: var(--texts-medium); }
+.stack-val--light { color: var(--texts-white); }
+.history { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 13.5px; color: var(--texts-dark); }
+.history b { font-weight: 700; }
+
+.clients-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); align-items: start; }
+.sw--nuevos { background: var(--charts-c18); }
+.sw--perdidos { background: var(--charts-c04); }
+
+.pairs { display: flex; justify-content: space-around; align-items: flex-end; height: 220px; padding-top: 10px; border-bottom: 1px solid var(--neutral-l04); }
+.pair { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.pair-bars { display: flex; align-items: flex-end; gap: 6px; height: 180px; }
+.pair-bar { width: 40px; border-radius: 6px 6px 0 0; display: flex; justify-content: center; }
+.pair-bar span { margin-top: -20px; font: 700 13px/1 var(--font-body); color: var(--texts-strong); }
+.pair-bar--nuevos { background: var(--charts-c18); }
+.pair-bar--perdidos { background: var(--charts-c04); }
+.pair-year { font: 700 14px/1 var(--font-body); color: var(--texts-dark); margin-bottom: -48px; text-align: center; }
+.pair-year small { display: block; margin-top: 6px; font: 600 12.5px/1 var(--font-body); color: var(--primary-d01); }
+
+.note { margin: 16px 0 0; padding: 12px 14px; border-radius: 8px; background: var(--neutral-l02); font-size: 13px; line-height: 1.5; color: var(--texts-dark); }
+.note b { font-weight: 700; }
+.pairs + .note { margin-top: 60px; }
+
+.stack--prod { margin-top: 4px; }
+.p1 { background: var(--charts-c03); }
+.p2 { background: var(--charts-c05); }
+.p3 { background: var(--charts-c08); }
+.p4 { background: var(--charts-c12); }
+.prod-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; }
+.prod-list li { display: grid; grid-template-columns: 14px minmax(0, 1fr) 60px 50px; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--neutral-l03); font-size: 14px; color: var(--texts-dark); }
+.prod-list li:last-child { border-bottom: 0; }
+.prod-list .sw { width: 10px; height: 10px; border-radius: 50%; }
+.prod-list b { text-align: right; font-weight: 700; color: var(--texts-strong); }
+.prod-list .pct { text-align: right; color: var(--texts-medium); }
+
+/* ── Pestaña Relación integral ─────────────────────────────────────────────── */
+.lines { display: flex; flex-direction: column; margin-top: 8px; }
+.line { display: grid; grid-template-columns: 200px minmax(0, 1fr) 270px; align-items: center; gap: var(--space-3); padding: 16px 0; border-bottom: 1px solid var(--neutral-l03); }
+.line:last-child { border-bottom: 0; }
+.line--total { padding-bottom: 20px; border-bottom: 1px solid var(--neutral-l04); }
+.line-name b { display: block; font: 700 14.5px/1.3 var(--font-body); color: var(--texts-strong); }
+.line-name small { display: block; font-size: 12.5px; color: var(--texts-medium); }
+.line-bar { display: flex; height: 28px; border-radius: 8px; overflow: hidden; background: var(--neutral-l02); }
+.line--total .line-bar { height: 34px; }
+.line-seg { display: flex; align-items: center; min-width: 0; padding: 0 10px; }
+.line-val { display: inline-flex; align-items: center; gap: 5px; font: 700 12px/1 var(--font-body); color: var(--texts-strong); white-space: nowrap; }
+.line-detail { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--texts-dark); }
+.line-detail span { display: flex; align-items: center; gap: 6px; }
+.line-detail b { font-weight: 700; }
+.line-detail .sw { width: 8px; height: 8px; border-radius: 50%; }
+.line-note { color: var(--texts-medium); padding-left: 14px; }
+.finding { display: flex; align-items: flex-start; gap: 12px; margin-top: 16px; padding: 14px 18px; border-radius: 12px; background: var(--feedback-success-light); }
+.finding-icon { color: var(--primary-00); margin-top: 1px; }
+.finding p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--texts-dark); }
+.finding b { font-weight: 700; }
+
+/* ── Pestaña Plan corporativo ─────────────────────────────────────────────── */
+.kpis--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.btn-inline { width: auto; height: 40px; padding: 0 18px; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-heading); }
+.up { color: var(--primary-d01); font-weight: 700; }
+.pairs--money .pair-bar { width: 52px; }
+.pairs--money .pair-bar span { font-size: 12px; }
+/* Los años y la neta van debajo del eje: se reserva su espacio dentro de la card */
+#panel-plan .pairs { margin: 16px 0 52px; }
+#panel-plan .finding { margin-top: var(--space-3); }
+.aum-chart { display: block; width: 100%; height: auto; margin-top: 16px; overflow: visible; }
+.sw--aum { background: var(--charts-c03); }
+.aum-grid { stroke: var(--neutral-l03); stroke-width: 1; }
+.aum-area { fill: rgba(96, 169, 166, 0.15); }
+.aum-line { fill: none; stroke: var(--charts-c03); stroke-width: 3; stroke-linejoin: round; }
+.aum-dot { fill: var(--neutral-00); stroke: var(--charts-c03); stroke-width: 3; }
+.aum-val { font: 700 12px var(--font-body); fill: var(--texts-strong); }
+.aum-x { font: 400 12px var(--font-body); fill: var(--texts-medium); }
+
+/* ── Pestaña Ruta comercial ───────────────────────────────────────────────── */
+.route-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-1); }
+.step { display: flex; flex-direction: column; gap: 10px; }
+.step-head { display: flex; align-items: center; gap: 10px; font: 700 14px/22px var(--font-heading); color: var(--primary-d01); }
+.step-num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--primary-00); color: var(--texts-white); font: 700 13px/1 var(--font-body); }
+.step-num--warning { background: var(--feedback-warning-dark); color: var(--texts-strong); }
+.step-num--warning + * , .step-head:has(.step-num--warning) { color: var(--texts-strong); }
+.step-title { margin: 0; font: 700 16px/1.35 var(--font-heading); color: var(--texts-strong); }
+.step-desc { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--texts-dark); }
+.step-who { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; color: var(--texts-dark); }
+.step-who span { display: inline-flex; align-items: center; gap: 6px; }
+.step-who .sw { width: 8px; height: 8px; border-radius: 50%; }
+.step-who svg { color: var(--icon-neutral-2); }
+.step-goal { margin: auto 0 0; padding: 10px 12px; border-radius: 8px; background: var(--neutral-l02); font-size: 13.5px; color: var(--texts-dark); }
+.step-goal b { font-weight: 700; color: var(--texts-strong); }
+.step-check { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--texts-dark); cursor: pointer; }
+.step-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--primary-00); }
+
+.soon-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
+.soon-card { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.soon-card .step-goal { margin-top: 4px; }
+.chip-soon { padding: 4px 11px; border-radius: var(--radius-pill); background: var(--feedback-info-light); color: var(--feedback-info-dark); font: 600 12px/1.4 var(--font-body); }
+.muted { color: var(--texts-medium); }
+
+/* ── Pestañas pendientes ──────────────────────────────────────────────────── */
+.pending { display: grid; place-items: center; text-align: center; min-height: 360px; color: var(--texts-medium); }
+.pending h2 { margin: 0 0 6px; font: 700 17px/1.3 var(--font-heading); color: var(--texts-dark); }
+.pending p { margin: 0; }
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.footer {
+  margin-top: var(--space-4); border-top: 1px solid var(--neutral-l03);
+  padding: 20px 0; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
+}
+.footer-links { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.footer-link { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--texts-dark); font-size: 14px; text-decoration: none; }
+.footer-link:hover { color: var(--texts-brand); }
+.footer-copy { color: var(--texts-medium); font-size: 13px; }
+
+@media (max-width: 1180px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 6px; }
+  .tab { border-radius: 12px; }
+  .panel { border-radius: var(--radius-card); margin-top: 8px; }
+  .resumen-grid, .owner-grid, .clients-grid, .oport { grid-template-columns: minmax(0, 1fr); }
+  .line { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .kpis--3, .soon-cards { grid-template-columns: minmax(0, 1fr); }
+  .route-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .owner { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══ Riel ═════════════════════════════════════════════════════════════ -->
+  <nav class="rail" aria-label="Navegación principal">
+    <button class="rail-btn rail-btn--menu" aria-label="Abrir menú"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+    <button class="rail-btn" aria-label="Inicio"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg></button>
+    <button class="rail-btn" aria-label="Portafolio"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></button>
+    <button class="rail-btn" aria-label="Clientes"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 19c.6-3.4 3-5.2 6.2-5.2s5.6 1.8 6.2 5.2"/><path d="M16.5 6.2a3 3 0 0 1 0 5.6M18 13.9c2.2.5 3.5 2.1 3.9 5.1"/></svg></button>
+    <svg class="rail-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    <button class="rail-btn" aria-label="Solicitudes"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></button>
+    <button class="rail-btn" aria-label="Reportes"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M8 15.5V12M12 15.5V8.5M16 15.5v-5"/></svg></button>
+    <svg class="rail-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    <button class="rail-btn" aria-label="Herramientas"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a3.7 3.7 0 0 0 4.9 4.9l-8.4 8.4a2.4 2.4 0 0 1-3.4-3.4z"/><path d="m5 5 3 3"/></svg></button>
+    <svg class="rail-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    <button class="rail-btn" aria-label="Cerrar sesión"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></button>
+  </nav>
+
+  <div>
+    <!-- ═══ Barra superior ════════════════════════════════════════════════ -->
+    <header class="topbar">
+      <div class="brand" role="img" aria-label="Skandia">
+        <span class="brand-mark">
+          <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="14" fill="#1c1c1c"/><circle cx="10.5" cy="13" r="3.1" fill="#ffffff"/><circle cx="19.5" cy="13" r="3.1" fill="#ffffff"/></svg>
+        </span>
+        <span class="brand-mark brand-mark--brand">
+          <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M4 17c4.5 0 5.5-8 9-8s4.5 4 9 4" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        </span>
+      </div>
+
+      <label class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>
+        <input type="search" placeholder="Busca por nombre, documento, celular o correo" aria-label="Buscar cliente o empresa">
+      </label>
+
+      <button class="quick">
+        Acciones rápidas
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+
+      <button class="bell" aria-label="Notificaciones: más de 9 sin leer">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 15.5V10a6 6 0 1 0-12 0v5.5L4.5 18h15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+        <span class="bell-badge num">+9</span>
+      </button>
+
+      <button class="user">
+        <span class="user-avatar" aria-hidden="true">MH</span>
+        <span>
+          <span class="user-name">Mónica Herrera Duque</span>
+          <span class="user-role">Dirección comercial · Agencia Norte</span>
+        </span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </header>
+
+    <main class="main">
+
+      <!-- ═══ Migas ═══════════════════════════════════════════════════════ -->
+      <div class="crumbs">
+        <button class="back" aria-label="Volver al buscador"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4"/><path d="m10 6-6 6 6 6"/></svg></button>
+        <nav class="crumbs-path" aria-label="Ruta"><a href="#">Inicio</a> / <span class="crumbs-current">Empresa ABC S.A.</span></nav>
+      </div>
+
+      <!-- ═══ Encabezado ═══════════════════════════════════════════════════ -->
+      <header class="page-head">
+        <div class="page-title-row">
+          <h1 class="page-title">Radiografía de Empresa ABC S.A.</h1>
+          <button class="tip" id="open-info" aria-haspopup="dialog" aria-label="Qué ves en la vista gerencial"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button>
+        </div>
+        <p class="page-desc">De la nómina al cliente: dónde estamos, cuánta oportunidad queda en la empresa y cuál es la ruta más rápida para capturarla.</p>
+      </header>
+
+      <!-- ═══ Franja de identidad ═════════════════════════════════════════ -->
+      <section class="identity" aria-label="Datos de la empresa">
+        <span class="chip">Vista gerencial</span>
+        <span class="identity-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5.5A1.5 1.5 0 0 1 5.5 4h7A1.5 1.5 0 0 1 14 5.5V21"/><path d="M14 10h4.5A1.5 1.5 0 0 1 20 11.5V21"/><path d="M2.5 21h19"/><path d="M7 8h4M7 12h4M7 16h4"/></svg>
+          <span class="num">NIT 900.456.789-1</span>
+        </span>
+        <span class="identity-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          <span>Agencia Norte</span>
+        </span>
+        <span class="identity-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 19c.6-3.4 3-5.2 6.2-5.2s5.6 1.8 6.2 5.2"/><path d="M16.5 6.2a3 3 0 0 1 0 5.6M18 13.9c2.2.5 3.5 2.1 3.9 5.1"/></svg>
+          <span class="num">1.250 empleados</span>
+        </span>
+        <span class="identity-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5 19.5c.7-3.6 3.3-5.5 7-5.5s6.3 1.9 7 5.5"/></svg>
+          <span>Dueño del plan: Juan Alberto Rodríguez González</span>
+        </span>
+        <span class="identity-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+          <span>Ene 2024 – Oct 2026</span>
+        </span>
+      </section>
+
+      <!-- ═══ Tarjetas de posición (patrón de la ficha de cliente) ════════ -->
+      <!-- Omitidas por ahora: se retoman más adelante. Quitar "hidden" para mostrarlas. -->
+      <section class="kpis" aria-label="Posición de Skandia en la empresa" hidden>
+        <article class="kpi">
+          <span class="kpi-label">
+            Total bajo gestión
+            <button class="tip" aria-label="Qué incluye el total bajo gestión"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button>
+          </span>
+          <span class="kpi-value--lead num">$61.580 M</span>
+          <span class="kpi-sub">Clientes Skandia en la empresa</span>
+          <span class="kpi-strong num">412 de 1.250 empleados</span>
+        </article>
+
+        <article class="kpi">
+          <span class="kpi-icon kpi-icon--savings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M9 19V5M14 19v-7M19 19v-11"/></svg></span>
+          <span class="kpi-label">Ahorro e inversión</span>
+          <span class="kpi-value num">$40.700 M</span>
+          <div class="kpi-metrics">
+            <div class="metric"><div class="metric-label">Plan corporativo</div><div class="metric-value num">$27.400 M</div></div>
+            <div class="metric"><div class="metric-label">Voluntaria y FICs</div><div class="metric-value num">$13.300 M</div></div>
+          </div>
+        </article>
+
+        <article class="kpi">
+          <span class="kpi-icon kpi-icon--retire"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12.5c0-3.3 3.1-5.5 7-5.5h4.5l3-2v3.6c1 .8 1.5 2 1.5 3.4 0 3.3-3.1 5.5-7 5.5H8l-2 2v-2.6c-1.8-.9-3-2.4-3-4.4Z"/><path d="M8 11.5h.01"/></svg></span>
+          <span class="kpi-label">Plan de retiro y Cesantías</span>
+          <span class="kpi-value num">$20.880 M</span>
+          <div class="kpi-metrics">
+            <div class="metric"><div class="metric-label">Obligatoria</div><div class="metric-value num">$18.750 M</div></div>
+            <div class="metric"><div class="metric-label">Cesantías</div><div class="metric-value num">$2.130 M</div></div>
+          </div>
+        </article>
+
+        <article class="kpi">
+          <span class="kpi-icon kpi-icon--insure"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 2.8v5.4c0 4.2-2.8 7.6-7 9.3-4.2-1.7-7-5.1-7-9.3V5.8z"/></svg></span>
+          <span class="kpi-label">Seguros</span>
+          <span class="kpi-value num">$410 M</span>
+          <div class="kpi-metrics">
+            <div class="metric"><div class="metric-label">Prima anual</div><div class="metric-value num">$410 M</div></div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ═══ Pestañas ════════════════════════════════════════════════════ -->
+      <div class="tabs" role="tablist" aria-label="Secciones de la radiografía">
+        <button class="tab" role="tab" id="tab-resumen" aria-controls="panel-resumen" aria-selected="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+          Resumen
+        </button>
+        <button class="tab" role="tab" id="tab-dueno" aria-controls="panel-dueno" aria-selected="false" tabindex="-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="3.4"/><path d="M3.5 19.5c.7-3.6 3.1-5.5 6.5-5.5 1.6 0 3 .4 4 1.2"/><path d="m15.5 18 2 2 4-4.5"/></svg>
+          Gestión del dueño
+        </button>
+        <button class="tab" role="tab" id="tab-clientes" aria-controls="panel-clientes" aria-selected="false" tabindex="-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 19c.6-3.4 3-5.2 6.2-5.2s5.6 1.8 6.2 5.2"/><path d="M16.5 6.2a3 3 0 0 1 0 5.6M18 13.9c2.2.5 3.5 2.1 3.9 5.1"/></svg>
+          Clientes
+        </button>
+        <button class="tab" role="tab" id="tab-relacion" aria-controls="panel-relacion" aria-selected="false" tabindex="-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>
+          Relación integral
+        </button>
+        <button class="tab" role="tab" id="tab-plan" aria-controls="panel-plan" aria-selected="false" tabindex="-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5.5A1.5 1.5 0 0 1 5.5 4h7A1.5 1.5 0 0 1 14 5.5V21"/><path d="M14 10h4.5A1.5 1.5 0 0 1 20 11.5V21"/><path d="M2.5 21h19"/></svg>
+          Plan corporativo
+        </button>
+        <button class="tab" role="tab" id="tab-ruta" aria-controls="panel-ruta" aria-selected="false" tabindex="-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8.5a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H16"/></svg>
+          Ruta comercial
+        </button>
+      </div>
+
+      <!-- ── Resumen ───────────────────────────────────────────────────── -->
+      <section class="panel" role="tabpanel" id="panel-resumen" aria-labelledby="tab-resumen">
+
+        <div class="kpis kpis--panel">
+          <article class="kpi">
+            <span class="kpi-label">Penetración en la nómina <span class="tip-wrap"><button class="tip" aria-label="Qué es la penetración en la nómina" aria-describedby="tip-penetracion"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-penetracion">Clientes de Skandia que trabajan en la empresa, divididos entre los <b>empleados reportados</b>. Hoy el total de empleados viene del dato que la empresa entregó al abrir el plan; con ACH será la nómina real.</span></span></span>
+            <span class="kpi-value--big num">33,0%</span>
+            <span class="kpi-sub num">412 clientes de 1.250 empleados</span>
+            <div class="kpi-metrics"><div class="metric"><div class="metric-label"><span class="metric-dot sw--dueno"></span>Dueño</div><div class="metric-value num">13,7%</div><div class="metric-sub num">171</div></div><div class="metric"><div class="metric-label"><span class="metric-dot sw--agencia"></span>Agencia</div><div class="metric-value num">2,4%</div><div class="metric-sub num">30</div></div><div class="metric"><div class="metric-label"><span class="metric-dot sw--otras"></span>Otras</div><div class="metric-value num">16,9%</div><div class="metric-sub num">211</div></div></div>
+          </article>
+
+          <article class="kpi">
+            <span class="kpi-label">Cross-sell 2P+ <span class="tip-wrap"><button class="tip" aria-label="Qué es el cross-sell 2P+" aria-describedby="tip-crosssell"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-crosssell">Porcentaje de clientes de la empresa que tienen <b>2 o más líneas de producto</b> con Skandia (por ejemplo, plan corporativo y cesantías).</span></span></span>
+            <span class="kpi-value--big num">42,0%</span>
+            <span class="kpi-sub num">173 clientes con 2 o más productos</span>
+            <div class="kpi-metrics"><div class="metric"><div class="metric-label"><span class="metric-dot sw--dueno"></span>Del dueño</div><div class="metric-value num">46,2%</div><div class="metric-sub num">79 de 171</div></div><div class="metric"><div class="metric-label"><span class="metric-dot sw--otras"></span>Resto</div><div class="metric-value num">39,0%</div><div class="metric-sub num">94 de 241</div></div></div>
+          </article>
+
+          <article class="kpi">
+            <span class="kpi-label">Share de obligatoria de la agencia <span class="tip-wrap"><button class="tip" aria-label="Qué es el share de obligatoria" aria-describedby="tip-share"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-share">De los empleados de la empresa afiliados a <b>pensión obligatoria</b> con Skandia, cuántos atiende tu agencia (el dueño del plan más los demás asesores de Agencia Norte).</span></span></span>
+            <span class="kpi-value--big num">30,4%</span>
+            <span class="kpi-sub num">38 de 125 afiliados a obligatoria</span>
+            <div class="kpi-metrics"><div class="metric"><div class="metric-label"><span class="metric-dot sw--dueno"></span>Dueño</div><div class="metric-value num">26</div></div><div class="metric"><div class="metric-label"><span class="metric-dot sw--agencia"></span>Agencia</div><div class="metric-value num">12</div></div><div class="metric"><div class="metric-label"><span class="metric-dot sw--otras"></span>Otras</div><div class="metric-value num">87</div></div></div>
+          </article>
+
+          <article class="kpi">
+            <span class="kpi-label">Activos de Skandia en la empresa <span class="tip-wrap"><button class="tip" aria-label="Qué son los activos de Skandia en la empresa" aria-describedby="tip-activos"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-activos">Activos que Skandia administra para los empleados de la empresa en pensión obligatoria, voluntaria, cesantías, fiduciaria y el plan corporativo. <b>No incluye seguros</b>: ahí se mide la prima.</span></span></span>
+            <span class="kpi-value--big num">$61.580 M</span>
+            <span class="kpi-sub num">Plan corporativo $27.400 M · +222% desde ene 2024</span>
+            <div class="kpi-metrics"><div class="metric"><div class="metric-label"><span class="metric-dot sw--dueno"></span>Dueño</div><div class="metric-value num">$36.550 M</div><div class="metric-sub num">59%</div></div><div class="metric"><div class="metric-label"><span class="metric-dot sw--agencia"></span>Agencia</div><div class="metric-value num">$3.690 M</div><div class="metric-sub num">6%</div></div><div class="metric"><div class="metric-label"><span class="metric-dot sw--otras"></span>Otras</div><div class="metric-value num">$21.340 M</div><div class="metric-sub num">35%</div></div></div>
+          </article>
+        </div>
+
+        <div class="resumen-grid">
+          <section class="card products products--slim" aria-labelledby="products-title">
+            <h2 class="block-title" id="products-title">Productos de la empresa</h2>
+          <div class="acc">
+            <article class="acc-card">
+              <button class="acc-head" aria-expanded="true">
+                <span class="kpi-icon kpi-icon--savings" style="margin:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M9 19V5M14 19v-7M19 19v-11"/></svg></span>
+                <span class="acc-title">Ahorro e inversión</span>
+                <span class="acc-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></span>
+              </button>
+              <div class="acc-body">
+                <button class="product product--slim">
+                  <span class="product-row"><span class="product-name">Plan de Ahorro Corporativo · Bonificaciones</span><b class="product-amount num">$52.732.191</b><svg class="product-chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+                  <span class="product-meta">#1000000999999 · Fondo Voluntario de Pensión Skandia Multifund</span>
+                </button>
+                <button class="product product--slim">
+                  <span class="product-row"><span class="product-name">Plan de Ahorro Corporativo · Beneflex</span><b class="product-amount num">$52.732.191</b><svg class="product-chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+                  <span class="product-meta">#1000000999999 · Fondo Voluntario de Pensión Skandia Multifund</span>
+                </button>
+                <button class="product product--slim">
+                  <span class="product-row"><span class="product-name">Plan de Ahorro Corporativo · Ahorro Mutuo</span><b class="product-amount num">$52.732.191</b><svg class="product-chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+                  <span class="product-meta">#1000000999999 · Fondo Voluntario de Pensión Skandia Multifund</span>
+                </button>
+              </div>
+            </article>
+
+            <article class="acc-card">
+              <button class="acc-head" aria-expanded="false">
+                <span class="kpi-icon kpi-icon--insure" style="margin:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 2.8v5.4c0 4.2-2.8 7.6-7 9.3-4.2-1.7-7-5.1-7-9.3V5.8z"/></svg></span>
+                <span class="acc-title">Seguros</span>
+                <span class="acc-chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+              </button>
+            </article>
+          </div>
+          </section>
+          <section class="card products products--route" aria-labelledby="ruta-title">
+            <h2 class="block-title" id="ruta-title">Ruta de penetración</h2>
+          <div class="card-body">
+            <div class="route" role="img" aria-label="Penetración actual 33 por ciento: dueño 13,7, resto de la agencia 2,4, otras agencias 16,9. Meta 2027: 45 por ciento.">
+              <div class="route-bar">
+                <span class="route-seg" style="width:13.7%;background:var(--gestion-dueno)"></span>
+                <span class="route-seg" style="width:2.4%;background:var(--gestion-agencia)"></span>
+                <span class="route-seg" style="width:16.9%;background:var(--gestion-otras)"></span>
+              </div>
+              <span class="route-mark route-mark--hoy" style="left:33%"><span class="route-mark-label">Hoy · 33,0%</span><span class="route-mark-line"></span></span>
+              <span class="route-mark route-mark--meta" style="left:45%"><span class="route-mark-label">Meta 2027 · 45%</span><span class="route-mark-line"></span></span>
+            </div>
+            <div class="route-scale num" aria-hidden="true"><span style="left:0">0%</span><span style="left:25%">25%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span></div>
+            <div class="route-foot">
+              <div class="legend-inline">
+                <span><i class="sw sw--dueno"></i>Dueño del plan</span>
+                <span><i class="sw sw--agencia"></i>Resto de Agencia Norte</span>
+                <span><i class="sw sw--otras"></i>Otras agencias (agregado)</span>
+                <span><i class="sw sw--vacio"></i>Sin relación: 838 empleados</span>
+              </div>
+            </div>
+            <div class="info-alert">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M12 11v5.5"/><path d="M12 7.6h.01"/></svg>
+              <p>Hoy estás en <b>33,0%</b> · Meta 2027: <b>45%</b> (562 de 1.250 empleados) · faltan <b>150 clientes</b>. Para llegar a la meta se necesitan <b>10 clientes netos al mes</b>; en 2026 el neto va en +1.</p>
+            </div>
+          </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ── Pestañas que se alinean en los siguientes pasos ──────────────── -->
+      <section class="panel" role="tabpanel" id="panel-dueno" aria-labelledby="tab-dueno" hidden>
+        <article class="owner">
+          <span class="owner-avatar" aria-hidden="true">JR</span>
+          <div class="owner-info">
+            <h2 class="owner-name">Juan Alberto Rodríguez González</h2>
+            <p class="owner-meta">Dueño del plan desde marzo de 2019 · Agencia Norte · abrió el Plan de Ahorro Corporativo con la empresa</p>
+          </div>
+          <span class="tag tag--warning" data-plan-status="Plan de acción enviado"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Requiere plan de acción</span>
+        </article>
+
+        <div class="kpis kpis--panel">
+          <article class="kpi">
+            <span class="kpi-label">Último cliente nuevo del dueño <span class="tip-wrap"><button class="tip" aria-label="Qué mide el último cliente nuevo" aria-describedby="tip-ultimo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-ultimo">Fecha del <b>último cliente nuevo para Skandia</b> que vinculó el dueño del plan en esta empresa, en cualquier línea.</span></span></span>
+            <span class="kpi-value--big kpi-value--warning">Hace 14 meses <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Alerta"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+            <span class="kpi-sub">Agosto de 2025</span>
+          </article>
+          <article class="kpi">
+            <span class="kpi-label">Clientes nuevos desde 2024</span>
+            <span class="kpi-value--big num">5 <small class="kpi-of">de 52</small></span>
+            <span class="kpi-sub num">Otros asesores vincularon 47</span>
+          </article>
+          <article class="kpi">
+            <span class="kpi-label">Partícipes nuevos en el plan</span>
+            <span class="kpi-value--big num">9 → 6 → 1</span>
+            <span class="kpi-sub">2024 · 2025 · 2026 (a octubre)</span>
+          </article>
+          <article class="kpi">
+            <span class="kpi-label">Neto de sus clientes desde 2024 <span class="tip-wrap"><button class="tip" aria-label="Qué es el neto" aria-describedby="tip-neto"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-neto"><b>Clientes nuevos menos clientes perdidos</b> en el año.</span></span></span>
+            <span class="kpi-value--big num">+1</span>
+            <span class="kpi-sub num">5 nuevos · 4 perdidos. La empresa: +21</span>
+          </article>
+        </div>
+
+        <div class="owner-grid">
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title">Clientes nuevos en la empresa, por quién los vinculó</h3>
+                <p class="card-sub">Clientes nuevos para Skandia que trabajan en Empresa ABC S.A.</p>
+              </div>
+              <div class="legend-inline">
+                <span><i class="sw sw--dueno"></i>Dueño</span>
+                <span><i class="sw sw--agencia"></i>Resto de Agencia Norte</span>
+                <span><i class="sw sw--otras"></i>Otras agencias</span>
+              </div>
+            </div>
+            <div class="bars">
+              <div class="bar-col">
+                <span class="bar-total num">22</span>
+                <div class="bar" role="img" aria-label="2024: 22 clientes nuevos. Dueño 3, resto de la agencia 4, otras agencias 15."><span class="seg seg--otras" style="height:136px" title="Otras agencias: 15"><span class="seg-val">15</span></span><span class="seg seg--agencia" style="height:36px" title="Resto de Agencia Norte: 4"><span class="seg-val">4</span></span><span class="seg seg--dueno" style="height:27px" title="Dueño: 3"><span class="seg-val">3</span></span></div>
+                <span class="bar-year">2024</span>
+              </div>
+              <div class="bar-col">
+                <span class="bar-total num">18</span>
+                <div class="bar" role="img" aria-label="2025: 18 clientes nuevos. Dueño 2, resto de la agencia 3, otras agencias 13."><span class="seg seg--otras" style="height:118px" title="Otras agencias: 13"><span class="seg-val">13</span></span><span class="seg seg--agencia" style="height:27px" title="Resto de Agencia Norte: 3"><span class="seg-val">3</span></span><span class="seg seg--dueno" style="height:18px" title="Dueño: 2"></span></div>
+                <span class="bar-year">2025</span>
+              </div>
+              <div class="bar-col">
+                <span class="bar-total num">12</span>
+                <div class="bar" role="img" aria-label="2026*: 12 clientes nuevos. Dueño 0, resto de la agencia 2, otras agencias 10."><span class="seg seg--otras" style="height:91px" title="Otras agencias: 10"><span class="seg-val">10</span></span><span class="seg seg--agencia" style="height:18px" title="Resto de Agencia Norte: 2"></span></div>
+                <span class="bar-year">2026*</span>
+              </div>
+            </div>
+            <p class="card-foot">* 2026 hasta octubre.</p>
+          </article>
+
+          <div class="owner-side">
+            <article class="reading">
+              <h3 class="reading-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Lectura para la conversación</h3>
+              <p class="reading-text">Desde 2024, otros asesores vincularon <b>47</b> clientes nuevos en la empresa; el dueño del plan, <b>5</b>. No vincula un cliente nuevo desde agosto de 2025 y en 2026 sumó <b>1</b> partícipe al plan. La empresa crece, pero por fuera de su gestión.</p>
+            </article>
+            <article class="card actions">
+              <h3 class="card-title">Acciones</h3>
+              <button class="btn-primary" id="open-plan" aria-haspopup="dialog">Crear plan de acción</button>
+              <button class="btn-outline">Reasignar empresa</button>
+              <p class="actions-note">Las dos acciones le llegan al asesor a su correo y como notificación en Contigo.</p>
+            </article>
+          </div>
+        </div>
+
+        <section class="card block" aria-labelledby="asesores-title">
+          <div class="block-head">
+            <h2 class="block-title" id="asesores-title">Asesores con clientes en la empresa (14)</h2>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col"><span class="th">Asesor</span></th>
+                  <th scope="col"><span class="th">Clientes</span></th>
+                  <th scope="col"><span class="th">Activos</span></th>
+                  <th scope="col"><span class="th">Clientes nuevos desde 2024</span></th>
+                  <th scope="col"><span class="th">Último cliente nuevo</span></th>
+                  <th scope="col"><span class="th">Estado</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row-owner">
+                  <th scope="row"><span class="who"><i class="sw sw--dueno"></i><span><b>Juan Alberto Rodríguez González</b><small>Dueño del plan · Agencia Norte</small></span></span></th>
+                  <td class="c num">171</td><td class="c num">$36.550 M</td><td class="c num">5</td><td>Ago 2025</td>
+                  <td><span class="tag tag--warning" data-plan-status="Plan enviado">Requiere plan</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="who"><i class="sw sw--agencia"></i><span><b>Felipe Arango Mejía</b><small>Agencia Norte</small></span></span></th>
+                  <td class="c num">17</td><td class="c num">$2.100 M</td><td class="c num">6</td><td>Jul 2026</td>
+                  <td><span class="tag tag--success">Activo</span></td>
+                </tr>
+                <tr>
+                  <th scope="row"><span class="who"><i class="sw sw--agencia"></i><span><b>Diana Cortés Rojas</b><small>Agencia Norte</small></span></span></th>
+                  <td class="c num">13</td><td class="c num">$1.590 M</td><td class="c num">3</td><td>Sep 2026</td>
+                  <td><span class="tag tag--success">Activo</span></td>
+                </tr>
+                <tr class="row-agg">
+                  <th scope="row"><span class="who"><i class="sw sw--otras"></i><span><b><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Otras agencias</b><small>11 asesores</small></span></span></th>
+                  <td class="c num">211</td><td class="c num">$21.340 M</td><td class="c num">38</td><td>Oct 2026</td>
+                  <td><span class="tag tag--neutral">Agregado</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="panel" role="tabpanel" id="panel-clientes" aria-labelledby="tab-clientes" hidden>
+
+        <section class="card block" aria-labelledby="oport-title">
+          <h2 class="block-title block-title--space" id="oport-title">La oportunidad</h2>
+          <div class="oport">
+            <div class="oport-stats">
+              <div class="stat">
+                <span class="kpi-label">Empleados <span class="tip-wrap"><button class="tip" aria-label="De dónde sale el total de empleados" aria-describedby="tip-empleados"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-empleados">Empleados que la empresa reportó al abrir el plan (actualizado en marzo de 2026). <b>No es la nómina real</b>: esa llegará con ACH.</span></span></span>
+                <span class="kpi-value--big num">1.250</span>
+              </div>
+              <div class="stat">
+                <span class="kpi-label">Clientes Skandia</span>
+                <span class="kpi-value--big num stat-brand">412</span>
+              </div>
+              <div class="stat">
+                <span class="kpi-label">Sin relación <span class="tip-wrap"><button class="tip" aria-label="Qué es la población sin relación" aria-describedby="tip-sinrel"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-sinrel">Empleados de la empresa <b>sin ningún producto</b> con Skandia. Es la población no atendida.</span></span></span>
+                <span class="kpi-value--big num stat-muted">838</span>
+              </div>
+            </div>
+
+            <div class="oport-bar">
+              <div class="oport-bar-head">
+                <span class="kpi-label">Penetración en la nómina</span>
+                <span class="kpi-value--big num stat-brand">33,0%</span>
+              </div>
+              <div class="stack" role="img" aria-label="De 1.250 empleados: 171 clientes del dueño, 30 del resto de la agencia, 211 de otras agencias y 838 sin relación con Skandia.">
+                <span class="stack-seg seg--dueno" style="width:13.7%"><span class="stack-val">171</span></span>
+                <span class="stack-seg seg--agencia" style="width:2.4%"></span>
+                <span class="stack-seg seg--otras" style="width:16.9%"><span class="stack-val">211</span></span>
+                <span class="stack-seg stack-empty" style="width:67%"><span class="stack-val stack-val--muted">838 sin relación con Skandia</span></span>
+              </div>
+              <div class="legend-inline">
+                <span><i class="sw sw--dueno"></i>Dueño del plan · 171</span>
+                <span><i class="sw sw--agencia"></i>Resto de Agencia Norte · 30</span>
+                <span><i class="sw sw--otras"></i>Otras agencias · 211</span>
+                <span><i class="sw sw--vacio"></i>Sin relación · 838</span>
+              </div>
+              <div class="history num">
+                <span>Penetración 2024: <b>32,3%</b></span>
+                <span>2025: <b>32,9%</b></span>
+                <span>2026: <b>33,0%</b></span>
+                <span class="tag tag--warning">+0,7 pp en dos años</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="clients-grid">
+          <section class="card block" aria-labelledby="evol-title">
+            <div class="block-head block-head--space">
+              <h2 class="block-title" id="evol-title">Evolución de clientes</h2>
+              <span class="tag tag--warning"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>El neto se desacelera</span>
+            </div>
+            <div class="card-body">
+              <div class="card-head">
+                <p class="card-sub">Clientes nuevos y perdidos por año, toda la empresa</p>
+                <div class="legend-inline">
+                  <span><i class="sw sw--nuevos"></i>Nuevos</span>
+                  <span><i class="sw sw--perdidos"></i>Perdidos</span>
+                </div>
+              </div>
+              <div class="pairs">
+                <div class="pair" role="img" aria-label="2024: 22 nuevos, 9 perdidos, neto +13">
+                  <div class="pair-bars"><span class="pair-bar pair-bar--nuevos" style="height:170px"><span>22</span></span><span class="pair-bar pair-bar--perdidos" style="height:70px"><span>9</span></span></div>
+                  <span class="pair-year">2024<small>Neto +13</small></span>
+                </div>
+                <div class="pair" role="img" aria-label="2025: 18 nuevos, 11 perdidos, neto +7">
+                  <div class="pair-bars"><span class="pair-bar pair-bar--nuevos" style="height:139px"><span>18</span></span><span class="pair-bar pair-bar--perdidos" style="height:85px"><span>11</span></span></div>
+                  <span class="pair-year">2025<small>Neto +7</small></span>
+                </div>
+                <div class="pair" role="img" aria-label="2026*: 12 nuevos, 11 perdidos, neto +1">
+                  <div class="pair-bars"><span class="pair-bar pair-bar--nuevos" style="height:93px"><span>12</span></span><span class="pair-bar pair-bar--perdidos" style="height:85px"><span>11</span></span></div>
+                  <span class="pair-year">2026*<small>Neto +1</small></span>
+                </div>
+              </div>
+              <p class="note">Del dueño: neto +2 en 2024, +1 en 2025 y −2 en 2026. Acumulado de la empresa: 52 nuevos, 31 perdidos, neto +21. En 2026 casi cada cliente nuevo compensa uno perdido. * 2026 hasta octubre.</p>
+            </div>
+          </section>
+
+          <section class="card block" aria-labelledby="prod-title">
+            <div class="block-head block-head--space">
+              <h2 class="block-title" id="prod-title">Productos por cliente</h2>
+              <span class="block-meta"><b class="num">42,0%</b> con 2 o más</span>
+            </div>
+            <div class="card-body">
+              <div class="card-head">
+                <p class="card-sub">Base: 412 clientes de la empresa</p>
+              </div>
+              <div class="stack stack--prod" role="img" aria-label="1 producto 58%, 2 productos 24%, 3 productos 12%, 4 o más 6%.">
+                <span class="stack-seg p1" style="width:58%"><span class="stack-val">58%</span></span>
+                <span class="stack-seg p2" style="width:24%"><span class="stack-val">24%</span></span>
+                <span class="stack-seg p3" style="width:12%"><span class="stack-val stack-val--light">12%</span></span>
+                <span class="stack-seg p4" style="width:6%"></span>
+              </div>
+              <ul class="prod-list">
+                <li><i class="sw p1"></i><span>1 producto (1P)</span><b class="num">239</b><span class="num pct">58%</span></li>
+                <li><i class="sw p2"></i><span>2 productos (2P)</span><b class="num">99</b><span class="num pct">24%</span></li>
+                <li><i class="sw p3"></i><span>3 productos (3P)</span><b class="num">49</b><span class="num pct">12%</span></li>
+                <li><i class="sw p4"></i><span>4 productos o más (4P+)</span><b class="num">25</b><span class="num pct">6%</span></li>
+              </ul>
+              <p class="note"><b>239 clientes monoproducto</b> son la vía rápida: ya confían en Skandia, les falta el segundo producto. 92 son del dueño; los otros 147 los atienden otros asesores.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+      <section class="panel" role="tabpanel" id="panel-relacion" aria-labelledby="tab-relacion" hidden>
+        <section class="block" aria-labelledby="lineas-title">
+          <div class="block-head block-head--space">
+            <div>
+              <h2 class="block-title" id="lineas-title">Activos administrados por línea de negocio</h2>
+              <p class="card-sub">Lo del dueño frente a lo de otros asesores, línea por línea. En seguros se mide la prima anual.</p>
+            </div>
+            <div class="legend-inline">
+              <span><i class="sw sw--dueno"></i>Dueño del plan</span>
+              <span><i class="sw sw--agencia"></i>Resto de Agencia Norte</span>
+              <span><i class="sw sw--otras"></i>Otras agencias (agregado)</span>
+            </div>
+          </div>
+          <div class="lines">
+            <div class="line line--total">
+              <div class="line-name"><b>Total en la empresa</b><small>Sin seguros</small></div>
+              <div class="line-bar" role="img" aria-label="Total en la empresa: dueño $36.550 M, resto de la agencia $3.690 M, otras agencias $21.340 M"><span class="line-seg seg--dueno" style="width:59.4%"><span class="line-val">$36.550 M</span></span><span class="line-seg seg--agencia" style="width:6.0%"></span><span class="line-seg seg--otras" style="width:34.7%"><span class="line-val"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>$21.340 M</span></span></div>
+              <div class="line-detail"><span><i class="sw sw--dueno"></i>Dueño: <b>$36.550 M</b> · 59%</span><span><i class="sw sw--agencia"></i>Resto de Agencia Norte: <b>$3.690 M</b></span><span><i class="sw sw--otras"></i>Otras agencias: <b>$21.340 M</b></span></div>
+            </div>
+            <div class="line">
+              <div class="line-name"><b>Plan de Ahorro Corporativo</b><small>Voluntaria corporativa</small></div>
+              <div class="line-bar" role="img" aria-label="Plan de Ahorro Corporativo: dueño $27.400 M, resto de la agencia $0 M, otras agencias $0 M"><span class="line-seg seg--dueno" style="width:100.0%"><span class="line-val">$27.400 M</span></span></div>
+              <div class="line-detail"><span><i class="sw sw--dueno"></i>Dueño: <b>$27.400 M</b> · 100%</span><span class="line-note">El plan es 100% del dueño</span></div>
+            </div>
+            <div class="line">
+              <div class="line-name"><b>Pensión obligatoria</b><small>FPOB</small></div>
+              <div class="line-bar" role="img" aria-label="Pensión obligatoria: dueño $3.900 M, resto de la agencia $1.800 M, otras agencias $13.050 M"><span class="line-seg seg--dueno" style="width:20.8%"><span class="line-val">$3.900 M</span></span><span class="line-seg seg--agencia" style="width:9.6%"></span><span class="line-seg seg--otras" style="width:69.6%"><span class="line-val"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>$13.050 M</span></span></div>
+              <div class="line-detail"><span><i class="sw sw--dueno"></i>Dueño: <b>$3.900 M</b> · 21%</span><span><i class="sw sw--agencia"></i>Resto de Agencia Norte: <b>$1.800 M</b></span><span><i class="sw sw--otras"></i>Otras agencias: <b>$13.050 M</b></span></div>
+            </div>
+            <div class="line">
+              <div class="line-name"><b>Pensión voluntaria</b><small>Multifund individual</small></div>
+              <div class="line-bar" role="img" aria-label="Pensión voluntaria: dueño $4.100 M, resto de la agencia $1.300 M, otras agencias $4.200 M"><span class="line-seg seg--dueno" style="width:42.7%"><span class="line-val">$4.100 M</span></span><span class="line-seg seg--agencia" style="width:13.5%"></span><span class="line-seg seg--otras" style="width:43.8%"><span class="line-val"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>$4.200 M</span></span></div>
+              <div class="line-detail"><span><i class="sw sw--dueno"></i>Dueño: <b>$4.100 M</b> · 43%</span><span><i class="sw sw--agencia"></i>Resto de Agencia Norte: <b>$1.300 M</b></span><span><i class="sw sw--otras"></i>Otras agencias: <b>$4.200 M</b></span></div>
+            </div>
+            <div class="line">
+              <div class="line-name"><b>Cesantías</b></div>
+              <div class="line-bar" role="img" aria-label="Cesantías: dueño $450 M, resto de la agencia $240 M, otras agencias $1.440 M"><span class="line-seg seg--dueno" style="width:21.1%"><span class="line-val">$450 M</span></span><span class="line-seg seg--agencia" style="width:11.3%"></span><span class="line-seg seg--otras" style="width:67.6%"><span class="line-val"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>$1.440 M</span></span></div>
+              <div class="line-detail"><span><i class="sw sw--dueno"></i>Dueño: <b>$450 M</b> · 21%</span><span><i class="sw sw--agencia"></i>Resto de Agencia Norte: <b>$240 M</b></span><span><i class="sw sw--otras"></i>Otras agencias: <b>$1.440 M</b></span></div>
+            </div>
+            <div class="line">
+              <div class="line-name"><b>Seguros</b><small>Primas anuales</small></div>
+              <div class="line-bar" role="img" aria-label="Seguros: dueño $180 M, resto de la agencia $40 M, otras agencias $190 M"><span class="line-seg seg--dueno" style="width:43.9%"><span class="line-val">$180 M</span></span><span class="line-seg seg--agencia" style="width:9.8%"></span><span class="line-seg seg--otras" style="width:46.3%"><span class="line-val"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>$190 M</span></span></div>
+              <div class="line-detail"><span><i class="sw sw--dueno"></i>Dueño: <b>$180 M</b> · 44%</span><span><i class="sw sw--agencia"></i>Resto de Agencia Norte: <b>$40 M</b></span><span><i class="sw sw--otras"></i>Otras agencias: <b>$190 M</b></span></div>
+            </div>
+            <div class="line">
+              <div class="line-name"><b>Fiduciaria</b><small>FICs</small></div>
+              <div class="line-bar" role="img" aria-label="Fiduciaria: dueño $700 M, resto de la agencia $350 M, otras agencias $2.650 M"><span class="line-seg seg--dueno" style="width:18.9%"><span class="line-val">$700 M</span></span><span class="line-seg seg--agencia" style="width:9.5%"></span><span class="line-seg seg--otras" style="width:71.6%"><span class="line-val"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>$2.650 M</span></span></div>
+              <div class="line-detail"><span><i class="sw sw--dueno"></i>Dueño: <b>$700 M</b> · 19%</span><span><i class="sw sw--agencia"></i>Resto de Agencia Norte: <b>$350 M</b></span><span><i class="sw sw--otras"></i>Otras agencias: <b>$2.650 M</b></span></div>
+            </div>
+          </div>
+          <div class="finding">
+            <svg class="finding-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
+            <p><b>Hallazgo:</b> el dueño administra el <b>59%</b> de los activos de Skandia en la empresa, pero 3 de cada 4 de esos pesos son del plan corporativo. En las demás líneas tiene el <b>27%</b>.</p>
+          </div>
+        </section>
+      </section>
+      <section class="panel" role="tabpanel" id="panel-plan" aria-labelledby="tab-plan" hidden>
+        <div class="block-head block-head--space">
+          <div>
+            <h2 class="block-title" id="pac-title">Plan de Ahorro Corporativo</h2>
+            <p class="card-sub">Bonificación voluntaria: AUM, aportes y retiros</p>
+          </div>
+          <button class="btn-outline btn-inline">Ver detalle del plan
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+
+        <div class="kpis kpis--panel kpis--3">
+          <article class="kpi">
+            <span class="kpi-label">Aportes 2026</span>
+            <span class="kpi-value--big num">$2.800 M</span>
+            <span class="kpi-sub">Enero a octubre de 2026</span>
+          </article>
+          <article class="kpi">
+            <span class="kpi-label">Venta neta acumulada <span class="tip-wrap"><button class="tip" aria-label="Qué es la venta neta" aria-describedby="tip-ventaneta"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-ventaneta"><b>Aportes menos retiros</b> del período. Mide cuánto dinero nuevo se quedó en el plan; no incluye rendimientos.</span></span></span>
+            <span class="kpi-value--big num stat-brand">+$6.700 M</span>
+            <span class="kpi-sub">Enero de 2024 a octubre de 2026</span>
+          </article>
+          <article class="kpi">
+            <span class="kpi-label">AUM actual <span class="tip-wrap"><button class="tip" aria-label="Qué es el AUM" aria-describedby="tip-aum"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3C16.957 3 21 7.04297 21 12C21 16.9922 16.957 21 12 21C7.00781 21 3 16.9922 3 12C3 7.04297 7.00781 3 12 3ZM12 19.3125C16.0078 19.3125 19.3125 16.043 19.3125 12C19.3125 7.99219 16.0078 4.6875 12 4.6875C7.95703 4.6875 4.6875 7.99219 4.6875 12C4.6875 16.043 7.95703 19.3125 12 19.3125ZM12 14.8125C12.5977 14.8125 13.125 15.3047 13.125 15.9375C13.125 16.5703 12.5977 17.0625 12 17.0625C11.332 17.0625 10.875 16.5703 10.875 15.9375C10.875 15.3047 11.3672 14.8125 12 14.8125ZM13.1602 7.5C14.5664 7.5 15.6562 8.58984 15.6211 9.96094C15.6211 10.8047 15.1641 11.6133 14.4258 12.0703L12.8438 13.0547V13.125C12.8438 13.582 12.457 13.9688 12 13.9688C11.543 13.9688 11.1562 13.582 11.1562 13.125V12.5625C11.1562 12.2812 11.2969 12 11.5781 11.8242L13.582 10.6289C13.8281 10.4883 13.9688 10.2422 13.9688 9.96094C13.9688 9.53906 13.582 9.1875 13.125 9.1875H11.332C10.9102 9.1875 10.5938 9.53906 10.5938 9.96094C10.5938 10.418 10.207 10.8047 9.75 10.8047C9.29297 10.8047 8.90625 10.418 8.90625 9.96094C8.90625 8.58984 9.99609 7.5 11.3672 7.5H13.1602Z" fill="currentColor"/></svg></button><span class="tooltip" role="tooltip" id="tip-aum">Saldo administrado del plan al corte: <b>aportes acumulados más rendimientos, menos retiros</b>.</span></span></span>
+            <span class="kpi-value--big num">$27.400 M</span>
+            <span class="kpi-sub num">156 partícipes · <b class="up">+222%</b> desde enero de 2024</span>
+          </article>
+        </div>
+
+        <div class="clients-grid">
+          <section class="card block" aria-labelledby="aportes-title">
+            <div class="block-head block-head--space">
+              <h3 class="block-title" id="aportes-title">Aportes y retiros anuales</h3>
+              <div class="legend-inline">
+                <span><i class="sw sw--nuevos"></i>Aportes</span>
+                <span><i class="sw sw--perdidos"></i>Retiros</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="card-sub">Millones de pesos · * 2026 hasta octubre</p>
+              <div class="pairs pairs--money">
+                <div class="pair" role="img" aria-label="2024: aportes $3.200 millones, retiros $950 millones, neta $2.250 millones">
+                  <div class="pair-bars"><span class="pair-bar pair-bar--nuevos" style="height:133px"><span>$3.200</span></span><span class="pair-bar pair-bar--perdidos" style="height:39px"><span>$950</span></span></div>
+                  <span class="pair-year">2024<small>Neta +$2.250 M</small></span>
+                </div>
+                <div class="pair" role="img" aria-label="2025: aportes $4.100 millones, retiros $1.800 millones, neta $2.300 millones">
+                  <div class="pair-bars"><span class="pair-bar pair-bar--nuevos" style="height:170px"><span>$4.100</span></span><span class="pair-bar pair-bar--perdidos" style="height:75px"><span>$1.800</span></span></div>
+                  <span class="pair-year">2025<small>Neta +$2.300 M</small></span>
+                </div>
+                <div class="pair" role="img" aria-label="2026*: aportes $2.800 millones, retiros $650 millones, neta $2.150 millones">
+                  <div class="pair-bars"><span class="pair-bar pair-bar--nuevos" style="height:116px"><span>$2.800</span></span><span class="pair-bar pair-bar--perdidos" style="height:27px"><span>$650</span></span></div>
+                  <span class="pair-year">2026*<small>Neta +$2.150 M</small></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card block" aria-labelledby="aum-title">
+            <div class="block-head block-head--space">
+              <h3 class="block-title" id="aum-title">Evolución del AUM</h3>
+              <div class="legend-inline"><span><i class="sw sw--aum"></i>Saldo administrado</span></div>
+            </div>
+            <div class="card-body">
+              <p class="card-sub">Saldo administrado, millones de pesos</p>
+              <svg class="aum-chart" viewBox="0 0 560 220" role="img" aria-label="Evolución del AUM en millones: enero 2024 8.500, diciembre 2024 14.200, diciembre 2025 21.800, octubre 2026 27.400"><line x1="30" x2="530" y1="190.0" y2="190.0" class="aum-grid"/><line x1="30" x2="530" y1="136.7" y2="136.7" class="aum-grid"/><line x1="30" x2="530" y1="83.3" y2="83.3" class="aum-grid"/><line x1="30" x2="530" y1="30.0" y2="30.0" class="aum-grid"/><path d="M50.0 144.7 L203.3 114.3 L370.6 73.7 L510.0 43.9 L510.0 190 L50.0 190 Z" class="aum-area"/><path d="M50.0 144.7 L203.3 114.3 L370.6 73.7 L510.0 43.9" class="aum-line"/><circle cx="50.0" cy="144.7" r="5" class="aum-dot"/><text x="50.0" y="132.7" class="aum-val" text-anchor="middle">$8.500</text><text x="50.0" y="212" class="aum-x" text-anchor="middle">Ene 2024</text><circle cx="203.3" cy="114.3" r="5" class="aum-dot"/><text x="203.3" y="102.3" class="aum-val" text-anchor="middle">$14.200</text><text x="203.3" y="212" class="aum-x" text-anchor="middle">Dic 2024</text><circle cx="370.6" cy="73.7" r="5" class="aum-dot"/><text x="370.6" y="61.7" class="aum-val" text-anchor="middle">$21.800</text><text x="370.6" y="212" class="aum-x" text-anchor="middle">Dic 2025</text><circle cx="510.0" cy="43.9" r="5" class="aum-dot"/><text x="510.0" y="31.9" class="aum-val" text-anchor="middle">$27.400</text><text x="510.0" y="212" class="aum-x" text-anchor="middle">Oct 2026</text></svg>
+            </div>
+          </section>
+        </div>
+
+        <div class="finding">
+          <svg class="finding-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
+          <p><b>Hallazgo:</b> los aportes de 2026 van en <b>$2.800 M</b> a octubre, por debajo del ritmo de 2025 ($4.100 M), y el plan sumó solo <b>1 partícipe nuevo</b> este año (9 en 2024, 6 en 2025). El saldo crece por lo que ya está adentro, no por gente nueva.</p>
+        </div>
+      </section>
+      <section class="panel" role="tabpanel" id="panel-ruta" aria-labelledby="tab-ruta" hidden>
+        <div class="block-head block-head--space">
+          <div>
+            <h2 class="block-title" id="rutac-title">Ruta comercial</h2>
+            <p class="card-sub">Metas sugeridas para los próximos 12 meses</p>
+          </div>
+          <button class="btn-outline btn-inline" id="open-plan-ruta" aria-haspopup="dialog">Crear plan de acción con las metas marcadas</button>
+        </div>
+
+        <div class="route-cards">
+          <article class="card step">
+            <span class="step-head"><span class="step-num">1</span>Activar</span>
+            <h3 class="step-title">838 empleados sin relación</h3>
+            <p class="step-desc">Vinculación en nómina y jornadas en la sede de la empresa.</p>
+            <p class="step-goal">Meta: <b>+150 clientes</b> → <b>45%</b></p>
+            <label class="step-check"><input type="checkbox" data-ruta-goal="activar" checked> Incluir en el plan de acción</label>
+          </article>
+
+          <article class="card step">
+            <span class="step-head"><span class="step-num">2</span>Profundizar</span>
+            <h3 class="step-title">239 clientes monoproducto</h3>
+            <p class="step-desc">Segundo producto: voluntaria o plan corporativo.</p>
+            <p class="step-who"><span><i class="sw sw--dueno"></i>92 del dueño</span><span><i class="sw sw--otras"></i>147 de otros asesores <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-label="Agregado, sin detalle"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></p>
+            <p class="step-goal">Meta: 2P+ de 42% a <b>50%</b> (+33 clientes)</p>
+            <label class="step-check"><input type="checkbox" data-ruta-goal="profundizar" checked> Incluir en el plan de acción</label>
+          </article>
+
+          <article class="card step">
+            <span class="step-head"><span class="step-num">3</span>Consolidar</span>
+            <h3 class="step-title">87 afiliados a obligatoria con otras agencias</h3>
+            <p class="step-desc">Coordinar con las otras agencias para que la empresa tenga un solo frente.</p>
+            <p class="step-goal">Meta: share de 30% a <b>40%</b> (+12 afiliados)</p>
+            <label class="step-check"><input type="checkbox" data-ruta-goal="consolidar" checked> Incluir en el plan de acción</label>
+          </article>
+
+          <article class="card step">
+            <span class="step-head"><span class="step-num step-num--warning">4</span>Retener</span>
+            <h3 class="step-title">11 clientes perdidos en 2026</h3>
+            <p class="step-desc">Alertas tempranas de retiro y de salida de la empresa.</p>
+            <p class="step-who"><span><i class="sw sw--dueno"></i>2 del dueño</span><span><i class="sw sw--otras"></i>9 de otros asesores</span></p>
+            <p class="step-goal">Meta: neto anual <b>≥ +10</b></p>
+            <label class="step-check"><input type="checkbox" data-ruta-goal="retener" checked> Incluir en el plan de acción</label>
+          </article>
+        </div>
+      </section>
+
+
+      <footer class="footer">
+        <div class="footer-links">
+          <a class="footer-link" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 21l2-5.3A8.5 8.5 0 1 1 21 11.5z"/></svg>Centro de ayuda</a>
+          <a class="footer-link" href="#">Términos y condiciones</a>
+          <a class="footer-link" href="#">Accesibilidad</a>
+          <a class="footer-link" href="#">Mapa del sitio</a>
+          <a class="footer-link" href="#">Onboarding</a>
+        </div>
+        <span class="footer-copy">2026 © Skandia</span>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- ═══ Modal informativa: vista gerencial ════════════════════════════════ -->
+<div class="overlay" id="info-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="info-title" aria-describedby="info-desc">
+    <div class="modal-head">
+      <h2 class="modal-title" id="info-title">Vista gerencial: la empresa completa y la gestión del dueño del plan</h2>
+      <button class="modal-close" data-close-info aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <p class="modal-desc" id="info-desc">Ves cuánto gestiona el dueño frente a lo que vinculan otros asesores, y puedes pedirle un plan de acción o reasignar la empresa.</p>
+    <div class="info-scope">
+            <div class="scope-cols">
+              <div>
+                <h3 class="scope-title">Ves</h3>
+                <ul class="scope-list scope-yes">
+                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Todo lo que ve el dueño del plan</li>
+                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Gestión del dueño: vinculaciones, tiempo sin vincular y estado</li>
+                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Asesores de tu agencia con clientes en la empresa</li>
+                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Acciones: plan de acción y reasignación</li>
+                </ul>
+              </div>
+              <div>
+                <h3 class="scope-title">No ves</h3>
+                <ul class="scope-list scope-no">
+                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>Asesores de otras agencias: aparecen agregados</li>
+                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>Detalle de clientes individuales</li>
+                </ul>
+              </div>
+            </div>
+    </div>
+    <button type="button" class="btn-primary btn-small" data-close-info>Entendido</button>
+  </div>
+</div>
+
+<!-- ═══ Modal: Crear plan de acción ═══════════════════════════════════════ -->
+<div class="overlay" id="plan-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="plan-title" aria-describedby="plan-desc">
+    <div class="modal-head">
+      <h2 class="modal-title" id="plan-title">Crear plan de acción</h2>
+      <button class="modal-close" data-close aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <p class="modal-desc" id="plan-desc">Para <b>Juan Alberto Rodríguez González</b> en Empresa ABC S.A. Las metas vienen sugeridas desde la ruta comercial; puedes ajustarlas antes de crear el plan.</p>
+
+    <form id="plan-form" class="modal-body" novalidate>
+      <fieldset class="goals">
+        <legend class="goals-title">Metas para los próximos 12 meses</legend>
+
+        <div class="goal" data-goal="activar">
+          <label class="goal-check"><input type="checkbox" checked> <span><b>Activar</b> · clientes nuevos</span></label>
+          <div class="goal-edit">
+            <span class="goal-affix">+</span>
+            <input class="goal-input" type="number" inputmode="numeric" min="0" step="1" value="150" data-suggested="150" aria-label="Meta de clientes nuevos">
+            <span class="goal-affix">clientes</span>
+          </div>
+          <p class="goal-calc" aria-live="polite"></p>
+        </div>
+
+        <div class="goal" data-goal="profundizar">
+          <label class="goal-check"><input type="checkbox" checked> <span><b>Profundizar</b> · cross-sell 2P+ (hoy 42%)</span></label>
+          <div class="goal-edit">
+            <span class="goal-affix">a</span>
+            <input class="goal-input" type="number" inputmode="numeric" min="42" max="100" step="1" value="50" data-suggested="50" aria-label="Meta de cross-sell 2P+ en porcentaje">
+            <span class="goal-affix">%</span>
+          </div>
+          <p class="goal-calc" aria-live="polite"></p>
+        </div>
+
+        <div class="goal" data-goal="consolidar">
+          <label class="goal-check"><input type="checkbox" checked> <span><b>Consolidar</b> · share de obligatoria (hoy 30%)</span></label>
+          <div class="goal-edit">
+            <span class="goal-affix">a</span>
+            <input class="goal-input" type="number" inputmode="numeric" min="30" max="100" step="1" value="40" data-suggested="40" aria-label="Meta de share de obligatoria en porcentaje">
+            <span class="goal-affix">%</span>
+          </div>
+          <p class="goal-calc" aria-live="polite"></p>
+        </div>
+
+        <div class="goal" data-goal="retener">
+          <label class="goal-check"><input type="checkbox" checked> <span><b>Retener</b> · neto anual de clientes (hoy +1)</span></label>
+          <div class="goal-edit">
+            <span class="goal-affix">≥ +</span>
+            <input class="goal-input" type="number" inputmode="numeric" min="0" step="1" value="10" data-suggested="10" aria-label="Meta de neto anual de clientes">
+            <span class="goal-affix">clientes</span>
+          </div>
+          <p class="goal-calc" aria-live="polite"></p>
+        </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend class="field-label">Plazo para que el asesor responda</legend>
+        <div class="segmented">
+          <label><input type="radio" name="plazo" value="15" checked><span>15 días</span></label>
+          <label><input type="radio" name="plazo" value="30"><span>30 días</span></label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label class="field-label" for="plan-msg">Mensaje para el asesor <span class="opt">(opcional)</span></label>
+        <textarea id="plan-msg" rows="3" placeholder="Cuéntale qué esperas del plan o en qué quieres que se enfoque."></textarea>
+      </div>
+
+      <p class="modal-note">El asesor recibe el plan a su correo y como notificación en Contigo.</p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" data-close>Cancelar</button>
+        <button type="submit" class="btn-primary">Crear plan de acción</button>
+      </div>
+    </form>
+
+    <!-- Confirmación: reemplaza el formulario al enviar -->
+    <div class="sent" id="plan-sent" hidden tabindex="-1">
+      <span class="sent-icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
+      <h2 class="sent-title" id="plan-sent-title">Plan de acción enviado</h2>
+      <p class="sent-desc">Juan Alberto Rodríguez González lo recibió a su correo y como notificación en Contigo. Tiene <b id="sent-plazo">15 días</b> para responder.</p>
+      <div class="sent-summary">
+        <h3 class="sent-summary-title">Metas del plan</h3>
+        <ul class="sent-list" id="sent-list"></ul>
+      </div>
+      <button type="button" class="btn-primary" data-close>Entendido</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // Pestañas: clic y flechas del teclado, como un tablist accesible.
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  function select(tab) {
+    tabs.forEach((t) => {
+      const on = t === tab;
+      t.setAttribute('aria-selected', on);
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    tab.focus();
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => select(tab));
+    tab.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') select(tabs[(i + 1) % tabs.length]);
+      if (e.key === 'ArrowLeft') select(tabs[(i - 1 + tabs.length) % tabs.length]);
+    });
+  });
+
+  // ── Crear plan de acción: metas sugeridas que el director puede editar ──
+  const overlay = document.getElementById('plan-overlay');
+  const planForm = document.getElementById('plan-form');
+  const openPlan = document.getElementById('open-plan');
+  const fmt = (n, d = 0) => n.toLocaleString('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  // Datos de hoy en Empresa ABC S.A. (los mismos del Resumen)
+  const HOY = { empleados: 1250, clientes: 412, clientes2p: 173, afiliados: 125, agencia: 38 };
+  const calc = {
+    activar: (v) => `Penetración resultante: ${fmt((HOY.clientes + v) / HOY.empleados * 100, 1)}% (hoy 33,0%)`,
+    profundizar: (v) => {
+      const faltan = Math.ceil(HOY.clientes * v / 100) - HOY.clientes2p;
+      return faltan > 0 ? `+${fmt(faltan)} clientes con 2 o más productos` : 'Ya se cumple hoy';
+    },
+    consolidar: (v) => {
+      const faltan = Math.ceil(HOY.afiliados * v / 100) - HOY.agencia;
+      return faltan > 0 ? `+${fmt(faltan)} afiliados a obligatoria con tu agencia` : 'Ya se cumple hoy';
+    },
+    retener: (v) => `Clientes nuevos menos perdidos en el año`,
+  };
+
+  function renderGoal(goal) {
+    const input = goal.querySelector('.goal-input');
+    const check = goal.querySelector('input[type="checkbox"]');
+    const out = goal.querySelector('.goal-calc');
+    const v = Number(input.value) || 0;
+    const suggested = Number(input.dataset.suggested);
+    goal.classList.toggle('is-off', !check.checked);
+    input.disabled = !check.checked;
+    out.innerHTML = '';
+    const info = document.createElement('span');
+    info.textContent = calc[goal.dataset.goal](v);
+    out.append(info);
+    if (v !== suggested) {
+      const ed = document.createElement('span');
+      ed.className = 'edited';
+      ed.textContent = `Editada · sugerida: ${fmt(suggested)}`;
+      const reset = document.createElement('button');
+      reset.type = 'button';
+      reset.textContent = 'Usar la sugerida';
+      reset.addEventListener('click', () => { input.value = suggested; renderGoal(goal); input.focus(); });
+      out.append(ed, reset);
+    } else {
+      const sg = document.createElement('span');
+      sg.textContent = '· Sugerida por la ruta comercial';
+      out.append(sg);
+    }
+  }
+  const goals = [...overlay.querySelectorAll('.goal')];
+  goals.forEach((g) => {
+    renderGoal(g);
+    g.querySelector('.goal-input').addEventListener('input', () => renderGoal(g));
+    g.querySelector('input[type="checkbox"]').addEventListener('change', () => renderGoal(g));
+  });
+
+  let openModal = function () {
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    const first = overlay.querySelector('.goal-input:not([disabled])');
+    if (first && first.offsetParent) first.focus();
+  };
+  let lastOpener = openPlan;
+  function closeModal() {
+    overlay.hidden = true;
+    document.body.style.overflow = '';
+    lastOpener.focus();
+  }
+  openPlan.addEventListener('click', () => { lastOpener = openPlan; openModal(); });
+  overlay.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', closeModal));
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Tab') {   // el foco no sale del modal
+      const f = [...overlay.querySelectorAll('button, input:not([disabled]), textarea')].filter((el) => el.offsetParent);
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+
+  // Al enviar: el modal pasa a la confirmación con el resumen de lo enviado
+  const sent = document.getElementById('plan-sent');
+  const intro = overlay.querySelector('.modal-head');
+  const desc = document.getElementById('plan-desc');
+  const RESUMEN = {
+    activar: (v) => `Activar: +${fmt(v)} clientes nuevos`,
+    profundizar: (v) => `Profundizar: cross-sell 2P+ de 42% a ${fmt(v)}%`,
+    consolidar: (v) => `Consolidar: share de obligatoria de 30% a ${fmt(v)}%`,
+    retener: (v) => `Retener: neto anual ≥ +${fmt(v)}`,
+  };
+  planForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const list = document.getElementById('sent-list');
+    list.innerHTML = '';
+    goals.filter((g) => g.querySelector('input[type="checkbox"]').checked).forEach((g) => {
+      const input = g.querySelector('.goal-input');
+      const li = document.createElement('li');
+      li.textContent = RESUMEN[g.dataset.goal](Number(input.value) || 0);
+      if (Number(input.value) !== Number(input.dataset.suggested)) {
+        const tag = document.createElement('span');
+        tag.className = 'sent-edited';
+        tag.textContent = 'editada';
+        li.append(' ', tag);
+      }
+      list.append(li);
+    });
+    document.getElementById('sent-plazo').textContent = `${planForm.plazo.value} días`;
+    planForm.hidden = true; desc.hidden = true; intro.hidden = true;
+    sent.hidden = false;
+    overlay.querySelector('.modal').setAttribute('aria-labelledby', 'plan-sent-title');
+    sent.focus();
+    // La ficha refleja que ya hay un plan en curso
+    document.querySelectorAll('[data-plan-status]').forEach((t) => {
+      t.className = 'tag tag--info';
+      t.textContent = t.dataset.planStatus;
+    });
+    openPlan.textContent = 'Ver plan de acción enviado';
+    openRuta.textContent = 'Ver plan de acción enviado';
+    rutaChecks.forEach((c) => { c.disabled = true; });
+  });
+
+  // Ruta comercial: "Incluir en el plan de acción" y las metas del modal van sincronizadas
+  const rutaChecks = [...document.querySelectorAll('[data-ruta-goal]')];
+  const openRuta = document.getElementById('open-plan-ruta');
+  rutaChecks.forEach((c) => c.addEventListener('change', () => {
+    const g = goals.find((x) => x.dataset.goal === c.dataset.rutaGoal);
+    g.querySelector('input[type="checkbox"]').checked = c.checked;
+    renderGoal(g);
+  }));
+  goals.forEach((g) => g.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+    const c = rutaChecks.find((r) => r.dataset.rutaGoal === g.dataset.goal);
+    if (c) c.checked = e.target.checked;
+  }));
+  openRuta.addEventListener('click', () => { lastOpener = openRuta; openModal(); });
+
+  // Al volver a abrir, el modal muestra lo enviado si ya existe un plan
+  const baseOpen = openModal;
+  openModal = function () {
+    baseOpen();
+    if (!sent.hidden) sent.focus();
+  };
+
+  // Modal informativa: se abre con el ícono de ayuda del título
+  const infoOverlay = document.getElementById('info-overlay');
+  const openInfo = document.getElementById('open-info');
+  const closeInfo = () => { infoOverlay.hidden = true; document.body.style.overflow = ''; openInfo.focus(); };
+  openInfo.addEventListener('click', () => {
+    infoOverlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    infoOverlay.querySelector('.modal-close').focus();
+  });
+  infoOverlay.querySelectorAll('[data-close-info]').forEach((b) => b.addEventListener('click', closeInfo));
+  infoOverlay.addEventListener('click', (e) => { if (e.target === infoOverlay) closeInfo(); });
+  infoOverlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeInfo();
+    if (e.key === 'Tab') {
+      const f = [...infoOverlay.querySelectorAll('button')];
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+</script>
+</body>
+</html>
