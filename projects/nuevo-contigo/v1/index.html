@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha cliente · Contigo (propuesta)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#00C73D; --green-soft:#E6F9EC; --mint:#EBFBF6; --blue:#0099DE;
+    --ink:#333; --ink-2:#555; --muted:#8a8a8a; --line:#ECECEC; --gray-bg:#F5F5F5; --red:#E5383B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Montserrat,system-ui,sans-serif;color:var(--ink);background:#fff;overflow-x:hidden}
+  svg{display:block}
+  .ico{width:22px;height:22px;stroke:var(--green);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .ico-sm{width:14px;height:14px;stroke:var(--ink-2);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Sidebar */
+  .side{position:fixed;left:0;top:0;bottom:0;width:112px;border-right:1px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;padding:20px 0 24px;z-index:5}
+  .side .burger{width:100px;height:40px;border-radius:10px;background:#F7F7F7;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:22px}
+  .side ul{list-style:none;display:flex;flex-direction:column;gap:12px;width:100%;align-items:center}
+  .side .item{position:relative;width:100px;padding:10px 4px 8px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--ink);text-align:center;cursor:pointer;border:0;background:none;font-family:'Open Sans',sans-serif;line-height:1.2}
+  .side .item:hover{background:#F7F7F7}
+  .side .item.on{background:#F3F3F3;color:var(--green);font-weight:500}
+  .side .item .ico{stroke:var(--ink);width:22px;height:22px;stroke-width:1.8}
+  .side .item.on .ico{stroke:var(--green);fill:var(--green-soft)}
+  .side .item .ico-fill{stroke:none;fill:var(--ink);width:20px;height:20px;margin:1px 0}
+  .side .item.open .ico-fill{fill:var(--green)}
+  .side .item.open{background:#F3F3F3;color:var(--green);font-weight:500}
+  .side .item.open .ico{stroke:var(--green)}
+  .side .bottom{margin-top:auto}
+  .drawer{font-family:'Open Sans',sans-serif;position:fixed;left:112px;top:0;bottom:0;width:312px;background:#fff;border-right:1px solid var(--line);box-shadow:8px 0 24px rgba(0,0,0,.06);padding:14px 12px 28px;z-index:6;display:none;flex-direction:column}
+  .drawer.show{display:flex}
+  .dr-sec{display:none}
+  .dr-sec.show{display:block}
+  .dr-sec h3{font-size:16px;font-weight:700;color:var(--green);background:#F7F7F7;border-radius:10px;padding:14px 12px;margin-bottom:10px}
+  .dr-sec a{display:block;padding:16px 14px;border-radius:8px;font-size:16px;color:var(--ink);text-decoration:none}
+  .dr-sec a:hover{background:var(--green-soft)}
+  .dr-foot{margin-top:auto;background:#F7F7F7;border-radius:8px;padding:12px 10px;font-size:13px;line-height:1.6;color:var(--ink)}
+  .veil{position:fixed;left:112px;top:0;right:0;bottom:0;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:4;display:none}
+  .veil.show{display:block}
+  .side .item .ico.ico-fill{stroke:none}
+  .side .item.on .ico.ico-fill,.side .item.open .ico.ico-fill{fill:var(--green);stroke:none}
+  body.dr-open .side .item.on:not(.open) .ico.ico-fill{fill:var(--ink)}
+  body.dr-open .side .item.on:not(.open){background:none;color:var(--ink);font-weight:400}
+  body.dr-open .side .item.on:not(.open) .ico{stroke:var(--ink);fill:none}
+  body.dr-open .burger .ico{stroke:var(--green)!important;stroke-width:2.2}
+
+  /* Header */
+  .wrap{margin-left:112px}
+  header{white-space:nowrap;height:88px;display:flex;align-items:center;padding:0 32px;background:linear-gradient(100deg,#fff 72%,#F0FBEF 100%);border-bottom:1px solid #F3F3F3}
+  .brand{display:flex;align-items:center;gap:20px;font-size:16px;font-weight:700;color:var(--ink);text-decoration:none;flex:none}
+  .brand svg{width:38px;height:38px;display:block}
+  .search{margin-left:60px;margin-right:40px;flex:1;max-width:738px;min-width:0;height:50px;border:1px solid #F0F0F0;border-radius:10px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;gap:12px;padding:0 22px;color:#6b6b6b;font-size:16px;font-family:'Open Sans',sans-serif}
+  .search span{overflow:hidden;text-overflow:ellipsis}
+  .hello{margin-left:32px;display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;color:var(--ink)}
+  .hello .n{color:var(--green)}
+  .avatar{width:52px;height:52px;border-radius:50%;padding:2px;background:var(--green);flex:none}
+  .avatar img{width:100%;height:100%;border-radius:50%;border:2px solid #fff;object-fit:cover;display:block}
+  .bell{margin-left:auto;position:relative;width:50px;height:50px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex:none;border:0;cursor:pointer}
+  .bell b{position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;font-family:'Open Sans',sans-serif}
+  /* Tu sami: ícono de Isa (assets/sami.png) con animación sutil:
+     flota, respira y destella. Quieto con "reducir movimiento". */
+  .sami-ico{position:relative;width:56px;height:56px;display:block;flex:none;margin:-10px -6px -10px -10px}
+  .sami-ico img{position:relative;width:56px;height:56px;display:block;animation:samiFlota 3s ease-in-out infinite;transform-origin:50% 70%}
+  .sami-ico::before{content:"";position:absolute;left:6px;top:12px;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(124,242,154,.9),rgba(124,242,154,0) 70%);animation:samiGlow 3s ease-in-out infinite}
+  .sami-ico::after{content:"";position:absolute;right:6px;top:4px;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,140,.95),rgba(255,236,140,0) 65%);animation:samiDestello 2.4s ease-in-out infinite;pointer-events:none}
+  .sami:hover .sami-ico img{animation:samiSaluda .9s ease-in-out}
+  @keyframes samiFlota{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+  @keyframes samiGlow{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+  @keyframes samiDestello{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
+  @keyframes samiSaluda{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+  @media (prefers-reduced-motion:reduce){.sami-ico img,.sami-ico::before,.sami-ico::after{animation:none!important}}
+  .sami{margin-left:40px;display:flex;align-items:center;gap:10px;height:50px;padding:0 18px;border:2px solid #A8EBB2;border-radius:8px;background:linear-gradient(90deg,#F4FCF3,#E3F8DF);box-shadow:0 0 12px rgba(0,199,61,.22);font-family:inherit;font-size:18px;font-weight:700;color:var(--ink);cursor:pointer;flex:none}
+
+  main{padding:0 clamp(16px,4vw,58px) 0 clamp(16px,2.5vw,35px)}
+  .crumb{display:flex;align-items:center;gap:14px;font-size:12px;padding:20px 0 0 6px}
+  .crumb .sep{color:var(--ink-2)}
+  .crumb a{color:var(--green);font-weight:600;text-decoration:none}
+
+  .idbar{margin-top:20px;background:#FAFAFA;border-radius:4px;min-height:44px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:8px 9px;font-size:12px;color:var(--ink-2)}
+  .idbar h1{font-size:14px;font-weight:600;color:var(--ink);margin-right:2px}
+  .chip{background:var(--green-soft);color:var(--ink);padding:5px 8px;border-radius:12px}
+  .meta{display:flex;align-items:center;gap:5px}
+
+  /* KPIs */
+  .saldos{margin-top:34px}
+  .saldos-h{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .saldos-h h2{font-size:24px;font-weight:700;color:var(--ink)}
+  .saldos-h h2 span{color:var(--green)}
+  .tip{position:relative;display:inline-flex}
+  .tip-btn{border:0;background:none;padding:0;cursor:help;display:flex;border-radius:50%}
+  .tip-btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .tip-box{position:absolute;left:50%;top:calc(100% + 10px);transform:translateX(-50%);width:max-content;max-width:300px;background:#333;color:#fff;font-family:'Open Sans',sans-serif;font-size:13px;font-weight:400;line-height:1.45;padding:10px 12px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;visibility:hidden;transition:opacity .15s;z-index:3;white-space:normal}
+  .tip-box::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top:0;border-bottom-color:#333}
+  .tip:hover .tip-box,.tip-btn:focus-visible+.tip-box,.tip-btn:focus+.tip-box{opacity:1;visibility:visible}
+  .saldos-sub{font-size:14px;color:var(--ink-2);margin-top:12px}
+  .saldos-sub b{color:var(--ink);font-weight:600}
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,2.2vw,32px);margin-top:24px}
+  .card{display:flex;padding:12px 16px 16px 16px;flex-direction:column;align-items:flex-start;gap:8px;flex:1 0 0;border-radius:16px;background:var(--Secondary-Neutral-00,#FFF);box-shadow:0 0 4px 0 rgba(68,68,68,.15);position:relative}
+  .card .tag{position:absolute;right:16px;top:16px;background:var(--green-soft);color:var(--green);font-weight:600;font-size:12px;padding:5px 10px;border-radius:6px}
+  .card-h{display:flex;align-items:center;gap:10px}
+  .card .circ{flex:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .card .circ .ico{width:17px;height:17px;stroke-width:2}
+  .card .lbl{font-size:14px;font-family:'Open Sans',sans-serif;color:var(--ink-2)}
+  .card .val{font-size:16px;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:8px}
+  .card .subs{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+  .card .sub{background:#F3F3F3;border-radius:3px;padding:7px 10px;font-size:11px;text-align:center;color:var(--ink-2)}
+  .card .sub b{display:block;color:var(--ink);font-weight:600;margin-bottom:5px;font-size:11px}
+  .card .sub.out{background:#fff;border:1px solid var(--line);display:flex;align-items:center;gap:18px}
+  .card .sub{flex:1 1 80px;font-family:'Open Sans',sans-serif;border-radius:5px}
+  .card .sub.out{justify-content:center;position:relative}
+  .card .sub.out svg{position:absolute;right:10px;top:50%;transform:translateY(-50%)}
+  .total{padding-top:40px}
+  .total .big{font-size:24px;font-weight:700;color:var(--green);margin:8px 0 14px}
+  .total .val{margin-top:12px}
+  .card .more{display:inline-block;margin:0 0 0 38px;color:var(--green);font-size:15px;font-weight:700;text-decoration:none}
+  .card .more:hover{text-decoration:underline}
+  .trend{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+
+  /* Tabs */
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);margin-top:38px;font-size:14px;font-weight:600;color:var(--ink-2)}
+  .tab{height:37px;display:flex;align-items:center;justify-content:center;gap:10px}
+  .tab.on{background:var(--green);color:#fff;border-radius:10px 10px 0 0}
+  .tab.on .ico{stroke:#fff}
+  .tab .ico{stroke:var(--ink-2)}
+  .panel{border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;padding:38px 20px 50px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;min-height:645px}
+  .acc{border:1px solid var(--line);border-radius:10px;padding:22px 16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+  .acc-h{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600}
+  .acc-h .circ{width:36px;height:36px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center}
+  .acc-h .chev{margin-left:auto}
+  .prod{margin:20px 0 22px 16px;border-left:2px solid var(--green);padding-left:6px}
+  .prod .t{font-size:14px;font-weight:600;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:-8px}
+  .prod .t .ed{color:var(--blue);font-size:11px;font-weight:700;font-style:italic}
+  .prod .t .n{font-weight:400}
+  .prod .d{font-size:11px;color:var(--ink-2);margin-top:10px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+  .prod .d b{color:var(--ink)}
+  .prod .d a{color:var(--blue);font-weight:600;font-size:13px;text-decoration:underline;display:inline-flex;align-items:center;gap:5px}
+
+  .monitor{background:var(--mint);border-radius:10px;padding:26px 24px 24px}
+  .monitor h2{font-size:18px;font-weight:600}
+  .monitor p{font-size:13px;color:var(--ink-2);line-height:1.7;margin-top:10px}
+  .donut{width:240px;height:240px;border-radius:50%;margin:28px auto 0;background:conic-gradient(var(--blue) 0 82%,#1FD655 82% 97%,#55E6C4 97% 100%);-webkit-mask:radial-gradient(circle,transparent 79px,#000 80px);mask:radial-gradient(circle,transparent 79px,#000 80px)}
+  .legend{list-style:none;width:fit-content;margin:16px auto 0;font-size:13px;color:var(--ink-2)}
+  .legend li{display:flex;align-items:center;gap:5px;margin-bottom:12px}
+  .legend i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .legend b{font-size:11px;color:var(--ink)}
+  .mbtn{margin:10px auto 0;width:fit-content;display:flex;align-items:center;gap:12px;border:1px solid var(--green);border-radius:24px;padding:11px 20px;color:var(--green);font-weight:600;font-size:18px;background:transparent;font-family:inherit}
+
+  footer{margin-top:50px;border-top:1px solid var(--line);min-height:56px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 40px;padding:16px 32px;font-size:14px;color:var(--ink)}
+  footer .r{margin-left:auto;color:var(--muted)}
+
+
+  /* ===== Retiros en curso — valores exactos de Portal Clientes
+     (Dashboard portafolios y contratos/Dashboard Portal Clientes.dc.html, 30-oct) ===== */
+  :root{
+    --primary-00:#00c73d; --primary-l05:#f6fcf2; --primarygrey-00:#404040; --primarygrey-l03:#666666;
+    --neutral-l04:#dddddd; --feedback-info-dark:#0099de;
+    --texts-dark:var(--primarygrey-00); --texts-medium:var(--primarygrey-l03); --texts-link:var(--feedback-info-dark);
+    --icon-brand:var(--primary-00); --icon-link:var(--feedback-info-dark);
+    --background-brand-light:var(--primary-l05); --stroke-brand:var(--primary-00); --stroke-grey-light:var(--neutral-l04);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.05);
+    --title:'Montserrat'; --body:'Open Sans';
+  }
+  .retiros{display:flex;align-items:center;justify-content:center;gap:24px;width:100%;box-sizing:border-box;margin:24px 0 0;padding:8px 28px;border-radius:12px;border:2px solid transparent;background:var(--background-brand-light);cursor:pointer;text-align:left;font-family:var(--body),sans-serif;transition:border-color 150ms ease}
+  .retiros:hover{border-color:var(--stroke-brand)}
+  .retiros:focus-visible{outline:2px solid var(--feedback-info-dark);outline-offset:2px}
+  .retiros .rt{flex:0 1 auto;min-width:0;font-family:var(--title),sans-serif;font-weight:700;font-size:14px;color:var(--texts-dark)}
+  .camino{flex:0 0 200px;display:flex;align-items:center;gap:8px}
+  .camino .nodo{flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center}
+  .camino .nodo.billetera{color:var(--icon-brand)}
+  .camino .linea{position:relative;flex:1;height:2px;background-image:linear-gradient(90deg,#5CD5FF 55%,transparent 45%);background-size:10px 2px;background-repeat:repeat-x;animation:skCaminoFlujo .9s linear infinite}
+  .camino .moneda{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:var(--primary-00);box-shadow:0 2px 6px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;color:#fff;animation:skDineroLatido 2s ease-in-out infinite}
+  @keyframes skDineroLatido{0%{transform:translate(-50%,-50%) scale(1);box-shadow:0 0 0 0 rgba(0,199,61,.45)}50%{transform:translate(-50%,-50%) scale(1.12)}100%{transform:translate(-50%,-50%) scale(1);box-shadow:0 0 0 10px rgba(0,199,61,0)}}
+  @keyframes skCaminoFlujo{from{background-position-x:0}to{background-position-x:10px}}
+  @media (prefers-reduced-motion:reduce){.camino .linea,.camino .moneda{animation:none}}
+  .retiros .rl{flex:0 0 auto;display:flex;align-items:center;gap:4px;font-family:var(--title),sans-serif;font-weight:700;font-size:14px;color:var(--texts-link);white-space:nowrap}
+
+  .rmodal{position:fixed;inset:0;background:rgba(255,255,255,.94);display:none;align-items:center;justify-content:center;padding:24px;z-index:70}
+  .rmodal.show{display:flex}
+  .rdlg{animation:skModalIn .25s ease-out;position:relative;width:1080px;max-width:100%;max-height:calc(100vh - 48px);overflow:auto;box-sizing:border-box;padding:32px;border-radius:16px;background:#fff;box-shadow:0 0 30px 0 rgba(61,75,92,.15);display:flex;flex-direction:column;gap:16px;font-family:var(--body),sans-serif}
+  @keyframes skModalIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .rclose{position:absolute;top:24px;right:24px;display:flex;border:0;background:none;padding:4px;cursor:pointer;color:var(--icon-brand)}
+  .rdlg-h{display:flex;flex-direction:column;gap:6px;padding-right:40px}
+  .rdlg-h h2{margin:0;font-family:var(--title),sans-serif;font-weight:700;font-size:24px;color:var(--texts-dark)}
+  .rdlg-h p{margin:0;font-size:16px;color:var(--texts-dark)}
+  .retiro{border:1px solid var(--stroke-grey-light);border-radius:16px;background:#fff;box-shadow:var(--shadow-sm)}
+  .retiro-h{display:flex;flex-direction:column;gap:10px;width:100%;padding:20px 24px;border:0;background:none;cursor:pointer;text-align:left;font-family:var(--body),sans-serif}
+  .retiro-h .fila{display:flex;justify-content:space-between;align-items:center;gap:16px;width:100%}
+  .retiro-h .cab{font-weight:700;font-size:15px;color:var(--texts-dark)}
+  .retiro-h .chev{display:flex;color:var(--icon-brand);transition:transform .2s}
+  .retiro-h[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .retiro-h .cuando{font-size:15px;color:var(--texts-dark)}
+  .segmentos{display:flex;gap:6px;width:100%}
+  .segmentos span{flex:1;height:6px;border-radius:100px;background:var(--stroke-grey-light)}
+  .segmentos span.on{background:linear-gradient(90deg,var(--primary-00),#8fe000)}
+  .retiro-h .paso{font-size:14px;color:var(--texts-medium)}
+  .retiro-b{padding:0 24px 20px;display:flex;flex-direction:column;gap:16px}
+  .retiro-b[hidden]{display:none}
+  .rdet{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--stroke-grey-light);border-radius:16px;font-size:15px;color:var(--texts-dark);margin:0}
+  .rdet div{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 22px;border-bottom:1px solid var(--stroke-grey-light)}
+  .rdet dt{font-weight:700}
+  .rdet dd{margin:0;text-align:right}
+  .rpdf{align-self:flex-end;display:inline-flex;align-items:center;gap:8px;font-family:var(--title),sans-serif;font-weight:700;font-size:16px;text-decoration:none;color:var(--texts-link)}
+  @media (max-width:600px){
+    .retiros{gap:12px;justify-content:space-between;padding:8px 16px}
+    .camino{display:none}
+    .rdlg{padding:24px 16px}
+    .rdet{grid-template-columns:1fr}
+  }
+
+  /* ===== Responsive ===== */
+  .mburger{display:none;width:40px;height:40px;border:0;border-radius:10px;background:#F7F7F7;align-items:center;justify-content:center;cursor:pointer;margin-right:12px;flex:none}
+  @media (max-width:1280px){
+    .search{margin-left:32px;margin-right:24px}.hello,.sami{margin-left:24px}
+  }
+  @media (max-width:1279px){
+    .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+  }
+  @media (max-width:600px){
+    .kpis{grid-template-columns:1fr;gap:14px}
+  }
+  @media (max-width:1100px){
+    .hello .txt{display:none}
+  }
+  @media (max-width:960px){
+    .panel{grid-template-columns:1fr;padding:24px 16px 32px}
+    .tabs{display:flex;overflow-x:auto;scrollbar-width:none;font-size:13px}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{flex:1 0 auto;padding:0 18px}
+    .brand .bt,.sami .st{display:none}
+    .sami{padding:0 12px}
+  }
+  @media (max-width:768px){
+    .wrap{margin-left:0}
+    .mburger{display:flex}
+    .side{transform:translateX(-100%);transition:transform .2s ease;box-shadow:8px 0 24px rgba(0,0,0,.08)}
+    body.nav-open .side{transform:none}
+    .veil{left:0}
+    .drawer{width:min(312px,calc(100vw - 112px))}
+    header{flex-wrap:wrap;height:auto;padding:12px 16px;row-gap:12px}
+    header{background:#fff}
+    .search{order:5;flex:1 0 100%;max-width:none;margin-left:0;height:44px;font-size:14px;padding:0 14px}
+    .hello{margin-left:12px}
+    .avatar{width:42px;height:42px}
+    .bell{width:42px;height:42px;margin-left:auto}
+    .sami{height:42px;margin-left:12px;padding:0 10px}
+    .idbar h1{flex:1 0 100%}
+    .saldos{margin-top:24px}
+    .saldos-h{flex-wrap:nowrap}
+    .saldos-h h2{font-size:19px}
+    .saldos-h .tip svg{flex:none;width:24px;height:24px}
+    .tip-box{left:auto;right:-8px;transform:none}
+    .tip-box::before{left:auto;right:14px;transform:none}
+    .monitor{padding:20px 16px}
+    .donut{width:200px;height:200px;-webkit-mask:radial-gradient(circle,transparent 65px,#000 66px);mask:radial-gradient(circle,transparent 65px,#000 66px)}
+    .mbtn{font-size:16px}
+    footer{padding:16px;gap:10px 24px;font-size:13px}
+    footer .r{margin-left:0;flex:1 0 100%}
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="side" aria-label="Menú principal">
+  <button class="burger" aria-label="Expandir menú"><svg class="ico" viewBox="0 0 24 24" style="stroke:#333"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <ul>
+    <li><a class="item on" aria-current="page"><svg class="ico" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>Inicio</a></li>
+    <li><a class="item"><svg class="ico ico-fill" viewBox="0 0 32 32" style="width:26px;height:26px;margin:-2px 0" aria-hidden="true"><!-- Chart-line-up (librería) --><path d="M7.0625 22.5312C7.0625 23.1328 7.49219 23.5625 8.09375 23.5625H25.9688C26.5273 23.5625 27 24.0352 27 24.5938C27 25.1953 26.5273 25.625 25.9688 25.625H8.09375C6.375 25.625 5 24.25 5 22.5312V7.40625C5 6.84766 5.42969 6.375 6.03125 6.375C6.58984 6.375 7.0625 6.84766 7.0625 7.40625V22.5312ZM19.7812 10.5H24.5938C25.1523 10.5 25.625 10.9727 25.625 11.5312V16.3438C25.625 16.9453 25.1523 17.375 24.5938 17.375C23.9922 17.375 23.5625 16.9453 23.5625 16.3438V14.0234L18.75 18.793C18.3633 19.2227 17.7188 19.2227 17.332 18.793L13.8945 15.3984L11.1875 18.1055C10.8008 18.5352 10.1562 18.5352 9.76953 18.1055C9.33984 17.7188 9.33984 17.0742 9.76953 16.6445L13.207 13.207C13.5938 12.8203 14.2383 12.8203 14.625 13.207L18.0625 16.6445L22.1016 12.5625H19.7812C19.1797 12.5625 18.75 12.1328 18.75 11.5312C18.75 10.9727 19.1797 10.5 19.7812 10.5Z"/></svg>Monitor</a></li>
+    <li><button class="item" data-fly="f-afil" aria-haspopup="true" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M12 15c1-.6 2.5-1 4-1 3 0 6 2 6 5"/></svg>Afiliaciones</button></li>
+    <li><a class="item"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M8 7h8M8 11h8M8 15h8"/></svg>Informes</a></li>
+    <li><a class="item"><svg class="ico" viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M7 15l4-4 3 3 6-6"/><path d="M17 8h3v3"/></svg>Informes</a></li>
+    <li><button class="item" data-fly="f-com" aria-haspopup="true" aria-expanded="false"><svg class="ico ico-fill" viewBox="0 0 32 32" style="width:26px;height:26px;margin:-2px 0" aria-hidden="true"><!-- Briefcase (librería) --><path d="M24.25 9.8125C25.7539 9.8125 27 11.0586 27 12.5625V23.5625C27 25.1094 25.7539 26.3125 24.25 26.3125H7.75C6.20312 26.3125 5 25.1094 5 23.5625V12.5625C5 11.0586 6.20312 9.8125 7.75 9.8125H10.5V8.4375C10.5 6.93359 11.7031 5.6875 13.25 5.6875H18.75C20.2539 5.6875 21.5 6.93359 21.5 8.4375V9.8125H24.25ZM13.25 7.75C12.8633 7.75 12.5625 8.09375 12.5625 8.4375V9.8125H19.4375V8.4375C19.4375 8.09375 19.0938 7.75 18.75 7.75H13.25ZM7.75 11.875C7.36328 11.875 7.0625 12.2188 7.0625 12.5625V16.6875H24.9375V12.5625C24.9375 12.2188 24.5938 11.875 24.25 11.875H7.75ZM24.25 24.25C24.5938 24.25 24.9375 23.9492 24.9375 23.5625V18.75H18.75V19.4375C18.75 20.2109 18.1055 20.8125 17.375 20.8125H14.625C13.8516 20.8125 13.25 20.2109 13.25 19.4375V18.75H7.0625V23.5625C7.0625 23.9492 7.36328 24.25 7.75 24.25H24.25Z"/></svg>Comercial</button></li>
+    <li><button class="item" data-fly="f-ope" aria-haspopup="true" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Operativo</button></li>
+  </ul>
+  <a class="item bottom"><svg class="ico" viewBox="0 0 24 24"><path d="M10 4H5v16h5"/><path d="M14 8l4 4-4 4M18 12H9"/></svg>Cerrar sesión</a>
+</nav>
+
+<div class="veil" id="veil"></div>
+<aside class="drawer" id="drawer" aria-label="Submenú">
+  <div class="dr-sec" id="f-afil"><h3>Afiliaciones</h3>
+    <a href="#">Recomendación profesional 🏆</a><a href="#">Vinculaciones Digitales</a><a href="#">Prospectos Multifund</a></div>
+  <div class="dr-sec" id="f-com"><h3>Comercial</h3>
+    <a href="#">Comisiones Skandia Vida</a><a href="#">Herramientas</a><a href="#">One seguros</a><a href="#">Comisiones</a><a href="#">Simuladores</a><a href="#">Contenidos</a><a href="#">Carrera de los mejores</a><a href="#">Portafolios admisibles Sk Créditos</a><a href="#">Comisiones 💫</a></div>
+  <div class="dr-sec" id="f-ope"><h3>Operativo</h3>
+    <a href="#">Herramientas</a><a href="#">Monitor</a><a href="#">Tutoriales</a></div>
+  <div class="dr-foot">Último login: 03/11/2026 - 10:09:02 AM<br>Dirección IP: 98.98.26.115<br>2026 SKANDIA</div>
+</aside>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const drawer=document.getElementById('drawer'), veil=document.getElementById('veil'), burger=document.querySelector('.burger');
+  const ICON_MENU='<path d="M4 6h16M4 12h16M4 18h16"/>', ICON_X='<path d="M6 6l12 12M18 6L6 18"/>';
+  function closeAll(){
+    drawer.classList.remove('show'); veil.classList.remove('show'); document.body.classList.remove('dr-open');
+    document.querySelectorAll('.dr-sec').forEach(x=>x.classList.remove('show'));
+    document.querySelectorAll('[data-fly]').forEach(x=>{x.classList.remove('open');x.setAttribute('aria-expanded','false')});
+    burger.querySelector('svg').innerHTML=ICON_MENU; burger.setAttribute('aria-label','Expandir menú');
+    if(document.body.classList.contains('nav-open')){ veil.classList.add('show'); burger.querySelector('svg').innerHTML=ICON_X; }
+  }
+  function openSec(id){
+    closeAll();
+    document.getElementById(id).classList.add('show'); drawer.classList.add('show'); veil.classList.add('show'); document.body.classList.add('dr-open');
+    const b=document.querySelector('[data-fly="'+id+'"]'); b.classList.add('open'); b.setAttribute('aria-expanded','true');
+    burger.querySelector('svg').innerHTML=ICON_X; burger.setAttribute('aria-label','Cerrar menú');
+  }
+  document.querySelectorAll('[data-fly]').forEach(b=>b.addEventListener('click',()=>{
+    b.classList.contains('open') ? closeAll() : openSec(b.dataset.fly);
+  }));
+  burger.addEventListener('click',()=>{ if(mq.matches){ closeNav(); return; } drawer.classList.contains('show') ? closeAll() : openSec('f-afil'); });
+  const mq=window.matchMedia('(max-width:768px)');
+  function closeNav(){ document.body.classList.remove('nav-open'); closeAll(); }
+  document.querySelector('.mburger').addEventListener('click',()=>{ document.body.classList.add('nav-open'); veil.classList.add('show'); burger.querySelector('svg').innerHTML=ICON_X; burger.setAttribute('aria-label','Cerrar menú'); });
+  veil.addEventListener('click',closeNav);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeNav(); });
+  mq.addEventListener('change',e=>{ if(!e.matches) closeNav(); });
+});
+</script>
+
+<div class="wrap">
+  <!-- Header -->
+  <header>
+    <button class="mburger" aria-label="Abrir menú"><svg class="ico" viewBox="0 0 24 24" style="stroke:#333"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <a class="brand" href="#"><svg viewBox="0 0 60 61" aria-hidden="true"><path d="M3.32082 56.9184C10.4127 64.0052 22.5328 58.9871 22.5328 48.9536C22.5328 45.9673 21.3465 43.1033 19.2348 40.9916C17.1232 38.8799 14.2592 37.6936 11.2728 37.6936C1.23931 37.6936 -3.7838 49.8239 3.31064 56.9184" fill="#00C73D"/><path d="M52.2388 0H5.71268C0.997463 0 -1.36142 5.69999 1.97206 9.03346L50.9665 58.0279C54.3 61.3614 60 59 60 54.2873V7.76878C60.0003 6.7496 59.7998 5.74034 59.4098 4.79871C59.0199 3.85707 58.4482 3.00152 57.7274 2.28097C57.0066 1.56042 56.1508 0.988996 55.2091 0.599358C54.2673 0.20972 53.258 0.00951191 52.2388 0.0101807M36.5282 22.7414C34.2813 22.7414 31.9479 21.3928 31.9173 18.9245H35.0014C35.0243 19.5632 35.7343 20.1968 36.6326 20.1968C37.3654 20.1713 37.9812 19.8405 37.9812 19.2756C37.9812 18.8023 37.6962 18.5428 36.8947 18.329L35.4518 17.9499C32.1438 17.0516 32.1184 15.3747 32.1438 14.3568C32.1667 12.7257 34.1286 11.2142 36.4468 11.2142C38.6454 11.2142 40.961 12.1837 40.9864 14.8785H37.8845C37.8616 14.0515 37.1517 13.909 36.6326 13.909C35.9252 13.909 35.4518 14.2398 35.4747 14.736C35.4977 15.0668 35.7826 15.3976 36.4443 15.563L38.312 16.0592C40.9839 16.7921 41.3147 18.5657 41.3147 19.2756C41.3147 21.6141 38.854 22.7262 36.5384 22.7262M49.2845 22.4895L45.5973 18.1153V22.4895H42.3351V5.44044H45.5973V14.4714L48.2336 11.4636H52.4068L47.8264 16.334L53.3228 22.5048L49.2845 22.4895Z" fill="#00C73D"/></svg><span class="bt">Portal Contigo</span></a>
+    <div class="search" role="search"><svg class="ico-sm" viewBox="0 0 24 24" style="stroke:#888;width:18px;height:18px"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg><span>Elige cliente o caso para buscar</span></div>
+    <button class="bell" aria-label="Notificaciones, 4 nuevas"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg><b>4</b></button>
+    <div class="hello"><div class="avatar"><img src="assets/avatar-asesor.jpg" alt="Foto de perfil del asesor"></div><span class="txt">Hola, <span class="n">Juan</span> 👋</span></div>
+    <button class="sami" aria-label="Tu sami"><span class="sami-ico"><img src="assets/sami.png" alt="" width="56" height="56"></span><span class="st">Tu sami</span></button>
+  </header>
+
+  <main>
+    <button class="retiros" type="button" id="btn-retiros" aria-haspopup="dialog" aria-controls="rmodal">
+      <span class="rt">Retiros en curso (1)</span>
+      <span class="camino" aria-hidden="true">
+        <span class="nodo"><svg viewBox="0 0 60 61" style="height:13px;width:auto" aria-hidden="true"><path d="M3.32082 56.9184C10.4127 64.0052 22.5328 58.9871 22.5328 48.9536C22.5328 45.9673 21.3465 43.1033 19.2348 40.9916C17.1232 38.8799 14.2592 37.6936 11.2728 37.6936C1.23931 37.6936 -3.7838 49.8239 3.31064 56.9184" fill="#00C73D"/><path d="M52.2388 0H5.71268C0.997463 0 -1.36142 5.69999 1.97206 9.03346L50.9665 58.0279C54.3 61.3614 60 59 60 54.2873V7.76878C60.0003 6.7496 59.7998 5.74034 59.4098 4.79871C59.0199 3.85707 58.4482 3.00152 57.7274 2.28097C57.0066 1.56042 56.1508 0.988996 55.2091 0.599358C54.2673 0.20972 53.258 0.00951191 52.2388 0.0101807M36.5282 22.7414C34.2813 22.7414 31.9479 21.3928 31.9173 18.9245H35.0014C35.0243 19.5632 35.7343 20.1968 36.6326 20.1968C37.3654 20.1713 37.9812 19.8405 37.9812 19.2756C37.9812 18.8023 37.6962 18.5428 36.8947 18.329L35.4518 17.9499C32.1438 17.0516 32.1184 15.3747 32.1438 14.3568C32.1667 12.7257 34.1286 11.2142 36.4468 11.2142C38.6454 11.2142 40.961 12.1837 40.9864 14.8785H37.8845C37.8616 14.0515 37.1517 13.909 36.6326 13.909C35.9252 13.909 35.4518 14.2398 35.4747 14.736C35.4977 15.0668 35.7826 15.3976 36.4443 15.563L38.312 16.0592C40.9839 16.7921 41.3147 18.5657 41.3147 19.2756C41.3147 21.6141 38.854 22.7262 36.5384 22.7262M49.2845 22.4895L45.5973 18.1153V22.4895H42.3351V5.44044H45.5973V14.4714L48.2336 11.4636H52.4068L47.8264 16.334L53.3228 22.5048L49.2845 22.4895Z" fill="#00C73D"/></svg></span>
+        <span class="linea"><span class="moneda"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></span>
+        <span class="nodo billetera"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
+      </span>
+      <span class="rl">Ver detalle <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
+    </button>
+
+    <div class="crumb">
+      <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="#00C73D" stroke-width="2" stroke-linecap="round"><path d="M21 8H2M8 1L1 8l7 7"/></svg>
+      <span style="margin-left:4px">Inicio</span><span class="sep">/</span><a href="#">Óscar Camilo Hernández Ramírez</a>
+    </div>
+
+    <div class="idbar">
+      <h1>Óscar Camilo Hernández Ramírez</h1>
+      <span class="chip">Beneficio tributario: No</span>
+      <span class="meta"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>CC.111111111</span>
+      <span class="meta"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>32 años</span>
+      <span class="meta"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>3044444444</span>
+      <span class="meta"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 6l9 7 9-7"/></svg>oschernandez@gmail.com</span>
+    </div>
+
+    <!-- KPIs -->
+
+
+    <section class="saldos">
+    <div class="saldos-h">
+      <h2>Total bajo gestión: <span>$358.900.109</span></h2>
+      <span class="tip"><button class="tip-btn" type="button" aria-label="¿Qué es Total bajo gestión?" aria-describedby="tip-total"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><!-- Circle-question (librería) --><path fill="#0099DE" d="M16 5C22.0586 5 27 9.94141 27 16C27 22.1016 22.0586 27 16 27C9.89844 27 5 22.1016 5 16C5 9.94141 9.89844 5 16 5ZM16 24.9375C20.8984 24.9375 24.9375 20.9414 24.9375 16C24.9375 11.1016 20.8984 7.0625 16 7.0625C11.0586 7.0625 7.0625 11.1016 7.0625 16C7.0625 20.9414 11.0586 24.9375 16 24.9375ZM16 19.4375C16.7305 19.4375 17.375 20.0391 17.375 20.8125C17.375 21.5859 16.7305 22.1875 16 22.1875C15.1836 22.1875 14.625 21.5859 14.625 20.8125C14.625 20.0391 15.2266 19.4375 16 19.4375ZM17.418 10.5C19.1367 10.5 20.4688 11.832 20.4258 13.5078C20.4258 14.5391 19.8672 15.5273 18.9648 16.0859L17.0312 17.2891V17.375C17.0312 17.9336 16.5586 18.4062 16 18.4062C15.4414 18.4062 14.9688 17.9336 14.9688 17.375V16.6875C14.9688 16.3438 15.1406 16 15.4844 15.7852L17.9336 14.3242C18.2344 14.1523 18.4062 13.8516 18.4062 13.5078C18.4062 12.9922 17.9336 12.5625 17.375 12.5625H15.1836C14.668 12.5625 14.2812 12.9922 14.2812 13.5078C14.2812 14.0664 13.8086 14.5391 13.25 14.5391C12.6914 14.5391 12.2188 14.0664 12.2188 13.5078C12.2188 11.832 13.5508 10.5 15.2266 10.5H17.418Z"/></svg></button><span class="tip-box" role="tooltip" id="tip-total">Suma del saldo total de todos los productos de tu cliente, incluyendo seguros. Gracias a tu gestión en Skandia, lograremos cumplir sus objetivos.</span></span>
+    </div>
+    <div class="kpis">
+
+      <div class="card">
+        <div class="card-h">
+        <div class="circ" style="background:var(--green-soft)"><svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><!-- Chart-mixed (librería) --><path fill="#1DD64C" d="M19.42 14.3958C19.0333 14.6966 18.4747 14.6966 18.088 14.3958L13.1895 10.099L6.61532 14.4388C6.14267 14.7826 5.49814 14.6537 5.19735 14.181C4.8536 13.7083 4.98251 13.0638 5.45517 12.7201L12.6739 7.95053C13.0606 7.69271 13.5763 7.69271 13.92 7.99349L18.7755 12.2474L25.3067 6.61849C25.7364 6.27474 26.3809 6.31771 26.7677 6.7474C27.1114 7.17709 27.0684 7.82162 26.6388 8.20834L19.42 14.3958ZM15.338 16.6732V23.5482C15.338 24.7083 14.3927 25.6107 13.2755 25.6107C12.1153 25.6107 11.213 24.7083 11.213 23.5482V16.6732C11.213 15.556 12.1153 14.6107 13.2755 14.6107C14.3927 14.6107 15.338 15.556 15.338 16.6732ZM13.6192 23.5482V16.6732C13.6192 16.5013 13.4474 16.3294 13.2755 16.3294C13.0606 16.3294 12.9317 16.5013 12.9317 16.6732V23.5482C12.9317 23.763 13.0606 23.8919 13.2755 23.8919C13.4474 23.8919 13.6192 23.763 13.6192 23.5482ZM9.83798 20.7982V23.5482C9.83798 24.7083 8.89267 25.6107 7.77548 25.6107C6.61532 25.6107 5.71298 24.7083 5.71298 23.5482V20.7982C5.71298 19.681 6.61532 18.7357 7.77548 18.7357C8.89267 18.7357 9.83798 19.681 9.83798 20.7982ZM8.11923 23.5482V20.7982C8.11923 20.6263 7.94735 20.4544 7.77548 20.4544C7.56064 20.4544 7.43173 20.6263 7.43173 20.7982V23.5482C7.43173 23.763 7.56064 23.8919 7.77548 23.8919C7.94735 23.8919 8.11923 23.763 8.11923 23.5482ZM16.713 19.4232C16.713 18.306 17.6153 17.3607 18.7755 17.3607C19.8927 17.3607 20.838 18.306 20.838 19.4232V23.5482C20.838 24.7083 19.8927 25.6107 18.7755 25.6107C17.6153 25.6107 16.713 24.7083 16.713 23.5482V19.4232ZM18.7755 19.0794C18.5606 19.0794 18.4317 19.2513 18.4317 19.4232V23.5482C18.4317 23.763 18.5606 23.8919 18.7755 23.8919C18.9474 23.8919 19.1192 23.763 19.1192 23.5482V19.4232C19.1192 19.2513 18.9474 19.0794 18.7755 19.0794ZM26.338 16.6732V23.5482C26.338 24.7083 25.3927 25.6107 24.2755 25.6107C23.1153 25.6107 22.213 24.7083 22.213 23.5482V16.6732C22.213 15.556 23.1153 14.6107 24.2755 14.6107C25.3927 14.6107 26.338 15.556 26.338 16.6732ZM24.6192 23.5482V16.6732C24.6192 16.5013 24.4474 16.3294 24.2755 16.3294C24.0606 16.3294 23.9317 16.5013 23.9317 16.6732V23.5482C23.9317 23.763 24.0606 23.8919 24.2755 23.8919C24.4474 23.8919 24.6192 23.763 24.6192 23.5482Z"/></svg></div>
+          <div>
+        <div class="lbl">Ahorro e inversión</div>
+        <div class="val">$53.156.957 <span class="trend" style="background:#FDECEC"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#E5383B" stroke-width="1.5"><path d="M1 4l3 3 2-2 5 4"/><path d="M8 9h3V6"/></svg></span></div>
+          </div>
+        </div>
+        <div class="subs">
+          <div class="sub"><b>Rendimientos</b>$5.662.279</div>
+          <div class="sub out"><div><b>TIR</b>13.5%</div><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6"><path d="M1.5 3.5L5 7l3.5-3.5"/></svg></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+        <div class="circ" style="background:#E6F4FB"><svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><!-- Piggy-bank (librería) --><path fill="#0099DE" d="M12.0469 9.21094C11.5312 9.03906 11.2305 8.4375 11.4453 7.92188C12.0039 6.24609 13.6367 5 15.5273 5C17.375 5 19.0078 6.24609 19.6094 7.92188C19.7812 8.4375 19.4805 9.03906 18.9648 9.21094C18.4062 9.42578 17.8477 9.125 17.6328 8.60938C17.332 7.70703 16.5156 7.0625 15.5273 7.0625C14.5391 7.0625 13.6797 7.70703 13.3789 8.60938C13.1641 9.125 12.6055 9.42578 12.0469 9.21094ZM20.8125 16.3438C20.8125 15.7852 21.2422 15.3125 21.8438 15.3125C22.4023 15.3125 22.875 15.7852 22.875 16.3438C22.875 16.9453 22.4023 17.375 21.8438 17.375C21.2422 17.375 20.8125 16.9453 20.8125 16.3438ZM13.25 10.5H19.7812C20.5547 9.68359 21.6289 9.125 22.875 9.125H23.6055C24.25 9.125 24.7656 9.76953 24.5938 10.4141L24.25 11.875C25.1523 12.6055 25.9258 13.5508 26.3984 14.625H27C27.7305 14.625 28.375 15.2695 28.375 16V20.125C28.375 20.8984 27.7305 21.5 27 21.5H25.625C25.0664 22.2734 24.3359 22.875 23.5625 23.3477V24.9375C23.5625 26.0977 22.6172 27 21.5 27H19.4375C18.2773 27 17.375 26.0977 17.375 24.9375V24.25H15.3125V24.9375C15.3125 26.0977 14.3672 27 13.25 27H11.1875C10.0273 27 9.125 26.0977 9.125 24.9375V22.875C7.49219 21.7148 6.46094 19.8242 6.375 17.7188C4.78516 17.5039 3.625 16.1719 3.625 14.582C3.625 13.3789 4.26953 12.3047 5.34375 11.7461L5.55859 11.6602C6.07422 11.4023 6.67578 11.6172 6.93359 12.1328C7.19141 12.6484 6.97656 13.25 6.46094 13.5078L6.28906 13.5938C5.90234 13.8086 5.6875 14.1523 5.6875 14.582C5.6875 15.1406 6.07422 15.5703 6.58984 15.6562C7.36328 12.6914 10.0273 10.5 13.25 10.5ZM13.25 12.5625C10.5859 12.5625 8.4375 14.7539 8.4375 17.375C8.4375 18.9648 9.16797 20.3828 10.3281 21.2422C10.8438 21.6289 11.1875 22.2305 11.1875 22.875V24.9375H13.25V24.25C13.25 23.1328 14.1523 22.1875 15.3125 22.1875H17.375C18.4922 22.1875 19.4375 23.1328 19.4375 24.25V24.9375H21.5V23.3477C21.5 22.6172 21.8867 21.9297 22.4883 21.543C23.0898 21.2422 23.5625 20.8125 23.9492 20.2969C24.3359 19.7812 24.9375 19.4375 25.625 19.4375H26.3125V16.6875C25.5391 16.6445 24.8086 16.1719 24.5078 15.4844C24.1641 14.7109 23.6484 14.0234 23.0039 13.5508C22.3164 13.0352 22.0156 12.2188 22.2305 11.4023L22.2734 11.3164C21.8867 11.4023 21.5859 11.6172 21.3281 11.875C20.9414 12.3477 20.3828 12.5625 19.7812 12.5625H13.25Z"/></svg></div>
+          <div>
+        <div class="lbl">Plan de retiro y Cesantías</div>
+        <div class="val">$293.743.152 <span class="trend" style="background:var(--green-soft)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#00C73D" stroke-width="1.5"><path d="M1 9l3-3 2 2 5-5"/><path d="M8 3h3v3"/></svg></span></div>
+          </div>
+        </div>
+        <div class="subs"><div class="sub"><b>IBC</b>$5.662.279</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+        <div class="circ" style="background:#E3FAF3"><svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><!-- Shield (librería) --><path fill="#4AE6C3" d="M15.1836 26.8335C10.5859 24.8999 5.6875 19.0132 5.6875 10.4624C5.6875 9.646 6.16016 8.91553 6.93359 8.57178L15.1836 5.13428C15.4414 5.04834 15.6992 5.00537 16 5.00537C16.2578 5.00537 16.5156 5.04834 16.7734 5.13428L25.0234 8.57178C25.7969 8.91553 26.3125 9.646 26.3125 10.4624C26.3125 20.0015 20.4688 25.2866 16.7734 26.8335C16.2578 27.0483 15.6992 27.0483 15.1836 26.8335ZM16 7.0249L7.75 10.4624C7.75 17.7671 11.7891 23.1812 16 24.8999C19.9961 23.2241 24.25 17.939 24.25 10.4624L16 7.0249Z"/></svg></div>
+          <div>
+        <div class="lbl">Seguros</div>
+        <div class="val">$12.000.000</div>
+          </div>
+        </div>
+        <div class="subs"><div class="sub"><b>Prima mes</b>$656.729</div><div class="sub"><b>Suma asegurada</b>$199.054.656</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+        <div class="circ" style="background:#F1FAE3"><svg class="ico" viewBox="0 0 24 24" style="stroke:#6CC000"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M6 15h4"/></svg></div>
+          <div>
+        <div class="lbl">Crédito preaprobado</div>
+        <div class="val">$160.500.000</div>
+          </div>
+        </div>
+        <a class="more" href="#">Conoce más</a>
+      </div>
+    </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <div class="tab on" role="tab" aria-selected="true"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5h8v2M3 13h18M11 13v2h2v-2"/></svg>Productos</div>
+      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Datos cliente</div>
+      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>Documentos</div>
+      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="10" rx="1"/><path d="M3 12l9 6 9-6v9H3z"/><path d="M8 7h8"/></svg>Casos</div>
+    </div>
+
+    <section class="panel">
+      <div>
+        <div class="acc">
+          <div class="acc-h">
+            <span class="circ"><svg class="ico" viewBox="0 0 24 24"><path d="M3 10l5-4 4 3 6-5"/><path d="M15 4h3v3"/><rect x="4" y="15" width="3" height="5"/><rect x="10" y="13" width="3" height="7"/><rect x="16" y="14" width="3" height="6"/></svg></span>
+            Ahorro e inversión
+            <svg class="chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6"><path d="M6.5 1.5L3 5l3.5 3.5"/></svg>
+          </div>
+          <div class="prod">
+            <div class="t"><span class="ed">-ED</span>Potencializar mi inversión <span class="n">| #100000063061</span>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6" style="margin-left:8px"><path d="M3 1.5L6.5 5 3 8.5"/></svg></div>
+            <div class="d">Fondo Voluntario de Pensión Skandia Multifund | Saldo Total: <b>$52.732.191</b>
+              <a href="#"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="#0099DE" stroke-width="1.4"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>Más</a></div>
+          </div>
+        </div>
+        <div class="acc">
+          <div class="acc-h">
+            <span class="circ" style="background:#E3FAF3"><svg class="ico" viewBox="0 0 24 24" style="stroke:#2DD4A7"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></span>
+            Seguros
+            <svg class="chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6"><path d="M3 1.5L6.5 5 3 8.5"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <aside class="monitor">
+        <h2>Monitor Contigo</h2>
+        <p>Encuentra la composición de inversiones y todo sobre los portafolios de tu cliente.</p>
+        <div class="donut" role="img" aria-label="Composición: 82% Plan de retiro y Cesantías, 15% Ahorro e inversión, 3% Seguros"></div>
+        <ul class="legend">
+          <li><i style="background:var(--blue)"></i><b>82%</b> Plan de retiro y Cesantías</li>
+          <li><i style="background:#1FD655"></i><b>15%</b> Ahorro e inversión</li>
+          <li><i style="background:#55E6C4"></i><b>3%</b> Seguros</li>
+        </ul>
+        <button class="mbtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/><path d="M17 8h3v3"/></svg>Monitor Contigo</button>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <span style="display:flex;align-items:center;gap:10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.6"><path d="M4 20l1.5-4A8 8 0 1 1 9 19z"/></svg>Centro de ayuda</span>
+    <span>Términos y condiciones</span><span>Accesibilidad</span><span>Mapa del sitio</span><span>Onboarding</span>
+    <span class="r">2023 © Skandia</span>
+  </footer>
+</div>
+
+<div class="rmodal" id="rmodal">
+  <div class="rdlg" role="dialog" aria-modal="true" aria-labelledby="rmodal-t">
+    <button class="rclose" type="button" aria-label="Cerrar"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <div class="rdlg-h">
+      <h2 id="rmodal-t">Retiros en curso</h2>
+      <p>Aquí verás los retiros en curso de todos los contratos de tu cliente en Skandia.</p>
+    </div>
+    <div class="retiro">
+      <button class="retiro-h" type="button" aria-expanded="true" aria-controls="retiro-1">
+        <span class="fila"><span class="cab">Contrato #100000063061 - Código de confirmación #202611021528170P</span><span class="chev"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></span>
+        <span class="cuando">Finalizará el jueves en la tarde</span>
+        <span class="segmentos"><span class="on"></span><span class="on"></span><span></span></span>
+        <span class="paso">Estamos procesando el retiro</span>
+      </button>
+      <div class="retiro-b" id="retiro-1">
+        <dl class="rdet">
+          <div><dt>Monto solicitado</dt><dd>$2.000.000</dd></div>
+          <div><dt>Estado</dt><dd>En proceso</dd></div>
+          <div><dt>Destino</dt><dd>Bancolombia | Cuenta de ahorros | Titular</dd></div>
+          <div><dt>Tipo de retiro</dt><dd>Parcial</dd></div>
+          <div><dt>Impuestos del retiro</dt><dd>$0</dd></div>
+          <div><dt>Monto bruto del retiro</dt><dd>$2.000.000</dd></div>
+          <div><dt>Solicitado el</dt><dd>02/11/2026 - 3:28 p.m.</dd></div>
+        </dl>
+        <a class="rpdf" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Descargar PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const m=document.getElementById('rmodal'), b=document.getElementById('btn-retiros');
+  const open=()=>{m.classList.add('show');m.querySelector('.rclose').focus();};
+  const close=()=>{m.classList.remove('show');b.focus();};
+  b.addEventListener('click',open);
+  m.querySelectorAll('.retiro-h').forEach(h=>h.addEventListener('click',()=>{
+    const ex=h.getAttribute('aria-expanded')==='true'; h.setAttribute('aria-expanded',String(!ex));
+    document.getElementById(h.getAttribute('aria-controls')).hidden=ex;
+  }));
+  m.querySelector('.rclose').addEventListener('click',close);
+  m.addEventListener('click',e=>{if(e.target===m)close();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&m.classList.contains('show'))close();});
+});
+</script>
+</body>
+</html>
