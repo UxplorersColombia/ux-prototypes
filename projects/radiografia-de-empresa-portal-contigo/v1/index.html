@@ -171,6 +171,10 @@ svg { display: block; flex: none; }
 
 /* ── Migas y franja de identidad ──────────────────────────────────────────── */
 .crumbs { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+/* Volver a la lista de secciones: solo en celular, dentro de una sección */
+.m-back { display: none; align-items: center; gap: 12px; margin-bottom: var(--space-2); }
+.m-back-btn { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--primary-00); color: var(--texts-white); }
+.m-back-title { margin: 0; font: 700 20px/1.3 var(--font-heading); color: var(--texts-strong); }
 .back { background: none; border: 0; padding: 4px; color: var(--primary-00); display: grid; place-items: center; }
 .crumbs-path { font-size: 13px; color: var(--texts-dark); }
 .crumbs-path a { text-decoration: none; }
@@ -676,10 +680,11 @@ svg { display: block; flex: none; }
 .prod-list .pct { text-align: right; color: var(--texts-medium); }
 /* Clientes por segmento: dona con la lista al lado */
 .segmentos { margin-top: var(--space-3); }
-.bars--edad { gap: var(--space-2); margin-top: 8px; }
+/* Misma altura que la dona: la zona de barras mide lo mismo (220 px) y los años van debajo */
+.bars--edad { gap: var(--space-2); margin-top: 8px; height: 220px; }
 .seg--edad { background: var(--charts-c03); }
 .segmentos-body { display: flex; align-items: center; gap: var(--space-4); margin-top: 8px; }
-.donut { width: 180px; height: 180px; flex: none; }
+.donut { width: 220px; height: 220px; flex: none; }
 .donut-seg { fill: none; stroke-width: 28; }
 .donut-seg:hover { stroke-width: 32; }
 .donut-total { font: 700 26px/1 var(--font-heading); fill: var(--texts-strong); }
@@ -888,10 +893,26 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
   .identity { display: flex; gap: 8px 14px; margin-bottom: var(--space-3); }
   .identity-item { white-space: normal; }
 
-  /* Pestañas: una sola fila que se desliza de lado */
-  .tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab { flex: 0 0 auto; padding: 0 16px; border-radius: 12px 12px 0 0; }
+  /* Pestañas en celular: lista de secciones como tarjetas (ficha de Contigo). Al tocar una se entra a su detalle */
+  .tabs { display: flex; flex-direction: column; gap: 12px; padding-bottom: var(--space-3); }
+  .tab, .tab[aria-selected="true"] {
+    justify-content: flex-start; gap: 14px; height: 56px; padding: 0 16px;
+    border-radius: 12px; background: var(--neutral-00); color: var(--texts-dark);
+    box-shadow: 0 0 4px 0 rgba(61, 75, 92, 0.15); font-size: 15px;
+  }
+  .tab svg, .tab[aria-selected="true"] svg { width: 24px; height: 24px; color: var(--texts-dark); flex: none; }
+  .tab::after { content: ""; width: 8px; height: 8px; margin-left: auto; border-top: 2.4px solid var(--primary-00); border-right: 2.4px solid var(--primary-00); transform: rotate(45deg); }
+  .tab:hover { color: var(--texts-dark); }
+  body:not(.m-detalle) .panel { display: none !important; }
+  body.m-detalle .crumbs, body.m-detalle .page-head, body.m-detalle .identity, body.m-detalle .tabs { display: none; }
+  body.m-detalle .m-back { display: flex; }
+  /* En celular la sección va sin el contenedor mayor: las tarjetas quedan directo sobre el fondo */
+  .panel { border: 0; border-radius: 0; box-shadow: none; padding: 0 !important; }
+  /* Tarjeta del dueño en celular: nombre y datos a todo el ancho, el tag debajo */
+  .owner-avatar { display: none; }
+  .owner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 16px; }
+  .owner-info { flex: none; width: 100%; }
+  .gestion-zona { padding: 12px; }
   .panel { padding: var(--space-2); margin-top: 0; border-radius: 0 0 var(--radius-card) var(--radius-card); }
 
   .kpis, .kpis--panel { grid-template-columns: minmax(0, 1fr); }
@@ -1078,6 +1099,11 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
       </section>
 
       <!-- ═══ Pestañas ════════════════════════════════════════════════════ -->
+      <!-- Celular: al entrar a una sección, botón de volver a la lista de secciones (como la ficha de Contigo) -->
+      <div class="m-back">
+        <button type="button" class="m-back-btn" id="m-back" aria-label="Volver a las secciones"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+        <h2 class="m-back-title" id="m-back-title">Resumen</h2>
+      </div>
       <div class="tabs" role="tablist" aria-label="Secciones de la radiografía">
         <button class="tab" role="tab" id="tab-resumen" data-fp="panel-resumen-fp" aria-controls="panel-resumen" data-dir="panel-resumen" data-own="panel-resumen-own" aria-selected="true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
@@ -1490,22 +1516,22 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <div class="bars bars--edad">
                 <div class="bar-col">
                   <span class="bar-total num">62</span>
-                  <div class="bar" role="img" aria-label="18–30 años: 62 clientes"><span class="seg seg--edad" style="height:75px" data-tip="62 clientes · 15%"></span></div>
+                  <div class="bar" role="img" aria-label="18–30 años: 62 clientes"><span class="seg seg--edad" style="height:71px" data-tip="62 clientes · 15%"></span></div>
                   <span class="bar-year">18–30</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">158</span>
-                  <div class="bar" role="img" aria-label="31–45 años: 158 clientes"><span class="seg seg--edad" style="height:190px" data-tip="158 clientes · 38%"></span></div>
+                  <div class="bar" role="img" aria-label="31–45 años: 158 clientes"><span class="seg seg--edad" style="height:180px" data-tip="158 clientes · 38%"></span></div>
                   <span class="bar-year">31–45</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">132</span>
-                  <div class="bar" role="img" aria-label="46–60 años: 132 clientes"><span class="seg seg--edad" style="height:159px" data-tip="132 clientes · 32%"></span></div>
+                  <div class="bar" role="img" aria-label="46–60 años: 132 clientes"><span class="seg seg--edad" style="height:151px" data-tip="132 clientes · 32%"></span></div>
                   <span class="bar-year">46–60</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">60</span>
-                  <div class="bar" role="img" aria-label="Más de 60 años: 60 clientes"><span class="seg seg--edad" style="height:72px" data-tip="60 clientes · 15%"></span></div>
+                  <div class="bar" role="img" aria-label="Más de 60 años: 60 clientes"><span class="seg seg--edad" style="height:68px" data-tip="60 clientes · 15%"></span></div>
                   <span class="bar-year">Más de 60</span>
                 </div>
             </div>
@@ -1923,22 +1949,22 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <div class="bars bars--edad">
                 <div class="bar-col">
                   <span class="bar-total num">25</span>
-                  <div class="bar" role="img" aria-label="18–30 años: 25 clientes"><span class="seg seg--edad" style="height:72px" data-tip="25 clientes · 15%"></span></div>
+                  <div class="bar" role="img" aria-label="18–30 años: 25 clientes"><span class="seg seg--edad" style="height:68px" data-tip="25 clientes · 15%"></span></div>
                   <span class="bar-year">18–30</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">66</span>
-                  <div class="bar" role="img" aria-label="31–45 años: 66 clientes"><span class="seg seg--edad" style="height:190px" data-tip="66 clientes · 39%"></span></div>
+                  <div class="bar" role="img" aria-label="31–45 años: 66 clientes"><span class="seg seg--edad" style="height:180px" data-tip="66 clientes · 39%"></span></div>
                   <span class="bar-year">31–45</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">55</span>
-                  <div class="bar" role="img" aria-label="46–60 años: 55 clientes"><span class="seg seg--edad" style="height:158px" data-tip="55 clientes · 32%"></span></div>
+                  <div class="bar" role="img" aria-label="46–60 años: 55 clientes"><span class="seg seg--edad" style="height:150px" data-tip="55 clientes · 32%"></span></div>
                   <span class="bar-year">46–60</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">25</span>
-                  <div class="bar" role="img" aria-label="Más de 60 años: 25 clientes"><span class="seg seg--edad" style="height:72px" data-tip="25 clientes · 15%"></span></div>
+                  <div class="bar" role="img" aria-label="Más de 60 años: 25 clientes"><span class="seg seg--edad" style="height:68px" data-tip="25 clientes · 15%"></span></div>
                   <span class="bar-year">Más de 60</span>
                 </div>
             </div>
@@ -2153,22 +2179,22 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <div class="bars bars--edad">
                 <div class="bar-col">
                   <span class="bar-total num">6</span>
-                  <div class="bar" role="img" aria-label="18–30 años: 6 clientes"><span class="seg seg--edad" style="height:95px" data-tip="6 clientes · 19%"></span></div>
+                  <div class="bar" role="img" aria-label="18–30 años: 6 clientes"><span class="seg seg--edad" style="height:90px" data-tip="6 clientes · 19%"></span></div>
                   <span class="bar-year">18–30</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">12</span>
-                  <div class="bar" role="img" aria-label="31–45 años: 12 clientes"><span class="seg seg--edad" style="height:190px" data-tip="12 clientes · 39%"></span></div>
+                  <div class="bar" role="img" aria-label="31–45 años: 12 clientes"><span class="seg seg--edad" style="height:180px" data-tip="12 clientes · 39%"></span></div>
                   <span class="bar-year">31–45</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">9</span>
-                  <div class="bar" role="img" aria-label="46–60 años: 9 clientes"><span class="seg seg--edad" style="height:142px" data-tip="9 clientes · 29%"></span></div>
+                  <div class="bar" role="img" aria-label="46–60 años: 9 clientes"><span class="seg seg--edad" style="height:135px" data-tip="9 clientes · 29%"></span></div>
                   <span class="bar-year">46–60</span>
                 </div>
                 <div class="bar-col">
                   <span class="bar-total num">4</span>
-                  <div class="bar" role="img" aria-label="Más de 60 años: 4 clientes"><span class="seg seg--edad" style="height:63px" data-tip="4 clientes · 13%"></span></div>
+                  <div class="bar" role="img" aria-label="Más de 60 años: 4 clientes"><span class="seg seg--edad" style="height:60px" data-tip="4 clientes · 13%"></span></div>
                   <span class="bar-year">Más de 60</span>
                 </div>
             </div>
@@ -2466,11 +2492,35 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
     });
     const destino = tab.getAttribute('aria-controls');
     panels.forEach((p) => { p.hidden = p.id !== destino; });
-    if (focus) tab.focus();
+    document.getElementById('m-back-title').textContent = nombreTab(tab);
+    if (focus && !(movil.matches && document.body.classList.contains('m-detalle'))) tab.focus();
   }
 
+  // Celular: las pestañas son una lista de secciones; al tocar una se entra a su detalle y "volver" regresa a la lista
+  const movil = matchMedia('(max-width: 768px)');
+  let scrollLista = 0;
+  function nombreTab(tab) {
+    const c = tab.cloneNode(true);
+    c.querySelectorAll('[data-only]').forEach((el) => { if (!el.dataset.only.split(' ').includes(vista())) el.remove(); });
+    return c.textContent.trim();
+  }
+  function abrirSeccion() {
+    if (!movil.matches) return;
+    scrollLista = scrollY;
+    document.body.classList.add('m-detalle');
+    scrollTo(0, 0);
+    document.getElementById('m-back').focus();
+  }
+  function volverALista() {
+    const activa = tabs.find((t) => t.getAttribute('aria-selected') === 'true');
+    document.body.classList.remove('m-detalle');
+    scrollTo(0, scrollLista);
+    if (activa) activa.focus();
+  }
+  document.getElementById('m-back').addEventListener('click', volverALista);
+
   tabs.forEach((tab) => {
-    tab.addEventListener('click', () => select(tab));
+    tab.addEventListener('click', () => { select(tab); abrirSeccion(); });
     tab.addEventListener('keydown', (e) => {
       const v = visibles(), i = v.indexOf(tab);
       if (e.key === 'ArrowRight') select(v[(i + 1) % v.length]);
