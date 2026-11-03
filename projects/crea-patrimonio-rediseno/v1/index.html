@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crea Patrimonio · Diagnóstico preliminar</title>
+
+  <!-- 1. Fuentes + tipografía de tags nativos -->
+  <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-fonts.css">
+  <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-typography.css">
+  <!-- 2. Íconos (peer obligatorio, el bundle no los trae) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7/primeicons.css">
+  <!-- 3. Componentes sk-* (30 custom elements + tema Skandia) -->
+  <script src="https://skcostgblobresources.blob.core.windows.net/skco-lib-components/sk-components-elements.js"></script>
+
+  <style>
+    /* ── Tokens estáticos que el bundle NO define (espejo de sk-tokens.scss). NO BORRAR. ── */
+    :root {
+      --sk-space-zero: 0; --sk-space-xxs: 4px; --sk-space-xs: 8px; --sk-space-s: 12px; --sk-space-m: 16px;
+      --sk-space-l: 24px; --sk-space-xl: 32px; --sk-space-2xl: 40px; --sk-space-3xl: 48px;
+      --sk-space-4xl: 56px; --sk-space-5xl: 64px;
+      --sk-radius-sm: 4px; --sk-radius-md: 8px; --sk-radius-lg: 12px; --sk-radius-pill: 9999px;
+      --sk-shadow-subtle: 0 0 2px rgba(68, 68, 68, 0.15);
+      --sk-shadow-surface: 0 0 2px 0 rgba(61, 75, 92, 0.15);
+      --sk-shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.12);
+      --sk-shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.16);
+      --sk-font-title: 'Montserrat', sans-serif;
+      --sk-font-body: 'Open Sans', system-ui, sans-serif;
+      --sk-font-weight-regular: 400; --sk-font-weight-medium: 500; --sk-font-weight-bold: 700;
+      --sk-gradient-brand: linear-gradient(135deg, #00c73d 0%, #8fe000 100%);
+      --sk-control-height: 48px; --sk-control-height-sm: 40px;
+    }
+
+    /* ── Ancho completo. NO BORRAR. ── */
+    :root :is(sk-input-text, sk-input-number, sk-input-select, sk-textarea, sk-date-picker, sk-date-range-picker,
+              sk-file-upload, sk-listbox, sk-form-field, sk-select-button, sk-button, sk-paginator, sk-stepper,
+              sk-table, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) {
+      width: 100%; max-width: none; min-width: 0; box-sizing: border-box;
+    }
+    :root :is(sk-input-text, sk-input-select, sk-date-picker, sk-date-range-picker, sk-listbox, sk-form-field,
+              sk-button, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) { display: block; }
+    :root :is(sk-input-number, sk-textarea, sk-file-upload):not([data-ancho="auto"]) { display: flex; }
+    :root :is(.sk-input-select, .sk-listbox, .p-select, .p-listbox, .p-datepicker, .p-inputnumber, .p-fileupload) { width: 100%; max-width: none; }
+    :root sk-button:not([data-ancho="auto"]):not([label]) { display: inline-block; width: auto; }
+    :root sk-button:not([data-ancho="auto"])[label] .p-button { width: 100%; justify-content: center; }
+    :root sk-select-button:not([data-ancho="auto"]) { display: flex; }
+    :root sk-select-button:not([data-ancho="auto"]) .p-selectbutton { display: flex; width: 100%; }
+    :root sk-select-button:not([data-ancho="auto"]) .p-togglebutton { flex: 1 1 0; min-width: 0; justify-content: center; }
+    :root sk-form-field :is(input, select, textarea) { width: 100%; box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    /* ── Presentación: lienzo fijo 1280×720 que escala a la ventana ── */
+    html, body { margin: 0; height: 100%; }
+    body { background: #eef1ee; font-family: var(--sk-font-body); color: var(--sk-color-text, #232323); }
+    .deck { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; }
+    .stage { width: 1280px; height: 720px; position: relative; transform-origin: center center; transform: scale(var(--k, 1)); }
+    .slide {
+      position: absolute; inset: 0; box-sizing: border-box; display: none; flex-direction: column;
+      gap: var(--sk-space-l); padding: var(--sk-space-3xl) var(--sk-space-5xl) 88px;
+      background: var(--sk-color-surface, #fff); border-radius: var(--sk-radius-lg);
+      box-shadow: var(--sk-shadow-raised); overflow: hidden;
+    }
+    .slide.active { display: flex; }
+    .slide.dark { background: #232323; color: #fff; }
+    .slide.brand { background: var(--sk-gradient-brand); color: #232323; }
+
+    .top { display: flex; justify-content: space-between; align-items: center; gap: var(--sk-space-m); min-height: 32px; }
+    .eyebrow { font-family: var(--sk-font-title); font-weight: 700; font-size: 15px; color: var(--sk-color-text-muted, #666); }
+    .dark .eyebrow { color: #bfe8c9; }
+
+    .slide h1, .slide h2 { font-family: var(--sk-font-title); font-weight: 700; margin: 0; color: inherit; letter-spacing: 0; }
+    .slide h1 { font-size: 56px; line-height: 1.1; max-width: 1000px; }
+    .slide h2 { font-size: 38px; line-height: 1.18; max-width: 1080px; }
+    .slide p { margin: 0; }
+    .lead { font-size: 22px; line-height: 1.45; color: var(--sk-color-text-muted, #555); max-width: 980px; }
+    .dark .lead { color: #d9dcd9; }
+    .brand .lead { color: #232323; }
+
+    .grow { flex: 1; min-height: 0; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sk-space-xl); align-items: stretch; }
+    .cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sk-space-l); }
+    .cols-62 { display: grid; grid-template-columns: 1.55fr 1fr; gap: var(--sk-space-2xl); align-items: center; }
+
+    .big { font-family: var(--sk-font-title); font-weight: 700; font-size: 84px; line-height: 1; color: #232323; }
+    .big.md { font-size: 56px; }
+    .dark .big { color: #fff; }
+    .big-cap { font-size: 20px; line-height: 1.4; color: var(--sk-color-text-muted, #555); margin-top: var(--sk-space-xs); }
+    .dark .big-cap { color: #d9dcd9; }
+    .mark { box-shadow: inset 0 -14px 0 #b9f3c8; }
+    .ref { font-size: 12px; line-height: 1.35; font-style: normal; font-weight: 400; color: var(--sk-color-text-muted, #666); margin-top: 6px; }
+    .dark .ref { color: #b8bcb8; }
+    .link .ref { font-size: 11.5px; color: #b8bcb8; margin-top: 2px; }
+    .link.out .ref { color: #232323; }
+
+    .so { border-left: 4px solid var(--sk-color-primary, #00c73d); padding: var(--sk-space-xxs) 0 var(--sk-space-xxs) var(--sk-space-m);
+          font-size: 20px; line-height: 1.45; max-width: 1080px; }
+    .so b { font-family: var(--sk-font-title); }
+    .quote { font-size: 20px; line-height: 1.5; font-style: italic; }
+    .quote small { display: block; font-style: normal; font-size: 15px; margin-top: var(--sk-space-xs); color: var(--sk-color-text-muted, #666); }
+    .bridge { font-family: var(--sk-font-title); font-weight: 700; font-size: 22px; color: var(--sk-color-primary-active, #03a835); }
+    .dark .bridge { color: #8fe000; }
+
+    .foot { position: absolute; left: var(--sk-space-5xl); right: var(--sk-space-5xl); bottom: 28px; display: flex;
+            justify-content: space-between; gap: var(--sk-space-l); font-size: 13px; color: var(--sk-color-text-muted, #666); }
+    .foot .pg { white-space: nowrap; }
+    .dark .foot { color: #b8bcb8; }
+    .brand .foot { color: #232323; }
+
+    .icon-dot { width: 64px; height: 64px; border-radius: var(--sk-radius-pill); background: var(--sk-gradient-brand);
+                display: grid; place-items: center; color: #232323; font-size: 28px; flex: none; }
+    .tile { display: flex; gap: var(--sk-space-l); align-items: flex-start; }
+    .tile h3 { font-family: var(--sk-font-title); font-weight: 700; font-size: 24px; margin: 0 0 var(--sk-space-xs); }
+    .tile p { font-size: 19px; line-height: 1.45; color: var(--sk-color-text-muted, #555); }
+
+    /* Gráfico de barras propio (solo tokens) */
+    .chart { display: flex; flex-direction: column; gap: var(--sk-space-xs); }
+    .bars { display: flex; align-items: flex-end; gap: 14px; height: 280px; border-bottom: 1px solid var(--sk-color-border, #ddd); }
+    .bcol { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%; }
+    .bar { width: 100%; border-radius: 4px 4px 0 0; background: #c4c9c5; }
+    .bar.hi { background: var(--sk-color-primary, #00c73d); }
+    .bar.dk { background: #404040; }
+    .bval { font-family: var(--sk-font-title); font-weight: 700; font-size: 17px; }
+    .bval.hi { font-size: 22px; }
+    .blabels { display: flex; gap: 14px; }
+    .blabels span { flex: 1; text-align: center; font-size: 15px; color: var(--sk-color-text-muted, #666); }
+    .legend { display: flex; gap: var(--sk-space-l); font-size: 15px; color: var(--sk-color-text-muted, #555); flex-wrap: wrap; }
+    .legend i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+
+    /* Indicadores de reemplazo */
+    .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sk-space-m); align-content: start; }
+    .kpi { border: 1px solid var(--sk-color-border, #ddd); border-radius: var(--sk-radius-lg); padding: var(--sk-space-s); display: grid; gap: 4px; align-content: start; }
+    .kpi .n { font-family: var(--sk-font-title); font-weight: 700; font-size: 36px; line-height: 1; }
+    .kpi .c { font-size: 15px; line-height: 1.4; color: var(--sk-color-text-muted, #555); }
+    .kpi .k { font-size: 12px; color: var(--sk-color-text-muted, #666); white-space: nowrap; }
+    .meter { display: flex; gap: 2px; height: 10px; border-radius: 4px; background: #e3e6e3; overflow: hidden; margin-top: 4px; }
+    .meter span { background: var(--sk-color-primary, #00c73d); }
+    .meter.stack span.b { background: #404040; }
+    .meter.stack span.c2 { background: #c4c9c5; }
+    .baseline { position: absolute; left: 0; right: 0; border-top: 2px dashed #404040; pointer-events: none; }
+    .baseline span { position: absolute; right: 0; top: -22px; font-size: 13px; color: #404040; background: var(--sk-color-surface, #fff); padding-left: 6px; }
+
+    /* Comparación horizontal */
+    .hrow { display: grid; grid-template-columns: 230px 1fr 130px; column-gap: var(--sk-space-m); align-items: center; row-gap: 2px; }
+    .hrow .hl { font-family: var(--sk-font-title); font-weight: 700; font-size: 19px; }
+    .hrow .hb { height: 34px; background: #eef1ee; border-radius: 4px; overflow: hidden; }
+    .hrow .hbar { display: block; height: 100%; border-radius: 4px; }
+    .hrow .hv { font-family: var(--sk-font-title); font-weight: 700; font-size: 30px; text-align: right; }
+    .hrow .hd { grid-column: 2 / 4; font-size: 15px; color: var(--sk-color-text-muted, #555); }
+
+    /* Barras apiladas por canal (reapertura) */
+    .stk { display: grid; gap: 10px; margin: var(--sk-space-xs) 0; }
+    .stk .r { display: grid; grid-template-columns: 120px 1fr 78px 78px; column-gap: 12px; align-items: center; }
+    .stk .r.h { font-size: 13px; color: var(--sk-color-text-muted, #666); line-height: 1.2; }
+    .stk .lab { font-size: 16px; font-weight: 600; }
+    .stk .tr { display: flex; height: 30px; }
+    .stk .tr i { display: block; height: 100%; }
+    .stk .v { font-family: var(--sk-font-title); font-weight: 700; font-size: 17px; text-align: right; }
+    .stk .v.mid { background: #232323; color: #fff; border-radius: 6px; padding: 3px 0; text-align: center; }
+    .stk .r.tot { border-top: 1px solid var(--sk-color-border, #ddd); padding-top: 10px; }
+
+    /* Pasos simples (slide 10) */
+    .stepsimple { display: grid; gap: var(--sk-space-m); align-content: center; }
+    .ss { display: flex; gap: var(--sk-space-m); align-items: flex-start; }
+    .ss .sn { flex: none; width: 40px; height: 40px; border-radius: var(--sk-radius-pill); background: var(--sk-gradient-brand); display: grid; place-items: center; font-family: var(--sk-font-title); font-weight: 700; font-size: 20px; color: #232323; }
+    .ss .st { font-family: var(--sk-font-title); font-weight: 700; font-size: 20px; line-height: 1.25; }
+    .ss .sd { font-size: 17px; line-height: 1.4; color: var(--sk-color-text-muted, #555); margin-top: 4px; }
+
+    /* Tarjetas de opciones (slide de liquidez) */
+    .opts { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr; gap: var(--sk-space-s); min-height: 0; }
+    .opt { border: 1px solid var(--sk-color-border, #ddd); border-radius: var(--sk-radius-lg); padding: var(--sk-space-s) var(--sk-space-m); display: grid; gap: 6px; align-content: start; }
+    .opt .oh { display: flex; gap: var(--sk-space-s); align-items: center; }
+    .opt .ic { flex: none; width: 34px; height: 34px; border-radius: var(--sk-radius-pill); background: var(--sk-gradient-brand); display: grid; place-items: center; color: #232323; font-size: 15px; }
+    .opt h3 { font-family: var(--sk-font-title); font-weight: 700; font-size: 16px; line-height: 1.25; margin: 0; }
+    .opt .who { font-size: 14px; line-height: 1.35; color: var(--sk-color-text-muted, #555); }
+    .opt .here { font-size: 14px; line-height: 1.4; }
+    .pill { display: inline-block; font-size: 12.5px; font-weight: 700; padding: 1px 9px; border-radius: var(--sk-radius-pill); margin-right: 4px; }
+    .pill.mid { background: #fff1cc; color: #6b4a00; }
+    .pill.no { background: #e6e8e6; color: #333; }
+    .opt.sum { background: #232323; color: #fff; border-color: #232323; align-content: center; }
+    .opt.sum .sbig { font-family: var(--sk-font-title); font-weight: 700; font-size: 42px; line-height: 1; color: #8fe000; }
+    .opt.sum .scap { font-size: 15px; line-height: 1.4; color: #e3e6e3; }
+
+    /* Escalera de penalidad */
+    .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sk-space-s); }
+    .step { border: 1px solid var(--sk-color-border, #ddd); border-radius: var(--sk-radius-lg); padding: var(--sk-space-m); display: grid; gap: 6px; text-align: center; }
+    .step .y { font-size: 16px; color: var(--sk-color-text-muted, #666); }
+    .step .p { font-family: var(--sk-font-title); font-weight: 700; font-size: 34px; }
+    .step .t { font-size: 14px; color: var(--sk-color-text-muted, #666); }
+    .step.on { border: 2px solid var(--sk-color-primary, #00c73d); background: #f2fcf4; }
+    .steps-sm .step { padding: var(--sk-space-s); gap: 2px; }
+    .steps-sm .step .p { font-size: 30px; }
+
+    /* Línea de tiempo de comisión */
+    .track { position: relative; height: 186px; flex: none; }
+    .track .axis { position: absolute; left: 0; right: 0; top: 112px; height: 2px; background: var(--sk-color-border, #ddd); }
+    .seg { position: absolute; height: 22px; border-radius: 4px; top: 84px; }
+    .seg.pay { background: var(--sk-color-primary, #00c73d); }
+    .seg.back { top: 156px; height: 16px; background: repeating-linear-gradient(45deg, #c4c9c5 0 6px, #e3e6e3 6px 12px); }
+    .pin { position: absolute; top: 72px; width: 14px; height: 40px; margin-left: -7px; border-radius: 4px; background: var(--sk-color-primary, #00c73d); }
+    .tick { position: absolute; top: 122px; font-size: 14px; color: var(--sk-color-text-muted, #666); transform: translateX(-50%); white-space: nowrap; }
+    .tlabel { position: absolute; font-size: 15px; line-height: 1.35; }
+    .y8 { position: absolute; top: 40px; height: 74px; width: 0; border-left: 2px dashed #404040; }
+
+    /* Cadena final */
+    .chain { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1.15fr; gap: var(--sk-space-m); align-items: stretch; }
+    .chain .arrow { align-self: center; }
+    .link { background: #2f2f2f; border-radius: var(--sk-radius-lg); padding: var(--sk-space-l); min-height: 120px; display: grid; gap: var(--sk-space-xs); align-content: start; }
+    .link h3 { font-family: var(--sk-font-title); font-size: 20px; margin: 0; color: #8fe000; }
+    .link p { font-size: 16px; line-height: 1.4; color: #e3e6e3; }
+    .link.out { background: var(--sk-gradient-brand); }
+    .link.out h3, .link.out p { color: #232323; }
+    .arrow { color: #8fe000; font-size: 26px; }
+
+    .list { display: grid; gap: var(--sk-space-s); margin: 0; padding: 0; list-style: none; }
+    .list li { font-size: 19px; line-height: 1.4; display: flex; gap: var(--sk-space-s); align-items: baseline; }
+    .list li .pi { color: var(--sk-color-primary, #00c73d); font-size: 16px; }
+    .dark .list li { color: #e8eae8; }
+    .chips { display: flex; gap: var(--sk-space-s); flex-wrap: wrap; }
+    .card-body { display: grid; gap: var(--sk-space-m); }
+
+    /* Navegación */
+    .nav { position: fixed; right: 20px; bottom: 16px; display: flex; gap: var(--sk-space-xs); align-items: center; z-index: 5; }
+    .count { font-family: var(--sk-font-title); font-weight: 700; font-size: 14px; color: #404040; min-width: 56px; text-align: center; }
+
+    @media print {
+      @page { size: 1280px 720px; margin: 0; }
+      body { background: #fff; }
+      .deck { position: static; display: block; overflow: visible; }
+      .stage { transform: none !important; height: auto; }
+      .slide { display: flex !important; position: relative; inset: auto; height: 720px; border-radius: 0; box-shadow: none; page-break-after: always; break-after: page; }
+      .nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main id="app"></main>
+
+  <template id="ui">
+    <div class="deck"><div class="stage" id="stage">
+
+      <!-- ═════════ 1 · PORTADA ═════════ -->
+      <section class="slide dark" data-title="Portada">
+        <div class="top"><sk-logo sk-style="blanco" style="height: 30px"></sk-logo><span class="eyebrow">Diagnóstico preliminar · octubre 2026</span></div>
+        <div class="grow"></div>
+        <h1>Crea Patrimonio: por qué la gente se va y qué podemos hacer</h1>
+        <p class="lead">Lo que nos dicen los datos, los clientes, los asesores y otros mercados, contado a través de una clienta: Ana.</p>
+        <div class="chips">
+          <sk-chip label="35.903 pólizas" sk-style="primary" size="small"></sk-chip>
+          <sk-chip label="370 casos de retención" sk-style="primary" size="small"></sk-chip>
+          <sk-chip label="+60 mil casos de servicio" sk-style="primary" size="small"></sk-chip>
+          <sk-chip label="Estudios con clientes y asesores 2021–2026" sk-style="primary" size="small"></sk-chip>
+          <sk-chip label="Prácticas de 12 mercados" sk-style="primary" size="small"></sk-chip>
+        </div>
+        <div class="grow"></div>
+        <p class="ref">Fuentes: 35.903 pólizas = book de seguros, código OMPEV (Cuant. §0.1) · 370 casos = cola de retención de seguros, jun–oct 2026 (Cuant. §0.1) · estudios con clientes y asesores = Dovetail. Siglas: Cuant. = creapatrimonio-cuantitativo-databricks · Com. = creapatrimonio-comisiones · Dovetail = creapatrimonio-hallazgos-dovetail · Bench = creapatrimonio-bench (bóveda, 01-Proyectos/creapatrimonio).</p>
+        <div class="foot"><span>Equipo UX · Producto · Uso interno</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 2 · CONOCE A ANA ═════════ -->
+      <section class="slide" data-title="Conoce a Ana">
+        <div class="top"><sk-tag sk-style="success" size="small">La promesa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>Ana ahorra para el futuro de su hija. Crea Patrimonio le promete dos cosas a la vez.</h2>
+        <div class="cols grow" style="align-items:center">
+          <div class="card-body">
+            <div class="tile"><span class="icon-dot"><i class="pi pi-wallet"></i></span><div><h3>Una alcancía</h3><p>Ana pone una cuota fija cada mes durante muchos años.</p></div></div>
+            <div class="tile"><span class="icon-dot"><i class="pi pi-shield"></i></span><div><h3>Un seguro</h3><p>Si a Ana le pasa algo, el seguro completa lo que falta para la meta.</p></div></div>
+          </div>
+          <sk-card header="¿Para qué lo compra la gente?" subheader="Lo que dicen clientes y asesores">
+            <div class="card-body">
+              <p class="quote">“Iba a hacer uno hace unos días para un ahijado, para un fondo educativo.”<small>Cliente · estudio 2021 · Dovetail H5</small></p>
+              <p class="quote">“Los que más predominan es tener un ahorro a largo plazo para lo que ellos quieran […] los demás es más por el tema del educativo.”<small>Asesora · entrevista en Dovetail · H5</small></p>
+            </div>
+          </sk-card>
+        </div>
+        <div class="foot"><span>Ana es un personaje para contar la historia. Todas las cifras de esta presentación son reales.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 3 · LA PROMESA ═════════ -->
+      <section class="slide" data-title="Firmó por 20 años">
+        <div class="top"><sk-tag sk-style="success" size="small">La promesa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>Ana firmó por 20 años, pero le vendieron el año 8 como el momento de salir sin perder.</h2>
+        <div class="cols-62 grow">
+          <div class="card-body">
+            <sk-card>
+              <p class="quote">“En el año 8 […] estuviste 8 años asegurados y se te devuelve el capital.”<small>Asesor, explicándole la cotización a un cliente (caso de servicio, 2022) · Cuant. §3</small></p>
+            </sk-card>
+            <sk-card>
+              <p class="quote">“En el año 8 (96 primas pagadas) se logra un punto de equilibrio.”<small>Respuesta oficial de Gestión Seguros, 2024 · Cuant. §3</small></p>
+            </sk-card>
+          </div>
+          <div>
+            <p class="big">3 de 4</p>
+            <p class="big-cap">pólizas están pactadas a <b>20 o 25 años</b></p>
+            <div style="margin-top:20px"><sk-progress-bar value="74" show-value aria-label="74 % de las pólizas a 20 o 25 años"></sk-progress-bar></div>
+            <p class="ref">Book de seguros, Crea Patrimonio: 14.094 a 20 años + 12.583 a 25 = 26.677 de 35.903 (74 %) · Cuant. §6</p>
+          </div>
+        </div>
+        <p class="bridge">Entonces, ¿qué pasa cuando llega el año 8?</p>
+        <div class="foot"><span>Fuentes: book de seguros (35.903 pólizas, oct-2026) · casos de Salesforce 2022–2026</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 4 · DOS MOMENTOS ═════════ -->
+      <section class="slide" data-title="Dos momentos">
+        <div class="top"><sk-tag sk-style="info" size="small">Lo que pasa en realidad</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>La gente se va en dos momentos: al empezar y al cumplir 8 años.</h2>
+        <div class="chart grow">
+          <p class="lead" style="font-size:18px">De cada 100 pólizas vivas, cuántas se cancelan en cada año de la póliza</p>
+          <div class="bars" id="bars-anios" style="height:236px"></div>
+          <div class="blabels" id="lbl-anios"></div>
+          <div class="legend">
+            <span><i style="background:#404040"></i>Al empezar: no pagan las primeras cuotas</span>
+            <span><i style="background:var(--sk-color-primary,#00c73d)"></i>Al cumplir 8 años: las salidas se duplican</span>
+          </div>
+        </div>
+        <p class="ref">Book de seguros, Crea Patrimonio con al menos un pago: cancelaciones del año ÷ años-póliza expuestos. Cancelaciones en los años 1 a 10: 2.965 · 1.235 · 246 · 281 · 321 · 313 · 326 · 301 · 340 · 125 · Cuant. §7</p>
+        <p class="so"><b>Y eso qué:</b> son dos problemas distintos. Al inicio falla la venta y el arranque. En el año 9 el cliente decide irse.</p>
+        <div class="foot"><span>Fuente: book de seguros · pólizas con al menos un pago · años 1 a 10 de la póliza</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 5 · NO ES UNA RACHA ═════════ -->
+      <section class="slide" data-title="No es una racha">
+        <div class="top"><sk-tag sk-style="info" size="small">Lo que pasa en realidad</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>No es una mala racha: se repite con las pólizas de cada año de venta.</h2>
+        <div class="cols-62 grow">
+          <div class="chart">
+            <p class="lead" style="font-size:18px">De cada 100, cuántas se van en el año 8 y en el año 9</p>
+            <div class="bars" id="bars-cohorte" style="height:215px"></div>
+            <div class="blabels" id="lbl-cohorte"></div>
+            <div class="legend"><span><i style="background:#c4c9c5"></i>Año 8</span><span><i style="background:var(--sk-color-primary,#00c73d)"></i>Año 9</span></div>
+            <p class="ref">Book de seguros: tasa de cancelación del año 8 y del año 9 dentro de cada cohorte de emisión · Cuant. §7</p>
+          </div>
+          <sk-card header="Pasa en todo el mundo" subheader="Lo que muestra el bench">
+            <p style="font-size:19px;line-height:1.5">En EE. UU., los estudios de la industria muestran salidas masivas <b>el año en que se acaba la penalidad</b>, aunque el mercado no cambie.</p>
+            <p class="ref">SOA/LIMRA, anualidades de tasa fija 2023–24 · Bench §3.2</p>
+          </sk-card>
+        </div>
+        <p class="so"><b>Y eso qué:</b> las pólizas vendidas en 2018 se van más rápido que las de 2016. El problema viene del producto y de cómo se vende, y está creciendo.</p>
+        <div class="foot"><span>Fuentes: book de seguros, por año de venta · bench internacional (SOA/LIMRA, reporte público 2026)</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 6 · AÑO 8 → AÑO 9 ═════════ -->
+      <section class="slide" data-title="Pide la cuenta">
+        <div class="top"><sk-tag sk-style="info" size="small">Lo que pasa en realidad</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>Ana pide la cuenta en el año 8 y se va en el 9. Pero tampoco sale gratis.</h2>
+        <div>
+          <p class="lead" style="font-size:18px;margin-bottom:8px">Cuánto le descuentan a Ana si cancela</p>
+          <div class="steps steps-sm">
+            <div class="step"><span class="y">Año 7</span><span class="p">25 %</span><span class="t">&nbsp;</span></div>
+            <div class="step on"><span class="y">Año 8</span><span class="p">15 %</span><span class="t">Más pedidos de “¿cuánto me devuelven?”</span></div>
+            <div class="step on"><span class="y">Año 9</span><span class="p">9 %</span><span class="t">Más cancelaciones</span></div>
+            <div class="step"><span class="y">Año 10</span><span class="p">5 %</span><span class="t">&nbsp;</span></div>
+            <div class="step"><span class="y">Año 11</span><span class="p">0 %</span><span class="t">&nbsp;</span></div>
+          </div>
+          <p class="ref">Tabla reconstruida desde las preliquidaciones de Gestión Seguros en Salesforce (1.069 pólizas únicas, 2023–jul 2026) · Cuant. §2. Circula al menos otra versión.</p>
+        </div>
+        <div class="cols grow" style="align-items:start">
+          <div class="card-body">
+            <p style="font-size:17px;line-height:1.45">Además, si sus aportes no cumplen 10 años, <b>paga los impuestos que se había ahorrado</b>. Y la garantía de capital solo aplica si llega al final.</p>
+            <p class="ref">Impuestos: “cuenta contingente”, Cuant. §2 · Garantía de capital: solo al vencimiento, no al rescate (Cond. 6.1), Bench §0</p>
+            <p class="so" style="font-size:17px"><b>Y eso qué:</b> cuando la promesa choca con el contrato, el cliente no siente una penalidad: siente un engaño. Al menos 3 clientes lo dicen así en los casos de servicio.</p>
+            <p class="ref">Citas de clientes en casos de Salesforce 2022–2026 · Cuant. §3</p>
+          </div>
+          <sk-card>
+            <p class="quote" style="font-size:17px">“[…] con la información para poder retirarme al año 8 de aportes (96 cuotas) y rendimientos por llegar a punto de equilibrio, lo cual no se está honrando y fue engañoso desde el día 1.”<small>Cliente, en una carta a la Superintendencia Financiera (caso de servicio, 2024)</small></p>
+          </sk-card>
+        </div>
+        <div class="foot"><span>Fuentes: tabla reconstruida de preliquidaciones en Salesforce (1.069 pólizas; circula al menos otra versión) · book de seguros · condicionado SFC 2026</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 7 · CANCELAR Y REABRIR ═════════ -->
+      <section class="slide" data-title="Cancelar y reabrir" style="gap:var(--sk-space-s)">
+        <div class="top"><sk-tag sk-style="info" size="small">Lo que pasa en realidad</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:34px">Cancelar y abrir otra póliza ya se puede medir, y se dispara en el año 9.</h2>
+        <div class="cols grow" style="grid-template-columns:1.05fr 1fr;gap:var(--sk-space-2xl)">
+          <div class="chart">
+            <p class="lead" style="font-size:17px">De cada 100 pólizas canceladas en cada año, cuántas terminan en otra póliza del mismo cliente</p>
+            <div class="bars" id="bars-reemp" style="height:120px;position:relative"></div>
+            <div class="blabels" id="lbl-reemp"></div>
+            <div class="legend" style="font-size:14px">
+              <span><i style="background:none;border-top:2px dashed #404040;height:0;border-radius:0"></i>Clientes que no cancelan: 1,6 de cada 100</span>
+              <span>Total: 303 de 6.491 (4,7 de cada 100)</span>
+              <span class="ref" style="flex-basis:100%;margin-top:0">Cada barra es un porcentaje, no un número de pólizas. Ejemplo: en el año 9 se cancelaron 340 pólizas y en 33 el mismo cliente abrió otra (9,7 %). Book de seguros: póliza nueva del mismo cliente entre 90 días antes y 180 después. Línea: clientes activos que no cancelan, 2023–2026 · Cuant. §8</span>
+            </div>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><p class="n">86 de 100</p><p class="c">son con el <b>mismo asesor</b>, y casi siempre la nueva es otro Crea Patrimonio</p>
+              <div class="meter"><span style="width:86%"></span></div><p class="ref" style="margin-top:0">Cuant. §8</p></div>
+            <div class="kpi"><p class="n">3 de 4</p><p class="c"><b>no bajan la cuota:</b> la nueva paga igual o más</p>
+              <div class="meter stack" title="Igual 41 % · Más alta 32 % · Más baja 27 %"><span style="width:41%"></span><span class="b" style="width:32%"></span><span class="c2" style="width:27%"></span></div>
+              <p class="k">Igual 41 % · Más alta 32 % · Más baja 27 %</p><p class="ref" style="margin-top:0">41 % + 32 % = 73 % · Cuant. §8</p></div>
+            <div class="kpi"><p class="n">185</p><p class="c"><b>asesores</b> con algún caso. 136 tienen uno solo; <b>uno tiene 21</b> y va a revisión</p><p class="ref" style="margin-top:0">303 reemplazos · Cuant. §8</p></div>
+            <div class="kpi"><p class="n">23 días</p><p class="c">pasan entre cancelar y abrir la nueva. <b>En 90 casos</b> la nueva se abrió antes de cancelar</p><p class="ref" style="margin-top:0">Mediana · Cuant. §8</p></div>
+          </div>
+        </div>
+        <p class="so" style="font-size:18px"><b>Y eso qué:</b> la póliza nueva vuelve a pagar comisión de entrada. Hipótesis: por eso llevan a Ana a cancelar.</p>
+        <p class="ref">Ninguna regla excluye los reemplazos (mapeo de comisiones OMPEV, oct-2026 · Com. §1 y §5) y no hay ningún control cuando el mismo asesor cancela y abre otra (equipo del proyecto, sin documento) · Cuant. §8</p>
+        <p class="bridge" style="font-size:20px">¿Cuánto gana el asesor si Ana se queda, frente a si abre una nueva?</p>
+        <div class="foot"><span>Fuentes: book de seguros (6.491 cancelaciones; póliza nueva entre 3 meses antes y 6 después) · mapeo de comisiones OMPEV, Comisiones 2026</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 7b · LO QUE DICE LA TABLA DE CANCELACIONES ═════════ -->
+      <section class="slide" data-title="Tabla de cancelaciones" style="gap:var(--sk-space-s)">
+        <div class="top"><sk-tag sk-style="info" size="small">Lo que pasa en realidad</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:32px">Cancelar al empezar muchas veces se revierte; cancelar con 7 años o más, pocas veces, y cada año hay más.</h2>
+        <div class="cols grow" style="grid-template-columns:1.05fr 1fr;gap:var(--sk-space-2xl)">
+          <div class="chart">
+            <p class="lead" style="font-size:17px">De cada 100 pólizas que se cancelan en cada año, cuántas se reactivan después</p>
+            <div class="bars" id="bars-react" style="height:170px"></div>
+            <div class="blabels" id="lbl-react"></div>
+            <div class="legend" style="font-size:14px">
+              <span><i style="background:#404040"></i>Año 2: casi la mitad vuelve</span>
+              <span><i style="background:var(--sk-color-primary,#00c73d)"></i>Año 9: casi nadie vuelve</span>
+            </div>
+            <p class="ref">Pólizas con alguna cancelación, según el año de la póliza en que se cancelaron por primera vez. Tabla de vigencia en Databricks: 36.097 pólizas, corte 31-oct-2026 · Cuant. §12</p>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><p class="n">28 días</p><p class="c">tarda en mediana una póliza cancelada en reactivarse. <b>96 de cada 100</b> vuelven en menos de 90 días</p><p class="ref" style="margin-top:0">1.871 de 1.957 · Cuant. §12</p></div>
+            <div class="kpi"><p class="n">×20</p><p class="c">crecieron las cancelaciones de pólizas con <b>7 años o más</b>: de 23 en 2022 a 468 en 2026. Pasaron de 4 a 30 de cada 100</p><p class="ref" style="margin-top:0">Cancelaciones definitivas · Cuant. §12</p></div>
+            <div class="kpi"><p class="n">El doble</p><p class="c">En los años 9 y 10 cancela <b>14,7 %</b> en el canal Seguros y <b>7,5 %</b> en Agencias. No prueba la causa: son clientes distintos</p><p class="ref" style="margin-top:0">97 de 662 y 162 de 2.147 · Cuant. §12</p></div>
+            <div class="kpi"><p class="n">1.557</p><p class="c">cancelaciones definitivas en 2026, hasta octubre: ya <b>superan las 1.422</b> de todo 2025</p><p class="ref" style="margin-top:0">Cuant. §12</p></div>
+          </div>
+        </div>
+        <p class="so" style="font-size:18px"><b>Y eso qué:</b> lo que más crece es la salida de pólizas con 7 años o más, y esa pocas veces se revierte.</p>
+        <div class="foot"><span>Fuente: tabla de vigencia de Crea Patrimonio en Databricks (producto.public.CreaPatri_Vigencia), corte 31-oct-2026</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 7c · QUIÉN VUELVE: REAPERTURA POR CANAL Y VENTANA ═════════ -->
+      <section class="slide" data-title="Doble comisión por canal" style="gap:var(--sk-space-s)">
+        <div class="top"><sk-tag sk-style="info" size="small">Lo que pasa en realidad</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:30px">Quien cancela y abre una póliza nueva entre los 6 y 12 meses: 1,6 de cada 100 en Empleados, 1,3 en Agencias y 0,9 en Seguros.</h2>
+        <div class="cols grow" style="grid-template-columns:1.15fr 1fr;gap:var(--sk-space-2xl)">
+          <div class="chart">
+            <p class="lead" style="font-size:17px">Clientes que cancelaron y abrieron una póliza nueva, de cada 100</p>
+            <div class="stk" id="stk-reab"></div>
+            <div class="legend" style="font-size:14px">
+              <span><i style="background:#00c73d"></i>En los primeros 6 meses</span>
+              <span><i style="background:#232323"></i>Entre 6 y 12 meses</span>
+            </div>
+            <p class="ref">Clientes, no pólizas. No se muestran 3.639 sin canal conocido ni 30 de IFAs. Dinero: comisión de entrada de una póliza nueva con cuota de $600 mil y 20 años (2 % + 0,5 % en el mes 19, agencias), sin descontar recobros. Estimación · Com. §4 · Cuant. §12.2</p>
+          </div>
+          <div class="kpis" style="grid-template-columns:1fr;align-content:center">
+            <div class="kpi"><p class="n" style="font-size:30px">65 clientes</p><p class="c">cancelaron y abrieron póliza nueva <b>entre 6 y 12 meses</b> después (1,1&nbsp;% de 5.789). Son los casos candidatos a doble comisión. Otros <b>320</b> la abrieron en menos de 6 meses: <b>385</b> en el primer año</p></div>
+            </div>
+        </div>
+        <p class="so" style="font-size:18px"><b>Y eso qué:</b> cada póliza nueva paga unos <b>$2,5 M</b> de comisión. Los 65 de 6 a 12 meses son <b>cerca de $160 M</b>; los 385 del primer año, <b>cerca de $960 M</b>.</p>
+        <div class="foot"><span>Fuente: tabla de vigencia de Crea Patrimonio en Databricks y reporte de Data (canal de venta × ventana de reapertura), corte 31-oct-2026</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 8 · COMISIÓN ═════════ -->
+      <section class="slide" data-title="Comisión" style="gap:var(--sk-space-m)">
+        <div class="top"><sk-tag sk-style="warning" size="small">Por qué pasa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:34px">La comisión grande se paga en 19 meses. Desde la prima 25, que Ana se vaya no le cuesta nada al asesor.</h2>
+        <div class="cols grow" style="grid-template-columns:1.1fr 1fr;gap:var(--sk-space-2xl)">
+          <div class="chart">
+            <p class="lead" style="font-size:17px">Lo que cobra el asesor por la póliza de Ana, en millones de pesos</p>
+            <div class="bars" id="bars-com" style="height:160px"></div>
+            <div class="blabels" id="lbl-com"></div>
+            <div class="legend" style="font-size:14px">
+              <span><i style="background:var(--sk-color-primary,#00c73d)"></i>Se paga una sola vez</span>
+              <span><i style="background:#c4c9c5"></i>Mantenimiento, por año</span>
+              <span><i style="background:#404040"></i>Solo si se paga el tramo alto</span>
+            </div>
+          </div>
+          <div class="kpis" style="grid-template-columns:1fr">
+            <div class="kpi"><p class="n">$2,5 M</p><p class="c">en los <b>primeros 19 meses</b>: 2 % al empezar y 0,5 % en el mes 19</p></div>
+            <div class="kpi"><p class="n">$0,2 M</p><p class="c"><b>al año</b> por mantener la póliza de Ana en el año 9. Los primeros 19 meses pagan lo de <b>11 años</b> de mantenimiento</p></div>
+            <div class="kpi"><p class="n">$0</p><p class="c">es lo que <b>devuelve</b> si Ana cancela después de la prima 24. Antes, devuelve parte de lo cobrado</p></div>
+          </div>
+        </div>
+        <p class="so" style="font-size:18px"><b>Y eso qué:</b> cada año que Ana se queda, el asesor cobra unos $0,2 M. Si se va, no pierde nada más que eso.</p>
+        <p class="ref">Ana: cuota de $600 mil, agencias. Entrada y mes 19 sobre $100,8 M (14 años de cuotas); mantenimiento sobre su ahorro de $71,6 M. Los asesores lo describen igual: “200 pesos, 300, 700 pesos” (Dovetail H10 y H11) · Com. §1 y §4.1</p>
+        <div class="foot"><span>Fuentes: mapeo de esquemas de comisiones OMPEV (Comisiones, 2026) · reuniones con Comisiones, 28-oct-2026 · entrevistas a asesores en Dovetail</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 9 · QUEDARSE O REABRIR (2 AÑOS) ═════════ -->
+      <section class="slide" data-title="Quedarse o reabrir" style="gap:var(--sk-space-m)">
+        <div class="top"><sk-tag sk-style="warning" size="small">Por qué pasa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:34px">Si Ana cancela en el año 9 y abre otra póliza, su asesor cobra 5 veces más en los 2 años siguientes.</h2>
+        <div class="grow" style="display:grid;gap:var(--sk-space-s);align-content:start">
+          <p class="lead" style="font-size:18px">Lo que cobra el asesor en 2 años por la póliza de Ana, en millones de pesos</p>
+          <div class="hrow">
+            <span class="hl">Si Ana se queda</span>
+            <div class="hb"><span class="hbar" style="width:20%;background:#c4c9c5"></span></div>
+            <span class="hv">$0,5 M</span>
+            <span class="hd">El mantenimiento de su póliza actual: unos $0,25 M por año.</span>
+          </div>
+          <div class="hrow">
+            <span class="hl">Si cancela y abre otra</span>
+            <div class="hb"><span class="hbar" style="width:100%;background:var(--sk-color-primary,#00c73d)"></span></div>
+            <span class="hv">$2,5 M</span>
+            <span class="hd">$2,0 M de entrada al empezar la póliza nueva + $0,5 M en el mes 19.</span>
+          </div>
+          <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:var(--sk-space-xs)">
+            <div class="kpi"><p class="n">5 veces</p><p class="c">más <b>en los 3 canales</b>. Agencias: $0,5 M frente a $2,5 M. Empleados: $0,3 M frente a $1,6 M</p><p class="ref" style="margin-top:0">Com. §4.2</p></div>
+            <div class="kpi"><p class="n">$3,5 M</p><p class="c">cuesta a Skandia el reemplazo con intermediarios: <b>el agente, el promotor y el aliado</b> cobran cada uno su entrada</p><p class="ref" style="margin-top:0">3 % de entrada, no 2 % · Com. §1.1</p></div>
+            <div class="kpi"><p class="n">Ningún</p><p class="c"><b>control</b> frena que el mismo asesor cancele una póliza y abra otra al mismo cliente</p><p class="ref" style="margin-top:0">Equipo del proyecto, sin documento</p></div>
+          </div>
+        </div>
+        <p class="so" style="font-size:18px"><b>Y eso qué:</b> el esquema paga más por reabrir que por retener y nada lo frena. Que el asesor lo busque es hipótesis.</p>
+        <p class="ref">Cuota de $600 mil y ahorro de $71,6 M (medianas, años 8–9), póliza nueva a 20 años con igual cuota, mantenimiento al tope, sin incrementos ni exclusividad: supuestos que favorecen quedarse · Com. §4.1</p>
+        <div class="foot"><span>Fuentes: mapeo de esquemas de comisiones OMPEV (Comisiones, 2026) · book de seguros (oct-2026) · cálculo en creapatrimonio-comisiones §4</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 10 · CUÁNDO CONVIENE QUEDARSE ═════════ -->
+      <section class="slide" data-title="Cuándo conviene quedarse" style="gap:var(--sk-space-m)">
+        <div class="top"><sk-tag sk-style="warning" size="small">Por qué pasa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:34px">Reabrir paga mucho de una vez; quedarse paga poquito cada año. Por eso quedarse solo gana desde el año 13.</h2>
+        <div class="cols grow" style="grid-template-columns:1.2fr 1fr;gap:var(--sk-space-2xl)">
+          <div class="chart">
+            <p class="lead" style="font-size:17px">Lo que lleva cobrado el asesor en total, año tras año, en millones de pesos</p>
+            <div id="line-acum"></div>
+            <p class="ref">Desde el año 9 de la póliza de Ana (cuota de $600 mil, agencias y agentes independientes) · Com. §4.2</p>
+          </div>
+          <div class="stepsimple">
+            <div class="ss"><span class="sn">1</span><div><p class="st">Reabrir paga casi todo al empezar</p><p class="sd">$2,5 M en los primeros 2 años: la entrada de la póliza nueva.</p></div></div>
+            <div class="ss"><span class="sn">2</span><div><p class="st">Quedarse paga poco, pero cada año</p><p class="sd">Unos $0,2 M al año en los años 9 y 10, y algo más con el tiempo. La suma sube despacio.</p></div></div>
+            <div class="ss"><span class="sn">3</span><div><p class="st">En el año 13 se cruzan</p><p class="sd">Ahí lo acumulado por quedarse ($2,8 M) alcanza a lo de reabrir ($2,6 M). Antes, reabrir gana.</p></div></div>
+          </div>
+        </div>
+        <p class="so" style="font-size:18px"><b>Y eso qué:</b> esperar 4 años para cobrar lo mismo es mala cuenta para el asesor. Y ese premio depende de un pago del mes 121 que calcula una persona: si no se hace, el cruce llega en el año 17.</p>
+        <p class="ref">374 pólizas vigentes ya pasaron el mes 121 y Comisiones creía que ninguna: no sabemos si se les está pagando (Databricks, corte 31-oct-2026) · Cuant. §12 · Com. §3</p>
+        <div class="foot"><span>Fuentes: mapeo de esquemas de comisiones OMPEV (Comisiones, 2026) · tabla de vigencia en Databricks · cálculo en creapatrimonio-comisiones §4</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 9 · LIQUIDEZ ═════════ -->
+      <section class="slide" data-title="Cuando no alcanza">
+        <div class="top"><sk-tag sk-style="warning" size="small">Por qué pasa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>Cuando a Ana no le alcanza, la póliza no le dice cómo pausar o pagar menos. Así que se atrasa o cancela.</h2>
+        <div class="cols-62 grow">
+          <div class="card-body">
+            <div><p class="big">4 de 10</p><p class="big-cap">pólizas con más de 7 años tienen cuotas sin pagar y siguen vivas: es una <b>pausa que pasa en la práctica, pero que la póliza no explica</b></p>
+              <div style="margin-top:16px;max-width:520px"><sk-progress-bar value="41" show-value aria-label="41 % con cuotas sin pagar"></sk-progress-bar></div><p class="ref">Book de seguros, pólizas activas con al menos 1 cuota sin pagar: 41 % años 7–8 · 43 % año 9 · 41 % años 10–11 · Cuant. §9</p></div>
+            <ul class="list">
+              <li><i class="pi pi-circle-fill"></i><span><b>La mitad</b> de quienes cancelaron en 2026 venía atrasada en sus cuotas.<span class="ref" style="display:block">Book de seguros: 50 % de las revocaciones de 2026 (57 % en pólizas de 7 años o más) · Cuant. §9</span></span></li>
+              <li><i class="pi pi-circle-fill"></i><span><b>3 de cada 1.000</b> usan el crédito con respaldo de su póliza, aunque 1 de cada 3 tiene cupo.<span class="ref" style="display:block">Book de seguros: 0,3 % de las activas usa el crédito; 31,7 % tiene cupo · Cuant. §9</span></span></li>
+            </ul>
+          </div>
+          <sk-card header="La voz del cliente">
+            <p class="quote">“Yo preferiría hacerlos trimestralmente. Porque soy independiente, mis ingresos mes a mes son muy variables.”<small>Cliente · estudio 2021 · Dovetail §2.7</small></p>
+          </sk-card>
+        </div>
+        <div class="foot"><span>Fuentes: book de seguros (pólizas activas y cancelaciones 2026) · Dovetail, estudio de 2021</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 10 · RETENCIÓN ═════════ -->
+      <section class="slide" data-title="Retención">
+        <div class="top"><sk-tag sk-style="warning" size="small">Por qué pasa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>Cuando Ana llama a cancelar, ya es tarde, y el equipo de retención tiene poco que ofrecerle.</h2>
+        <div class="cols-62 grow">
+          <div class="chart">
+            <p class="lead" style="font-size:18px">De cada 100 clientes que retención logra contactar, cuántos se quedan</p>
+            <div class="bars" id="bars-ret" style="height:240px"></div>
+            <div class="blabels" id="lbl-ret"></div>
+            <p class="ref">Cola de retención de seguros (370 casos, jun–oct 2026): retenidos ÷ clientes contactados · Cuant. §10</p>
+          </div>
+          <div class="card-body">
+            <div><p class="big md">7 de 10</p><p class="big-cap">de los que se van dicen “no tengo plata”</p><p class="ref">70 % de 197 no retenidos, motivo “liquidez” · Cuant. §10</p></div>
+            <div><p class="big md">1 de 5</p><p class="big-cap">de los que se quedaron canceló después</p><p class="ref">17 de 88 retenidos (19 %) · Cuant. §10</p></div>
+            <div><p class="big md">La mitad</p><p class="big-cap">de las llamadas son de pólizas entre los años 8 y 10</p><p class="ref">182 casos (50 %); el año 9 es el más frecuente, con 82 · Cuant. §10</p></div>
+          </div>
+        </div>
+        <div class="foot"><span>Fuente: base de la cola de retención de seguros, junio a octubre 2026 (370 casos; los 361 identificados son de Crea Patrimonio)</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 11 · FONDO VOLUNTARIO ═════════ -->
+      <section class="slide" data-title="Fondo voluntario" style="gap:var(--sk-space-m)">
+        <div class="top"><sk-tag sk-style="warning" size="small">Por qué pasa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>Algunas Anas no se van de Skandia: pasan su plata a un fondo de pensiones.</h2>
+        <div class="cols-62 grow">
+          <div class="card-body">
+            <div><p class="big">4 de 10</p><p class="big-cap">cancelaciones de pólizas con 10 años o más son para trasladar la plata a un fondo de pensiones</p><p class="ref">Book de seguros, motivo de cancelación en Pharos: 39 % en los años 10–11 (16 % en el año 9) · Cuant. §7</p></div>
+            <div class="chart" style="max-width:520px">
+              <p class="lead" style="font-size:17px">Traslados por año</p>
+              <div class="bars" id="bars-afp" style="height:70px"></div>
+              <div class="blabels" id="lbl-afp"></div>
+              <p class="ref">Cancelaciones por “traslado a AFP”, 2026 a octubre · Cuant. §8</p>
+            </div>
+            <p class="lead" style="font-size:19px"><b>6 de cada 10</b> de esos clientes tienen hoy un fondo voluntario en Skandia.</p>
+            <p class="ref">57 % (34 % de los activos). “Traslado a AFP” no dice si es voluntario u obligatorio · Cuant. §8</p>
+          </div>
+          <sk-card header="Skandia ya lo vende así" subheader="Llamada de fidelización del fondo voluntario">
+            <p class="quote">“Tu plata va a seguir rentando, no se te va a penalizar, no se te va a cancelar como en otras entidades.”<small>Agente de fidelización · llamada en Dovetail (no menciona Crea Patrimonio)</small></p>
+          </sk-card>
+        </div>
+        <p class="bridge">El fondo da el mismo beneficio de impuestos, con más libertad. ¿Alguien ya resolvió esto?</p>
+        <div class="foot"><span>Fuentes: book de seguros (motivo “traslado a AFP”; *2026 hasta octubre) · Dovetail, llamadas de fidelización</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 12 · SKANDIA MÉXICO ═════════ -->
+      <section class="slide" data-title="Skandia México">
+        <div class="top"><sk-tag sk-style="success" size="small">Qué podemos hacer</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>Skandia México ya lo resolvió con un producto casi igual: Crea Futuro.</h2>
+        <sk-table id="tabla-mx" paginator="false" density="compact"></sk-table>
+        <p class="so" style="font-size:18px"><b>Y eso qué:</b> la flexibilidad ya está diseñada y aprobada en el mismo grupo. Colombia tiene a su favor la garantía de capital, y el reto es sumar opciones sin perderla.</p>
+        <div class="foot"><span>Fuentes: condiciones generales de Crea Futuro (CNSF, mar-2025) y de Crea Patrimonio (SFC, mar-2026) · Garantía de capital: Cond. 6.1, desde COP 504.000 · Bench §0 y §1.3</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 15 · QUÉ HACEN AFUERA: LIQUIDEZ ═════════ -->
+      <section class="slide" data-title="Afuera: cuando no alcanza" style="gap:var(--sk-space-m)">
+        <div class="top"><sk-tag sk-style="success" size="small">Qué podemos hacer</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:34px">Afuera, cuando al cliente no le alcanza, la póliza le ofrece una pausa o un ajuste, no solo cancelar.</h2>
+        <div class="opts grow">
+          <div class="opt"><div class="oh"><span class="ic"><i class="pi pi-pause"></i></span><h3>Pausar las cuotas</h3></div><p class="who"><b>Afuera:</b> Skandia México (hasta 13 cuotas) y FWD en Tailandia</p><p class="here"><span class="pill mid">A medias</span> Pasa en la práctica desde el año 2, sin nombre ni reglas.</p></div>
+          <div class="opt"><div class="oh"><span class="ic"><i class="pi pi-arrow-down"></i></span><h3>Bajar la cuota sin cancelar</h3></div><p class="who"><b>Afuera:</b> India, hasta la mitad desde el año 5</p><p class="here"><span class="pill no">No</span> La cuota solo puede subir.</p></div>
+          <div class="opt"><div class="oh"><span class="ic"><i class="pi pi-wallet"></i></span><h3>Sacar parte del ahorro y devolverlo</h3></div><p class="who"><b>Afuera:</b> Sura Colombia, hasta 80 %, se puede reintegrar</p><p class="here"><span class="pill mid">A medias</span> Hay retiro parcial, pero paga la penalidad completa.</p></div>
+          <div class="opt"><div class="oh"><span class="ic"><i class="pi pi-credit-card"></i></span><h3>Pedir un préstamo con la póliza</h3></div><p class="who"><b>Afuera:</b> Sura Colombia, hasta 80 % del valor de la póliza</p><p class="here"><span class="pill mid">A medias</span> Solo con un banco aprobado por Skandia.</p></div>
+          <div class="opt"><div class="oh"><span class="ic"><i class="pi pi-sync"></i></span><h3>Pagar la cuota con su propio ahorro</h3></div><p class="who"><b>Afuera:</b> Sura Colombia</p><p class="here"><span class="pill mid">A medias</span> Solo desde el año 2 y solo el costo del seguro.</p></div>
+          <div class="opt"><div class="oh"><span class="ic"><i class="pi pi-shield"></i></span><h3>Dejar de pagar y conservar algo</h3></div><p class="who"><b>Afuera:</b> Sura y Skandia México (póliza saldada o prorrogada)</p><p class="here"><span class="pill no">No</span> La póliza no lo ofrece.</p></div>
+          <div class="opt"><div class="oh"><span class="ic"><i class="pi pi-refresh"></i></span><h3>Reactivar una póliza caída</h3></div><p class="who"><b>Afuera:</b> Skandia México y Sura</p><p class="here"><span class="pill no">No aparece</span> La póliza no lo menciona.</p></div>
+          <div class="opt sum"><p class="sbig">4 + 3</p><p class="scap">De estas 7 opciones, Crea Patrimonio tiene <b>4 a medias</b> y <b>3 no las tiene</b>.</p></div>
+        </div>
+        <p class="so" style="font-size:17px"><b>Y eso qué:</b> afuera “no puedo pagar” se vuelve una pausa o un ajuste. Ojo: “no tengo plata” también es la respuesta más fácil en una llamada de retención; la mitad de quienes cancelaron en 2026 venía atrasada.</p>
+        <p class="ref">Bench §2 y §7.1 · Sura: condicionado F-02-81-530 (cl. 5.3 a 5.6) · India: IRDAI 2019 · Skandia México: condiciones de Crea Futuro. No sabemos si el ramo de pensiones impone estas restricciones: pregunta abierta para Laura y Actuaría</p>
+        <div class="foot"><span>Fuente: bench, secciones 2 y 7.1 (condicionados, reguladores y prensa especializada, citados uno a uno en el documento)</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 16 · QUÉ HACEN AFUERA: ASESOR Y CANAL ═════════ -->
+      <section class="slide" data-title="Afuera: asesor y canal" style="gap:var(--sk-space-m)">
+        <div class="top"><sk-tag sk-style="success" size="small">Qué podemos hacer</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:34px">Afuera también cambiaron cómo se le paga al asesor y cómo se vende.</h2>
+        <div class="cols grow" style="grid-template-columns:1fr 1fr">
+          <sk-card header="Cómo se le paga al asesor">
+            <ul class="list" style="gap:8px">
+              <li style="font-size:16px"><i class="pi pi-check"></i><span><b>Australia:</b> 60 % de comisión al vender y 20 % cada año que el cliente siga. Si la póliza cae en el año 1 o 2, el asesor devuelve el 100 % o el 60 %.</span></li>
+              <li style="font-size:16px"><i class="pi pi-check"></i><span><b>Malasia:</b> no se paga comisión si la póliza nueva reemplaza a otra.</span></li>
+              <li style="font-size:16px"><i class="pi pi-check"></i><span><b>EE. UU.:</b> antes de reemplazar, el cliente recibe por escrito qué penalidad paga, qué pierde y si el reloj vuelve a cero.</span></li>
+              <li style="font-size:16px"><i class="pi pi-check"></i><span><b>Singapur:</b> parte del bono del asesor depende de la calidad de la asesoría, no de cuánto vendió.</span></li>
+            </ul>
+            <p class="ref">Bench §4.2 Australia · §4.4 EE. UU. · §4.5 Malasia y Singapur</p>
+          </sk-card>
+          <sk-card header="Cómo se vende: por internet se quedan más">
+            <div class="chart">
+              <p class="lead" style="font-size:16px">India: de cada 100 pólizas, cuántas siguen pagando</p>
+              <div class="bars" id="bars-canal" style="height:110px"></div>
+              <div class="blabels" id="lbl-canal"></div>
+              <div class="legend" style="font-size:14px"><span><i style="background:#c4c9c5"></i>Compraron con un agente</span><span><i style="background:var(--sk-color-primary,#00c73d)"></i>Compraron por internet</span></div>
+              <p class="ref">IRDAI vía Cafemutual (oct-2026), período no indicado · Bench §3.2. Ojo: quien compra solo suele llegar más convencido. En Skandia aún no se puede comparar: las cohortes digitales no llegan al año 8.</p>
+            </div>
+          </sk-card>
+        </div>
+        <p class="so" style="font-size:18px"><b>Y eso qué:</b> en Australia, con la comisión casi toda al vender, 45 de cada 100 asesorías revisadas eran deficientes; con otros esquemas, 7. Por eso cambiaron cómo se paga.</p>
+        <p class="ref">ASIC REP 413 (oct. 2014), ~200 expedientes: 45 % de asesoría no conforme con comisión inicial frente a 7 % con otras estructuras · Bench §4.2</p>
+        <div class="foot"><span>Fuente: bench, secciones 3 y 4 (condicionados, reguladores y prensa especializada, citados uno a uno en el documento)</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 14 · OPORTUNIDADES ═════════ -->
+      <section class="slide" data-title="Oportunidades">
+        <div class="top"><sk-tag sk-style="success" size="small">Qué podemos hacer</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2>Las oportunidades con más potencial.</h2>
+        <div class="cols-3 grow">
+          <sk-card header="Cuando a Ana no le alcanza">
+            <ul class="list">
+              <li style="font-size:18px"><i class="pi pi-check"></i><span><b>Volver la pausa una opción oficial</b> y que Ana sepa cuántas cuotas puede saltar. <sk-tag sk-style="info" size="small">Ya existe a medias</sk-tag></span></li>
+              <li style="font-size:18px"><i class="pi pi-check"></i><span><b>Bajar la cuota o la meta</b> sin tener que cancelar.</span></li>
+              <li style="font-size:18px"><i class="pi pi-check"></i><span><b>Dejar de pagar sin perderlo todo</b> (póliza saldada) o sacar una parte con un cargo conocido.</span></li>
+            </ul>
+          </sk-card>
+          <sk-card header="Lo que Ana ve">
+            <ul class="list">
+              <li style="font-size:18px"><i class="pi pi-check"></i><span><b>Una lista año por año</b> de cuánto recibe si cancela en el año 8, en el 9, en el 10… Hoy solo ve una proyección al firmar.</span></li>
+              <li style="font-size:18px"><i class="pi pi-check"></i><span><b>Una sola versión del año 8</b>, igual en la venta y en la póliza. <sk-tag sk-style="info" size="small">Ya existe a medias</sk-tag></span></li>
+            </ul>
+          </sk-card>
+          <sk-card header="Cómo se vende y se paga">
+            <ul class="list">
+              <li style="font-size:18px"><i class="pi pi-check"></i><span><b>Cero comisión si la póliza nueva reemplaza a otra</b>, como en Malasia. Hoy no hay control.</span></li>
+              <li style="font-size:18px"><i class="pi pi-check"></i><span><b>Pagarle al asesor</b> por que Ana se quede, no solo por vender.</span></li>
+              <li style="font-size:18px"><i class="pi pi-check"></i><span><b>Más venta digital:</b> en India, al año siguen 86 de cada 100 compras por internet y 67 de las hechas con agente; a los 5 años, 71 y 47.</span></li>
+            </ul>
+          </sk-card>
+        </div>
+        <p class="so" style="font-size:18px">Son hipótesis para validar. Ojo con la venta digital: quien compra solo suele llegar más convencido. Las soluciones las vamos a construir con los asesores en los talleres.</p>
+        <p class="ref">Cada práctica frente a Crea Patrimonio: Bench §7.1 · “Ya existe a medias”: Cuant. §5 y §9 · India: persistencia al mes 13 (86 % online, 67 % agentes) y al mes 61 (71 % y 47 %), IRDAI vía Cafemutual, periodo no indicado · Bench §3.2</p>
+        <div class="foot"><span>Fuente: mapa de 24 prácticas frente a Crea Patrimonio (bench, sección 7.1) · India: datos IRDAI vía Cafemutual, oct-2026, sin periodo indicado</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 18 · CIERRE ═════════ -->
+      <section class="slide dark" data-title="Cierre">
+        <div class="top"><span class="eyebrow">En resumen</span><sk-logo sk-style="blanco" style="height: 24px"></sk-logo></div>
+        <h2>El problema no es Ana ni el asesor: es cómo está armado el sistema.</h2>
+        <div class="chain">
+          <div class="link"><h3>Un producto rígido</h3><p>No le dice a Ana cómo pausar o pagar menos cuando no le alcanza.</p><p class="ref">Cuant. §9 · Bench §7.1</p></div>
+          <i class="pi pi-plus arrow"></i>
+          <div class="link"><h3>Una venta a 8 años</h3><p>El año 8 se vende como salida sin pérdida, pero aún hay descuento.</p><p class="ref">Cuant. §2 y §3</p></div>
+          <i class="pi pi-plus arrow"></i>
+          <div class="link"><h3>Comisión al inicio</h3><p>Reabrir paga 5 veces más que retener. El premio por quedarse llega tarde: recién desde el año 13.</p><p class="ref">Com. §3 y §4 · mapeo de comisiones OMPEV</p></div>
+          <i class="pi pi-arrow-right arrow"></i>
+          <div class="link out"><h3>Todos empujan a la salida</h3><p>Las salidas se duplican en el año 9.</p><p class="ref">Book de seguros: 5,6 % → 11,3 % · Cuant. §7</p></div>
+        </div>
+        <div class="grow" style="display:grid;align-content:start;gap:var(--sk-space-s)">
+          <p class="eyebrow" style="margin-bottom:4px">Lo que sigue</p>
+          <ul class="list">
+            <li><i class="pi pi-calendar"></i><span><b>19 de noviembre:</b> sesión con Producto para decidir qué llevamos al taller</span></li>
+            <li><i class="pi pi-users"></i><span><b>Finales de noviembre:</b> taller con FPs para validar lo que encontramos y construir las soluciones juntos (siguiente slide)</span></li>
+          </ul>
+        </div>
+        <div class="foot"><span>Detalle completo en la bóveda: 01-Proyectos/creapatrimonio</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 19 · LO QUE SIGUE: EL TALLER ═════════ -->
+      <section class="slide" data-title="Lo que sigue: el taller" style="gap:var(--sk-space-m)">
+        <div class="top"><sk-tag sk-style="success" size="small">Lo que sigue</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 style="font-size:32px">Un taller con FPs para validar lo que encontramos y construir las soluciones juntos.</h2>
+        <p class="lead" style="font-size:17px"><b>Para qué:</b> contrastar con quienes acompañan a Ana si esta es la historia que viven, escuchar cómo viven el incentivo sin señalar a nadie, y priorizar qué probar primero. <i>Propuesta preliminar: duración, número de FPs y formato están por definir.</i></p>
+        <div class="cols-3 grow" style="grid-template-columns:1fr 1.25fr 1fr;gap:var(--sk-space-m)">
+          <sk-card header="Antes: pre-work (1 semana)">
+            <ul class="list" style="gap:8px">
+              <li style="font-size:15px"><i class="pi pi-check"></i><span><b>Cada FP cuenta un caso</b> (15 min, sin nombres): el último cliente con 7 años o más que quiso cancelar. Qué pasó y qué le ofreció.</span></li>
+              <li style="font-size:15px"><i class="pi pi-check"></i><span><b>Lee la historia de Ana</b> en una página: resumen de este diagnóstico.</span></li>
+              <li style="font-size:15px"><i class="pi pi-check"></i><span><b>Marca</b> cuáles de las 7 opciones para cuando no alcanza ya le han pedido sus clientes.</span></li>
+              <li style="font-size:15px"><i class="pi pi-check"></i><span><b>El equipo</b> junta los casos, quita datos personales y arma el mapa de Ana.</span></li>
+            </ul>
+          </sk-card>
+          <sk-card header="Durante: 3 horas">
+            <ul class="list" style="gap:6px">
+              <li style="font-size:15px"><i class="pi pi-clock"></i><span><b>0:00 · Cómo trabajamos.</b> Sin nombres y sin culpas. 15 min</span></li>
+              <li style="font-size:15px"><i class="pi pi-clock"></i><span><b>0:15 · ¿Esta es la historia de Ana?</b> Validamos los hallazgos con sus casos. 35 min</span></li>
+              <li style="font-size:15px"><i class="pi pi-clock"></i><span><b>0:50 · Cuando a Ana no le alcanza.</b> Qué hacen hoy y qué necesitarían de las 7 opciones. 50 min</span></li>
+              <li style="font-size:15px"><i class="pi pi-clock"></i><span><b>1:50 · Qué premia hoy el esquema</b> y qué haría que quedarse también convenga. 45 min (pausa de 10 min antes)</span></li>
+              <li style="font-size:15px"><i class="pi pi-clock"></i><span><b>2:35 · Priorizar:</b> más impacto y menos esfuerzo. 25 min</span></li>
+            </ul>
+          </sk-card>
+          <sk-card header="Después: lo que esperamos">
+            <ul class="list" style="gap:8px">
+              <li style="font-size:15px"><i class="pi pi-check"></i><span><b>Una lista priorizada</b> de oportunidades, validada por los FPs.</span></li>
+              <li style="font-size:15px"><i class="pi pi-check"></i><span><b>2 o 3 ideas con un primer boceto</b> de cómo funcionarían para Ana y para el asesor.</span></li>
+              <li style="font-size:15px"><i class="pi pi-check"></i><span><b>La voz del asesor</b> sobre el incentivo, que hoy es solo hipótesis.</span></li>
+              <li style="font-size:15px"><i class="pi pi-check"></i><span><b>Lo que falta medir</b>, para el siguiente paso con Producto.</span></li>
+            </ul>
+          </sk-card>
+        </div>
+        <div class="foot"><span>Taller: finales de noviembre · Antes, el 19 de noviembre: sesión con Producto para decidir qué llevamos</span><span class="pg"></span></div>
+      </section>
+
+    </div></div>
+
+    <div class="nav">
+      <sk-button id="prev" icon="pi pi-arrow-left" sk-type="secondary" size="small" aria-label="Slide anterior"></sk-button>
+      <span class="count" id="count">1 / 14</span>
+      <sk-button id="next" icon="pi pi-arrow-right" size="small" aria-label="Slide siguiente"></sk-button>
+    </div>
+  </template>
+
+  <script>
+    // Datos de los gráficos (ver creapatrimonio-cuantitativo-databricks.md)
+    const DATA = {
+      anios: { max: 12, h: 236, rows: [
+        ['1', 10.0, 'dk'], ['2', 5.5, 'dk'], ['3', 1.4], ['4', 1.9], ['5', 2.6],
+        ['6', 3.2], ['7', 4.4], ['8', 5.6], ['9', 11.3, 'hi'], ['10', 11.3, 'hi'] ], prefix: 'Año ' },
+      cohorte: { max: 18, h: 215, groups: [['Vendidas en 2016', 5.7, 9.2], ['Vendidas en 2017', 5.9, 10.2], ['Vendidas en 2018', 5.6, 17.1]] },
+      ret: { max: 55, h: 240, rows: [['Años 1–2', 38], ['Años 3–6', 51], ['Años 7–8', 29], ['Año 9', 14, 'hi'], ['Años 10–11', 27]] },
+      afp: { max: 100, h: 70, rows: [['2024', 14], ['2025', 57], ['2026*', 92, 'hi']] },
+      reemp: { max: 13, h: 120, base: 1.6, rows: [['Año 1', 5.5], ['Año 2', 1.9], ['Años 3–6', 2.8], ['Años 7–8', 4.6], ['Año 9', 9.7, 'hi'], ['Años 10–11', 12.1, 'hi']] },
+      // creapatrimonio-comisiones §1 y §4 (script comisiones_ana.py): Ana, cuota $600 mil, agencias; millones de pesos
+      com: { max: 2.2, h: 160, rows: [['Mes 1: entrada', 2.016, 'hi'], ['Mes 19', 0.504, 'hi'], ['Año 9', 0.233], ['Año 10', 0.265], ['Año 11 (si se paga)', 0.684, 'dk']] },
+      // acumulado desde el año 9 (años 9 a 20), millones; script comisiones_ana.py, agencias (Com. §4.2)
+      acum: { quedarse: [0.233, 0.498, 1.182, 1.945, 2.791, 3.723, 4.744, 5.858, 7.069, 8.381, 9.797, 11.322],
+              reabrir:  [2.016, 2.520, 2.520, 2.520, 2.630, 2.767, 2.932, 3.127, 3.352, 3.609, 4.273, 5.016] },
+      // tabla de vigencia (Cuant. §12): de las pólizas con cancelación en cada año, % que se reactivan
+      react: { max: 50, h: 170, rows: [['Año 1', 14], ['Año 2', 47, 'dk'], ['Año 3', 4], ['Año 4', 3], ['Año 5', 6], ['Año 6', 10], ['Año 7', 17], ['Año 8', 11], ['Año 9', 8, 'hi'], ['Año 10', 7]] },
+      // India, persistencia por canal (Bench §3.2): [momento, agente, internet]
+      canal: { max: 100, h: 110, groups: [['Al año (mes 13)', 67, 86], ['A los 5 años (mes 61)', 47, 71]] },
+    };
+    const fmt = (v) => (Number.isInteger(v) ? String(v) : v.toFixed(1).replace('.', ','));
+
+    function bars(root, id, { max, h, rows }, prefix = '', suf = '') {
+      const b = root.querySelector('#bars-' + id), l = root.querySelector('#lbl-' + id);
+      rows.forEach(([lab, v, cls]) => {
+        const col = document.createElement('div'); col.className = 'bcol';
+        col.innerHTML = `<span class="bval ${cls === 'hi' ? 'hi' : ''}">${fmt(v)}${suf}</span><div class="bar ${cls || ''}" style="height:${(v / max) * (h - 34)}px"></div>`;
+        col.title = `${prefix}${lab}: ${fmt(v)}`;
+        b.append(col);
+        const s = document.createElement('span'); s.textContent = prefix + lab; l.append(s);
+      });
+    }
+    function cohort(root, { max, h, groups }, id = 'cohorte', names = ['año 8', 'año 9'], unit = ' de cada 100', suf = '') {
+      const b = root.querySelector('#bars-' + id), l = root.querySelector('#lbl-' + id);
+      groups.forEach(([lab, a8, a9]) => {
+        const g = document.createElement('div'); g.className = 'bcol'; g.style.flexDirection = 'row'; g.style.alignItems = 'flex-end'; g.style.gap = '8px';
+        [[a8, ''], [a9, 'hi']].forEach(([v, cls]) => {
+          const c = document.createElement('div'); c.className = 'bcol';
+          c.innerHTML = `<span class="bval ${cls}">${fmt(v)}${suf}</span><div class="bar ${cls}" style="height:${(v / max) * (h - 34)}px"></div>`;
+          c.title = `${lab}, ${cls ? names[1] : names[0]}: ${fmt(v)}${unit}`;
+          g.append(c);
+        });
+        b.append(g);
+        const s = document.createElement('span'); s.textContent = lab; l.append(s);
+      });
+    }
+
+    // Reapertura por canal y ventana (tabla de Data, 3-nov): [canal, clientes, 0-6, 6-12, 12+]
+    const REAB = [['Agencias', 684, 46, 9, 55], ['Empleados', 381, 20, 6, 26], ['Seguros', 1055, 33, 9, 42], ['Total', 5789, 320, 65, 385]];
+    function stack(root, id) {
+      const el = root.querySelector('#' + id), pc = (a, n) => (a / n) * 100, f1 = (v) => v.toFixed(1).replace('.', ',') + ' %', MAX = 10;
+      let h = `<div class="r h"><span></span><span>Cuándo abrieron la nueva</span><span style="text-align:center">Nueva en 6 a 12 meses</span><span style="text-align:right">En 12 meses</span></div>`;
+      REAB.forEach(([c, n, a, b, d]) => {
+        const w = (x) => ((pc(x, n) / MAX) * 100).toFixed(2) + '%';
+        h += `<div class="r ${c === 'Total' ? 'tot' : ''}"><span class="lab">${c}</span><div class="tr"><i style="width:${w(a)};background:#00c73d;border-radius:6px 0 0 6px"></i><i style="width:${w(b)};background:#232323;border-radius:0 6px 6px 0"></i></div><span class="v mid">${f1(pc(b, n))}</span><span class="v">${f1(pc(d, n))}</span></div>`;
+      });
+      el.innerHTML = h;
+    }
+
+    // Línea acumulada de lo que cobra el asesor: quedarse frente a reabrir (slide 10)
+    function lineAcum(root, id) {
+      const el = root.querySelector('#' + id), { quedarse: q, reabrir: r } = DATA.acum;
+      const W = 600, H = 262, m = { l: 40, r: 92, t: 18, b: 34 }, n = q.length, ymax = 12;
+      const x = (i) => m.l + (i * (W - m.l - m.r)) / (n - 1), y = (v) => H - m.b - (v / ymax) * (H - m.t - m.b);
+      const pts = (a) => a.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+      let g = '';
+      [0, 3, 6, 9, 12].forEach((v) => { g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="#e3e6e3"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end" font-size="12" fill="#666">${v}</text>`; });
+      q.forEach((_, i) => { g += `<text x="${x(i)}" y="${H - 12}" text-anchor="middle" font-size="12" fill="#666">${9 + i}</text>`; });
+      const cx = x(4);
+      g += `<text x="${(m.l + W - m.r) / 2}" y="${H - 0}" text-anchor="middle" font-size="12" fill="#666" dy="0"></text>`;
+      g += `<line x1="${cx}" x2="${cx}" y1="${y(0)}" y2="${m.t + 8}" stroke="#404040" stroke-dasharray="4 4"/>`;
+      g += `<polyline points="${pts(r)}" fill="none" stroke="#00c73d" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>`;
+      g += `<polyline points="${pts(q)}" fill="none" stroke="#404040" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>`;
+      g += `<circle cx="${cx}" cy="${y(q[4])}" r="7" fill="#fff" stroke="#232323" stroke-width="3"/>`;
+      g += `<text x="${cx + 8}" y="${m.t + 12}" font-size="14" font-weight="700" fill="#232323">Año 13: se cruzan</text>`;
+      g += `<text x="${x(n - 1) + 8}" y="${y(q[n - 1]) + 5}" font-size="14" font-weight="700" fill="#232323">$${fmt(q[n - 1])} M</text><text x="${x(n - 1) + 8}" y="${y(q[n - 1]) + 21}" font-size="12" fill="#555">si se queda</text>`;
+      g += `<text x="${x(n - 1) + 8}" y="${y(r[n - 1]) + 5}" font-size="14" font-weight="700" fill="#03a835">$${fmt(r[n - 1])} M</text><text x="${x(n - 1) + 8}" y="${y(r[n - 1]) + 21}" font-size="12" fill="#555">si reabre</text>`;
+      g += `<text x="${x(0) + 6}" y="${y(4.4)}" font-size="13" font-weight="700" fill="#03a835">Reabrir: $2,0 M al empezar</text><line x1="${x(0)}" x2="${x(0)}" y1="${y(4.0)}" y2="${y(r[0]) - 6}" stroke="#03a835" stroke-width="2"/>`;
+      g += `<text x="${m.l}" y="${m.t - 4}" font-size="12" fill="#666">Año de la póliza original →</text>`;
+      el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Acumulado que cobra el asesor: quedarse frente a reabrir, años 9 a 20">${g}</svg>`;
+    }
+
+    customElements.whenDefined('sk-button').then(() => {
+      const ui = document.importNode(document.getElementById('ui').content, true);
+      const $ = (s) => ui.querySelector(s);
+
+      // 1) Datos complejos ANTES de montar
+      $('#tabla-mx').columns = [
+        { field: 'q', header: '¿Qué puede hacer Ana?', width: '25%' },
+        { field: 'co', header: 'En Colombia (Crea Patrimonio)', width: '22%' },
+        { field: 'mx', header: 'En México (Crea Futuro)', width: '22%' },
+        { field: 'ayuda', header: 'Cómo mejora su experiencia', width: '31%' },
+      ];
+      $('#tabla-mx').value = [
+        { q: 'Pausar sus cuotas sin perder la póliza', co: 'Pasa en la práctica, pero no está en la póliza', mx: 'Sí: hasta 13 cuotas, escritas en la póliza', ayuda: 'Un mal mes no la obliga a cancelar.' },
+        { q: 'Dejar de pagar y quedarse con algo', co: 'No', mx: 'Sí: una póliza más pequeña, ya pagada', ayuda: 'Si ya no puede pagar, no pierde todo lo que puso.' },
+        { q: 'Reactivar la póliza si se le cae', co: 'No aparece en la póliza', mx: 'Sí, si Skandia lo autoriza', ayuda: 'Puede volver sin abrir una póliza nueva ni empezar la penalidad de cero.' },
+        { q: 'Sacar sus aportes extra sin castigo', co: 'No está claro', mx: 'Sí', ayuda: 'Se anima a aportar más porque sabe que puede sacarlo.' },
+        { q: 'Recibir al menos lo que puso, si llega al final', co: 'Sí, si la cuota es de 504 mil o más', mx: 'No aparece', ayuda: 'Sabe que su ahorro está protegido si llega hasta el final.' },
+      ];
+      bars(ui, 'anios', DATA.anios, 'Año ', ' %');
+      bars(ui, 'react', DATA.react, '', ' %');
+      bars(ui, 'com', DATA.com, '', ' M');
+      lineAcum(ui, 'line-acum');
+      stack(ui, 'stk-reab');
+      cohort(ui, DATA.canal, 'canal', ['con agente', 'por internet'], ' de cada 100', ' %');
+      cohort(ui, DATA.cohorte, 'cohorte', ['año 8', 'año 9'], ' de cada 100', ' %');
+      bars(ui, 'ret', DATA.ret, '', ' %');
+      bars(ui, 'afp', DATA.afp);
+      bars(ui, 'reemp', DATA.reemp, '', ' %');
+      {
+        const { max, h, base } = DATA.reemp, line = document.createElement('div');
+        line.className = 'baseline';
+        line.style.bottom = `${(base / max) * (h - 34)}px`;
+        line.title = 'Un cliente que no cancela abre otra póliza en 1,6 de cada 100 casos en el mismo lapso';
+        ui.querySelector('#bars-reemp').append(line);
+      }
+
+      // 2) Navegación
+      const slides = [...ui.querySelectorAll('.slide')];
+      slides.forEach((s, i) => s.querySelector('.pg') && (s.querySelector('.pg').textContent = `${i + 1} / ${slides.length}`));
+      let cur = 0;
+      const go = (n) => {
+        cur = Math.max(0, Math.min(slides.length - 1, n));
+        slides.forEach((s, i) => s.classList.toggle('active', i === cur));
+        document.getElementById('count').textContent = `${cur + 1} / ${slides.length}`;
+        history.replaceState(null, '', '#' + (cur + 1));
+      };
+      $('#prev').addEventListener('skClick', () => go(cur - 1));
+      $('#next').addEventListener('skClick', () => go(cur + 1));
+      document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+        if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+        if (e.key === 'Home') go(0);
+        if (e.key === 'End') go(slides.length - 1);
+      });
+      const fit = () => {
+        const k = Math.min((innerWidth - 32) / 1280, (innerHeight - 72) / 720);
+        document.documentElement.style.setProperty('--k', Math.max(0.3, k));
+      };
+      addEventListener('resize', fit);
+
+      // 3) Montar
+      document.getElementById('app').append(ui);
+      fit();
+      go((parseInt(location.hash.slice(1), 10) || 1) - 1);
+    });
+  </script>
+</body>
+</html>
