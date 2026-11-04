@@ -46,6 +46,7 @@
   --feedback-warning-dark: #ffae08;
   --feedback-warning-light: #fff3e0;
   --feedback-success-light: #ecfdf3;
+  --feedback-error-light: #fff5f4;
   --feedback-error-dark: #e03430;
   --feedback-success-dark: #16d727;
 
@@ -423,12 +424,12 @@ svg { display: block; flex: none; }
 .dot { width: 11px; height: 11px; border-radius: 50%; }
 .btn-secondary {
   display: inline-flex; align-items: center; gap: 10px;
-  height: 46px; padding: 0 20px;
+  height: 48px; padding: 0 20px;
   border: 1px solid var(--primary-00); border-radius: var(--radius-pill);
   background: var(--neutral-00); color: var(--primary-00);
-  font: 700 18px/1 var(--font-heading);
+  font: 700 14px/1 var(--font-heading);
 }
-.btn-secondary:hover { background: var(--primary-l05); }
+.btn-secondary:hover { background: var(--button-brand-secondary-hover, var(--primary-l04)); }
 
 /* Cajitas de desglose: el valor puede ocupar dos líneas para que siempre quepa */
 .kpi-metrics .metric { padding: 8px 6px; }
@@ -495,11 +496,13 @@ svg { display: block; flex: none; }
 .reading-text b { font-weight: 700; }
 
 .actions { display: flex; flex-direction: column; gap: 12px; }
-.btn-primary, .btn-outline { height: 48px; width: 100%; border-radius: var(--radius-pill); font: 700 14px/1 var(--font-body); }
+.btn-primary, .btn-outline { height: 48px; width: 100%; border-radius: var(--radius-pill); font: 700 14px/1 var(--font-heading); }
 .btn-primary { border: 0; background: var(--primary-00); color: var(--texts-white); }
 .btn-primary:hover { background: var(--primary-d01); }
 .btn-outline { border: 1px solid var(--primary-00); background: var(--neutral-00); color: var(--primary-d01); }
-.btn-outline:hover { background: var(--primary-l05); }
+.btn-outline:hover { background: var(--primary-l04); }
+/* Botones: texto Montserrat 700, 14px; alturas Small 30px y Large 48px; deshabilitado en gris */
+.btn-primary:disabled, .btn-outline:disabled { background: var(--neutral-l03); border-color: var(--neutral-l03); color: rgb(64 64 64 / 0.4); cursor: not-allowed; }
 .actions-note { margin: 0; font-size: 12.5px; color: var(--texts-medium); }
 /* Dueño y asesores: gráfica a la izquierda; lectura y CTA del plan de acción a la derecha, en un mismo contenedor */
 .owner-chart { margin-bottom: var(--space-4); }
@@ -565,7 +568,7 @@ svg { display: block; flex: none; }
 .goal.is-off { opacity: 0.55; }
 .goal-check { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--texts-dark); cursor: pointer; }
 .goal-check b { font-weight: 700; color: var(--texts-strong); }
-.goal-check input { width: 18px; height: 18px; accent-color: var(--primary-00); margin: 0; flex: none; }
+
 .goal-edit { display: flex; align-items: center; gap: 6px; }
 .goal-affix { font-size: 14px; color: var(--texts-dark); white-space: nowrap; }
 .goal-input {
@@ -581,6 +584,81 @@ svg { display: block; flex: none; }
 
 .field { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .field-label { padding: 0; font: 700 14px/1.3 var(--font-body); color: var(--texts-strong); }
+.field-opt { font-weight: 400; color: var(--texts-medium); }
+/* Seguimiento del plan de acción */
+.plan-seg { margin-bottom: var(--space-3); background: var(--neutral-l02); box-shadow: none; }
+/* Sobre el fondo gris, los encabezados de la tabla y el paso actual van en blanco */
+.plan-seg .th { background: var(--neutral-00); }
+.plan-seg .seg-steps li.is-now::before { background: var(--neutral-00); }
+.seg-steps { list-style: none; margin: 8px 0 20px; padding: 0; display: flex; gap: 8px; counter-reset: paso; }
+.seg-steps li { flex: 1; position: relative; padding-top: 30px; font: 600 12.5px/1.3 var(--font-body); color: var(--texts-medium); text-align: center; }
+.seg-steps li::before { counter-increment: paso; content: counter(paso); position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--neutral-l03); color: var(--texts-dark); font: 700 12px/1 var(--font-body); z-index: 1; }
+.seg-steps li::after { content: ""; position: absolute; top: 11px; left: calc(-50% + 16px); right: calc(50% + 16px); height: 2px; background: var(--neutral-l03); }
+.seg-steps li:first-child::after { display: none; }
+.seg-steps li.is-done::before { content: "✓"; background: var(--primary-00); color: var(--texts-white); }
+.seg-steps li.is-done::after, .seg-steps li.is-now::after { background: var(--primary-00); }
+.seg-steps li.is-now { color: var(--texts-strong); }
+.seg-steps li.is-now::before { background: var(--neutral-00); color: var(--primary-d01); box-shadow: inset 0 0 0 2px var(--primary-00); }
+.table--seg tbody td { text-align: center; }
+.seg-bar { display: flex; align-items: center; gap: 8px; min-width: 140px; }
+.seg-bar-track { flex: 1; height: 8px; border-radius: 999px; background: var(--neutral-l03); overflow: hidden; }
+.seg-bar-fill { display: block; height: 100%; border-radius: inherit; background: var(--primary-00); }
+.seg-bar-fill--warning { background: var(--feedback-warning-dark); }
+.seg-bar-val { font: 700 13px/1 var(--font-body); color: var(--texts-strong); min-width: 34px; text-align: right; }
+.seg-nota { margin: 12px 0 8px; font-size: 13px; color: var(--texts-medium); }
+.modal-actions--end { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+.modal-actions--end .btn-primary, .modal-actions--end .btn-outline { width: auto; padding: 0 28px; }
+@media (max-width: 768px) { .modal-actions--end { flex-direction: column-reverse; } .modal-actions--end .btn-primary, .modal-actions--end .btn-outline { width: 100%; } }
+/* Confirmación con la estructura de las modales de Skandia: X arriba, ícono en círculo, título y texto centrados, botón a todo el ancho */
+.modal.modal--confirm { max-width: 440px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 40px var(--space-4) var(--space-4); }
+.confirm-icon { width: 88px; height: 88px; border-radius: 50%; display: grid; place-items: center; background: var(--feedback-warning-light); color: var(--feedback-warning-dark); }
+/* Tipografía del DS: título Section Title H2 Bold (24/32), texto Body (16/24); espacios en múltiplos de 8 */
+.confirm-title { margin: var(--space-3) 0 var(--space-2); font: 700 24px/32px var(--font-heading); color: var(--texts-strong); }
+.confirm-desc { margin: 0 0 var(--space-4); font: 400 16px/24px var(--font-body); color: var(--texts-dark); }
+.confirm-desc b { font-weight: 700; }
+.confirm-desc p { margin: 0; }
+.confirm-desc p + p { margin-top: var(--space-2); }
+/* Datos de la meta que se elimina */
+.confirm-meta { padding: var(--space-1) var(--space-2); border-radius: 8px; background: var(--neutral-l02); font-size: 14px; line-height: 22px; color: var(--texts-dark); }
+.confirm-actions { align-self: stretch; display: flex; flex-direction: column; gap: var(--space-2); }
+.sk-alert--warning { background: var(--feedback-warning-light); border-color: var(--feedback-warning-dark); }
+.sk-alert--warning .sk-alert__icon { color: var(--feedback-warning-dark); }
+.ruta-vacia { margin: 0; font-size: 14px; color: var(--texts-medium); }
+.seg-steps li.is-off::before { content: "×"; background: var(--neutral-l05); color: var(--texts-white); }
+.ruta-metas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ruta-metas > li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px 16px; padding: 12px 0; border-bottom: 1px solid var(--neutral-l04); }
+.ruta-metas > li:last-child { border-bottom: 0; }
+.ruta-meta-name { font: 600 14px/1.4 var(--font-body); color: var(--texts-strong); }
+.ruta-meta-val { display: block; margin-top: 2px; font: 400 13px/1.4 var(--font-body); color: var(--texts-dark); }
+.ruta-meta-val b { font-weight: 700; color: var(--texts-strong); }
+.ruta-metas > li.is-descartada .ruta-meta-name, .ruta-metas > li.is-descartada .ruta-meta-val { color: var(--texts-medium); text-decoration: line-through; }
+.ruta-meta-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.btn-xs { height: 30px; padding: 0 14px; border-radius: var(--radius-pill); border: 1px solid var(--primary-00); background: var(--neutral-00); color: var(--primary-d01); font: 700 13px/1 var(--font-heading); white-space: nowrap; cursor: pointer; }
+.btn-xs:hover { background: var(--primary-l04); }
+.btn-xs--primary { background: var(--primary-00); color: var(--texts-white); }
+.btn-xs--primary:hover { background: var(--primary-d01); }
+.btn-xs--ghost { border-color: transparent; background: none; }
+.btn-xs { display: inline-flex; align-items: center; gap: 6px; }
+/* Descartar: solo ícono de papelera */
+.btn-icon { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 50%; background: none; color: var(--texts-medium); cursor: pointer; }
+.btn-icon:hover { background: var(--feedback-error-light); color: var(--feedback-error-dark); }
+.ruta-meta-edit { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 13px; color: var(--texts-dark); }
+.ruta-meta-edit .goal-input { width: 76px; height: 30px; font-size: 14px; }
+@media (max-width: 768px) { .ruta-metas > li { grid-template-columns: minmax(0, 1fr) auto; } .ruta-meta-acts { grid-column: 1 / -1; justify-content: flex-start; } }
+.ruta-own-metas { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; }
+.ruta-own-metas li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--neutral-l03); font-size: 14px; color: var(--texts-dark); }
+.ruta-own-metas li:last-child { border-bottom: 0; }
+.ruta-own-metas b { font-weight: 700; color: var(--texts-strong); white-space: nowrap; }
+.ruta-own-actions { display: flex; gap: 12px; margin-top: 8px; }
+.ruta-own-actions .btn-primary, .ruta-own-actions .btn-outline { width: auto; padding: 0 28px; }
+.ruta-own-actions[hidden] { display: none; }
+@media (max-width: 768px) { .ruta-own-actions { flex-direction: column; } .ruta-own-actions .btn-primary, .ruta-own-actions .btn-outline { width: 100%; } }
+@media (max-width: 768px) { .seg-steps li { font-size: 11px; } }
+/* La leyenda de un fieldset no respeta el gap del flex: se separa con margen */
+legend.field-label { margin-bottom: 12px; }
+/* Plazo personalizado: aparece al elegir "Otro" */
+.plazo-otro { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--texts-dark); }
+.plazo-otro[hidden] { display: none; }
 .opt { font-weight: 400; color: var(--texts-medium); }
 .field textarea {
   width: 100%; resize: vertical; min-height: 84px; padding: 12px 14px;
@@ -609,13 +687,13 @@ svg { display: block; flex: none; }
 .sent-summary-title { margin: 0 0 8px; font: 700 14px/1.3 var(--font-body); color: var(--texts-strong); }
 .sent-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--texts-dark); }
 .sent-edited { font-size: 12px; color: var(--texts-medium); }
-.sent .btn-primary { align-self: stretch; height: 30px; font-family: var(--font-heading); }
+.sent .btn-primary { align-self: stretch; height: 30px; }
 
 /* Modal informativa de la vista gerencial */
 .page-title-row .tip svg { width: 24px; height: 24px; }
 .info-scope { margin-bottom: var(--space-3); }
 .info-scope .scope-cols { gap: 16px 32px; }
-.btn-small { width: 100%; height: 30px; font-family: var(--font-heading); }
+.btn-small { width: 100%; height: 30px; }
 
 .modal-note { margin: 0; font-size: 12.5px; color: var(--texts-medium); }
 .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -744,8 +822,8 @@ svg { display: block; flex: none; }
 /* ── Pestaña Plan corporativo ─────────────────────────────────────────────── */
 .kpis--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 /* Botón secundario dentro de una card */
-.btn-card { width: auto; height: 40px; padding: 0 20px; margin-top: 4px; font-family: var(--font-heading); }
-.btn-inline { width: auto; height: 40px; padding: 0 18px; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-heading); }
+.btn-card { width: auto; height: 30px; padding: 0 20px; margin-top: 4px; }
+.btn-inline { width: auto; height: 48px; padding: 0 24px; display: inline-flex; align-items: center; gap: 8px; }
 .up { color: var(--primary-d01); font-weight: 700; }
 .pairs--money .pair-bar { width: 52px; }
 .pairs--money .pair-bar span { font-size: 12px; }
@@ -777,7 +855,25 @@ svg { display: block; flex: none; }
 .step-goal { margin: auto 0 0; padding: 10px 12px; border-radius: 8px; background: var(--neutral-l02); font-size: 13.5px; color: var(--texts-dark); }
 .step-goal b { font-weight: 700; color: var(--texts-strong); }
 .step-check { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--texts-dark); cursor: pointer; }
-.step-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--primary-00); }
+/* Checkbox según sk-checkbox del DS Skandia: caja de 20px, radio 4px, borde gris 1,5px; marcado en verde de marca con chulo blanco;
+   hover con sombra verde; foco con disco verde suave; texto Open Sans 14px regular, separado 8px */
+input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; flex: none;
+  width: 20px; height: 20px; margin: 0; border-radius: 4px;
+  border: 1.5px solid var(--primarygrey-l05); background: var(--neutral-00) center / 12px 12px no-repeat;
+  cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+input[type="checkbox"]:checked {
+  background-color: var(--primary-00); border-color: var(--primary-00);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+}
+label:hover > input[type="checkbox"]:not(:disabled), input[type="checkbox"]:not(:disabled):hover { border-color: var(--primary-00); box-shadow: 0 0 8px color-mix(in srgb, var(--primary-00), transparent 70%); }
+input[type="checkbox"]:focus-visible { outline: 0; box-shadow: 0 0 0 8px color-mix(in srgb, var(--feedback-success-dark), transparent 78%); }
+input[type="checkbox"]:disabled { cursor: not-allowed; border-color: var(--neutral-l04); background-color: var(--feedback-standby-light, #f5f5f5); }
+input[type="checkbox"]:disabled:checked { background-color: var(--neutral-l06, #b7b7b7); border-color: var(--neutral-l06, #b7b7b7); }
+.goal-check, .step-check { gap: 8px; font: 400 14px/20px var(--font-body); color: var(--texts-dark); }
+
+
 
 .soon-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
 .soon-card { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
@@ -833,6 +929,11 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
 }
 .view-switch-label { margin-right: 6px; font: 600 13px/1 var(--font-body); color: var(--neutral-l05); white-space: nowrap; }
 .view-switch label { cursor: pointer; }
+/* Escenario de empresa (con o sin plan corporativo): cambia de página conservando la vista */
+.view-switch-link { display: block; padding: 9px 16px; border-radius: var(--radius-pill); font: 700 13px/1 var(--font-heading); color: var(--texts-white); white-space: nowrap; text-decoration: none; }
+.view-switch-link[aria-current="page"] { background: var(--primary-00); color: var(--texts-strong); }
+.view-switch-link:focus-visible { outline: 2px solid var(--primary-00); outline-offset: 2px; }
+.view-switch-sep { width: 1px; height: 22px; margin: 0 8px; background: rgba(255, 255, 255, 0.3); }
 .view-switch input { position: absolute; opacity: 0; pointer-events: none; }
 .view-switch span:not(.view-switch-label) { display: block; padding: 9px 16px; border-radius: var(--radius-pill); font: 700 13px/1 var(--font-heading); color: var(--texts-white); white-space: nowrap; }
 .view-switch input:checked + span { background: var(--primary-00); color: var(--texts-strong); }
@@ -1041,10 +1142,6 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5.5A1.5 1.5 0 0 1 5.5 4h7A1.5 1.5 0 0 1 14 5.5V21"/><path d="M14 10h4.5A1.5 1.5 0 0 1 20 11.5V21"/><path d="M2.5 21h19"/><path d="M7 8h4M7 12h4M7 16h4"/></svg>
           <span class="num">NIT 900.456.789-1</span>
         </span>
-        <span class="identity-item">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
-          <span><span data-only="director dueno">Agencia Norte</span><span data-only="fp">Agencia Centro</span></span>
-        </span>
         <span class="identity-item" data-only="director dueno">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 19c.6-3.4 3-5.2 6.2-5.2s5.6 1.8 6.2 5.2"/><path d="M16.5 6.2a3 3 0 0 1 0 5.6M18 13.9c2.2.5 3.5 2.1 3.9 5.1"/></svg>
           <span class="num">1.250 empleados</span>
@@ -1052,6 +1149,10 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
         <span class="identity-item" data-only="director">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5 19.5c.7-3.6 3.3-5.5 7-5.5s6.3 1.9 7 5.5"/></svg>
           <span>Dueño del plan: Juan Alberto Rodríguez González</span>
+        </span>
+        <span class="identity-item">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          <span><span data-only="director dueno">Agencia Norte</span><span data-only="fp">Agencia Centro</span></span>
         </span>
       </section>
 
@@ -1244,7 +1345,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
               <p class="owner-meta">Dueño del plan desde marzo de 2019 · abrió el Plan de Ahorro Corporativo con la empresa</p>
               <p class="owner-meta">Última gestión: <b>julio de 2026</b>, añadió un partícipe nuevo en el plan</p>
             </div>
-            <span class="tag tag--warning" data-plan-status="Plan de acción enviado"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Requiere plan de acción</span>
+            <span class="tag tag--warning" data-plan-status="Ruta de acción enviada"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Requiere ruta de acción</span>
           </article>
           <div class="plan-type gestion-anio">
             <span class="plan-type-label" id="gestion-anio-label">Gestión en</span>
@@ -1320,8 +1421,8 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
                 </div>
               </div>
               <div class="actions">
-                <button class="btn-primary" id="open-plan" aria-haspopup="dialog">Crear plan de acción</button>
-                <p class="actions-note">El plan de acción le llega al asesor a su correo y como notificación en Contigo, y queda en su ruta comercial.</p>
+                <button class="btn-primary" id="open-plan" aria-haspopup="dialog">Crear Ruta de Acción</button>
+                <p class="actions-note">La ruta de acción le llega al asesor a su correo y como notificación en Contigo, y queda en su ruta comercial.</p>
               </div>
             </div>
           </div>
@@ -1348,7 +1449,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
                 <tr class="row-owner">
                   <th scope="row"><span class="who"><i class="sw sw--dueno"></i><span><b>Juan Alberto Rodríguez González</b><small>Dueño del plan · Agencia Norte</small></span></span></th>
                   <td class="c num">171</td><td class="c num">$36.550 M</td><td class="c num">5</td><td>Ago 2025</td>
-                  <td><span class="tag tag--warning" data-plan-status="Plan enviado">Requiere plan</span></td>
+                  <td><span class="tag tag--warning" data-plan-status="Ruta enviada">Requiere ruta</span></td>
                 </tr>
                 <tr>
                   <th scope="row"><span class="who"><i class="sw sw--agencia"></i><span><b>Felipe Arango Mejía</b><small>Agencia Norte</small></span></span></th>
@@ -1679,8 +1780,20 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <h2 class="block-title" id="rutac-title">Ruta comercial</h2>
             <p class="card-sub">Metas sugeridas para los próximos 12 meses</p>
           </div>
-          <button class="btn-outline btn-inline" id="open-plan-ruta" aria-haspopup="dialog">Crear plan de acción con las metas marcadas</button>
+          <button class="btn-outline btn-inline" id="open-plan-ruta" aria-haspopup="dialog">Crear Ruta de Acción</button>
         </div>
+
+        <!-- Seguimiento de la ruta de acción: aparece al enviarla -->
+        <section class="card block plan-seg" id="plan-seg" aria-labelledby="plan-seg-title" hidden>
+          <div class="block-head block-head--space">
+            <div>
+              <h2 class="block-title" id="plan-seg-title">Ruta de acción</h2>
+              <p class="card-sub" data-ruta-mod></p>
+            </div>
+            <button type="button" class="btn-xs" data-editar-ruta aria-haspopup="dialog">Editar ruta</button>
+          </div>
+          <ul class="ruta-metas" data-ruta-metas></ul>
+        </section>
 
         <div class="route-cards">
           <article class="card step">
@@ -1688,7 +1801,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <h3 class="step-title">838 empleados sin relación</h3>
             <p class="step-desc">Vinculación en nómina y jornadas en la sede de la empresa.</p>
             <p class="step-goal">Meta: <b>+150 clientes</b> → <b>45%</b></p>
-            <label class="step-check"><input type="checkbox" data-ruta-goal="activar" checked> Incluir en el plan de acción</label>
+            <label class="step-check"><input type="checkbox" data-ruta-goal="activar" checked> Incluir en la ruta de acción</label>
           </article>
 
           <article class="card step">
@@ -1698,7 +1811,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <p class="step-who"><span><i class="sw sw--dueno"></i>92 del dueño</span><span><i class="sw sw--otras"></i>147 de otros asesores <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-label="Agregado, sin detalle"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></p>
             <p class="step-goal">Meta: 2P+ de 42% a <b>50%</b> (+33 clientes)</p>
             <button class="link-btn" data-lista="monoproducto">Ver los 109 clientes de tu agencia <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
-            <label class="step-check"><input type="checkbox" data-ruta-goal="profundizar" checked> Incluir en el plan de acción</label>
+            <label class="step-check"><input type="checkbox" data-ruta-goal="profundizar" checked> Incluir en la ruta de acción</label>
           </article>
 
           <article class="card step">
@@ -1706,7 +1819,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <h3 class="step-title">87 afiliados a obligatoria con otras agencias</h3>
             <p class="step-desc">Coordinar con las otras agencias para que la empresa tenga un solo frente.</p>
             <p class="step-goal">Meta: share de 30% a <b>40%</b> (+12 afiliados)</p>
-            <label class="step-check"><input type="checkbox" data-ruta-goal="consolidar" checked> Incluir en el plan de acción</label>
+            <label class="step-check"><input type="checkbox" data-ruta-goal="consolidar" checked> Incluir en la ruta de acción</label>
           </article>
 
           <article class="card step">
@@ -1716,7 +1829,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <p class="step-who"><span><i class="sw sw--dueno"></i>2 del dueño</span><span><i class="sw sw--agencia"></i>1 del resto de tu agencia</span><span><i class="sw sw--otras"></i>8 de otras agencias</span></p>
             <p class="step-goal">Meta: neto anual <b>≥ +10</b></p>
             <button class="link-btn" data-lista="perdidos">Ver los 3 clientes de tu agencia <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
-            <label class="step-check"><input type="checkbox" data-ruta-goal="retener" checked> Incluir en el plan de acción</label>
+            <label class="step-check"><input type="checkbox" data-ruta-goal="retener" checked> Incluir en la ruta de acción</label>
           </article>
         </div>
       </section>
@@ -2039,6 +2152,18 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
           </div>
         </div>
 
+        <!-- Ruta de acción recibida: el dueño la marca como cumplida o la descarta -->
+        <section class="card block plan-seg" id="ruta-own" aria-labelledby="ruta-own-title" hidden>
+          <div class="block-head block-head--space">
+            <div>
+              <h2 class="block-title" id="ruta-own-title">Ruta de acción de tu director</h2>
+              <p class="card-sub" data-ruta-mod></p>
+            </div>
+            <button type="button" class="btn-xs" data-editar-ruta aria-haspopup="dialog">Editar ruta</button>
+          </div>
+          <ul class="ruta-metas" data-ruta-metas></ul>
+        </section>
+
         <div class="route-cards">
           <article class="card step">
             <span class="step-head"><span class="step-num">1</span>Activar</span>
@@ -2306,10 +2431,33 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
 
 <!-- ═══ Selector flotante de vista (control del prototipo, no es parte de Contigo) ═══ -->
 <div class="view-switch" role="radiogroup" aria-label="Ver como">
+  <span class="view-switch-label">Empresa</span>
+  <a class="view-switch-link" data-empresa="con" href="#" aria-current="page">Con plan corporativo</a>
+  <a class="view-switch-link" data-empresa="sin" href="#">Sin plan corporativo</a>
+  <span class="view-switch-sep" aria-hidden="true"></span>
   <span class="view-switch-label">Ver como</span>
   <label><input type="radio" name="view" value="director" checked><span>Director comercial</span></label>
   <label><input type="radio" name="view" value="dueno"><span>Dueño del plan</span></label>
   <label><input type="radio" name="view" value="fp"><span>Asesor (otro FP)</span></label>
+</div>
+
+
+<!-- ═══ Confirmar: descartar una meta de la ruta de acción ═══ -->
+<div class="overlay" id="descartar-overlay" hidden>
+  <div class="modal modal--confirm" role="alertdialog" aria-modal="true" aria-labelledby="descartar-title" aria-describedby="descartar-desc">
+    <button class="modal-close" data-cerrar-descarte aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <span class="confirm-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M26.7732 22.918C27.4607 24.1211 26.6014 25.625 25.1834 25.625H6.83573C5.41776 25.625 4.55838 24.1211 5.20291 22.918L14.3982 7.27734C14.7849 6.67578 15.3865 6.375 16.031 6.375C16.6326 6.375 17.2342 6.67578 17.6209 7.27734L26.7732 22.918ZM7.26541 23.5625H24.7537L15.9881 8.65234L7.26541 23.5625ZM16.031 19.5234C16.7615 19.5234 17.3631 20.125 17.3631 20.8555C17.3631 21.5859 16.7615 22.1875 16.031 22.1875C15.2576 22.1875 14.656 21.5859 14.656 20.8555C14.656 20.125 15.2576 19.5234 16.031 19.5234ZM14.9998 12.9062C14.9998 12.3477 15.4295 11.875 16.031 11.875C16.5896 11.875 17.0623 12.3477 17.0623 12.9062V17.0312C17.0623 17.6328 16.5896 18.0625 16.031 18.0625C15.4295 18.0625 14.9998 17.6328 14.9998 17.0312V12.9062Z" fill="currentColor"/></svg></span>
+    <h2 class="confirm-title" id="descartar-title">¿Descartar esta meta?</h2>
+    <div class="confirm-desc" id="descartar-desc">
+      <p>Se eliminará la meta <b id="descartar-meta"></b></p>
+      <p class="confirm-meta" id="descartar-detalle"></p>
+      <p>Si lo deseas, puedes volver a añadirla desde <b>Editar ruta</b>, pero cambiará su fecha de inicio.</p>
+    </div>
+    <div class="confirm-actions">
+      <button type="button" class="btn-primary" id="descartar-ok">Descartar meta</button>
+      <button type="button" class="btn-outline" data-cerrar-descarte>Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ Panel lateral: de la cifra al listado de clientes ═════════════════ -->
@@ -2360,7 +2508,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
       <h2 class="modal-title" id="info-title"><span data-only="director">Vista gerencial: la empresa completa y la gestión del dueño del plan</span><span data-only="dueno">Eres el dueño del plan: ves la empresa completa</span><span data-only="fp">Esta radiografía muestra solo tus 31 clientes en Empresa ABC S.A.</span></h2>
       <button class="modal-close" data-close-info aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <p class="modal-desc" id="info-desc"><span data-only="director">Ves cuánto gestiona el dueño frente a lo que vinculan otros asesores, y puedes pedirle un plan de acción.</span><span data-only="dueno">Lo que gestionan otros asesores aparece en gris y agregado. Sirve para dimensionar la empresa; no muestra sus clientes ni sus contratos.</span><span data-only="fp">Puedes trabajar a tus clientes de esta empresa como siempre. El plan corporativo lo atiende otro asesor.</span></p>
+    <p class="modal-desc" id="info-desc"><span data-only="director">Ves cuánto gestiona el dueño frente a lo que vinculan otros asesores, y puedes pedirle una ruta de acción.</span><span data-only="dueno">Lo que gestionan otros asesores aparece en gris y agregado. Sirve para dimensionar la empresa; no muestra sus clientes ni sus contratos.</span><span data-only="fp">Puedes trabajar a tus clientes de esta empresa como siempre. El plan corporativo lo atiende otro asesor.</span></p>
     <div class="info-scope" data-only="dueno"><div class="scope-cols"><div><h3 class="scope-title">Ves</h3><ul class="scope-list scope-yes"><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Total de la empresa y población no atendida</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Todas las líneas: plan corporativo, obligatoria, voluntaria, cesantías, seguros y fiduciaria</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tu porción frente a la de otros asesores (agregada)</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Potencial total y ruta comercial</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Informe en PDF para la reunión con gestión humana</li></ul></div><div><h3 class="scope-title">No ves</h3><ul class="scope-list scope-no"><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>Nombres, saldos y contratos de los clientes de otros asesores</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>Quiénes son los otros asesores</li></ul></div></div></div>
     <div class="info-scope" data-only="fp"><div class="scope-cols"><div><h3 class="scope-title">Ves</h3><ul class="scope-list scope-yes"><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tus clientes, sus productos y su evolución</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tus activos por línea de negocio</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tus clientes con un solo producto, para ofrecer el segundo</li></ul></div><div><h3 class="scope-title">No ves</h3><ul class="scope-list scope-no"><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>Clientes, saldos y contratos de otros asesores</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>El plan corporativo y sus partícipes</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>El tamaño total de la empresa y su potencial</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>Quién atiende el plan corporativo</li><li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>El informe en PDF</li></ul></div></div></div>
         <div class="info-scope" data-only="director">
@@ -2371,14 +2519,13 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
                   <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Todo lo que ve el dueño del plan</li>
                   <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Gestión del dueño: vinculaciones, tiempo sin vincular y estado</li>
                   <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Asesores de tu agencia con clientes en la empresa</li>
-                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Acciones: plan de acción y reasignación</li>
+                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Acciones: ruta de acción</li>
                 </ul>
               </div>
               <div>
                 <h3 class="scope-title">No ves</h3>
                 <ul class="scope-list scope-no">
                   <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>Asesores de otras agencias: aparecen agregados</li>
-                  <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.5 3.3M6.3 7.6C4.2 9.2 3 12 3 12s3.5 6 9 6a8.6 8.6 0 0 0 4.4-1.2"/><path d="M9.9 10a3 3 0 0 0 4.2 4.2"/><path d="m3 3 18 18"/></svg>Detalle de clientes individuales</li>
                 </ul>
               </div>
             </div>
@@ -2391,10 +2538,10 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
 <div class="overlay" id="plan-overlay" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="plan-title" aria-describedby="plan-desc">
     <div class="modal-head">
-      <h2 class="modal-title" id="plan-title">Crear plan de acción</h2>
+      <h2 class="modal-title" id="plan-title">Crear Ruta de Acción</h2>
       <button class="modal-close" data-close aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <p class="modal-desc" id="plan-desc">Para <b>Juan Alberto Rodríguez González</b> en Empresa ABC S.A. Las metas vienen sugeridas desde la ruta comercial; puedes ajustarlas antes de crear el plan.</p>
+    <p class="modal-desc" id="plan-desc">Para <b>Juan Alberto Rodríguez González</b> en Empresa ABC S.A. Las metas vienen sugeridas desde la ruta comercial; puedes ajustarlas antes de crear la ruta.</p>
 
     <form id="plan-form" class="modal-body" novalidate>
       <fieldset class="goals">
@@ -2442,33 +2589,39 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
       </fieldset>
 
       <fieldset class="field">
-        <legend class="field-label">Plazo para que el asesor responda</legend>
+        <legend class="field-label">Plazo para que el asesor revise la ruta <span class="field-opt">(opcional)</span></legend>
         <div class="segmented">
-          <label><input type="radio" name="plazo" value="15" checked><span>15 días</span></label>
+          <label><input type="radio" name="plazo" value="" checked><span>Sin plazo</span></label>
+          <label><input type="radio" name="plazo" value="15"><span>15 días</span></label>
           <label><input type="radio" name="plazo" value="30"><span>30 días</span></label>
+          <label><input type="radio" name="plazo" value="otro"><span>Otro</span></label>
         </div>
+        <label class="plazo-otro" id="plazo-otro" hidden>
+          <input type="number" class="goal-input" id="plazo-dias" min="1" max="180" value="45" inputmode="numeric" aria-label="Número de días para revisar la ruta">
+          <span>días</span>
+        </label>
       </fieldset>
 
       <div class="field">
         <label class="field-label" for="plan-msg">Mensaje para el asesor <span class="opt">(opcional)</span></label>
-        <textarea id="plan-msg" rows="3" placeholder="Cuéntale qué esperas del plan o en qué quieres que se enfoque."></textarea>
+        <textarea id="plan-msg" rows="3" placeholder="Cuéntale qué esperas de la ruta o en qué quieres que se enfoque."></textarea>
       </div>
 
-      <p class="modal-note">El asesor recibe el plan a su correo y como notificación en Contigo.</p>
+      <p class="modal-note">El asesor recibe la ruta a su correo y como notificación en Contigo.</p>
 
       <div class="modal-actions">
         <button type="button" class="btn-outline" data-close>Cancelar</button>
-        <button type="submit" class="btn-primary">Crear plan de acción</button>
+        <button type="submit" class="btn-primary">Crear Ruta de Acción</button>
       </div>
     </form>
 
     <!-- Confirmación: reemplaza el formulario al enviar -->
     <div class="sent" id="plan-sent" hidden tabindex="-1">
       <span class="sent-icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
-      <h2 class="sent-title" id="plan-sent-title">Plan de acción enviado</h2>
-      <p class="sent-desc">Juan Alberto Rodríguez González lo recibió a su correo y como notificación en Contigo. Tiene <b id="sent-plazo">15 días</b> para responder.</p>
+      <h2 class="sent-title" id="plan-sent-title">Ruta de acción enviada</h2>
+      <p class="sent-desc">Juan Alberto Rodríguez González la recibió a su correo y como notificación en Contigo. <span id="sent-plazo-wrap">Tiene <b id="sent-plazo">15 días</b> para revisar su ruta y estructurar una estrategia junto a tu apoyo.</span></p>
       <div class="sent-summary">
-        <h3 class="sent-summary-title">Metas del plan</h3>
+        <h3 class="sent-summary-title">Metas de la ruta</h3>
         <ul class="sent-list" id="sent-list"></ul>
       </div>
       <button type="button" class="btn-primary" data-close>Entendido</button>
@@ -2537,6 +2690,21 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
     select(actual, false);
   }
   document.querySelectorAll('input[name="view"]').forEach((r) => r.addEventListener('change', () => cambiarVista(r.value)));
+  // Escenario de empresa: con plan corporativo (esta u otra página). Funciona igual en local y en el repo
+  const enRepo = !/radiografia-empresa-/.test(location.pathname);
+  const PAGINAS = { con: enRepo ? './' : 'radiografia-empresa-contigo.html', sin: enRepo ? 'sin-pac.html' : 'radiografia-empresa-sin-pac.html' };
+  document.querySelectorAll('[data-empresa]').forEach((a) => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (a.getAttribute('aria-current')) return;
+    // Sin plan no hay dueño: si se viene de esa vista, se entra como director
+    const v = a.dataset.empresa === 'sin' && vista() !== 'director' ? 'director' : vista();
+    location.href = PAGINAS[a.dataset.empresa] + '?vista=' + v;
+  }));
+  // Vista pedida al llegar desde la otra página
+  const pedida = new URLSearchParams(location.search).get('vista');
+  const radioPedido = pedida && document.querySelector('input[name="view"][value="' + pedida + '"]');
+  if (radioPedido) { radioPedido.checked = true; document.body.dataset.view = pedida; }
+
   // Al cargar, deja visible solo el panel de la pestaña activa en la vista inicial
   cambiarVista(document.body.dataset.view);
 
@@ -2588,6 +2756,12 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
       out.append(sg);
     }
   }
+  // Plazo: "Otro" muestra el campo para escribir los días
+  planForm.querySelectorAll('input[name="plazo"]').forEach((r) => r.addEventListener('change', () => {
+    const otro = planForm.plazo.value === 'otro';
+    document.getElementById('plazo-otro').hidden = !otro;
+    if (otro) document.getElementById('plazo-dias').focus();
+  }));
   const goals = [...overlay.querySelectorAll('.goal')];
   goals.forEach((g) => {
     renderGoal(g);
@@ -2645,7 +2819,10 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
       }
       list.append(li);
     });
-    document.getElementById('sent-plazo').textContent = `${planForm.plazo.value} días`;
+    // Plazo opcional: sin plazo no se menciona en la confirmación
+    const plazo = planForm.plazo.value === 'otro' ? Number(document.getElementById('plazo-dias').value) || 0 : Number(planForm.plazo.value);
+    document.getElementById('sent-plazo-wrap').hidden = !plazo;
+    document.getElementById('sent-plazo').textContent = plazo === 1 ? '1 día' : `${plazo} días`;
     planForm.hidden = true; desc.hidden = true; intro.hidden = true;
     sent.hidden = false;
     overlay.querySelector('.modal').setAttribute('aria-labelledby', 'plan-sent-title');
@@ -2655,12 +2832,107 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
       t.className = 'tag tag--info';
       t.textContent = t.dataset.planStatus;
     });
-    openPlan.textContent = 'Ver plan de acción enviado';
-    openRuta.textContent = 'Ver plan de acción enviado';
+    openPlan.textContent = 'Ver ruta de acción enviada';
+    openRuta.textContent = 'Ver ruta de acción enviada';
     rutaChecks.forEach((c) => { c.disabled = true; });
+    const editada = editandoRuta;
+    editandoRuta = false;
+    modificarRuta();
+    pintarSeguimiento(editada);
+    document.getElementById('plan-sent-title').textContent = editada ? 'Ruta de acción actualizada' : 'Ruta de acción enviada';
   });
 
-  // Ruta comercial: "Incluir en el plan de acción" y las metas del modal van sincronizadas
+  // ── Ruta de acción: listado de metas (datos de ejemplo) ──
+  // Director y dueño ven la misma lista. Cada meta se marca como lograda, se descarta o se modifica; no se mide tiempo
+  const fmt1 = (n) => n.toLocaleString('es-CO', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const SEG = {
+    activar:     { nombre: 'Activar · penetración', ini: 33.0, meta: (v) => (412 + v) / 1250 * 100, f: (n) => fmt1(n) + '%', pre: '+', unidad: 'clientes nuevos' },
+    profundizar: { nombre: 'Profundizar · cross-sell 2P+', ini: 42.0, meta: (v) => v, f: (n) => fmt1(n) + '%', pre: '', unidad: '% con 2 o más productos' },
+    consolidar:  { nombre: 'Consolidar · share de obligatoria', ini: 30.4, meta: (v) => v, f: (n) => fmt1(n) + '%', pre: '', unidad: '% de share' },
+    retener:     { nombre: 'Retener · neto anual de clientes', ini: 1, meta: (v) => v, f: (n) => (n > 0 ? '+' : '') + n, pre: '+', unidad: 'de neto anual' },
+  };
+  let RUTA = [];   // [{ key, valor, estado: 'curso' | 'lograda' | 'descartada' }]
+  let editandoRuta = false;
+  let rutaMod = null;   // { quien: 'director' | 'dueno', fecha }
+  function modificarRuta() { rutaMod = { quien: vista() === 'dueno' ? 'dueno' : 'director', fecha: new Date() }; }
+  function pintarMod() {
+    if (!rutaMod) return;
+    const cuando = rutaMod.fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) + ', ' +
+      rutaMod.fecha.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+    document.querySelectorAll('[data-ruta-mod]').forEach((p) => {
+      // Cada vista lo lee desde su lado: "por ti" o el nombre del otro
+      const enDueno = !!p.closest('#ruta-own');
+      const yo = enDueno ? rutaMod.quien === 'dueno' : rutaMod.quien === 'director';
+      const otro = enDueno ? 'tu director comercial' : 'Juan Alberto Rodríguez González (dueño del plan)';
+      p.textContent = 'Última modificación: ' + cuando + ' · por ' + (yo ? 'ti' : otro);
+    });
+  }
+  function pintarSeguimiento(conservar) {
+    const antes = Object.fromEntries(RUTA.map((m) => [m.key, m]));
+    RUTA = goals.filter((g) => g.querySelector('input[type="checkbox"]').checked)
+      .map((g) => ({ key: g.dataset.goal, valor: Number(g.querySelector('.goal-input').value) || 0, estado: (conservar && antes[g.dataset.goal] && antes[g.dataset.goal].estado) || 'curso', inicio: (conservar && antes[g.dataset.goal] && antes[g.dataset.goal].inicio) || new Date(), editando: false }));
+    document.getElementById('plan-seg').hidden = false;
+    document.getElementById('ruta-own').hidden = false;
+    pintarRuta();
+  }
+  function pintarRuta() {
+    pintarMod();
+    document.querySelectorAll('[data-ruta-metas]').forEach((ul) => {
+      ul.innerHTML = '';
+      if (!RUTA.length) ul.innerHTML = '<li class="ruta-vacia">La ruta no tiene metas. Puedes añadirlas desde Editar ruta.</li>';
+      RUTA.forEach((m, i) => {
+        const D = SEG[m.key];
+        const li = document.createElement('li');
+        li.className = 'is-' + m.estado;
+        const info = document.createElement('div');
+        const name = document.createElement('span');
+        name.className = 'ruta-meta-name';
+        name.textContent = D.nombre;
+        info.append(name);
+        if (m.editando) {
+          const ed = document.createElement('label');
+          ed.className = 'ruta-meta-edit';
+          ed.innerHTML = (D.pre ? '<span>' + D.pre + '</span>' : '') + '<input type="number" class="goal-input" min="0" step="1"><span></span>';
+          ed.querySelector('input').value = m.valor;
+          ed.querySelector('input').setAttribute('aria-label', 'Nueva meta: ' + D.nombre);
+          ed.lastChild.textContent = D.unidad;
+          info.append(ed);
+        } else {
+          const val = document.createElement('span');
+          val.className = 'ruta-meta-val';
+          val.innerHTML = 'Hoy <b></b> → meta <b></b> · Desde el <span></span>';
+          val.children[0].textContent = D.f(D.ini);
+          val.children[1].textContent = D.f(D.meta(m.valor));
+          val.children[2].textContent = m.inicio.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+          info.append(val);
+        }
+        const tag = document.createElement('span');
+        tag.className = 'tag ' + { curso: 'tag--info', lograda: 'tag--success', descartada: 'tag--neutral' }[m.estado];
+        tag.textContent = { curso: 'En curso', lograda: 'Lograda', descartada: 'Descartada' }[m.estado];
+        if (m.estado === 'curso') { tag.className = ''; tag.textContent = ''; }   // Sin etiqueta mientras está en curso
+        const acts = document.createElement('div');
+        acts.className = 'ruta-meta-acts';
+        const btn = (txt, cls, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-xs ' + cls; b.textContent = txt; b.addEventListener('click', fn); acts.append(b); return b; };
+        if (m.editando) {
+          btn('Guardar', 'btn-xs--primary', () => { m.valor = Number(li.querySelector('input').value) || 0; m.editando = false; pintarRuta(); });
+          btn('Cancelar', 'btn-xs--ghost', () => { m.editando = false; pintarRuta(); });
+        } else if (m.estado === 'curso') {
+          btn('Lograda', 'btn-xs--primary', () => { m.estado = 'lograda'; modificarRuta(); pintarRuta(); }).innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> Lograda';
+          const del = btn('', 'btn-icon', (e) => confirmarDescarte(m, e.currentTarget));
+          del.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+          del.setAttribute('aria-label', 'Descartar meta: ' + D.nombre);
+          del.title = 'Descartar meta';
+        } else {
+          btn('Deshacer', 'btn-xs--ghost', () => { m.estado = 'curso'; modificarRuta(); pintarRuta(); });
+        }
+        li.append(info, tag, acts);
+        ul.append(li);
+        if (m.editando) li.querySelector('input').focus();
+      });
+    });
+  }
+
+  // Ruta comercial: "Incluir en la ruta de acción" y las metas del modal van sincronizadas
   const rutaChecks = [...document.querySelectorAll('[data-ruta-goal]')];
   const openRuta = document.getElementById('open-plan-ruta');
   rutaChecks.forEach((c) => c.addEventListener('change', () => {
@@ -2673,6 +2945,57 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
     if (c) c.checked = e.target.checked;
   }));
   openRuta.addEventListener('click', () => { lastOpener = openRuta; openModal(); });
+
+  // Descartar una meta: se confirma, sale de la ruta y se desmarca en la modal
+  const descOverlay = document.getElementById('descartar-overlay');
+  let metaADescartar = null, descOpener = null;
+  function confirmarDescarte(m, opener) {
+    metaADescartar = m; descOpener = opener;
+    const D = SEG[m.key];
+    document.getElementById('descartar-meta').textContent = D.nombre;
+    document.getElementById('descartar-detalle').textContent = 'Hoy ' + D.f(D.ini) + ' → meta ' + D.f(D.meta(m.valor)) +
+      ' · Creada el ' + m.inicio.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+    descOverlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.getElementById('descartar-ok').focus();
+  }
+  function cerrarDescarte() {
+    descOverlay.hidden = true;
+    document.body.style.overflow = '';
+    if (descOpener && descOpener.isConnected) descOpener.focus();
+  }
+  document.getElementById('descartar-ok').addEventListener('click', () => {
+    const key = metaADescartar.key;
+    RUTA = RUTA.filter((x) => x !== metaADescartar);
+    const g = goals.find((x) => x.dataset.goal === key);
+    g.querySelector('input[type="checkbox"]').checked = false;
+    renderGoal(g);
+    descOpener = null;
+    cerrarDescarte();
+    modificarRuta();
+    pintarRuta();
+  });
+  descOverlay.querySelectorAll('[data-cerrar-descarte]').forEach((b) => b.addEventListener('click', cerrarDescarte));
+  descOverlay.addEventListener('click', (e) => { if (e.target === descOverlay) cerrarDescarte(); });
+  descOverlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cerrarDescarte();
+    if (e.key === 'Tab') {   // el foco no sale de la modal
+      const f = [...descOverlay.querySelectorAll('button')];
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+
+  // "Editar ruta": la misma modal de crear, con las metas actuales
+  document.querySelectorAll('[data-editar-ruta]').forEach((b) => b.addEventListener('click', () => {
+    editandoRuta = true;
+    planForm.hidden = false; desc.hidden = false; intro.hidden = false; sent.hidden = true;
+    overlay.querySelector('.modal').setAttribute('aria-labelledby', 'plan-title');
+    document.getElementById('plan-title').textContent = 'Editar ruta de acción';
+    planForm.querySelector('button[type="submit"]').textContent = 'Guardar cambios';
+    lastOpener = b;
+    openModal();
+  }));
 
   // Al volver a abrir, el modal muestra lo enviado si ya existe un plan
   const baseOpen = openModal;
