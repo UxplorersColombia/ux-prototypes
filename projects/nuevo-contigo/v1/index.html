@@ -53,8 +53,12 @@
   header{white-space:nowrap;height:88px;display:flex;align-items:center;padding:0 32px;background:linear-gradient(100deg,#fff 72%,#F0FBEF 100%);border-bottom:1px solid #F3F3F3}
   .brand{display:flex;align-items:center;gap:20px;font-size:16px;font-weight:700;color:var(--ink);text-decoration:none;flex:none}
   .brand svg{width:38px;height:38px;display:block}
-  .search{margin-left:60px;margin-right:40px;flex:1;max-width:738px;min-width:0;height:50px;border:1px solid #F0F0F0;border-radius:10px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;gap:12px;padding:0 22px;color:#6b6b6b;font-size:16px;font-family:'Open Sans',sans-serif}
-  .search span{overflow:hidden;text-overflow:ellipsis}
+  .search{margin-left:60px;margin-right:40px;flex:1;max-width:738px;min-width:0;height:50px;display:flex;align-items:center;gap:10px;padding:0 20px;background:#f7f7f7;border:1.5px solid #dddddd;border-radius:9999px;box-shadow:none;cursor:text;transition:border-color .18s,background .18s,box-shadow .18s}
+  .search:focus-within{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(0,199,61,.1)}
+  .search .s-ico{flex:none;width:16px;height:16px;fill:#a5a5a5;transition:fill .18s}
+  .search:focus-within .s-ico{fill:var(--green)}
+  .search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-family:'Open Sans',sans-serif;font-size:15px;color:#404040}
+  .search input::placeholder{color:#a5a5a5}
   .hello{margin-left:32px;display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;color:var(--ink)}
   .hello .n{color:var(--green)}
   .avatar{width:52px;height:52px;border-radius:50%;padding:2px;background:var(--green);flex:none}
@@ -88,8 +92,8 @@
   /* KPIs */
   .saldos{margin-top:34px}
   .saldos-h{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-  .saldos-h h2{font-size:24px;font-weight:700;color:var(--ink)}
-  .saldos-h h2 span{color:var(--green)}
+  .saldos-h h2{font-size:24px;font-weight:700;color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .saldos-h h2 .amt{color:var(--green)}
   .ojo{border:0;background:none;padding:2px;cursor:pointer;display:flex;color:var(--green);border-radius:6px}
   .ojo:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
   .tip{position:relative;display:inline-flex}
@@ -220,6 +224,71 @@
     .rdet{grid-template-columns:1fr}
   }
 
+
+  /* ===== Control del prototipo: vista Escritorio / Móvil (no es parte del diseño) ===== */
+  .pv-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:200;display:flex;gap:4px;width:300px;padding:5px;background:#fff;border:1px solid #dddddd;border-radius:100px;box-shadow:0 4px 16px rgba(0,0,0,.14)}
+  .pv-bar button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:36px;border:0;border-radius:100px;background:transparent;font-family:Montserrat,sans-serif;font-weight:700;font-size:14px;color:#404040;cursor:pointer;transition:background-color .15s,color .15s}
+  .pv-bar button:hover{background:#fafafa}
+  .pv-bar button[aria-selected="true"]{background:var(--green);color:#fff}
+  .pv-bar button:focus-visible{outline:2px solid #0099de;outline-offset:2px}
+  .pv-movil{position:fixed;inset:0;z-index:150;background:#e9eaec;display:none;justify-content:center;align-items:stretch;padding:0;overflow:hidden}
+  .pv-movil.show{display:flex}
+  .pv-tel{flex:none;width:375px;height:100%;background:#fff;box-shadow:0 0 12px rgba(0,0,0,.08)}
+  .pv-tel iframe{width:100%;height:100%;border:0;display:block}
+  body.pv-embed .pv-bar,body.pv-embed .pv-movil{display:none!important}
+  html.pv-on .pv-bar{top:12px;bottom:auto}
+  html.pv-on .pv-movil{padding-top:62px}
+  body.pv-embed main{padding-bottom:84px}
+  @media (max-width:768px){.pv-bar,.pv-movil{display:none!important}}
+
+
+  /* ===== Móvil: estructura actual de Contigo (volver + nombre, Ampliar, secciones en filas) ===== */
+  .m-cliente,.m-ampliar,.tab .m-chev{display:none}
+  @media (max-width:600px){
+    .crumb,.idbar{display:none}
+    .m-cliente{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px}
+    .m-volver{flex:none;width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
+    .m-cliente span{font-size:15px;font-weight:700;color:var(--green);text-align:right}
+    .saldos{margin-top:20px}
+    .m-ampliar{display:flex;align-items:center;gap:6px;margin:16px 0 0 auto;border:0;background:none;padding:0;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700;color:var(--blue);text-decoration:underline}
+    .m-ampliar[aria-expanded="true"] svg path{d:path("M8 12h8")}
+    .kpis{margin-top:10px}
+    .kpis.ampliado .card .subs{display:flex;flex-wrap:wrap;margin-top:4px}
+    .kpis.ampliado .card{align-items:stretch}
+    .tabs{flex-direction:column;gap:12px;overflow:visible;margin-top:28px;font-size:15px}
+    .tabs .tab,.tabs .tab.on{font-family:'Open Sans',sans-serif;font-size:14px;font-weight:700;flex:none;width:100%;height:auto;justify-content:flex-start;gap:16px;padding:16px 18px;border-radius:8px;background:#fff;border:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.04);color:var(--ink-2)}
+    .tab .ico,.tab.on .ico{stroke:var(--ink-2)}
+    .tab.on .ico .f{fill:none}
+    .tab.on .ico .d{stroke:var(--ink-2)}
+    .tab:not(.on):hover{background:#fff}
+    .tab .m-chev{display:block;margin-left:auto;color:var(--green)}
+    .panel{display:none}
+    footer{display:none}
+  }
+
+
+  /* ===== Retiros en curso, móvil — igual a Portal Clientes (tarjeta flotante + hoja inferior) ===== */
+  .m-wallet{display:none}
+  @media (max-width:600px){
+    .retiros{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;width:240px;min-width:80px;margin:0;display:flex;justify-content:center;align-items:center;gap:8px;padding:8px 16px;border-radius:50px;border:none;background:var(--primary-00);box-shadow:0 12px 32px -8px rgba(0,0,0,.12),0 4px 8px -2px rgba(0,0,0,.06)}
+    .retiros:hover{border-color:transparent}
+    .retiros .m-wallet{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--icon-brand)}
+    .retiros .rt{font-size:14px;white-space:nowrap;color:#fff}
+    .retiros .camino,.retiros .rl{display:none}
+    .rmodal{align-items:flex-end;padding:0}
+    .rdlg{width:390px;max-width:100%;max-height:85vh;padding:20px 16px 28px;border-radius:16px 16px 0 0;gap:12px;animation:skHoja .25s ease-out}
+    @keyframes skHoja{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+    .rclose{top:16px;right:12px}
+    .rdlg-h h2{font-size:18px}
+    .rdlg-h p{font-size:14px}
+    .retiro-h{padding:16px}
+    .retiro-h .cab{font-size:13px}
+    .retiro-b{padding:0 16px 16px}
+    .rdet{font-size:13px}
+    .rdet div{padding:12px 14px}
+    .rmodal.show ~ * .retiros, body:has(.rmodal.show) .retiros{display:none}
+  }
+
   /* ===== Responsive ===== */
   .mburger{display:none;width:40px;height:40px;border:0;border-radius:10px;background:#F7F7F7;align-items:center;justify-content:center;cursor:pointer;margin-right:12px;flex:none}
   @media (max-width:1280px){
@@ -229,7 +298,21 @@
     .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
   }
   @media (max-width:600px){
-    .kpis{grid-template-columns:1fr;gap:14px}
+    /* Saldo en móvil — igual a Portal Clientes (Dashboard Portal Clientes.dc.html, vista Móvil) */
+    .saldos-h h2{column-gap:10px;row-gap:2px}
+    .saldos-h h2 .tt{flex-basis:100%;font-size:18px}
+    .saldos-h h2 .amt{font-size:20px}
+    .saldos-h .ojo svg,.saldos-h .tip svg{width:20px;height:20px}
+    /* Tarjetas en móvil: cuadrícula 2 × 2 como el Contigo actual */
+    .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0 0;padding:0;overflow:visible}
+    .card{min-width:0;padding:12px;border-radius:12px;gap:6px;justify-content:flex-start}
+    .card-h{flex-direction:column;align-items:flex-start;gap:10px}
+    .card .circ{width:38px;height:38px}
+    .card .circ svg,.card .circ .ico{width:24px;height:24px}
+    .card .lbl{font-size:13px;line-height:17px;color:var(--ink-2)}
+    .card .val{font-size:15px;margin-top:2px;white-space:nowrap;gap:6px}
+    .card .trend{width:20px;height:20px}
+    .card .subs,.card .more{display:none}
   }
   @media (max-width:1100px){
     .hello .txt{display:none}
@@ -251,15 +334,18 @@
     .drawer{width:min(312px,calc(100vw - 112px))}
     header{flex-wrap:wrap;height:auto;padding:12px 16px;row-gap:12px}
     header{background:#fff}
-    .search{order:5;flex:1 0 100%;max-width:none;margin-left:0;height:44px;font-size:14px;padding:0 14px}
-    .hello{margin-left:12px}
+    .search{order:5;flex:1 0 100%;max-width:none;margin:0;height:44px;padding:0 16px}
+    .search input{font-size:14px}
+    .hello{display:none}
     .avatar{width:42px;height:42px}
     .bell{width:42px;height:42px;margin-left:auto}
-    .sami{height:42px;margin-left:12px;padding:0 10px}
+    .sami{width:42px;height:42px;margin-left:12px;padding:0;border-radius:50%;justify-content:center;overflow:visible}
+    .sami .sami-ico{width:46px;height:46px;margin:0}
+    .sami .sami-ico img{width:46px;height:46px}
+    .sami .sami-ico::before{left:5px;top:10px;width:28px;height:28px}
+    .sami .sami-ico::after{right:4px;top:3px}
     .idbar h1{flex:1 0 100%}
     .saldos{margin-top:24px}
-    .saldos-h{flex-wrap:nowrap}
-    .saldos-h h2{font-size:19px}
     .saldos-h .tip svg{flex:none;width:24px;height:24px}
     .ojo svg{width:20px;height:20px}
     .tip-box{left:auto;right:-8px;transform:none}
@@ -334,7 +420,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   <header>
     <button class="mburger" aria-label="Abrir menú"><svg class="ico" viewBox="0 0 24 24" style="stroke:#333"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <a class="brand" href="#"><svg viewBox="0 0 60 61" aria-hidden="true"><path d="M3.32082 56.9184C10.4127 64.0052 22.5328 58.9871 22.5328 48.9536C22.5328 45.9673 21.3465 43.1033 19.2348 40.9916C17.1232 38.8799 14.2592 37.6936 11.2728 37.6936C1.23931 37.6936 -3.7838 49.8239 3.31064 56.9184" fill="#00C73D"/><path d="M52.2388 0H5.71268C0.997463 0 -1.36142 5.69999 1.97206 9.03346L50.9665 58.0279C54.3 61.3614 60 59 60 54.2873V7.76878C60.0003 6.7496 59.7998 5.74034 59.4098 4.79871C59.0199 3.85707 58.4482 3.00152 57.7274 2.28097C57.0066 1.56042 56.1508 0.988996 55.2091 0.599358C54.2673 0.20972 53.258 0.00951191 52.2388 0.0101807M36.5282 22.7414C34.2813 22.7414 31.9479 21.3928 31.9173 18.9245H35.0014C35.0243 19.5632 35.7343 20.1968 36.6326 20.1968C37.3654 20.1713 37.9812 19.8405 37.9812 19.2756C37.9812 18.8023 37.6962 18.5428 36.8947 18.329L35.4518 17.9499C32.1438 17.0516 32.1184 15.3747 32.1438 14.3568C32.1667 12.7257 34.1286 11.2142 36.4468 11.2142C38.6454 11.2142 40.961 12.1837 40.9864 14.8785H37.8845C37.8616 14.0515 37.1517 13.909 36.6326 13.909C35.9252 13.909 35.4518 14.2398 35.4747 14.736C35.4977 15.0668 35.7826 15.3976 36.4443 15.563L38.312 16.0592C40.9839 16.7921 41.3147 18.5657 41.3147 19.2756C41.3147 21.6141 38.854 22.7262 36.5384 22.7262M49.2845 22.4895L45.5973 18.1153V22.4895H42.3351V5.44044H45.5973V14.4714L48.2336 11.4636H52.4068L47.8264 16.334L53.3228 22.5048L49.2845 22.4895Z" fill="#00C73D"/></svg><span class="bt">Portal Contigo</span></a>
-    <div class="search" role="search"><svg class="ico-sm" viewBox="0 0 24 24" style="stroke:#888;width:18px;height:18px"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg><span>Elige cliente o caso para buscar</span></div>
+    <label class="search" role="search"><svg class="s-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg><input type="search" placeholder="Elige Cliente o Caso para buscar..." aria-label="Buscar cliente o caso"></label>
     <button class="bell" aria-label="Notificaciones, 4 nuevas"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg><b>4</b></button>
     <div class="hello"><div class="avatar"><img src="assets/avatar-asesor.jpg" alt="Foto de perfil del asesor"></div><span class="txt">Hola, <span class="n">Juan</span> 👋</span></div>
     <button class="sami" aria-label="Tu sami"><span class="sami-ico"><img src="assets/sami.png" alt="" width="56" height="56"></span><span class="st">Tu sami</span></button>
@@ -342,7 +428,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   <main>
     <button class="retiros" type="button" id="btn-retiros" aria-haspopup="dialog" aria-controls="rmodal">
-      <span class="rt">Retiros en curso (1)</span>
+      <span class="m-wallet" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span><span class="rt">Retiros en curso (1)</span>
       <span class="camino" aria-hidden="true">
         <span class="nodo"><svg viewBox="0 0 60 61" style="height:13px;width:auto" aria-hidden="true"><path d="M3.32082 56.9184C10.4127 64.0052 22.5328 58.9871 22.5328 48.9536C22.5328 45.9673 21.3465 43.1033 19.2348 40.9916C17.1232 38.8799 14.2592 37.6936 11.2728 37.6936C1.23931 37.6936 -3.7838 49.8239 3.31064 56.9184" fill="#00C73D"/><path d="M52.2388 0H5.71268C0.997463 0 -1.36142 5.69999 1.97206 9.03346L50.9665 58.0279C54.3 61.3614 60 59 60 54.2873V7.76878C60.0003 6.7496 59.7998 5.74034 59.4098 4.79871C59.0199 3.85707 58.4482 3.00152 57.7274 2.28097C57.0066 1.56042 56.1508 0.988996 55.2091 0.599358C54.2673 0.20972 53.258 0.00951191 52.2388 0.0101807M36.5282 22.7414C34.2813 22.7414 31.9479 21.3928 31.9173 18.9245H35.0014C35.0243 19.5632 35.7343 20.1968 36.6326 20.1968C37.3654 20.1713 37.9812 19.8405 37.9812 19.2756C37.9812 18.8023 37.6962 18.5428 36.8947 18.329L35.4518 17.9499C32.1438 17.0516 32.1184 15.3747 32.1438 14.3568C32.1667 12.7257 34.1286 11.2142 36.4468 11.2142C38.6454 11.2142 40.961 12.1837 40.9864 14.8785H37.8845C37.8616 14.0515 37.1517 13.909 36.6326 13.909C35.9252 13.909 35.4518 14.2398 35.4747 14.736C35.4977 15.0668 35.7826 15.3976 36.4443 15.563L38.312 16.0592C40.9839 16.7921 41.3147 18.5657 41.3147 19.2756C41.3147 21.6141 38.854 22.7262 36.5384 22.7262M49.2845 22.4895L45.5973 18.1153V22.4895H42.3351V5.44044H45.5973V14.4714L48.2336 11.4636H52.4068L47.8264 16.334L53.3228 22.5048L49.2845 22.4895Z" fill="#00C73D"/></svg></span>
         <span class="linea"><span class="moneda"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></span>
@@ -351,6 +437,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <span class="rl">Ver detalle <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
     </button>
 
+    <div class="m-cliente"><a class="m-volver" href="#" aria-label="Volver al inicio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></a><span>Óscar Camilo Hernández Ramírez</span></div>
     <div class="crumb">
       <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="#00C73D" stroke-width="2" stroke-linecap="round"><path d="M21 8H2M8 1L1 8l7 7"/></svg>
       <span style="margin-left:4px">Inicio</span><span class="sep">/</span><a href="#">Óscar Camilo Hernández Ramírez</a>
@@ -370,9 +457,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     <section class="saldos">
     <div class="saldos-h">
-      <h2>Total bajo gestión: <span>$358.900.109</span></h2>
-      <button class="ojo" id="btn-ojo" type="button" aria-label="Ocultar saldos" aria-pressed="false"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg></button><span class="tip"><button class="tip-btn" type="button" aria-label="¿Qué es Total bajo gestión?" aria-describedby="tip-total"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><!-- Circle-question (librería) --><path fill="#0099DE" d="M16 5C22.0586 5 27 9.94141 27 16C27 22.1016 22.0586 27 16 27C9.89844 27 5 22.1016 5 16C5 9.94141 9.89844 5 16 5ZM16 24.9375C20.8984 24.9375 24.9375 20.9414 24.9375 16C24.9375 11.1016 20.8984 7.0625 16 7.0625C11.0586 7.0625 7.0625 11.1016 7.0625 16C7.0625 20.9414 11.0586 24.9375 16 24.9375ZM16 19.4375C16.7305 19.4375 17.375 20.0391 17.375 20.8125C17.375 21.5859 16.7305 22.1875 16 22.1875C15.1836 22.1875 14.625 21.5859 14.625 20.8125C14.625 20.0391 15.2266 19.4375 16 19.4375ZM17.418 10.5C19.1367 10.5 20.4688 11.832 20.4258 13.5078C20.4258 14.5391 19.8672 15.5273 18.9648 16.0859L17.0312 17.2891V17.375C17.0312 17.9336 16.5586 18.4062 16 18.4062C15.4414 18.4062 14.9688 17.9336 14.9688 17.375V16.6875C14.9688 16.3438 15.1406 16 15.4844 15.7852L17.9336 14.3242C18.2344 14.1523 18.4062 13.8516 18.4062 13.5078C18.4062 12.9922 17.9336 12.5625 17.375 12.5625H15.1836C14.668 12.5625 14.2812 12.9922 14.2812 13.5078C14.2812 14.0664 13.8086 14.5391 13.25 14.5391C12.6914 14.5391 12.2188 14.0664 12.2188 13.5078C12.2188 11.832 13.5508 10.5 15.2266 10.5H17.418Z"/></svg></button><span class="tip-box" role="tooltip" id="tip-total">Saldo total de todos los productos activos que tiene tu cliente con Skandia, incluyendo seguros. Gracias a tu gestión, lograremos cumplir sus objetivos.</span></span>
+      <h2><span class="tt">Total bajo gestión:</span> <span class="amt">$358.900.109</span><button class="ojo" id="btn-ojo" type="button" aria-label="Ocultar saldos" aria-pressed="false"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg></button><span class="tip"><button class="tip-btn" type="button" aria-label="¿Qué es Total bajo gestión?" aria-describedby="tip-total"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><!-- Circle-question (librería) --><path fill="#0099DE" d="M16 5C22.0586 5 27 9.94141 27 16C27 22.1016 22.0586 27 16 27C9.89844 27 5 22.1016 5 16C5 9.94141 9.89844 5 16 5ZM16 24.9375C20.8984 24.9375 24.9375 20.9414 24.9375 16C24.9375 11.1016 20.8984 7.0625 16 7.0625C11.0586 7.0625 7.0625 11.1016 7.0625 16C7.0625 20.9414 11.0586 24.9375 16 24.9375ZM16 19.4375C16.7305 19.4375 17.375 20.0391 17.375 20.8125C17.375 21.5859 16.7305 22.1875 16 22.1875C15.1836 22.1875 14.625 21.5859 14.625 20.8125C14.625 20.0391 15.2266 19.4375 16 19.4375ZM17.418 10.5C19.1367 10.5 20.4688 11.832 20.4258 13.5078C20.4258 14.5391 19.8672 15.5273 18.9648 16.0859L17.0312 17.2891V17.375C17.0312 17.9336 16.5586 18.4062 16 18.4062C15.4414 18.4062 14.9688 17.9336 14.9688 17.375V16.6875C14.9688 16.3438 15.1406 16 15.4844 15.7852L17.9336 14.3242C18.2344 14.1523 18.4062 13.8516 18.4062 13.5078C18.4062 12.9922 17.9336 12.5625 17.375 12.5625H15.1836C14.668 12.5625 14.2812 12.9922 14.2812 13.5078C14.2812 14.0664 13.8086 14.5391 13.25 14.5391C12.6914 14.5391 12.2188 14.0664 12.2188 13.5078C12.2188 11.832 13.5508 10.5 15.2266 10.5H17.418Z"/></svg></button><span class="tip-box" role="tooltip" id="tip-total">Saldo total de todos los productos activos que tiene tu cliente con Skandia, incluyendo seguros. Gracias a tu gestión, lograremos cumplir sus objetivos.</span></span></h2>
     </div>
+    <button class="m-ampliar" type="button" aria-expanded="false">Ampliar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></button>
     <div class="kpis">
 
       <div class="card">
@@ -426,12 +513,12 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     <!-- Tabs -->
     <div class="tabs" role="tablist">
-      <div class="tab on" role="tab" aria-selected="true"><svg class="ico" viewBox="0 0 24 24"><rect class="f" x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5h8v2"/><path class="d" d="M3 13h18M11 13v2h2v-2"/></svg>Productos</div>
-      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><circle class="f" cx="12" cy="8" r="4"/><path class="f" d="M4 21c0-4 4-6 8-6s8 2 8 6z"/></svg>Datos cliente</div>
-      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><path class="f" d="M6 3h8l4 4v14H6z"/><path class="d" d="M14 3v4h4"/></svg>Documentos</div>
-      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><rect class="f" x="4" y="3" width="16" height="10" rx="1"/><path class="f" d="M3 12l9 6 9-6v9H3z"/><path class="d" d="M8 7h8"/></svg>Casos</div>
-      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><path class="f" d="M9 3h6l1 2h3v16H5V5h3z"/><path class="d" d="M9 3v3h6V3"/><path class="d" d="M9 13l2 2 4-4"/></svg>Recomendación profesional</div>
-      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><rect class="f" x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4"/><path class="d" d="M3 10h18"/><path class="d" d="M8 15l2 2 4-4"/></svg>Actividades</div>
+      <div class="tab on" role="tab" aria-selected="true"><svg class="ico" viewBox="0 0 24 24"><rect class="f" x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5h8v2"/><path class="d" d="M3 13h18M11 13v2h2v-2"/></svg>Productos<svg class="m-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
+      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><circle class="f" cx="12" cy="8" r="4"/><path class="f" d="M4 21c0-4 4-6 8-6s8 2 8 6z"/></svg>Datos cliente<svg class="m-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
+      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><path class="f" d="M6 3h8l4 4v14H6z"/><path class="d" d="M14 3v4h4"/></svg>Documentos<svg class="m-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
+      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><rect class="f" x="4" y="3" width="16" height="10" rx="1"/><path class="f" d="M3 12l9 6 9-6v9H3z"/><path class="d" d="M8 7h8"/></svg>Casos<svg class="m-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
+      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><path class="f" d="M9 3h6l1 2h3v16H5V5h3z"/><path class="d" d="M9 3v3h6V3"/><path class="d" d="M9 13l2 2 4-4"/></svg>Recomendación profesional<svg class="m-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
+      <div class="tab" role="tab"><svg class="ico" viewBox="0 0 24 24"><rect class="f" x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4"/><path class="d" d="M3 10h18"/><path class="d" d="M8 15l2 2 4-4"/></svg>Actividades<svg class="m-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
     </div>
 
     <section class="panel">
@@ -526,7 +613,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
   // Envuelve cada monto ($...) de la ficha para poder ocultarlo con el ojo.
-  const SEL=['.saldos-h h2 span','.card .val','.card .sub','.prod .d b','.rdet dd'];
+  const SEL=['.saldos-h h2 .amt','.card .val','.card .sub','.prod .d b','.rdet dd'];
   const RX=/\$\s?[\d.,]+/g;
   document.querySelectorAll(SEL.join(',')).forEach(el=>{
     const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT); const nodes=[];
@@ -547,6 +634,44 @@ document.addEventListener('DOMContentLoaded',()=>{
     b.querySelector('svg').innerHTML=oculto?ON:OFF;
     document.querySelectorAll('.money').forEach(sp=>sp.textContent=oculto?'$ ••••••':sp.dataset.v);
   });
+});
+</script>
+
+<!-- Control del prototipo: vista Escritorio / Móvil -->
+<div class="pv-bar" id="pv-bar" role="tablist" aria-label="Vista del prototipo">
+  <button role="tab" id="pv-desk" aria-selected="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Escritorio</button>
+  <button role="tab" id="pv-mov" aria-selected="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>Móvil</button>
+</div>
+<div class="pv-movil" id="pv-movil"><div class="pv-tel"><iframe title="Ficha de cliente, vista móvil"></iframe></div></div>
+<script>
+(function(){
+  // Dentro del teléfono la ficha se carga con ?embed: sin control y sin marco.
+  if (new URLSearchParams(location.search).has('embed')) { document.body.classList.add('pv-embed'); return; }
+  const d=document.getElementById('pv-desk'), m=document.getElementById('pv-mov'),
+        capa=document.getElementById('pv-movil'), f=capa.querySelector('iframe');
+  function ver(v){
+    const mov = v==='movil';
+    d.setAttribute('aria-selected', String(!mov)); m.setAttribute('aria-selected', String(mov));
+    if (mov && !f.src) f.src = location.pathname + '?embed=1';
+    capa.classList.toggle('show', mov);
+    document.documentElement.style.overflow = mov ? 'hidden' : '';
+    document.documentElement.classList.toggle('pv-on', mov);
+    history.replaceState(null,'', mov ? '#movil' : location.pathname);
+  }
+  d.addEventListener('click',()=>ver('desk'));
+  m.addEventListener('click',()=>{ if (f.src) f.contentWindow.location.reload(); ver('movil'); });
+  document.getElementById('pv-bar').addEventListener('keydown',e=>{
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){ const v=d.getAttribute('aria-selected')==='true'?'movil':'desk'; ver(v); (v==='movil'?m:d).focus(); }
+  });
+  if (location.hash==='#movil') ver('movil');
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const b=document.querySelector('.m-ampliar'), k=document.querySelector('.kpis');
+  b.addEventListener('click',()=>{ const on=b.getAttribute('aria-expanded')!=='true';
+    b.setAttribute('aria-expanded',String(on)); k.classList.toggle('ampliado',on);
+    b.firstChild.nodeValue = on ? 'Reducir ' : 'Ampliar '; });
 });
 </script>
 </body>
