@@ -50,9 +50,15 @@
 
   /* Header */
   .wrap{margin-left:112px}
-  header{position:sticky;top:0;z-index:3;white-space:nowrap;height:88px;display:flex;align-items:center;padding:0 32px;background:linear-gradient(100deg,#fff 72%,#F0FBEF 100%);border-bottom:1px solid #F3F3F3}
+  header{position:sticky;top:0;z-index:3;white-space:nowrap;height:80px;flex-shrink:0;display:flex;align-items:center;padding:0 32px;background:#fff;box-shadow:0 0 4px 0 rgba(61,75,92,.15)}
   .brand{display:flex;align-items:center;gap:20px;font-size:16px;font-weight:700;color:var(--ink);text-decoration:none;flex:none}
   .brand svg{width:38px;height:38px;display:block}
+  .ia-sw{display:flex;flex:none;height:44px;border:1px solid #e3e3e3;border-radius:8px;overflow:hidden;background:#fff}
+  .ia-sw button{width:58px;height:100%;border:0;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s}
+  .ia-sami{background:#fff}.ia-sami:hover{background:#f4fcf3}
+  .ia-gpt{background:var(--green)}.ia-gpt:hover{background:#00b336}
+  .ia-sami svg{width:30px;height:30px}.ia-gpt svg{width:24px;height:24px}
+  .ia-sw button:focus-visible{outline:2px solid var(--green);outline-offset:-3px}
   .search{margin-left:60px;margin-right:40px;flex:1;max-width:738px;min-width:0;height:50px;display:flex;align-items:center;gap:10px;padding:0 20px;background:#f7f7f7;border:1.5px solid #dddddd;border-radius:9999px;box-shadow:none;cursor:text;transition:border-color .18s,background .18s,box-shadow .18s}
   .search:focus-within{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(0,199,61,.1)}
   .search .s-ico{flex:none;width:16px;height:16px;fill:#a5a5a5;transition:fill .18s}
@@ -440,7 +446,7 @@
   /* ===== Responsive ===== */
   .mburger{display:none;width:40px;height:40px;border:0;border-radius:10px;background:#F7F7F7;align-items:center;justify-content:center;cursor:pointer;margin-right:12px;flex:none}
   @media (max-width:1280px){
-    .search{margin-left:32px;margin-right:24px}.hello,.sami{margin-left:24px}
+    .search{margin-left:32px;margin-right:24px}.hello{margin-left:24px}
   }
   @media (max-width:1279px){
     .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
@@ -470,8 +476,6 @@
     .tabs{display:flex;overflow-x:auto;scrollbar-width:none;font-size:13px}
     .tabs::-webkit-scrollbar{display:none}
     .tab{flex:1 0 auto;padding:0 18px}
-    .brand .bt,.sami .st{display:none}
-    .sami{padding:0 12px}
   }
   @media (max-width:768px){
     .wrap{margin-left:0}
@@ -481,17 +485,13 @@
     .veil{left:0}
     .drawer{width:min(312px,calc(100vw - 112px))}
     header{flex-wrap:wrap;height:auto;padding:12px 16px;row-gap:12px}
-    header{background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+    header{background:#fff;box-shadow:0 0 4px 0 rgba(61,75,92,.15)}
     .search{order:5;flex:1 0 100%;max-width:none;margin:0;height:44px;padding:0 16px}
     .search input{font-size:14px}
     .hello{display:none}
     .avatar{width:42px;height:42px}
     .bell{width:42px;height:42px;margin-left:auto}
-    .sami{width:42px;height:42px;margin-left:12px;padding:0;border-radius:50%;justify-content:center;overflow:visible}
-    .sami .sami-ico{width:46px;height:46px;margin:0}
-    .sami .sami-ico img{width:46px;height:46px}
-    .sami .sami-ico::before{left:5px;top:10px;width:28px;height:28px}
-    .sami .sami-ico::after{right:4px;top:3px}
+    .ia-sw{height:40px}.ia-sw button{width:48px}.ia-sami svg{width:26px;height:26px}.ia-gpt svg{width:20px;height:20px}
     .idbar h1{flex:1 0 100%}
     .saldos{margin-top:24px}
     .saldos-h .tip svg{flex:none;width:24px;height:24px}
@@ -637,11 +637,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   <!-- Header -->
   <header>
     <button class="mburger" aria-label="Abrir menú"><svg class="ico" viewBox="0 0 24 24" style="stroke:#333"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-    <a class="brand" href="#"><svg viewBox="0 0 60 61" aria-hidden="true"><path d="M3.32082 56.9184C10.4127 64.0052 22.5328 58.9871 22.5328 48.9536C22.5328 45.9673 21.3465 43.1033 19.2348 40.9916C17.1232 38.8799 14.2592 37.6936 11.2728 37.6936C1.23931 37.6936 -3.7838 49.8239 3.31064 56.9184" fill="#00C73D"/><path d="M52.2388 0H5.71268C0.997463 0 -1.36142 5.69999 1.97206 9.03346L50.9665 58.0279C54.3 61.3614 60 59 60 54.2873V7.76878C60.0003 6.7496 59.7998 5.74034 59.4098 4.79871C59.0199 3.85707 58.4482 3.00152 57.7274 2.28097C57.0066 1.56042 56.1508 0.988996 55.2091 0.599358C54.2673 0.20972 53.258 0.00951191 52.2388 0.0101807M36.5282 22.7414C34.2813 22.7414 31.9479 21.3928 31.9173 18.9245H35.0014C35.0243 19.5632 35.7343 20.1968 36.6326 20.1968C37.3654 20.1713 37.9812 19.8405 37.9812 19.2756C37.9812 18.8023 37.6962 18.5428 36.8947 18.329L35.4518 17.9499C32.1438 17.0516 32.1184 15.3747 32.1438 14.3568C32.1667 12.7257 34.1286 11.2142 36.4468 11.2142C38.6454 11.2142 40.961 12.1837 40.9864 14.8785H37.8845C37.8616 14.0515 37.1517 13.909 36.6326 13.909C35.9252 13.909 35.4518 14.2398 35.4747 14.736C35.4977 15.0668 35.7826 15.3976 36.4443 15.563L38.312 16.0592C40.9839 16.7921 41.3147 18.5657 41.3147 19.2756C41.3147 21.6141 38.854 22.7262 36.5384 22.7262M49.2845 22.4895L45.5973 18.1153V22.4895H42.3351V5.44044H45.5973V14.4714L48.2336 11.4636H52.4068L47.8264 16.334L53.3228 22.5048L49.2845 22.4895Z" fill="#00C73D"/></svg><span class="bt">Portal Contigo</span></a>
+    <div class="ia-sw" role="group" aria-label="Asistentes de IA"><button type="button" class="ia-sami" aria-label="Sami"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="5" width="28" height="22" rx="10" fill="#1d1f1e"/><circle cx="11.5" cy="15.5" r="3.4" fill="#00E04A"/><circle cx="20.5" cy="15.5" r="3.4" fill="#00E04A"/></svg></button><button type="button" class="ia-gpt" aria-label="ChatGPT"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/></svg></button></div>
     <label class="search" role="search"><svg class="s-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg><input type="search" placeholder="Elige Cliente o Caso para buscar..." aria-label="Buscar cliente o caso"></label>
     <button class="bell" aria-label="Notificaciones, 4 nuevas"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg><b>4</b></button>
     <div class="hello"><div class="avatar"><img src="assets/avatar-asesor.jpg" alt="Foto de perfil del asesor"></div><span class="txt">Hola, <span class="n">Juan</span> 👋</span></div>
-    <button class="sami" aria-label="Tu sami"><span class="sami-ico"><img src="assets/sami.png" alt="" width="56" height="56"></span><span class="st">Tu sami</span></button>
   </header>
 
   <main>
