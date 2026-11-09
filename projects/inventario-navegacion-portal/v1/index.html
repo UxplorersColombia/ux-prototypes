@@ -17,8 +17,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .row .lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-right:4px}
 .chip{font:600 13px/1.2 inherit;font-family:inherit;padding:6px 12px;border:1px solid #cfd8d2;background:#fff;color:var(--brand);border-radius:999px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
-.chip:focus-visible,.search:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
-.search{flex:1 1 220px;min-width:0;font:inherit;font-size:14px;padding:8px 12px;border:1px solid #d3ddd6;border-radius:10px;background:#fff;color:var(--ink)}
+.chip:focus-visible,.sel:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.sel{min-width:220px;max-width:100%;font:inherit;font-size:14px;padding:8px 12px;border:1px solid #d3ddd6;border-radius:10px;background:#fff;color:var(--ink);cursor:pointer}
 .count{font-size:13px;color:var(--ink3);margin-left:auto}
 .mods{display:flex;flex-wrap:wrap;gap:6px}
 .mods a{font-size:12.5px;font-weight:600;color:var(--brand2);text-decoration:none;padding:3px 9px;border-radius:999px;background:var(--soft)}
@@ -73,10 +73,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <button class="chip" data-f="tg" data-v="dis" aria-pressed="false">Diseño</button>
     <button class="chip" data-f="tg" data-v="tec" aria-pressed="false">Técnico</button>
     <button class="chip" data-f="tg" data-v="dep" aria-pressed="false">Dependencia</button>
-    <input class="search" id="q" type="search" placeholder="Buscar en el inventario" aria-label="Buscar en el inventario">
     <span class="count" id="count"></span>
   </div>
-  <nav class="mods" id="mods" aria-label="Módulos"></nav>
+  <div class="row"><label class="lbl" for="exp">Experiencia</label><select class="sel" id="exp"><option value="">Todas</option></select></div>
 </div>
 
 <main id="list"></main>
@@ -93,14 +92,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   const PLAN='https://claude.ai/artifact/UfUvLRrsK3QB564PiqJEQi';
   const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   let k=0; navInv.forEach(m=>m.o.forEach(o=>{ o.n=++k; o.ok=!!o.sol||(o.g||[]).includes('man'); }));
-  const F={st:'',tg:'',q:''};
+  const EXP=['Aportes','Gestión de portafolios','Dashboard','Retiros','Traslados','Documentos','Actualización de datos','Fichas de producto','Créditos'];
+  const expOf=m=>m.m.split(' · ')[0];
+  const F={st:'',tg:'',exp:''};
   const $=id=>document.getElementById(id);
   function match(o){
     if(F.st==='pri'&&!o.pri) return false;
     if(F.st==='pend'&&o.ok) return false;
     if(F.st==='ok'&&!o.ok) return false;
     if(F.tg&&!(o.tg||[]).includes(F.tg)) return false;
-    if(F.q){ const h=(o.t+' '+(o.a||[]).join(' ')).toLowerCase(); if(!h.includes(F.q)) return false; }
     return true; }
   function item(m,o){
     const tags=[o.pri?'<span class="tag t-pri">Prioritario</span>':'', o.sol?'<span class="tag t-sol">✓ Solucionado</span>':'',
@@ -111,14 +111,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <div class="txt">${esc(o.t)}${o.a&&o.a.length?`<div class="acc"><b>Acción:</b><ol>${o.a.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:''}${links?`<div class="links">${links}</div>`:''}</div>
       <div class="imgs">${(o.img||[]).map(k=>`<button type="button" class="th" data-k="${k}" data-c="${esc(m.m)} · ítem ${o.n}" aria-label="Ver imagen del ítem ${o.n}"><img src="${invImg[k]}" alt="Captura del ítem ${o.n}" loading="lazy"></button>`).join('')}</div></article>`; }
   function render(){
-    let n=0, mods=[];
-    const html=navInv.map((m,i)=>{ const os=m.o.filter(match); if(!os.length) return ''; n+=os.length; mods.push(`<a href="#m${i}">${esc(m.m)}</a>`);
+    let n=0;
+    const html=navInv.map((m,i)=>{ if(F.exp&&expOf(m)!==F.exp) return ''; const os=m.o.filter(match); if(!os.length) return ''; n+=os.length;
       return `<section class="mod" id="m${i}"><h2>${esc(m.m)}</h2>${os.map(o=>item(m,o)).join('')}</section>`; }).join('');
-    $('list').innerHTML=html||'<p class="empty">Ningún ítem coincide con los filtros. Prueba con «Todos» o borra la búsqueda.</p>';
-    $('mods').innerHTML=mods.join(''); $('count').textContent=`${n} de ${k} ítems`; }
+    $('list').innerHTML=html||'<p class="empty">Ningún ítem coincide con los filtros. Prueba con «Todos» o con otra experiencia.</p>';
+    $('count').textContent=`${n} de ${k} ítems`; }
   document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{ F[b.dataset.f]=b.dataset.v;
     document.querySelectorAll(`.chip[data-f="${b.dataset.f}"]`).forEach(x=>x.setAttribute('aria-pressed',String(x===b))); render(); }));
-  $('q').addEventListener('input',e=>{ F.q=e.target.value.trim().toLowerCase(); render(); });
+  $('exp').innerHTML+=EXP.filter(x=>navInv.some(m=>expOf(m)===x)).map(x=>`<option>${x}</option>`).join('');
+  $('exp').addEventListener('change',e=>{ F.exp=e.target.value; render(); });
   $('list').addEventListener('click',e=>{ const t=e.target.closest('.th'); if(!t) return; $('lbImg').src=invImg[t.dataset.k]; $('lbImg').alt=t.dataset.c; $('lbCap').textContent=t.dataset.c; $('lb').hidden=false; $('lbClose').focus(); });
   const close=()=>{ $('lb').hidden=true; }; $('lbClose').addEventListener('click',close);
   $('lb').addEventListener('click',e=>{ if(e.target.id==='lb') close(); }); document.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
