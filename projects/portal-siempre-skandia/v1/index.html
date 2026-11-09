@@ -1295,6 +1295,44 @@
   .sk-ta{display:flex;flex-direction:column;gap:4px;width:100%;margin-bottom:var(--sk-space-m);}
   /* RONDA 29 — campo "Cuéntanos más" que aparece solo con la respuesta desfavorable (wf4) */
   .why-field{margin-top:var(--sk-space-s);}
+  /* RONDA 37 — wf7 "Qué recibes" (valor concreto de la comunidad). */
+  .community-list{margin:0 0 var(--sk-space-m);padding-left:20px;display:grid;gap:6px;font-size:16px;line-height:24px;color:var(--sk-color-text);}
+  .community-list li::marker{color:var(--sk-color-primary-active);}
+  /* RONDA 37 — acceso persistente a WhatsApp + preguntas frecuentes. */
+  .help-fab{position:fixed;right:24px;bottom:24px;z-index:100;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px;border-radius:999px;border:1px solid var(--sk-color-primary);background:var(--sk-color-surface);color:var(--sk-color-primary-active);font-family:var(--sk-font-heading,inherit);font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.08);}
+  .help-fab i{width:20px;height:20px;display:inline-flex;}
+  .help-fab i svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .help-panel{position:fixed;right:24px;bottom:84px;z-index:101;width:360px;max-width:calc(100vw - 32px);max-height:min(70vh,560px);overflow-y:auto;padding:var(--sk-space-m);background:var(--sk-color-surface);border:1px solid var(--sk-color-border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);}
+  .help-panel[hidden]{display:none;}
+  .help-panel__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sk-space-xs,4px);}
+  .faq-list details{border-top:1px solid var(--sk-color-border);padding:10px 0;}
+  .faq-list details:last-child{border-bottom:1px solid var(--sk-color-border);}
+  .faq-list summary{cursor:pointer;font-size:14px;line-height:22px;font-weight:600;color:var(--sk-color-text);}
+  .faq-list details p{margin:6px 0 0;font-size:14px;line-height:22px;color:var(--sk-color-text-muted);}
+  @media (max-width:767px){
+    .help-fab{right:16px;bottom:16px;}
+    .help-fab span{display:none;}
+    .help-fab{width:48px;padding:0;justify-content:center;}
+    .help-panel{right:16px;bottom:76px;}
+  }
+  /* RONDA 37 — guía de consolidación del PAC (wf2): pasos numerados. */
+  .pac-steps{margin:0;padding-left:20px;display:grid;gap:8px;font-size:16px;line-height:24px;color:var(--sk-color-text);}
+  .pac-steps li::marker{color:var(--sk-color-primary-active);font-weight:700;}
+  /* RONDA 37 — Ruta 2 firma en físico: el módulo de wf3 es solo de consulta
+     (sin botón "Firmar documento", sin conteo ni mensaje de "ya firmaste"). */
+  body[data-route-group="r2"] .sign-open-wrap,
+  body[data-route-group="r2"] .sign-only{display:none !important;}
+  /* RONDA 37 — botón terciario compacto "¿Quieres contarnos más?" bajo cada
+     pregunta de la entrevista. El padding base de `.sk-btn--tertiary`
+     (12px 24px) es de acción principal de pantalla; acá es un apoyo discreto. */
+  .more-toggle-row{margin-top:4px;}
+  .more-toggle-row .sk-btn{width:auto;padding:6px 12px;margin-left:-12px;min-height:0;font-size:14px;}
+  /* RONDA 37 — paso 0 de la entrevista: datos precargados, solo lectura. */
+  .wf4-data{margin:0 0 var(--sk-space-m);padding:0;display:grid;gap:0;border:1px solid var(--sk-color-border);border-radius:8px;overflow:hidden;background:var(--sk-color-surface,#fff);}
+  .wf4-data__row{display:flex;gap:var(--sk-space-m);padding:12px 16px;border-top:1px solid var(--sk-color-border);}
+  .wf4-data__row:first-child{border-top:none;}
+  .wf4-data dt{flex:0 0 120px;margin:0;color:var(--sk-color-text-muted);font-size:14px;line-height:22px;}
+  .wf4-data dd{margin:0;color:var(--sk-color-text);font-size:16px;line-height:24px;font-weight:600;}
   .why-field[hidden]{display:none;}
   .sk-ta__label{font-family:var(--sk-font-body);font-size:.875rem;line-height:1.375rem;color:#3b4448;}
   .sk-ta__wrapper{
@@ -2076,9 +2114,18 @@
       <input type="checkbox" id="qaShowNovedades">
       <label for="qaShowNovedades">wf8 — mostrar Novedades (2.0, oculta por defecto)</label>
     </div>
-    <div class="qa-field checkline">
-      <input type="checkbox" id="qaOutExec">
-      <label for="qaOutExec">wf6 — previsualizar variante "ejecutivo" (🟡 no confirmada)</label>
+    <!-- RONDA 37, 2026-11-06 — reunión con Claudia: el outplacement ejecutivo
+         aplica solo a las categorías A y B; a las demás no se les muestra
+         (ni siquiera como etiqueta). Reemplaza el checkbox "previsualizar
+         variante ejecutivo". En producción la categoría llega de la planta
+         de colaboradores; acá se simula. Compensar sigue visible para todos. -->
+    <div class="qa-field">
+      <label for="qaCategoria">Categoría del colaborador (dato de planta simulado)</label>
+      <select id="qaCategoria">
+        <option value="otra" selected>Otra (sin outplacement ejecutivo)</option>
+        <option value="A">A (outplacement ejecutivo)</option>
+        <option value="B">B (outplacement ejecutivo)</option>
+      </select>
     </div>
     <div class="qa-field checkline">
       <input type="checkbox" id="qaLoginError">
@@ -2158,6 +2205,38 @@
       <button class="nav-item v-novedades sk-interactive" data-nav="wf8"><i class="pi pi-megaphone"><svg><use href="#pi-megaphone"></use></svg></i><span class="nav-item__label">Novedades</span></button>
     </div>
   </nav>
+
+  <!-- ============================================================
+       RONDA 37, 2026-11-06 — reunión con Claudia: "¿a quién llamo, a quién
+       le escribo, dónde?" → acceso persistente a la línea de WhatsApp de
+       Nómina + preguntas frecuentes, en todas las pantallas menos wf0
+       (antes de ingresar no hay quién ayudar; ver showScreen()). Es un
+       popover NO modal: no atrapa el foco, se cierra con Escape o al hacer
+       clic fuera. Vive dentro de .app-shell para quedar inerte cuando se
+       abre un modal (setAppInert()). Estilo secundario (borde verde, fondo
+       blanco), no primario: la pantalla ya tiene su acción principal.
+       🟡 Las preguntas son ejemplos; las valida Nómina.
+       ============================================================ -->
+  <button type="button" class="help-fab sk-interactive" id="helpFab" aria-expanded="false" aria-controls="helpPanel" style="display:none;">
+    <i class="pi pi-comment"><svg><use href="#pi-comment"></use></svg></i><span>¿Dudas? Escríbenos</span>
+  </button>
+  <div class="help-panel" id="helpPanel" role="region" aria-label="Ayuda" hidden>
+    <div class="help-panel__head">
+      <p class="sk-card__header" style="margin:0;">¿Necesitas ayuda?</p>
+      <button type="button" class="nav-drawer__close-btn" id="helpClose" aria-label="Cerrar ayuda"><i class="pi pi-times"><svg><use href="#pi-times"></use></svg></i></button>
+    </div>
+    <p class="sk-body muted" style="margin:0 0 var(--sk-space-s);">Resuelve tus dudas con el equipo de Nómina.</p>
+    <sk-button style="display:block;"><a class="sk-btn sk-btn--primary sk-interactive" href="https://wa.me/573205914238" target="_blank" rel="noopener" style="width:100%;">Escribir por WhatsApp</a></sk-button>
+    <p class="sk-label-strong" style="margin:var(--sk-space-m) 0 var(--sk-space-xs,4px);">Preguntas frecuentes</p>
+    <div class="faq-list">
+      <details><summary>¿Cuándo me pagan mi liquidación?</summary><p>En Mi liquidación ves en qué etapa va tu proceso. El pago se realiza cuando termina la revisión de tu paz y salvo.</p></details>
+      <details><summary>¿Dónde están mis documentos?</summary><p>En Mis documentos encuentras los que debes firmar y los que puedes descargar.</p></details>
+      <details><summary>¿Qué pasa con mis cesantías?</summary><p>Si las tienes con Skandia, puedes mantenerlas. Escríbenos por WhatsApp y te contamos las opciones.</p></details>
+      <details><summary>¿Cómo obtengo mi certificado de ingresos y retenciones?</summary><p>Estará disponible en Mis documentos. Te avisamos cuando esté listo.</p></details>
+      <details><summary>¿Algo de mis datos no coincide?</summary><p>Escríbenos por WhatsApp a la línea de Nómina y lo revisamos contigo.</p></details>
+    </div>
+    <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:flex;margin-top:var(--sk-space-s);"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Preguntas y respuestas de ejemplo. Las valida Nómina; Kiki revisa el copy.</span></p>
+  </div>
 
   <!-- Modal obligatorio de encuesta (Gate 1: wf4 antes de wf3; Gate 2: wf5
        antes de #wf3List). A diferencia del drawer de arriba, este modal NO
@@ -2312,7 +2391,7 @@
           <div class="sk-alert sk-callout" data-type="error" data-variant="error" data-audience="user">
             <i class="pi pi-exclamation-triangle"><svg><use href="#pi-exclamation-triangle"></use></svg></i>
             <div class="sk-alert__body">
-              <p class="sk-alert__msg">No pudimos verificar tu información. Revisa los datos e intenta de nuevo. Si el problema continúa, escríbenos a [canal de soporte por definir].</p>
+              <p class="sk-alert__msg">No pudimos verificar tu información. Revisa los datos e intenta de nuevo. Si el problema continúa, escríbenos por WhatsApp a la línea de Nómina: <a class="sk-link" href="https://wa.me/573205914238" target="_blank" rel="noopener">+57 320 591 4238</a>.</p>
             </div>
           </div>
         </div>
@@ -2510,7 +2589,10 @@
             <div class="wf1-hero">
               <div class="wf1-hero__content">
                 <p class="wf1-hero__eyebrow">Siempre Skandia</p>
-                <p class="wf1-hero__title">Siempre Skandia te acompaña en este proceso, con calma y claridad.</p>
+                <!-- RONDA 37, 2026-11-06 — Claudia (reunión de revisión): "con calma"
+                     suena a "cálmate" y puede despertar lo que no queremos. Se
+                     deja solo "con claridad". -->
+                <p class="wf1-hero__title">Siempre Skandia te acompaña en este proceso, con claridad.</p>
                 <!-- REVISOR: pendiente de confirmar wording con Kiki (Ruta 3, colaborador/pensión) — content.md no definía este texto, ver histórico junto al <h1> de abajo. -->
                 <p class="wf1-hero__body">Aquí encuentras la información de tu proceso de retiro en un solo lugar.</p>
                 <div class="wf1-hero__actions">
@@ -2555,8 +2637,10 @@
             <div class="wf1-hero">
               <div class="wf1-hero__content">
                 <p class="wf1-hero__eyebrow">Siempre Skandia</p>
-                <p class="wf1-hero__title">Siempre Skandia acompaña este proceso, con calma y claridad.</p>
-                <p class="wf1-hero__body">Aquí puedes revisar, con calma, la información de este proceso.</p>
+                <!-- RONDA 37, 2026-11-06 — se quita "con calma" (ver nota en r3c). En
+                     fallecimiento pesa más: no se le dice a la familia cómo sentirse. -->
+                <p class="wf1-hero__title">Siempre Skandia acompaña este proceso, con claridad.</p>
+                <p class="wf1-hero__body">Aquí puedes revisar la información de este proceso.</p>
                 <div class="wf1-hero__actions">
                   <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-goto="wf2" style="width:auto;">Ver mi proceso</button></sk-button>
                   <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-goto="wf3" style="width:auto;">Mis documentos</button></sk-button>
@@ -2799,6 +2883,40 @@
         </ul>
       </div>
 
+      <!-- ============================================================
+           RONDA 37, 2026-11-06 — reunión con Claudia, dos accionables nuevos
+           en "Mi liquidación":
+           1) Entrada a «Transforma tu liquidación» (simulador: qué pasa si la
+              liquidación va a cuenta de ahorros, Mfund, Sipen, Crea o al
+              obligatorio). Ruta 1 y Ruta 3 colaborador: siempre. Ruta 2:
+              solo cuando el pago ya se realizó (última etapa) — el riesgo
+              "venta oportunista antes del pago" del deck (riesgo 2) es
+              mayor en la salida no elegida. Ruta 3 beneficiario: nunca.
+           2) Guía para consolidar el PAC ("¿a quién le escribo? ¿qué
+              hago?"). 🟡 Los pasos son de ejemplo hasta que Nómina/Producto
+              entreguen el manual real.
+           ============================================================ -->
+      <div id="wf2SimEntry" class="sk-card" style="max-width:640px;margin-top:var(--sk-space-l);display:none;">
+        <p class="sk-card__header">Transforma tu liquidación</p>
+        <p class="sk-body muted">Mira qué pasa con tu liquidación según dónde la recibas: cuánto queda disponible, cuánto queda ahorrado y qué beneficio tributario podrías tener. La decisión siempre es tuya.</p>
+        <sk-button style="display:block;margin-top:var(--sk-space-s);"><a class="sk-btn sk-btn--secondary sk-interactive" href="simulador-liquidacion-siempre-skandia.html" target="_blank" rel="noopener" style="width:auto;">Simular mi liquidación</a></sk-button>
+      </div>
+
+      <div class="variant sk-card" data-r="r1 r2 r3c" id="wf2PacCard" style="max-width:640px;margin-top:var(--sk-space-m);">
+        <p class="sk-card__header">¿Tienes un PAC con Skandia?</p>
+        <p class="sk-body muted">Guarda esta guía para el día que quieras consolidarlo. Así sabes con quién hablar y qué hacer.</p>
+        <sk-button style="display:block;margin-top:var(--sk-space-s);"><button type="button" class="sk-btn sk-btn--secondary sk-interactive" id="wf2PacToggle" aria-expanded="false" aria-controls="wf2PacGuide" style="width:auto;">Ver la guía para consolidar mi PAC</button></sk-button>
+        <div id="wf2PacGuide" hidden style="margin-top:var(--sk-space-m);">
+          <ol class="pac-steps">
+            <li><strong>Escríbenos.</strong> Cuéntanos por WhatsApp a la línea de Nómina (<a class="sk-link" href="https://wa.me/573205914238" target="_blank" rel="noopener">+57 320 591 4238</a>) que quieres consolidar tu PAC.</li>
+            <li><strong>Revisamos contigo.</strong> Te confirmamos lo que tienes con Skandia y qué documentos necesitas.</li>
+            <li><strong>Diligencia y firma.</strong> Completas la solicitud y la firmas.</li>
+            <li><strong>Te avisamos.</strong> Cuando quede lista, te lo confirmamos por el mismo canal.</li>
+          </ol>
+          <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:flex;margin-top:var(--sk-space-s);"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Pasos de ejemplo. El manual real de consolidación del PAC lo entregan Nómina y Producto; Kiki valida el copy.</span></p>
+        </div>
+      </div>
+
       <div class="sk-alert sk-callout" data-type="info" data-variant="info" data-audience="user" style="margin-top:var(--sk-space-l);max-width:640px;">
         <i class="pi pi-info-circle"><svg><use href="#pi-info-circle"></use></svg></i>
         <div class="sk-alert__body">
@@ -2851,7 +2969,10 @@
 
       <nav class="sk-breadcrumb" aria-label="Breadcrumb"><ol class="sk-breadcrumb__list"><li><a class="sk-breadcrumb__link" href="#wf1" data-goto="wf1">Inicio</a></li><li><span class="sk-breadcrumb__separator" aria-hidden="true">/</span><span class="sk-breadcrumb__link sk-breadcrumb__link--active" aria-current="page">Mis documentos</span></li></ol></nav>
       <h1 class="sk-display">Tus documentos</h1>
-      <p class="sk-body muted content-gap" style="margin-top:6px;">Firma los documentos que lo necesitan sin salir del portal, y descarga los que Skandia ya preparó para ti.</p>
+      <!-- RONDA 37 — en Ruta 2 la firma es en físico (ver nota del módulo 1),
+           así que el subtítulo no puede invitar a "firmar sin salir del portal". -->
+      <div class="variant" data-r="r1 r3c r3b"><p class="sk-body muted content-gap" style="margin-top:6px;">Firma los documentos que lo necesitan sin salir del portal, y descarga los que Skandia ya preparó para ti.</p></div>
+      <div class="variant" data-r="r2"><p class="sk-body muted content-gap" style="margin-top:6px;">Aquí consultas los documentos de tu retiro y descargas los que Skandia ya preparó para ti.</p></div>
 
       <!-- ============================================================
            MÓDULO 1 — Documentos por firmar. RONDA 30: ver documento +
@@ -2860,9 +2981,21 @@
            de red real (igual que el resto del archivo no tiene backend)
            — el estado "firmado" es simulado y vive en el DOM/JS.
            ============================================================ -->
-      <p class="sk-h2 content-gap">Documentos por firmar</p>
-      <p class="sk-body muted content-gap" style="margin-top:2px;">Revisa y firma electrónicamente cada documento — no necesitas descargarlo, imprimirlo ni volver a subirlo.</p>
-      <p class="sk-caption" id="wf3UploadCountLabel" style="margin:4px 0 var(--sk-space-m);"></p>
+      <!-- RONDA 37, 2026-11-06 — reunión con Claudia: solo quienes renuncian
+           (salida elegida) firman por el portal; en Ruta 2 la firma es en
+           físico y el portal es de consulta ("los de [salida no elegida] no los
+           va a firmar él"). 🟡 Supuesto por confirmar con Nómina: en Ruta 2 el
+           módulo pasa a "Tus documentos de retiro", sin botón de firma. -->
+      <div class="variant" data-r="r1 r3c r3b">
+        <p class="sk-h2 content-gap">Documentos por firmar</p>
+        <p class="sk-body muted content-gap" style="margin-top:2px;">Revisa y firma electrónicamente cada documento — no necesitas descargarlo, imprimirlo ni volver a subirlo.</p>
+      </div>
+      <div class="variant" data-r="r2">
+        <p class="sk-h2 content-gap">Tus documentos de retiro</p>
+        <p class="sk-body muted content-gap" style="margin-top:2px;">Estos documentos los firmas en físico con el equipo de Nómina. Cuando los carguen, los verás aquí para consultarlos.</p>
+        <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer" style="display:flex;margin-top:6px;margin-bottom:6px;"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Supuesto de la reunión con Claudia: en Ruta 2 la firma es física y este módulo es solo de consulta. Pendiente de confirmar con Nómina; la etapa «Documentos pendientes de tu firma» de Mi liquidación sigue igual para Ruta 2 hasta que se confirme.</span></p>
+      </div>
+      <p class="sk-caption sign-only" id="wf3UploadCountLabel" style="margin:4px 0 var(--sk-space-m);"></p>
 
       <div class="card-grid" id="wf3UploadList">
         <sk-card>
@@ -2871,7 +3004,7 @@
             <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
             <div class="sign-doc-actions" style="margin-top:10px;">
               <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
-              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
+              <sk-button class="sign-open-wrap"><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
             <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
@@ -2882,7 +3015,7 @@
             <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
             <div class="sign-doc-actions" style="margin-top:10px;">
               <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
-              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
+              <sk-button class="sign-open-wrap"><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
             <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
@@ -2893,7 +3026,7 @@
             <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
             <div class="sign-doc-actions" style="margin-top:10px;">
               <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
-              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
+              <sk-button class="sign-open-wrap"><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
             <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
@@ -2904,7 +3037,7 @@
             <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
             <div class="sign-doc-actions" style="margin-top:10px;">
               <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
-              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
+              <sk-button class="sign-open-wrap"><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
             <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
@@ -2915,7 +3048,7 @@
             <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
             <div class="sign-doc-actions" style="margin-top:10px;">
               <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
-              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
+              <sk-button class="sign-open-wrap"><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
             <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
@@ -2926,7 +3059,7 @@
             <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
             <div class="sign-doc-actions" style="margin-top:10px;">
               <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
-              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
+              <sk-button class="sign-open-wrap"><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
             <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
@@ -2937,21 +3070,21 @@
             <span class="sk-badge sk-badge--warning sk-badge--stroke" data-sign-badge>Pendiente de firmar</span>
             <div class="sign-doc-actions" style="margin-top:10px;">
               <sk-button><button type="button" class="sk-btn sk-btn--secondary sk-interactive" data-sign-view>Ver documento</button></sk-button>
-              <sk-button><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
+              <sk-button class="sign-open-wrap"><button type="button" class="sk-btn sk-btn--primary sk-interactive" data-sign-open>Firmar documento</button></sk-button>
             </div>
             <p class="sk-caption" data-sign-meta style="margin-top:8px;display:none;"></p>
           </div>
         </sk-card>
       </div>
 
-      <div id="wf3UploadDoneMsg" style="display:none;max-width:640px;margin-top:var(--sk-space-m);">
+      <div id="wf3UploadDoneMsg" class="sign-only" style="display:none;max-width:640px;margin-top:var(--sk-space-m);">
         <div class="sk-alert sk-callout" data-type="success" data-variant="success" data-audience="user">
           <i class="pi pi-check-circle"><svg><use href="#pi-check-circle"></use></svg></i>
           <div class="sk-alert__body"><p class="sk-alert__msg">Ya firmaste los 7 documentos. Nómina los recibirá para continuar tu proceso.</p></div>
         </div>
       </div>
 
-      <p class="sk-caption content-gap" style="margin-top:var(--sk-space-m);">Tus documentos firmados quedan guardados en tu portal de Skandia.</p>
+      <p class="sk-caption content-gap sign-only" style="margin-top:var(--sk-space-m);">Tus documentos firmados quedan guardados en tu portal de Skandia.</p>
 
       <hr class="divider" style="margin:var(--sk-space-l) 0;">
 
@@ -2971,6 +3104,26 @@
       <p class="sk-caption" id="wf3DocsCountLabel" aria-hidden="true" style="margin:4px 0 var(--sk-space-m);"></p>
 
       <div class="card-grid" id="wf3List">
+        <!-- RONDA 37, 2026-11-06 — reunión con Claudia: los documentos que la
+             gente siempre pide (certificación laboral, CIR, planilla) van en
+             "Para descargar". La certificación ya existe como documento por
+             firmar (módulo de arriba); acá se habilita sola cuando se firma
+             (ver updateSignSummary() → syncCertDownload()). -->
+        <sk-card>
+          <div class="sk-card" data-doc="certificacion">
+            <div style="margin-bottom:8px;">
+              <p class="sk-label-strong" style="margin:0 0 6px;">Carta de certificación laboral</p>
+              <span class="sk-badge sk-badge--warning sk-badge--stroke" data-badge>Pendiente de firma</span>
+            </div>
+            <p class="sk-caption muted" data-status-text>Se habilita cuando tus documentos de retiro estén firmados.</p>
+            <sk-button style="display:none;" data-cert-download>
+              <button class="sk-btn sk-btn--secondary sk-interactive" style="width:auto;" data-download>
+                <i class="pi pi-download"><svg><use href="#pi-download"></use></svg></i>Descargar
+              </button>
+            </sk-button>
+          </div>
+        </sk-card>
+
         <sk-card>
           <div class="sk-card" data-doc="cir">
             <div style="margin-bottom:8px;">
@@ -3025,7 +3178,7 @@
       <div id="wf3DownloadError" style="display:none;max-width:640px;margin-top:var(--sk-space-m);">
         <div class="sk-alert sk-callout" data-type="error" data-variant="error" data-audience="user">
           <i class="pi pi-exclamation-triangle"><svg><use href="#pi-exclamation-triangle"></use></svg></i>
-          <div class="sk-alert__body"><p class="sk-alert__msg">No pudimos descargar tu documento. Intenta de nuevo en unos minutos. Si el problema sigue, escríbenos a [canal de soporte por definir].</p></div>
+          <div class="sk-alert__body"><p class="sk-alert__msg">No pudimos descargar tu documento. Intenta de nuevo en unos minutos. Si el problema sigue, escríbenos por WhatsApp a la línea de Nómina: <a class="sk-link" href="https://wa.me/573205914238" target="_blank" rel="noopener">+57 320 591 4238</a>.</p></div>
         </div>
       </div>
 
@@ -3142,11 +3295,20 @@
       <div id="wf4Steps">
         <!-- Paso 0 — confirmación de datos (siempre) -->
         <div class="wf4-step" data-step="0">
-          <p class="sk-body content-gap">Confirma que tus datos estén correctos:</p>
+          <!-- RONDA 37, 2026-11-06 — reunión con Claudia: los datos llegan
+               precargados del sistema y NO se pueden editar, así que pedir
+               "confirma que estén correctos" confundía ("¿por qué me piden
+               confirmar si no puedo cambiarlos?"). Se muestran como lista de
+               solo lectura, sin campos ni mensaje de confirmación. Si algo no
+               coincide, la salida es la línea de WhatsApp de Nómina. -->
+          <p class="sk-body content-gap">Estos son los datos de tu retiro.</p>
           <!-- REVISOR: Datos de ejemplo para este prototipo — en producción vienen pre-llenados del sistema. -->
-          <sk-input-text><div class="sk-field"><div class="sk-field__box is-floating"><span class="sk-field__label">Nombre</span><input type="text" value="Laura Gómez"></div></div></sk-input-text>
-          <sk-input-text><div class="sk-field"><div class="sk-field__box is-floating"><span class="sk-field__label">Cargo</span><input type="text" value="Analista de Mercadeo"></div></div></sk-input-text>
-          <sk-input-text><div class="sk-field"><div class="sk-field__box is-floating"><span class="sk-field__label">Área</span><input type="text" value="Mercadeo y Comunicaciones"></div></div></sk-input-text>
+          <dl class="wf4-data">
+            <div class="wf4-data__row"><dt>Nombre</dt><dd>Laura Gómez</dd></div>
+            <div class="wf4-data__row"><dt>Cargo</dt><dd>Analista de Mercadeo</dd></div>
+            <div class="wf4-data__row"><dt>Área</dt><dd>Mercadeo y Comunicaciones</dd></div>
+          </dl>
+          <p class="sk-caption muted">¿Algo no coincide? Escríbenos por WhatsApp a la línea de Nómina: <a class="sk-link" href="https://wa.me/573205914238" target="_blank" rel="noopener">+57 320 591 4238</a>.</p>
         </div>
 
         <!-- Paso 1 — Compensación -->
@@ -3174,12 +3336,12 @@
             <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Muy buena</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Buena</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Mala</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-comunicacion-g1">Muy mala</label></fieldset></sk-radio-group>
             <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Tu líder apoyó tu desarrollo y desempeño?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-lider-apoyo-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-apoyo-g1">No</label></fieldset></sk-radio-group>
-            <div class="why-field" data-why-name="wf4-lider-apoyo-g1" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="¿Qué te faltó?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
+            <div class="why-field" data-why-name="wf4-lider-apoyo-g1" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="Escribe aquí lo que quieras compartir"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
           </div>
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Recibías retroalimentación clara sobre tu desempeño?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-lider-retro-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-retro-g2">No</label></fieldset></sk-radio-group>
-            <div class="why-field" data-why-name="wf4-lider-retro-g2" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="¿Qué te faltó?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
+            <div class="why-field" data-why-name="wf4-lider-retro-g2" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="Escribe aquí lo que quieras compartir"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
             <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Cómo calificarías el trato que recibiste de tus líderes?</p>
             <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Muy bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-lider-trato-g2">Muy malo</label></fieldset></sk-radio-group>
           </div>
@@ -3213,7 +3375,7 @@
             <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Muy bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Bueno</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Regular</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Malo</label><label class="sk-radio-row"><input type="radio" name="wf4-clima-g2">Muy malo</label></fieldset></sk-radio-group>
             <p class="sk-body content-gap" style="margin-top:var(--sk-space-m);">¿Sentiste que tus inquietudes o sugerencias eran escuchadas?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-escuchado-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-escuchado-g2">No</label></fieldset></sk-radio-group>
-            <div class="why-field" data-why-name="wf4-escuchado-g2" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="¿Qué te faltó?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
+            <div class="why-field" data-why-name="wf4-escuchado-g2" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="Escribe aquí lo que quieras compartir"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
           </div>
         </div>
 
@@ -3223,7 +3385,7 @@
           <div class="variant" data-r="r1 r3c">
             <p class="sk-body content-gap">¿Sientes que los beneficios que recibiste cubrieron tus necesidades?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-g1">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-beneficios-g1">No</label></fieldset></sk-radio-group>
-            <div class="why-field" data-why-name="wf4-beneficios-g1" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="¿Qué te faltó?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
+            <div class="why-field" data-why-name="wf4-beneficios-g1" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="Escribe aquí lo que quieras compartir"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
           </div>
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Los beneficios que recibiste cumplieron tus expectativas?</p>
@@ -3250,7 +3412,7 @@
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Contabas con las herramientas necesarias para cumplir tus funciones?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-herramientas-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-herramientas-g2">No</label></fieldset></sk-radio-group>
-            <div class="why-field" data-why-name="wf4-herramientas-g2" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="¿Qué te faltó?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
+            <div class="why-field" data-why-name="wf4-herramientas-g2" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="Escribe aquí lo que quieras compartir"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
           </div>
         </div>
 
@@ -3264,7 +3426,7 @@
           <div class="variant" data-r="r2">
             <p class="sk-body content-gap">¿Las capacitaciones que recibiste fueron útiles para tu rol?</p>
             <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf4-capacitaciones-g2">Sí</label><label class="sk-radio-row"><input type="radio" name="wf4-capacitaciones-g2">No</label></fieldset></sk-radio-group>
-            <div class="why-field" data-why-name="wf4-capacitaciones-g2" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="¿Qué te faltó?"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
+            <div class="why-field" data-why-name="wf4-capacitaciones-g2" data-why-on="No" hidden><sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="Escribe aquí lo que quieras compartir"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea></div>
           </div>
         </div>
 
@@ -3360,7 +3522,12 @@
 
       <div id="wf5Steps">
         <div class="wf5-step" data-step="0">
-          <p class="sk-body content-gap">¿Qué tan claro fue el proceso de salida desde el día que informaste tu retiro?</p>
+          <!-- RONDA 37, 2026-11-06 — "desde el día que informaste tu retiro" solo
+               tiene sentido si la persona renunció (Claudia: ¿esto es para los
+               que renunciaron?). En Ruta 2 (decisión de la compañía) y en
+               fallecimiento (r3b) se usa un texto neutro. -->
+          <div class="variant" data-r="r1 r3c"><p class="sk-body content-gap">¿Qué tan claro fue el proceso de salida desde el día que informaste tu retiro?</p></div>
+          <div class="variant" data-r="r2 r3b"><p class="sk-body content-gap">¿Qué tan claro fue el proceso de retiro desde su inicio?</p></div>
           <sk-radio-group><fieldset class="sk-radio-group"><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Muy claro</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Claro</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Regular</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Confuso</label><label class="sk-radio-row"><input type="radio" name="wf5-claridad">Muy confuso</label></fieldset></sk-radio-group>
         </div>
         <div class="wf5-step" data-step="1">
@@ -3407,7 +3574,10 @@
             <div class="sk-alert sk-callout" data-type="info" data-variant="info" data-audience="user"><i class="pi pi-info-circle"><svg><use href="#pi-info-circle"></use></svg></i><div class="sk-alert__body"><p class="sk-alert__msg">Perfecto. Alguien de Skandia puede acompañarte con esto — sin compromiso.</p></div></div>
           </div>
         </div>
-        <div class="wf5-step" data-step="5">
+        <!-- RONDA 37 — esta pregunta ofrece la comunidad de excolaboradores, que
+             Ruta 2 no tiene (salida no elegida): no se hace en esa ruta
+             (`data-not-r`, lo filtra renderWf5()). -->
+        <div class="wf5-step" data-step="5" data-not-r="r2">
           <p class="sk-body content-gap">¿Te interesaría mantenerte informado de contenidos y oportunidades como ex colaborador?</p>
           <sk-radio-group><fieldset class="sk-radio-group sk-radio-group--row"><label class="sk-radio-row"><input type="radio" name="wf5-mantenerse">Sí</label><label class="sk-radio-row"><input type="radio" name="wf5-mantenerse">No</label></fieldset></sk-radio-group>
         </div>
@@ -3490,6 +3660,9 @@
       <nav class="sk-breadcrumb" aria-label="Breadcrumb"><ol class="sk-breadcrumb__list"><li><a class="sk-breadcrumb__link" href="#wf1" data-goto="wf1">Inicio</a></li><li><span class="sk-breadcrumb__separator" aria-hidden="true">/</span><span class="sk-breadcrumb__link sk-breadcrumb__link--active" aria-current="page">Apoyo para tu próximo paso</span></li></ol></nav>
       <h1 class="sk-display">Apoyo para tu próximo paso</h1>
 
+      <!-- RONDA 37 — columna flex para que el bloque ejecutivo (solo categorías
+           A y B) quede ARRIBA de Compensar sin mover su marcado. -->
+      <div id="wf6Body" style="display:flex;flex-direction:column;">
       <div id="wf6General">
         <p class="sk-body muted content-gap" style="margin-top:6px;">Como parte de tu proceso de desvinculación, puedes acceder al Subsidio de Desempleo de Compensar: un beneficio que te brinda acompañamiento y herramientas para volver al mundo laboral.</p>
 
@@ -3548,15 +3721,16 @@
         </div>
       </div>
 
-      <div id="wf6Exec" style="display:none;">
+      <div id="wf6Exec" style="display:none;order:-1;">
         <div class="flag-banner sk-callout" data-variant="warning" data-audience="reviewer">
           <i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i>
-          <p><strong>Vista previa no confirmada.</strong> Hoy no existe en Gestión Humana el dato de elegibilidad al beneficio ejecutivo (riesgo abierto confirmado por Javier). No pasa a producción con este nivel activo.</p>
+          <p><strong>Solo categorías A y B.</strong> Reunión con Claudia (2026-11): esta sección no se muestra a las demás categorías, ni siquiera como etiqueta. La categoría debe llegar de la planta de colaboradores; hasta conectarla se simula con el selector QA. No pasa a producción sin ese dato (PRD §6, decisión 5).</p>
           <!-- PRD §6, decisión 5 -->
         </div>
         <p class="sk-body muted content-gap" style="margin-top:6px;">Tienes acceso a un programa de acompañamiento profesional. Así puedes empezar.</p>
         <sk-button style="display:block;margin:var(--sk-space-m) 0;max-width:340px;"><button class="sk-btn sk-btn--primary sk-interactive" style="width:100%;">Empezar mi acompañamiento</button></sk-button>
       </div>
+      </div><!-- /#wf6Body -->
 
       <!-- RONDA 21 — oculta por pedido de Javier ("por ahora"): con la
            tarjeta CTA a compensar.com ya cerrando la sección, este aviso
@@ -3596,7 +3770,20 @@
       <nav class="sk-breadcrumb" aria-label="Breadcrumb"><ol class="sk-breadcrumb__list"><li><a class="sk-breadcrumb__link" href="#wf1" data-goto="wf1">Inicio</a></li><li><span class="sk-breadcrumb__separator" aria-hidden="true">/</span><span class="sk-breadcrumb__link sk-breadcrumb__link--active" aria-current="page">Comunidad</span></li></ol></nav>
       <div class="variant" data-r="r1">
         <h1 class="sk-display">Sigue siendo parte de Siempre Skandia</h1>
-        <p class="sk-body muted content-gap" style="margin-top:6px;">Una comunidad de personas que también pasaron por Skandia — contenido, novedades y espacio para seguir en contacto.</p>
+        <!-- RONDA 37, 2026-11-06 — reunión con Claudia: "la palabra comunidad
+             es todo y nada… hay que definir qué queremos ofrecerle, para que
+             la gente entienda por qué unirse". Se dice en concreto qué
+             recibe la persona y que el grupo es solo de lectura (nadie
+             escribe). 🟡 El contenido final lo define Mercadeo con Nómina. -->
+        <p class="sk-body muted content-gap" style="margin-top:6px;">Un grupo de WhatsApp de personas que también pasaron por Skandia. Solo recibes información: no tienes que escribir ni responder.</p>
+        <p class="sk-h2 content-gap" style="margin-top:var(--sk-space-m);">Qué recibes</p>
+        <ul class="community-list">
+          <li>Un aviso cuando tus certificados estén listos para descargar.</li>
+          <li>Novedades de Skandia y contenido útil para cuidar tus finanzas.</li>
+          <li>Beneficios y oportunidades para quienes fueron parte de Skandia.</li>
+          <li>Un canal directo con el equipo de Nómina.</li>
+        </ul>
+        <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Propuesta de valor de ejemplo. Mercadeo y Nómina definen qué contenido recibirá la comunidad; Godoy revisa la redirección y la cláusula de datos.</span></p>
         <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>Alcance real (referidos, eventos, Boomerang Talent) aún no confirmado para el lanzamiento de noviembre.</span><!-- PRD §6, decisión 10 --></p>
         <div id="wf7JoinBlock-r1">
           <sk-checkbox style="display:block;margin-top:var(--sk-space-m);max-width:340px;">
@@ -3608,17 +3795,22 @@
           <sk-button style="display:block;margin:var(--sk-space-s,8px) 0 0;max-width:340px;"><button class="sk-btn sk-btn--primary sk-interactive" id="wf7JoinBtn-r1" style="width:100%;" disabled>Unirme a la comunidad</button></sk-button>
           <p class="sk-caption">Puedes salir de la comunidad cuando quieras, sin que afecte nada de tu proceso.</p>
         </div>
+        <!-- RONDA 37 — "mejorar el redireccionamiento hacia la comunidad": en vez de
+             "te escribiremos pronto", al autorizar la persona pasa directo al
+             grupo de WhatsApp. 🟡 El enlace es de ejemplo hasta crear el grupo. -->
         <div id="wf7JoinDone-r1" style="display:none;">
           <div class="sk-alert sk-callout" data-type="success" data-variant="success" data-audience="user" style="margin-top:var(--sk-space-m);max-width:340px;">
             <i class="pi pi-check-circle"><svg><use href="#pi-check-circle"></use></svg></i>
-            <div class="sk-alert__body"><p class="sk-alert__msg">¡Listo! Tu solicitud quedó registrada. Te escribiremos pronto con los detalles para unirte al grupo.</p></div>
+            <div class="sk-alert__body"><p class="sk-alert__msg">¡Listo! Ya puedes entrar al grupo de WhatsApp de la comunidad.</p></div>
           </div>
+          <sk-button style="display:block;margin-top:var(--sk-space-s,8px);max-width:340px;"><a class="sk-btn sk-btn--primary sk-interactive" href="https://chat.whatsapp.com/ENLACE-DE-EJEMPLO" target="_blank" rel="noopener" style="width:100%;">Ir al grupo de WhatsApp</a></sk-button>
+          <p class="placeholder-note inline-flag sk-callout" data-variant="warning" data-audience="reviewer"><i class="pi pi-flag-fill"><svg><use href="#pi-flag-fill"></use></svg></i><span>🟡 Enlace de ejemplo: se cambia por el del grupo real cuando se cree.</span></p>
         </div>
       </div>
 
       <div class="variant" data-rg="r3">
         <h1 class="sk-display">Si quieres, puedes seguir en contacto</h1>
-        <p class="sk-body muted content-gap" style="margin-top:6px;">Sin ninguna obligación. Solo si te interesa mantenerte al tanto.</p>
+        <p class="sk-body muted content-gap" style="margin-top:6px;">Sin ninguna obligación. Solo si te interesa mantenerte al tanto. Recibes información por WhatsApp: no tienes que escribir ni responder.</p>
         <div id="wf7JoinBlock-r3">
           <sk-checkbox style="display:block;margin-top:var(--sk-space-m);max-width:340px;">
             <label class="sk-checkbox-row">
@@ -3631,8 +3823,9 @@
         <div id="wf7JoinDone-r3" style="display:none;">
           <div class="sk-alert sk-callout" data-type="success" data-variant="success" data-audience="user" style="margin-top:var(--sk-space-m);max-width:340px;">
             <i class="pi pi-check-circle"><svg><use href="#pi-check-circle"></use></svg></i>
-            <div class="sk-alert__body"><p class="sk-alert__msg">¡Listo! Tu solicitud quedó registrada. Te escribiremos pronto con los detalles para unirte al grupo.</p></div>
+            <div class="sk-alert__body"><p class="sk-alert__msg">¡Listo! Ya puedes entrar al grupo de WhatsApp de la comunidad.</p></div>
           </div>
+          <sk-button style="display:block;margin-top:var(--sk-space-s,8px);max-width:340px;"><a class="sk-btn sk-btn--secondary sk-interactive" href="https://chat.whatsapp.com/ENLACE-DE-EJEMPLO" target="_blank" rel="noopener" style="width:100%;">Ir al grupo de WhatsApp</a></sk-button>
         </div>
       </div>
       </div>
@@ -3806,6 +3999,13 @@
     // reiniciar el índice de paso.
     rebuildWf4Steps();
 
+    // RONDA 37 — wf5 también cambia de pasos según la ruta (la pregunta de
+    // comunidad no va en Ruta 2): se reinicia en la pregunta 1.
+    if (typeof wf5Idx !== 'undefined'){ wf5Idx = 0; renderWf5(); }
+
+    // RONDA 37 — wf3: en Ruta 2 la firma es en físico (texto del estado).
+    applySignMode();
+
     // wf8 — recalcular ventana 1
     renderVentana1();
   }
@@ -3840,6 +4040,9 @@
     document.getElementById('sideRail').classList.toggle('is-hidden', isLogin);
     document.getElementById('mobileTopbar').classList.toggle('is-hidden', isLogin);
     document.getElementById('appFooter').style.display = isLogin ? 'none' : '';
+    // RONDA 37 — el botón de ayuda no aparece antes de ingresar (wf0).
+    document.getElementById('helpFab').style.display = isLogin ? 'none' : '';
+    if (isLogin) document.getElementById('helpPanel').hidden = true;
     if (isLogin && closeDrawer) closeDrawer();
 
     document.querySelectorAll('.nav-item[data-nav]').forEach(function(b){
@@ -4256,6 +4459,12 @@
     var stage = parseInt(stageInput.value,10);
     var list = isReduced ? document.querySelectorAll('#wf2StepperReduced li') : document.querySelectorAll('#wf2StepperFull li');
     syncStepperDots(list, stage);
+    // RONDA 37 — entrada al simulador de «Transforma tu liquidación»:
+    // r1 y r3c siempre; r2 solo con el pago ya realizado (etapa final);
+    // r3b nunca (beneficiario, fallecimiento).
+    var simVisible = (state.route === 'r1' || state.route === 'r3c') ||
+                     (state.route === 'r2' && stage === 5);
+    document.getElementById('wf2SimEntry').style.display = simVisible ? 'block' : 'none';
     // Paneles "Tu progreso" del home — las 4 rutas, ver nota RONDA 35
     // junto a `updateHomeProgress()`. `stage` es el mismo dato para las 4
     // (una sola fuente, un solo slider QA); cada llamada fija su propio
@@ -4301,6 +4510,33 @@
   // RONDA 22 — el aviso de Inicio también depende de esta etapa (ver
   // renderWf1Notif()), no solo el propio stepper de wf2.
   document.getElementById('qaStage').addEventListener('input', function(){ renderStage(); renderWf1Notif(); });
+
+  /* RONDA 37 — ayuda persistente (WhatsApp + preguntas frecuentes): popover
+     no modal. Se cierra con la X, con Escape o al hacer clic fuera. */
+  (function(){
+    var fab = document.getElementById('helpFab');
+    var panel = document.getElementById('helpPanel');
+    function setOpen(open){
+      panel.hidden = !open;
+      fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    fab.addEventListener('click', function(e){ e.stopPropagation(); setOpen(panel.hidden); });
+    document.getElementById('helpClose').addEventListener('click', function(){ setOpen(false); fab.focus(); });
+    document.addEventListener('click', function(e){
+      if (!panel.hidden && !panel.contains(e.target) && e.target !== fab && !fab.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && !panel.hidden){ setOpen(false); fab.focus(); }
+    });
+  })();
+
+  /* RONDA 37 — guía para consolidar el PAC: se despliega en la misma tarjeta. */
+  document.getElementById('wf2PacToggle').addEventListener('click', function(){
+    var guide = document.getElementById('wf2PacGuide');
+    guide.hidden = !guide.hidden;
+    this.setAttribute('aria-expanded', guide.hidden ? 'false' : 'true');
+    this.textContent = guide.hidden ? 'Ver la guía para consolidar mi PAC' : 'Ocultar la guía';
+  });
 
   /* ---------- wf3 — Documentos (descarga — ajuste A, ronda 3) ---------- */
   function renderWf3(){
@@ -4366,9 +4602,39 @@
   var currentSignDoc = null; // key del documento abierto en #docModal ahora mismo
   var docLastFocused = null;
 
+  /* RONDA 37 — la "Carta de certificación laboral" también vive en "Para
+     descargar" y se habilita sola cuando la firma (decisión de la reunión
+     con Claudia: ahí van los documentos que la gente siempre pide). */
+  function syncCertDownload(){
+    var signBadge = document.querySelector('#wf3UploadList [data-sign-doc="certificacion"] [data-sign-badge]');
+    var card = document.querySelector('#wf3List [data-doc="certificacion"]');
+    if (!signBadge || !card) return;
+    var ok = signBadge.classList.contains('sk-badge--success');
+    var badge = card.querySelector('[data-badge]');
+    badge.classList.remove('sk-badge--success','sk-badge--warning');
+    badge.classList.add(ok ? 'sk-badge--success' : 'sk-badge--warning');
+    badge.textContent = ok ? 'Disponible' : 'Pendiente de firma';
+    card.querySelector('[data-status-text]').style.display = ok ? 'none' : '';
+    card.querySelector('[data-cert-download]').style.display = ok ? 'inline-block' : 'none';
+    // Solo el resumen de puntos/conteo: renderWf3() también reabriría
+    // #wf3List y pisaría el bloqueo de la encuesta (Gate 2).
+    renderDocsSummary(document.getElementById('qaDocsEmpty').checked);
+  }
+
+  /* RONDA 37 — en Ruta 2 la firma es en físico: sin botón "Firmar" (CSS) y
+     con el estado "Firma en físico" en vez de "Pendiente de firmar". Solo
+     cambia el texto de los pendientes; el conteo (clase del badge) no se toca. */
+  function applySignMode(){
+    var physical = (state.route === 'r2');
+    document.querySelectorAll('#wf3UploadList [data-sign-badge].sk-badge--warning').forEach(function(b){
+      b.textContent = physical ? 'Firma en físico' : 'Pendiente de firmar';
+    });
+  }
+
   function updateSignSummary(){
     var ready = document.querySelectorAll('#wf3UploadList [data-sign-badge].sk-badge--success').length;
     window.__signCount = ready;
+    syncCertDownload();
     var label = document.getElementById('wf3UploadCountLabel');
     if (label) label.textContent = ready + ' de 7 documentos firmados';
     var doneMsg = document.getElementById('wf3UploadDoneMsg');
@@ -4555,28 +4821,71 @@
      3 en Grupo 1 y 5 en Grupo 2) despliega un campo opcional "Cuéntanos más"
      solo con la respuesta DESFAVORABLE: "No" en casi todas, "Sí" en "¿Hubo
      conflictos…?". Se vacía al cambiar la respuesta para no enviar texto huérfano. */
-  document.querySelectorAll('.why-field').forEach(function(box){
-    var name = box.getAttribute('data-why-name');
-    var trigger = box.getAttribute('data-why-on');
+  /* RONDA 37, 2026-11-06 — reunión con Claudia: "agregar el campo opcional
+     'cuéntanos más' en TODAS las preguntas". Antes solo las 8 Sí/No lo
+     tenían, y solo con la respuesta desfavorable. Ahora cada pregunta (Likert
+     y Sí/No) lleva un botón terciario plegado "¿Quieres contarnos más?" que
+     despliega el campo: no sube la carga cognitiva (Claudia: "si le abrimos
+     campo para todas va a parecer más larga") y quien quiere decir algo lo
+     tiene a mano. En las Sí/No el campo sigue abriéndose solo con la
+     respuesta desfavorable (RONDA 29). En las Likert se crea aquí el mismo
+     `.why-field` (sin `data-why-on`, nunca se abre solo). */
+  var MORE_TEXTAREA_HTML = '<sk-textarea><div class="sk-ta"><label class="sk-ta__label">Cuéntanos más</label><div class="sk-ta__wrapper"><textarea class="sk-ta__field" rows="3" placeholder="Escribe aquí lo que quieras compartir"></textarea></div><div class="sk-ta__footer"></div></div></sk-textarea>';
+  document.querySelectorAll('#wf4Steps sk-radio-group').forEach(function(group){
+    var first = group.querySelector('input[type="radio"]');
+    if (!first) return;
+    var name = first.name;
+    var box = group.nextElementSibling;
+    if (!(box && box.classList.contains('why-field'))){
+      box = document.createElement('div');
+      box.className = 'why-field';
+      box.hidden = true;
+      box.setAttribute('data-why-name', name);
+      box.innerHTML = MORE_TEXTAREA_HTML;
+      group.parentNode.insertBefore(box, group.nextSibling);
+    }
+    var trigger = box.getAttribute('data-why-on'); // null en las Likert: no se abre sola
     var ta = box.querySelector('textarea');
-    var radios = document.querySelectorAll('input[type="radio"][name="' + name + '"]');
-    radios.forEach(function(r){
-      r.addEventListener('change', function(){
-        var show = false;
-        radios.forEach(function(x){ if (x.checked && x.parentElement.textContent.trim() === trigger) show = true; });
-        box.hidden = !show;
-        if (!show) ta.value = '';
-      });
+    var row = document.createElement('div');
+    row.className = 'more-toggle-row';
+    row.innerHTML = '<sk-button><button type="button" class="sk-btn sk-btn--tertiary sk-interactive more-toggle" aria-expanded="false">¿Quieres contarnos más?</button></sk-button>';
+    group.parentNode.insertBefore(row, box);
+    var btn = row.querySelector('button');
+    function sync(){
+      btn.setAttribute('aria-expanded', box.hidden ? 'false' : 'true');
+      btn.textContent = box.hidden ? '¿Quieres contarnos más?' : 'Ocultar comentario';
+    }
+    btn.addEventListener('click', function(){
+      box.hidden = !box.hidden;
+      sync();
+      if (!box.hidden) ta.focus();
     });
+    if (trigger){
+      var radios = document.querySelectorAll('input[type="radio"][name="' + name + '"]');
+      radios.forEach(function(r){
+        r.addEventListener('change', function(){
+          var show = false;
+          radios.forEach(function(x){ if (x.checked && x.parentElement.textContent.trim() === trigger) show = true; });
+          box.hidden = !show;
+          if (!show) ta.value = '';
+          sync();
+        });
+      });
+    }
   });
 
   /* ---------- wf5 — Encuesta (paginado) ---------- */
   var wf5Idx = 0;
   function renderWf5(){
-    var steps = document.querySelectorAll('.wf5-step');
+    var allSteps = Array.prototype.slice.call(document.querySelectorAll('.wf5-step'));
+    // RONDA 37 — pasos excluidos por ruta (`data-not-r`), p. ej. la pregunta
+    // de comunidad en Ruta 2. Misma idea que `visibleSteps` en renderWf4().
+    var steps = allSteps.filter(function(s){
+      return (s.getAttribute('data-not-r') || '').split(' ').indexOf(state.route) === -1;
+    });
     document.getElementById('wf5Done').style.display = 'none';
     document.getElementById('wf5Steps').style.display = 'block';
-    steps.forEach(function(s){ s.style.display = 'none'; });
+    allSteps.forEach(function(s){ s.style.display = 'none'; });
     if (wf5Idx >= steps.length){
       document.getElementById('wf5Steps').style.display = 'none';
       document.getElementById('wf5Done').style.display = 'block';
@@ -4620,12 +4929,20 @@
   });
 
   /* ---------- wf6 — Outplacement (toggle QA de nivel) ---------- */
-  document.getElementById('qaOutExec').addEventListener('change', function(){
-    var exec = this.checked;
+  /* RONDA 37, 2026-11-06 — ya no es un toggle "general ⇄ ejecutivo": Compensar
+     (wf6General) se ve SIEMPRE y el outplacement ejecutivo (wf6Exec) se suma
+     solo si la categoría es A o B. Con cualquier otra categoría, o sin dato,
+     no existe en pantalla (regla "oculto, no deshabilitado" del archivo). */
+  function applyCategory(){
+    var cat = document.getElementById('qaCategoria').value; // 'A' | 'B' | 'otra'
+    var exec = (cat === 'A' || cat === 'B');
+    state.category = cat;
+    document.body.setAttribute('data-category', cat);
     document.body.setAttribute('data-outlevel', exec ? 'ejecutivo' : 'general');
-    document.getElementById('wf6General').style.display = exec ? 'none' : 'block';
     document.getElementById('wf6Exec').style.display = exec ? 'block' : 'none';
-  });
+  }
+  document.getElementById('qaCategoria').addEventListener('change', applyCategory);
+  applyCategory();
 
   /* RONDA 27, 2026-09-21 — Novedades oculta por defecto (pedido de Rafa,
      complejidad operativa de contenido real). `.v-novedades` marca los 4
