@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transforma tu liquidación — Siempre Skandia</title>
+
+<!-- 1. Fuentes oficiales + tipografía de los tags nativos (h1–h6, p, label, small) -->
+<link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-fonts.css">
+<link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-typography.css">
+<!-- 2. Íconos (peer obligatorio, el bundle no los trae) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7/primeicons.css">
+<!-- 3. Componentes sk-* (custom elements + tema Skandia; aplica los 24 colores --sk-color-*) -->
+<script src="https://skcostgblobresources.blob.core.windows.net/skco-lib-components/sk-components-elements.js"></script>
+
+<!--
+  ============================================================================
+  TRANSFORMA TU LIQUIDACIÓN — LANDING / SIMULADOR (Siempre Skandia)
+  2026-11-06 · Reunión con Claudia: "podríamos tener un intermedio, como un
+  landing, una especie de simulador: qué pasa si lo envías a este producto"
+  antes de pasar al asesor. Se enlaza desde el brochure (bloque 03) y desde
+  "Mi liquidación" en el portal.
+
+  PROPUESTA VISUAL: concepto B de Stitch ("Tu liquidación en el tiempo",
+  proyecto 9613170974532591979, carpeta stitch/simulador-b-tiempo/). Stitch
+  propone la composición; esto se reconstruye con el sistema de diseño
+  (skill sk-elements-html) y SVG propio para el gráfico (nunca el HTML de Stitch).
+
+  2026-11-09 · MIGRADO A COMPONENTES sk-* (skill sk-elements-html):
+   · Todo lo de la página va dentro de <template id="ui"> y se monta con JS
+     cuando el bundle termina de arrancar (si no, sk-card/sk-select-button
+     pierden sus hijos).
+   · Componentes: sk-logo, sk-link, sk-card, sk-chip,
+     sk-select-button, sk-tag, sk-alert, sk-button, sk-checkbox + reemplazo
+     .sk-acc-r (acordeón) de la plantilla. Íconos: primeicons (pi pi-*).
+   · TOKENS: ningún hex/rgb suelto fuera del bloque :root. Colores de las curvas:
+     --charts-c01…c05 en el orden de SIM_PARAMS.ordenChips.
+   · EXCEPCIONES (decididas con Javier, 2026-11-09):
+       1) El título del héroe conserva un tamaño de exhibición (clamp 28–42 px);
+          el resto del texto usa la escala oficial.
+       2) Los dos deslizadores (valor y años) siguen siendo <input type="range">
+          nativos con tokens: el sistema de diseño no tiene un sk-slider.
+       3) El gráfico es SVG propio (no existe componente de gráficas).
+       4) text-shadow del héroe: no hay token de sombra de texto.
+       5) El campo del valor de la liquidación es un <input> propio con la cifra
+          grande (clamp 30–44 px), NO sk-input-number: es la «cifra protagonista»
+          del concepto C de Stitch.
+
+  QUÉ ES DINÁMICO
+   · Valor de la liquidación: campo + deslizador, las curvas se recalculan y se
+     animan (sin animación con prefers-reduced-motion).
+   · Hasta tres destinos: se activan/desactivan como chips.
+   · Línea de tiempo: se arrastra sobre el gráfico, con el deslizador nativo
+     (teclado/lector de pantalla) o con los atajos Hoy / 3 / 5 / 10 años; las
+     tarjetas de abajo muestran las cifras de ese año.
+
+  REGLAS DE CONTENIDO (skills regulacion-deber-asesoria + skandia-comunicacion)
+   · Es CONTENIDO INFORMATIVO, no asesoría: ningún destino aparece como
+     "recomendado", ni se promete rentabilidad ("obligaciones de medio y no de
+     resultado"). Aviso en dos capas: frase humana + texto normativo expandible.
+   · Todo beneficio tributario va calificado ("según tu caso y las condiciones
+     vigentes"); nada de "no pagarás impuestos" ni "más barato que retirar".
+   · Lo que escribe la persona no se guarda ni se envía (no hay red ni storage).
+
+  🟡 TODAS las cifras y textos de producto viven en SIM_PARAMS (más abajo) y son
+  DE EJEMPLO, con la marca visible (sk-tag "Cifras de ejemplo"): Producto los
+  valida y Legal revisa los claims. Gating en el portal: en Ruta 2 la entrada a
+  este simulador solo aparece después de "Pago realizado" (riesgo de "venta
+  oportunista antes del pago", deck v4, riesgo 2).
+  ============================================================================
+-->
+
+<style>
+  /* ══ 1. TOKENS QUE EL BUNDLE NO DEFINE. (Los 24 colores --sk-color-* los aplica el bundle al arrancar.) ══ */
+  :root{
+    /* Espaciado (1:1 con --size-* de UX) */
+    --sk-space-zero:0; --sk-space-xxs:4px; --sk-space-xs:8px; --sk-space-s:12px; --sk-space-m:16px;
+    --sk-space-l:24px; --sk-space-xl:32px; --sk-space-2xl:40px; --sk-space-3xl:48px;
+    --sk-space-4xl:56px; --sk-space-5xl:64px;
+    /* Grid de página (1:1 con --grid-* de UX). Fronteras: móvil < 768 · tablet 768–1023.98 · desktop ≥ 1024 */
+    --sk-grid-mobile-columns:4;  --sk-grid-mobile-gutter:16px;  --sk-grid-mobile-margin:16px;
+    --sk-grid-tablet-columns:8;  --sk-grid-tablet-gutter:24px;  --sk-grid-tablet-margin:32px;
+    --sk-grid-desktop-columns:12; --sk-grid-desktop-gutter:24px; --sk-grid-desktop-margin:90px;
+    /* Sombras: una por rol */
+    --sk-shadow-subtle:0 0 2px rgba(68, 68, 68, 0.15);
+    --sk-shadow-surface:0 0 2px 0 rgba(61, 75, 92, 0.15);
+    --sk-shadow-raised:0 4px 16px rgba(0, 0, 0, 0.12);
+    --sk-shadow-overlay:0 8px 24px rgba(0, 0, 0, 0.16);
+    /* Tipografía */
+    --sk-font-title:'Montserrat', sans-serif; --sk-font-body:'Open Sans', system-ui, sans-serif;
+    --sk-font-weight-regular:400; --sk-font-weight-medium:500; --sk-font-weight-bold:700;
+    /* Marca */
+    --sk-gradient-brand:linear-gradient(135deg, #00c73d 0%, #8fe000 100%);
+
+    /* Catálogo UX sin token en la librería */
+    --bordes-s:4px; --bordes-m:16px; --bordes-l:32px; --bordes-xl:104px;
+    --background-warning-light:#fff3e0; --background-info-light:#ebf4ff; --background-error-light:#fff5f4;
+    --background-secundaria:#f7f7f7; --background-grey-medium:#b7b7b7; --background-black:#232323;
+    --stroke-grey-medium:#c5c5c5;
+    --texts-secundaria:#29806d; --texts-complementary:#4ae6c3;
+    --button-secundaria-default:#29806d; --button-secundaria-hover:#1d594c;
+    --button-secundaria-secondary-hover:#ccfdf2; --button-secundaria-tertiary-hover:#edfefa;
+    --illustration-01:#00f0e0; --illustration-02:#45e39e; --illustration-03:#45ad00; --illustration-04:#ffae08;
+    /* Gráficas: usar en orden c01, c02, c03… */
+    --charts-c01:#a1dd70; --charts-c02:#a4d7e1; --charts-c03:#60a9a6; --charts-c04:#ff9460; --charts-c05:#8ba2c1;
+    --charts-c06:#f67e7d; --charts-c07:#dddfd0; --charts-c08:#6a7491; --charts-c09:#de423e; --charts-c10:#95dbb7;
+    --charts-c11:#ffbf9f; --charts-c12:#bc6995; --charts-c13:#d9d052; --charts-c14:#d6c09c; --charts-c15:#fecd72;
+    --charts-c16:#cba1d2; --charts-c17:#c5d8a4; --charts-c18:#368cb5; --charts-c19:#00f59f; --charts-c20:#f50cc9;
+    --charts-c21:#83a488; --charts-c22:#fcf9c6; --charts-c23:#b2f9fc; --charts-c24:#bf9078; --charts-c25:#9eb23b;
+    --charts-c26:#73777b; --charts-c27:#ffe2e2; --charts-c28:#36d6e0; --charts-c29:#aba09d; --charts-c30:#b5d1ff;
+    --charts-c31:#ecffb5; --charts-c32:#6f32c6; --charts-c33:#1f6feb; --charts-c34:#2e8b57; --charts-c35:#f4b400;
+    --charts-c36:#ff5a5f; --charts-c37:#7b3fa1; --charts-c38:#1abc9c; --charts-c39:#f28c28; --charts-c40:#4f6d8a;
+
+    /* Local: cuánto se monta la tarjeta del simulador sobre el héroe (escala de espaciado). */
+    --overlap:var(--sk-space-5xl);
+  }
+
+  /* ══ 2. ANCHO COMPLETO (plantilla). Campos, botones, alertas y tarjetas llenan su contenedor. ══ */
+  :root :is(sk-input-text, sk-input-number, sk-input-select, sk-textarea, sk-date-picker, sk-date-range-picker,
+            sk-file-upload, sk-listbox, sk-form-field, sk-select-button, sk-button, sk-paginator, sk-stepper,
+            sk-table, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) {
+    width:100%; max-width:none; min-width:0; box-sizing:border-box;
+  }
+  :root :is(sk-input-text, sk-input-select, sk-date-picker, sk-date-range-picker, sk-listbox, sk-form-field,
+            sk-button, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) { display:block; }
+  :root :is(sk-input-number, sk-textarea, sk-file-upload):not([data-ancho="auto"]) { display:flex; }
+  :root :is(.sk-input-select, .sk-listbox, .p-select, .p-listbox, .p-datepicker, .p-inputnumber, .p-fileupload) { width:100%; max-width:none; }
+  :root sk-button:not([data-ancho="auto"]):not([label]) { display:inline-block; width:auto; }
+  :root sk-button:not([data-ancho="auto"])[label] .p-button { width:100%; justify-content:center; }
+  :root sk-select-button:not([data-ancho="auto"]) { display:flex; }
+  :root sk-select-button:not([data-ancho="auto"]) .p-selectbutton { display:flex; width:100%; }
+  :root sk-select-button:not([data-ancho="auto"]) .p-togglebutton { flex:1 1 0; min-width:0; justify-content:center; }
+  :root sk-form-field :is(input, select, textarea) { width:100%; box-sizing:border-box; }
+
+  /* ══ 3. LAYOUT DE PÁGINA (grid de UX) ══ */
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ margin:0; background:var(--background-secundaria); }
+  h1,h2,h3,p,dl,dd,ul{ margin:0; }   /* sk-typography.css no resetea márgenes */
+  :focus-visible{ outline:3px solid var(--sk-color-border-focus); outline-offset:2px; }
+  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  .wrap{ width:100%; max-width:1280px; margin:0 auto; padding-inline:var(--sk-grid-mobile-margin); }
+  .sk-grid{ display:grid; grid-template-columns:repeat(var(--sk-grid-mobile-columns), minmax(0, 1fr)); gap:var(--sk-space-m) var(--sk-grid-mobile-gutter); }
+  .sk-grid > *{ grid-column:1 / -1; min-width:0; }
+  @media (min-width:768px){
+    .wrap{ padding-inline:var(--sk-grid-tablet-margin); }
+    .sk-grid{ grid-template-columns:repeat(var(--sk-grid-tablet-columns), minmax(0, 1fr)); column-gap:var(--sk-grid-tablet-gutter); }
+    .sk-grid > :is([data-col="3"], [data-col="4"], [data-col="6"]){ grid-column:span 4; }
+  }
+  @media (min-width:1024px){
+    .wrap{ padding-inline:var(--sk-grid-desktop-margin); }
+    .sk-grid{ grid-template-columns:repeat(var(--sk-grid-desktop-columns), minmax(0, 1fr)); column-gap:var(--sk-grid-desktop-gutter); }
+    .sk-grid > [data-col="3"]{ grid-column:span 3; } .sk-grid > [data-col="4"]{ grid-column:span 4; }
+    .sk-grid > [data-col="6"]{ grid-column:span 6; } .sk-grid > [data-col="8"]{ grid-column:span 8; }
+  }
+  .stack{ display:grid; gap:var(--sk-space-l); }
+  /* Grupo de botones: columnas iguales; en móvil se apilan con la acción principal (la última en el HTML) arriba. */
+  .actions{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:var(--sk-space-s); align-items:center; }
+  @media (max-width:767.98px){
+    .actions{ grid-auto-flow:row; }
+    .actions > :last-child{ order:-1; }
+  }
+
+  /* ══ 4. REEMPLAZO DE sk-accordion (plantilla): un solo <details> por grupo, ↑/↓ entre cabeceras ══ */
+  .sk-acc-r{ display:flex; flex-direction:column; gap:var(--sk-space-xs); }
+  .sk-acc-r summary{ display:flex; align-items:center; gap:var(--sk-space-xs); padding:var(--sk-space-m) var(--sk-space-l); border-radius:var(--bordes-s); list-style:none; cursor:pointer;
+    background:var(--sk-color-surface); box-shadow:var(--sk-shadow-surface); color:var(--sk-color-text); font:700 14px/22px var(--sk-font-body); }
+  .sk-acc-r summary::-webkit-details-marker{ display:none; }
+  .sk-acc-r summary::after{ content:'\e902'; font-family:'primeicons'; font-size:16px; margin-left:auto; transition:transform .24s ease; }
+  .sk-acc-r details[open] > summary{ border-radius:var(--bordes-s) var(--bordes-s) 0 0; background:var(--sk-color-primary); color:var(--sk-color-text-inverse); box-shadow:var(--sk-shadow-surface); }
+  .sk-acc-r details[open] > summary::after{ transform:rotate(180deg); }
+  .sk-acc-r summary:focus-visible{ outline:2px solid var(--sk-color-primary); outline-offset:2px; }
+  .sk-acc-r details > :not(summary){ margin:0; padding:var(--sk-space-l); border:1px solid var(--sk-color-border); border-top:0; border-radius:0 0 var(--bordes-s) var(--bordes-s);
+    background:var(--sk-color-surface); color:var(--sk-color-text); font-size:14px; line-height:22px; }
+
+  /* ══ 5. LA PÁGINA ══ */
+  /* ---------- Cabecera ---------- */
+  .top{ background:var(--sk-color-surface); border-bottom:1px solid var(--sk-color-border); height:var(--sk-space-5xl); position:relative; z-index:3; }
+  .top .wrap{ height:100%; display:flex; align-items:center; justify-content:space-between; gap:var(--sk-space-m); }
+  .brand{ display:flex; align-items:center; gap:var(--sk-space-m); min-width:0; }
+  .brand sk-logo{ height:var(--sk-space-xl); flex:0 0 auto; }
+  .brand p{ font-family:var(--sk-font-title); padding-left:var(--sk-space-m); border-left:1px solid var(--sk-color-border); white-space:nowrap; }
+
+  /* ---------- Héroe ---------- */
+  .hero{ position:relative; overflow:hidden; background:var(--sk-gradient-brand); color:var(--sk-color-text-inverse); padding:var(--sk-space-2xl) 0 calc(var(--overlap) + var(--sk-space-2xl)); }
+  /* Marca de agua: isotipo oficial (sk-logo isotipo-simple, blanco). */
+  .hero__mark{ position:absolute; right:-60px; top:-40px; opacity:.14; pointer-events:none; }
+  .hero__mark sk-logo{ height:520px; }
+  .hero .wrap{ position:relative; }
+  .kicker{ font-weight:var(--sk-font-weight-bold); }
+  /* EXCEPCIÓN 1: el título del héroe conserva tamaño de exhibición (la escala oficial llega a h1 32/40). */
+  .hero h1{ font-size:clamp(28px,4.2vw,42px); line-height:1.18; max-width:24ch; margin:var(--sk-space-s) 0 var(--sk-space-s); text-shadow:0 1px 2px color-mix(in srgb, var(--sk-color-text) 14%, transparent); }
+  .hero p:not(.kicker){ max-width:56ch; text-shadow:0 1px 2px color-mix(in srgb, var(--sk-color-text) 12%, transparent); }
+
+  /* ---------- Escenario ---------- */
+  main{ position:relative; z-index:2; }
+  .stage{ margin-top:calc(var(--overlap) * -1); }
+  .help{ display:block; color:var(--sk-color-text-muted); margin-top:var(--sk-space-xs); }
+  .group-label{ display:block; font-weight:var(--sk-font-weight-bold); }
+  /* EXCEPCIÓN 5: campo del valor con la cifra protagonista (input propio, no sk-input-number). */
+  .amount{ display:flex; align-items:baseline; gap:var(--sk-space-xs); margin-top:var(--sk-space-xxs); border-bottom:2px solid var(--sk-color-border); }
+  .amount:focus-within{ border-color:var(--sk-color-primary); }
+  .amount span, .amount input{ font-family:var(--sk-font-title); font-weight:var(--sk-font-weight-bold); font-size:clamp(30px,5vw,44px); line-height:1.2; }
+  .amount input{ border:0; background:transparent; color:inherit; width:100%; min-width:0; padding:0; }
+  .amount input:focus{ outline:none; }
+  .amount.is-error{ border-color:var(--sk-color-error); }
+  .help.is-error{ color:var(--sk-color-error); font-weight:var(--sk-font-weight-bold); }
+
+  /* Deslizadores (valor y años): riel con relleno verde y manija blanca con borde. */
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:28px; background:transparent; margin:var(--sk-space-xs) 0 0; cursor:pointer; --p:0%; }
+  input[type=range]::-webkit-slider-runnable-track{ height:8px; border-radius:var(--bordes-xl); background:linear-gradient(to right,var(--sk-color-primary) var(--p),var(--sk-color-border) var(--p)); }
+  input[type=range]::-moz-range-track{ height:8px; border-radius:var(--bordes-xl); background:var(--sk-color-border); }
+  input[type=range]::-moz-range-progress{ height:8px; border-radius:var(--bordes-xl); background:var(--sk-color-primary); }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:26px; height:26px; margin-top:-9px; border-radius:50%; background:var(--sk-color-surface); border:3px solid var(--sk-color-primary); box-shadow:var(--sk-shadow-subtle); }
+  input[type=range]::-moz-range-thumb{ width:20px; height:20px; border-radius:50%; background:var(--sk-color-surface); border:3px solid var(--sk-color-primary); box-shadow:var(--sk-shadow-subtle); }
+
+  /* Chips de destinos: el punto toma el color de la serie en el gráfico (--c = --charts-cNN). */
+  .chips{ display:flex; flex-wrap:wrap; gap:var(--sk-space-s); margin-top:var(--sk-space-s); }
+  :root sk-chip .sk-chip__icon{ color:var(--c); }
+  .chip-note{ min-height:20px; }
+
+  /* ---------- Gráfico ---------- */
+  .chart-head{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:var(--sk-space-s); margin:var(--sk-space-xl) 0 var(--sk-space-xs); padding-top:var(--sk-space-l); border-top:1px solid var(--sk-color-border); }
+  #chart{ position:relative; width:100%; touch-action:pan-y; user-select:none; -webkit-user-select:none; }
+  #chart svg{ display:block; width:100%; overflow:visible; cursor:ew-resize; }
+  #chart text{ font-family:var(--sk-font-body); }
+  #chart text.b{ font-weight:var(--sk-font-weight-bold); }
+  .tip{ position:absolute; pointer-events:none; background:var(--sk-color-surface); border:1px solid var(--sk-color-border); border-radius:var(--bordes-s); box-shadow:var(--sk-shadow-raised); padding:var(--sk-space-s); font-size:12px; line-height:20px; min-width:190px; z-index:2; }
+  .tip b{ display:block; font-family:var(--sk-font-title); color:var(--sk-color-text-muted); margin-bottom:var(--sk-space-xxs); }
+  .tip div{ display:flex; align-items:center; justify-content:space-between; gap:var(--sk-space-s); }
+  .tip div span{ display:inline-flex; align-items:center; gap:var(--sk-space-xs); }
+  .tip i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .tip strong{ font-family:var(--sk-font-title); }
+  .scrub{ margin-left:var(--ml,56px); margin-right:var(--mr,128px); }
+  #years{ margin-top:var(--sk-space-s); }
+  /* sk-tag no hace salto de línea: en móvil se muestra la versión corta (el detalle va en la nota de abajo). */
+  .flag-short{ display:none; }
+
+  /* ---------- Resultados ---------- */
+  .results{ margin-top:var(--sk-space-l); }
+  .res-title{ display:flex; align-items:center; gap:var(--sk-space-xs); }
+  .res-title i{ width:12px; height:12px; border-radius:50%; background:var(--c); flex:0 0 auto; }
+  .res-title i.dash{ background:transparent; border:3px dashed var(--c); }
+  #results .desc{ color:var(--sk-color-text-muted); margin:var(--sk-space-xxs) 0 var(--sk-space-s); }
+  #results dl{ display:grid; gap:0; font-size:14px; line-height:22px; }   /* 14/22 = escala oficial «label» */
+  #results dl div{ display:flex; justify-content:space-between; gap:var(--sk-space-m); padding:var(--sk-space-xs) 0; border-top:1px solid var(--sk-color-border); }
+  #results dt{ color:var(--sk-color-text-muted); }
+  #results dd{ text-align:right; font-weight:var(--sk-font-weight-bold); }
+  #results dl div.total{ align-items:baseline; padding-top:var(--sk-space-s); border-top:2px solid var(--sk-color-border); }
+  #results dl div.total dd{ font-family:var(--sk-font-title); font-size:24px; line-height:32px; white-space:nowrap; }   /* 24/32 = escala oficial «h2» */
+
+  /* ---------- Aviso, asesor, pie ---------- */
+  .block{ margin-top:var(--sk-space-l); }
+  .advisor-grid{ align-items:center; }
+  #asesorNote:not(:empty){ margin-top:var(--sk-space-m); padding-top:var(--sk-space-s); border-top:1px solid var(--sk-color-border); }
+  .legal{ padding:var(--sk-space-xl) 0 var(--sk-space-3xl); text-align:center; }
+  .legal p{ color:var(--sk-color-text-muted); }
+  .legal .sk-acc-r{ margin:var(--sk-space-s) 0 0; text-align:left; }
+  .legal small{ display:block; margin-top:var(--sk-space-s); }
+
+  /* ---------- Notas de revisión (🟡) ---------- */
+  .rev-note{ margin-top:var(--sk-space-s); }
+  .legal .rev-note{ max-width:760px; margin:var(--sk-space-m) auto 0; text-align:left; }
+  body[data-hide-notes="true"] .rev-note{ display:none; }
+  .qa{ position:fixed; left:var(--sk-space-m); bottom:var(--sk-space-m); z-index:50; background:var(--sk-color-surface); border:1px solid var(--sk-color-border);
+       border-radius:var(--bordes-s); box-shadow:var(--sk-shadow-overlay); padding:var(--sk-space-xs) var(--sk-space-s); }
+
+  /* ---------- Movimiento reducido ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; scroll-behavior:auto !important; }
+  }
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .hero__mark sk-logo{ height:380px; }
+    .hero__mark{ right:-90px; }
+  }
+  @media (max-width:640px){
+    :root{ --overlap:var(--sk-space-4xl); }
+    .brand p{ display:none; }
+    .flag-long{ display:none; }
+    .flag-short{ display:inline; }
+    .hero{ padding-top:var(--sk-space-xl); }
+    /* En móvil el globo de cifras taparía el gráfico: las cifras ya están en las tarjetas de abajo. */
+    .tip{ display:none; }
+    /* El interruptor de revisión deja de flotar sobre el contenido y queda al final de la página. */
+    .qa{ position:static; margin:0 var(--sk-space-m) var(--sk-space-l); width:fit-content; }
+  }
+</style>
+</head>
+<body data-hide-notes="false">
+
+<div id="app"></div>
+
+<!-- ══ TODA la UI va dentro del template. Se monta cuando el bundle está listo. ══ -->
+<template id="ui">
+
+  <header class="top">
+    <div class="wrap">
+      <div class="brand">
+        <sk-logo></sk-logo>
+        <p>Siempre Skandia</p>
+      </div>
+      <sk-link id="topLink" label="¿Dudas? Escríbenos por WhatsApp" href="https://wa.me/573205914238" target="_blank" icon-left="pi pi-whatsapp"></sk-link>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero__mark" aria-hidden="true"><sk-logo variant="isotipo-simple" sk-style="blanco" decorativo></sk-logo></div>
+    <div class="wrap">
+      <p class="kicker">Transforma tu liquidación</p>
+      <h1>Mira qué pasa con tu liquidación según dónde la recibas</h1>
+      <p>Compara hasta tres opciones a lo largo del tiempo y conoce cuánto dinero tendrías disponible, cuánto quedaría ahorrado y qué beneficio tributario podrías tener. La decisión siempre es tuya.</p>
+    </div>
+  </section>
+
+  <main>
+    <div class="wrap">
+
+      <section class="stage" aria-labelledby="t-chart">
+        <sk-card>
+          <div class="sk-grid">
+            <div data-col="6">
+              <label class="group-label" for="amount">Valor aproximado de tu liquidación</label>
+              <div class="amount" id="amountBox"><span aria-hidden="true">$</span><input id="amount" type="text" inputmode="numeric" autocomplete="off" aria-describedby="amountHelp"></div>
+              <input id="amountRange" type="range" min="1000000" max="100000000" step="500000" aria-label="Ajustar el valor de tu liquidación" aria-describedby="amountHelp">
+              <small class="help" id="amountHelp">Mueve para ajustar el valor o escribe el tuyo. Lo que escribes aquí no se guarda ni se envía.</small>
+            </div>
+            <div data-col="6">
+              <label class="group-label" id="chipsLabel">Opciones que comparas (hasta tres)</label>
+              <div class="chips" id="chips" role="group" aria-labelledby="chipsLabel"></div>
+              <small class="help chip-note" id="chipNote" aria-live="polite"></small>
+            </div>
+          </div>
+
+          <div class="chart-head">
+            <div>
+              <h2 id="t-chart">Así evolucionaría tu liquidación</h2>
+              <small class="help" style="margin-top:var(--sk-space-xxs);">Mueve la línea de tiempo para ver cada año.</small>
+            </div>
+            <span class="flag-long"><sk-tag sk-style="warning" show-icon icon="pi pi-exclamation-triangle">Cifras de ejemplo — pendientes de validar con Producto</sk-tag></span>
+            <span class="flag-short"><sk-tag sk-style="warning" show-icon icon="pi pi-exclamation-triangle">Cifras de ejemplo</sk-tag></span>
+          </div>
+
+          <div id="chart"></div>
+          <div class="scrub" id="scrub">
+            <input id="yearRange" type="range" min="0" max="10" step="1" value="3" aria-label="Años que quieres ver">
+          </div>
+          <sk-select-button id="years" allow-empty="false" aria-label="Atajos de tiempo"></sk-select-button>
+
+          <div class="rev-note"><sk-alert type="warning" closable="false" message="🟡 Tasas, plazos y los textos de retiro y beneficio tributario son supuestos de ejemplo (objeto SIM_PARAMS del archivo). Producto los valida y Legal revisa los claims tributarios antes de producción."></sk-alert></div>
+        </sk-card>
+      </section>
+
+      <div class="sk-grid results block" id="results" aria-live="off"></div>
+      <p class="sr-only" id="liveSummary" aria-live="polite"></p>
+
+      <div class="block"><sk-alert type="info" closable="false" message="Estos valores son un ejemplo con supuestos de rentabilidad. La rentabilidad real puede variar y no está garantizada."></sk-alert></div>
+
+      <section class="block" aria-labelledby="t-asesor">
+        <sk-card>
+          <div class="sk-grid advisor-grid">
+            <div data-col="6">
+              <h2 id="t-asesor">¿Quieres resolver tus dudas antes de decidir?</h2>
+              <p>Un Financial Planner puede revisar tu caso contigo, sin compromiso.</p>
+            </div>
+            <div data-col="6">
+              <div class="actions">
+                <sk-link label="Escribir por WhatsApp" href="https://wa.me/573205914238" target="_blank" icon-left="pi pi-whatsapp"></sk-link>
+                <sk-button id="asesorBtn" label="Hablar con un asesor"></sk-button>
+              </div>
+            </div>
+          </div>
+          <div id="asesorNote" role="status"></div>
+        </sk-card>
+      </section>
+      <div class="rev-note"><sk-alert type="warning" closable="false" message="🟡 El destino de «Hablar con un asesor» sigue pendiente (Cata confirma el contacto del Financial Planner). Por ahora lleva a la línea de WhatsApp de Nómina."></sk-alert></div>
+
+      <footer class="legal">
+        <p>Esta herramienta es informativa y no es una recomendación de inversión.</p>
+        <section class="sk-acc-r">
+          <details name="legal">
+            <summary>Ver aviso legal completo</summary>
+            <p>Contenido informativo. Los datos e información no deben interpretarse como una asesoría, recomendación o sugerencia por parte de Skandia para la toma de decisiones de inversión. El cliente asume la responsabilidad por sus decisiones de inversión, en el marco del Decreto 1239 de 2024 y la Circular Externa 014 de 2025. Las obligaciones de Skandia son de medio y no de resultado; no se garantizan rentabilidades futuras.</p>
+          </details>
+        </section>
+        <small>Vigilado Superintendencia Financiera de Colombia.</small>
+        <div class="rev-note"><sk-alert type="warning" closable="false" message="🟡 Legal (Andrés Londoño) valida el aviso. Falta indicar la entidad responsable de cada producto (Skandia AFP–ACCAI S.A. para Mfund/FVP; confirmar Sipen y Crea Ahorro) y qué destinos se pueden mostrar en un simulador público."></sk-alert></div>
+      </footer>
+    </div>
+  </main>
+
+  <div class="qa"><sk-checkbox id="qaNotes" label="Ocultar notas de revisión"></sk-checkbox></div>
+
+</template>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ================================================================
+     SIM_PARAMS — TODOS los supuestos de la simulación, en un solo lugar.
+     🟡 CIFRAS DE EJEMPLO. Pendiente de validar con Producto (tasas,
+     reglas de retiro) y con Legal (claims tributarios). Nada de esto es
+     una tasa, un plazo ni una regla oficial de Skandia.
+     Color de cada destino: token --charts-cNN, en el orden de ordenChips.
+     ================================================================ */
+  var SIM_PARAMS = {
+    horizonteMax: 10,                 // años que cubre la línea de tiempo
+    montoMin: 1000000,                // valor mínimo aceptado
+    montoMax: 1000000000,             // valor máximo aceptado
+    montoInicial: 20000000,
+    seleccionInicial: ['cuenta','mfund','sipen'],
+    anioInicial: 3,
+    atajosAnios: [0, 3, 5, 10],
+    destinos: {
+      cuenta:  { nombre:'Cuenta de ahorros',  corto:'Ahorros', color:'var(--charts-c01)', dash:false,
+                 desc:'Recibe tu liquidación y úsala cuando quieras.',
+                 tasaAnual:0.0106, disponibleHoy:1,
+                 retiro:'Cuando quieras',
+                 tributario:'Sin beneficio tributario por aporte' },
+      mfund:   { nombre:'Mfund',              corto:'Mfund',   color:'var(--charts-c02)', dash:false,
+                 desc:'Ahorra de forma flexible para tus metas.',
+                 tasaAnual:0.0388, disponibleHoy:0,
+                 retiro:'Cuando lo necesites, con retención',
+                 tributario:'Según tu caso y las condiciones vigentes' },
+      sipen:   { nombre:'Sipen',              corto:'Sipen',   color:'var(--charts-c03)', dash:false,
+                 desc:'Aporta a tu pensión voluntaria y cuida tu futuro.',
+                 tasaAnual:0.0469, disponibleHoy:0,
+                 retiro:'Según las reglas del fondo',
+                 tributario:'Los aportes pueden tener beneficio tributario, según tu caso y las condiciones vigentes' },
+      crea:    { nombre:'Crea Ahorro',        corto:'Crea',    color:'var(--charts-c04)', dash:false,
+                 desc:'Ahorro programado para fortalecer tus sueños.',
+                 tasaAnual:0.0300, disponibleHoy:0,
+                 retiro:'Según el plan que elijas',
+                 tributario:'Según tu caso y las condiciones vigentes' },
+      pension: { nombre:'Pensión obligatoria', corto:'Pensión', color:'var(--charts-c05)', dash:true,
+                 desc:'Haz un aporte voluntario a tu fondo de pensiones obligatorias.',
+                 tasaAnual:0.0410, disponibleHoy:0,
+                 retiro:'Según las reglas del fondo',
+                 tributario:'Según tu caso y las condiciones vigentes' }
+    },
+    ordenChips: ['cuenta','mfund','sipen','crea','pension']
+  };
+  var MAX_SEL = 3;
+  var WA = 'https://wa.me/573205914238';
+
+  /* ---------- Utilidades ---------- */
+  var $ = function(id){ return document.getElementById(id); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
+  function pesos(n){ return '$' + (Math.round(n/1000)*1000).toLocaleString('es-CO'); }
+  function pesosExactos(n){ return '$' + Math.round(n).toLocaleString('es-CO'); }
+  function mill(v){
+    var m = v/1e6;
+    var t = (Math.abs(m - Math.round(m)) < 0.05) ? String(Math.round(m)) : m.toFixed(1).replace('.', ',');
+    return '$' + t + 'M';
+  }
+  function yl(y){ return y === 0 ? 'Hoy' : (y + (y === 1 ? ' año' : ' años')); }
+  function valorLabel(y){ return y === 0 ? 'Valor hoy' : ('Valor estimado en ' + yl(y)); }
+
+  var state = {
+    amount: SIM_PARAMS.montoInicial,
+    selected: SIM_PARAMS.seleccionInicial.slice(),
+    year: SIM_PARAMS.anioInicial
+  };
+
+  function serie(key, amount){
+    var p = SIM_PARAMS.destinos[key], out = [], y;
+    for (y = 0; y <= SIM_PARAMS.horizonteMax; y++) out.push(amount * Math.pow(1 + p.tasaAnual, y));
+    return out;
+  }
+
+  /* ================================================================
+     MONTAJE — el bundle debe estar listo; los datos de los componentes
+     se asignan ANTES de insertar la UI en la página.
+     ================================================================ */
+  var TAGS = ['sk-button','sk-card','sk-chip','sk-select-button','sk-logo','sk-link','sk-alert','sk-tag','sk-checkbox'];
+  Promise.all(TAGS.map(function(t){ return customElements.whenDefined(t); })).then(function(){
+    var ui = document.importNode(document.getElementById('ui').content, true);
+    var q = function(s){ return ui.querySelector(s); };
+
+    /* Atajos de tiempo (sk-select-button: elige un valor de formulario → allow-empty="false") */
+    var yearsEl = q('#years');
+    yearsEl.options = SIM_PARAMS.atajosAnios.map(function(y){ return { label: y === 0 ? 'Hoy' : (y + ' años'), value: y }; });
+    yearsEl.value = state.year;
+
+    /* Chips de destinos (sk-chip seleccionables; `selected` va por PROPIEDAD, el atributo vacío no cuenta como true) */
+    var chipsBox = q('#chips');
+    SIM_PARAMS.ordenChips.forEach(function(k){
+      var d = SIM_PARAMS.destinos[k], c = document.createElement('sk-chip');
+      c.setAttribute('label', d.nombre);
+      c.setAttribute('icon', d.dash ? 'pi pi-circle' : 'pi pi-circle-fill');
+      c.setAttribute('show-icon', '');
+      c.setAttribute('data-k', k);
+      c.style.setProperty('--c', d.color);
+      c.selected = state.selected.indexOf(k) > -1;
+      chipsBox.appendChild(c);
+    });
+
+    $('app').append(ui);
+    start();
+  });
+
+  function start(){
+    /* ---------- Chips de destinos ---------- */
+    var chipGuard = false;
+    function setChip(chip, sel){ chipGuard = true; chip.selected = sel; chipGuard = false; }
+    document.querySelectorAll('#chips sk-chip').forEach(function(chip){
+      var k = chip.getAttribute('data-k');
+      chip.addEventListener('selectedChange', function(e){
+        if (chipGuard) return;
+        var sel = e.detail, note = $('chipNote'), i = state.selected.indexOf(k);
+        setChip(chip, sel);                                       // espejo: mantiene el componente en sincronía
+        if (sel){
+          if (i > -1) return;
+          if (state.selected.length >= MAX_SEL){ note.textContent = 'Elige hasta tres opciones. Quita una para cambiarla.'; setChip(chip, false); return; }
+          state.selected.push(k);
+        } else {
+          if (i === -1) return;
+          if (state.selected.length === 1){ note.textContent = 'Deja al menos una opción para comparar.'; setChip(chip, true); return; }
+          state.selected.splice(i,1);
+        }
+        note.textContent = '';
+        retarget();
+        buildCards();
+      });
+    });
+
+    /* ---------- Animación de las curvas ---------- */
+    var disp = {};   // key -> [valores por año] actualmente dibujados
+    var raf = 0;
+    function retarget(){
+      var tg = {}, from = {};
+      state.selected.forEach(function(key){
+        tg[key] = serie(key, state.amount);
+        from[key] = disp[key] ? disp[key].slice() : tg[key].map(function(){ return state.amount; });
+      });
+      Object.keys(disp).forEach(function(key){ if (!tg[key]) delete disp[key]; });
+      if (reduce){ disp = tg; draw(); return; }
+      cancelAnimationFrame(raf);
+      var t0 = performance.now(), dur = 380;
+      (function step(now){
+        var t = clamp((now - t0)/dur, 0, 1), e = 1 - Math.pow(1 - t, 3);
+        Object.keys(tg).forEach(function(key){
+          disp[key] = tg[key].map(function(v,i){ return from[key][i] + (v - from[key][i]) * e; });
+        });
+        draw();
+        if (t < 1) raf = requestAnimationFrame(step);
+      })(t0);
+    }
+
+    /* ---------- Gráfico (SVG a mano; colores = tokens) ---------- */
+    var chartEl = $('chart'), geom = null;
+    function niceStep(raw){
+      var exp = Math.floor(Math.log10(raw)), f = raw / Math.pow(10, exp), nf = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10;
+      return nf * Math.pow(10, exp);
+    }
+    function draw(){
+      var W = chartEl.clientWidth || 800, narrow = W < 560;
+      var H = narrow ? 290 : 380, ml = narrow ? 46 : 60, mr = narrow ? 66 : 132, mt = 40, mb = 34;
+      var pw = W - ml - mr, ph = H - mt - mb, N = SIM_PARAMS.horizonteMax;
+      var keys = state.selected.filter(function(k){ return disp[k]; });
+      if (!keys.length) return;
+      var vmax = state.amount, vmin = state.amount;
+      keys.forEach(function(k){ disp[k].forEach(function(v){ vmax = Math.max(vmax, v); vmin = Math.min(vmin, v); }); });
+      var span = Math.max(vmax - state.amount, state.amount * 0.05);
+      var lo = state.amount - span * 0.45, hi = state.amount + span * 1.12;
+      var step = niceStep((hi - lo) / 4);
+      var ticks = [], t;
+      for (t = Math.ceil(lo/step)*step; t <= hi; t += step) ticks.push(t);
+      var xs = function(y){ return ml + pw * y / N; };
+      var ys = function(v){ return mt + ph * (1 - (v - lo) / (hi - lo)); };
+      geom = { ml:ml, mr:mr, pw:pw, N:N, W:W, H:H, mt:mt, mb:mb };
+
+      var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" height="' + H + '" role="img" aria-label="Gráfico: evolución de tu liquidación en cada opción, de hoy a ' + N + ' años">';
+      ticks.forEach(function(v){
+        s += '<line x1="' + ml + '" x2="' + (ml + pw) + '" y1="' + ys(v) + '" y2="' + ys(v) + '" stroke="var(--sk-color-border)" stroke-dasharray="3 5"/>';
+        s += '<text x="' + (ml - 10) + '" y="' + (ys(v) + 4) + '" text-anchor="end" font-size="12" fill="var(--sk-color-text-muted)">' + mill(v) + '</text>';
+      });
+      var y;
+      for (y = 0; y <= N; y++){
+        var major = (y === 0 || y === 3 || y === 5 || y === 10);
+        s += '<line x1="' + xs(y) + '" x2="' + xs(y) + '" y1="' + (mt + ph) + '" y2="' + (mt + ph + (major ? 6 : 3)) + '" stroke="var(--stroke-grey-medium)"/>';
+        if (major) s += '<text x="' + xs(y) + '" y="' + (mt + ph + 24) + '" text-anchor="middle" font-size="12" fill="var(--sk-color-text-muted)" ' + (y === state.year ? 'class="b"' : '') + '>' + (y === 0 ? 'Hoy' : y + (narrow ? 'a' : ' años')) + '</text>';
+      }
+      // áreas y líneas
+      keys.forEach(function(k){
+        var d = SIM_PARAMS.destinos[k], pts = disp[k].map(function(v,i){ return xs(i).toFixed(1) + ',' + ys(v).toFixed(1); });
+        s += '<path d="M' + pts.join(' L') + ' L' + xs(N) + ',' + (mt + ph) + ' L' + xs(0) + ',' + (mt + ph) + ' Z" fill="' + d.color + '" opacity="0.07"/>';
+      });
+      keys.forEach(function(k){
+        var d = SIM_PARAMS.destinos[k], pts = disp[k].map(function(v,i){ return xs(i).toFixed(1) + ',' + ys(v).toFixed(1); });
+        s += '<path d="M' + pts.join(' L') + '" fill="none" stroke="' + d.color + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"' + (d.dash ? ' stroke-dasharray="2 7"' : '') + '/>';
+      });
+      // rótulos directos al final de cada curva (con separación mínima)
+      var labs = keys.map(function(k){ return { k:k, y: ys(disp[k][N]) }; }).sort(function(a,b){ return a.y - b.y; });
+      for (var i = 1; i < labs.length; i++) if (labs[i].y - labs[i-1].y < 16) labs[i].y = labs[i-1].y + 16;
+      labs.forEach(function(l){
+        var d = SIM_PARAMS.destinos[l.k];
+        s += '<circle cx="' + xs(N) + '" cy="' + ys(disp[l.k][N]) + '" r="3.5" fill="' + d.color + '"/>';
+        s += '<text x="' + (xs(N) + 10) + '" y="' + (l.y + 4) + '" font-size="12" class="b" fill="var(--sk-color-text)">' + (narrow ? d.corto : d.nombre) + '</text>';
+      });
+      // línea de tiempo (scrubber)
+      var sx = xs(state.year);
+      s += '<line x1="' + sx + '" x2="' + sx + '" y1="' + (mt - 6) + '" y2="' + (mt + ph) + '" stroke="var(--sk-color-text)" stroke-width="2"/>';
+      keys.forEach(function(k){
+        var d = SIM_PARAMS.destinos[k];
+        s += '<circle cx="' + sx + '" cy="' + ys(disp[k][state.year]) + '" r="6" fill="var(--sk-color-surface)" stroke="' + d.color + '" stroke-width="3"/>';
+      });
+      var pill = yl(state.year), pw2 = pill.length * 7.4 + 22;
+      s += '<rect x="' + (sx - pw2/2) + '" y="' + (mt - 34) + '" width="' + pw2 + '" height="26" rx="13" fill="var(--sk-color-text)"/>';
+      s += '<text x="' + sx + '" y="' + (mt - 16.5) + '" text-anchor="middle" font-size="12" class="b" fill="var(--sk-color-text-inverse)">' + pill + '</text>';
+      s += '</svg><div class="tip" id="tip" aria-hidden="true"></div>';
+      chartEl.innerHTML = s;
+
+      // globo con las cifras de ese año
+      var tip = $('tip'), rows = '<b>' + (state.year === 0 ? 'Hoy' : 'A ' + yl(state.year)) + '</b>';
+      state.selected.forEach(function(k){
+        var d = SIM_PARAMS.destinos[k], v = (disp[k] ? disp[k][state.year] : state.amount);
+        rows += '<div><span><i style="background:' + d.color + '"></i>' + d.nombre + '</span><strong>' + pesos(v) + '</strong></div>';
+      });
+      tip.innerHTML = rows;
+      var tw = tip.offsetWidth, left = sx + 16;
+      if (left + tw > W - 4) left = sx - tw - 16;
+      tip.style.left = Math.max(4, left) + 'px';
+      tip.style.top = (mt + 6) + 'px';
+
+      // la regla de años queda alineada con el área del gráfico
+      var scrub = $('scrub');
+      scrub.style.setProperty('--ml', ml + 'px');
+      scrub.style.setProperty('--mr', mr + 'px');
+    }
+
+    /* ---------- Tarjetas por opción (sk-card) ----------
+       buildCards() crea las tarjetas cuando cambia la selección: se arma el HTML en un <template>
+       (hijos antes de insertar) y se inserta de una vez. updateCards() solo cambia cifras. */
+    function buildCards(){
+      var box = $('results'), n = state.selected.length, col = n === 3 ? 4 : (n === 2 ? 6 : 12), html = '';
+      state.selected.forEach(function(k){
+        var d = SIM_PARAMS.destinos[k];
+        html += '<sk-card data-col="' + col + '" data-k="' + k + '">' +
+          '<h3 class="res-title"><i' + (d.dash ? ' class="dash"' : '') + ' style="--c:' + d.color + '"></i>' + d.nombre + '</h3>' +
+          '<p class="desc">' + d.desc + '</p><dl>' +
+          '<div><dt>Disponible para usar hoy</dt><dd data-f="disp"></dd></div>' +
+          '<div><dt>Queda ahorrado</dt><dd data-f="ahorro"></dd></div>' +
+          '<div><dt>Cuándo puedes retirarlo</dt><dd>' + d.retiro + '</dd></div>' +
+          '<div><dt>Beneficio tributario</dt><dd>' + d.tributario + '</dd></div>' +
+          '<div class="total"><dt data-f="lbl"></dt><dd data-f="val"></dd></div></dl></sk-card>';
+      });
+      var tpl = document.createElement('template');
+      tpl.innerHTML = html;
+      box.replaceChildren(tpl.content);
+      updateCards();
+    }
+    function updateCards(){
+      var y = state.year;
+      document.querySelectorAll('#results sk-card').forEach(function(c){
+        var k = c.getAttribute('data-k'), d = SIM_PARAMS.destinos[k];
+        var disponible = state.amount * d.disponibleHoy, ahorrado = state.amount - disponible;
+        c.querySelector('[data-f="disp"]').textContent = pesosExactos(disponible);
+        c.querySelector('[data-f="ahorro"]').textContent = pesosExactos(ahorrado);
+        c.querySelector('[data-f="lbl"]').textContent = valorLabel(y);
+        c.querySelector('[data-f="val"]').textContent = pesos(serie(k, state.amount)[y]);
+      });
+      announce();
+    }
+    var annT = 0;
+    function announce(){
+      clearTimeout(annT);
+      annT = setTimeout(function(){
+        var parts = state.selected.map(function(k){
+          return SIM_PARAMS.destinos[k].nombre + ' ' + pesos(serie(k, state.amount)[state.year]);
+        });
+        $('liveSummary').textContent = (state.year === 0 ? 'Hoy' : 'A ' + yl(state.year)) + ': ' + parts.join(', ') + '.';
+      }, 450);
+    }
+
+    /* ---------- Valor de la liquidación (campo propio con cifra grande + deslizador) ---------- */
+    var amountIn = $('amount'), amountRange = $('amountRange'), amountBox = $('amountBox'), amountHelp = $('amountHelp');
+    var HELP_OK = amountHelp.textContent;
+    function fillRange(el){ el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%'); }
+    function rangoMsg(){ return 'Escribe un valor entre ' + pesosExactos(SIM_PARAMS.montoMin) + ' y ' + pesosExactos(SIM_PARAMS.montoMax) + '.'; }
+    function clearAmountError(){
+      amountBox.classList.remove('is-error'); amountHelp.classList.remove('is-error');
+      amountHelp.textContent = HELP_OK; amountIn.removeAttribute('aria-invalid');
+    }
+    function setAmount(v, fromInput){
+      state.amount = v;
+      if (!fromInput) amountIn.value = v.toLocaleString('es-CO');
+      amountRange.value = clamp(v, +amountRange.min, +amountRange.max);
+      fillRange(amountRange);
+      clearAmountError();
+      retarget(); updateCards();
+    }
+    amountRange.addEventListener('input', function(){ setAmount(+amountRange.value); });
+    amountIn.addEventListener('input', function(){
+      var digits = amountIn.value.replace(/\D/g, '');
+      var v = digits ? parseInt(digits, 10) : 0;
+      amountIn.value = digits ? v.toLocaleString('es-CO') : '';
+      if (v < SIM_PARAMS.montoMin || v > SIM_PARAMS.montoMax){
+        amountBox.classList.add('is-error'); amountHelp.classList.add('is-error');
+        amountHelp.textContent = rangoMsg();
+        amountIn.setAttribute('aria-invalid', 'true');
+        return;
+      }
+      setAmount(v, true);
+    });
+    amountIn.addEventListener('blur', function(){
+      amountIn.value = state.amount.toLocaleString('es-CO');
+      clearAmountError();
+    });
+
+    /* ---------- Línea de tiempo: deslizador, atajos (sk-select-button) y arrastre sobre el gráfico ---------- */
+    var yearRange = $('yearRange'), yearsEl = $('years');
+    function setYear(y, fromRange){
+      y = clamp(Math.round(y), 0, SIM_PARAMS.horizonteMax);
+      if (y === state.year && fromRange) return;
+      state.year = y;
+      yearRange.value = y; fillRange(yearRange);
+      yearRange.setAttribute('aria-valuetext', yl(y));
+      yearsEl.value = SIM_PARAMS.atajosAnios.indexOf(y) > -1 ? y : null;
+      draw(); updateCards();
+    }
+    yearRange.addEventListener('input', function(){ setYear(+yearRange.value, true); });
+    yearsEl.addEventListener('valueChange', function(e){
+      var v = e.detail;
+      yearsEl.value = v;                                           // espejo
+      if (v == null) return;
+      if (v !== state.year) setYear(v);
+    });
+    var dragging = false;
+    function yearFromPointer(e){
+      var r = chartEl.getBoundingClientRect(), x = e.clientX - r.left;
+      setYear((x - geom.ml) / geom.pw * geom.N);
+    }
+    chartEl.addEventListener('pointerdown', function(e){ if (!geom) return; dragging = true; try{ chartEl.setPointerCapture(e.pointerId); }catch(_){} yearFromPointer(e); });
+    chartEl.addEventListener('pointermove', function(e){ if (dragging) yearFromPointer(e); });
+    ['pointerup','pointercancel','lostpointercapture'].forEach(function(n){ chartEl.addEventListener(n, function(){ dragging = false; }); });
+    if (window.ResizeObserver) new ResizeObserver(function(){ draw(); }).observe(chartEl); else window.addEventListener('resize', draw);
+
+    /* ---------- Asesor, enlace superior y notas de revisión ---------- */
+    $('asesorBtn').addEventListener('skClick', function(){
+      var n = $('asesorNote');
+      if (n.firstChild){ n.replaceChildren(); return; }
+      var p = document.createElement('p'), l = document.createElement('sk-link');
+      l.setAttribute('label', '+57 320 591 4238'); l.setAttribute('href', WA); l.setAttribute('target', '_blank');
+      p.append('Escríbenos por WhatsApp a la línea de Nómina y te ponemos en contacto con un Financial Planner: ', l, '.');
+      n.replaceChildren(p);
+    });
+    var topLink = $('topLink'), mq = window.matchMedia('(max-width:640px)');
+    function topLabel(){
+      topLink.setAttribute('label', mq.matches ? 'WhatsApp' : '¿Dudas? Escríbenos por WhatsApp');
+      // En móvil los 4 atajos de tiempo no caben a partes iguales sin partir «3 años»: toman el ancho de su texto.
+      if (mq.matches) $('years').setAttribute('data-ancho', 'auto'); else $('years').removeAttribute('data-ancho');
+    }
+    topLabel();
+    if (mq.addEventListener) mq.addEventListener('change', topLabel); else mq.addListener(topLabel);
+    // Pantallas de 380 px o menos: ni así caben los 4 atajos con «años»; quedan solo los números (el eje del gráfico ya dice «años»).
+    var mqXs = window.matchMedia('(max-width:380px)');
+    function atajosOpciones(){
+      yearsEl.options = SIM_PARAMS.atajosAnios.map(function(y){ return { label: y === 0 ? 'Hoy' : (mqXs.matches ? String(y) : y + ' años'), value: y }; });
+      yearsEl.value = SIM_PARAMS.atajosAnios.indexOf(state.year) > -1 ? state.year : null;
+    }
+    if (mqXs.matches) atajosOpciones();
+    if (mqXs.addEventListener) mqXs.addEventListener('change', atajosOpciones); else mqXs.addListener(atajosOpciones);
+    $('qaNotes').addEventListener('checkedChange', function(e){ document.body.setAttribute('data-hide-notes', e.detail ? 'true' : 'false'); });
+
+    /* ---------- Acordeón (reemplazo .sk-acc-r): ↑/↓ entre cabeceras ---------- */
+    document.querySelectorAll('.sk-acc-r').forEach(function(g){
+      g.addEventListener('keydown', function(e){
+        var heads = [].slice.call(g.querySelectorAll(':scope > details > summary')), i = heads.indexOf(document.activeElement);
+        if (i < 0) return;
+        var dest = { ArrowDown: heads[(i + 1) % heads.length], ArrowUp: heads[(i - 1 + heads.length) % heads.length], Home: heads[0], End: heads[heads.length - 1] }[e.key];
+        if (dest){ e.preventDefault(); dest.focus(); }
+      });
+    });
+
+    /* ---------- Arranque ---------- */
+    amountIn.value = state.amount.toLocaleString('es-CO');
+    amountRange.value = state.amount; fillRange(amountRange);
+    yearRange.value = state.year; fillRange(yearRange); yearRange.setAttribute('aria-valuetext', yl(state.year));
+    state.selected.forEach(function(k){ disp[k] = serie(k, state.amount); });
+    draw(); buildCards();
+    window.__sim = { state: state, params: SIM_PARAMS };   // para pruebas
+  }
+})();
+</script>
+</body>
+</html>
