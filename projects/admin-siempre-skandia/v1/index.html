@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salidas en curso · Siempre Skandia Administración</title>
+
+<!-- 1. Fuentes oficiales + tipografía de los tags nativos (h1–h6, p, label, small) -->
+<link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-fonts.css">
+<link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-typography.css">
+<!-- 2. Íconos (peer obligatorio, el bundle no los trae) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7/primeicons.css">
+<!-- 3. Componentes sk-* (custom elements + tema Skandia; aplica los 24 colores --sk-color-*) -->
+<script src="https://skcostgblobresources.blob.core.windows.net/skco-lib-components/sk-components-elements.js"></script>
+
+<!--
+  PERFIL ADMINISTRADOR DE NÓMINA — Siempre Skandia (prototipo HTML autocontenido)
+  RONDA 37, 2026-11-06 — reunión con Claudia: "necesitamos una interfaz para ustedes
+  como administradores, donde registren una salida, vaya por el camino A o B, y vean
+  gráficas y data".
+
+  Base visual: propuesta de Stitch (`stitch/admin-*`). El HTML de Stitch no se usa.
+  Correcciones de `stitch/resultado.md` aplicadas: sin "Versión 1.6.1", sin "Gestión
+  central", sin "Nómina y Compensación", ítem activo sin franja verde, etiquetas
+  flotantes, estados de documentos separados de las acciones.
+
+  2026-11-09 · MIGRADO A COMPONENTES sk-* (skill sk-elements-html):
+   · Todo va dentro de <template id="ui"> y se monta con JS cuando el bundle termina de
+     arrancar. Lo que se dibuja después (detalle, resultados, vista previa) se arma
+     igual: HTML en un <template>, se importa, se asignan las propiedades y se inserta.
+   · Componentes: sk-logo, sk-avatar, sk-button, sk-checkbox, sk-tag, sk-badge, sk-alert,
+     sk-card, sk-input-text, sk-input-select (también como buscador de personas, con
+     filtro externo), sk-date-picker, sk-textarea, sk-radio (grupo .sk-rg de la
+     plantilla), sk-table (con su paginador), sk-stepper, sk-breadcrumb, sk-link,
+     sk-file-upload. Servicios: skElements.toast y skElements.modal.confirm.
+   · TOKENS: ningún hex/rgb suelto fuera del bloque :root. Íconos: primeicons (pi pi-*).
+     Colores de las gráficas: --charts-c01…c03 en orden.
+   · EXCEPCIONES (no existe componente equivalente en el sistema de diseño):
+       1) Navegación lateral y cajón móvil: <a> con tokens e íconos pi (no hay sk-menu/sk-sidenav).
+       2) Gráficas: SVG propio (no hay componente de gráficas).
+       3) Listas de documentos y tarjetas de indicadores: composición de layout con tokens.
+   · LIMITACIONES DE sk-table (sus celdas son solo texto): en la lista de salidas ya no hay
+     etiquetas de color ni enlace «Ver detalle»; la fila completa abre el detalle (clic, Enter
+     o Espacio). Los estados con color siguen en el detalle. sk-modal pierde los sk-* anidados,
+     por eso «Avanzar etapa» usa skElements.modal.confirm.
+
+  Reglas de producto (decisiones de Javier):
+   - SOLO DOS RUTAS: Ruta 1 (salida elegida) y Ruta 2 (salida no elegida). Pensión y
+     fallecimiento son Ruta 1 con una "variante" (cambia el tono, no la ruta).
+   - Los 8 tipos de salida son los administrativos del MPO (ver TYPES en el script).
+   - Solo las categorías A y B ven el outplacement ejecutivo del portal.
+   - Todo lo de aquí es simulado: sin red, sin backend. El estado vive en memoria y,
+     si se puede, en localStorage (clave `sk-siempre-admin-v1`).
+-->
+
+<style>
+  /* ══ 1. TOKENS QUE EL BUNDLE NO DEFINE. (Los 24 colores --sk-color-* los aplica el bundle al arrancar.) ══ */
+  :root{
+    /* Espaciado (1:1 con --size-* de UX) */
+    --sk-space-zero:0; --sk-space-xxs:4px; --sk-space-xs:8px; --sk-space-s:12px; --sk-space-m:16px;
+    --sk-space-l:24px; --sk-space-xl:32px; --sk-space-2xl:40px; --sk-space-3xl:48px;
+    --sk-space-4xl:56px; --sk-space-5xl:64px;
+    /* Grid de página (1:1 con --grid-* de UX). Fronteras: móvil < 768 · tablet 768–1023.98 · desktop ≥ 1024 */
+    --sk-grid-mobile-columns:4;  --sk-grid-mobile-gutter:16px;  --sk-grid-mobile-margin:16px;
+    --sk-grid-tablet-columns:8;  --sk-grid-tablet-gutter:24px;  --sk-grid-tablet-margin:32px;
+    --sk-grid-desktop-columns:12; --sk-grid-desktop-gutter:24px; --sk-grid-desktop-margin:90px;
+    /* Sombras: una por rol */
+    --sk-shadow-subtle:0 0 2px rgba(68, 68, 68, 0.15);
+    --sk-shadow-surface:0 0 2px 0 rgba(61, 75, 92, 0.15);
+    --sk-shadow-raised:0 4px 16px rgba(0, 0, 0, 0.12);
+    --sk-shadow-overlay:0 8px 24px rgba(0, 0, 0, 0.16);
+    /* Tipografía */
+    --sk-font-title:'Montserrat', sans-serif; --sk-font-body:'Open Sans', system-ui, sans-serif;
+    --sk-font-weight-regular:400; --sk-font-weight-medium:500; --sk-font-weight-bold:700;
+    /* Marca */
+    --sk-gradient-brand:linear-gradient(135deg, #00c73d 0%, #8fe000 100%);
+
+    /* Catálogo UX sin token en la librería */
+    --bordes-s:4px; --bordes-m:16px; --bordes-l:32px; --bordes-xl:104px;
+    --background-warning-light:#fff3e0; --background-info-light:#ebf4ff; --background-error-light:#fff5f4;
+    --background-secundaria:#f7f7f7; --background-grey-medium:#b7b7b7; --background-black:#232323;
+    --stroke-grey-medium:#c5c5c5;
+    --texts-secundaria:#29806d; --texts-complementary:#4ae6c3;
+    --button-secundaria-default:#29806d; --button-secundaria-hover:#1d594c;
+    --button-secundaria-secondary-hover:#ccfdf2; --button-secundaria-tertiary-hover:#edfefa;
+    --illustration-01:#00f0e0; --illustration-02:#45e39e; --illustration-03:#45ad00; --illustration-04:#ffae08;
+    /* Gráficas: usar en orden c01, c02, c03… */
+    --charts-c01:#a1dd70; --charts-c02:#a4d7e1; --charts-c03:#60a9a6; --charts-c04:#ff9460; --charts-c05:#8ba2c1;
+    --charts-c06:#f67e7d; --charts-c07:#dddfd0; --charts-c08:#6a7491; --charts-c09:#de423e; --charts-c10:#95dbb7;
+    --charts-c11:#ffbf9f; --charts-c12:#bc6995; --charts-c13:#d9d052; --charts-c14:#d6c09c; --charts-c15:#fecd72;
+    --charts-c16:#cba1d2; --charts-c17:#c5d8a4; --charts-c18:#368cb5; --charts-c19:#00f59f; --charts-c20:#f50cc9;
+    --charts-c21:#83a488; --charts-c22:#fcf9c6; --charts-c23:#b2f9fc; --charts-c24:#bf9078; --charts-c25:#9eb23b;
+    --charts-c26:#73777b; --charts-c27:#ffe2e2; --charts-c28:#36d6e0; --charts-c29:#aba09d; --charts-c30:#b5d1ff;
+    --charts-c31:#ecffb5; --charts-c32:#6f32c6; --charts-c33:#1f6feb; --charts-c34:#2e8b57; --charts-c35:#f4b400;
+    --charts-c36:#ff5a5f; --charts-c37:#7b3fa1; --charts-c38:#1abc9c; --charts-c39:#f28c28; --charts-c40:#4f6d8a;
+
+    /* Local: ancho de la navegación lateral (geometría de página). */
+    --adm-nav-w:240px;
+  }
+
+  /* ══ 2. ANCHO COMPLETO (plantilla). Campos, botones, alertas y tarjetas llenan su contenedor. ══ */
+  :root :is(sk-input-text, sk-input-number, sk-input-select, sk-textarea, sk-date-picker, sk-date-range-picker,
+            sk-file-upload, sk-listbox, sk-form-field, sk-select-button, sk-button, sk-paginator, sk-stepper,
+            sk-table, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) {
+    width:100%; max-width:none; min-width:0; box-sizing:border-box;
+  }
+  :root :is(sk-input-text, sk-input-select, sk-date-picker, sk-date-range-picker, sk-listbox, sk-form-field,
+            sk-button, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) { display:block; }
+  :root :is(sk-input-number, sk-textarea, sk-file-upload):not([data-ancho="auto"]) { display:flex; }
+  :root :is(.sk-input-select, .sk-listbox, .p-select, .p-listbox, .p-datepicker, .p-inputnumber, .p-fileupload) { width:100%; max-width:none; }
+  :root sk-button:not([data-ancho="auto"]):not([label]) { display:inline-block; width:auto; }
+  :root sk-button:not([data-ancho="auto"])[label] .p-button { width:100%; justify-content:center; }
+  :root sk-select-button:not([data-ancho="auto"]) { display:flex; }
+  :root sk-select-button:not([data-ancho="auto"]) .p-selectbutton { display:flex; width:100%; }
+  :root sk-select-button:not([data-ancho="auto"]) .p-togglebutton { flex:1 1 0; min-width:0; justify-content:center; }
+  :root sk-form-field :is(input, select, textarea) { width:100%; box-sizing:border-box; }
+
+  /* ══ 3. LAYOUT DE PÁGINA (grid de UX) ══ */
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ margin:0; background:var(--background-secundaria); }
+  h1,h2,h3,p,dl,dd,ul,ol{ margin:0; }   /* sk-typography.css no resetea márgenes */
+  ul,ol{ padding:0; list-style:none; }
+  h1[tabindex="-1"]:focus, main:focus{ outline:none; }
+  :focus-visible{ outline:3px solid var(--sk-color-border-focus); outline-offset:2px; }
+  [hidden]{ display:none !important; }
+  .sr-only{ position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+  .skip-link{ position:absolute; left:-9999px; top:var(--sk-space-xs); z-index:200; background:var(--sk-color-surface); color:var(--sk-color-text); padding:var(--sk-space-xs) var(--sk-space-m); border-radius:var(--bordes-s); border:2px solid var(--sk-color-primary); font-weight:var(--sk-font-weight-bold); }
+  .skip-link:focus{ left:var(--sk-space-xs); }
+  .muted{ color:var(--sk-color-text-muted); }
+  .t-label{ font-size:14px; line-height:22px; }                      /* 14/22 = escala oficial «label» */
+  .fig{ font-family:var(--sk-font-title); font-weight:var(--sk-font-weight-bold); font-size:32px; line-height:40px; }   /* 32/40 = escala oficial «h1» */
+  .sk-grid{ display:grid; grid-template-columns:repeat(var(--sk-grid-mobile-columns), minmax(0, 1fr)); gap:var(--sk-space-m) var(--sk-grid-mobile-gutter); }
+  .sk-grid > *{ grid-column:1 / -1; min-width:0; }
+  @media (min-width:768px){
+    .sk-grid{ grid-template-columns:repeat(var(--sk-grid-tablet-columns), minmax(0, 1fr)); column-gap:var(--sk-grid-tablet-gutter); }
+    .sk-grid > :is([data-col="3"], [data-col="4"], [data-col="6"]){ grid-column:span 4; }
+  }
+  @media (min-width:1024px){
+    .sk-grid{ grid-template-columns:repeat(var(--sk-grid-desktop-columns), minmax(0, 1fr)); column-gap:var(--sk-grid-desktop-gutter); }
+    .sk-grid > [data-col="3"]{ grid-column:span 3; } .sk-grid > [data-col="4"]{ grid-column:span 4; }
+    .sk-grid > [data-col="6"]{ grid-column:span 6; } .sk-grid > [data-col="8"]{ grid-column:span 8; }
+  }
+  .stack{ display:grid; gap:var(--sk-space-m); }
+  /* Grupo de botones: columnas iguales; en móvil se apilan con la acción principal (la última en el HTML) arriba. */
+  .actions{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0, 1fr); gap:var(--sk-space-s); align-items:center; }
+  @media (max-width:767.98px){
+    .actions{ grid-auto-flow:row; }
+    .actions > :last-child{ order:-1; }
+  }
+
+  /* ══ 4. REEMPLAZO DE sk-radio-group (plantilla) ══ */
+  .sk-rg{ display:grid; gap:var(--sk-space-xxs); }
+  .sk-rg__label{ font-weight:var(--sk-font-weight-bold); font-size:14px; line-height:22px; color:var(--sk-color-text); }
+  .sk-rg [role="radiogroup"]{ display:flex; flex-direction:column; align-items:flex-start; }
+  .sk-rg[data-dir="row"] [role="radiogroup"]{ flex-direction:row; flex-wrap:wrap; column-gap:var(--sk-space-m); }
+  .sk-rg__help{ margin:0; color:var(--sk-color-text-muted); }
+
+  /* ══ 5. LA PÁGINA ══ */
+  /* ---------- Barra QA (solo revisión) ---------- */
+  .qa-bar{ background:var(--sk-color-surface); border-bottom:1px solid var(--sk-color-border); padding:var(--sk-space-xs) var(--sk-space-l); display:flex; flex-wrap:wrap; align-items:center; gap:var(--sk-space-xs) var(--sk-space-l); }
+  .qa-bar small{ color:var(--sk-color-text-muted); }
+  body[data-hide-reviewer-notes="true"] [data-audience="reviewer"]{ display:none !important; }
+  .adm-note{ margin-top:var(--sk-space-s); }
+
+  /* ---------- Cabecera ---------- */
+  .adm-header{ position:sticky; top:0; z-index:30; height:var(--sk-space-5xl); background:var(--sk-color-surface); border-bottom:1px solid var(--sk-color-border); display:flex; align-items:center; justify-content:space-between; gap:var(--sk-space-m); padding:0 var(--sk-space-l); }
+  .adm-header__brand{ display:flex; align-items:center; gap:var(--sk-space-s); min-width:0; }
+  .adm-header__brand sk-logo{ height:var(--sk-space-xl); flex:0 0 auto; }
+  .adm-header__sep{ width:1px; height:var(--sk-space-l); background:var(--sk-color-border); flex-shrink:0; }
+  .adm-header__product{ font-weight:var(--sk-font-weight-medium); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .adm-header__user{ display:flex; align-items:center; gap:var(--sk-space-s); font-weight:var(--sk-font-weight-bold); white-space:nowrap; }
+  .adm-menu-btn{ display:none; }
+
+  /* ---------- Estructura y navegación lateral (EXCEPCIÓN 1: no hay componente de menú) ---------- */
+  .adm-body{ display:grid; grid-template-columns:var(--adm-nav-w) minmax(0, 1fr); min-height:calc(100vh - var(--sk-space-5xl)); }
+  .adm-nav{ background:var(--sk-color-surface); border-right:1px solid var(--sk-color-border); padding:var(--sk-space-m) var(--sk-space-s); position:sticky; top:var(--sk-space-5xl); align-self:start; height:calc(100vh - var(--sk-space-5xl)); overflow-y:auto; }
+  .adm-nav__list{ display:flex; flex-direction:column; gap:var(--sk-space-xxs); margin:0; padding:0; list-style:none; }
+  .adm-nav__item{ display:flex; align-items:center; gap:var(--sk-space-s); padding:var(--sk-space-s); border-radius:var(--bordes-s); color:var(--sk-color-text-muted); text-decoration:none; font-weight:var(--sk-font-weight-medium); }
+  .adm-nav__item .pi{ font-size:20px; color:var(--sk-color-primary-active); }
+  .adm-nav__item:hover{ background:var(--background-secundaria); }
+  .adm-nav__item[aria-current="page"]{ background:var(--sk-color-tertiary-hover-bg); color:var(--sk-color-text); font-weight:var(--sk-font-weight-bold); }
+  .adm-main{ padding:var(--sk-space-xl); min-width:0; }
+  .adm-wrap{ max-width:1180px; }
+  .adm-view{ display:none; }
+  .adm-view.is-active{ display:block; }
+  .adm-pagehead{ display:flex; justify-content:space-between; align-items:flex-start; gap:var(--sk-space-m); flex-wrap:wrap; margin-bottom:var(--sk-space-l); }
+  .adm-pagehead .lede{ margin-top:var(--sk-space-xs); max-width:62ch; }
+  .adm-footer{ border-top:1px solid var(--sk-color-border); margin-top:var(--sk-space-3xl); padding-top:var(--sk-space-m); text-align:center; color:var(--sk-color-text-muted); }
+
+  /* ---------- Cajón móvil (EXCEPCIÓN 1) ---------- */
+  .adm-drawer-overlay{ position:fixed; inset:0; z-index:90; background:color-mix(in srgb, var(--sk-color-text) 55%, transparent); opacity:0; pointer-events:none; transition:opacity .24s ease; }
+  .adm-drawer-overlay.is-open{ opacity:1; pointer-events:auto; }
+  .adm-drawer{ position:fixed; top:0; bottom:0; left:0; z-index:91; width:min(300px, 86vw); background:var(--sk-color-surface); padding:var(--sk-space-m) var(--sk-space-s); transform:translateX(-100%); transition:transform .24s ease; overflow-y:auto; visibility:hidden; }
+  .adm-drawer.is-open{ transform:translateX(0); visibility:visible; }
+  .adm-drawer__head{ display:flex; align-items:center; justify-content:space-between; padding:0 var(--sk-space-xs) var(--sk-space-m); }
+  .adm-drawer__head sk-logo{ height:var(--sk-space-xl); }
+
+  /* ---------- Indicadores ---------- */
+  .adm-kpis{ margin:var(--sk-space-l) 0; }
+  #kpis .t-label{ color:var(--sk-color-text-muted); }
+  #kpis .fig{ margin-top:var(--sk-space-xxs); }
+
+  /* ---------- Lista, vacío ---------- */
+  .adm-tip{ display:block; margin:var(--sk-space-s) 0 var(--sk-space-xs); color:var(--sk-color-text-muted); }
+  #exits-empty{ text-align:center; }
+  #exits-empty .pi{ font-size:32px; color:var(--sk-color-primary-active); margin-bottom:var(--sk-space-xs); }
+  #exits-empty sk-button{ margin-top:var(--sk-space-m); }
+
+  /* ---------- Registrar ---------- */
+  .adm-form{ max-width:780px; }
+  .adm-block{ padding:var(--sk-space-l) 0; border-top:1px solid var(--sk-color-border); }
+  .adm-block:first-of-type{ border-top:none; padding-top:0; }
+  .adm-block > h2{ margin-bottom:var(--sk-space-m); }
+  .adm-help{ display:block; color:var(--sk-color-text-muted); margin-top:var(--sk-space-xs); }
+  .adm-ficha{ background:var(--background-secundaria); border-radius:var(--bordes-s); padding:var(--sk-space-m); margin-bottom:var(--sk-space-s); }
+  .adm-dl{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--sk-space-s) var(--sk-space-m); margin:0; }
+  .adm-dl dt{ font-size:12px; line-height:20px; font-weight:var(--sk-font-weight-bold); color:var(--sk-color-text-muted); }   /* 12/20 = escala oficial «small» */
+  .adm-dl dd{ margin:var(--sk-space-xxs) 0 0; font-weight:var(--sk-font-weight-bold); word-break:break-word; }
+  .adm-dl--2{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .adm-route{ margin-top:var(--sk-space-s); display:flex; gap:var(--sk-space-xs); align-items:center; flex-wrap:wrap; }
+  .adm-two{ margin-top:var(--sk-space-m); }
+  #f-route:not(:empty), #p-dup:not(:empty){ margin-top:var(--sk-space-s); }
+
+  /* ---------- Detalle ---------- */
+  .adm-detail-grid{ display:grid; grid-template-columns:1fr; gap:var(--sk-space-m); align-items:start; margin-top:var(--sk-space-m); }
+  @media (min-width:1024px){ .adm-detail-grid{ grid-template-columns:1.1fr 1fr; } }
+  .adm-col{ display:grid; gap:var(--sk-space-m); min-width:0; }
+  .adm-cardhead{ display:flex; justify-content:space-between; align-items:baseline; gap:var(--sk-space-s); margin-bottom:var(--sk-space-xs); }
+  .adm-cardhead span{ color:var(--sk-color-text-muted); font-weight:var(--sk-font-weight-bold); }
+  .adm-hint{ display:block; color:var(--sk-color-text-muted); margin-bottom:var(--sk-space-xs); }
+  .adm-steps__foot{ display:flex; justify-content:space-between; align-items:center; gap:var(--sk-space-m); flex-wrap:wrap; border-top:1px solid var(--sk-color-border); margin-top:var(--sk-space-l); padding-top:var(--sk-space-m); }
+  .adm-steps__foot p{ display:flex; align-items:center; gap:var(--sk-space-xs); color:var(--sk-color-text-muted); }
+  .adm-docs{ list-style:none; margin:0; padding:0; }
+  .adm-docs li{ display:grid; grid-template-columns:20px minmax(0, 1fr) auto; gap:var(--sk-space-xxs) var(--sk-space-s); align-items:center; padding:var(--sk-space-s) 0; border-top:1px solid var(--sk-color-border); }
+  .adm-docs li:first-child{ border-top:none; }
+  .adm-docs .pi{ font-size:20px; color:var(--sk-color-primary-active); grid-row:1; }
+  .adm-docs__name{ font-weight:var(--sk-font-weight-bold); grid-column:2; }
+  .adm-docs__status{ grid-column:3; grid-row:1; }
+  .adm-docs__meta{ grid-column:2; color:var(--sk-color-text-muted); }
+  .adm-docs__act{ grid-column:3; justify-self:end; }
+  .adm-docs__act sk-button{ min-width:180px; }
+  .adm-doc-list-note{ margin-top:var(--sk-space-s); }
+
+  /* ---------- Resultados (EXCEPCIÓN 2: gráficas en SVG propio) ---------- */
+  .adm-charts{ display:grid; grid-template-columns:1fr; gap:var(--sk-space-m); margin-top:var(--sk-space-m); }
+  @media (min-width:1024px){ .adm-charts{ grid-template-columns:1fr 1fr; } }
+  .adm-charts [data-wide]{ grid-column:1 / -1; }
+  .adm-charts svg{ width:100%; height:auto; display:block; }
+  .adm-charts [data-wide] svg{ max-width:760px; }
+  .ch-label{ font-family:var(--sk-font-body); font-weight:var(--sk-font-weight-medium); font-size:14px; fill:var(--sk-color-text); }
+  .ch-val{ font-family:var(--sk-font-body); font-weight:var(--sk-font-weight-bold); font-size:14px; fill:var(--sk-color-text); }
+  .ch-sub{ font-family:var(--sk-font-body); font-weight:var(--sk-font-weight-medium); font-size:12px; fill:var(--sk-color-text-muted); }
+  .ch-track{ fill:var(--sk-color-disabled); }
+  .adm-nps{ display:flex; align-items:baseline; gap:var(--sk-space-s); margin:var(--sk-space-xxs) 0 var(--sk-space-s); }
+
+  /* ---------- Planta ---------- */
+  .adm-upload-actions{ margin-top:var(--sk-space-m); max-width:360px; }
+  .adm-block-gap{ margin-top:var(--sk-space-m); }
+
+  /* ---------- Movimiento reducido ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+  }
+
+  /* ---------- Responsive ---------- */
+  /* Tablet y móvil: la navegación pasa al cajón (el stepper y las tablas necesitan el ancho). */
+  @media (max-width:1023.98px){
+    .adm-dl{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .adm-body{ grid-template-columns:minmax(0, 1fr); }
+    .adm-nav{ display:none; }
+    .adm-menu-btn{ display:inline-flex; }
+  }
+  @media (max-width:479.98px){
+    .adm-header__product{ display:none; }
+  }
+  @media (max-width:767.98px){
+    .adm-header{ padding:0 var(--sk-space-s); }
+    .adm-header__brand sk-logo{ height:var(--sk-space-l); }
+    .adm-header__user .t-label{ display:none; }
+    .adm-header__product{ font-size:12px; line-height:20px; white-space:normal; }
+    .adm-header__sep{ display:none; }
+    .adm-main{ padding:var(--sk-space-m); }
+    .qa-bar{ padding:var(--sk-space-xs) var(--sk-space-m); }
+    .adm-docs li{ grid-template-columns:20px minmax(0, 1fr); }
+    .adm-docs__status{ grid-column:2; grid-row:auto; }
+    .adm-docs__act{ grid-column:2; justify-self:stretch; }
+    .adm-docs__act sk-button{ min-width:0; }
+    .adm-upload-actions{ max-width:none; }
+  }
+</style>
+</head>
+<body data-hide-reviewer-notes="false">
+
+<div id="app"></div>
+
+<!-- ══ TODA la UI va dentro del template. Se monta cuando el bundle está listo. ══ -->
+<template id="ui">
+
+<a class="skip-link" href="#main">Saltar al contenido</a>
+
+<div class="qa-bar" id="qaBar" role="region" aria-label="Controles de revisión">
+  <sk-tag sk-style="warning" size="small">MODO QA</sk-tag>
+  <small>Controles de revisión: no forman parte del perfil real.</small>
+  <sk-button id="qa-reset" label="Restablecer datos de ejemplo" sk-type="tertiary" size="small" data-ancho="auto"></sk-button>
+  <sk-checkbox id="qa-hide-notes" label="Ocultar notas de revisión"></sk-checkbox>
+</div>
+
+<header class="adm-header">
+  <div class="adm-header__brand">
+    <span class="adm-menu-btn"><sk-button id="menu-btn" sk-type="tertiary" icon="pi pi-bars" aria-label="Abrir menú" aria-haspopup="dialog" aria-controls="drawer"></sk-button></span>
+    <sk-logo></sk-logo>
+    <span class="adm-header__sep" aria-hidden="true"></span>
+    <span class="adm-header__product">Siempre Skandia · Administración</span>
+  </div>
+  <div class="adm-header__user"><span class="t-label">Equipo de Nómina</span><sk-avatar text="Equipo Nómina"></sk-avatar></div>
+</header>
+
+<div class="adm-drawer-overlay" id="drawer-overlay"></div>
+<aside class="adm-drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menú de navegación" aria-hidden="true">
+  <div class="adm-drawer__head">
+    <sk-logo></sk-logo>
+    <sk-button id="drawer-close" sk-type="tertiary" icon="pi pi-times" aria-label="Cerrar menú"></sk-button>
+  </div>
+  <ul class="adm-nav__list" id="drawer-nav"></ul>
+</aside>
+
+<div class="adm-body">
+  <nav class="adm-nav" aria-label="Principal"><ul class="adm-nav__list" id="side-nav"></ul></nav>
+
+  <main class="adm-main" id="main" tabindex="-1">
+   <div class="adm-wrap">
+
+    <!-- ============ 1 · SALIDAS EN CURSO ============ -->
+    <section class="adm-view" id="view-salidas" data-title="Salidas en curso">
+      <div class="adm-pagehead">
+        <div>
+          <h1 tabindex="-1">Salidas en curso</h1>
+          <p class="muted lede">Registra cada salida, asigna su ruta y actualiza la etapa de la liquidación. Lo que cambies aquí lo ve la persona en su portal.</p>
+        </div>
+        <sk-button id="go-register" label="Registrar salida" data-ancho="auto"></sk-button>
+      </div>
+      <div class="adm-note" data-audience="reviewer"><sk-alert type="warning" closable="false" message="🟡 Lo ve solo el equipo administrador; el alojamiento y el acceso siguen siendo parte del frente técnico, no se resuelven aquí. Todos los datos de esta herramienta son de ejemplo."></sk-alert></div>
+
+      <div class="sk-grid adm-kpis" id="kpis"></div>
+
+      <form id="filters" role="search" aria-label="Filtrar salidas" onsubmit="return false">
+        <sk-card>
+          <div class="sk-grid">
+            <sk-input-text data-col="3" id="flt-q" label="Nombre o documento" type="search" icon-left="pi pi-search" clearable></sk-input-text>
+            <sk-input-select data-col="3" id="flt-ruta" label="Ruta"></sk-input-select>
+            <sk-input-select data-col="3" id="flt-cat" label="Categoría"></sk-input-select>
+            <sk-input-select data-col="3" id="flt-etapa" label="Etapa"></sk-input-select>
+          </div>
+        </sk-card>
+      </form>
+
+      <small class="adm-tip" id="exits-tip">Selecciona una fila para ver el detalle de la salida.</small>
+      <div id="table-card"><sk-table id="exits-table" responsive-layout="stack" page-size="8" aria-label="Salidas registradas"></sk-table></div>
+      <sk-card id="exits-empty" hidden>
+        <i class="pi pi-search" aria-hidden="true"></i>
+        <h2>No hay salidas con estos filtros</h2>
+        <p class="muted">Prueba con otra búsqueda o limpia los filtros para ver todas las salidas.</p>
+        <sk-button id="flt-clear" label="Limpiar filtros" sk-type="secondary" data-ancho="auto"></sk-button>
+      </sk-card>
+    </section>
+
+    <!-- ============ 2 · REGISTRAR UNA SALIDA ============ -->
+    <section class="adm-view" id="view-registrar" data-title="Registrar una salida">
+      <div class="adm-pagehead">
+        <div>
+          <h1 tabindex="-1">Registrar una salida</h1>
+          <p class="muted lede">Busca a la persona en la planta y completa los datos de su salida. La ruta se asigna sola según el tipo de salida.</p>
+        </div>
+      </div>
+      <form class="adm-form" id="reg-form" novalidate onsubmit="return false">
+       <sk-card>
+        <div id="reg-summary" hidden><sk-alert type="error" closable="false" message="Revisa los campos marcados para registrar la salida."></sk-alert></div>
+
+        <section class="adm-block" aria-labelledby="b1">
+          <h2 id="b1">Persona</h2>
+          <div id="p-search">
+            <sk-input-select id="p-select" label="Buscar en la planta por nombre o documento" variant="semantic" content-search filter-mode="external" icon-left="pi pi-search"
+              empty-title="Busca a la persona" empty-message="Escribe al menos 2 letras del nombre o del documento."></sk-input-select>
+          </div>
+          <div id="p-card" hidden>
+            <div class="adm-ficha"><dl class="adm-dl" id="p-dl"></dl></div>
+            <sk-button id="p-change" label="Cambiar persona" sk-type="tertiary" size="small" data-ancho="auto"></sk-button>
+          </div>
+          <div id="p-dup" aria-live="polite"></div>
+          <small class="adm-help"><sk-link label="¿No aparece? Carga la plantilla de planta actualizada" href="#planta" size="small"></sk-link></small>
+        </section>
+
+        <section class="adm-block" aria-labelledby="b2">
+          <h2 id="b2">Salida</h2>
+          <sk-input-select id="f-type" label="Tipo de salida" variant="group"></sk-input-select>
+          <div class="sk-grid adm-two">
+            <sk-date-picker data-col="6" id="f-notif" label="Fecha de notificación"></sk-date-picker>
+            <sk-date-picker data-col="6" id="f-last" label="Último día de trabajo"></sk-date-picker>
+          </div>
+          <div id="f-route" aria-live="polite"></div>
+        </section>
+
+        <section class="adm-block" aria-labelledby="b3">
+          <h2 id="b3">Categoría</h2>
+          <div class="sk-rg" id="f-cat" data-dir="row">
+            <span class="sk-rg__label sr-only" id="f-cat-label">Categoría</span>
+            <div role="radiogroup" aria-labelledby="f-cat-label" aria-describedby="f-cat-help">
+              <sk-radio name="f-cat" value="A" label="A"></sk-radio>
+              <sk-radio name="f-cat" value="B" label="B"></sk-radio>
+              <sk-radio name="f-cat" value="Otra" label="Otra"></sk-radio>
+            </div>
+            <small class="sk-rg__help" id="f-cat-help">Solo las categorías A y B ven el programa de outplacement ejecutivo</small>
+          </div>
+        </section>
+
+        <section class="adm-block" aria-labelledby="b4">
+          <h2 id="b4">Situaciones especiales</h2>
+          <div class="sk-rg" id="f-special" data-dir="row">
+            <span class="sk-rg__label" id="f-special-label">¿Hay una situación especial que debamos tener en cuenta?</span>
+            <div role="radiogroup" aria-labelledby="f-special-label">
+              <sk-radio name="f-special" value="si" label="Sí"></sk-radio>
+              <sk-radio name="f-special" value="no" label="No"></sk-radio>
+            </div>
+          </div>
+          <div id="f-detail-wrap" hidden class="adm-block-gap">
+            <sk-textarea id="f-detail" label="Cuéntanos cuál es" help-text="Solo lo ve el equipo de Nómina" rows="3"></sk-textarea>
+          </div>
+          <div class="adm-note" data-audience="reviewer"><sk-alert type="warning" closable="false" message="🟡 El alcance de las «situaciones especiales» lo define Bienestar (duelo, familia, casos excepcionales). Hoy es un campo Sí/No con detalle."></sk-alert></div>
+        </section>
+
+        <div class="actions">
+          <sk-button id="reg-cancel" label="Cancelar" sk-type="secondary"></sk-button>
+          <sk-button id="reg-submit" label="Registrar salida"></sk-button>
+        </div>
+       </sk-card>
+      </form>
+    </section>
+
+    <!-- ============ 3 · DETALLE DE LA SALIDA ============ -->
+    <section class="adm-view" id="view-detalle" data-title="Detalle de la salida">
+      <div id="detail-host"></div>
+    </section>
+
+    <!-- ============ 4 · RESULTADOS ============ -->
+    <section class="adm-view" id="view-resultados" data-title="Resultados">
+      <div class="adm-pagehead">
+        <div>
+          <h1 tabindex="-1">Resultados</h1>
+          <p class="muted lede">Mira cómo responden las personas que salen, por ruta y por etapa.</p>
+        </div>
+        <sk-tag sk-style="warning">Datos de ejemplo</sk-tag>
+      </div>
+      <sk-alert type="info" closable="false" message="Datos de ejemplo. Las cifras de este tablero se calculan con las salidas de ejemplo de esta herramienta y cambian cuando registras o avanzas una salida."></sk-alert>
+      <div id="results-host"></div>
+    </section>
+
+    <!-- ============ 5 · PLANTILLA DE PLANTA ============ -->
+    <section class="adm-view" id="view-planta" data-title="Plantilla de planta">
+      <div class="adm-pagehead">
+        <div>
+          <h1 tabindex="-1">Plantilla de planta</h1>
+          <p class="muted lede">Carga la planta de colaboradores para que aparezca al registrar una salida. Usa la plantilla de ejemplo para ver las columnas que necesitamos.</p>
+        </div>
+      </div>
+      <div class="adm-note" data-audience="reviewer" style="margin-top:0;margin-bottom:var(--sk-space-m);"><sk-alert type="warning" closable="false" message="🟡 La conexión real con la planta de colaboradores es una integración pendiente: aquí el archivo solo simula la carga."></sk-alert></div>
+      <sk-file-upload id="plant-file" label="Arrastra aquí el archivo o elige uno" hint="Formatos: Excel (.xlsx) o CSV. Columnas: Nombre, Documento, Cargo, Área y Categoría." accept=".xlsx,.xls,.csv" choose-label="Elegir archivo"></sk-file-upload>
+      <div class="adm-upload-actions"><sk-button id="plant-template" label="Descargar plantilla de ejemplo" sk-type="secondary" icon="pi pi-download"></sk-button></div>
+      <div id="plant-error" class="adm-block-gap" hidden><sk-alert id="plant-error-alert" type="error" closable="false" message=""></sk-alert></div>
+      <div id="plant-result" class="adm-block-gap" hidden></div>
+      <div class="adm-block-gap"><sk-card>
+        <div class="adm-cardhead"><h2>Planta actual</h2><span id="plant-count"></span></div>
+        <sk-table id="plant-table" responsive-layout="stack" page-size="8" aria-label="Personas de la planta actual"></sk-table>
+      </sk-card></div>
+    </section>
+
+    <footer class="adm-footer"><small>Herramienta de uso interno</small></footer>
+   </div>
+  </main>
+</div>
+
+</template>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   DATOS DE REFERENCIA
+   ============================================================ */
+var KEY = 'sk-siempre-admin-v1';
+var PAGE = 8;
+var STAGES = ['Notificación registrada','Liquidación solicitada','Documentos en preparación','Documentos pendientes de firma','Paz y salvo en revisión','Pago realizado'];
+var DOCS7 = [
+  {k:'liquidacion', n:'Liquidación de contrato'},
+  {k:'cesantias',   n:'Autorización de retiro de cesantías'},
+  {k:'certificacion', n:'Carta de certificación laboral'},
+  {k:'pago',        n:'Autorización de pago'},
+  {k:'examenes',    n:'Carta de autorización de exámenes de retiro'},
+  {k:'pazysalvo',   n:'Formato de paz y salvo'},
+  {k:'puesto',      n:'Formato de entrega de puesto de trabajo'}
+];
+var DOWNLOADS = [
+  {k:'cert', n:'Carta de certificación laboral'},
+  {k:'cir',  n:'CIR (Certificado de Ingresos y Retenciones)'},
+  {k:'planilla', n:'Planilla de seguridad social'}
+];
+/* Los 8 tipos administrativos del MPO (ver investigacion/siempre-skandia-benchmark-y-propuesta-v2.md,
+   "Diferenciación por tipo de salida") agrupados en dos rutas por las sesiones de revisión:
+   Ruta 1 = renuncia voluntaria, terminación por pensión, fallecimiento (pensión y fallecimiento
+   conservan su tono propio como "variante"); Ruta 2 = mutuo acuerdo, con/sin justa causa,
+   terminación de contrato, período de prueba (mutuo acuerdo se reclasificó como no elegida). */
+var TYPES = [
+  {id:'renuncia',   label:'Renuncia voluntaria',          route:1, variant:''},
+  {id:'pension',    label:'Terminación por pensión',      route:1, variant:'Pensión'},
+  {id:'fallecimiento', label:'Fallecimiento',             route:1, variant:'Fallecimiento'},
+  {id:'mutuo',      label:'Mutuo acuerdo',                route:2, variant:''},
+  {id:'sin-justa',  label:'Terminación sin justa causa',  route:2, variant:''},
+  {id:'con-justa',  label:'Terminación con justa causa',  route:2, variant:''},
+  {id:'termino',    label:'Terminación de contrato',      route:2, variant:''},
+  {id:'prueba',     label:'Período de prueba',            route:2, variant:''}
+];
+var ROUTE_NAME = {1:'Ruta 1 · Salida elegida', 2:'Ruta 2 · Salida no elegida'};
+
+function P(n,d,c,a,k){ return {name:n,doc:d,cargo:c,area:a,cat:k}; }
+function plantSeed(){
+  return [
+    P('Mariana Beltrán','1.000.000.011','Analista de Procesos','Operaciones','B'),
+    P('Felipe Cardona','1.000.000.012','Gerente de Cuenta','Comercial','A'),
+    P('Luisa Fernanda Vera','1.000.000.013','Asistente Administrativa','Administrativa','Otra'),
+    P('Sebastián Mora','1.000.000.014','Ejecutivo Comercial','Comercial','Otra'),
+    P('Daniela Ruiz','1.000.000.015','Analista de Riesgos','Riesgos','B'),
+    P('Ricardo Salcedo','1.000.000.016','Director de Tecnología','Tecnología','A'),
+    P('Isabela Fonseca','1.000.000.017','Coordinadora de Mercadeo','Mercadeo y Comunicaciones','B'),
+    P('Nicolás Prieto','1.000.000.018','Auxiliar de Servicio','Servicio al Cliente','Otra'),
+    P('Catalina Duarte','1.000.000.019','Analista Contable','Finanzas','Otra'),
+    P('Mateo Villamizar','1.000.000.020','Asesor Financiero','Comercial','B'),
+    P('Juliana Arboleda','1.000.000.021','Líder de Talento','Gestión Humana','A'),
+    P('Santiago Barrera','1.000.000.022','Desarrollador','Tecnología','Otra'),
+    P('Valeria Quiroga','1.000.000.023','Analista de Datos','Analítica','B'),
+    P('Hernán Gaitán','1.000.000.024','Auxiliar Administrativo','Administrativa','Otra'),
+    P('Paola Zambrano','1.000.000.025','Analista de Cumplimiento','Legal','Otra')
+  ];
+}
+function allSigned(date, withFile){
+  var o = {};
+  DOCS7.forEach(function(d){ o[d.k] = withFile ? {date:date, file:{name:d.k+'-firmado.pdf', size:182000}} : {date:date}; });
+  return o;
+}
+function someSigned(keys, date, withFile){
+  var o = {};
+  keys.forEach(function(k){ o[k] = withFile ? {date:date, file:{name:k+'-firmado.pdf', size:176000}} : {date:date}; });
+  return o;
+}
+function allFiles(){
+  return {cert:{name:'certificacion-laboral.pdf',size:96000,date:'2026-11-02'}, cir:{name:'cir-2026.pdf',size:214000,date:'2026-11-02'}, planilla:{name:'planilla-seguridad-social.pdf',size:128000,date:'2026-11-02'}};
+}
+function E(o){
+  o.special = o.special || {yes:false, detail:''};
+  o.signed = o.signed || {};
+  o.files = o.files || {};
+  return o;
+}
+function seed(){
+  var ex = [
+    E({id:'s1', name:'Laura Gómez', doc:'1.000.000.101', cargo:'Analista de Mercadeo', area:'Mercadeo y Comunicaciones', cat:'B', type:'renuncia', notif:'2026-10-20', last:'2026-11-20', stage:3, ent:'Respondida', enc:'Pendiente', signed:someSigned(['liquidacion','cesantias'],'2026-11-03',false), files:{planilla:{name:'planilla-seguridad-social.pdf',size:128000,date:'2026-11-02'}}}),
+    E({id:'s2', name:'Carlos Pérez', doc:'1.000.000.102', cargo:'Ejecutivo de Ventas', area:'Comercial', cat:'Otra', type:'sin-justa', notif:'2026-11-03', last:'2026-11-05', stage:1, ent:'Pendiente', enc:'Pendiente'}),
+    E({id:'s3', name:'Marta Ríos', doc:'1.000.000.103', cargo:'Directora de Operaciones', area:'Operaciones', cat:'A', type:'pension', notif:'2026-09-15', last:'2026-10-31', stage:4, ent:'Respondida', enc:'Respondida', nps:10, signed:allSigned('2026-10-20',false), files:allFiles()}),
+    E({id:'s4', name:'Andrés Mejía', doc:'1.000.000.104', cargo:'Coordinador de Servicio', area:'Servicio al Cliente', cat:'Otra', type:'fallecimiento', notif:'2026-10-27', last:'2026-10-26', stage:2, ent:'No aplica', enc:'Pendiente', special:{yes:true, detail:'Acompañar a la familia en la entrega de documentos.'}}),
+    E({id:'s5', name:'Sofía Londoño', doc:'1.000.000.105', cargo:'Analista Financiera', area:'Finanzas', cat:'Otra', type:'renuncia', notif:'2026-09-01', last:'2026-09-30', stage:5, ent:'Respondida', enc:'Respondida', nps:9, signed:allSigned('2026-09-20',false), files:allFiles()}),
+    E({id:'s6', name:'Julián Aranda', doc:'1.000.000.106', cargo:'Asesor Comercial', area:'Comercial', cat:'B', type:'mutuo', notif:'2026-10-14', last:'2026-11-14', stage:3, ent:'Respondida', enc:'Respondida', nps:8, signed:someSigned(['liquidacion','cesantias','certificacion'],'2026-11-04',true)}),
+    E({id:'s7', name:'Diana Pardo', doc:'1.000.000.107', cargo:'Gerente de Producto', area:'Producto', cat:'A', type:'renuncia', notif:'2026-11-04', last:'2026-12-04', stage:0, ent:'Pendiente', enc:'Pendiente'}),
+    E({id:'s8', name:'Camilo Ospina', doc:'1.000.000.108', cargo:'Auxiliar Administrativo', area:'Administrativa', cat:'Otra', type:'con-justa', notif:'2026-10-10', last:'2026-10-10', stage:4, ent:'Respondida', enc:'Respondida', nps:7, signed:allSigned('2026-10-22',true), files:{cert:{name:'certificacion-laboral.pdf',size:96000,date:'2026-11-01'}, planilla:{name:'planilla-seguridad-social.pdf',size:128000,date:'2026-11-01'}}}),
+    E({id:'s9', name:'Valentina Rueda', doc:'1.000.000.109', cargo:'Analista de Datos', area:'Analítica', cat:'B', type:'renuncia', notif:'2026-10-28', last:'2026-11-28', stage:2, ent:'Pendiente', enc:'Pendiente'}),
+    E({id:'s10', name:'Tomás Herrera', doc:'1.000.000.110', cargo:'Auxiliar de Servicio', area:'Servicio al Cliente', cat:'Otra', type:'termino', notif:'2026-08-25', last:'2026-09-15', stage:5, ent:'Respondida', enc:'Respondida', nps:6, signed:allSigned('2026-09-10',true), files:allFiles()}),
+    E({id:'s11', name:'Natalia Cárdenas', doc:'1.000.000.111', cargo:'Asistente de Mercadeo', area:'Mercadeo y Comunicaciones', cat:'Otra', type:'prueba', notif:'2026-11-05', last:'2026-11-06', stage:1, ent:'Pendiente', enc:'Pendiente'}),
+    E({id:'s12', name:'Esteban Quintero', doc:'1.000.000.112', cargo:'Gerente de Cuenta', area:'Comercial', cat:'B', type:'pension', notif:'2026-10-18', last:'2026-11-30', stage:3, ent:'Respondida', enc:'Pendiente', signed:someSigned(['liquidacion'],'2026-11-05',false), special:{yes:true, detail:'Prefiere recibir las comunicaciones por correo personal.'}})
+  ];
+  return {v:1, exits:ex, plant:plantSeed(), seq:13};
+}
+
+/* ============================================================
+   ESTADO (memoria + localStorage con try/catch)
+   ============================================================ */
+function load(){
+  try{
+    var r = window.localStorage.getItem(KEY);
+    if (!r) return null;
+    var o = JSON.parse(r);
+    if (o && o.v === 1 && Array.isArray(o.exits) && Array.isArray(o.plant)) return o;
+  }catch(e){}
+  return null;
+}
+var S = load() || seed();
+function save(){
+  try{ window.localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+}
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+var $ = function(s, r){ return (r||document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function typeOf(id){ for (var i=0;i<TYPES.length;i++) if (TYPES[i].id===id) return TYPES[i]; return TYPES[0]; }
+function find(id){ for (var i=0;i<S.exits.length;i++) if (S.exits[i].id===id) return S.exits[i]; return null; }
+function displayName(e){ return e.type === 'fallecimiento' ? 'Beneficiarios de ' + e.name : e.name; }
+function fmtDate(iso){
+  if (!iso) return '—';
+  var d = new Date(iso + 'T12:00:00');
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('es-CO', {day:'numeric', month:'short', year:'numeric'});
+}
+function fmtSize(b){ return b >= 1048576 ? (b/1048576).toFixed(1).replace('.',',') + ' MB' : Math.max(1, Math.round(b/1024)) + ' KB'; }
+function pad2(n){ return ('0' + n).slice(-2); }
+function today(){ var d = new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function isoOf(d){ return d instanceof Date && !isNaN(d.getTime()) ? d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()) : ''; }
+function countSigned(e){ var n=0; DOCS7.forEach(function(d){ if (e.signed[d.k]) n++; }); return n; }
+function routeOf(e){ return typeOf(e.type).route; }
+function pi(n){ return '<i class="pi pi-'+n+'" aria-hidden="true"></i>'; }
+/* Etiquetas (sk-tag / sk-badge): Ruta 1 = success, Ruta 2 = info; Respondida = success, Pendiente = warning. */
+function tagRoute(r, text){ return '<sk-tag size="small" sk-style="'+(r===1?'success':'info')+'">'+esc(text || 'Ruta '+r)+'</sk-tag>'; }
+function tagState(s){
+  if (s === 'Respondida') return '<sk-tag size="small" sk-style="success">Respondida</sk-tag>';
+  if (s === 'Pendiente') return '<sk-tag size="small" sk-style="warning">Pendiente</sk-tag>';
+  return '<small class="muted">'+esc(s)+'</small>';
+}
+function tagVar(v){ return '<sk-badge state="info" type="square" style="stroke">'+esc(v)+'</sk-badge>'; }
+function tagOk(t){ return '<sk-tag size="small" sk-style="success">'+t+'</sk-tag>'; }
+function tagWarn(t){ return '<sk-tag size="small" sk-style="warning">'+t+'</sk-tag>'; }
+/* Dibujo dinámico: el HTML se arma en un <template>, se importa (así los sk-* ya están activos),
+   se asignan las propiedades complejas y solo entonces se inserta en la página. */
+function frag(html){
+  var t = document.createElement('template');
+  t.innerHTML = html;
+  return document.importNode(t.content, true);
+}
+function ok(summary, detail){ window.skElements.toast.success(summary, detail); }
+function info(summary, detail){ window.skElements.toast.info(summary, detail); }
+function focusIn(el){
+  if (!el) return;
+  var inner = el.querySelector && el.querySelector('input, textarea, [role="combobox"], .p-select, button');
+  (inner || el).focus && (inner || el).focus();
+}
+
+/* ============================================================
+   MONTAJE — el bundle debe estar listo; los datos de los componentes se asignan ANTES de insertar
+   ============================================================ */
+var TAGS = ['sk-button','sk-card','sk-logo','sk-avatar','sk-tag','sk-badge','sk-alert','sk-checkbox','sk-input-text','sk-input-select',
+            'sk-date-picker','sk-textarea','sk-radio','sk-table','sk-stepper','sk-breadcrumb','sk-link','sk-file-upload'];
+Promise.all(TAGS.map(function(t){ return customElements.whenDefined(t); })).then(function(){
+  var ui = document.importNode(document.getElementById('ui').content, true);
+  var q = function(s){ return ui.querySelector(s); };
+
+  q('#flt-ruta').options = [{label:'Todas las rutas', value:''},{label:'Ruta 1', value:'1'},{label:'Ruta 2', value:'2'}];
+  q('#flt-cat').options = [{label:'Todas las categorías', value:''},{label:'A', value:'A'},{label:'B', value:'B'},{label:'Otra', value:'Otra'}];
+  q('#flt-etapa').options = [{label:'Todas las etapas', value:''}].concat(STAGES.map(function(s,i){ return {label:s, value:String(i)}; }));
+
+  var exits = q('#exits-table');
+  exits.columns = [
+    {field:'nombre', header:'Nombre', width:'17%'}, {field:'tipo', header:'Tipo de salida', width:'17%'},
+    {field:'ruta', header:'Ruta', width:'8%'}, {field:'variante', header:'Variante', width:'10%'},
+    {field:'cat', header:'Categoría', width:'9%'}, {field:'etapa', header:'Etapa', width:'18%'},
+    {field:'ent', header:'Entrevista', width:'10%'}, {field:'enc', header:'Encuesta', width:'11%'}
+  ];
+  exits.value = [];
+  exits.pageSizeOptions = [8, 16, 24];
+
+  q('#f-type').optionGroups = [
+    {label:'Salida elegida · Ruta 1', items:TYPES.filter(function(t){ return t.route===1; }).map(function(t){ return {label:t.label, value:t.id}; })},
+    {label:'Salida no elegida · Ruta 2', items:TYPES.filter(function(t){ return t.route===2; }).map(function(t){ return {label:t.label, value:t.id}; })}
+  ];
+  q('#p-select').options = [];
+  $$('sk-radio[name="f-cat"]', ui).forEach(function(r){ r.selectedValue = 'Otra'; });
+  $$('sk-radio[name="f-special"]', ui).forEach(function(r){ r.selectedValue = 'no'; });
+
+  var plant = q('#plant-table');
+  plant.columns = PLANT_COLS();
+  plant.value = [];
+  plant.pageSizeOptions = [8, 16, 24];
+
+  document.getElementById('app').append(ui);
+  start();
+});
+function PLANT_COLS(){
+  return [{field:'name', header:'Nombre'}, {field:'doc', header:'Documento'}, {field:'cargo', header:'Cargo'}, {field:'area', header:'Área'}, {field:'cat', header:'Categoría'}];
+}
+
+function start(){
+
+/* ============================================================
+   NAVEGACIÓN (hash) + cajón móvil
+   ============================================================ */
+var NAV = [
+  {href:'#salidas', view:'salidas', label:'Salidas', ic:'list'},
+  {href:'#registrar', view:'registrar', label:'Registrar salida', ic:'user-plus'},
+  {href:'#resultados', view:'resultados', label:'Resultados', ic:'chart-bar'},
+  {href:'#planta', view:'planta', label:'Plantilla de planta', ic:'users'}
+];
+var currentView = '';
+function buildNav(){
+  var html = NAV.map(function(n){ return '<li><a class="adm-nav__item" href="'+n.href+'" data-view="'+n.view+'">'+pi(n.ic)+'<span>'+n.label+'</span></a></li>'; }).join('');
+  $('#side-nav').innerHTML = html;
+  $('#drawer-nav').innerHTML = html;
+}
+function parseHash(){
+  var h = (window.location.hash || '#salidas').replace(/^#/, '');
+  var p = h.split('/');
+  return {view:p[0] || 'salidas', id:p[1] || ''};
+}
+var TITLES = {salidas:'Salidas en curso', registrar:'Registrar una salida', detalle:'Detalle de la salida', resultados:'Resultados', planta:'Plantilla de planta'};
+function route(first){
+  closeDrawer(true);
+  var r = parseHash();
+  if (!TITLES[r.view]) r = {view:'salidas', id:''};
+  currentView = r.view;
+  $$('.adm-view').forEach(function(v){ v.classList.toggle('is-active', v.id === 'view-' + r.view); });
+  var navView = r.view === 'detalle' ? 'salidas' : r.view;
+  $$('.adm-nav__item').forEach(function(a){
+    if (a.getAttribute('data-view') === navView) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+  });
+  var title = TITLES[r.view];
+  if (r.view === 'salidas') renderList();
+  else if (r.view === 'registrar') resetForm();
+  else if (r.view === 'detalle'){ var e = find(r.id); title = e ? displayName(e) + ' · Detalle de la salida' : 'No encontramos esta salida'; renderDetail(r.id); }
+  else if (r.view === 'resultados') renderResults();
+  else if (r.view === 'planta') renderPlant();
+  document.title = title + ' · Siempre Skandia Administración';
+  window.scrollTo(0, 0);
+  if (!first){
+    var h1 = $('#view-' + r.view + ' h1');
+    if (h1){ if (!h1.hasAttribute('tabindex')) h1.setAttribute('tabindex','-1'); h1.focus({preventScroll:true}); }
+  }
+}
+
+var drawerOpener = null;
+function openDrawer(){
+  drawerOpener = document.activeElement;
+  $('#drawer').classList.add('is-open'); $('#drawer').setAttribute('aria-hidden','false');
+  $('#drawer-overlay').classList.add('is-open');
+  $('#menu-btn').setAttribute('aria-expanded','true');
+  focusIn($('#drawer-close'));
+}
+function closeDrawer(silent){
+  var d = $('#drawer');
+  if (!d.classList.contains('is-open')) return;
+  d.classList.remove('is-open'); d.setAttribute('aria-hidden','true');
+  $('#drawer-overlay').classList.remove('is-open');
+  $('#menu-btn').setAttribute('aria-expanded','false');
+  if (!silent && drawerOpener && drawerOpener.focus) drawerOpener.focus();
+}
+$('#menu-btn').addEventListener('skClick', openDrawer);
+$('#drawer-close').addEventListener('skClick', function(){ closeDrawer(); });
+$('#drawer-overlay').addEventListener('click', function(){ closeDrawer(); });
+$('#drawer').addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){ e.preventDefault(); closeDrawer(); return; }
+  if (e.key !== 'Tab') return;
+  var els = $$('a[href], button:not([disabled])', $('#drawer'));
+  if (!els.length) return;
+  var first = els[0], last = els[els.length-1];
+  if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+});
+
+/* ============================================================
+   1 · LISTA
+   ============================================================ */
+var flt = {q:'', ruta:'', cat:'', etapa:''};
+var curList = [], tblPage = 1, tblSize = PAGE;
+var exitsTbl = $('#exits-table');
+
+function npsOf(ex){
+  var sc = ex.filter(function(e){ return e.enc === 'Respondida' && typeof e.nps === 'number'; }).map(function(e){ return e.nps; });
+  if (!sc.length) return {n:0, score:null, pro:0, pas:0, det:0};
+  var pro = sc.filter(function(s){ return s >= 9; }).length;
+  var det = sc.filter(function(s){ return s <= 6; }).length;
+  var pas = sc.length - pro - det;
+  return {n:sc.length, score:Math.round((pro - det) / sc.length * 100), pro:pro, pas:pas, det:det};
+}
+function kpis(){
+  var ex = S.exits;
+  var curso = ex.filter(function(e){ return e.stage < 5; }).length;
+  var firma = ex.filter(function(e){ return e.stage === 3; }).length;
+  var apl = ex.filter(function(e){ return e.ent !== 'No aplica'; });
+  var resp = apl.filter(function(e){ return e.ent === 'Respondida'; }).length;
+  return {curso:curso, firma:firma, entResp:resp, entApl:apl.length, nps:npsOf(ex)};
+}
+function renderKpis(){
+  var k = kpis();
+  var items = [
+    ['Salidas en curso', String(k.curso), 'kpi-curso', 'sin pago realizado'],
+    ['Pendientes de firma', String(k.firma), 'kpi-firma', 'en la etapa de firma'],
+    ['Entrevistas respondidas', k.entResp + ' de ' + k.entApl, 'kpi-entrevistas', 'sin contar «No aplica»'],
+    ['NPS del proceso', k.nps.score == null ? '—' : String(k.nps.score), 'kpi-nps', 'de −100 a 100']
+  ];
+  $('#kpis').replaceChildren(frag(items.map(function(i){
+    return '<sk-card data-col="3"><p class="t-label">'+i[0]+'</p><p class="fig" id="'+i[2]+'">'+i[1]+'</p>'+(i[3]?'<small class="muted">'+i[3]+'</small>':'')+'</sk-card>';
+  }).join('')));
+}
+function filtered(){
+  var qq = norm(flt.q).replace(/\./g,'').trim();
+  return S.exits.filter(function(e){
+    if (qq && norm(e.name + ' ' + displayName(e)).indexOf(qq) < 0 && e.doc.replace(/\./g,'').indexOf(qq) < 0) return false;
+    if (flt.ruta && String(routeOf(e)) !== flt.ruta) return false;
+    if (flt.cat && e.cat !== flt.cat) return false;
+    if (flt.etapa !== '' && String(e.stage) !== flt.etapa) return false;
+    return true;
+  });
+}
+function rowOf(e){
+  var t = typeOf(e.type);
+  return {id:e.id, nombre:displayName(e), tipo:t.label, ruta:'Ruta '+t.route, variante:t.variant || '—', cat:e.cat, etapa:STAGES[e.stage], ent:e.ent, enc:e.enc};
+}
+function renderList(resetPage){
+  renderKpis();
+  curList = filtered();
+  var empty = curList.length === 0;
+  $('#table-card').hidden = empty;
+  $('#exits-tip').hidden = empty;
+  $('#exits-empty').hidden = !empty;
+  exitsTbl.value = curList.map(rowOf);
+  if (resetPage){ tblPage = 1; exitsTbl.page = 1; }
+}
+exitsTbl.addEventListener('rowClick', function(e){ var r = e.detail; if (r && r.id) window.location.hash = '#detalle/' + r.id; });
+exitsTbl.addEventListener('pageChange', function(e){ tblPage = e.detail; exitsTbl.page = e.detail; });
+exitsTbl.addEventListener('pageSizeChange', function(e){ tblSize = e.detail; exitsTbl.pageSize = e.detail; tblPage = 1; exitsTbl.page = 1; });
+/* sk-table abre la fila solo con clic: se suma Enter y Espacio para teclado. */
+exitsTbl.addEventListener('keydown', function(e){
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  var tr = e.target.closest && e.target.closest('tbody tr');
+  if (!tr) return;
+  var rows = $$('tbody tr', exitsTbl), i = rows.indexOf(tr);
+  var item = curList[(tblPage - 1) * tblSize + i];
+  if (!item) return;
+  e.preventDefault();
+  window.location.hash = '#detalle/' + item.id;
+});
+
+var fq = $('#flt-q');
+fq.addEventListener('valueChange', function(e){ fq.value = e.detail; flt.q = e.detail || ''; renderList(true); });
+['ruta','cat','etapa'].forEach(function(k){
+  var el = $('#flt-' + k);
+  el.addEventListener('valueChange', function(e){ el.value = e.detail; flt[k] = e.detail == null ? '' : String(e.detail); renderList(true); });
+});
+function clearFilters(){
+  flt = {q:'', ruta:'', cat:'', etapa:''};
+  fq.value = ''; ['ruta','cat','etapa'].forEach(function(k){ $('#flt-' + k).value = ''; });
+}
+$('#flt-clear').addEventListener('skClick', function(){ clearFilters(); renderList(true); focusIn(fq); });
+$('#go-register').addEventListener('skClick', function(){ window.location.hash = '#registrar'; });
+
+/* ============================================================
+   2 · REGISTRAR
+   ============================================================ */
+var F = {person:null};
+var pSel = $('#p-select'), typeSel = $('#f-type'), dNotif = $('#f-notif'), dLast = $('#f-last'), detailTa = $('#f-detail');
+var SEARCH_EMPTY = {title:'Busca a la persona', msg:'Escribe al menos 2 letras del nombre o del documento.'};
+var NONE_FOUND = {title:'Sin resultados', msg:'No encontramos a nadie con ese dato. Puedes cargar la plantilla de planta actualizada.'};
+
+function syncGroup(name, v){ $$('sk-radio[name="'+name+'"]').forEach(function(r){ r.selectedValue = v; }); }
+function groupVal(name){ var r = $('sk-radio[name="'+name+'"]'); return r ? r.selectedValue : ''; }
+$$('sk-radio').forEach(function(r){
+  r.addEventListener('selectedValueChange', function(e){
+    var name = r.getAttribute('name');
+    syncGroup(name, e.detail);
+    if (name === 'f-special'){
+      var yes = e.detail === 'si';
+      $('#f-detail-wrap').hidden = !yes;
+      if (!yes){ detailTa.value = ''; detailTa.errorMessage = ''; refreshSummary(); }
+      else focusIn(detailTa);
+    }
+  });
+});
+
+function setErr(el, msg){ el.errorMessage = msg || ''; if (!msg) refreshSummary(); }
+function anyError(){
+  return [pSel, typeSel, dNotif, dLast, detailTa].some(function(el){ return !!el.errorMessage; }) || !!$('#p-dup').firstChild;
+}
+function refreshSummary(){ if (!anyError()) $('#reg-summary').hidden = true; }
+function clearErrors(){
+  [pSel, typeSel, dNotif, dLast, detailTa].forEach(function(el){ el.errorMessage = ''; });
+  $('#p-dup').replaceChildren();
+  $('#reg-summary').hidden = true;
+}
+function resetForm(){
+  F = {person:null};
+  pSel.options = []; pSel.value = null; pSel.emptyTitle = SEARCH_EMPTY.title; pSel.emptyMessage = SEARCH_EMPTY.msg;
+  $('#p-search').hidden = false; $('#p-card').hidden = true;
+  typeSel.value = null; dNotif.value = null; dLast.value = null; detailTa.value = '';
+  syncGroup('f-cat', 'Otra'); syncGroup('f-special', 'no');
+  $('#f-detail-wrap').hidden = true;
+  updateRoute();
+  clearErrors();
+}
+/* Buscador de personas: sk-input-select con filtro externo (variante semantic = nombre + descripción). */
+var comboItems = [];
+pSel.addEventListener('skSearch', function(e){
+  var qq = norm(e.detail || '').replace(/\./g,'').trim();
+  if (qq.length < 2){
+    comboItems = []; pSel.options = [];
+    pSel.emptyTitle = SEARCH_EMPTY.title; pSel.emptyMessage = SEARCH_EMPTY.msg;
+    return;
+  }
+  comboItems = S.plant.filter(function(p){ return norm(p.name).indexOf(qq) >= 0 || p.doc.replace(/\./g,'').indexOf(qq) >= 0; }).slice(0, 6);
+  pSel.emptyTitle = NONE_FOUND.title; pSel.emptyMessage = NONE_FOUND.msg;
+  pSel.options = comboItems.map(function(p){ return {label:p.name, value:p.doc, description:p.doc + ' · ' + p.cargo}; });
+});
+pSel.addEventListener('valueChange', function(e){
+  var v = e.detail;
+  pSel.value = v;                                                  // espejo
+  if (!v) return;
+  var p = S.plant.filter(function(x){ return x.doc === v; })[0];
+  if (p) pickPerson(p);
+});
+function pickPerson(p){
+  F.person = p;
+  $('#p-dl').innerHTML = [['Nombre',p.name],['Documento',p.doc],['Cargo',p.cargo],['Área',p.area],['Categoría',p.cat]].map(function(r){ return '<div><dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd></div>'; }).join('');
+  $('#p-search').hidden = true; $('#p-card').hidden = false;
+  setErr(pSel, ''); $('#p-dup').replaceChildren(); refreshSummary();
+  syncGroup('f-cat', p.cat);
+  focusIn($('#p-change'));
+}
+$('#p-change').addEventListener('skClick', function(){
+  F.person = null;
+  $('#p-card').hidden = true; $('#p-search').hidden = false;
+  $('#p-dup').replaceChildren();
+  pSel.options = []; pSel.value = null; pSel.emptyTitle = SEARCH_EMPTY.title; pSel.emptyMessage = SEARCH_EMPTY.msg;
+  focusIn(pSel);
+});
+
+function updateRoute(){
+  var id = typeSel.value, box = $('#f-route');
+  if (!id){ box.replaceChildren(frag('<small class="adm-help">La ruta se asigna al elegir el tipo de salida.</small>')); return; }
+  var t = typeOf(id);
+  box.replaceChildren(frag('<div class="adm-route">'+tagRoute(t.route, 'Ruta asignada: '+ROUTE_NAME[t.route])+(t.variant ? tagVar('Variante: '+t.variant) : '')+'</div><small class="adm-help">La persona verá el portal y los mensajes de esta ruta</small>'));
+}
+typeSel.addEventListener('valueChange', function(e){ typeSel.value = e.detail; updateRoute(); if (e.detail) setErr(typeSel, ''); });
+dNotif.addEventListener('valueChange', function(e){ dNotif.value = e.detail; if (e.detail) setErr(dNotif, ''); });
+dLast.addEventListener('valueChange', function(e){ dLast.value = e.detail; if (e.detail) setErr(dLast, ''); });
+detailTa.addEventListener('valueChange', function(e){ detailTa.value = e.detail; if (e.detail && String(e.detail).trim()) setErr(detailTa, ''); });
+
+function submitForm(){
+  clearErrors();
+  var bad = [];
+  var typeId = typeSel.value, notif = isoOf(dNotif.value), last = isoOf(dLast.value);
+  var yes = groupVal('f-special') === 'si';
+  var detail = String(detailTa.value || '').trim();
+  if (!F.person){ pSel.errorMessage = 'Elige a la persona de la planta.'; bad.push(pSel); }
+  else {
+    var dup = S.exits.filter(function(e){ return e.doc === F.person.doc; })[0];
+    if (dup){
+      $('#p-dup').replaceChildren(frag('<sk-alert type="error" closable="false" message="Ya hay una salida registrada para esta persona."></sk-alert><div class="adm-block-gap"><sk-link label="Ver salida" href="#detalle/'+dup.id+'"></sk-link></div>'));
+      bad.push($('#p-change'));
+    }
+  }
+  if (!typeId){ typeSel.errorMessage = 'Elige el tipo de salida.'; bad.push(typeSel); }
+  if (!notif){ dNotif.errorMessage = 'Escribe la fecha de notificación.'; bad.push(dNotif); }
+  if (!last){ dLast.errorMessage = 'Escribe el último día de trabajo.'; bad.push(dLast); }
+  else if (notif && last < notif){ dLast.errorMessage = 'El último día no puede ser anterior a la fecha de notificación.'; bad.push(dLast); }
+  if (yes && !detail){ detailTa.errorMessage = 'Cuéntanos cuál es la situación especial.'; bad.push(detailTa); }
+  if (bad.length){
+    $('#reg-summary').hidden = false;
+    focusIn(bad[0]);
+    return;
+  }
+  var cat = groupVal('f-cat') || 'Otra';
+  var id = 's' + (S.seq++);
+  var t = typeOf(typeId);
+  var e = E({id:id, name:F.person.name, doc:F.person.doc, cargo:F.person.cargo, area:F.person.area, cat:cat, type:typeId, notif:notif, last:last, stage:0,
+    ent: typeId === 'fallecimiento' ? 'No aplica' : 'Pendiente', enc:'Pendiente', special:{yes:yes, detail:yes ? detail : ''}});
+  S.exits.unshift(e);
+  save();
+  clearFilters();
+  ok('Salida registrada', displayName(e) + ' · ' + ROUTE_NAME[t.route]);
+  window.location.hash = '#salidas';
+}
+$('#reg-submit').addEventListener('skClick', submitForm);
+$('#reg-form').addEventListener('submit', function(ev){ ev.preventDefault(); submitForm(); });
+$('#reg-cancel').addEventListener('skClick', function(){ window.location.hash = '#salidas'; });
+
+/* ============================================================
+   3 · DETALLE
+   ============================================================ */
+function docRow(icon, name, statusTag, meta, act){
+  return '<li>'+pi(icon)+'<span class="adm-docs__name">'+esc(name)+'</span><span class="adm-docs__status">'+statusTag+'</span>'+(meta?'<small class="adm-docs__meta">'+meta+'</small>':'')+(act?'<span class="adm-docs__act">'+act+'</span>':'')+'</li>';
+}
+function renderDetail(id){
+  var host = $('#detail-host');
+  var e = find(id);
+  if (!e){
+    var nf = frag('<div class="adm-pagehead"><div><h1 tabindex="-1">No encontramos esta salida</h1><p class="muted lede">Puede que se haya restablecido la información de ejemplo. Vuelve a la lista para abrir otra salida.</p></div><sk-button id="back-list" label="Volver a las salidas" data-ancho="auto"></sk-button></div>');
+    nf.querySelector('#back-list').addEventListener('skClick', function(){ window.location.hash = '#salidas'; });
+    host.replaceChildren(nf);
+    return;
+  }
+  var t = typeOf(e.type), r2 = t.route === 2;
+  var signed = countSigned(e);
+  var last = e.stage === STAGES.length - 1;
+
+  var docs7 = DOCS7.map(function(d){
+    var s = e.signed[d.k], statusTag, meta = '', act;
+    if (!r2){
+      statusTag = s ? tagOk('Firmado') : tagWarn('Pendiente de firma');
+      meta = s ? 'Firmado el ' + fmtDate(s.date) : '';
+      act = s ? '' : '<sk-button size="small" sk-type="secondary" label="Marcar como firmado" data-act="sign" data-key="'+d.k+'" aria-label="Marcar como firmado: '+esc(d.n)+'"></sk-button>';
+    } else {
+      statusTag = s ? tagOk('Copia cargada') : tagWarn('Firma en físico');
+      meta = s && s.file ? esc(s.file.name) + ' · ' + fmtSize(s.file.size) + ' · ' + fmtDate(s.date) : (s ? 'Cargada el ' + fmtDate(s.date) : '');
+      var lbl = s ? 'Reemplazar copia' : 'Subir copia firmada';
+      act = '<sk-button size="small" sk-type="secondary" label="'+lbl+'" data-act="pick-sign" data-key="'+d.k+'" aria-label="'+lbl+': '+esc(d.n)+'"></sk-button><input type="file" hidden data-file-sign="'+d.k+'" accept=".pdf,.jpg,.jpeg,.png">';
+    }
+    return docRow('file', d.n, statusTag, meta, act);
+  }).join('');
+
+  var downs = DOWNLOADS.map(function(d){
+    var f = e.files[d.k], lbl = f ? 'Reemplazar archivo' : 'Subir archivo';
+    return docRow('download', d.n, f ? tagOk('Disponible') : tagWarn('En preparación'), f ? esc(f.name)+' · '+fmtSize(f.size)+' · '+fmtDate(f.date) : '',
+      '<sk-button size="small" sk-type="secondary" label="'+lbl+'" data-act="pick-file" data-key="'+d.k+'" aria-label="'+lbl+': '+esc(d.n)+'"></sk-button><input type="file" hidden data-file-down="'+d.k+'">');
+  }).join('');
+
+  var dl = [['Documento',e.doc],['Cargo',e.cargo],['Área',e.area],['Tipo de salida',t.label],['Fecha de notificación',fmtDate(e.notif)],['Último día de trabajo',fmtDate(e.last)]]
+    .map(function(r){ return '<div><dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd></div>'; }).join('');
+
+  var noteDocs = r2 ? '🟡 Supuesto de la reunión con Claudia: en la salida no elegida la firma es física; Nómina lo confirma.'
+                    : '🟡 «Marcar como firmado» solo simula la firma de la persona en su portal; en producción lo registra la firma electrónica (frente técnico pendiente).';
+
+  var f = frag(
+    '<sk-breadcrumb id="d-bc"></sk-breadcrumb>' +
+    '<div class="adm-pagehead"><div><h1 tabindex="-1">'+esc(displayName(e))+'</h1><div class="adm-route">'+tagRoute(t.route, ROUTE_NAME[t.route])+(t.variant ? tagVar('Variante: '+t.variant) : '')+'<small class="muted">'+(e.cat==='Otra'?'Otra categoría':'Categoría '+esc(e.cat))+'</small></div></div></div>' +
+    '<sk-card><section aria-labelledby="h-etapa"><h2 id="h-etapa">Etapa de la liquidación</h2><div class="adm-block-gap"><sk-stepper id="d-stepper" aria-label="Etapas de la liquidación"></sk-stepper></div>' +
+      '<div class="adm-steps__foot"><p>'+pi('eye')+'<span>'+(last ? 'La liquidación ya está en la última etapa.' : 'La persona ve este cambio en su portal.')+'</span></p><sk-button id="adv-btn" label="Avanzar a la siguiente etapa" data-ancho="auto" data-act="advance"'+(last?' disabled':'')+'></sk-button></div></section></sk-card>' +
+    '<div class="adm-detail-grid"><div class="adm-col">' +
+      '<sk-card><section aria-labelledby="h-docs"><div class="adm-cardhead"><h2 id="h-docs">Documentos de retiro</h2><span id="signed-count">'+signed+' de 7 firmados</span></div>' +
+        '<small class="adm-hint">'+(r2 ? 'En esta ruta la firma es en físico. Carga aquí la copia firmada de cada documento.' : 'La persona firma estos documentos en su portal.')+'</small>' +
+        '<ul class="adm-docs">'+docs7+'</ul>' +
+        '<div class="adm-note adm-doc-list-note" data-audience="reviewer"><sk-alert type="warning" closable="false" message="'+esc(noteDocs)+'"></sk-alert></div></section></sk-card>' +
+    '</div><div class="adm-col">' +
+      '<sk-card><section aria-labelledby="h-datos"><h2 id="h-datos">Datos de la salida</h2><dl class="adm-dl adm-dl--2 adm-block-gap">'+dl+'</dl></section></sk-card>' +
+      '<sk-card><section aria-labelledby="h-desc"><h2 id="h-desc">Documentos para descargar</h2><small class="adm-hint">Los ve la persona en «Documentos disponibles para descargar».</small><ul class="adm-docs">'+downs+'</ul></section></sk-card>' +
+      '<sk-card><section aria-labelledby="h-enc"><h2 id="h-enc">Entrevista y encuesta</h2><ul class="adm-docs">' +
+        docRow('users', 'Entrevista de retiro', tagState(e.ent), '', '') + docRow('check-circle', 'Encuesta del proceso', tagState(e.enc), '', '') + '</ul></section></sk-card>' +
+      '<sk-card><section aria-labelledby="h-esp"><h2 id="h-esp">Situaciones especiales</h2><p class="adm-block-gap">'+(e.special.yes ? esc(e.special.detail) : 'No')+'</p><small class="adm-help">Solo lo ve el equipo de Nómina</small></section></sk-card>' +
+    '</div></div>');
+
+  // Propiedades complejas: antes de insertar
+  f.querySelector('#d-bc').items = [{label:'Salidas', href:'#salidas'}, {label:displayName(e)}];
+  var st = f.querySelector('#d-stepper');
+  st.steps = STAGES.map(function(s, i){ return {id:'e'+i, label:s, state: i < e.stage ? 'completed' : (i === e.stage ? 'active' : 'pending')}; });
+  st.activeStep = e.stage;
+  st.canChange = function(){ return false; };                       // el avance solo se hace con el botón y su confirmación
+
+  // Eventos
+  $$('[data-act]', f).forEach(function(b){ b.addEventListener('skClick', function(){ onAct(e, b); }); });
+  $$('input[type="file"]', f).forEach(function(inp){ inp.addEventListener('change', function(){ onFile(e, inp); }); });
+  host.replaceChildren(f);
+}
+var pendingFocus = null;
+function afterDetailRender(){
+  if (pendingFocus){
+    var el = $(pendingFocus); pendingFocus = null;
+    if (el){ focusIn(el); return; }
+  }
+  var h1 = $('#detail-host h1'); if (h1) h1.focus({preventScroll:true});
+}
+function rerenderDetail(){ var id = parseHash().id; renderDetail(id); afterDetailRender(); }
+
+function onAct(e, b){
+  var act = b.getAttribute('data-act'), key = b.getAttribute('data-key');
+  if (act === 'advance') openAdvance(e);
+  else if (act === 'sign'){
+    e.signed[key] = {date:today()};
+    save();
+    renderDetail(e.id);
+    var sc = $('#signed-count'); sc.setAttribute('tabindex','-1'); sc.focus();
+    ok('Documento marcado como firmado', 'Llevas ' + countSigned(e) + ' de 7.');
+  }
+  else if (act === 'pick-sign'){ $('[data-file-sign="'+key+'"]').click(); }
+  else if (act === 'pick-file'){ $('[data-file-down="'+key+'"]').click(); }
+}
+function onFile(e, inp){
+  var f = inp.files && inp.files[0];
+  if (!f) return;
+  if (inp.hasAttribute('data-file-sign')){
+    var k = inp.getAttribute('data-file-sign');
+    e.signed[k] = {date:today(), file:{name:f.name, size:f.size}};
+    save(); pendingFocus = '[data-act="pick-sign"][data-key="'+k+'"]';
+    rerenderDetail();
+    ok('Copia firmada cargada', 'Llevas ' + countSigned(e) + ' de 7.');
+  } else if (inp.hasAttribute('data-file-down')){
+    var k2 = inp.getAttribute('data-file-down');
+    e.files[k2] = {name:f.name, size:f.size, date:today()};
+    save(); pendingFocus = '[data-act="pick-file"][data-key="'+k2+'"]';
+    rerenderDetail();
+    ok('Archivo cargado', 'La persona ya puede verlo en su portal.');
+  }
+}
+
+/* Confirmación del avance: servicio skElements.modal.confirm (sk-modal no admite sk-* anidados). */
+function openAdvance(e){
+  var from = STAGES[e.stage], to = STAGES[e.stage + 1];
+  var missing = 7 - countSigned(e);
+  var msg = 'La salida de ' + displayName(e) + ' pasará de «' + from + '» a «' + to + '». La persona ve este cambio en su portal.';
+  if (e.stage === 3 && missing > 0){
+    msg += ' Atención: faltan ' + missing + (missing === 1 ? ' documento' : ' documentos') + ' por ' + (routeOf(e) === 2 ? 'cargar con la copia firmada' : 'firmar') + '. Puedes avanzar si Nómina ya los recibió por otro medio.';
+  }
+  window.skElements.modal.confirm({title:'Avanzar a la siguiente etapa', message:msg, acceptLabel:'Avanzar', cancelLabel:'Cancelar'}).then(function(yes){
+    if (!yes) return;
+    var cur = find(parseHash().id);
+    if (!cur || cur.stage >= STAGES.length - 1) return;
+    cur.stage++;
+    save();
+    renderDetail(cur.id);
+    var lastStage = cur.stage >= STAGES.length - 1;
+    var target = lastStage ? $('#h-etapa') : $('#adv-btn');
+    if (target){ if (lastStage){ target.setAttribute('tabindex','-1'); target.focus(); } else focusIn(target); }
+    ok('Etapa actualizada', STAGES[cur.stage] + '. La persona ya lo ve en su portal.');
+  });
+}
+
+/* ============================================================
+   4 · RESULTADOS (SVG propio, calculado con los datos de ejemplo; colores = --charts-cNN en orden)
+   ============================================================ */
+function pct(n, d){ return d ? Math.round(n / d * 100) : null; }
+function hbars(rows, opts){
+  var labelW = opts.labelW, barX = labelW + 8, barW = opts.barW, rowH = 38, H = rows.length * rowH + 4, W = barX + barW + 150;
+  var max = opts.max || Math.max.apply(null, rows.map(function(r){ return r.value; }).concat([1]));
+  var s = '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-labelledby="'+opts.id+'-t"><title id="'+opts.id+'-t">'+esc(opts.title)+'</title>';
+  rows.forEach(function(r, i){
+    var y = i * rowH + 4, w = Math.max(r.value > 0 ? 4 : 0, Math.round(r.value / max * barW));
+    s += '<text class="ch-label" x="0" y="'+(y+19)+'">'+esc(r.label)+'</text>' +
+         '<rect class="ch-track" x="'+barX+'" y="'+(y+6)+'" width="'+barW+'" height="18" rx="9"/>' +
+         '<rect x="'+barX+'" y="'+(y+6)+'" width="'+w+'" height="18" rx="9" style="fill:'+r.color+'"/>' +
+         '<text class="ch-val" x="'+(barX+barW+10)+'" y="'+(y+20)+'">'+esc(r.text)+'</text>';
+  });
+  return s + '</svg>';
+}
+function renderResults(){
+  var ex = S.exits;
+  function rate(field, route){
+    var apl = ex.filter(function(e){ return routeOf(e) === route && e[field] !== 'No aplica'; });
+    var okN = apl.filter(function(e){ return e[field] === 'Respondida'; }).length;
+    return {n:okN, d:apl.length, p:pct(okN, apl.length)};
+  }
+  function row(field, route, color){
+    var r = rate(field, route);
+    return {label:'Ruta ' + route, value:r.p || 0, text:(r.p == null ? '—' : r.p + ' %') + ' (' + r.n + ' de ' + r.d + ')', color:color};
+  }
+  var C1 = 'var(--charts-c01)', C2 = 'var(--charts-c02)', C3 = 'var(--charts-c03)';
+  var cEnt = hbars([row('ent',1,C1), row('ent',2,C2)], {id:'ch-ent', title:'Tasa de respuesta de la entrevista de retiro por ruta', labelW:56, barW:280, max:100});
+  var cEnc = hbars([row('enc',1,C1), row('enc',2,C2)], {id:'ch-enc', title:'Tasa de respuesta de la encuesta del proceso por ruta', labelW:56, barW:280, max:100});
+  var dist = STAGES.map(function(s, i){ var n = ex.filter(function(e){ return e.stage === i; }).length; return {label:s, value:n, text:n + (n === 1 ? ' salida' : ' salidas'), color:C1}; });
+  var cStage = hbars(dist, {id:'ch-stage', title:'Salidas por etapa de la liquidación', labelW:250, barW:280});
+  var nps = npsOf(ex), tot = Math.max(nps.n, 1), W = 520;
+  var segs = [{n:nps.pro, l:'Promotores', c:C1},{n:nps.pas, l:'Pasivos', c:C2},{n:nps.det, l:'Detractores', c:C3}];
+  var npsSvg = '<svg viewBox="0 0 '+W+' 84" style="max-width:520px" role="img" aria-labelledby="ch-nps-t"><title id="ch-nps-t">Promotores, pasivos y detractores de la encuesta del proceso</title>';
+  if (nps.n){
+    var x = 0;
+    segs.forEach(function(sg){
+      var w = Math.round(sg.n / tot * W);
+      if (sg.n) npsSvg += '<rect x="'+x+'" y="4" width="'+w+'" height="24" style="fill:'+sg.c+'"/>';
+      x += w;
+    });
+    var lx = 0;
+    segs.forEach(function(sg){
+      npsSvg += '<rect x="'+lx+'" y="44" width="12" height="12" rx="3" style="fill:'+sg.c+'"/><text class="ch-label" x="'+(lx+18)+'" y="55">'+sg.l+' '+pct(sg.n, nps.n)+' %</text><text class="ch-sub" x="'+(lx+18)+'" y="73">'+sg.n+(sg.n===1?' respuesta':' respuestas')+'</text>';
+      lx += 176;
+    });
+  } else npsSvg += '<text class="ch-sub" x="0" y="24">Todavía no hay respuestas de la encuesta.</text>';
+  npsSvg += '</svg>';
+  $('#results-host').replaceChildren(frag(
+    '<div class="adm-charts">' +
+      '<sk-card><section aria-labelledby="r1"><h2 id="r1">Entrevista de retiro</h2><small class="adm-hint">Tasa de respuesta por ruta</small>'+cEnt+'</section></sk-card>' +
+      '<sk-card><section aria-labelledby="r2"><h2 id="r2">Encuesta del proceso</h2><small class="adm-hint">Tasa de respuesta por ruta</small>'+cEnc+'</section></sk-card>' +
+      '<sk-card data-wide><section aria-labelledby="r3"><h2 id="r3">NPS del proceso</h2><div class="adm-nps"><span class="fig" id="res-nps">'+(nps.score == null ? '—' : nps.score)+'</span><small class="muted">con '+nps.n+(nps.n===1?' respuesta':' respuestas')+'</small></div>'+npsSvg+'</section></sk-card>' +
+      '<sk-card data-wide><section aria-labelledby="r4"><h2 id="r4">Salidas por etapa</h2><small class="adm-hint">Dónde está hoy cada salida</small>'+cStage+'</section></sk-card>' +
+    '</div>'));
+}
+
+/* ============================================================
+   5 · PLANTILLA DE PLANTA
+   ============================================================ */
+var CSV_HEADER = ['Nombre','Documento','Cargo','Área','Categoría'];
+function csvEsc(v){ v = String(v == null ? '' : v); return /[",;\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; }
+function templateCsv(){
+  var rows = [CSV_HEADER, ['Ana María Torres','1.000.000.901','Analista de Nómina','Gestión Humana','B'], ['Luis Felipe Ortega','1.000.000.902','Asesor Comercial','Comercial','Otra']];
+  return '﻿' + rows.map(function(r){ return r.map(csvEsc).join(','); }).join('\r\n') + '\r\n';
+}
+function renderPlant(){
+  $('#plant-count').textContent = S.plant.length + ' personas';
+  $('#plant-table').value = S.plant.map(function(p){ return {name:p.name, doc:p.doc, cargo:p.cargo, area:p.area, cat:p.cat}; });
+}
+$('#plant-template').addEventListener('skClick', function(){
+  var blob = new Blob([templateCsv()], {type:'text/csv;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'plantilla-planta-siempre-skandia.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  info('Plantilla de ejemplo descargada');
+});
+function parseCsv(text){
+  text = text.replace(/^﻿/, '');
+  var first = text.split(/\r?\n/)[0] || '';
+  var sep = (first.split(';').length > first.split(',').length) ? ';' : ',';
+  var rows = [], cur = [], v = '', qt = false;
+  for (var i = 0; i < text.length; i++){
+    var c = text[i];
+    if (qt){ if (c === '"'){ if (text[i+1] === '"'){ v += '"'; i++; } else qt = false; } else v += c; }
+    else if (c === '"') qt = true;
+    else if (c === sep){ cur.push(v); v = ''; }
+    else if (c === '\n' || c === '\r'){ if (c === '\r' && text[i+1] === '\n') i++; cur.push(v); v = ''; if (cur.join('').trim() !== '') rows.push(cur); cur = []; }
+    else v += c;
+  }
+  if (v !== '' || cur.length){ cur.push(v); if (cur.join('').trim() !== '') rows.push(cur); }
+  return rows;
+}
+function showPlantError(msg){
+  $('#plant-error-alert').setAttribute('message', msg);
+  $('#plant-error').hidden = false; $('#plant-result').hidden = true;
+}
+function previewTable(list){
+  var f = frag('<sk-table id="plant-preview" responsive-layout="stack" aria-label="Vista previa del archivo"></sk-table>');
+  var t = f.querySelector('#plant-preview');
+  t.columns = PLANT_COLS();
+  t.paginator = false;
+  t.value = list.slice(0, 5).map(function(p){ return {name:p.name, doc:p.doc, cargo:p.cargo, area:p.area, cat:p.cat}; });
+  return f;
+}
+function showPlantResult(title, size, strong, extra, list){
+  var f = frag('<sk-card><div class="adm-cardhead"><h2>'+esc(title)+'</h2><span>'+fmtSize(size)+'</span></div><p><strong id="plant-loaded">'+strong+'</strong> '+(extra.tag || '')+'</p><small class="adm-help">'+extra.help+'</small><div class="adm-block-gap" id="plant-preview-host"></div></sk-card>');
+  f.querySelector('#plant-preview-host').appendChild(previewTable(list));
+  $('#plant-result').replaceChildren(f);
+  $('#plant-result').hidden = false;
+}
+function handlePlantFile(f){
+  $('#plant-error').hidden = true;
+  if (!f) return;
+  var isCsv = /\.csv$/i.test(f.name);
+  var isXls = /\.xlsx?$/i.test(f.name);
+  if (!isCsv && !isXls){ showPlantError('Ese formato no sirve. Usa un archivo Excel (.xlsx) o CSV.'); return; }
+  if (isXls){
+    showPlantResult(f.name, f.size, S.plant.length + ' personas cargadas',
+      {tag:'<sk-tag size="small" sk-style="warning">Vista previa de ejemplo</sk-tag>', help:'En este prototipo no se lee el contenido del Excel: se muestra una vista previa de ejemplo.'}, S.plant.slice(0, 3));
+    renderPlant(); info('Archivo recibido', f.name);
+    return;
+  }
+  var rd = new FileReader();
+  rd.onload = function(){
+    var rows = parseCsv(String(rd.result));
+    if (!rows.length){ showPlantError('El archivo está vacío.'); return; }
+    var head = rows[0].map(function(h){ return norm(h).trim(); });
+    var need = ['nombre','documento','cargo','area','categoria'];
+    var idx = need.map(function(n){ return head.indexOf(n); });
+    var missing = need.filter(function(n, i){ return idx[i] < 0; }).map(function(n){ return CSV_HEADER[need.indexOf(n)]; });
+    if (missing.length){ showPlantError('Faltan estas columnas: ' + missing.join(', ') + '. Descarga la plantilla de ejemplo para ver el formato.'); return; }
+    var list = [];
+    rows.slice(1).forEach(function(r){
+      var name = (r[idx[0]] || '').trim(); if (!name) return;
+      var c = (r[idx[4]] || '').trim().toUpperCase();
+      list.push({name:name, doc:(r[idx[1]] || '').trim(), cargo:(r[idx[2]] || '').trim(), area:(r[idx[3]] || '').trim(), cat:(c === 'A' || c === 'B') ? c : 'Otra'});
+    });
+    if (!list.length){ showPlantError('No encontramos personas en el archivo.'); return; }
+    list.forEach(function(p){
+      var at = -1; S.plant.forEach(function(q, i){ if (q.doc === p.doc) at = i; });
+      if (at >= 0) S.plant[at] = p; else S.plant.push(p);
+    });
+    save();
+    showPlantResult(f.name, f.size, list.length + (list.length===1 ? ' persona cargada' : ' personas cargadas'), {tag:'', help:'Ya puedes buscarlas al registrar una salida.'}, list);
+    renderPlant(); ok(list.length + (list.length === 1 ? ' persona cargada' : ' personas cargadas'), 'La planta ya está actualizada.');
+  };
+  rd.readAsText(f);
+}
+var upload = $('#plant-file');
+upload.addEventListener('skChange', function(e){
+  var files = e.detail || [];
+  if (files.length) handlePlantFile(files[0]);
+  upload.value = [];
+});
+upload.addEventListener('skReject', function(){ showPlantError('Ese formato no sirve. Usa un archivo Excel (.xlsx) o CSV.'); });
+
+/* ============================================================
+   QA
+   ============================================================ */
+$('#qa-reset').addEventListener('skClick', function(){
+  try{ window.localStorage.removeItem(KEY); }catch(e){}
+  S = seed();
+  clearFilters();
+  $('#plant-result').hidden = true; $('#plant-error').hidden = true;
+  info('Datos de ejemplo restablecidos');
+  if (parseHash().view === 'salidas'){ route(true); } else window.location.hash = '#salidas';
+});
+$('#qa-hide-notes').addEventListener('checkedChange', function(e){ document.body.setAttribute('data-hide-reviewer-notes', e.detail ? 'true' : 'false'); });
+
+/* ============================================================
+   INICIO
+   ============================================================ */
+buildNav();
+window.addEventListener('hashchange', function(){ route(); });
+// Pulsar el ítem del menú de la vista en la que ya estás no cambia el hash: se vuelve a dibujar y el foco va al título.
+document.addEventListener('click', function(ev){
+  var a = ev.target.closest && ev.target.closest('.adm-nav__item');
+  if (a && a.getAttribute('href') === (window.location.hash || '#salidas')){ ev.preventDefault(); route(); }
+});
+route(true);
+window.__adm = { state:function(){ return S; }, flt:function(){ return flt; } };   // para pruebas
+}
+})();
+</script>
+</body>
+</html>
