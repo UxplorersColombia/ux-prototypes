@@ -31,6 +31,9 @@
   .side .item.open{background:#F3F3F3;color:var(--green);font-weight:500}
   .side .item.open .ico{stroke:var(--green)}
   .side .bottom{margin-top:auto}
+  .side-top,.m-sub,.side .dr-foot{display:none}
+  .side-top{display:contents}
+  .side-top>:not(.burger){display:none}
   .drawer{font-family:'Open Sans',sans-serif;position:fixed;left:112px;top:0;bottom:0;width:312px;background:#fff;border-right:1px solid var(--line);box-shadow:8px 0 24px rgba(0,0,0,.06);padding:14px 12px 28px;z-index:6;display:none;flex-direction:column}
   .drawer.show{display:flex}
   .dr-sec{display:none}
@@ -258,9 +261,10 @@
     .crumb{display:none}
     .idbar{margin-top:14px;font-size:11px;line-height:18px;gap:6px 12px}
     .idbar .ico-sm{width:12px;height:12px}
-    .idbar h1{display:block;flex:1 0 100%;font-size:16px;line-height:22px;font-weight:700}
+    .idbar h1{display:none}
     .meta:hover{text-decoration:none}
-    .m-cliente{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px}
+    .m-cliente{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-top:20px}
+    .m-nombre{font-family:Montserrat,sans-serif;font-size:14px;line-height:20px;font-weight:700;color:var(--ink)}
     .m-volver{flex:none;width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
     .saldos{margin-top:20px}
     .m-ampliar{display:flex;align-items:center;gap:6px;margin:16px 0 0 auto;border:0;background:none;padding:0;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700;color:var(--blue);text-decoration:underline}
@@ -480,10 +484,29 @@
   @media (max-width:768px){
     .wrap{margin-left:0}
     .mburger{display:flex}
-    .side{transform:translateX(-100%);transition:transform .2s ease;box-shadow:8px 0 24px rgba(0,0,0,.08)}
+    /* Menú móvil a todo el ancho, como Portal Clientes */
+    .side{width:100%;right:0;border-right:0;align-items:stretch;padding:0 0 24px;overflow-y:auto;transform:translateX(-100%);transition:transform .2s ease}
     body.nav-open .side{transform:none}
-    .veil{left:0}
-    .drawer{width:min(312px,calc(100vw - 112px))}
+    body.nav-open{overflow:hidden}
+    .veil,.drawer{display:none!important}
+    .side-top{display:flex;align-items:center;gap:12px;height:68px;padding:0 16px;border-bottom:1px solid #F3F3F3;margin-bottom:16px;flex:none}
+    .side .side-top .burger{width:48px;height:48px;margin:0;border-radius:10px}
+    .side .side-top .burger .ico{stroke:var(--green)!important;width:26px;height:26px}
+    .side-top .bell{margin-left:auto}
+    .side-top>.ia-sw{display:flex}.side-top>.bell{display:flex}
+    body.nav-open .retiros{display:none}
+    .side .item{text-decoration:none!important}
+    .side ul{gap:4px;padding:0 12px;align-items:stretch}
+    .side .item{width:100%;flex-direction:row;justify-content:flex-start;gap:20px;padding:18px 16px;font-size:18px;text-align:left;border-radius:10px;box-sizing:border-box}
+    .side .item .ico{width:26px;height:26px;flex:none}
+    .side .item.on,.side .item.open{background:#FAFAFA;font-weight:400}
+    .side .item:hover{background:#FAFAFA}
+    .side .bottom{margin:4px 12px 0;width:auto}
+    .m-sub{display:none;padding:8px 0 4px}
+    li.m-open .m-sub{display:block}
+    .m-sub a{display:block;padding:14px 16px;font-family:'Open Sans',sans-serif;font-size:15px;color:var(--ink);text-decoration:none;border-radius:8px}
+    .m-sub a:hover{background:var(--green-soft)}
+    .side .dr-foot{display:block;margin:24px 16px 0;flex:none}
     header{flex-wrap:wrap;height:auto;padding:12px 16px;row-gap:12px}
     header{background:#fff;box-shadow:0 0 4px 0 rgba(61,75,92,.15)}
     .search{order:5;flex:1 0 100%;max-width:none;margin:0;height:44px;padding:0 16px}
@@ -580,7 +603,7 @@
 
 <!-- Sidebar -->
 <nav class="side" aria-label="Menú principal">
-  <button class="burger" aria-label="Expandir menú"><svg class="ico" viewBox="0 0 24 24" style="stroke:#333"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <div class="side-top"><button class="burger" aria-label="Expandir menú"><svg class="ico" viewBox="0 0 24 24" style="stroke:#333"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><span class="side-top-extra"></span></div>
   <ul>
     <li><a class="item on" aria-current="page"><svg class="ico" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>Inicio</a></li>
     <li><a class="item"><svg class="ico ico-fill" viewBox="0 0 32 32" style="width:26px;height:26px;margin:-2px 0" aria-hidden="true"><!-- Chart-line-up (librería) --><path d="M7.0625 22.5312C7.0625 23.1328 7.49219 23.5625 8.09375 23.5625H25.9688C26.5273 23.5625 27 24.0352 27 24.5938C27 25.1953 26.5273 25.625 25.9688 25.625H8.09375C6.375 25.625 5 24.25 5 22.5312V7.40625C5 6.84766 5.42969 6.375 6.03125 6.375C6.58984 6.375 7.0625 6.84766 7.0625 7.40625V22.5312ZM19.7812 10.5H24.5938C25.1523 10.5 25.625 10.9727 25.625 11.5312V16.3438C25.625 16.9453 25.1523 17.375 24.5938 17.375C23.9922 17.375 23.5625 16.9453 23.5625 16.3438V14.0234L18.75 18.793C18.3633 19.2227 17.7188 19.2227 17.332 18.793L13.8945 15.3984L11.1875 18.1055C10.8008 18.5352 10.1562 18.5352 9.76953 18.1055C9.33984 17.7188 9.33984 17.0742 9.76953 16.6445L13.207 13.207C13.5938 12.8203 14.2383 12.8203 14.625 13.207L18.0625 16.6445L22.1016 12.5625H19.7812C19.1797 12.5625 18.75 12.1328 18.75 11.5312C18.75 10.9727 19.1797 10.5 19.7812 10.5Z"/></svg>Monitor</a></li>
@@ -625,6 +648,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   }));
   burger.addEventListener('click',()=>{ if(mq.matches){ closeNav(); return; } drawer.classList.contains('show') ? closeAll() : openSec('f-afil'); });
   const mq=window.matchMedia('(max-width:768px)');
+  document.querySelectorAll('[data-fly]').forEach(b=>{
+    const sub=document.createElement('div'); sub.className='m-sub';
+    document.querySelectorAll('#'+b.dataset.fly+' a').forEach(a=>sub.appendChild(a.cloneNode(true)));
+    b.parentNode.appendChild(sub);
+    b.addEventListener('click',e=>{ if(!mq.matches) return; e.stopImmediatePropagation();
+      const li=b.parentNode, ab=!li.classList.contains('m-open');
+      document.querySelectorAll('.side li.m-open').forEach(x=>{x.classList.remove('m-open');x.querySelector('[data-fly]').classList.remove('open');x.querySelector('[data-fly]').setAttribute('aria-expanded','false');});
+      if(ab){ li.classList.add('m-open'); b.classList.add('open'); b.setAttribute('aria-expanded','true'); }
+    },true);
+  });
+  const extra=document.querySelector('.side-top-extra'), sw=document.querySelector('header .ia-sw'), bl=document.querySelector('header .bell');
+  if(sw) extra.replaceWith(sw.cloneNode(true)); if(bl) document.querySelector('.side-top').appendChild(bl.cloneNode(true));
+  document.querySelector('.side').appendChild(document.querySelector('.dr-foot').cloneNode(true));
   function closeNav(){ document.body.classList.remove('nav-open'); closeAll(); }
   document.querySelector('.mburger').addEventListener('click',()=>{ document.body.classList.add('nav-open'); veil.classList.add('show'); burger.querySelector('svg').innerHTML=ICON_X; burger.setAttribute('aria-label','Cerrar menú'); });
   veil.addEventListener('click',closeNav);
@@ -654,7 +690,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <span class="rl">Ver detalle <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span>
     </button>
 
-    <div class="m-cliente"><a class="m-volver" href="#" aria-label="Volver al inicio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></a></div>
+    <div class="m-cliente"><a class="m-volver" href="#" aria-label="Volver al inicio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></a><span class="m-nombre">Óscar Camilo Hernández Ramírez</span></div>
     <div class="crumb">
       <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="#00C73D" stroke-width="2" stroke-linecap="round"><path d="M21 8H2M8 1L1 8l7 7"/></svg>
       <span style="margin-left:4px">Inicio</span><span class="sep">/</span><a href="#">Óscar Camilo Hernández Ramírez</a>
