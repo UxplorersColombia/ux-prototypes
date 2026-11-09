@@ -191,9 +191,6 @@
   .monto-chips button:hover:not(.on), .chart-steps button:hover:not(.on){border-color:var(--sk-primary);background:#f6fcf2;z-index:1;}
   .monto-chips button:focus-visible, .chart-steps button:focus-visible{z-index:3;}
 
-  /* Frecuencia: control secundario, fuera del lienzo editable */
-  .freq-row{margin-top:16px;padding-top:16px;border-top:1px dashed var(--sk-n3);}
-
   /* Ficha del CAT seleccionado — campos de solo lectura (no inputs), ver reunión 31 jul: fechas/rango no deben editarse */
   .cat-ficha{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:18px;}
   @media (max-width:680px){ .cat-ficha{grid-template-columns:1fr;} }
@@ -236,6 +233,9 @@
   .fi-side .s-dates{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--sk-n4);}
   .fi-side .s-dates span b{display:block;color:var(--sk-surface-800);font-size:11.5px;font-weight:700;margin-top:1px;}
   .fi-side .s-dates span:last-child{text-align:right;}
+  /* Frecuencia de pago del cupón: dato fijo del CAT (viene del archivo), no es un control */
+  .fi-side .s-freq{margin-top:12px;padding-top:10px;border-top:1px dashed var(--sk-n3);display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:11px;color:var(--sk-n4);}
+  .fi-side .s-freq b{color:var(--sk-surface-800);font-size:11.5px;font-weight:700;text-align:right;}
   .cat-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;}
   #alertEstado:not(:empty){margin-top:16px;}
   .cat-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--sk-font-title);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:0.4px;border-radius:var(--sk-radius-pill);padding:4px 10px;}
@@ -478,12 +478,46 @@
     .audience-tag{margin-left:0;}
   }
 
+  /* Resumen descargable (Imprimir → Guardar como PDF). Antes se cortaba: la gráfica tiene
+     min-width:640px dentro de un contenedor con scroll, las tarjetas se partían entre páginas
+     y se ocultaba todo el bloque del CAT. Ahora: página carta con márgenes, gráfica al ancho
+     de la hoja, bloques que no se parten, y la ficha del CAT (rango, plazo, frecuencia) visible. */
+  @page{size:letter portrait;margin:12mm;}
   @media print{
-    .audience-tag, .subtitle, #captureSection, .btn-row, .tc-modal-overlay{display:none !important;}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    body{background:#fff !important;}
+    .wrap{max-width:none;padding:0;}
+
+    /* Solo lo interactivo se oculta */
+    .audience-tag, .subtitle, .btn-row, .tc-modal-overlay, #simulacionCard,
+    #catCard > .card-title, #catCard > .card-desc, #catCard .edit-zone,
+    .chart-hint, .chart-steps, details > summary,
+    details[style*="display:none"]{display:none !important;}
     details{display:block !important;}
-    details > summary{display:none !important;}
+    details[style*="display:none"]{display:none !important;}
+
+    .card{box-shadow:none;}
+    .sc-card{transition:none;transform:none !important;box-shadow:none;}
+
+    /* Mantener la composición de escritorio aunque la hoja sea angosta */
+    .scenarios3{grid-template-columns:repeat(3,1fr) !important;}
+    .cat-ficha{grid-template-columns:1.25fr 1fr !important;}
+    .compare-grid, .faq-grid{grid-template-columns:1fr 1fr !important;}
+
+    /* Gráfica completa dentro del ancho de la hoja */
+    .chart-scroll{overflow:visible !important;}
+    svg.chart{min-width:0 !important;width:100% !important;}
+
+    /* Bloques que no se parten entre páginas */
+    .result-banner, .cat-head, .cat-ficha, .fi-hero, .fi-side, .scenarios3, .sc-card, .legend,
+    .chart-scroll, .chart-detail, .final-range, .compare-grid > *, .faq-card, .faq-summary,
+    .faq-chart, .help-body, .disclaimer-block, .legal-section, .compliance-footer, .sk-alert{break-inside:avoid;page-break-inside:avoid;}
+    .card-title, .card-desc, .cat-head{break-after:avoid;page-break-after:avoid;}
+    /* Página 1: CAT + banner de resultado. Página 2 en adelante: escenarios y gráfica (el título no queda huérfano al pie). */
+    .result-banner + .card{break-before:page;page-break-before:always;margin-top:0;}
+
     .legal-section{border-top:none;margin-top:12px;}
-    .legal-collapse{max-height:none !important;padding-bottom:0 !important;}
+    .legal-collapse{max-height:none !important;overflow:visible !important;padding-bottom:0 !important;}
     .legal-fade, .legal-toggle{display:none !important;}
   }
 </style>
@@ -517,7 +551,7 @@
   </header>
 
   <h1>Simulador de CATs</h1>
-  <p class="subtitle">Elige el CAT que estás presentando y el monto que evalúa tu cliente. Aquí verás los tres escenarios dentro del rango objetivo — límite inferior, punto medio y límite superior — para explicarle cómo se calcula su rentabilidad.</p>
+  <p class="subtitle">Elige el CAT que estás presentando y el monto que evalúa tu cliente. Aquí verás los tres escenarios dentro del rango objetivo: límite inferior, punto medio y límite superior, para explicarle cómo se calcula su rentabilidad.</p>
 
   <div class="sk-alert sk-alert-info" style="margin-bottom:22px;">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -527,9 +561,9 @@
   <div id="captureSection">
 
     <!-- CAT ACTIVO -->
-    <div class="card">
+    <div class="card" id="catCard">
       <h2 class="card-title">¿Qué CAT estás presentando?</h2>
-      <div class="card-desc">Selecciona el CAT. Sus fechas y rango objetivo ya están definidos desde que Skandia lo comercializa.</div>
+      <div class="card-desc">Selecciona el CAT. Sus fechas, rango objetivo y frecuencia de pago ya están definidos desde que Skandia lo comercializa.</div>
 
       <div class="edit-zone">
         <div class="ez-head">
@@ -552,7 +586,7 @@
       </div>
         </div>
         <div class="ez-aside note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <div>Al cambiar el CAT se actualizan el <b>rango objetivo</b>, el <b>plazo</b> y los tres escenarios de abajo.</div>
+          <div>Al cambiar el CAT se actualizan el <b>rango objetivo</b>, el <b>plazo</b>, la <b>frecuencia de pago</b> y los tres escenarios de abajo.</div>
         </div>
         </div>
       </div>
@@ -573,7 +607,7 @@
     </div>
 
     <!-- SIMULACIÓN -->
-    <div class="card">
+    <div class="card" id="simulacionCard">
       <h2 class="card-title">Simulación</h2>
       <div class="card-desc">Ajusta el monto que tu cliente quiere invertir.</div>
 
@@ -600,25 +634,6 @@
               <button type="button" data-m="500000000">$500M</button>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Frecuencia: viene predeterminada por el CAT, así que queda fuera de la zona editable -->
-      <div class="freq-row">
-        <div class="sk-field" style="max-width:420px;">
-          <div class="box is-floating" id="frecuenciaBox" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="frecuenciaList" aria-labelledby="frecuenciaLabel">
-            <div class="inner">
-              <label id="frecuenciaLabel">Frecuencia de pagos periódicos (cupón)</label>
-              <span class="value"></span>
-            </div>
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            <ul class="sk-popover" id="frecuenciaList" role="listbox" aria-labelledby="frecuenciaLabel" hidden></ul>
-          </div>
-          <select id="frecuencia" class="sk-visually-hidden" aria-hidden="true" tabindex="-1">
-            <option value="2">Semestral</option>
-            <option value="1">Anual</option>
-          </select>
-          <div class="help">Definida para cada CAT.</div>
         </div>
       </div>
     </div>
@@ -774,8 +789,9 @@
           <li>Este contenido es de uso interno y exclusivo para Colaboradores, Fuerza de Distribución y/o Agencias Comerciales de Skandia. No podrá ofrecerse, divulgarse ni reproducirse a terceros ajenos a Skandia.</li>
           <li>Las rentabilidades históricas no son garantía de resultados futuros. Los portafolios pertenecientes al Fondo Voluntario de Pensión Skandia Multifund son administrados por Skandia AFP - ACCAI S.A. y difieren a los Fondos Obligatorios de Pensiones que prevé la Ley 100 de 1993.</li>
           <li>Esta herramienta tiene un propósito único de informar y proveer un ejercicio de análisis pedagógico para la Fuerza Comercial; no constituye recomendación, sugerencia, consejo ni asesoría alguna para la toma de decisiones de inversión, conforme al artículo 2.40.1.1.2 del Decreto 2555 de 2010.</li>
-          <li>Los resultados son simulaciones hipotéticas basadas en los supuestos configurados por el usuario (CAT seleccionado, monto y frecuencia) y no reflejan el comportamiento real de ningún portafolio, título o cliente.</li>
+          <li>Los resultados son simulaciones hipotéticas basadas en los supuestos configurados por el usuario (CAT seleccionado y monto) y no reflejan el comportamiento real de ningún portafolio, título o cliente.</li>
           <li>Skandia no garantiza ni promete que las rentabilidades u objetivos aquí simulados se obtendrán en la realidad, ni garantiza el capital invertido; las obligaciones de Skandia son de medio y no de resultado.</li>
+          <li>Sujeto a disponibilidad de mercado. La Sociedad Administradora podrá invertir una porción en otros activos elegibles según el prospecto, preservando el plazo y el perfil de riesgo. Infórmese en el prospecto antes de invertir.</li>
           <li>Las tasas objetivo pueden variar en el tiempo. El rango objetivo mostrado para cada CAT corresponde a la última información vigente indicada en la etiqueta de esta página.</li>
           <li>Este documento no sustituye el Prospecto del respectivo CAT ni el Reglamento del Fondo, documentos que contienen la información completa y vinculante y que prevalecen ante cualquier discrepancia.</li>
           <li>Skandia y su fuerza comercial no son responsables por el uso no autorizado de esta herramienta por parte de terceros ajenos a Skandia.</li>
@@ -856,7 +872,7 @@ const CATS_SNAPSHOT = [
 
 let CATS = [];
 let catActual = null;
-let catCombo = null, frecCombo = null;
+let catCombo = null;
 
 async function cargarDatos(){
   return CATS_SNAPSHOT;
@@ -1049,8 +1065,6 @@ function poblarSelectCat(){
 
 function selectCat(id){
   catActual = CATS.find(c => c.id === id) || CATS[0];
-  document.getElementById('frecuencia').value = catActual.frecuenciaDefault;
-  if(frecCombo) frecCombo.refresh();
   renderFichaCat();
   recalc();
 }
@@ -1094,6 +1108,7 @@ function renderFichaCat(){
         <span>Inicio<b>${fmtDate(fInicio)}</b></span>
         <span>Vencimiento<b>${fmtDate(fFin)}</b></span>
       </div>
+      <div class="s-freq"><span>Frecuencia de pago del cupón</span><b>${freqLabelCap(c.frecuenciaDefault)}</b></div>
     </div>`;
 }
 
@@ -1406,7 +1421,7 @@ function renderComparison(monto, frecuencia, periodos, objMid, freqCap){
 // ---------- Cálculo principal ----------
 function recalc(){
   const monto = getMoneyVal('monto');
-  const frecuencia = parseInt(document.getElementById('frecuencia').value);
+  const frecuencia = catActual.frecuenciaDefault;  // fija por CAT, viene del archivo (sin selector)
   const c = catActual;
   const fInicio = parseISODate(c.fInicio), fFin = parseISODate(c.fFin);
 
@@ -1487,9 +1502,7 @@ cargarDatos().then(cats => {
   actualizarBadgesVigencia();
   setupMoneyInput('monto');
   setupMontoChips();
-  document.getElementById('frecuencia').addEventListener('change', recalc);
   catCombo = comboSetup('catSelBox', 'catSelList', 'catSel');
-  frecCombo = comboSetup('frecuenciaBox', 'frecuenciaList', 'frecuencia');
   selectCat(CATS[0].id);
   openTycModal();
 });
