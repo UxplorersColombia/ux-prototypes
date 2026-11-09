@@ -393,6 +393,7 @@
   .lg-slide.on{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .45s ease}
   .lg-flecha{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:46px;height:46px;border-radius:50%;border:0;background:#3a3a3a;color:var(--green);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color .15s}
   .lg-flecha:hover{background:#1e1e1e}
+  .lg-flecha[hidden],.lg-puntos[hidden]{display:none!important}
   .lg-flecha:focus-visible,.lg-puntos button:focus-visible{outline:2px solid #fff;outline-offset:2px}
   .lg-flecha.prev{left:16px}
   .lg-flecha.next{right:16px}
@@ -566,9 +567,9 @@
         <button class="lg-flecha next" type="button" aria-label="Siguiente"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
         <div class="lg-hero">
           <div class="lg-slides">
-        <article class="lg-slide on" role="group" aria-roledescription="diapositiva" aria-label="1 de 3">
-          <p class="lg-eyebrow">Para grandes propósitos</p>
-          <h2>Más herramientas para que llegues <span>más lejos</span></h2>
+        <article class="lg-slide on" role="group" aria-roledescription="diapositiva" aria-label="1 de 1">
+          <p class="lg-eyebrow">Contigo para grandes propósitos</p>
+          <h2>Herramientas para que llegues <span>más lejos</span></h2>
           <p class="lg-txt">Tecnología, conocimiento y un equipo experto para que te enfoques en el bienestar financiero de tus clientes.</p>
           <ul class="lg-chips">
           <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>Mejores decisiones</li>
@@ -577,6 +578,7 @@
           <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Metas más reales</li>
         </ul>
         </article>
+        <!-- Slides guardados para después (PAC y Copiloto):
         <article class="lg-slide" role="group" aria-roledescription="diapositiva" aria-label="2 de 3" aria-hidden="true">
           <p class="lg-eyebrow">Nuevo en la ficha de cliente</p>
           <h2>Planes de <span>ahorro corporativo</span> en la ficha</h2>
@@ -589,11 +591,10 @@
           <p class="lg-txt">Journeys guiados para acompañar a tus clientes en momentos clave, como cuando evalúan un retiro.</p>
           <ul class="lg-chips"><li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>Journeys guiados</li><li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Momentos clave</li><li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Conversaciones con contexto</li><li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>Historial de cada cliente</li></ul>
         </article>
+        -->
           </div>
           <div class="lg-puntos" role="tablist" aria-label="Elegir diapositiva">
             <button type="button" role="tab" aria-selected="true" aria-label="Diapositiva 1"></button>
-            <button type="button" role="tab" aria-selected="false" aria-label="Diapositiva 2"></button>
-            <button type="button" role="tab" aria-selected="false" aria-label="Diapositiva 3"></button>
           </div>
         </div>
       </div>
@@ -1009,6 +1010,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 (function(){
   const c=document.querySelector('.lg-carrusel'); if(!c) return;
   const slides=[...c.querySelectorAll('.lg-slide')], puntos=[...c.querySelectorAll('.lg-puntos button')];
+  if(slides.length<2){ c.querySelectorAll('.lg-flecha,.lg-puntos').forEach(x=>x.hidden=true); return; }
   let i=0, t=null; const quieto=matchMedia('(prefers-reduced-motion: reduce)').matches;
   function ir(n){
     i=(n+slides.length)%slides.length;
