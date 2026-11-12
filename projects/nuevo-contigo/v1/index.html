@@ -364,7 +364,7 @@
   .mis:only-child>.mis-d{max-width:70ch}
   .mis:only-child>.mis-btn{grid-column:2;grid-row:1/5;align-self:center;justify-self:end;margin-top:0}
   .mis:only-child>.mis-conv{grid-column:1;grid-row:4;justify-self:start;margin:4px 0 0}
-  @media (max-width:960px){.mis:only-child{display:flex}}
+  @media (max-width:960px){.mis:only-child{display:flex;align-items:flex-start}}
   .panel-cop .mis-conv{font-family:'Open Sans',sans-serif;letter-spacing:0;color:#b5b9bc}
   .panel-cop .mis-conv b{color:#ffffff;font-weight:500}
   .mis-btn:focus-visible,.cop-filtros button:focus-visible{outline:2px solid #0099de;outline-offset:2px}
@@ -379,6 +379,19 @@
   .cop-otras .jy[hidden]{display:none}
   @media (max-width:960px){.cop-mis{grid-template-columns:1fr}.cop-otras{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media (max-width:600px){.cop-otras{grid-template-columns:1fr}}
+  /* Móvil: cada pestaña abre como una pantalla aparte (sin saldos ni lista de pestañas), como en Contigo móvil */
+  @media (max-width:600px){
+    body.m-detalle .idbar,body.m-detalle .saldos,body.m-detalle .tabs,body.m-detalle .retiros{display:none!important}
+    body.m-detalle .panel:not([hidden]){display:grid;grid-template-columns:1fr;margin-top:20px}
+    body.m-detalle .panel.panel-cop:not([hidden]){display:flex;padding:20px 16px 28px;border-radius:16px}
+    body.m-detalle .m-nombre{font-size:16px}
+    .panel-cop .cop-h{flex-wrap:wrap;gap:14px}
+    .panel-cop .cop-hud{flex-direction:column;align-items:flex-start;gap:4px;padding-left:22px}
+    .panel-cop .cop-hud>span,.panel-cop .cop-hud>span:first-child{padding:0;border-left:0}
+    .panel-cop .cop-otras{grid-template-columns:1fr}
+    .panel-cop .mis{padding:18px 16px 20px}
+    .panel-cop .mis .mis-btn,.panel-cop .mis:only-child>.mis-btn{align-self:stretch}
+  }
   /* ===== Modo misión: al abrir Asesoría Pro toda la ficha pasa a modo oscuro espacial ===== */
   body,.side,header,.card,.idbar,.retiros,footer,.tab,.search,.drawer{transition:background-color .45s ease,color .45s ease,border-color .45s ease,box-shadow .45s ease}
   body.modo-mision{--ink:#ffffff;--ink-2:#e3e5e7;--muted:#b5b9bc;--line:#3d3d3d;background:#1b1b1b;color:#ffffff}
@@ -425,7 +438,8 @@
   @media (prefers-reduced-motion:reduce){body,.side,header,.card,.idbar,.retiros,footer,.tab,.search,.drawer{transition:none}}
   /* ===== Asesoría Pro · Estilo espacial "mission control" (tomado de la presentación Review Devengers) ===== */
   .tabs .tab[data-panel="copiloto"]{background:#404040;color:#ffffff;box-shadow:none} /* mismo gris del panel del login */
-  .tabs .tab[data-panel="copiloto"]:not(.on):hover{color:#8fe000}
+  @media (min-width:601px) and (hover:hover){.tabs .tab[data-panel="copiloto"]:not(.on):hover{color:#8fe000}} /* sin hover en móvil */
+  @media (max-width:600px){.tabs .tab[data-panel="copiloto"]:hover{border-radius:8px;background:#404040;color:#fff}}
   .tabs .tab[data-panel="copiloto"].on{background:var(--Primary-Green-N00,#00C73D);color:#1b1b1b;box-shadow:0 0 4px 0 rgba(61,75,92,.15);text-shadow:none} /* mismo verde activo de las demás pestañas */
   .tabs .tab[data-panel="copiloto"] .tab-sami{filter:drop-shadow(0 0 6px rgba(143,224,0,.55))}
   .panel.panel-cop{position:relative;overflow:hidden;isolation:isolate;padding:28px 32px 36px;border-radius:0 16px 16px 16px;color:#ffffff;
@@ -463,7 +477,16 @@
   .panel-cop .cop-filtros button{background:#242424;border-color:rgba(255,255,255,.18);color:#ffffff;font-weight:600}
   .panel-cop .cop-filtros button[aria-pressed="true"]{background:#00C73D;border-color:#00C73D;color:#03140a}
   .panel-cop .cop-otras .jy{background:#242424;border:1px solid #3d3d3d;transition:transform .2s,border-color .2s,box-shadow .2s}
+  .cop-otras button.jy:active{transform:scale(.98)}
+  /* Misión principal: mismo efecto de clic que las tarjetas del catálogo (aún sin acción) */
+  .mis{cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
+  .mis:hover{transform:translateY(-3px)}
+  .mis:active{transform:translateY(-1px) scale(.99)}
+  .panel-cop .mis.mis-urg:hover{border-color:rgba(0,199,61,.6);box-shadow:0 0 26px rgba(0,199,61,.14),inset 0 0 30px rgba(0,199,61,.04)}
+  .mis-btn{transition:background-color .15s,border-color .15s,transform .1s}
+  .mis-btn:active{transform:scale(.97)}
   .panel-cop .cop-otras button.jy:hover{transform:translateY(-3px);border-color:rgba(0,199,61,.55);box-shadow:0 0 22px rgba(0,199,61,.15)}
+  .panel-cop .cop-otras button.jy:active{transform:translateY(-1px) scale(.98)}
   .panel-cop .cop-otras .jy .jy-t{color:#ffffff}
   .panel-cop .cop-otras .jy-d,.panel-cop .jy-chev{color:#b5b9bc}
   .panel-cop .cop-otras .jy.off{opacity:1}
@@ -495,6 +518,22 @@
   .cop-prog>i>i{display:block;height:100%;background:#8fe000;box-shadow:0 0 8px #8fe000}
   .panel-cop .cop-b{padding-top:24px}
   .panel-cop .cop-mis{margin-top:0}
+  /* Loading introductorio al abrir Asesoría Pro (≈1,3 s) */
+  .cop-intro{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:rgba(255,255,255,.94);font-family:Montserrat,sans-serif;font-size:16px;color:#404040}
+  body.cop-cargando .cop-intro{display:flex;animation:copIntroSale .35s ease 1s forwards}
+  .panel-cop.intro .cop{opacity:0}
+  .panel-cop.revela .cop{animation:copRevela .5s cubic-bezier(.2,.8,.2,1) both}
+  .cop-intro-orb{position:relative;width:120px;height:120px;display:grid;place-items:center}
+  .cop-intro-ring{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(64,64,64,.35);animation:copIntroGira 1.2s linear infinite}
+  .cop-intro-ring i{position:absolute;top:-4px;left:50%;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#00C73D}
+  .cop-intro-orb img{width:72px;height:auto;animation:copIntroSami .9s ease-in-out infinite alternate;filter:drop-shadow(0 8px 12px rgba(0,0,0,.18))}
+  .cop-intro p{margin:0;opacity:0;animation:copIntroTxt .4s ease .2s forwards}
+  @keyframes copIntroGira{to{transform:rotate(360deg)}}
+  @keyframes copIntroSami{from{transform:translateY(2px)}to{transform:translateY(-6px)}}
+  @keyframes copIntroTxt{to{opacity:1}}
+  @keyframes copIntroSale{to{opacity:0;visibility:hidden}}
+  @keyframes copRevela{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.cop-intro-ring,.cop-intro-orb img{animation:none}.panel-cop.revela .cop{animation:none}}
   .cop-hist{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px;border:1px solid #e9e9e9;border-radius:8px}
   .cop-hist>div{display:flex;flex-direction:column;gap:2px}
   .cop-estado{font-size:12px;font-weight:600;color:#009a2f;background:var(--green-soft);border-radius:9999px;padding:3px 10px}
@@ -1109,7 +1148,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
 
     <section class="panel panel-cop" id="p-copiloto" data-panel-id="copiloto" hidden>
-      <div class="cop-espacio" aria-hidden="true"><svg class="cop-orbita" viewBox="0 0 1200 600" preserveAspectRatio="xMaxYMin slice"><g class="cop-giro"><ellipse cx="900" cy="120" rx="420" ry="130" fill="none" stroke="rgba(255,255,255,.14)" stroke-dasharray="2 8"/><circle cx="1320" cy="120" r="5" fill="#8fe000" style="filter:drop-shadow(0 0 8px #8fe000)"/></g></svg></div>
+      <div class="cop-intro" role="status" aria-live="polite"><div class="cop-intro-orb" aria-hidden="true"><span class="cop-intro-ring"><i></i></span><img src="assets/sami-cabeza.png" alt="" width="72" height="53"></div><p>Preparando tu misión con Óscar…</p></div><div class="cop-espacio" aria-hidden="true"><svg class="cop-orbita" viewBox="0 0 1200 600" preserveAspectRatio="xMaxYMin slice"><g class="cop-giro"><ellipse cx="900" cy="120" rx="420" ry="130" fill="none" stroke="rgba(255,255,255,.14)" stroke-dasharray="2 8"/><circle cx="1320" cy="120" r="5" fill="#8fe000" style="filter:drop-shadow(0 0 8px #8fe000)"/></g></svg></div>
       <div class="cop">
         <div class="cop-h">
           <div class="cop-cab">
@@ -1139,11 +1178,11 @@ document.addEventListener('DOMContentLoaded',()=>{
             <button type="button" aria-pressed="false" data-f="acomp">Acompañamiento</button>
           </div>
           <div class="cop-otras">
-            <div class="jy off" aria-disabled="true" data-cat="acomp"><span class="jy-t">Caída relevante del portafolio</span></div>
-            <div class="jy off" aria-disabled="true" data-cat="acomp"><span class="jy-t">Planeación de aportes voluntarios</span></div>
-            <div class="jy off" aria-disabled="true" data-cat="acomp"><span class="jy-t">Revisión de portafolio y objetivos</span></div>
-            <div class="jy off" aria-disabled="true" data-cat="inicio"><span class="jy-t">Primeros pasos del cliente</span></div>
-            <div class="jy off" aria-disabled="true" data-cat="acomp"><span class="jy-t">Gestión de solicitudes</span></div>
+            <button class="jy" type="button" data-cat="acomp"><span class="jy-t">Caída relevante del portafolio</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="jy" type="button" data-cat="acomp"><span class="jy-t">Planeación de aportes voluntarios</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="jy" type="button" data-cat="acomp"><span class="jy-t">Revisión de portafolio y objetivos</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="jy" type="button" data-cat="inicio"><span class="jy-t">Primeros pasos del cliente</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="jy" type="button" data-cat="acomp"><span class="jy-t">Gestión de solicitudes</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
           </div>
         </div>
         <div class="cop-b" data-cop-panel="historial" hidden>
@@ -1318,7 +1357,20 @@ document.addEventListener('DOMContentLoaded',()=>{
     tabs.forEach(x=>{const on=x===t; x.classList.toggle('on',on); x.setAttribute('aria-selected',String(on));});
     document.body.classList.toggle('modo-mision', t.dataset.panel==='copiloto');
     const k=t.dataset.panel, existe=paneles.some(p=>p.dataset.panelId===k);
+    const venia=document.querySelector('#p-copiloto').hidden;
     paneles.forEach(p=>p.hidden = p.dataset.panelId !== (existe ? k : 'otros'));
+    // Loading introductorio solo al entrar a Asesoría Pro desde otra pestaña
+    // Solo la primera vez que se abre Asesoría Pro en la sesión; las siguientes abre directo
+    let yaVisto=false; try{ yaVisto=sessionStorage.getItem('nc-asesoria-intro')==='1'; }catch(e){}
+    if(k==='copiloto' && venia && yaVisto){ const pc=document.getElementById('p-copiloto'); pc.classList.remove('intro','revela'); void pc.offsetWidth; pc.classList.add('revela'); }
+    if(k==='copiloto' && venia && !yaVisto){
+      try{ sessionStorage.setItem('nc-asesoria-intro','1'); }catch(e){}
+      const pc=document.getElementById('p-copiloto'), corto=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const ld=document.querySelector('.cop-intro'); if(ld.parentNode!==document.body) document.body.appendChild(ld);
+      clearTimeout(activar.t); pc.classList.remove('intro','revela'); document.body.classList.remove('cop-cargando'); void pc.offsetWidth;
+      pc.classList.add('intro'); document.body.classList.add('cop-cargando');
+      activar.t=setTimeout(()=>{ pc.classList.remove('intro'); document.body.classList.remove('cop-cargando'); pc.classList.add('revela'); }, corto?400:1350);
+    }
   }
   tabs.forEach(t=>{
     t.addEventListener('click',()=>activar(t));
@@ -1333,6 +1385,27 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.querySelectorAll('.cop-seg button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
     document.querySelectorAll('[data-cop-panel]').forEach(p=>p.hidden=p.dataset.copPanel!==b.dataset.cop);
   }));
+});
+</script>
+<script>
+// Móvil: al tocar una pestaña se abre como pantalla aparte; la flecha verde regresa a la ficha
+document.addEventListener('DOMContentLoaded',()=>{
+  const mq=matchMedia('(max-width:600px)'), nombre=document.querySelector('.m-nombre'), volver=document.querySelector('.m-volver');
+  const original=nombre ? nombre.textContent : '';
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.addEventListener('click',()=>{
+    if(!mq.matches) return;
+    document.body.classList.add('m-detalle');
+    if(nombre) nombre.textContent=t.textContent.trim();
+    scrollTo(0,0);
+  }));
+  function salir(){
+    document.body.classList.remove('m-detalle','modo-mision');
+    if(nombre) nombre.textContent=original;
+    const pr=document.querySelector('.tabs .tab[data-panel="productos"]'); if(pr){ document.querySelectorAll('.tabs .tab').forEach(x=>{x.classList.toggle('on',x===pr);x.setAttribute('aria-selected',String(x===pr));}); }
+    scrollTo(0,0);
+  }
+  if(volver) volver.addEventListener('click',e=>{ if(document.body.classList.contains('m-detalle')){ e.preventDefault(); salir(); } });
+  mq.addEventListener('change',e=>{ if(!e.matches) document.body.classList.remove('m-detalle'); });
 });
 </script>
 <script>
