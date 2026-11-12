@@ -373,6 +373,15 @@ svg { display: block; flex: none; }
 .products--slim .acc-body { gap: 16px; margin-top: 14px; }
 .product--slim { padding: 10px 10px 10px 12px; border-radius: 0 8px 8px 0; }
 .product--slim:hover { background: var(--primary-l05); }
+/* Cifra de un KPI que abre la lista de clientes */
+.link-btn.link-btn--kpi { font: inherit; letter-spacing: inherit; color: var(--feedback-info-dark); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+/* Productos bloqueados (vista del asesor que no es dueño): se ven, pero no se puede ingresar */
+.product--locked { cursor: not-allowed; border-left-color: var(--neutral-l05); }
+.product--locked:hover { background: none; }
+.product--locked .product-name, .product--locked .product-meta { color: var(--texts-light); }
+.product-lock { flex: none; color: var(--texts-medium); }
+.products--locked .sk-alert--in-card { margin: 12px 0 4px; }
+.resumen-grid--fp { grid-template-columns: minmax(0, 1fr); }
 .product-row { display: flex; align-items: center; gap: 10px; }
 .product--slim .product-name { flex: 1; font-size: 14px; }
 .product-amount { font: 700 14px/1.3 var(--font-body); color: var(--texts-strong); }
@@ -586,6 +595,29 @@ svg { display: block; flex: none; }
 .field-label { padding: 0; font: 700 14px/1.3 var(--font-body); color: var(--texts-strong); }
 .field-opt { font-weight: 400; color: var(--texts-medium); }
 /* Seguimiento del plan de acción */
+/* Ruta comercial sin ruta creada: estado vacío con el CTA */
+/* Cajitas de la ruta creada: acciones por meta */
+.step-acts { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--neutral-l03); }
+.step-prog { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.step-prog-head { display: flex; justify-content: space-between; font: 600 12.5px/1.3 var(--font-body); color: var(--texts-dark); }
+.step-prog-head b { font-weight: 700; color: var(--texts-strong); }
+.step-prog .seg-bar-track { flex: none; display: block; height: 12px; border-radius: 999px; background: var(--neutral-l03); overflow: hidden; }
+.step-prog .seg-bar-fill { display: block; height: 100%; border-radius: inherit; background: var(--primary-00); }
+.step-prog-meta { font-size: 12px; color: var(--texts-medium); }
+.step-acts .tag[hidden], .step-acts button[hidden], .btn-inline[hidden] { display: none; }
+.step.is-lograda { box-shadow: inset 0 0 0 1px var(--primary-00); }
+.btn-icon--danger:hover { background: var(--feedback-error-light); color: var(--feedback-error-dark); }
+.modal.modal--meta { max-width: 440px; }
+.modal--meta .goal-edit { display: flex; align-items: center; gap: 8px; }
+.modal--meta .goal-calc { margin: 8px 0 var(--space-3); font-size: 13px; color: var(--texts-medium); }
+/* El listado aparte de la ruta ya no se muestra en el director: todo vive en las cajitas */
+#plan-seg { display: none !important; }
+.ruta-vacia { background: var(--neutral-l02); box-shadow: none; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-5, 40px) var(--space-3); text-align: center; }
+.ruta-vacia-title { margin: 0; font: 700 18px/26px var(--font-heading); color: var(--texts-strong); }
+.ruta-vacia-desc { margin: 0; max-width: 520px; font: 400 14px/22px var(--font-body); color: var(--texts-dark); }
+.ruta-vacia .btn-primary { width: auto; min-width: 280px; padding: 0 32px; margin-top: var(--space-1); }
+.route-cards[hidden], .route-cards .step[hidden], .ruta-vacia[hidden], #ruta-head[hidden] { display: none; }
+#ruta-pasos .step-check { display: none; }
 .plan-seg { margin-bottom: var(--space-3); background: var(--neutral-l02); box-shadow: none; }
 /* Sobre el fondo gris, los encabezados de la tabla y el paso actual van en blanco */
 .plan-seg .th { background: var(--neutral-00); }
@@ -921,7 +953,8 @@ body[data-view="dueno"] [data-only]:not([data-only~="dueno"]),
 body[data-view="fp"] [data-only]:not([data-only~="fp"]) { display: none !important; }
 .route-cards--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 #panel-plan-fp .sk-alert { align-items: flex-start; }
-body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+body[data-view="dueno"] .tabs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .view-switch {
   position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 40;
   display: flex; align-items: center; gap: 4px; padding: 6px 6px 6px 16px;
@@ -1226,7 +1259,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5.5A1.5 1.5 0 0 1 5.5 4h7A1.5 1.5 0 0 1 14 5.5V21"/><path d="M14 10h4.5A1.5 1.5 0 0 1 20 11.5V21"/><path d="M2.5 21h19"/></svg>
           Plan corporativo
         </button>
-        <button class="tab" role="tab" id="tab-ruta" data-fp="panel-ruta-fp" aria-controls="panel-ruta" data-dir="panel-ruta" data-own="panel-ruta-own" aria-selected="false" tabindex="-1">
+        <button class="tab" role="tab" id="tab-ruta" data-only="director dueno" data-fp="panel-ruta-fp" aria-controls="panel-ruta" data-dir="panel-ruta" data-own="panel-ruta-own" aria-selected="false" tabindex="-1">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8.5a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H16"/></svg>
           Ruta comercial
         </button>
@@ -1775,13 +1808,22 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
           </div>
       </section>
       <section class="panel" role="tabpanel" id="panel-ruta" aria-labelledby="tab-ruta" hidden>
-        <div class="block-head block-head--space">
+        <!-- Título y descripción ocultos mientras no haya ruta (el estado vacío ya explica qué hacer) -->
+        <div class="block-head block-head--space" id="ruta-head" hidden>
           <div>
             <h2 class="block-title" id="rutac-title">Ruta comercial</h2>
-            <p class="card-sub">Metas sugeridas para los próximos 12 meses</p>
+            <p class="card-sub" data-ruta-mod></p>
           </div>
-          <button class="btn-outline btn-inline" id="open-plan-ruta" aria-haspopup="dialog">Crear Ruta de Acción</button>
+          <button class="btn-outline btn-inline" id="open-plan-ruta" aria-haspopup="dialog" hidden>Crear Ruta de Acción</button>
+          <button class="btn-outline btn-inline" id="editar-ruta-head" data-editar-ruta aria-haspopup="dialog" hidden>Editar ruta</button>
         </div>
+
+        <!-- Sin ruta todavía: el primer paso es crearla. Al crearla (aquí o en Dueño y asesores) se arman la ruta y sus pasos -->
+        <section class="card ruta-vacia" id="ruta-vacia" aria-labelledby="ruta-vacia-title">
+          <h3 class="ruta-vacia-title" id="ruta-vacia-title">Aún no hay una ruta de acción para esta empresa</h3>
+          <p class="ruta-vacia-desc">Crea la ruta con las metas sugeridas para el dueño del plan. Puedes ajustarlas antes de enviarla.</p>
+          <button class="btn-primary" id="crear-ruta-vacia" aria-haspopup="dialog">Crear Ruta de Acción</button>
+        </section>
 
         <!-- Seguimiento de la ruta de acción: aparece al enviarla -->
         <section class="card block plan-seg" id="plan-seg" aria-labelledby="plan-seg-title" hidden>
@@ -1795,13 +1837,20 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
           <ul class="ruta-metas" data-ruta-metas></ul>
         </section>
 
-        <div class="route-cards">
+        <div class="route-cards" id="ruta-pasos" hidden>
           <article class="card step">
             <span class="step-head"><span class="step-num">1</span>Activar</span>
             <h3 class="step-title">838 empleados sin relación</h3>
             <p class="step-desc">Vinculación en nómina y jornadas en la sede de la empresa.</p>
             <p class="step-goal">Meta: <b>+150 clientes</b> → <b>45%</b></p>
             <label class="step-check"><input type="checkbox" data-ruta-goal="activar" checked> Incluir en la ruta de acción</label>
+            <div class="step-acts" data-step="activar">
+              <div class="step-prog">
+                <div class="step-prog-head"><span>Cumplimiento</span><b class="num" data-step-pct>0%</b></div>
+                <span class="seg-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Cumplimiento de la meta"><span class="seg-bar-fill" data-step-fill style="width:0%"></span></span>
+                <span class="step-prog-meta" data-step-meta></span>
+              </div>
+            </div>
           </article>
 
           <article class="card step">
@@ -1810,8 +1859,14 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <p class="step-desc">Segundo producto: voluntaria o plan corporativo.</p>
             <p class="step-who"><span><i class="sw sw--dueno"></i>92 del dueño</span><span><i class="sw sw--otras"></i>147 de otros asesores <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-label="Agregado, sin detalle"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></p>
             <p class="step-goal">Meta: 2P+ de 42% a <b>50%</b> (+33 clientes)</p>
-            <button class="link-btn" data-lista="monoproducto">Ver los 109 clientes de tu agencia <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
             <label class="step-check"><input type="checkbox" data-ruta-goal="profundizar" checked> Incluir en la ruta de acción</label>
+            <div class="step-acts" data-step="profundizar">
+              <div class="step-prog">
+                <div class="step-prog-head"><span>Cumplimiento</span><b class="num" data-step-pct>0%</b></div>
+                <span class="seg-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Cumplimiento de la meta"><span class="seg-bar-fill" data-step-fill style="width:0%"></span></span>
+                <span class="step-prog-meta" data-step-meta></span>
+              </div>
+            </div>
           </article>
 
           <article class="card step">
@@ -1820,6 +1875,13 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <p class="step-desc">Coordinar con las otras agencias para que la empresa tenga un solo frente.</p>
             <p class="step-goal">Meta: share de 30% a <b>40%</b> (+12 afiliados)</p>
             <label class="step-check"><input type="checkbox" data-ruta-goal="consolidar" checked> Incluir en la ruta de acción</label>
+            <div class="step-acts" data-step="consolidar">
+              <div class="step-prog">
+                <div class="step-prog-head"><span>Cumplimiento</span><b class="num" data-step-pct>0%</b></div>
+                <span class="seg-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Cumplimiento de la meta"><span class="seg-bar-fill" data-step-fill style="width:0%"></span></span>
+                <span class="step-prog-meta" data-step-meta></span>
+              </div>
+            </div>
           </article>
 
           <article class="card step">
@@ -1828,8 +1890,14 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <p class="step-desc">Alertas tempranas de retiro y de salida de la empresa.</p>
             <p class="step-who"><span><i class="sw sw--dueno"></i>2 del dueño</span><span><i class="sw sw--agencia"></i>1 del resto de tu agencia</span><span><i class="sw sw--otras"></i>8 de otras agencias</span></p>
             <p class="step-goal">Meta: neto anual <b>≥ +10</b></p>
-            <button class="link-btn" data-lista="perdidos">Ver los 3 clientes de tu agencia <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
             <label class="step-check"><input type="checkbox" data-ruta-goal="retener" checked> Incluir en la ruta de acción</label>
+            <div class="step-acts" data-step="retener">
+              <div class="step-prog">
+                <div class="step-prog-head"><span>Cumplimiento</span><b class="num" data-step-pct>0%</b></div>
+                <span class="seg-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Cumplimiento de la meta"><span class="seg-bar-fill" data-step-fill style="width:0%"></span></span>
+                <span class="step-prog-meta" data-step-meta></span>
+              </div>
+            </div>
           </article>
         </div>
       </section>
@@ -2204,7 +2272,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
         <div class="kpis kpis--panel">
           <article class="kpi">
             <span class="kpi-label">Tus clientes en esta empresa</span>
-            <span class="kpi-value--big num">2</span>
+            <span class="kpi-value--big num"><button type="button" class="link-btn link-btn--kpi" data-lista="clientes" aria-label="Ver tus 2 clientes en esta empresa">2</button></span>
             <span class="kpi-sub num">3 productos entre los dos</span>
           </article>
           <article class="kpi">
@@ -2222,6 +2290,39 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
             <span class="kpi-value--big num">0</span>
             <span class="kpi-sub num">1 nuevo · 1 perdido (a octubre)</span>
           </article>
+        </div>
+
+        <div class="resumen-grid resumen-grid--fp">
+          <section class="card products products--slim products--locked" aria-labelledby="products-title-fp">
+            <h2 class="block-title" id="products-title-fp">Productos de la empresa</h2>
+            <div class="sk-alert sk-alert--info sk-alert--in-card" role="note"><span class="sk-alert__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16 4C22.6094 4 28 9.39062 28 16C28 22.6562 22.6094 28 16 28C9.34375 28 4 22.6562 4 16C4 9.39062 9.34375 4 16 4ZM16 25.75C21.3438 25.75 25.75 21.3906 25.75 16C25.75 10.6562 21.3438 6.25 16 6.25C10.6094 6.25 6.25 10.6562 6.25 16C6.25 21.3906 10.6094 25.75 16 25.75ZM16 18.25C15.3438 18.25 14.875 17.7812 14.875 17.125V11.125C14.875 10.5156 15.3438 10 16 10C16.6094 10 17.125 10.5156 17.125 11.125V17.125C17.125 17.7812 16.6094 18.25 16 18.25ZM16 19.8438C16.7969 19.8438 17.4531 20.5 17.4531 21.2969C17.4531 22.0938 16.7969 22.75 16 22.75C15.1562 22.75 14.5 22.0938 14.5 21.2969C14.5 20.5 15.1562 19.8438 16 19.8438Z" fill="currentColor"/></svg></span><div class="sk-alert__content"><p class="sk-alert__desc">Estos productos los atiende el dueño del plan. Puedes ver cuáles tiene la empresa, pero no ingresar a ellos ni ver sus saldos.</p></div></div>
+          <div class="acc">
+            <article class="acc-card">
+              <div class="acc-head">
+                <span class="kpi-icon kpi-icon--savings" style="margin:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M9 19V5M14 19v-7M19 19v-11"/></svg></span>
+                <span class="acc-title">Ahorro e inversión</span>
+              </div>
+              <div class="acc-body">
+                <div class="product product--slim product--locked" aria-disabled="true">
+                  <span class="product-row"><span class="product-name">Programa Bonificaciones | #PC1288</span></span>
+                  <span class="product-meta">Plan de Ahorro Corporativo · Lo atiende el dueño del plan</span>
+                </div>
+                <div class="product product--slim product--locked" aria-disabled="true">
+                  <span class="product-row"><span class="product-name">Programa Bonificaciones | #PC2615</span></span>
+                  <span class="product-meta">Plan de Ahorro Corporativo · Lo atiende el dueño del plan</span>
+                </div>
+                <div class="product product--slim product--locked" aria-disabled="true">
+                  <span class="product-row"><span class="product-name">Programa Ahorro Mutuo | #PC0001</span></span>
+                  <span class="product-meta">Plan de Ahorro Corporativo · Lo atiende el dueño del plan</span>
+                </div>
+                <div class="product product--slim product--locked" aria-disabled="true">
+                  <span class="product-row"><span class="product-name">Programa Bonificaciones | #PC2553</span></span>
+                  <span class="product-meta">Plan de Ahorro Corporativo · Lo atiende el dueño del plan</span>
+                </div>
+              </div>
+            </article>
+          </div>
+          </section>
         </div>
       </section>
 
@@ -2414,6 +2515,28 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
 </div>
 
 
+
+<!-- ═══ Editar una meta de la ruta de acción ═══ -->
+<div class="overlay" id="editar-meta-overlay" hidden>
+  <div class="modal modal--meta" role="dialog" aria-modal="true" aria-labelledby="editar-meta-title">
+    <div class="modal-head">
+      <h2 class="modal-title" id="editar-meta-title">Editar meta</h2>
+      <button class="modal-close" data-cerrar-meta aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <p class="modal-desc" id="editar-meta-nombre"></p>
+    <div class="goal-edit">
+      <span class="goal-affix" id="editar-meta-pre"></span>
+      <input class="goal-input" type="number" inputmode="numeric" min="0" step="1" id="editar-meta-valor" aria-labelledby="editar-meta-nombre">
+      <span class="goal-affix" id="editar-meta-unidad"></span>
+    </div>
+    <p class="goal-calc" id="editar-meta-calc" aria-live="polite"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-outline" data-cerrar-meta>Cancelar</button>
+      <button type="button" class="btn-primary" id="editar-meta-ok">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ Confirmar: descartar una meta de la ruta de acción ═══ -->
 <div class="overlay" id="descartar-overlay" hidden>
   <div class="modal modal--confirm" role="alertdialog" aria-modal="true" aria-labelledby="descartar-title" aria-describedby="descartar-desc">
@@ -2513,7 +2636,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
       <h2 class="modal-title" id="plan-title">Crear Ruta de Acción</h2>
       <button class="modal-close" data-close aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <p class="modal-desc" id="plan-desc">Para <b>Juan Alberto Rodríguez González</b> en Empresa ABC S.A. Las metas vienen sugeridas desde la ruta comercial; puedes ajustarlas antes de crear la ruta.</p>
+    <p class="modal-desc" id="plan-desc">Para <b>Juan Alberto Rodríguez González</b> en Empresa ABC S.A. Te sugerimos metas a partir de los datos de la empresa; puedes ajustarlas antes de crear la ruta.</p>
 
     <form id="plan-form" class="modal-body" novalidate>
       <fieldset class="goals">
@@ -2724,7 +2847,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
       out.append(ed, reset);
     } else {
       const sg = document.createElement('span');
-      sg.textContent = '· Sugerida por la ruta comercial';
+      sg.textContent = '· Meta sugerida';
       out.append(sg);
     }
   }
@@ -2818,10 +2941,10 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
   // Director y dueño ven la misma lista. Cada meta se marca como lograda, se descarta o se modifica; no se mide tiempo
   const fmt1 = (n) => n.toLocaleString('es-CO', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const SEG = {
-    activar:     { nombre: 'Activar · penetración', ini: 33.0, meta: (v) => (412 + v) / 1250 * 100, f: (n) => fmt1(n) + '%', pre: '+', unidad: 'clientes nuevos' },
-    profundizar: { nombre: 'Profundizar · cross-sell 2P+', ini: 42.0, meta: (v) => v, f: (n) => fmt1(n) + '%', pre: '', unidad: '% con 2 o más productos' },
-    consolidar:  { nombre: 'Consolidar · share de obligatoria', ini: 30.4, meta: (v) => v, f: (n) => fmt1(n) + '%', pre: '', unidad: '% de share' },
-    retener:     { nombre: 'Retener · neto anual de clientes', ini: 1, meta: (v) => v, f: (n) => (n > 0 ? '+' : '') + n, pre: '+', unidad: 'de neto anual' },
+    activar:     { hoyDemo: 34.2, nombre: 'Activar · penetración', ini: 33.0, meta: (v) => (412 + v) / 1250 * 100, f: (n) => fmt1(n) + '%', pre: '+', unidad: 'clientes nuevos' },
+    profundizar: { hoyDemo: 44.5, nombre: 'Profundizar · cross-sell 2P+', ini: 42.0, meta: (v) => v, f: (n) => fmt1(n) + '%', pre: '', unidad: '% con 2 o más productos' },
+    consolidar:  { hoyDemo: 31.2, nombre: 'Consolidar · share de obligatoria', ini: 30.4, meta: (v) => v, f: (n) => fmt1(n) + '%', pre: '', unidad: '% de share' },
+    retener:     { hoyDemo: 4, nombre: 'Retener · neto anual de clientes', ini: 1, meta: (v) => v, f: (n) => (n > 0 ? '+' : '') + n, pre: '+', unidad: 'de neto anual' },
   };
   let RUTA = [];   // [{ key, valor, estado: 'curso' | 'lograda' | 'descartada' }]
   let editandoRuta = false;
@@ -2847,8 +2970,44 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
     document.getElementById('ruta-own').hidden = false;
     pintarRuta();
   }
+  // Texto de la meta en cada cajita, recalculado con el valor actual
+  const METAS_TXT = {
+    activar: (v) => 'Meta: <b>+' + fmt(v) + ' clientes</b> → <b>' + fmt((HOY.clientes + v) / HOY.empleados * 100, 1) + '%</b>',
+    profundizar: (v) => 'Meta: 2P+ de 42% a <b>' + fmt(v) + '%</b> (+' + Math.max(0, Math.ceil(HOY.clientes * v / 100) - HOY.clientes2p) + ' clientes)',
+    consolidar: (v) => 'Meta: share de 30% a <b>' + fmt(v) + '%</b> (+' + Math.max(0, Math.ceil(HOY.afiliados * v / 100) - HOY.agencia) + ' afiliados)',
+    retener: (v) => 'Meta: neto anual <b>≥ +' + fmt(v) + '</b>',
+  };
+  function pintarCajitas() {
+    document.querySelectorAll('#ruta-pasos .step-acts').forEach((acts) => {
+      const card = acts.closest('.step');
+      const m = RUTA.find((x) => x.key === acts.dataset.step);
+      card.hidden = !m;
+      if (!m) return;
+      card.querySelector('.step-goal').innerHTML = METAS_TXT[m.key](m.valor);
+      // Cumplimiento: cuánto del camino entre el dato al crear la meta y la meta ya se recorrió (con los datos de la radiografía)
+      const D = SEG[m.key];
+      const meta = D.meta(m.valor), hoy = D.hoyDemo;   // dato de ejemplo del avance después de crear la ruta
+      const pct = Math.max(0, Math.min(100, Math.round((hoy - D.ini) / ((meta - D.ini) || 1) * 100)));
+      acts.querySelector('[data-step-pct]').textContent = pct + '%';
+      acts.querySelector('[data-step-fill]').style.width = pct + '%';
+      acts.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', pct);
+      acts.querySelector('[data-step-meta]').textContent = 'Hoy ' + D.f(hoy) + ' · meta ' + D.f(meta);
+      card.classList.toggle('is-lograda', pct >= 100);
+    });
+  }
   function pintarRuta() {
     pintarMod();
+    pintarCajitas();
+    // Un solo botón general: en la modal se cambian valores, se quitan o se vuelven a agregar metas
+    document.getElementById('editar-ruta-head').hidden = false;
+    document.getElementById('ruta-vacia').hidden = true;
+    document.getElementById('ruta-head').hidden = false;
+    // Con la ruta creada no se muestra "Ver ruta de acción enviada": la ruta vive en las cajitas
+    const pasos = document.getElementById('ruta-pasos');
+    pasos.hidden = false;
+    pasos.querySelectorAll('[data-ruta-goal]').forEach((c) => {
+      c.closest('.step').hidden = !RUTA.some((m) => m.key === c.dataset.rutaGoal);
+    });
     document.querySelectorAll('[data-ruta-metas]').forEach((ul) => {
       ul.innerHTML = '';
       if (!RUTA.length) ul.innerHTML = '<li class="ruta-vacia">La ruta no tiene metas. Puedes añadirlas desde Editar ruta.</li>';
@@ -2958,6 +3117,50 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
     }
   });
 
+  // Acciones de cada cajita: Lograda / Deshacer, Editar (modal) y Eliminar (confirmación)
+  const metaOverlay = document.getElementById('editar-meta-overlay');
+  const metaInput = document.getElementById('editar-meta-valor');
+  const UNIDAD = { activar: ['+', 'clientes nuevos'], profundizar: ['', '% con 2 o más productos'], consolidar: ['', '% de share'], retener: ['+', 'de neto anual'] };
+  let metaEditando = null, metaOpener = null;
+  const pintarCalcMeta = () => { document.getElementById('editar-meta-calc').textContent = calc[metaEditando.key](Number(metaInput.value) || 0); };
+  function abrirEditarMeta(m, opener) {
+    metaEditando = m; metaOpener = opener;
+    document.getElementById('editar-meta-nombre').textContent = SEG[m.key].nombre;
+    document.getElementById('editar-meta-pre').textContent = UNIDAD[m.key][0];
+    document.getElementById('editar-meta-unidad').textContent = UNIDAD[m.key][1];
+    metaInput.value = m.valor;
+    pintarCalcMeta();
+    metaOverlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    metaInput.focus();
+  }
+  function cerrarEditarMeta() {
+    metaOverlay.hidden = true;
+    document.body.style.overflow = '';
+    if (metaOpener) metaOpener.focus();
+  }
+  metaInput.addEventListener('input', pintarCalcMeta);
+  document.getElementById('editar-meta-ok').addEventListener('click', () => {
+    metaEditando.valor = Number(metaInput.value) || 0;
+    // La modal de crear/editar ruta queda con el mismo valor
+    const g = goals.find((x) => x.dataset.goal === metaEditando.key);
+    g.querySelector('.goal-input').value = metaEditando.valor;
+    renderGoal(g);
+    modificarRuta();
+    cerrarEditarMeta();
+    pintarRuta();
+  });
+  metaOverlay.querySelectorAll('[data-cerrar-meta]').forEach((b) => b.addEventListener('click', cerrarEditarMeta));
+  metaOverlay.addEventListener('click', (e) => { if (e.target === metaOverlay) cerrarEditarMeta(); });
+  metaOverlay.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarEditarMeta(); });
+  document.querySelectorAll('#ruta-pasos .step-acts').forEach((acts) => {
+    const meta = () => RUTA.find((x) => x.key === acts.dataset.step);
+  });
+
+  // Estado vacío de Ruta comercial: abre la modal de crear la ruta
+  const crearVacia = document.getElementById('crear-ruta-vacia');
+  crearVacia.addEventListener('click', () => { lastOpener = crearVacia; openModal(); });
+
   // "Editar ruta": la misma modal de crear, con las metas actuales
   document.querySelectorAll('[data-editar-ruta]').forEach((b) => b.addEventListener('click', () => {
     editandoRuta = true;
@@ -3039,20 +3242,29 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
 
   // Listados del asesor (otro FP): solo sus clientes en la empresa. Datos de ejemplo.
   const LISTAS_FP = {
+    clientes: {
+      titulo: 'Clientes en esta empresa', sub: 'Tus clientes que trabajan en Empresa ABC S.A. y sus productos contigo.',
+      total: 2, dueno: 2, agencia: 0, otras: 0,
+      cols: ['Cliente', 'Productos', 'Segmento', 'Edad', 'Saldo'],
+      filas: [
+        ['dueno', 'Mariana Quintero Díaz', 'Cesantías', 'Finanzas Personales', '31', '$8.200.000'],
+        ['dueno', 'Óscar Iván Pardo', 'Pensión obligatoria y voluntaria', 'Privilegio', '44', '$134.300.000'],
+      ],
+    },
     monoproducto: {
       titulo: 'Clientes monoproducto', sub: 'Tus clientes de esta empresa con un solo producto. Son la vía más rápida al segundo producto.',
       total: 1, dueno: 1, agencia: 0, otras: 0,
-      cols: ['Cliente', 'Atendido por', 'Producto que tiene', 'Segmento', 'Edad', 'Saldo'],
+      cols: ['Cliente', 'Producto que tiene', 'Segmento', 'Edad', 'Saldo'],
       filas: [
-        ['dueno', 'Mariana Quintero Díaz', 'Natalia Ospina Gil', 'Cesantías', 'Finanzas Personales', '31', '$8.200.000'],
+        ['dueno', 'Mariana Quintero Díaz', 'Cesantías', 'Finanzas Personales', '31', '$8.200.000'],
       ],
     },
     perdidos: {
       titulo: 'Clientes perdidos en 2026', sub: 'Tus clientes que retiraron todo su saldo o salieron de la empresa entre enero y octubre de 2026.',
       total: 1, dueno: 1, agencia: 0, otras: 0,
-      cols: ['Cliente', 'Atendido por', 'Producto que tenía', 'Motivo', 'Fecha', 'Saldo retirado'],
+      cols: ['Cliente', 'Producto que tenía', 'Motivo', 'Fecha', 'Saldo retirado'],
       filas: [
-        ['dueno', 'Carolina Beltrán Ruiz', 'Natalia Ospina Gil', 'Cesantías', 'Salió de la empresa', 'Jul 2026', '$3.900.000'],
+        ['dueno', 'Carolina Beltrán Ruiz', 'Cesantías', 'Salió de la empresa', 'Jul 2026', '$3.900.000'],
       ],
     },
   };
@@ -3098,7 +3310,7 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
     const esDueno = vista() === 'dueno' || vista() === 'fp';
     const esFp = vista() === 'fp';
     const otros = L.total - L.dueno;
-    listOverlay.querySelector('.drawer').classList.toggle('drawer--full', clave === 'monoproducto' || clave === 'perdidos');
+    listOverlay.querySelector('.drawer').classList.toggle('drawer--full', clave === 'monoproducto' || clave === 'perdidos' || clave === 'clientes');
     document.getElementById('list-title').textContent = esDueno
       ? 'Tus ' + L.titulo.charAt(0).toLowerCase() + L.titulo.slice(1) + ' (' + L.dueno + ')'
       : L.titulo + ' (' + L.total + ')';
