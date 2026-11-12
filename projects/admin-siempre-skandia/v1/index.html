@@ -44,6 +44,20 @@
      o Espacio). Los estados con color siguen en el detalle. sk-modal pierde los sk-* anidados,
      por eso «Avanzar etapa» usa skElements.modal.confirm.
 
+  RONDA 38, 2026-11-12 — ajustes de la sesión con Catalina (Nómina), 2026-11-11:
+   - Columna «Fecha de pago» (fecha o «Pendiente») y filtro «Pago» (Pagado / Pendiente), para ver
+     en una sola pantalla qué falta por pagar. La fecha se guarda al avanzar a «Pago realizado»
+     y se puede corregir en el detalle (campo propio en la tarjeta de etapa).
+   - Las filas de la tabla cambian de fondo al pasar el cursor (o enfocarlas): se entiende que
+     abren el detalle.
+   - «Paz y salvo en revisión» se alimentará del estado de Approvals (Teams): el panel centraliza
+     información, no rehace el flujo de aprobación. Hoy se avanza a mano (nota 🟡 de revisión).
+   - Lo de Softland NO se muestra aquí ni a quien sale: es interno de Nómina; la persona solo ve
+     «Liquidación solicitada».
+   - La barra del NPS (Resultados) ocupa el 100 % del ancho de la tarjeta: ahora es HTML con flex (no SVG)
+     para que los textos de la leyenda no crezcan con el ancho. Las otras gráficas siguen siendo SVG.
+   - Estado v2 en localStorage (el v1 se descarta y se vuelve a sembrar con los datos de ejemplo).
+
   Reglas de producto (decisiones de Javier):
    - SOLO DOS RUTAS: Ruta 1 (salida elegida) y Ruta 2 (salida no elegida). Pensión y
      fallecimiento son Ruta 1 con una "variante" (cambia el tono, no la ruta).
@@ -202,6 +216,21 @@
   #kpis .fig{ margin-top:var(--sk-space-xxs); }
 
   /* ---------- Lista, vacío ---------- */
+  /* RONDA 38 — filtros en una sola fila (5 campos) para ocupar el mínimo alto: el buscador pesa el doble.
+     En móvil: buscador arriba y los 4 selectores en 2 columnas. */
+  .adm-filters{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--sk-space-s); }
+  .adm-filters > *{ min-width:0; }
+  .adm-filters > :first-child{ grid-column:1 / -1; }
+  @media (min-width:768px){
+    .adm-filters{ grid-template-columns:minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr); gap:var(--sk-space-m); }
+    .adm-filters > :first-child{ grid-column:auto; }
+  }
+  /* RONDA 38 — la fila abre el detalle: se nota al pasar el cursor o enfocarla. */
+  #exits-table tbody tr{ cursor:pointer; }
+  /* sk-table fija las celdas en transparente con !important: se pisa igual, con el verde claro de los botones y una marca a la izquierda. */
+  #exits-table tbody tr:hover > td, #exits-table tbody tr:focus-within > td{ background:var(--button-secundaria-tertiary-hover) !important; }
+  #exits-table tbody tr:hover > td:first-child, #exits-table tbody tr:focus-within > td:first-child{ box-shadow:inset 3px 0 0 var(--sk-color-primary-active); }
+  .adm-paid{ max-width:260px; margin-top:var(--sk-space-m); }
   .adm-tip{ display:block; margin:var(--sk-space-s) 0 var(--sk-space-xs); color:var(--sk-color-text-muted); }
   #exits-empty{ text-align:center; }
   #exits-empty .pi{ font-size:32px; color:var(--sk-color-primary-active); margin-bottom:var(--sk-space-xs); }
@@ -248,6 +277,14 @@
   .adm-charts [data-wide]{ grid-column:1 / -1; }
   .adm-charts svg{ width:100%; height:auto; display:block; }
   .adm-charts [data-wide] svg{ max-width:760px; }
+  /* RONDA 38 — barra de NPS al 100 % del ancho de la tarjeta. */
+  .adm-npsbar{ display:flex; width:100%; height:24px; }
+  .adm-npsbar > span{ display:block; min-width:0; }
+  .adm-npslegend{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:var(--sk-space-s) var(--sk-space-m); margin-top:var(--sk-space-m); }
+  .adm-npslegend li{ display:grid; grid-template-columns:12px minmax(0, 1fr); column-gap:var(--sk-space-xs); align-items:center; }
+  .adm-npslegend i{ width:12px; height:12px; border-radius:3px; }
+  .adm-npslegend .l{ font-weight:var(--sk-font-weight-medium); font-size:14px; line-height:22px; color:var(--sk-color-text); }
+  .adm-npslegend .s{ grid-column:2; font-weight:var(--sk-font-weight-medium); font-size:12px; line-height:18px; color:var(--sk-color-text-muted); }
   .ch-label{ font-family:var(--sk-font-body); font-weight:var(--sk-font-weight-medium); font-size:14px; fill:var(--sk-color-text); }
   .ch-val{ font-family:var(--sk-font-body); font-weight:var(--sk-font-weight-bold); font-size:14px; fill:var(--sk-color-text); }
   .ch-sub{ font-family:var(--sk-font-body); font-weight:var(--sk-font-weight-medium); font-size:12px; fill:var(--sk-color-text-muted); }
@@ -346,11 +383,12 @@
 
       <form id="filters" role="search" aria-label="Filtrar salidas" onsubmit="return false">
         <sk-card>
-          <div class="sk-grid">
-            <sk-input-text data-col="3" id="flt-q" label="Nombre o documento" type="search" icon-left="pi pi-search" clearable></sk-input-text>
-            <sk-input-select data-col="3" id="flt-ruta" label="Ruta"></sk-input-select>
-            <sk-input-select data-col="3" id="flt-cat" label="Categoría"></sk-input-select>
-            <sk-input-select data-col="3" id="flt-etapa" label="Etapa"></sk-input-select>
+          <div class="adm-filters">
+            <sk-input-text id="flt-q" label="Nombre o documento" type="search" icon-left="pi pi-search" clearable></sk-input-text>
+            <sk-input-select id="flt-ruta" label="Ruta"></sk-input-select>
+            <sk-input-select id="flt-cat" label="Categoría"></sk-input-select>
+            <sk-input-select id="flt-etapa" label="Etapa"></sk-input-select>
+            <sk-input-select id="flt-pago" label="Pago"></sk-input-select>
           </div>
         </sk-card>
       </form>
@@ -567,16 +605,16 @@ function seed(){
     E({id:'s2', name:'Carlos Pérez', doc:'1.000.000.102', cargo:'Ejecutivo de Ventas', area:'Comercial', cat:'Otra', type:'sin-justa', notif:'2026-11-03', last:'2026-11-05', stage:1, ent:'Pendiente', enc:'Pendiente'}),
     E({id:'s3', name:'Marta Ríos', doc:'1.000.000.103', cargo:'Directora de Operaciones', area:'Operaciones', cat:'A', type:'pension', notif:'2026-09-15', last:'2026-10-31', stage:4, ent:'Respondida', enc:'Respondida', nps:10, signed:allSigned('2026-10-20',false), files:allFiles()}),
     E({id:'s4', name:'Andrés Mejía', doc:'1.000.000.104', cargo:'Coordinador de Servicio', area:'Servicio al Cliente', cat:'Otra', type:'fallecimiento', notif:'2026-10-27', last:'2026-10-26', stage:2, ent:'No aplica', enc:'Pendiente', special:{yes:true, detail:'Acompañar a la familia en la entrega de documentos.'}}),
-    E({id:'s5', name:'Sofía Londoño', doc:'1.000.000.105', cargo:'Analista Financiera', area:'Finanzas', cat:'Otra', type:'renuncia', notif:'2026-09-01', last:'2026-09-30', stage:5, ent:'Respondida', enc:'Respondida', nps:9, signed:allSigned('2026-09-20',false), files:allFiles()}),
+    E({id:'s5', name:'Sofía Londoño', doc:'1.000.000.105', cargo:'Analista Financiera', area:'Finanzas', cat:'Otra', type:'renuncia', notif:'2026-09-01', last:'2026-09-30', stage:5, paid:'2026-10-02', ent:'Respondida', enc:'Respondida', nps:9, signed:allSigned('2026-09-20',false), files:allFiles()}),
     E({id:'s6', name:'Julián Aranda', doc:'1.000.000.106', cargo:'Asesor Comercial', area:'Comercial', cat:'B', type:'mutuo', notif:'2026-10-14', last:'2026-11-14', stage:3, ent:'Respondida', enc:'Respondida', nps:8, signed:someSigned(['liquidacion','cesantias','certificacion'],'2026-11-04',true)}),
     E({id:'s7', name:'Diana Pardo', doc:'1.000.000.107', cargo:'Gerente de Producto', area:'Producto', cat:'A', type:'renuncia', notif:'2026-11-04', last:'2026-12-04', stage:0, ent:'Pendiente', enc:'Pendiente'}),
     E({id:'s8', name:'Camilo Ospina', doc:'1.000.000.108', cargo:'Auxiliar Administrativo', area:'Administrativa', cat:'Otra', type:'con-justa', notif:'2026-10-10', last:'2026-10-10', stage:4, ent:'Respondida', enc:'Respondida', nps:7, signed:allSigned('2026-10-22',true), files:{cert:{name:'certificacion-laboral.pdf',size:96000,date:'2026-11-01'}, planilla:{name:'planilla-seguridad-social.pdf',size:128000,date:'2026-11-01'}}}),
     E({id:'s9', name:'Valentina Rueda', doc:'1.000.000.109', cargo:'Analista de Datos', area:'Analítica', cat:'B', type:'renuncia', notif:'2026-10-28', last:'2026-11-28', stage:2, ent:'Pendiente', enc:'Pendiente'}),
-    E({id:'s10', name:'Tomás Herrera', doc:'1.000.000.110', cargo:'Auxiliar de Servicio', area:'Servicio al Cliente', cat:'Otra', type:'termino', notif:'2026-08-25', last:'2026-09-15', stage:5, ent:'Respondida', enc:'Respondida', nps:6, signed:allSigned('2026-09-10',true), files:allFiles()}),
+    E({id:'s10', name:'Tomás Herrera', doc:'1.000.000.110', cargo:'Auxiliar de Servicio', area:'Servicio al Cliente', cat:'Otra', type:'termino', notif:'2026-08-25', last:'2026-09-15', stage:5, paid:'2026-09-18', ent:'Respondida', enc:'Respondida', nps:6, signed:allSigned('2026-09-10',true), files:allFiles()}),
     E({id:'s11', name:'Natalia Cárdenas', doc:'1.000.000.111', cargo:'Asistente de Mercadeo', area:'Mercadeo y Comunicaciones', cat:'Otra', type:'prueba', notif:'2026-11-05', last:'2026-11-06', stage:1, ent:'Pendiente', enc:'Pendiente'}),
     E({id:'s12', name:'Esteban Quintero', doc:'1.000.000.112', cargo:'Gerente de Cuenta', area:'Comercial', cat:'B', type:'pension', notif:'2026-10-18', last:'2026-11-30', stage:3, ent:'Respondida', enc:'Pendiente', signed:someSigned(['liquidacion'],'2026-11-05',false), special:{yes:true, detail:'Prefiere recibir las comunicaciones por correo personal.'}})
   ];
-  return {v:1, exits:ex, plant:plantSeed(), seq:13};
+  return {v:2, exits:ex, plant:plantSeed(), seq:13};
 }
 
 /* ============================================================
@@ -587,7 +625,7 @@ function load(){
     var r = window.localStorage.getItem(KEY);
     if (!r) return null;
     var o = JSON.parse(r);
-    if (o && o.v === 1 && Array.isArray(o.exits) && Array.isArray(o.plant)) return o;
+    if (o && o.v === 2 && Array.isArray(o.exits) && Array.isArray(o.plant)) return o;
   }catch(e){}
   return null;
 }
@@ -655,14 +693,16 @@ Promise.all(TAGS.map(function(t){ return customElements.whenDefined(t); })).then
 
   q('#flt-ruta').options = [{label:'Todas las rutas', value:''},{label:'Ruta 1', value:'1'},{label:'Ruta 2', value:'2'}];
   q('#flt-cat').options = [{label:'Todas las categorías', value:''},{label:'A', value:'A'},{label:'B', value:'B'},{label:'Otra', value:'Otra'}];
+  q('#flt-pago').options = [{label:'Todos', value:''},{label:'Pagado', value:'pagado'},{label:'Pendiente', value:'pendiente'}];
   q('#flt-etapa').options = [{label:'Todas las etapas', value:''}].concat(STAGES.map(function(s,i){ return {label:s, value:String(i)}; }));
 
   var exits = q('#exits-table');
   exits.columns = [
-    {field:'nombre', header:'Nombre', width:'17%'}, {field:'tipo', header:'Tipo de salida', width:'17%'},
-    {field:'ruta', header:'Ruta', width:'8%'}, {field:'variante', header:'Variante', width:'10%'},
-    {field:'cat', header:'Categoría', width:'9%'}, {field:'etapa', header:'Etapa', width:'18%'},
-    {field:'ent', header:'Entrevista', width:'10%'}, {field:'enc', header:'Encuesta', width:'11%'}
+    {field:'nombre', header:'Nombre', width:'15%'}, {field:'tipo', header:'Tipo de salida', width:'14%'},
+    {field:'ruta', header:'Ruta', width:'7%'}, {field:'variante', header:'Variante', width:'9%'},
+    {field:'cat', header:'Categoría', width:'8%'}, {field:'etapa', header:'Etapa', width:'16%'},
+    {field:'ent', header:'Entrevista', width:'9%'}, {field:'enc', header:'Encuesta', width:'9%'},
+    {field:'pago', header:'Fecha de pago', width:'13%'}
   ];
   exits.value = [];
   exits.pageSizeOptions = [8, 16, 24];
@@ -766,7 +806,7 @@ $('#drawer').addEventListener('keydown', function(e){
 /* ============================================================
    1 · LISTA
    ============================================================ */
-var flt = {q:'', ruta:'', cat:'', etapa:''};
+var flt = {q:'', ruta:'', cat:'', etapa:'', pago:''};
 var curList = [], tblPage = 1, tblSize = PAGE;
 var exitsTbl = $('#exits-table');
 
@@ -805,12 +845,14 @@ function filtered(){
     if (flt.ruta && String(routeOf(e)) !== flt.ruta) return false;
     if (flt.cat && e.cat !== flt.cat) return false;
     if (flt.etapa !== '' && String(e.stage) !== flt.etapa) return false;
+    if (flt.pago === 'pagado' && !e.paid) return false;
+    if (flt.pago === 'pendiente' && e.paid) return false;
     return true;
   });
 }
 function rowOf(e){
   var t = typeOf(e.type);
-  return {id:e.id, nombre:displayName(e), tipo:t.label, ruta:'Ruta '+t.route, variante:t.variant || '—', cat:e.cat, etapa:STAGES[e.stage], ent:e.ent, enc:e.enc};
+  return {id:e.id, nombre:displayName(e), tipo:t.label, ruta:'Ruta '+t.route, variante:t.variant || '—', cat:e.cat, etapa:STAGES[e.stage], ent:e.ent, enc:e.enc, pago:e.paid ? fmtDate(e.paid) : 'Pendiente'};
 }
 function renderList(resetPage){
   renderKpis();
@@ -839,13 +881,13 @@ exitsTbl.addEventListener('keydown', function(e){
 
 var fq = $('#flt-q');
 fq.addEventListener('valueChange', function(e){ fq.value = e.detail; flt.q = e.detail || ''; renderList(true); });
-['ruta','cat','etapa'].forEach(function(k){
+['ruta','cat','etapa','pago'].forEach(function(k){
   var el = $('#flt-' + k);
   el.addEventListener('valueChange', function(e){ el.value = e.detail; flt[k] = e.detail == null ? '' : String(e.detail); renderList(true); });
 });
 function clearFilters(){
-  flt = {q:'', ruta:'', cat:'', etapa:''};
-  fq.value = ''; ['ruta','cat','etapa'].forEach(function(k){ $('#flt-' + k).value = ''; });
+  flt = {q:'', ruta:'', cat:'', etapa:'', pago:''};
+  fq.value = ''; ['ruta','cat','etapa','pago'].forEach(function(k){ $('#flt-' + k).value = ''; });
 }
 $('#flt-clear').addEventListener('skClick', function(){ clearFilters(); renderList(true); focusIn(fq); });
 $('#go-register').addEventListener('skClick', function(){ window.location.hash = '#registrar'; });
@@ -1019,7 +1061,7 @@ function renderDetail(id){
       '<sk-button size="small" sk-type="secondary" label="'+lbl+'" data-act="pick-file" data-key="'+d.k+'" aria-label="'+lbl+': '+esc(d.n)+'"></sk-button><input type="file" hidden data-file-down="'+d.k+'">');
   }).join('');
 
-  var dl = [['Documento',e.doc],['Cargo',e.cargo],['Área',e.area],['Tipo de salida',t.label],['Fecha de notificación',fmtDate(e.notif)],['Último día de trabajo',fmtDate(e.last)]]
+  var dl = [['Documento',e.doc],['Cargo',e.cargo],['Área',e.area],['Tipo de salida',t.label],['Fecha de notificación',fmtDate(e.notif)],['Último día de trabajo',fmtDate(e.last)],['Fecha de pago',e.paid ? fmtDate(e.paid) : 'Pendiente']]
     .map(function(r){ return '<div><dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd></div>'; }).join('');
 
   var noteDocs = r2 ? '🟡 Supuesto de la reunión con Claudia: en la salida no elegida la firma es física; Nómina lo confirma.'
@@ -1029,7 +1071,9 @@ function renderDetail(id){
     '<sk-breadcrumb id="d-bc"></sk-breadcrumb>' +
     '<div class="adm-pagehead"><div><h1 tabindex="-1">'+esc(displayName(e))+'</h1><div class="adm-route">'+tagRoute(t.route, ROUTE_NAME[t.route])+(t.variant ? tagVar('Variante: '+t.variant) : '')+'<small class="muted">'+(e.cat==='Otra'?'Otra categoría':'Categoría '+esc(e.cat))+'</small></div></div></div>' +
     '<sk-card><section aria-labelledby="h-etapa"><h2 id="h-etapa">Etapa de la liquidación</h2><div class="adm-block-gap"><sk-stepper id="d-stepper" aria-label="Etapas de la liquidación"></sk-stepper></div>' +
-      '<div class="adm-steps__foot"><p>'+pi('eye')+'<span>'+(last ? 'La liquidación ya está en la última etapa.' : 'La persona ve este cambio en su portal.')+'</span></p><sk-button id="adv-btn" label="Avanzar a la siguiente etapa" data-ancho="auto" data-act="advance"'+(last?' disabled':'')+'></sk-button></div></section></sk-card>' +
+      '<div class="adm-steps__foot"><p>'+pi('eye')+'<span>'+(last ? 'La liquidación ya está en la última etapa.' : (e.stage === 4 ? 'Las áreas aprueban el paz y salvo en Approvals (Teams). La persona ve este cambio en su portal.' : 'La persona ve este cambio en su portal.'))+'</span></p><sk-button id="adv-btn" label="Avanzar a la siguiente etapa" data-ancho="auto" data-act="advance"'+(last?' disabled':'')+'></sk-button></div>' +
+        (last ? '<div class="adm-paid"><sk-date-picker id="d-paid" label="Fecha de pago"></sk-date-picker><small class="adm-hint">Se registró al llegar a «Pago realizado». Puedes corregirla.</small></div>' : '') +
+        '<div class="adm-note" data-audience="reviewer"><sk-alert type="warning" closable="false" message="🟡 «Paz y salvo en revisión» se actualizará con el estado de Approvals (Teams): la conexión la define Nómina con el equipo de Teams. Hoy se avanza a mano. El panel centraliza la información, no rehace el flujo de aprobación."></sk-alert></div></section></sk-card>' +
     '<div class="adm-detail-grid"><div class="adm-col">' +
       '<sk-card><section aria-labelledby="h-docs"><div class="adm-cardhead"><h2 id="h-docs">Documentos de retiro</h2><span id="signed-count">'+signed+' de 7 firmados</span></div>' +
         '<small class="adm-hint">'+(r2 ? 'En esta ruta la firma es en físico. Carga aquí la copia firmada de cada documento.' : 'La persona firma estos documentos en su portal.')+'</small>' +
@@ -1048,6 +1092,19 @@ function renderDetail(id){
   var st = f.querySelector('#d-stepper');
   st.steps = STAGES.map(function(s, i){ return {id:'e'+i, label:s, state: i < e.stage ? 'completed' : (i === e.stage ? 'active' : 'pending')}; });
   st.activeStep = e.stage;
+  var dPaid = f.querySelector('#d-paid');
+  if (dPaid){
+    if (e.paid) dPaid.value = new Date(e.paid + 'T12:00:00');
+    dPaid.addEventListener('valueChange', function(ev){
+      var iso = isoOf(ev.detail);
+      dPaid.value = ev.detail;
+      if (!iso || iso === e.paid) return;
+      e.paid = iso; save();
+      var dd = $('#h-datos'); var cell = dd && dd.parentNode.querySelectorAll('dd');
+      if (cell && cell.length) cell[cell.length - 1].textContent = fmtDate(iso);
+      ok('Fecha de pago actualizada', fmtDate(iso));
+    });
+  }
   st.canChange = function(){ return false; };                       // el avance solo se hace con el botón y su confirmación
 
   // Eventos
@@ -1104,11 +1161,13 @@ function openAdvance(e){
   if (e.stage === 3 && missing > 0){
     msg += ' Atención: faltan ' + missing + (missing === 1 ? ' documento' : ' documentos') + ' por ' + (routeOf(e) === 2 ? 'cargar con la copia firmada' : 'firmar') + '. Puedes avanzar si Nómina ya los recibió por otro medio.';
   }
+  if (e.stage + 1 === STAGES.length - 1) msg += ' Se registra hoy como fecha de pago; podrás corregirla en el detalle.';
   window.skElements.modal.confirm({title:'Avanzar a la siguiente etapa', message:msg, acceptLabel:'Avanzar', cancelLabel:'Cancelar'}).then(function(yes){
     if (!yes) return;
     var cur = find(parseHash().id);
     if (!cur || cur.stage >= STAGES.length - 1) return;
     cur.stage++;
+    if (cur.stage === STAGES.length - 1 && !cur.paid) cur.paid = today();
     save();
     renderDetail(cur.id);
     var lastStage = cur.stage >= STAGES.length - 1;
@@ -1151,28 +1210,23 @@ function renderResults(){
   var cEnc = hbars([row('enc',1,C1), row('enc',2,C2)], {id:'ch-enc', title:'Tasa de respuesta de la encuesta del proceso por ruta', labelW:56, barW:280, max:100});
   var dist = STAGES.map(function(s, i){ var n = ex.filter(function(e){ return e.stage === i; }).length; return {label:s, value:n, text:n + (n === 1 ? ' salida' : ' salidas'), color:C1}; });
   var cStage = hbars(dist, {id:'ch-stage', title:'Salidas por etapa de la liquidación', labelW:250, barW:280});
-  var nps = npsOf(ex), tot = Math.max(nps.n, 1), W = 520;
+  var nps = npsOf(ex);
   var segs = [{n:nps.pro, l:'Promotores', c:C1},{n:nps.pas, l:'Pasivos', c:C2},{n:nps.det, l:'Detractores', c:C3}];
-  var npsSvg = '<svg viewBox="0 0 '+W+' 84" style="max-width:520px" role="img" aria-labelledby="ch-nps-t"><title id="ch-nps-t">Promotores, pasivos y detractores de la encuesta del proceso</title>';
+  /* RONDA 38 — la barra del NPS ocupa el 100 % del ancho de la tarjeta (HTML con flex, no SVG: así los textos
+     conservan su tamaño). Cada tramo pesa lo que sus respuestas; los tramos en cero no se dibujan. */
+  var npsHtml;
   if (nps.n){
-    var x = 0;
-    segs.forEach(function(sg){
-      var w = Math.round(sg.n / tot * W);
-      if (sg.n) npsSvg += '<rect x="'+x+'" y="4" width="'+w+'" height="24" style="fill:'+sg.c+'"/>';
-      x += w;
-    });
-    var lx = 0;
-    segs.forEach(function(sg){
-      npsSvg += '<rect x="'+lx+'" y="44" width="12" height="12" rx="3" style="fill:'+sg.c+'"/><text class="ch-label" x="'+(lx+18)+'" y="55">'+sg.l+' '+pct(sg.n, nps.n)+' %</text><text class="ch-sub" x="'+(lx+18)+'" y="73">'+sg.n+(sg.n===1?' respuesta':' respuestas')+'</text>';
-      lx += 176;
-    });
-  } else npsSvg += '<text class="ch-sub" x="0" y="24">Todavía no hay respuestas de la encuesta.</text>';
-  npsSvg += '</svg>';
+    npsHtml = '<div class="adm-npsbar" role="img" aria-label="' + segs.map(function(sg){ return sg.l + ' ' + pct(sg.n, nps.n) + ' %'; }).join(', ') + '">' +
+      segs.filter(function(sg){ return sg.n; }).map(function(sg){ return '<span style="flex:' + sg.n + ' 1 0;background:' + sg.c + '"></span>'; }).join('') + '</div>' +
+      '<ul class="adm-npslegend">' + segs.map(function(sg){
+        return '<li><i style="background:' + sg.c + '" aria-hidden="true"></i><span class="l">' + sg.l + ' ' + pct(sg.n, nps.n) + ' %</span><span class="s">' + sg.n + (sg.n === 1 ? ' respuesta' : ' respuestas') + '</span></li>';
+      }).join('') + '</ul>';
+  } else npsHtml = '<p class="muted">Todavía no hay respuestas de la encuesta.</p>';
   $('#results-host').replaceChildren(frag(
     '<div class="adm-charts">' +
       '<sk-card><section aria-labelledby="r1"><h2 id="r1">Entrevista de retiro</h2><small class="adm-hint">Tasa de respuesta por ruta</small>'+cEnt+'</section></sk-card>' +
       '<sk-card><section aria-labelledby="r2"><h2 id="r2">Encuesta del proceso</h2><small class="adm-hint">Tasa de respuesta por ruta</small>'+cEnc+'</section></sk-card>' +
-      '<sk-card data-wide><section aria-labelledby="r3"><h2 id="r3">NPS del proceso</h2><div class="adm-nps"><span class="fig" id="res-nps">'+(nps.score == null ? '—' : nps.score)+'</span><small class="muted">con '+nps.n+(nps.n===1?' respuesta':' respuestas')+'</small></div>'+npsSvg+'</section></sk-card>' +
+      '<sk-card data-wide><section aria-labelledby="r3"><h2 id="r3">NPS del proceso</h2><div class="adm-nps"><span class="fig" id="res-nps">'+(nps.score == null ? '—' : nps.score)+'</span><small class="muted">con '+nps.n+(nps.n===1?' respuesta':' respuestas')+'</small></div>'+npsHtml+'</section></sk-card>' +
       '<sk-card data-wide><section aria-labelledby="r4"><h2 id="r4">Salidas por etapa</h2><small class="adm-hint">Dónde está hoy cada salida</small>'+cStage+'</section></sk-card>' +
     '</div>'));
 }
