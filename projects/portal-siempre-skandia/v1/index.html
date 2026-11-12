@@ -1318,6 +1318,19 @@
   /* RONDA 37 — guía de consolidación del PAC (wf2): pasos numerados. */
   .pac-steps{margin:0;padding-left:20px;display:grid;gap:8px;font-size:16px;line-height:24px;color:var(--sk-color-text);}
   .pac-steps li::marker{color:var(--sk-color-primary-active);font-weight:700;}
+  /* RONDA 38 — acordeón (reemplazo de sk-accordion, que el bundle no registra): estilos del DS
+     (plantilla de sk-elements-html), con los tokens y el chevron SVG del portal. Cerrado = tarjeta blanca;
+     abierto = cabecera verde con texto inverso (fidelidad al DS). */
+  .sk-acc-r{display:flex;flex-direction:column;gap:var(--sk-space-xs);}
+  .sk-acc-r summary{display:flex;align-items:center;gap:var(--sk-space-xs);padding:var(--sk-space-m) var(--sk-space-l);border-radius:4px;list-style:none;cursor:pointer;background:var(--sk-color-surface);box-shadow:var(--sk-shadow-surface);color:var(--sk-color-text);font-family:var(--sk-font-title);font-weight:700;font-size:1rem;line-height:24px;}
+  .sk-acc-r summary::-webkit-details-marker{display:none;}
+  .sk-acc-r__chev{width:16px;height:16px;margin-left:auto;flex:none;transition:transform var(--sk-motion-duration-base) var(--sk-motion-ease-standard);}
+  .sk-acc-r details[open] > summary{border-radius:4px 4px 0 0;background:var(--sk-color-primary);color:var(--sk-color-text-inverse);}
+  .sk-acc-r details[open] > summary .sk-acc-r__chev{transform:rotate(180deg);}
+  .sk-acc-r summary:focus-visible{outline:2px solid var(--sk-color-primary);outline-offset:2px;}
+  .sk-acc-r details > :not(summary){margin:0;padding:var(--sk-space-l);border:1px solid var(--sk-color-border);border-top:0;border-radius:0 0 4px 4px;background:var(--sk-color-surface);color:var(--sk-color-text);}
+  .pac-acc__body .sk-body{margin-bottom:var(--sk-space-s);}
+  @media (prefers-reduced-motion:reduce){.sk-acc-r__chev{transition:none;}}
   /* RONDA 37 — Ruta 2 firma en físico: el módulo de wf3 es solo de consulta
      (sin botón "Firmar documento", sin conteo ni mensaje de "ya firmaste"). */
   body[data-route-group="r2"] .sign-open-wrap,
@@ -2904,19 +2917,24 @@
         <sk-button style="display:block;margin-top:var(--sk-space-s);"><a class="sk-btn sk-btn--secondary sk-interactive" href="https://uxplorerscolombia.github.io/ux-prototypes/projects/simulador-liquidacion-siempre-skandia/v1/" target="_blank" rel="noopener" style="width:auto;">Simular mi liquidación</a></sk-button>
       </div>
 
-      <div class="variant sk-card" data-r="r1 r2 r3c" id="wf2PacCard" style="max-width:640px;margin-top:var(--sk-space-m);">
-        <p class="sk-card__header">¿Quieres retirar tu PAC?</p>
-        <p class="sk-body muted">Aplica por permanencia de 10 años, compra de vivienda, pensión o invalidez.</p>
-        <sk-button style="display:block;margin-top:var(--sk-space-s);"><button type="button" class="sk-btn sk-btn--secondary sk-interactive" id="wf2PacToggle" aria-expanded="false" aria-controls="wf2PacGuide" style="width:auto;">Ver cómo retirar mi PAC</button></sk-button>
-        <div id="wf2PacGuide" hidden style="margin-top:var(--sk-space-m);">
-          <!-- RONDA 38, 2026-11-12 — texto de Catalina (Nómina, sesión del 2026-11-11), el mismo
-               del brochure. Reemplaza los pasos de ejemplo de la RONDA 37 (que usaban WhatsApp). -->
-          <ol class="pac-steps">
+      <!-- RONDA 38, 2026-11-12 — ajuste de Javier tras revisar el portal: la info del PAC va en un
+           ACORDEÓN (sk-accordion no está registrado en el bundle: se usa su reemplazo oficial, `.sk-acc-r`
+           con <details>, ver CSS junto a `.pac-steps`). Texto de Catalina (Nómina, sesión del
+           2026-11-11), el mismo del brochure. Empieza cerrado; el wrapper `.variant` conserva la regla por ruta. -->
+      <div class="variant" data-r="r1 r2 r3c" id="wf2PacCard" style="max-width:640px;margin-top:var(--sk-space-m);">
+        <section class="sk-acc-r" aria-label="Retiro del PAC">
+          <details>
+            <summary>¿Quieres retirar tu PAC?<svg class="sk-acc-r__chev" aria-hidden="true" focusable="false"><use href="#pi-chevron-down"></use></svg></summary>
+            <div class="pac-acc__body">
+              <p class="sk-body muted">Aplica por permanencia de 10 años, compra de vivienda, pensión o invalidez.</p>
+              <ol class="pac-steps">
             <li><strong>Escríbenos.</strong> Envía un correo a <a class="sk-link" href="mailto:nomina@skandia.com.co">nomina@skandia.com.co</a> con el valor que quieres retirar y si lo quieres con o sin rendimientos.</li>
             <li><strong>Firma tu carta.</strong> Revisa y firma digitalmente la Carta de Consolidación PAC que te enviamos. Nosotros hacemos el resto.</li>
             <li><strong>Recibe tu dinero.</strong> En unos 3 días hábiles, estará disponible en tu contrato Skandia Multifund.</li>
           </ol>
-        </div>
+            </div>
+          </details>
+        </section>
       </div>
 
       <div class="sk-alert sk-callout" data-type="info" data-variant="info" data-audience="user" style="margin-top:var(--sk-space-l);max-width:640px;">
@@ -4531,14 +4549,6 @@
       if (e.key === 'Escape' && !panel.hidden){ setOpen(false); fab.focus(); }
     });
   })();
-
-  /* RONDA 37 — guía para consolidar el PAC: se despliega en la misma tarjeta. */
-  document.getElementById('wf2PacToggle').addEventListener('click', function(){
-    var guide = document.getElementById('wf2PacGuide');
-    guide.hidden = !guide.hidden;
-    this.setAttribute('aria-expanded', guide.hidden ? 'false' : 'true');
-    this.textContent = guide.hidden ? 'Ver cómo retirar mi PAC' : 'Ocultar los pasos';
-  });
 
   /* ---------- wf3 — Documentos (descarga — ajuste A, ronda 3) ---------- */
   function renderWf3(){
