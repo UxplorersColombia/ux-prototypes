@@ -611,12 +611,12 @@ svg { display: block; flex: none; }
 .modal--meta .goal-edit { display: flex; align-items: center; gap: 8px; }
 .modal--meta .goal-calc { margin: 8px 0 var(--space-3); font-size: 13px; color: var(--texts-medium); }
 /* El listado aparte de la ruta ya no se muestra en el director: todo vive en las cajitas */
-#plan-seg { display: none !important; }
+#plan-seg, #ruta-own { display: none !important; }
 .ruta-vacia { background: var(--neutral-l02); box-shadow: none; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-5, 40px) var(--space-3); text-align: center; }
 .ruta-vacia-title { margin: 0; font: 700 18px/26px var(--font-heading); color: var(--texts-strong); }
 .ruta-vacia-desc { margin: 0; max-width: 520px; font: 400 14px/22px var(--font-body); color: var(--texts-dark); }
 .ruta-vacia .btn-primary { width: auto; min-width: 280px; padding: 0 32px; margin-top: var(--space-1); }
-.route-cards[hidden], .route-cards .step[hidden], .ruta-vacia[hidden], #ruta-head[hidden] { display: none; }
+.route-cards[hidden], .route-cards .step[hidden], .ruta-vacia[hidden], #ruta-head[hidden], #ruta-head-own[hidden] { display: none; }
 #ruta-pasos .step-check { display: none; }
 .plan-seg { margin-bottom: var(--space-3); background: var(--neutral-l02); box-shadow: none; }
 /* Sobre el fondo gris, los encabezados de la tabla y el paso actual van en blanco */
@@ -2213,12 +2213,19 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       </section>
 
       <section class="panel" role="tabpanel" id="panel-ruta-own" aria-labelledby="tab-ruta" hidden data-view-panel="dueno">
-        <div class="block-head">
+        <div class="block-head block-head--space" id="ruta-head-own" hidden>
           <div>
             <h2 class="block-title">Ruta comercial</h2>
-            <p class="card-sub">Metas sugeridas para los próximos 12 meses</p>
+            <p class="card-sub" data-ruta-mod></p>
           </div>
+          <button class="btn-outline btn-inline" id="editar-ruta-own" data-editar-ruta aria-haspopup="dialog">Editar ruta</button>
         </div>
+
+        <!-- Sin ruta asignada por el director: estado vacío -->
+        <section class="card ruta-vacia" id="ruta-vacia-own" aria-labelledby="ruta-vacia-own-title">
+          <h3 class="ruta-vacia-title" id="ruta-vacia-own-title">Tu director comercial aún no te ha asignado una ruta de acción</h3>
+          <p class="ruta-vacia-desc">Cuando la cree, aquí verás las metas para esta empresa y su cumplimiento.</p>
+        </section>
 
         <!-- Ruta de acción recibida: el dueño la marca como cumplida o la descarta -->
         <section class="card block plan-seg" id="ruta-own" aria-labelledby="ruta-own-title" hidden>
@@ -2232,12 +2239,19 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
           <ul class="ruta-metas" data-ruta-metas></ul>
         </section>
 
-        <div class="route-cards">
+        <div class="route-cards" id="ruta-pasos-own" hidden>
           <article class="card step">
             <span class="step-head"><span class="step-num">1</span>Activar</span>
             <h3 class="step-title">838 empleados sin relación</h3>
             <p class="step-desc">Vinculación en nómina y jornadas en la sede de la empresa.</p>
             <p class="step-goal">Meta: <b>+150 clientes</b> → <b>45%</b></p>
+            <div class="step-acts" data-step="activar">
+              <div class="step-prog">
+                <div class="step-prog-head"><span>Cumplimiento</span><b class="num" data-step-pct>0%</b></div>
+                <span class="seg-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Cumplimiento de la meta"><span class="seg-bar-fill" data-step-fill style="width:0%"></span></span>
+                <span class="step-prog-meta" data-step-meta></span>
+              </div>
+            </div>
           </article>
 
           <article class="card step">
@@ -2246,7 +2260,13 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
             <p class="step-desc">Segundo producto: voluntaria o plan corporativo.</p>
             <p class="step-who"><span><i class="sw sw--dueno"></i>92 tuyos</span><span><i class="sw sw--otras"></i>147 de otros asesores <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-label="Agregado, sin detalle"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></p>
             <p class="step-goal">Meta: 2P+ de 42% a <b>50%</b> (+33 clientes)</p>
-            <button class="btn-outline btn-card" data-lista="monoproducto">Ver mis 92 clientes</button>
+            <div class="step-acts" data-step="profundizar">
+              <div class="step-prog">
+                <div class="step-prog-head"><span>Cumplimiento</span><b class="num" data-step-pct>0%</b></div>
+                <span class="seg-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Cumplimiento de la meta"><span class="seg-bar-fill" data-step-fill style="width:0%"></span></span>
+                <span class="step-prog-meta" data-step-meta></span>
+              </div>
+            </div>
           </article>
 
           <article class="card step">
@@ -2254,7 +2274,13 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
             <h3 class="step-title">87 afiliados a obligatoria con otras agencias</h3>
             <p class="step-desc">No ves quiénes son: la coordinación pasa por tu director.</p>
             <p class="step-goal">Meta: share de 30% a <b>40%</b> (+12 afiliados)</p>
-            <button class="btn-outline btn-card">Hablar con mi director</button>
+            <div class="step-acts" data-step="consolidar">
+              <div class="step-prog">
+                <div class="step-prog-head"><span>Cumplimiento</span><b class="num" data-step-pct>0%</b></div>
+                <span class="seg-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Cumplimiento de la meta"><span class="seg-bar-fill" data-step-fill style="width:0%"></span></span>
+                <span class="step-prog-meta" data-step-meta></span>
+              </div>
+            </div>
           </article>
 
           <article class="card step">
@@ -2263,7 +2289,13 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
             <p class="step-desc">Alertas tempranas de retiro y de salida de la empresa.</p>
             <p class="step-who"><span><i class="sw sw--dueno"></i>2 tuyos</span><span><i class="sw sw--otras"></i>9 de otros asesores</span></p>
             <p class="step-goal">Meta: neto anual <b>≥ +10</b></p>
-            <button class="btn-outline btn-card" data-lista="perdidos">Ver mis 2 clientes</button>
+            <div class="step-acts" data-step="retener">
+              <div class="step-prog">
+                <div class="step-prog-head"><span>Cumplimiento</span><b class="num" data-step-pct>0%</b></div>
+                <span class="seg-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Cumplimiento de la meta"><span class="seg-bar-fill" data-step-fill style="width:0%"></span></span>
+                <span class="step-prog-meta" data-step-meta></span>
+              </div>
+            </div>
           </article>
         </div>
       </section>
@@ -2956,7 +2988,7 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       rutaMod.fecha.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
     document.querySelectorAll('[data-ruta-mod]').forEach((p) => {
       // Cada vista lo lee desde su lado: "por ti" o el nombre del otro
-      const enDueno = !!p.closest('#ruta-own');
+      const enDueno = !!p.closest('#ruta-own, #panel-ruta-own');
       const yo = enDueno ? rutaMod.quien === 'dueno' : rutaMod.quien === 'director';
       const otro = enDueno ? 'tu director comercial' : 'Juan Alberto Rodríguez González (dueño del plan)';
       p.textContent = 'Última modificación: ' + cuando + ' · por ' + (yo ? 'ti' : otro);
@@ -2978,7 +3010,7 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     retener: (v) => 'Meta: neto anual <b>≥ +' + fmt(v) + '</b>',
   };
   function pintarCajitas() {
-    document.querySelectorAll('#ruta-pasos .step-acts').forEach((acts) => {
+    document.querySelectorAll('#ruta-pasos .step-acts, #ruta-pasos-own .step-acts').forEach((acts) => {
       const card = acts.closest('.step');
       const m = RUTA.find((x) => x.key === acts.dataset.step);
       card.hidden = !m;
@@ -3002,6 +3034,10 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     document.getElementById('editar-ruta-head').hidden = false;
     document.getElementById('ruta-vacia').hidden = true;
     document.getElementById('ruta-head').hidden = false;
+    // Dueño del plan: ve las mismas tarjetas que le asignó el director
+    document.getElementById('ruta-vacia-own').hidden = true;
+    document.getElementById('ruta-head-own').hidden = false;
+    document.getElementById('ruta-pasos-own').hidden = false;
     // Con la ruta creada no se muestra "Ver ruta de acción enviada": la ruta vive en las cajitas
     const pasos = document.getElementById('ruta-pasos');
     pasos.hidden = false;
