@@ -392,6 +392,18 @@
     .panel-cop .mis{padding:18px 16px 20px}
     .panel-cop .mis .mis-btn,.panel-cop .mis:only-child>.mis-btn{align-self:stretch}
   }
+  /* Asesoría Pro: recoger la sección de saldos para ganar espacio */
+  .saldos-tgl{display:none;margin-left:auto;align-items:center;gap:6px;border:0;background:none;padding:6px 10px;border-radius:8px;font-family:'Open Sans',sans-serif;font-size:14px;font-weight:600;color:#e3e5e7;cursor:pointer}
+  .saldos-tgl:hover{background:rgba(255,255,255,.06)}
+  .saldos-tgl:focus-visible{outline:2px solid #0099de;outline-offset:2px}
+  .saldos-tgl svg{transition:transform .25s}
+  body.modo-mision .saldos-tgl{display:inline-flex}
+  body.modo-mision .saldos-h{width:100%}
+  .kpis{transition:max-height .35s ease,opacity .25s ease,margin .35s ease}
+  body.modo-mision.saldos-recogidos .kpis{max-height:0!important;opacity:0;margin-top:0;overflow:hidden;pointer-events:none}
+  body.modo-mision.saldos-recogidos .saldos-tgl svg{transform:rotate(180deg)}
+  body.modo-mision:not(.saldos-recogidos) .kpis{max-height:600px}
+  @media (max-width:600px){.saldos-tgl{display:none!important}}
   /* ===== Modo misión: al abrir Asesoría Pro toda la ficha pasa a modo oscuro espacial ===== */
   body,.side,header,.card,.idbar,.retiros,footer,.tab,.search,.drawer{transition:background-color .45s ease,color .45s ease,border-color .45s ease,box-shadow .45s ease}
   body.modo-mision{--ink:#ffffff;--ink-2:#e3e5e7;--muted:#b5b9bc;--line:#3d3d3d;background:#1b1b1b;color:#ffffff}
@@ -534,6 +546,127 @@
   @keyframes copIntroSale{to{opacity:0;visibility:hidden}}
   @keyframes copRevela{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){.cop-intro-ring,.cop-intro-orb img{animation:none}.panel-cop.revela .cop{animation:none}}
+  /* ===== Journey: loading de Sami + modal claro sobre el modo misión ===== */
+  .jm-carga{position:fixed;inset:0;z-index:310;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,.94);font-family:'Open Sans',sans-serif;color:#404040;text-align:center;padding:24px}
+  .jm-carga[hidden],.jm-velo[hidden]{display:none!important}
+  .jm-carga-sami{position:relative;width:150px;height:150px;display:grid;place-items:center;margin-bottom:10px}
+  .jm-carga-sami .cop-intro-ring{border-color:rgba(64,64,64,.3)}
+  .jm-carga-sami .cop-intro-ring i{background:#00C73D;box-shadow:none}
+  .jm-carga-sami img{width:96px;height:auto;animation:copIntroSami .9s ease-in-out infinite alternate;filter:drop-shadow(0 8px 12px rgba(0,0,0,.18))}
+  .jm-carga h2{margin:0;font-family:Montserrat,sans-serif;font-weight:700;font-size:20px;color:#007a25}
+  .jm-carga-sub{margin:0 0 14px;font-size:14px;color:#666}
+  .jm-carga-pasos{list-style:none;display:grid;gap:10px;text-align:left;width:min(340px,100%)}
+  .jm-carga-pasos li{display:flex;align-items:center;gap:12px;font-size:15px;color:#a5a5a5;transition:color .3s}
+  .jm-ck{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid #dddddd;display:grid;place-items:center;color:transparent;transition:all .3s}
+  .jm-carga-pasos li.on{color:#404040}
+  .jm-carga-pasos li.on .jm-ck{background:#00C73D;border-color:#00C73D;color:#fff}
+  .jm-carga-pasos li.va .jm-ck{border-color:#00C73D;border-top-color:transparent;animation:copIntroGira .8s linear infinite}
+  .jm-carga-barra{width:min(340px,100%);height:6px;border-radius:9999px;background:#e9e9e9;overflow:hidden;margin-top:12px}
+  .jm-carga-barra i{display:block;height:100%;width:0;background:#00C73D;border-radius:9999px}
+  .jm-carga.corre .jm-carga-barra i{transition:width 2.4s cubic-bezier(.4,0,.2,1);width:100%}
+
+  .jm-velo{position:fixed;inset:0;z-index:305;display:flex;align-items:center;justify-content:center;padding:32px;background:rgba(10,10,10,.62);animation:jmFade .3s ease both}
+  .jy-modal{width:min(1240px,100%);height:min(860px,100%);display:flex;flex-direction:column;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.45);font-family:'Open Sans',sans-serif;color:#404040;animation:jmSube .35s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes jmFade{from{opacity:0}}
+  @keyframes jmSube{from{opacity:0;transform:translateY(18px) scale(.985)}}
+  .jm-top{display:flex;align-items:center;gap:20px;padding:14px 24px;background:#242424;color:#fff}
+  .jm-salir{display:flex;align-items:center;gap:8px;border:0;background:none;color:#fff;font-family:'Open Sans',sans-serif;font-size:15px;cursor:pointer;padding:6px 8px;border-radius:8px}
+  .jm-salir:hover{background:rgba(255,255,255,.08)}
+  .jm-tit{flex:1;min-width:0;margin:0;font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:#e3e5e7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .jm-modo{display:flex;gap:2px;padding:3px;border-radius:9999px;background:rgba(255,255,255,.08);box-shadow:0 0 0 1px rgba(255,255,255,.18) inset}
+  .jm-modo button{border:0;background:none;border-radius:9999px;padding:6px 12px;font-family:'Open Sans',sans-serif;font-size:13px;color:#e3e5e7;cursor:pointer}
+  .jm-modo button[aria-pressed="true"]{background:#00C73D;color:#1b1b1b;font-weight:600}
+  .jm-cuerpo{flex:1;min-height:0;display:grid;grid-template-columns:200px minmax(0,1fr)}
+  .jm-pasos{display:flex;flex-direction:column;gap:6px;padding:28px 16px 28px 28px;border-right:1px solid #f0f0f0}
+  .jm-p{display:flex;align-items:center;gap:12px;padding:8px 6px;border:0;background:none;border-radius:8px;font-family:'Open Sans',sans-serif;font-size:14px;color:#404040;cursor:pointer;text-align:left}
+  .jm-p:hover{background:#f6fcf2}
+  .jm-n{flex:none;width:24px;height:24px;border-radius:50%;border:1px solid #cfcfcf;display:grid;place-items:center;font-size:12px;font-weight:700;color:#666}
+  .jm-p.on{font-weight:700}
+  .jm-p.on .jm-n{background:#00C73D;border-color:#00C73D;color:#fff}
+  .jm-p.ok .jm-n{border-color:#00C73D;color:#00C73D;background:#f6fcf2}
+  .jm-scroll{overflow-y:auto;padding:24px 28px 32px;display:flex;flex-direction:column;gap:12px;scrollbar-color:#00C73D #f3f3f3;scrollbar-width:thin}
+  .jm-sec{border:1px solid #e9e9e9;border-radius:12px;background:#fff}
+  .jm-sec.abierta{border-color:#bfeccd;padding:20px 20px 24px}
+  .jm-sec-h{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+  .jm-eb{margin:0;font-size:12px;font-weight:700;color:#007a25}
+  .jm-sec h3{margin:2px 0 0;font-family:Montserrat,sans-serif;font-size:18px;font-weight:700}
+  .jm-sec-b{display:flex;flex-direction:column;gap:8px}
+  .jm-sec-b[hidden]{display:none}
+  .jm-sec.plegada .jm-sec-b{display:none}
+  .jm-sec.plegada .jm-plegar svg{transform:rotate(180deg)}
+  .jm-dest{padding:16px 18px;border-radius:12px;background:#f6fcf2;margin-bottom:6px}
+  .jm-dest .jm-monto{margin:0;font-family:Montserrat,sans-serif;font-size:26px;font-weight:700;color:#007a25}
+  .jm-dest p{margin:2px 0 6px;font-size:15px}
+  .jm-porque{font-size:14px!important;color:#555;margin-top:8px!important}
+  .jm-campo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;border:1px solid #ececec;border-radius:8px;font-size:14px;color:#666}
+  .jm-campo b{color:#404040;font-weight:600}
+  .jm-link{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:2px 0;font-family:'Open Sans',sans-serif;font-size:14px;font-weight:600;color:#00a234;cursor:pointer}
+  .jm-link:hover{text-decoration:underline}
+  .jm-link:disabled{color:#a5a5a5;cursor:not-allowed;text-decoration:none}
+  .jm-res{display:flex;align-items:center;gap:10px;padding:14px 18px;font-size:15px}
+  .jm-res b{font-family:Montserrat,sans-serif;font-weight:700}
+  .jm-resumen{flex:1;min-width:0;color:#666}
+  .jm-est{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid #00C73D;color:#00C73D;display:grid;place-items:center}
+  .jm-est svg{width:12px;height:12px}
+  .jm-est.jm-pend{border:1.5px dashed #a5a5a5}
+  .jm-prec,.jm-sec[data-sec="5"] .jm-sec-b{padding:0 18px}
+  .jm-nota{margin:0 0 4px;font-size:14px;color:#555}
+  .jm-chk{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1px solid #ececec;border-radius:8px;font-size:14px;cursor:pointer}
+  .jm-chk input{margin-top:3px;accent-color:#00C73D;width:16px;height:16px}
+  .jm-registrar{align-self:flex-start;margin-top:6px}
+  .jm-link:focus-visible,.jm-p:focus-visible,.jm-salir:focus-visible,.jm-modo button:focus-visible{outline:2px solid #0099de;outline-offset:2px}
+  .jy-modal.etapas .jm-sec:not(.abierta){display:none}
+  /* Estado de la misión después del journey */
+  .mis-estado{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#8fe000}
+  @media (max-width:900px){.jm-velo{padding:0}.jy-modal{height:100%;border-radius:0}.jm-cuerpo{grid-template-columns:1fr}.jm-pasos{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid #f0f0f0;padding:12px 16px}.jm-p{flex:none}.jm-tit{display:none}.jm-scroll{padding:16px}.jm-res{flex-wrap:wrap}}
+  @media (prefers-reduced-motion:reduce){.jm-velo,.jy-modal,.jm-carga-sami img{animation:none}.jm-carga.corre .jm-carga-barra i{transition:none}}
+  /* Journey · secciones completas (resumen ↔ contenido) */
+  .jm-sec .jm-full{display:none}
+  .jm-sec.abierta{border-color:#bfeccd;padding:20px 20px 24px}
+  .jm-sec.abierta .jm-full{display:flex;flex-direction:column;gap:10px}
+  .jm-sec.abierta .jm-res{display:none}
+  .jm-sec .jm-sec-h{margin-bottom:6px}
+  .jm-sec[data-estado="pend"] .jm-est,.jm-sec[data-estado="bloq"] .jm-est{border:1.5px dashed #a5a5a5;color:transparent}
+  .jm-sec[data-estado="bloq"] [data-abrir="5"]{color:#a5a5a5;pointer-events:none}
+  .jm-tgls{display:flex;gap:18px;flex-wrap:wrap}
+  .jm-mas{margin:8px 0 0!important;font-size:14px!important;color:#555}
+  .jm-mas[hidden]{display:none}
+  .jm-preg{margin:6px 0 0;font-size:15px;color:#404040}
+  .jm-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .jm-chips button{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid #dddddd;border-radius:9999px;background:#fff;font-family:'Open Sans',sans-serif;font-size:15px;color:#404040;cursor:pointer}
+  .jm-chips button svg{display:none}
+  .jm-chips button[aria-pressed="true"]{background:#f6fcf2;border-color:#00C73D;color:#007a25}
+  .jm-chips button[aria-pressed="true"] svg{display:block}
+  .jm-chips button:hover{border-color:#00C73D}
+  .jm-aviso{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1px solid #f1d9ae;border-radius:8px;background:#fff9ef;font-size:14px;color:#404040}
+  .jm-aviso svg{flex:none;color:#b7791f;margin-top:2px}
+  .jm-aviso .jm-link{font-size:14px}
+  .jm-comp{display:flex;flex-direction:column;border:1px solid #e9e9e9;border-radius:10px;overflow:hidden}
+  .jm-op{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 16px;border:0;border-bottom:1px solid #f0f0f0;background:#fff;text-align:left;font-family:'Open Sans',sans-serif;cursor:pointer}
+  .jm-op:last-child{border-bottom:0}
+  .jm-op>span:first-child{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+  .jm-op b{font-family:Montserrat,sans-serif;font-size:15px;color:#404040}
+  .jm-op small{flex-basis:100%;font-size:13px;color:#666}
+  .jm-op-v{text-align:right}
+  .jm-op-v small{display:block}
+  .jm-op.on{background:#f6fcf2}
+  .jm-op:hover{background:#fafafa}
+  .jm-op.on:hover{background:#f6fcf2}
+  .jm-norma{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border:1px solid #f1d9ae;border-radius:9999px;font-style:normal;font-size:11px;color:#b7791f}
+  .jm-norma svg{width:12px;height:12px}
+  .jm-credito{display:flex;flex-direction:column;gap:12px;padding:18px 20px;border:1px solid #bfeccd;border-radius:12px;box-shadow:0 0 4px 0 rgba(61,75,92,.15)}
+  .jm-credito[hidden]{display:none}
+  .jm-credito h4{margin:0;font-family:Montserrat,sans-serif;font-size:16px}
+  .jm-credito p{margin:0;font-size:14px}
+  .jm-tipo{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border:1px solid #d9f2df;border-radius:8px;background:#f6fcf2;font-size:13px}
+  .jm-tipo small{color:#666}
+  .jm-pronto{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border:1px dashed #bfeccd;border-radius:8px;background:#fbfefb;font-size:13px;color:#666}
+  .jm-pronto .mis-btn{margin:0;opacity:.55;cursor:not-allowed}
+  .jm-pronto em{font-style:normal;font-size:10px;font-weight:700;margin-left:6px;padding:2px 8px;border-radius:9999px;background:rgba(255,255,255,.35)}
+  .jm-cierre{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:4px}
+  .jm-cierre small{font-size:13px;color:#666}
+  .jm-registrar{display:inline-flex;align-items:center;gap:8px;margin:0}
+  @media (max-width:900px){.jm-op{flex-wrap:wrap}.jm-pronto,.jm-cierre{flex-direction:column;align-items:stretch}}
   .cop-hist{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px;border:1px solid #e9e9e9;border-radius:8px}
   .cop-hist>div{display:flex;flex-direction:column;gap:2px}
   .cop-estado{font-size:12px;font-weight:600;color:#009a2f;background:var(--green-soft);border-radius:9999px;padding:3px 10px}
@@ -1083,9 +1216,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     <section class="saldos">
     <div class="saldos-h">
       <h2><span class="tt">Total bajo gestión:</span> <span class="amt">$358.900.109</span><button class="ojo" id="btn-ojo" type="button" aria-label="Ocultar saldos" aria-pressed="false"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg></button><span class="tip"><button class="tip-btn" type="button" aria-label="¿Qué es Total bajo gestión?" aria-describedby="tip-total"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><!-- Circle-question (librería) --><path fill="#0099DE" d="M16 5C22.0586 5 27 9.94141 27 16C27 22.1016 22.0586 27 16 27C9.89844 27 5 22.1016 5 16C5 9.94141 9.89844 5 16 5ZM16 24.9375C20.8984 24.9375 24.9375 20.9414 24.9375 16C24.9375 11.1016 20.8984 7.0625 16 7.0625C11.0586 7.0625 7.0625 11.1016 7.0625 16C7.0625 20.9414 11.0586 24.9375 16 24.9375ZM16 19.4375C16.7305 19.4375 17.375 20.0391 17.375 20.8125C17.375 21.5859 16.7305 22.1875 16 22.1875C15.1836 22.1875 14.625 21.5859 14.625 20.8125C14.625 20.0391 15.2266 19.4375 16 19.4375ZM17.418 10.5C19.1367 10.5 20.4688 11.832 20.4258 13.5078C20.4258 14.5391 19.8672 15.5273 18.9648 16.0859L17.0312 17.2891V17.375C17.0312 17.9336 16.5586 18.4062 16 18.4062C15.4414 18.4062 14.9688 17.9336 14.9688 17.375V16.6875C14.9688 16.3438 15.1406 16 15.4844 15.7852L17.9336 14.3242C18.2344 14.1523 18.4062 13.8516 18.4062 13.5078C18.4062 12.9922 17.9336 12.5625 17.375 12.5625H15.1836C14.668 12.5625 14.2812 12.9922 14.2812 13.5078C14.2812 14.0664 13.8086 14.5391 13.25 14.5391C12.6914 14.5391 12.2188 14.0664 12.2188 13.5078C12.2188 11.832 13.5508 10.5 15.2266 10.5H17.418Z"/></svg></button><span class="tip-box" role="tooltip" id="tip-total">Saldo total de todos los productos activos que tiene tu cliente con Skandia, incluyendo seguros. Gracias a tu gestión, lograremos cumplir sus objetivos.</span></span></h2>
+      <button type="button" class="saldos-tgl" aria-expanded="true" aria-controls="kpis-saldos"><span>Recoger saldos</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button>
     </div>
     <button class="m-ampliar" type="button" aria-expanded="false">Ampliar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></button>
-    <div class="kpis">
+    <div class="kpis" id="kpis-saldos">
 
       <div class="card">
         <div class="card-h">
@@ -1241,6 +1375,116 @@ document.addEventListener('DOMContentLoaded',()=>{
   </footer>
 </div>
 
+
+<!-- Iniciar conversación: loading de Sami + modal claro del journey (sobre el modo misión) -->
+<div class="jm-carga" id="jm-carga" role="status" aria-live="polite" hidden>
+  <div class="jm-carga-sami" aria-hidden="true"><span class="cop-intro-ring"><i></i></span><img src="assets/sami-cabeza.png" alt="" width="96" height="70"></div>
+  <h2>Sami está preparando la conversación</h2>
+  <p class="jm-carga-sub">Estoy reuniendo los datos de Óscar para guiarte paso a paso.</p>
+  <ul class="jm-carga-pasos">
+    <li data-p="1"><span class="jm-ck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Leyendo la ficha del cliente</li>
+    <li data-p="2"><span class="jm-ck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Armando su contexto financiero</li>
+    <li data-p="3"><span class="jm-ck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Preparando la conversación guiada</li>
+  </ul>
+  <div class="jm-carga-barra"><i></i></div>
+</div>
+
+<div class="jm-velo" id="jm-velo" hidden>
+  <div class="jy-modal" role="dialog" aria-modal="true" aria-labelledby="jm-tit">
+    <header class="jm-top">
+      <button type="button" class="jm-salir" data-jm-salir><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Salir del journey</button>
+      <h2 id="jm-tit" class="jm-tit">Acompañamiento en el retiro · Óscar Camilo Hernández Ramírez</h2>
+      <div class="jm-modo" role="group" aria-label="Vista del journey">
+        <button type="button" aria-pressed="false" data-modo="etapas">Por etapas</button>
+        <button type="button" aria-pressed="true" data-modo="continuo">Continuo</button>
+      </div>
+    </header>
+    <div class="jm-cuerpo">
+      <nav class="jm-pasos" aria-label="Etapas de la conversación">
+        <button type="button" class="jm-p on ok" data-ir="1"><span class="jm-n"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Entender</button>
+        <button type="button" class="jm-p ok" data-ir="2"><span class="jm-n"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Su situación</button>
+        <button type="button" class="jm-p ok" data-ir="3"><span class="jm-n"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Opciones</button>
+        <button type="button" class="jm-p" data-ir="4"><span class="jm-n">4</span>Precauciones</button>
+        <button type="button" class="jm-p" data-ir="5"><span class="jm-n">5</span>Acuerdo</button>
+      </nav>
+      <div class="jm-scroll">
+        <section class="jm-sec abierta" data-sec="1" data-estado="ok">
+          <div class="jm-res"><span class="jm-est"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Entender</b><span class="jm-resumen" data-res="1">· Necesita $2 M antes del jueves</span><button type="button" class="jm-link" data-abrir="1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Editar</button></div>
+          <div class="jm-full">
+            <div class="jm-sec-h"><div><p class="jm-eb">Entender · ¿Qué necesita el cliente?</p><h3>Necesidad</h3></div><button type="button" class="jm-link" data-plegar><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg><span>Plegar</span></button></div>
+            <div class="jm-dest"><p class="jm-monto">$2.000.000</p><p>Lo que necesita recibir, antes del jueves · no sabe si podrá reponerlo</p>
+              <div class="jm-tgls"><button type="button" class="jm-link" data-tgl="pq"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span>Ver por qué</span></button><button type="button" class="jm-link" data-tgl="dt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span>Ver detalle</span></button></div>
+              <p class="jm-mas" data-mas="pq" hidden>Óscar solicitó un retiro parcial de su fondo voluntario el 2 de noviembre. Entender para qué necesita el dinero ayuda a confirmar si el retiro es su mejor opción.</p>
+              <p class="jm-mas" data-mas="dt" hidden>Solicitud del 2 nov · Retiro parcial · Destino: Bancolombia, cuenta de ahorros · Pago previsto: jueves.</p></div>
+            <div class="jm-campo"><span>Motivo: <b>Necesita liquidez</b></span><button type="button" class="jm-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
+            <div class="jm-campo"><span>Necesita: <b>$2.000.000</b></span><button type="button" class="jm-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
+            <div class="jm-campo"><span>Para cuándo: <b>Antes del jueves</b></span><button type="button" class="jm-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
+            <div class="jm-campo"><span>Ingresos adicionales en 12 meses: <b>No sabe</b></span><button type="button" class="jm-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
+            <div class="jm-campo"><span>Condición especial: <b>Ninguna</b></span><button type="button" class="jm-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
+          </div>
+        </section>
+        <section class="jm-sec" data-sec="2" data-estado="ok">
+          <div class="jm-res"><span class="jm-est"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Su situación</b><span class="jm-resumen" data-res="2">· $52,7 M disponibles en el contrato #100000063061</span><button type="button" class="jm-link" data-abrir="2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Editar</button></div>
+          <div class="jm-full">
+            <div class="jm-sec-h"><div><p class="jm-eb">Su situación · ¿Qué tiene hoy?</p><h3>Lo que tiene y desde dónde</h3></div><button type="button" class="jm-link" data-plegar><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg><span>Plegar</span></button></div>
+            <div class="jm-dest"><p class="jm-monto">$52.732.191</p><p>Disponible para retirar en el contrato #100000063061</p>
+              <div class="jm-tgls"><button type="button" class="jm-link" data-tgl="pq"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span>Ver por qué</span></button><button type="button" class="jm-link" data-tgl="dt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span>Ver detalle</span></button></div>
+              <p class="jm-mas" data-mas="pq" hidden>Es el saldo de su Fondo Voluntario de Pensión Skandia Multifund que puede retirar hoy.</p>
+              <p class="jm-mas" data-mas="dt" hidden>Potencializar mi inversión · #100000063061 · Fondo Voluntario de Pensión Skandia Multifund · Saldo total $52.732.191.</p></div>
+            <p class="jm-preg">¿Hablan de todos sus contratos?</p>
+            <div class="jm-chips" data-grupo="contratos"><button type="button" aria-pressed="false">Sí, de todos</button><button type="button" aria-pressed="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Solo de algunos</button></div>
+          </div>
+        </section>
+        <section class="jm-sec" data-sec="3" data-estado="ok">
+          <div class="jm-res"><span class="jm-est"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Opciones</b><span class="jm-resumen" data-res="3">· Prefiere el retiro parcial · recibe $2 M · se retienen $0</span><button type="button" class="jm-link" data-abrir="3"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Editar</button></div>
+          <div class="jm-full">
+            <div class="jm-sec-h"><div><p class="jm-eb">Opciones · ¿Qué puede hacer?</p><h3>Comparador</h3></div><button type="button" class="jm-link" data-plegar><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg><span>Plegar</span></button></div>
+            <div class="jm-dest"><p class="jm-monto" data-op-monto>$2.000.000</p><p data-op-txt>Hoy puede recibirlo con el retiro parcial; se retienen $0</p>
+              <div class="jm-tgls"><button type="button" class="jm-link" data-tgl="pq"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span>Ver por qué</span></button><button type="button" class="jm-link" data-tgl="dt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span>Ver cálculo</span></button></div>
+              <p class="jm-mas" data-mas="pq" hidden>Las tres opciones cubren lo que necesita. Cambian el costo y lo que queda invertido para sus metas.</p>
+              <p class="jm-mas" data-mas="dt" hidden>Crédito puente: $2.000.000 a una tasa de 17,78 % E.A. por 12 meses ≈ $355.600 de intereses. Retiros: según la información de la solicitud, impuestos del retiro $0.</p></div>
+            <div class="jm-aviso"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 7h14M3 13l2-6 2 6a2 2 0 0 1-4 0ZM17 13l2-6 2 6a2 2 0 0 1-4 0ZM8 21h8"/></svg><span>Desde Skandia no sabemos si Óscar usó estos aportes como <u>renta exenta</u> en declaraciones pasadas. <button type="button" class="jm-link" data-tgl="aviso">Leer más</button></span></div><p class="jm-mas" data-mas="aviso" hidden>Si los usó como renta exenta y retira antes de cumplir las condiciones de permanencia, podría tener que declararlos como renta en su próxima declaración. Recomiéndale validarlo con su contador.</p>
+            <div class="jm-comp" role="list">
+              <button type="button" class="jm-op on" data-op="parcial"><span><b>Retiro parcial</b><em class="jm-norma"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 7h14M3 13l2-6 2 6a2 2 0 0 1-4 0ZM17 13l2-6 2 6a2 2 0 0 1-4 0ZM8 21h8"/></svg>Norma tributaria</em><small>Se retienen $0</small></span><span class="jm-op-v"><b>$2.000.000</b><small>recibe hoy</small></span></button>
+              <button type="button" class="jm-op" data-op="credito"><span><b>Crédito puente</b><small>Intereses estimados $355.600</small></span><span class="jm-op-v"><b>$2.000.000</b><small>recibe hoy</small></span></button>
+              <button type="button" class="jm-op" data-op="total"><span><b>Retiro total</b><em class="jm-norma"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 7h14M3 13l2-6 2 6a2 2 0 0 1-4 0ZM17 13l2-6 2 6a2 2 0 0 1-4 0ZM8 21h8"/></svg>Norma tributaria</em><small>Se retienen $0</small></span><span class="jm-op-v"><b>$52.732.191</b><small>recibe hoy</small></span></button>
+            </div>
+            <p class="jm-preg">¿Cuál prefiere el cliente?</p>
+            <div class="jm-chips" data-grupo="opcion"><button type="button" aria-pressed="true" data-op="parcial"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Retiro parcial</button><button type="button" aria-pressed="false" data-op="credito">Crédito puente</button><button type="button" aria-pressed="false" data-op="total">Retiro total</button></div>
+          </div>
+        </section>
+        <section class="jm-sec" data-sec="4" data-estado="pend">
+          <div class="jm-res"><span class="jm-est"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Precauciones</b><span class="jm-resumen" data-res="4">· Pendiente</span><button type="button" class="jm-link" data-abrir="4">Completar</button></div>
+          <div class="jm-full">
+            <div class="jm-sec-h"><div><p class="jm-eb">Precauciones · ¿Qué debe tener en cuenta?</p><h3>Validación tributaria</h3></div><button type="button" class="jm-link" data-plegar><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg><span>Plegar</span></button></div>
+            <div class="jm-dest"><p class="jm-monto">$0</p><p data-prec-txt>Hoy no se retiene nada con el retiro parcial. Aun así, el uso pasado de estos aportes puede afectar su declaración de renta.</p>
+              <div class="jm-tgls"><button type="button" class="jm-link" data-tgl="pq"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span>Ver por qué</span></button><button type="button" class="jm-link" data-tgl="dt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span>Ver cálculo</span></button></div>
+              <p class="jm-mas" data-mas="pq" hidden>La retención depende de cómo usó estos aportes en sus declaraciones. Skandia no tiene esa información, por eso conviene validarlo antes de retirar.</p>
+              <p class="jm-mas" data-mas="dt" hidden>Según la solicitud del retiro: monto bruto $2.000.000 · impuestos del retiro $0.</p></div>
+            <div class="jm-aviso"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 7h14M3 13l2-6 2 6a2 2 0 0 1-4 0ZM17 13l2-6 2 6a2 2 0 0 1-4 0ZM8 21h8"/></svg><span>Desde Skandia no sabemos si Óscar usó estos aportes como <u>renta exenta</u> en declaraciones pasadas. <button type="button" class="jm-link" data-tgl="aviso">Leer más</button></span></div><p class="jm-mas" data-mas="aviso" hidden>Si los usó como renta exenta y retira antes de cumplir las condiciones de permanencia, podría tener que declararlos como renta en su próxima declaración. Recomiéndale validarlo con su contador.</p>
+            <p class="jm-preg">¿Le recomendaste validarlo antes de retirar, por su cuenta o con su contador?</p>
+            <div class="jm-chips" data-grupo="validacion"><button type="button" aria-pressed="false" data-v="si">Sí, se lo recomendé</button><button type="button" aria-pressed="false" data-v="no">No</button></div>
+          </div>
+        </section>
+        <section class="jm-sec" data-sec="5" data-estado="bloq">
+          <div class="jm-res"><span class="jm-est"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><b>Acuerdo</b><span class="jm-resumen" data-res="5">· Se abre al completar «Precauciones»</span><button type="button" class="jm-link" data-abrir="5">Abrir</button></div>
+          <div class="jm-full">
+            <div class="jm-sec-h"><div><p class="jm-eb">Acuerdo · ¿Qué decidimos y qué sigue?</p><h3>Decisión y cierre</h3></div><button type="button" class="jm-link" data-plegar><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg><span>Plegar</span></button></div>
+            <div class="jm-dest"><p class="jm-monto" data-ac-monto>$50.732.191</p><p>Sigue invertido si decide: <u data-ac-dec>retiro parcial</u></p></div>
+            <div class="jm-campo"><span>Decisión: <b data-ac-dec2>Mantiene el retiro parcial</b></span><button type="button" class="jm-link" data-abrir="3"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
+            <div class="jm-credito" data-credito hidden>
+              <h4>Solicitar crédito</h4>
+              <p>Monto: $2.000.000 · con GMF $2.008.000 · Tasa: 17,78 % E.A. · Pago previsto: 12 de nov de 2027 · Respaldo: $2.600.000 bloqueados en el contrato #100000063061 · Sin cuotas mensuales</p>
+              <div class="jm-tipo"><span>Tipo de crédito: <b>Crédito Impulso</b></span><small>Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A.</small></div>
+              <div class="jm-pronto"><span>Muy pronto el cliente podrá solicitar el Crédito Impulso desde aquí.</span><button type="button" class="mis-btn" disabled>Solicitar el Crédito Impulso <em>Muy pronto</em></button></div>
+            </div>
+            <div class="jm-cierre"><small data-ac-nota>El retiro sigue su curso y se paga el jueves.</small><button type="button" class="mis-btn jm-registrar" data-registrar>Confirmar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="rmodal" id="rmodal">
   <div class="rdlg" role="dialog" aria-modal="true" aria-labelledby="rmodal-t">
     <button class="rclose" type="button" aria-label="Cerrar"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
@@ -1355,7 +1599,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   const paneles=[...document.querySelectorAll('[data-panel-id]')];
   function activar(t){
     tabs.forEach(x=>{const on=x===t; x.classList.toggle('on',on); x.setAttribute('aria-selected',String(on));});
+    const entraMision = t.dataset.panel==='copiloto' && !document.body.classList.contains('modo-mision');
     document.body.classList.toggle('modo-mision', t.dataset.panel==='copiloto');
+    if(entraMision) document.body.classList.add('saldos-recogidos'); // los saldos se recogen solos al entrar
     const k=t.dataset.panel, existe=paneles.some(p=>p.dataset.panelId===k);
     const venia=document.querySelector('#p-copiloto').hidden;
     paneles.forEach(p=>p.hidden = p.dataset.panelId !== (existe ? k : 'otros'));
@@ -1406,6 +1652,114 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   if(volver) volver.addEventListener('click',e=>{ if(document.body.classList.contains('m-detalle')){ e.preventDefault(); salir(); } });
   mq.addEventListener('change',e=>{ if(!e.matches) document.body.classList.remove('m-detalle'); });
+});
+</script>
+<script>
+// Journey "Acompañamiento en el retiro": loading de Sami (≈2,6 s) y modal claro con 5 etapas
+document.addEventListener('DOMContentLoaded',()=>{
+  const CHECK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  const carga=document.getElementById('jm-carga'), velo=document.getElementById('jm-velo'), modal=velo.querySelector('.jy-modal');
+  const pasos=[...carga.querySelectorAll('.jm-carga-pasos li')], corto=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const secs=[...velo.querySelectorAll('.jm-sec')], navs=[...velo.querySelectorAll('.jm-p')];
+  let timers=[], completada=false, opcion='parcial';
+  function abrir(){
+    if(!velo.hidden || !carga.hidden) return;
+    pasos.forEach(li=>li.classList.remove('on','va')); carga.classList.remove('corre');
+    carga.hidden=false; void carga.offsetWidth; carga.classList.add('corre');
+    const t=corto?[0,150,300,450]:[100,800,1500,2600];
+    pasos[0].classList.add('va');
+    timers=[
+      setTimeout(()=>{pasos[0].classList.replace('va','on'); pasos[1].classList.add('va');},t[1]),
+      setTimeout(()=>{pasos[1].classList.replace('va','on'); pasos[2].classList.add('va');},t[2]),
+      setTimeout(()=>{pasos[2].classList.replace('va','on');},t[3]-300),
+      setTimeout(()=>{carga.hidden=true; velo.hidden=false; document.body.style.overflow='hidden'; velo.querySelector('[data-jm-salir]').focus();},t[3])
+    ];
+  }
+  function cerrar(){ timers.forEach(clearTimeout); carga.hidden=true; velo.hidden=true; document.body.style.overflow=''; progreso(); }
+  document.querySelectorAll('.cop-mis .mis-btn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation(); abrir();}));
+  document.querySelectorAll('.cop-mis .mis').forEach(c=>c.addEventListener('click',abrir));
+  velo.querySelector('[data-jm-salir]').addEventListener('click',cerrar);
+  velo.addEventListener('click',e=>{ if(e.target===velo) cerrar(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !velo.hidden) cerrar(); });
+  // Por etapas / continuo
+  velo.querySelectorAll('[data-modo]').forEach(b=>b.addEventListener('click',()=>{
+    velo.querySelectorAll('[data-modo]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+    modal.classList.toggle('etapas', b.dataset.modo==='etapas');
+  }));
+  // Abrir / plegar secciones
+  function abrirSec(n){
+    const sec=secs[n-1]; if(sec.dataset.estado==='bloq') return;
+    if(modal.classList.contains('etapas')) secs.forEach(x=>x.classList.remove('abierta'));
+    sec.classList.add('abierta');
+    navs.forEach(x=>x.classList.toggle('on',x.dataset.ir===String(n)));
+    sec.scrollIntoView({behavior:corto?'auto':'smooth',block:'start'});
+  }
+  velo.querySelectorAll('[data-abrir]').forEach(b=>b.addEventListener('click',()=>abrirSec(+b.dataset.abrir)));
+  navs.forEach(b=>b.addEventListener('click',()=>abrirSec(+b.dataset.ir)));
+  velo.querySelectorAll('[data-plegar]').forEach(b=>b.addEventListener('click',()=>b.closest('.jm-sec').classList.remove('abierta')));
+  // Ver por qué / ver detalle / leer más
+  velo.querySelectorAll('[data-tgl]').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation(); const cont=b.closest('.jm-dest')||b.closest('.jm-full'); const m=cont.querySelector('[data-mas="'+b.dataset.tgl+'"]'); if(!m) return;
+    m.hidden=!m.hidden; b.classList.toggle('abierto',!m.hidden);
+  }));
+  // Chips de selección única
+  velo.querySelectorAll('.jm-chips').forEach(g=>g.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+    if(g.dataset.grupo==='opcion') elegir(b.dataset.op);
+    if(g.dataset.grupo==='validacion') validar(b.dataset.v);
+    if(g.dataset.grupo==='contratos') velo.querySelector('[data-res="2"]').textContent = b.textContent.includes('todos') ? '· Hablan de todos sus contratos' : '· $52,7 M disponibles en el contrato #100000063061';
+  })));
+  // Opciones → comparador, precauciones y acuerdo
+  const OPC={
+    parcial:{monto:'$2.000.000', txt:'Hoy puede recibirlo con el retiro parcial; se retienen $0', res:'· Prefiere el retiro parcial · recibe $2 M · se retienen $0',
+             prec:'Hoy no se retiene nada con el retiro parcial. Aun así, el uso pasado de estos aportes puede afectar su declaración de renta.',
+             sigue:'$50.732.191', dec:'retiro parcial', dec2:'Mantiene el retiro parcial', nota:'El retiro sigue su curso y se paga el jueves.', credito:false},
+    credito:{monto:'$2.000.000', txt:'Hoy puede recibirlo con el crédito puente; intereses estimados $355.600', res:'· Prefiere el crédito puente · recibe $2 M · intereses estimados $355.600',
+             prec:'Con el crédito puente no hay retención y su ahorro sigue invertido. Si cancela el retiro, igual conviene validar su situación tributaria.',
+             sigue:'$52.732.191', dec:'crédito puente', dec2:'Toma el crédito puente', nota:'Queda como acción pendiente al registrar el cierre.', credito:true},
+    total:{monto:'$52.732.191', txt:'Hoy puede recibir todo su saldo con el retiro total; se retienen $0', res:'· Prefiere el retiro total · recibe $52,7 M · se retienen $0',
+             prec:'Con el retiro total no se retiene nada hoy, pero el uso pasado de estos aportes puede afectar su declaración de renta.',
+             sigue:'$0', dec:'retiro total', dec2:'Retira todo su saldo', nota:'El retiro total reemplaza la solicitud actual.', credito:false}
+  };
+  function elegir(op){
+    opcion=op; const o=OPC[op];
+    velo.querySelectorAll('.jm-op').forEach(x=>x.classList.toggle('on',x.dataset.op===op));
+    velo.querySelectorAll('[data-grupo="opcion"] button').forEach(x=>{ const on=x.dataset.op===op; x.setAttribute('aria-pressed',String(on)); });
+    velo.querySelector('[data-op-monto]').textContent=o.monto; velo.querySelector('[data-op-txt]').textContent=o.txt;
+    velo.querySelector('[data-res="3"]').textContent=o.res; velo.querySelector('[data-prec-txt]').textContent=o.prec;
+    velo.querySelector('[data-ac-monto]').textContent=o.sigue; velo.querySelector('[data-ac-dec]').textContent=o.dec;
+    velo.querySelector('[data-ac-dec2]').textContent=o.dec2; velo.querySelector('[data-ac-nota]').textContent=o.nota;
+    velo.querySelector('[data-credito]').hidden=!o.credito;
+  }
+  velo.querySelectorAll('.jm-op').forEach(b=>b.addEventListener('click',()=>elegir(b.dataset.op)));
+  function marcarNav(n,ok){ const nv=navs[n-1]; nv.classList.toggle('ok',ok); nv.querySelector('.jm-n').innerHTML= ok ? CHECK : String(n); }
+  function validar(v){
+    const s4=secs[3], s5=secs[4];
+    s4.dataset.estado='ok'; marcarNav(4,true); s4.querySelector('[data-abrir="4"]').innerHTML=s4.querySelector('[data-abrir="2"]') ? '' : velo.querySelector('[data-abrir="2"]').innerHTML;
+    velo.querySelector('[data-res="4"]').textContent = v==='si' ? '· Le recomendaste validarlo con su contador' : '· No se le recomendó validarlo';
+    s5.dataset.estado='pend'; velo.querySelector('[data-res="5"]').textContent='· Listo para registrar';
+  }
+  // Confirmar: misión completada
+  velo.querySelector('[data-registrar]').addEventListener('click',()=>{ completada=true; cerrar(); });
+  function progreso(){
+    const tarjeta=document.querySelector('.cop-mis .mis'); if(!tarjeta) return;
+    const hechas=secs.filter(x=>x.dataset.estado==='ok').length + (completada?1:0);
+    let est=tarjeta.querySelector('.mis-estado');
+    if(!est){ est=document.createElement('span'); est.className='mis-estado'; tarjeta.querySelector('.mis-cat').after(est); }
+    est.textContent = completada ? '✓ Misión completada' : 'En curso · '+Math.min(hechas,4)+' de 5 etapas';
+    tarjeta.querySelector('.mis-btn').textContent = completada ? 'Ver conversación' : 'Continuar conversación';
+    if(completada){ const b=document.querySelector('.cop-prog'); if(b){ b.querySelector('i i').style.width='100%'; b.querySelector('b').textContent='1'; } }
+  }
+});
+</script>
+<script>
+// Asesoría Pro: botón para recoger / ver los saldos de productos
+document.addEventListener('DOMContentLoaded',()=>{
+  const b=document.querySelector('.saldos-tgl'); if(!b) return;
+  const pinta=()=>{ const rec=document.body.classList.contains('saldos-recogidos'); b.setAttribute('aria-expanded',String(!rec)); b.querySelector('span').textContent=rec?'Ver saldos':'Recoger saldos'; };
+  b.addEventListener('click',()=>{ document.body.classList.toggle('saldos-recogidos'); pinta(); });
+  // al salir de Asesoría Pro los saldos vuelven a verse
+  new MutationObserver(()=>{ if(!document.body.classList.contains('modo-mision') && document.body.classList.contains('saldos-recogidos')) document.body.classList.remove('saldos-recogidos'); pinta(); }).observe(document.body,{attributes:true,attributeFilter:['class']});
 });
 </script>
 <script>
