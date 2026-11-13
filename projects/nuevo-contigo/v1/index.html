@@ -721,9 +721,78 @@
   .ds-com-h{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
   .ds-com-h>div{display:flex;flex-direction:column;gap:8px}
   .ds-com-h b{font-family:Montserrat,sans-serif;font-size:16px;line-height:24px;font-weight:700}
-  .ds-linea{flex:1;width:100%;min-height:96px;margin-top:8px}
+  .ds-graf{position:relative;flex:1;display:flex;min-height:96px;margin-top:8px}
+  .ds-linea{flex:1;width:100%;min-height:96px;display:block}
+  /* Puntos de la gráfica de comisiones + tooltip con el dato (Figma · 35987:7144) */
+  .ds-pts{position:absolute;inset:0}
+  .ds-pt{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;padding:0;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .ds-pt::before{content:"";width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px var(--charts-c01,#A1DD70);transition:transform .15s,background-color .15s}
+  .ds-pt:hover::before,.ds-pt:focus-visible::before{transform:scale(1.5);background:var(--charts-c01,#A1DD70)}
+  .ds-pt:focus-visible{outline:none}
+  .ds-pt:focus-visible::before{box-shadow:0 0 0 1px var(--charts-c01,#A1DD70),0 0 0 3px rgba(0,153,222,.6)}
+  .ds-pt-tt{position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;width:max-content;padding:4px 8px;border-radius:4px;background:var(--feedback-standby-dark,#444);color:#fff;font-family:'Open Sans',sans-serif;font-size:14px;line-height:22px;font-weight:400;text-align:left;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .15s,visibility .15s}
+  .ds-pt-tt b{font-weight:700}
+  .ds-pt.izq .ds-pt-tt{left:0;transform:none}
+  .ds-pt.der .ds-pt-tt{left:auto;right:0;transform:none}
+  .ds-pt:hover .ds-pt-tt,.ds-pt:focus-visible .ds-pt-tt{opacity:1;visibility:visible}
+  .ds-com{position:relative}
+  .ds-card.ds-com:has(.ds-pt:hover),.ds-card.ds-com:has(.ds-pt:focus-visible){z-index:5}
+  @media (prefers-reduced-motion:reduce){.ds-pt::before,.ds-pt-tt{transition:none}}
   .ds-meses{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;opacity:.8;font-size:12px;line-height:20px;text-align:center}
   .ds-escala{display:flex;justify-content:flex-end;gap:16px;font-size:12px;line-height:20px}
+
+
+  /* Selector de asesor (dropdown del DS: lista blanca, hover verde claro, seleccionado en verde con check) */
+  .ds-selw{position:relative}
+  .ds-sel-tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ds-sel-tx.vacio{color:#404040}
+  .ds-sel-chev{transition:transform .2s}
+  .ds-sel[aria-expanded="true"] .ds-sel-chev{transform:rotate(180deg)}
+  .ds-sel:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .ds-sel[aria-expanded="true"]{filter:drop-shadow(0 0 0 #00C73D) drop-shadow(0 0 2px rgba(68,68,68,.15));box-shadow:inset 0 0 0 1px #00C73D}
+  .ds-ops{position:absolute;top:calc(100% + 4px);left:0;right:0;min-width:248px;z-index:40;margin:0;padding:8px 0;list-style:none;background:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(61,75,92,.18);font-family:'Open Sans',sans-serif;font-size:14px;line-height:22px;color:#404040;outline:none}
+  .ds-ops[hidden]{display:none}
+  .ds-ops li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 16px;cursor:pointer;white-space:nowrap}
+  .ds-ops li:hover,.ds-ops li.activo{background:var(--background-brand-light,#F6FCF2)}
+  .ds-ops li[aria-selected="true"]{color:#00C73D;font-weight:600}
+  .ds-op-ck{flex:none;visibility:hidden}
+  .ds-ops li[aria-selected="true"] .ds-op-ck{visibility:visible}
+  /* Tooltip de las flechas (Figma · Plain Tooltip 43713:44247) */
+  .ds-tt{position:relative}
+  .ds-tt-btn{display:flex;align-items:center;justify-content:center;width:25px;height:25px;padding:0;border:0;border-radius:100px;background:#fff;cursor:help}
+  .ds-tt-btn:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+  .ds-tt-box{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:30;width:max-content;max-width:132px;padding:4px 8px;border-radius:4px;background:var(--feedback-standby-dark,#444);color:#fff;font-family:'Open Sans',sans-serif;font-size:14px;line-height:22px;font-weight:400;text-align:left;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .15s,visibility .15s}
+  .ds-tt:hover .ds-tt-box,.ds-tt-btn:focus-visible+.ds-tt-box{opacity:1;visibility:visible}
+  .ds-ind:has(.ds-tt:hover),.ds-ind:has(.ds-tt-btn:focus-visible){z-index:5}
+  .ds-ind{position:relative}
+  @media (max-width:600px){.ds-tt-box{left:auto;right:-4px;transform:none}}
+  @media (prefers-reduced-motion:reduce){.ds-tt-box,.ds-sel-chev{transition:none}}
+  /* Selector de mes de Logros (Figma Portal Contigo · Year Picker 43746:29739) */
+  .ds-mes{position:relative;display:flex}
+  .ds-lg-chev{transition:transform .2s}
+  .ds-lg-tab[aria-expanded="true"] .ds-lg-chev{transform:rotate(180deg)}
+  .ds-lg-tab:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .ds-mp{position:absolute;top:calc(100% + 8px);left:0;z-index:40;display:flex;flex-direction:column;width:235px;height:222px;padding:8px 4px 8px 0;background:#fff;border-radius:8px;filter:drop-shadow(0 0 2px rgba(68,68,68,.15));box-shadow:0 4px 16px rgba(61,75,92,.12)}
+  .ds-mp[hidden]{display:none}
+  .ds-mp-h{display:flex;align-items:center;gap:10px;height:30px;padding:0 8px}
+  .ds-mp-anio{flex:1;font-family:Montserrat,sans-serif;font-size:14px;line-height:22px;font-weight:500;color:#404040}
+  .ds-mp-nav{display:flex;gap:4px}
+  .ds-mp-nav button{display:flex;padding:0;border:0;background:none;cursor:pointer;border-radius:4px}
+  .ds-mp-nav button:disabled{opacity:.3;cursor:default}
+  .ds-mp-nav button:focus-visible{outline:2px solid var(--blue)}
+  .ds-mp-grid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr)}
+  .ds-mp-grid button{position:relative;border:0;background:none;padding:0;cursor:pointer;font-family:'Open Sans',sans-serif;font-size:12px;line-height:20px;font-weight:400;color:#404040}
+  .ds-mp-grid button::before{content:"";position:absolute;inset:6.25% 3.57%;border-radius:39.805px;background:transparent;transition:background-color .15s}
+  .ds-mp-grid button span{position:relative}
+  .ds-mp-grid button:hover:not(:disabled)::before{background:var(--background-brand-light,#F6FCF2)}
+  .ds-mp-grid button[aria-checked="true"]{color:#fff;font-weight:700}
+  .ds-mp-grid button[aria-checked="true"]::before{background:var(--primary-green-n00,#00C73D)}
+  .ds-mp-grid button:disabled{color:var(--texts-light,#A5A5A5);cursor:default}
+  .ds-mp-grid button:focus-visible{outline:none}
+  .ds-mp-grid button:focus-visible::before{box-shadow:0 0 0 2px var(--blue)}
+  .ds-fila3,.ds-col>.ds-ind{transition:opacity .2s}
+  .dash.actualiza .ds-ind b{animation:pfActualiza .35s ease}
+  @media (prefers-reduced-motion:reduce){.ds-mp-grid button::before,.ds-lg-chev{transition:none}.dash.actualiza .ds-ind b{animation:none}}
   @media (max-width:1100px){.ds-fila3{grid-template-columns:repeat(3,minmax(0,1fr))}}
   @media (max-width:900px){.ds-fila2{grid-template-columns:1fr}}
   @media (max-width:600px){
@@ -1652,24 +1721,24 @@ document.addEventListener('DOMContentLoaded',()=>{
       </a>
       <section class="ds-logros" aria-label="Logros del mes">
         <div class="ds-lg-h">
-          <button type="button" class="ds-lg-tab"><img src="assets/dash/star.svg" width="24" height="24" alt="">Logros en <span>octubre 2026</span><img src="assets/dash/chev-down-verde.svg" width="16" height="16" alt=""></button>
+          <div class="ds-mes"><button type="button" class="ds-lg-tab" aria-haspopup="dialog" aria-expanded="false" aria-controls="ds-mp"><img src="assets/dash/star.svg" width="24" height="24" alt="">Logros en <span id="ds-mes-txt">octubre 2026</span><img class="ds-lg-chev" src="assets/dash/chev-down-verde.svg" width="16" height="16" alt=""></button><div class="ds-mp" id="ds-mp" role="dialog" aria-label="Elige el mes de los logros" hidden><div class="ds-mp-h"><span class="ds-mp-anio" id="ds-mp-anio" aria-live="polite">2026</span><span class="ds-mp-nav"><button type="button" data-anio="1" aria-label="Año siguiente"><img src="assets/dash/chev-arriba.svg" width="16" height="16" alt=""></button><button type="button" data-anio="-1" aria-label="Año anterior"><img src="assets/dash/chev-abajo.svg" width="16" height="16" alt=""></button></span></div><div class="ds-mp-grid" role="radiogroup" aria-labelledby="ds-mp-anio"></div></div></div>
           <div class="ds-lg-der">
-            <button type="button" class="ds-sel"><span>Asesor</span><img src="assets/dash/chev-down-gris.svg" width="16" height="16" alt=""></button>
+            <div class="ds-selw"><button type="button" class="ds-sel" aria-haspopup="listbox" aria-expanded="false" aria-controls="ds-ops" aria-label="Filtrar logros por asesor"><span class="ds-sel-tx vacio">Asesor</span><img class="ds-sel-chev" src="assets/dash/chev-down-gris.svg" width="16" height="16" alt=""></button><ul class="ds-ops" id="ds-ops" role="listbox" aria-label="Asesores" tabindex="-1" hidden><li role="option" id="ds-op-0" data-i="0" aria-selected="false">Juan Camilo Rodríguez<svg class="ds-op-ck" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></li><li role="option" id="ds-op-1" data-i="1" aria-selected="false">María Fernanda López<svg class="ds-op-ck" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></li><li role="option" id="ds-op-2" data-i="2" aria-selected="false">Andrés Felipe Gómez<svg class="ds-op-ck" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></li><li role="option" id="ds-op-3" data-i="3" aria-selected="false">Laura Valentina Martínez<svg class="ds-op-ck" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></li><li role="option" id="ds-op-4" data-i="4" aria-selected="false">Santiago Herrera Ruiz<svg class="ds-op-ck" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></li></ul></div>
             <a href="#" class="ds-link">Balance Score Card</a>
           </div>
         </div>
         <div class="ds-lg-b">
-          <div class="ds-fila3"><article class="ds-ind"><div class="ds-ind-tx"><span>Venta neta</span><b>$40.000.000</b></div><div class="ds-ind-var"><b>-1%</b><span class="ds-tend"><img src="assets/dash/tend-baja.svg" width="16" height="16" alt=""></span></div></article><article class="ds-ind"><div class="ds-ind-tx"><span>Aportes de clientes</span><b>$10.000.000</b></div><div class="ds-ind-var"><b>2%</b><span class="ds-tend"><img src="assets/dash/tend-sube.svg" width="16" height="16" alt=""></span></div></article><article class="ds-ind"><div class="ds-ind-tx"><span>Retiros de clientes</span><b>$12.000.000</b></div><div class="ds-ind-var"><b>1%</b><span class="ds-tend"><img src="assets/dash/tend-sube-roja.svg" width="16" height="16" alt=""></span></div></article></div>
+          <div class="ds-fila3"><article class="ds-ind"><div class="ds-ind-tx"><span>Venta neta</span><b>$40.000.000</b></div><div class="ds-ind-var"><b>-1%</b><span class="ds-tend ds-tt"><button type="button" class="ds-tt-btn" aria-describedby="ds-tt-1"><img src="assets/dash/tend-baja.svg" width="16" height="16" alt="Variación"></button><span class="ds-tt-box" role="tooltip" id="ds-tt-1">% con respecto al mes anterior</span></span></div></article><article class="ds-ind"><div class="ds-ind-tx"><span>Aportes de clientes</span><b>$10.000.000</b></div><div class="ds-ind-var"><b>2%</b><span class="ds-tend ds-tt"><button type="button" class="ds-tt-btn" aria-describedby="ds-tt-2"><img src="assets/dash/tend-sube.svg" width="16" height="16" alt="Variación"></button><span class="ds-tt-box" role="tooltip" id="ds-tt-2">% con respecto al mes anterior</span></span></div></article><article class="ds-ind"><div class="ds-ind-tx"><span>Retiros de clientes</span><b>$12.000.000</b></div><div class="ds-ind-var"><b>1%</b><span class="ds-tend ds-tt"><button type="button" class="ds-tt-btn" aria-describedby="ds-tt-3"><img src="assets/dash/tend-sube-roja.svg" width="16" height="16" alt="Variación"></button><span class="ds-tt-box" role="tooltip" id="ds-tt-3">% con respecto al mes anterior</span></span></div></article></div>
           <div class="ds-fila2">
             <div class="ds-col">
-              <article class="ds-ind"><div class="ds-ind-tx"><span>Activos bajo administración</span><b>$125.000.000</b></div><div class="ds-ind-var"><b>1%</b><span class="ds-tend"><img src="assets/dash/tend-sube.svg" width="16" height="16" alt=""></span></div></article>
+              <article class="ds-ind"><div class="ds-ind-tx"><span>Activos bajo administración</span><b>$125.000.000</b></div><div class="ds-ind-var"><b>1%</b><span class="ds-tend ds-tt"><button type="button" class="ds-tt-btn" aria-describedby="ds-tt-4"><img src="assets/dash/tend-sube.svg" width="16" height="16" alt="Variación"></button><span class="ds-tt-box" role="tooltip" id="ds-tt-4">% con respecto al mes anterior</span></span></div></article>
               <article class="ds-card ds-dist">
                 <h3>Distribución de tus clientes totales</h3>
                 <div class="ds-dist-b">
-                  <div class="ds-dona" role="img" aria-label="82 % Plan de retiro y Cesantías, 15 % Ahorro e inversión, 3 % Seguros"></div>
+                  <div class="ds-dona" role="img" aria-label="82 % Pensiones y Cesantías, 15 % Ahorro Voluntario e inversión, 3 % Seguros"></div>
                   <ul class="ds-ley">
-                    <li><i style="background:#0099DE"></i><b>82%</b> Plan de retiro y Cesantías</li>
-                    <li><i style="background:#1DD64C"></i><b>15%</b> Ahorro e inversión</li>
+                    <li><i style="background:#0099DE"></i><b>82%</b> Pensiones y Cesantías</li>
+                    <li><i style="background:#1DD64C"></i><b>15%</b> Ahorro Voluntario e inversión</li>
                     <li><i style="background:#4AE6C3"></i><b>3%</b> Seguros</li>
                   </ul>
                 </div>
@@ -1677,7 +1746,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             </div>
             <article class="ds-card ds-com">
               <div class="ds-com-h"><div><h3>Tus comisiones</h3><b>$25.000.000</b></div><a href="#" class="ds-link">Ir a comisiones</a></div>
-              <svg class="ds-linea" viewBox="0 0 400 120" preserveAspectRatio="none" role="img" aria-label="Comisiones de enero a diciembre: la más baja en octubre y la más alta en diciembre"><polyline points="0.0,47.0 36.4,57.8 72.7,51.4 109.1,44.9 145.5,46.0 181.8,47.0 218.2,49.2 254.5,51.4 290.9,55.7 327.3,90.2 363.6,73.0 400.0,10.3" fill="none" stroke="#A1DD70" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>
+              <div class="ds-graf"><svg class="ds-linea" viewBox="0 0 400 120" preserveAspectRatio="none" role="img" aria-label="Comisiones de enero a diciembre: la más baja en octubre y la más alta en diciembre"><polyline points="16.7,47.0 50.0,57.8 83.3,51.4 116.7,44.9 150.0,46.0 183.3,47.0 216.7,49.2 250.0,51.4 283.3,55.7 316.7,90.2 350.0,73.0 383.3,10.3" fill="none" stroke="#A1DD70" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg><div class="ds-pts"><button type="button" class="ds-pt izq" style="left:4.167%;top:39.2%" aria-label="Enero: $2.250.000"><span class="ds-pt-tt" aria-hidden="true"><b>Enero</b>$2.250.000</span></button><button type="button" class="ds-pt" style="left:12.5%;top:48.2%" aria-label="Febrero: $1.890.000"><span class="ds-pt-tt" aria-hidden="true"><b>Febrero</b>$1.890.000</span></button><button type="button" class="ds-pt" style="left:20.833%;top:42.8%" aria-label="Marzo: $2.100.000"><span class="ds-pt-tt" aria-hidden="true"><b>Marzo</b>$2.100.000</span></button><button type="button" class="ds-pt" style="left:29.167%;top:37.4%" aria-label="Abril: $2.320.000"><span class="ds-pt-tt" aria-hidden="true"><b>Abril</b>$2.320.000</span></button><button type="button" class="ds-pt" style="left:37.5%;top:38.3%" aria-label="Mayo: $2.290.000"><span class="ds-pt-tt" aria-hidden="true"><b>Mayo</b>$2.290.000</span></button><button type="button" class="ds-pt" style="left:45.833%;top:39.2%" aria-label="Junio: $2.250.000"><span class="ds-pt-tt" aria-hidden="true"><b>Junio</b>$2.250.000</span></button><button type="button" class="ds-pt" style="left:54.167%;top:41.0%" aria-label="Julio: $2.180.000"><span class="ds-pt-tt" aria-hidden="true"><b>Julio</b>$2.180.000</span></button><button type="button" class="ds-pt" style="left:62.5%;top:42.8%" aria-label="Agosto: $2.100.000"><span class="ds-pt-tt" aria-hidden="true"><b>Agosto</b>$2.100.000</span></button><button type="button" class="ds-pt" style="left:70.833%;top:46.4%" aria-label="Septiembre: $1.960.000"><span class="ds-pt-tt" aria-hidden="true"><b>Septiembre</b>$1.960.000</span></button><button type="button" class="ds-pt" style="left:79.167%;top:75.2%" aria-label="Octubre: $800.000"><span class="ds-pt-tt" aria-hidden="true"><b>Octubre</b>$800.000</span></button><button type="button" class="ds-pt" style="left:87.5%;top:60.8%" aria-label="Noviembre: $1.380.000"><span class="ds-pt-tt" aria-hidden="true"><b>Noviembre</b>$1.380.000</span></button><button type="button" class="ds-pt der" style="left:95.833%;top:8.6%" aria-label="Diciembre: $3.480.000"><span class="ds-pt-tt" aria-hidden="true"><b>Diciembre</b>$3.480.000</span></button></div></div>
               <div class="ds-meses"><span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dic</span></div>
               <div class="ds-escala"><span>K: Miles</span><span>M: Millones</span></div>
             </article>
@@ -1726,7 +1795,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="card-h">
         <div class="circ" style="background:var(--green-soft)"><svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><!-- Chart-mixed (librería) --><path fill="#1DD64C" d="M19.42 14.3958C19.0333 14.6966 18.4747 14.6966 18.088 14.3958L13.1895 10.099L6.61532 14.4388C6.14267 14.7826 5.49814 14.6537 5.19735 14.181C4.8536 13.7083 4.98251 13.0638 5.45517 12.7201L12.6739 7.95053C13.0606 7.69271 13.5763 7.69271 13.92 7.99349L18.7755 12.2474L25.3067 6.61849C25.7364 6.27474 26.3809 6.31771 26.7677 6.7474C27.1114 7.17709 27.0684 7.82162 26.6388 8.20834L19.42 14.3958ZM15.338 16.6732V23.5482C15.338 24.7083 14.3927 25.6107 13.2755 25.6107C12.1153 25.6107 11.213 24.7083 11.213 23.5482V16.6732C11.213 15.556 12.1153 14.6107 13.2755 14.6107C14.3927 14.6107 15.338 15.556 15.338 16.6732ZM13.6192 23.5482V16.6732C13.6192 16.5013 13.4474 16.3294 13.2755 16.3294C13.0606 16.3294 12.9317 16.5013 12.9317 16.6732V23.5482C12.9317 23.763 13.0606 23.8919 13.2755 23.8919C13.4474 23.8919 13.6192 23.763 13.6192 23.5482ZM9.83798 20.7982V23.5482C9.83798 24.7083 8.89267 25.6107 7.77548 25.6107C6.61532 25.6107 5.71298 24.7083 5.71298 23.5482V20.7982C5.71298 19.681 6.61532 18.7357 7.77548 18.7357C8.89267 18.7357 9.83798 19.681 9.83798 20.7982ZM8.11923 23.5482V20.7982C8.11923 20.6263 7.94735 20.4544 7.77548 20.4544C7.56064 20.4544 7.43173 20.6263 7.43173 20.7982V23.5482C7.43173 23.763 7.56064 23.8919 7.77548 23.8919C7.94735 23.8919 8.11923 23.763 8.11923 23.5482ZM16.713 19.4232C16.713 18.306 17.6153 17.3607 18.7755 17.3607C19.8927 17.3607 20.838 18.306 20.838 19.4232V23.5482C20.838 24.7083 19.8927 25.6107 18.7755 25.6107C17.6153 25.6107 16.713 24.7083 16.713 23.5482V19.4232ZM18.7755 19.0794C18.5606 19.0794 18.4317 19.2513 18.4317 19.4232V23.5482C18.4317 23.763 18.5606 23.8919 18.7755 23.8919C18.9474 23.8919 19.1192 23.763 19.1192 23.5482V19.4232C19.1192 19.2513 18.9474 19.0794 18.7755 19.0794ZM26.338 16.6732V23.5482C26.338 24.7083 25.3927 25.6107 24.2755 25.6107C23.1153 25.6107 22.213 24.7083 22.213 23.5482V16.6732C22.213 15.556 23.1153 14.6107 24.2755 14.6107C25.3927 14.6107 26.338 15.556 26.338 16.6732ZM24.6192 23.5482V16.6732C24.6192 16.5013 24.4474 16.3294 24.2755 16.3294C24.0606 16.3294 23.9317 16.5013 23.9317 16.6732V23.5482C23.9317 23.763 24.0606 23.8919 24.2755 23.8919C24.4474 23.8919 24.6192 23.763 24.6192 23.5482Z"/></svg></div>
           <div>
-        <div class="lbl">Ahorro e inversión</div>
+        <div class="lbl">Ahorro Voluntario e inversión</div>
         <div class="val">$53.156.957 <span class="trend" style="background:#FDECEC"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#E5383B" stroke-width="1.5"><path d="M1 4l3 3 2-2 5 4"/><path d="M8 9h3V6"/></svg></span></div>
           </div>
         </div>
@@ -1740,7 +1809,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="card-h">
         <div class="circ" style="background:#E6F4FB"><svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><!-- Piggy-bank (librería) --><path fill="#0099DE" d="M12.0469 9.21094C11.5312 9.03906 11.2305 8.4375 11.4453 7.92188C12.0039 6.24609 13.6367 5 15.5273 5C17.375 5 19.0078 6.24609 19.6094 7.92188C19.7812 8.4375 19.4805 9.03906 18.9648 9.21094C18.4062 9.42578 17.8477 9.125 17.6328 8.60938C17.332 7.70703 16.5156 7.0625 15.5273 7.0625C14.5391 7.0625 13.6797 7.70703 13.3789 8.60938C13.1641 9.125 12.6055 9.42578 12.0469 9.21094ZM20.8125 16.3438C20.8125 15.7852 21.2422 15.3125 21.8438 15.3125C22.4023 15.3125 22.875 15.7852 22.875 16.3438C22.875 16.9453 22.4023 17.375 21.8438 17.375C21.2422 17.375 20.8125 16.9453 20.8125 16.3438ZM13.25 10.5H19.7812C20.5547 9.68359 21.6289 9.125 22.875 9.125H23.6055C24.25 9.125 24.7656 9.76953 24.5938 10.4141L24.25 11.875C25.1523 12.6055 25.9258 13.5508 26.3984 14.625H27C27.7305 14.625 28.375 15.2695 28.375 16V20.125C28.375 20.8984 27.7305 21.5 27 21.5H25.625C25.0664 22.2734 24.3359 22.875 23.5625 23.3477V24.9375C23.5625 26.0977 22.6172 27 21.5 27H19.4375C18.2773 27 17.375 26.0977 17.375 24.9375V24.25H15.3125V24.9375C15.3125 26.0977 14.3672 27 13.25 27H11.1875C10.0273 27 9.125 26.0977 9.125 24.9375V22.875C7.49219 21.7148 6.46094 19.8242 6.375 17.7188C4.78516 17.5039 3.625 16.1719 3.625 14.582C3.625 13.3789 4.26953 12.3047 5.34375 11.7461L5.55859 11.6602C6.07422 11.4023 6.67578 11.6172 6.93359 12.1328C7.19141 12.6484 6.97656 13.25 6.46094 13.5078L6.28906 13.5938C5.90234 13.8086 5.6875 14.1523 5.6875 14.582C5.6875 15.1406 6.07422 15.5703 6.58984 15.6562C7.36328 12.6914 10.0273 10.5 13.25 10.5ZM13.25 12.5625C10.5859 12.5625 8.4375 14.7539 8.4375 17.375C8.4375 18.9648 9.16797 20.3828 10.3281 21.2422C10.8438 21.6289 11.1875 22.2305 11.1875 22.875V24.9375H13.25V24.25C13.25 23.1328 14.1523 22.1875 15.3125 22.1875H17.375C18.4922 22.1875 19.4375 23.1328 19.4375 24.25V24.9375H21.5V23.3477C21.5 22.6172 21.8867 21.9297 22.4883 21.543C23.0898 21.2422 23.5625 20.8125 23.9492 20.2969C24.3359 19.7812 24.9375 19.4375 25.625 19.4375H26.3125V16.6875C25.5391 16.6445 24.8086 16.1719 24.5078 15.4844C24.1641 14.7109 23.6484 14.0234 23.0039 13.5508C22.3164 13.0352 22.0156 12.2188 22.2305 11.4023L22.2734 11.3164C21.8867 11.4023 21.5859 11.6172 21.3281 11.875C20.9414 12.3477 20.3828 12.5625 19.7812 12.5625H13.25Z"/></svg></div>
           <div>
-        <div class="lbl">Plan de retiro y Cesantías</div>
+        <div class="lbl">Pensiones y Cesantías</div>
         <div class="val">$293.743.152 <span class="trend" style="background:var(--green-soft)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#00C73D" stroke-width="1.5"><path d="M1 9l3-3 2 2 5-5"/><path d="M8 3h3v3"/></svg></span></div>
           </div>
         </div>
@@ -1837,7 +1906,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="acc">
           <div class="acc-h">
             <span class="circ"><svg class="ico" viewBox="0 0 24 24"><path d="M3 10l5-4 4 3 6-5"/><path d="M15 4h3v3"/><rect x="4" y="15" width="3" height="5"/><rect x="10" y="13" width="3" height="7"/><rect x="16" y="14" width="3" height="6"/></svg></span>
-            Ahorro e inversión
+            Ahorro Voluntario e inversión
             <svg class="chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6"><path d="M6.5 1.5L3 5l3.5 3.5"/></svg>
           </div>
           <div class="prod prod-click">
@@ -1859,10 +1928,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       <aside class="monitor">
         <div class="mon-h"><h2>Monitor Contigo</h2><a href="#" class="mon-ir" aria-label="Ir a Monitor Contigo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></div>
         <p>Encuentra la composición de inversiones y todo sobre los portafolios de tu cliente.</p>
-        <div class="donut" role="img" aria-label="Composición: 82% Plan de retiro y Cesantías, 15% Ahorro e inversión, 3% Seguros"></div>
+        <div class="donut" role="img" aria-label="Composición: 82% Pensiones y Cesantías, 15% Ahorro Voluntario e inversión, 3% Seguros"></div>
         <ul class="legend">
-          <li><i style="background:var(--blue)"></i><b>82%</b> Plan de retiro y Cesantías</li>
-          <li><i style="background:#1FD655"></i><b>15%</b> Ahorro e inversión</li>
+          <li><i style="background:var(--blue)"></i><b>82%</b> Pensiones y Cesantías</li>
+          <li><i style="background:#1FD655"></i><b>15%</b> Ahorro Voluntario e inversión</li>
           <li><i style="background:#55E6C4"></i><b>3%</b> Seguros</li>
         </ul>
         <button class="mbtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/><path d="M17 8h3v3"/></svg>Monitor Contigo</button>
@@ -2768,6 +2837,77 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Estado inicial: dashboard, salvo que en esta sesión se estuviera viendo la ficha
   let v='dash'; try{ v=sessionStorage.getItem(K)||'dash'; }catch(e){}
   if(v==='dash') irInicio(); else irFicha();
+});
+</script>
+<script>
+// Logros: selector de mes (solo un mes; los meses que aún no han cerrado no se pueden elegir). Datos de ejemplo por mes
+document.addEventListener('DOMContentLoaded',()=>{
+  const caja=document.querySelector('.ds-mes'); if(!caja) return;
+  const btn=caja.querySelector('.ds-lg-tab'), pop=caja.querySelector('.ds-mp'), grid=pop.querySelector('.ds-mp-grid');
+  const anioTx=pop.querySelector('#ds-mp-anio'), txt=document.getElementById('ds-mes-txt'), dash=document.getElementById('dash');
+  const CORTOS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const LARGOS=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const HOY=new Date(2026,10,13), MIN_ANIO=2024;
+  const ULT={a:HOY.getFullYear(), m:HOY.getMonth()-1}; // último mes cerrado: octubre 2026
+  let sel={...ULT}, vista=sel.a, ase=-1;
+  // Indicadores: valores base (octubre 2026)
+  const inds=[...dash.querySelectorAll('.ds-ind')].map(el=>{ const v=el.querySelector('.ds-ind-tx b'), p=el.querySelector('.ds-ind-var b');
+    return {v,p,base:Number(v.textContent.replace(/\D/g,'')),pb:parseFloat(p.textContent)}; });
+  const pesos=n=>'$'+Math.round(n).toLocaleString('es-CO');
+  function datos(a,m){
+    const k=(a-ULT.a)*12+(m-ULT.m);
+    inds.forEach((d,i)=>{ const fa=ase<0?1:0.18+0.05*((ase*37+i*11)%7); const f=(1+0.06*Math.sin(k*1.3+i)+0.01*k)*fa; d.v.textContent=pesos(Math.round(d.base*f/100000)*100000);
+      const pc=(k===0&&ase<0)?d.pb:Math.round(d.pb+2*Math.sin(k*0.9+i*2+(ase+1)*1.7)); d.p.textContent=pc+'%'; });
+    dash.classList.remove('actualiza'); void dash.offsetWidth; dash.classList.add('actualiza');
+  }
+  const futuro=(a,m)=>a>ULT.a||(a===ULT.a&&m>ULT.m);
+  function pintar(){
+    anioTx.textContent=vista;
+    pop.querySelector('[data-anio="1"]').disabled=vista>=ULT.a;
+    pop.querySelector('[data-anio="-1"]').disabled=vista<=MIN_ANIO;
+    grid.innerHTML=CORTOS.map((c,m)=>{ const on=sel.a===vista&&sel.m===m;
+      return '<button type="button" role="radio" data-m="'+m+'" aria-checked="'+on+'" tabindex="'+(on?0:-1)+'"'+(futuro(vista,m)?' disabled':'')+' aria-label="'+LARGOS[m]+' '+vista+'"><span>'+c+'</span></button>'; }).join('');
+    if(!grid.querySelector('[tabindex="0"]')){ const b=grid.querySelector('button:not(:disabled)'); if(b) b.tabIndex=0; }
+  }
+  function abrir(){ vista=sel.a; pintar(); pop.hidden=false; btn.setAttribute('aria-expanded','true'); (grid.querySelector('[tabindex="0"]')||grid.querySelector('button')).focus(); }
+  function cerrar(foco){ pop.hidden=true; btn.setAttribute('aria-expanded','false'); if(foco) btn.focus(); }
+  btn.addEventListener('click',()=>pop.hidden?abrir():cerrar(false));
+  pop.querySelectorAll('[data-anio]').forEach(b=>b.addEventListener('click',()=>{ vista+=Number(b.dataset.anio); pintar(); }));
+  grid.addEventListener('click',e=>{ const b=e.target.closest('button[data-m]'); if(!b||b.disabled) return;
+    sel={a:vista,m:Number(b.dataset.m)}; txt.textContent=LARGOS[sel.m]+' '+sel.a; datos(sel.a,sel.m); cerrar(true); });
+  grid.addEventListener('keydown',e=>{
+    const bs=[...grid.querySelectorAll('button')], i=bs.indexOf(document.activeElement); if(i<0) return;
+    const d={ArrowRight:1,ArrowLeft:-1,ArrowDown:4,ArrowUp:-4}[e.key]; if(!d) return; e.preventDefault();
+    let j=i+d; while(j>=0&&j<bs.length&&bs[j].disabled) j+=d>0?1:-1;
+    if(j>=0&&j<bs.length){ bs.forEach(x=>x.tabIndex=-1); bs[j].tabIndex=0; bs[j].focus(); }
+  });
+  pop.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.preventDefault(); cerrar(true); } });
+  window.dsAsesor=i=>{ ase=i; datos(sel.a,sel.m); };
+  document.addEventListener('click',e=>{ if(!pop.hidden&&!caja.contains(e.target)) cerrar(false); });
+});
+</script>
+<script>
+// Logros: selector de asesor (listbox). Elegir un asesor filtra los indicadores (datos de ejemplo)
+document.addEventListener('DOMContentLoaded',()=>{
+  const w=document.querySelector('.ds-selw'); if(!w) return;
+  const btn=w.querySelector('.ds-sel'), tx=w.querySelector('.ds-sel-tx'), lista=w.querySelector('.ds-ops'), ops=[...lista.querySelectorAll('li')];
+  let act=-1, sel=-1;
+  function marcar(i){ act=i; ops.forEach((o,k)=>o.classList.toggle('activo',k===i)); if(i>=0){ lista.setAttribute('aria-activedescendant',ops[i].id); ops[i].scrollIntoView({block:'nearest'}); } }
+  function abrir(){ lista.hidden=false; btn.setAttribute('aria-expanded','true'); marcar(sel>=0?sel:0); lista.focus(); }
+  function cerrar(foco){ lista.hidden=true; btn.setAttribute('aria-expanded','false'); marcar(-1); if(foco) btn.focus(); }
+  function elegir(i){ sel=i; ops.forEach((o,k)=>o.setAttribute('aria-selected',String(k===i))); tx.textContent=ops[i].textContent; tx.classList.remove('vacio'); cerrar(true); if(window.dsAsesor) window.dsAsesor(i); }
+  btn.addEventListener('click',()=>lista.hidden?abrir():cerrar(false));
+  btn.addEventListener('keydown',e=>{ if((e.key==='ArrowDown'||e.key==='ArrowUp')&&lista.hidden){ e.preventDefault(); abrir(); } });
+  ops.forEach((o,i)=>{ o.addEventListener('click',()=>elegir(i)); o.addEventListener('mousemove',()=>marcar(i)); });
+  lista.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){ e.preventDefault(); marcar(Math.min(act+1,ops.length-1)); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); marcar(Math.max(act-1,0)); }
+    else if(e.key==='Home'){ e.preventDefault(); marcar(0); }
+    else if(e.key==='End'){ e.preventDefault(); marcar(ops.length-1); }
+    else if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(act>=0) elegir(act); }
+    else if(e.key==='Escape'||e.key==='Tab'){ if(e.key==='Escape') e.preventDefault(); cerrar(e.key==='Escape'); }
+  });
+  document.addEventListener('click',e=>{ if(!lista.hidden&&!w.contains(e.target)) cerrar(false); });
 });
 </script>
 </body>
