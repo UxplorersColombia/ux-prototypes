@@ -444,7 +444,7 @@
     .kpis.ampliado .card .subs{display:flex;flex-wrap:wrap;margin-top:4px}
     .kpis.ampliado .card{align-items:stretch}
     .tabs{flex-direction:column;gap:12px;overflow:visible;margin-top:28px;font-size:15px}
-    .tabs .tab,.tabs .tab.on{font-family:'Open Sans',sans-serif;font-size:14px;font-weight:700;flex:none;width:100%;height:auto;justify-content:flex-start;gap:16px;padding:16px 18px;border-radius:8px;background:#fff;border:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.04);color:var(--ink-2)}
+    .tabs .tab,.tabs .tab.on{font-family:'Open Sans',sans-serif;font-size:14px;font-weight:700;flex:none;width:100%;height:48px;justify-content:center;align-items:center;align-self:stretch;gap:12px;padding:8px;border-radius:8px;background:var(--Secondary-Neutral-00,#FFF);border:0;box-shadow:0 0 4px 0 rgba(68,68,68,.15);color:var(--ink-2)}
     .tab .ico,.tab.on .ico{stroke:var(--ink-2)}
     .tab.on .ico .f{fill:none}
     .tab.on .ico .d{stroke:var(--ink-2)}
@@ -455,6 +455,77 @@
   }
 
 
+
+  /* ===== Móvil: navegación por niveles (cliente > sección > producto > sección del producto) =====
+     La flecha + nombre del cliente y la cabecera de datos se quedan fijas; la sección actual va debajo */
+  .m-seccion,.pf-dots{display:none}
+  @media (max-width:600px){
+    /* Barra de sección (ruta + título) oculta por ahora a pedido de Isa; el código queda listo para retomarla */
+    .m-seccion:not([hidden]){display:none;margin-top:20px}
+    .m-ruta{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;margin-bottom:2px;font-family:'Open Sans',sans-serif;font-size:12px;line-height:18px;color:var(--muted)}
+    .m-ruta:empty{display:none}
+    .m-ruta a{color:var(--blue);text-decoration:underline;font-weight:600}
+    .m-ruta .sep{color:var(--muted)}
+    .m-sec-tit{margin:0;font-family:Montserrat,sans-serif;font-size:18px;line-height:26px;font-weight:700;color:var(--ink)}
+    body.m-detalle .panel:not([hidden]){margin-top:16px}
+    body.vista-producto .v-producto{margin-top:16px}
+    /* Tarjetas del producto en carrusel */
+    .pf-cards{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 -16px;padding:4px 16px 8px}
+    .pf-cards::-webkit-scrollbar{display:none}
+    .pf-cards>.pf-card{flex:0 0 calc(100% - 20px);scroll-snap-align:center}
+    .pf-dots{display:flex;justify-content:center;gap:8px;margin-top:8px}
+    .pf-dots i{width:10px;height:10px;border-radius:50%;background:#ddd;transition:background-color .2s}
+    .pf-dots i.on{background:var(--green)}
+    /* Secciones del producto como filas (igual que las secciones de la ficha del cliente) */
+    .pf-tabs{flex-direction:column;gap:12px;overflow:visible;margin-top:24px}
+    .pf-tab,.pf-tab.on{flex:none;width:100%;height:48px;justify-content:center;align-items:center;align-self:stretch;gap:12px;padding:8px;border:0;border-radius:8px;background:var(--Secondary-Neutral-00,#FFF);box-shadow:0 0 4px 0 rgba(68,68,68,.15);font-family:'Open Sans',sans-serif;font-size:14px;font-weight:700;color:var(--ink-2)}
+    .pf-tab svg,.pf-tab.on svg{stroke:var(--ink-2)}
+    .pf-tab:not(.on):hover{color:var(--ink-2)}
+    .pf-tab:not(.on):hover svg{stroke:var(--ink-2)}
+    .pf-tab::after{content:"";margin-left:auto;width:18px;height:18px;flex:none;background:var(--green);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center/contain no-repeat}
+    body.vista-producto:not(.m-pf-sec) .pf-panel{display:none!important}
+    /* Pantalla de una sección del producto: solo su contenido */
+    body.m-pf-sec .pf-cards,body.m-pf-sec .pf-dots,body.m-pf-sec .pf-tabs{display:none!important}
+    body.m-pf-sec .pf-panel{border-radius:16px;padding:0;box-shadow:none;background:transparent}
+    .pf-seg{display:flex}
+    .pf-seg button{flex:1}
+    body.modo-mision .m-ruta a{color:#7cc7f0}
+  }
+
+  /* ===== Móvil: Productos como en Contigo (Ir a Pipeline, Monitor compacto arriba, categorías, disclaimer) ===== */
+  .m-pipe,.m-legal,.mon-ir{display:none}
+  .mon-h{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  @media (max-width:600px){
+    #p-productos{gap:16px}
+    #p-productos .m-pipe{display:flex;justify-content:flex-end;order:-2}
+    #p-productos .m-pipe .pf-pipeline,.pf-principal .pf-pipeline{width:100%;align-self:stretch;font-size:14px;padding:8px 18px}
+    #p-productos .monitor{order:-1;border-radius:16px;padding:20px}
+    #p-productos .monitor h2{font-size:18px;font-weight:700}
+    #p-productos .monitor p{font-size:14px;line-height:22px;margin-top:8px}
+    #p-productos .monitor .donut,#p-productos .monitor .legend,#p-productos .monitor .mbtn{display:none}
+    #p-productos .mon-ir{display:flex;flex:none;width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;align-items:center;justify-content:center}
+    #p-productos .m-legal{display:block;margin:8px 0 0;font-family:'Open Sans',sans-serif;font-size:11px;line-height:17px;color:#878787;text-align:justify}
+    body.modo-mision #p-productos .m-legal{color:#b5b9bc}
+  }
+
+  /* ===== Móvil: fila del producto sin línea verde; nombre, contrato y tag uno debajo del otro ===== */
+  @media (max-width:600px){
+    .prod,.prod.prod-click{border-left:0;margin:8px 0 0;padding:12px 8px;border-radius:8px}
+    .prod .t,.prod.prod-click .t{display:grid;grid-template-columns:1fr;align-items:center;gap:6px 8px}
+    .prod .t .prod-abrir:not(.prod-chev){grid-column:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+    .prod .t .ed{font-size:11px;line-height:14px}
+    .prod .t .nom{font-size:14px;line-height:20px;font-weight:700}
+    .prod .t .n{font-size:13px;line-height:18px;color:var(--ink-2)}
+    .prod .t .n-sep{display:none}
+    .prod .t .prod-tag{grid-column:1;justify-self:start;margin-top:4px}
+    /* Flecha junto al nombre del producto */
+    .prod .t .prod-chev{display:none}
+    .prod .t .nom::after{content:"";display:inline-block;width:14px;height:14px;margin-left:6px;vertical-align:-2px;background:var(--green);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center/contain no-repeat;transition:transform .15s}
+    .prod.prod-click:hover .nom::after{transform:translateX(3px)}
+    .prod .d{flex-direction:column;align-items:flex-start;gap:2px;margin-top:10px;font-size:12px;line-height:18px}
+    .prod .d .d-sep{display:none}
+    .prod .d a{margin-top:6px}
+  }
   /* ===== Retiros en curso, móvil — igual a Portal Clientes (tarjeta flotante + hoja inferior) ===== */
   .m-wallet{display:none}
   @media (max-width:600px){
@@ -545,10 +616,11 @@
   @media (max-width:600px){.cop-otras{grid-template-columns:1fr}}
   /* Móvil: cada pestaña abre como una pantalla aparte (sin saldos ni lista de pestañas), como en Contigo móvil */
   @media (max-width:600px){
-    body.m-detalle .idbar,body.m-detalle .saldos,body.m-detalle .tabs,body.m-detalle .retiros{display:none!important}
+    body.m-detalle .saldos,body.m-detalle .tabs,body.m-detalle .retiros{display:none!important}
     body.m-detalle .panel:not([hidden]){display:grid;grid-template-columns:1fr;margin-top:20px}
     body.m-detalle .panel.panel-cop:not([hidden]){display:flex;padding:20px 16px 28px;border-radius:16px}
-    body.m-detalle .m-nombre{font-size:16px}
+    /* Sin contenedor blanco general: las tarjetas van directo sobre el fondo */
+    body.m-detalle .panel:not(.panel-cop){padding:0;background:transparent;box-shadow:none;border-radius:0;min-height:0}
     .panel-cop .cop-h{flex-wrap:wrap;gap:14px}
     .panel-cop .cop-hud{flex-direction:column;align-items:flex-start;gap:4px;padding-left:22px}
     .panel-cop .cop-hud>span,.panel-cop .cop-hud>span:first-child{padding:0;border-left:0}
@@ -1373,6 +1445,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <span class="meta"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>3044444444</span>
       <span class="meta"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 6l9 7 9-7"/></svg>oschernandez@gmail.com</span>
     </div>
+    <div class="m-seccion" id="m-seccion" hidden><nav class="m-ruta" aria-label="Ruta"></nav><h2 class="m-sec-tit"></h2></div>
 
     <!-- KPIs -->
 
@@ -1495,6 +1568,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <p>Contenido de esta pestaña en construcción.</p>
     </section>
     <section class="panel" id="p-productos" data-panel-id="productos">
+      <div class="m-pipe"><button type="button" class="pf-pipeline">Ir a Pipeline</button></div>
       <div>
         <div class="acc">
           <div class="acc-h">
@@ -1503,9 +1577,9 @@ document.addEventListener('DOMContentLoaded',()=>{
             <svg class="chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6"><path d="M6.5 1.5L3 5l3.5 3.5"/></svg>
           </div>
           <div class="prod prod-click">
-            <div class="t"><button type="button" class="prod-abrir" data-abre-producto aria-label="Ver ficha del producto Potencializar mi inversión, contrato #100000063061"><span class="ed">-ED</span>Potencializar mi inversión <span class="n">| #100000063061</span></button><span class="prod-tag">Skandia Capital + Seguros</span>
+            <div class="t"><button type="button" class="prod-abrir" data-abre-producto aria-label="Ver ficha del producto Potencializar mi inversión, contrato #100000063061"><span class="ed">-ED</span><span class="nom">Potencializar mi inversión</span> <span class="n"><span class="n-sep">| </span>#100000063061</span></button><span class="prod-tag">Skandia Capital + Seguros</span>
               <button type="button" class="prod-abrir prod-chev" data-abre-producto aria-label="Ver ficha del producto"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6" style="margin-left:8px"><path d="M3 1.5L6.5 5 3 8.5"/></svg></button></div>
-            <div class="d">Fondo Voluntario de Pensión Skandia Multifund | Saldo Total: <b>$52.732.191</b>
+            <div class="d"><span class="d-fondo">Fondo Voluntario de Pensión Skandia Multifund</span><span class="d-sep">|</span><span>Saldo Total: <b>$52.732.191</b></span>
               <a href="#"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="#0099DE" stroke-width="1.4"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>Más</a></div>
           </div>
         </div>
@@ -1519,7 +1593,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       </div>
 
       <aside class="monitor">
-        <h2>Monitor Contigo</h2>
+        <div class="mon-h"><h2>Monitor Contigo</h2><a href="#" class="mon-ir" aria-label="Ir a Monitor Contigo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></div>
         <p>Encuentra la composición de inversiones y todo sobre los portafolios de tu cliente.</p>
         <div class="donut" role="img" aria-label="Composición: 82% Plan de retiro y Cesantías, 15% Ahorro e inversión, 3% Seguros"></div>
         <ul class="legend">
@@ -1529,6 +1603,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         </ul>
         <button class="mbtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 6-6"/><path d="M17 8h3v3"/></svg>Monitor Contigo</button>
       </aside>
+      <p class="m-legal">El contenido de este mensaje no constituye una recomendación profesional para realizar inversiones, en los términos del artículo 2.40.1.1.2 del Decreto 2555 de 2010. El contenido enviado es descriptivo del comportamiento histórico de portafolios y/o índices y no es material promocional. La rentabilidad pasada no es indicativa de futuros resultados. Recuerde que usted tiene el derecho a recibir una recomendación profesional que tenga en cuenta su perfil de cliente y la conveniencia de los productos.</p>
     </section>
 
     <!-- Ficha del producto: Potencializar mi inversión (#100000063061) -->
@@ -1542,7 +1617,7 @@ document.addEventListener('DOMContentLoaded',()=>{
               <a href="#" class="pf-retiro">Saldo para retiro: $52.732.191</a>
               <p class="pf-meta">Saldo total <i aria-hidden="true"></i> Contrato #100000063061</p>
             </div>
-            <button type="button" class="pf-pipeline">Ir a pipeline</button>
+            <button type="button" class="pf-pipeline">Ir a Pipeline</button>
           </div>
           <p class="pf-admin">Administrado por Skandia Pensiones y Cesantías S.A.</p>
         </article>
@@ -1569,6 +1644,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         </article>
       </div>
 
+      <div class="pf-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
       <div class="pf-tabs" role="tablist" aria-label="Secciones del producto"><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="comportamiento"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 6-6"/></svg>Comportamiento</button><button type="button" class="pf-tab on" role="tab" aria-selected="true" data-pf="composicion"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>Composición y saldos</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="movimientos"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/><path d="M16 16h5v5"/></svg>Movimientos</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="detalles"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 13h.01M12 13h.01M16 13h.01"/></svg>Detalles</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="cuentas"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>Cuentas y débito</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="actividad"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Actividad</button></div>
       <div class="pf-panel" data-pf-panel="composicion">
         <div class="pf-caja">
@@ -1890,12 +1966,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   const nombre=document.querySelector('.m-nombre'); let nombreAntes='';
   function abrir(){
     document.body.classList.add('vista-producto'); vista.hidden=false;
-    if(nombre){ nombreAntes=nombre.textContent; nombre.textContent='#100000063061'; }
     scrollTo(0,0);
   }
   function cerrar(){
-    document.body.classList.remove('vista-producto'); vista.hidden=true;
-    if(nombre && nombreAntes) nombre.textContent=nombreAntes;
+    document.body.classList.remove('vista-producto','m-pf-sec'); vista.hidden=true;
     scrollTo(0,0);
   }
   document.querySelectorAll('[data-abre-producto]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); abrir(); }));
@@ -1905,13 +1979,26 @@ document.addEventListener('DOMContentLoaded',()=>{
   }));
   const volver=document.querySelector('.m-volver');
   if(volver) volver.addEventListener('click',e=>{
-    if(document.body.classList.contains('vista-producto')){ e.preventDefault(); e.stopImmediatePropagation(); cerrar(); }
+    const B=document.body.classList;
+    if(B.contains('m-pf-sec')){ e.preventDefault(); e.stopImmediatePropagation(); B.remove('m-pf-sec'); scrollTo(0,0); }
+    else if(B.contains('vista-producto')){ e.preventDefault(); e.stopImmediatePropagation(); cerrar(); }
   },true);
+  // Móvil: cada sección del producto abre como pantalla aparte
+  const mqp=matchMedia('(max-width:600px)');
+  mqp.addEventListener('change',e=>{ if(!e.matches) document.body.classList.remove('m-pf-sec'); });
+  // Carrusel de tarjetas: punto activo
+  const cards=vista.querySelector('.pf-cards'), dots=[...vista.querySelectorAll('.pf-dots i')];
+  if(cards) cards.addEventListener('scroll',()=>{
+    const hijos=[...cards.children], c=cards.scrollLeft+cards.clientWidth/2;
+    let k=0, min=1e9; hijos.forEach((h,i)=>{ const d=Math.abs(h.offsetLeft+h.offsetWidth/2-c); if(d<min){min=d;k=i;} });
+    dots.forEach((d,i)=>d.classList.toggle('on',i===k));
+  },{passive:true});
   // Pestañas del producto
   const ptabs=[...vista.querySelectorAll('.pf-tab')];
   ptabs.forEach(t=>t.addEventListener('click',()=>{
     ptabs.forEach(x=>{ const on=x===t; x.classList.toggle('on',on); x.setAttribute('aria-selected',String(on)); });
     vista.querySelectorAll('[data-pf-panel]').forEach(p=>p.hidden = p.dataset.pfPanel !== (t.dataset.pf==='composicion' ? 'composicion' : 'otros'));
+    if(mqp.matches){ document.body.classList.add('m-pf-sec'); scrollTo(0,0); }
   }));
   // Composición actual / Standing allocation
   vista.querySelectorAll('.pf-seg button').forEach(b=>b.addEventListener('click',()=>{
@@ -2000,12 +2087,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.tabs .tab').forEach(t=>t.addEventListener('click',()=>{
     if(!mq.matches) return;
     document.body.classList.add('m-detalle');
-    if(nombre) nombre.textContent=t.textContent.trim();
     scrollTo(0,0);
   }));
   function salir(){
     document.body.classList.remove('m-detalle','modo-mision');
-    if(nombre) nombre.textContent=original;
     const pr=document.querySelector('.tabs .tab[data-panel="productos"]'); if(pr){ document.querySelectorAll('.tabs .tab').forEach(x=>{x.classList.toggle('on',x===pr);x.setAttribute('aria-selected',String(x===pr));}); }
     scrollTo(0,0);
   }
@@ -2138,7 +2223,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const pr=q('.tabs .tab[data-panel="productos"]');
     document.querySelectorAll('.tabs .tab').forEach(t=>{ t.classList.toggle('on',t===pr); t.setAttribute('aria-selected',String(t===pr)); });
     document.querySelectorAll('[data-panel-id]').forEach(p=>p.hidden=p.dataset.panelId!=='productos');
-    B.remove('modo-mision','saldos-recogidos','vista-producto','m-detalle','dr-open','cop-cargando');
+    B.remove('modo-mision','saldos-recogidos','vista-producto','m-pf-sec','m-detalle','dr-open','cop-cargando');
     document.querySelectorAll('.drawer.show,.veil.show').forEach(el=>el.classList.remove('show'));
     scrollTo(0,0);
   }
@@ -2282,6 +2367,32 @@ document.addEventListener('DOMContentLoaded',()=>{
   c.addEventListener('focusin',stop); c.addEventListener('focusout',play);
   ir(0); play();
 })();
+</script>
+<script>
+// Móvil: barra de sección. Dice en qué parte de la ficha está el asesor; la ruta permite subir de nivel
+document.addEventListener('DOMContentLoaded',()=>{
+  const caja=document.getElementById('m-seccion'); if(!caja) return;
+  const ruta=caja.querySelector('.m-ruta'), tit=caja.querySelector('.m-sec-tit'), B=document.body.classList;
+  const txt=el=>el?el.textContent.replace(/\s+/g,' ').trim():'';
+  const nivel=()=>B.contains('m-pf-sec')?3:B.contains('vista-producto')?2:B.contains('m-detalle')?1:0;
+  function pintar(){
+    const n=nivel(); caja.hidden=n===0; if(n===0) return;
+    const tab=txt(document.querySelector('.tabs .tab.on')), prod='Potencializar mi inversión';
+    const migas=[];
+    if(n>=2) migas.push([tab||'Productos',1]);
+    if(n===3) migas.push([prod,2]);
+    ruta.innerHTML=migas.map(([t,k])=>'<a href="#" data-nivel="'+k+'">'+t+'</a>').join('<span class="sep" aria-hidden="true">›</span>');
+    tit.textContent = n===1 ? tab : n===2 ? prod : txt(document.querySelector('.pf-tab.on'));
+  }
+  ruta.addEventListener('click',e=>{
+    const a=e.target.closest('[data-nivel]'); if(!a) return; e.preventDefault();
+    const v=document.querySelector('.m-volver'), meta=Number(a.dataset.nivel);
+    let g=5; while(nivel()>meta && g--) v.click();
+  });
+  new MutationObserver(pintar).observe(document.body,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('click',()=>setTimeout(pintar,0));
+  pintar();
+});
 </script>
 </body>
 </html>
