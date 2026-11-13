@@ -1,0 +1,172 @@
+/* Landing de marca empleadora (v4). Solo maqueta y decoración propia, escrita con tokens;
+   los controles son componentes sk-*. Estilo tomado del feed de Instagram de Skandia
+   (entregables/vacantes-instagram-estilo-visual.md): papel con grano, piezas de papel con cinta,
+   marcador sobre la palabra clave, recortes en blanco y negro y verde pleno con borde rasgado.
+
+   Movimiento (auditoría design-motion-principles, entregables/vacantes-auditoria-movimiento-v4.md):
+   nada se inclina ni se mueve al pasar el mouse; las piezas inclinadas son decorativas y estáticas.
+   Solo animan el trazo del titular y el sticker (una vez, al entrar en pantalla). */
+
+:root {
+  --motion-rapido: var(--sk-motion-duration-fast, 120ms);
+  --motion-lento: var(--sk-motion-duration-slow, 480ms);
+  --curva: var(--sk-motion-ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
+  --curva-enfasis: var(--sk-motion-ease-emphasized, cubic-bezier(0.16, 1, 0.3, 1));
+  /* Cinta adhesiva: fondo suave de advertencia del catálogo UX, semitransparente */
+  --cinta: color-mix(in srgb, var(--background-warning-light) 85%, transparent);
+}
+
+/* ── Secciones ── */
+.seccion { position: relative; padding-block: var(--sk-space-5xl); }
+.seccion > .contenedor { display: grid; gap: var(--sk-space-2xl); }
+.seccion-verde { background-color: var(--sk-color-primary); color: var(--sk-color-text-inverse);
+  background-image: radial-gradient(color-mix(in srgb, var(--background-black) 10%, transparent) 1px, transparent 0);
+  background-size: 8px 8px; }
+.seccion-verde h2 { color: var(--sk-color-text-inverse); }
+/* Resaltador lima sobre verde: el texto va en negro de marca para mantener contraste */
+.seccion-verde .marcador { color: var(--background-black); }
+.seccion-verde + .seccion-verde { padding-top: 0; }
+.seccion :is(h2, h3, p) { margin: 0; }
+/* Títulos de sección de display (la escala de 24 px se queda corta en una landing editorial) */
+.seccion h2 { font-size: clamp(28px, 3vw, 40px); line-height: 1.15; }
+.seccion:not(.seccion-verde) h2 { color: var(--background-black); }
+.seccion h2 .ligero { font-weight: 300; }
+/* El botón secundario es transparente: sobre verde va en una píldora de superficie */
+.sobre-verde { justify-self: center; background: var(--sk-color-surface); border-radius: var(--bordes-xl); box-shadow: var(--sk-shadow-raised); }
+.seccion-titulo { display: grid; gap: var(--sk-space-s); max-width: 720px; }
+:target { scroll-margin-top: 80px; }
+
+/* Borde superior de papel rasgado: SVG con el color de la sección siguiente */
+.rasgado { display: block; width: 100%; height: 22px; margin-bottom: -1px; fill: var(--sk-color-primary); }
+.rasgado.invertido { transform: scaleY(-1); margin-bottom: 0; margin-top: -1px; }
+
+/* ── Cabecera de la landing: mismos enlaces que el resto del flujo ── */
+.cabecera { position: sticky; top: 0; }
+
+/* ── Hero ── */
+.hero { padding-block: var(--sk-space-3xl) var(--sk-space-5xl); }
+.hero .contenedor { display: grid; gap: var(--sk-space-2xl); align-items: center; }
+@media (min-width: 1024px) { .hero .contenedor { grid-template-columns: 7fr 5fr; gap: var(--sk-space-3xl); } }
+.hero-texto { display: grid; gap: var(--sk-space-l); justify-items: start; }
+.hero-texto p { margin: 0; max-width: 560px; }
+.pildora { display: inline-flex; align-items: center; gap: var(--sk-space-xs); padding: var(--sk-space-xxs) var(--sk-space-s);
+  border-radius: var(--bordes-xl); background: var(--texts-complementary); color: var(--background-black);
+  font: var(--sk-font-weight-bold) 12px/20px var(--sk-font-title); letter-spacing: 0.14em; text-transform: uppercase; }
+.pildora::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sk-color-primary-active); }
+/* Titular de display: el único tamaño fuera de la escala, propio de una landing editorial */
+.titular { margin: 0; font-size: clamp(32px, 4.2vw, 52px); line-height: 1.12; letter-spacing: -0.01em; color: var(--background-black); }
+.titular .ligero { font-weight: 300; }
+.titular .ovalo { font-weight: 900; }
+.hero-dato { color: var(--sk-color-text-muted); }
+
+/* Collage del hero */
+.collage { position: relative; min-height: 420px; display: grid; place-items: center; }
+.collage .circulo { position: absolute; width: min(340px, 80%); aspect-ratio: 1; border-radius: 50%;
+  background: var(--sk-color-primary); left: 4%; top: 8%; }
+.collage .estallido { position: absolute; top: -8px; right: 4%; width: 150px; height: 150px; fill: var(--marca-lima); }
+.recorte { position: relative; z-index: 1; width: min(300px, 72%); aspect-ratio: 3 / 4; margin: 0;
+  border: 6px solid var(--sk-color-surface); border-radius: var(--bordes-m); overflow: hidden;
+  background: var(--sk-color-surface); box-shadow: var(--sk-shadow-raised); transform: rotate(-2deg); }
+.recorte img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.15); display: block; }
+.recorte .cinta { top: -10px; left: 50%; translate: -50% 0; rotate: 3deg; }
+.sticker { position: absolute; z-index: 2; right: 6%; bottom: -6px; width: 108px; height: 108px; border-radius: 50%;
+  background: var(--sk-color-surface); border: 2px solid var(--background-black); box-shadow: var(--sk-shadow-raised); }
+.sticker svg { width: 100%; height: 100%; }
+.sticker text { font: 900 10px var(--sk-font-title); letter-spacing: 0.24em; fill: var(--background-black); }
+.sticker .centro { fill: var(--marca-lima); }
+.flecha-mano { position: absolute; z-index: 2; left: 6%; bottom: 4%; width: 72px; height: 44px; fill: none;
+  stroke: var(--sk-color-primary-active); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 1023.98px) { .collage { min-height: 360px; } .collage .estallido { width: 110px; height: 110px; } }
+
+/* ── Piezas de papel con cinta (decorativas: inclinación estática, sin hover) ── */
+.pieza { position: relative; margin: 0; padding: var(--sk-space-l); display: grid; gap: var(--sk-space-xs); align-content: start;
+  background: var(--sk-color-surface); color: var(--sk-color-text); border: 1px solid var(--sk-color-border);
+  border-radius: var(--bordes-s); box-shadow: var(--sk-shadow-raised); rotate: var(--giro, 0deg); }
+.pieza.suave { background: var(--sk-color-secondary-hover-bg); }
+.pieza.lima { background: var(--marca-lima); color: var(--background-black); }
+.pieza h3 { color: var(--background-black); }
+.cinta { position: absolute; width: 88px; height: 22px; background: var(--cinta); box-shadow: var(--sk-shadow-subtle); pointer-events: none; }
+.pieza > .cinta { top: -11px; left: var(--cinta-x, 24px); rotate: var(--cinta-giro, -3deg); }
+
+/* ── Beneficios: bento 2+2+2 / 3+3 ── */
+.bento { display: grid; gap: var(--sk-space-l); }
+@media (min-width: 768px) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) {
+  .bento { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .bento > :nth-child(-n+3) { grid-column: span 2; }
+  .bento > :nth-child(n+4) { grid-column: span 2; }
+}
+
+/* ── Módulo de vacantes: carpetas rectas (no clicables, sin hover) ── */
+.carpetas { display: grid; gap: var(--sk-space-xl) var(--sk-space-l); }
+@media (min-width: 768px) { .carpetas { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.carpeta-l { display: grid; }
+.pestana { justify-self: start; display: inline-flex; align-items: center; gap: var(--sk-space-xxs);
+  padding: var(--sk-space-xxs) var(--sk-space-m); border-radius: var(--bordes-s) var(--bordes-s) 0 0;
+  background: var(--marca-lima); color: var(--background-black); font: var(--sk-font-weight-bold) 12px/20px var(--sk-font-title);
+  letter-spacing: 0.1em; text-transform: uppercase; }
+.carpeta-cuerpo { display: grid; gap: var(--sk-space-m); padding: var(--sk-space-l); min-height: 140px; align-content: space-between;
+  background: var(--sk-color-surface); color: var(--sk-color-text); border-radius: 0 var(--bordes-s) var(--bordes-s) var(--bordes-s);
+  box-shadow: var(--sk-shadow-overlay); }
+.carpeta-cuerpo h3 { color: var(--background-black); }
+.centrado { justify-self: center; }
+
+/* ── Así somos: CRECE compacto en una fila ── */
+.crece { display: grid; gap: var(--sk-space-l); list-style: none; margin: 0; padding: 0; }
+@media (min-width: 768px) { .crece { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .crece > li { grid-column: span 2; } .crece > li:nth-child(4) { grid-column: 2 / span 2; } }
+@media (min-width: 1024px) { .crece { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .crece > li, .crece > li:nth-child(4) { grid-column: auto; } }
+.crece > li { display: grid; grid-template-columns: auto 1fr; gap: var(--sk-space-xs) var(--sk-space-m); align-items: start; align-content: start; }
+@media (min-width: 768px) { .crece > li { grid-template-columns: 1fr; } }
+.crece-letra { justify-self: start; position: relative; display: inline-block; font: 900 clamp(64px, 7vw, 96px)/0.9 var(--sk-font-title); color: var(--sk-color-primary); }
+.crece-letra svg { position: absolute; left: -4px; right: -4px; bottom: -6px; width: calc(100% + 8px); height: 12px;
+  fill: none; stroke: var(--marca-lima); stroke-width: 5; stroke-linecap: round; }
+.crece-texto { display: grid; gap: var(--sk-space-xs); }
+.crece h3 { font-weight: 300; color: var(--background-black); }
+.crece h3 b { font-weight: 900; color: var(--sk-color-primary-active); }
+.crece .pieza { padding: var(--sk-space-m); }
+
+/* ── Impacto y reconocimientos: etiquetas con alfiler ── */
+.reconocimientos { display: grid; gap: var(--sk-space-xl) var(--sk-space-l); }
+@media (min-width: 768px) { .reconocimientos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .reconocimientos { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.reconocimientos .pieza { padding-top: var(--sk-space-xl); }
+.alfiler { position: absolute; top: -8px; left: var(--sk-space-l); width: 16px; height: 16px; border-radius: 50%;
+  background: var(--sk-color-primary-active); border: 2px solid var(--sk-color-surface); box-shadow: var(--sk-shadow-subtle); }
+.alfiler::after { content: ""; position: absolute; left: 50%; top: 14px; height: 14px; border-left: 1px dashed var(--sk-color-primary-active); }
+.anio { color: var(--sk-color-primary-active); font-weight: var(--sk-font-weight-bold); }
+
+/* ── Actualidad: carrusel de polaroids (reemplazo de sk-carousel de la skill) ── */
+.cabeza-carrusel { display: flex; align-items: end; justify-content: space-between; gap: var(--sk-space-m); }
+.controles { display: flex; gap: var(--sk-space-xs); }
+.carrusel { display: grid; grid-auto-flow: column; grid-auto-columns: min(300px, 78%); gap: var(--sk-space-l);
+  margin: 0; padding: var(--sk-space-m) var(--sk-space-xxs) var(--sk-space-l); list-style: none;
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: thin; }
+.carrusel > li { scroll-snap-align: start; }
+.polaroid { height: 100%; padding: var(--sk-space-s) var(--sk-space-s) var(--sk-space-m); }
+.polaroid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); border-radius: 2px; }
+.polaroid figcaption { font-weight: var(--sk-font-weight-bold); color: var(--background-black); }
+.polaroid > .cinta { left: 50%; translate: -50% 0; }
+
+/* ── Testimonios ── */
+.testimonios { display: grid; gap: var(--sk-space-xl) var(--sk-space-l); align-items: start; }
+@media (min-width: 1024px) { .testimonios { grid-template-columns: 5fr 4fr 3fr; } }
+.testimonios blockquote { margin: 0; font-style: italic; }
+.quien { display: flex; align-items: center; gap: var(--sk-space-s); padding-top: var(--sk-space-s); border-top: 1px dashed var(--sk-color-border); }
+.quien img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; object-position: 50% 25%;
+  border: 2px solid var(--sk-color-surface); box-shadow: var(--sk-shadow-subtle); filter: grayscale(1); }
+.quien p { display: grid; }
+
+/* ── Pie de la landing ── */
+.pie nav { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sk-space-l); }
+.pie a { color: var(--sk-color-text-inverse); }
+
+/* ── Movimiento ── */
+/* Sticker: una sola vuelta lenta cuando entra en pantalla (JS añade .gira). Nada en bucle. */
+.sticker svg { transition: rotate 1.2s var(--curva-enfasis); }
+.sticker.gira svg { rotate: 360deg; }
+@media (prefers-reduced-motion: reduce) {
+  .carrusel { scroll-behavior: auto; }
+  .sticker svg { transition: none; }
+}
