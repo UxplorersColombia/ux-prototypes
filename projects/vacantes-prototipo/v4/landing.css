@@ -25,7 +25,6 @@
 .seccion-verde h2 { color: var(--sk-color-text-inverse); }
 /* Resaltador lima sobre verde: el texto va en negro de marca para mantener contraste */
 .seccion-verde .marcador { color: var(--background-black); }
-.seccion-verde + .seccion-verde { padding-top: 0; }
 .seccion :is(h2, h3, p) { margin: 0; }
 /* Títulos de sección de display (la escala de 24 px se queda corta en una landing editorial) */
 .seccion h2 { font-size: clamp(28px, 3vw, 40px); line-height: 1.15; }
@@ -97,6 +96,14 @@
   .bento > :nth-child(n+4) { grid-column: span 2; }
 }
 
+/* ── Video: marco de recorte estático (sin inclinarse al hover) ── */
+.video-marco { position: relative; max-width: 860px; margin-inline: auto; width: 100%; }
+.video-marco > .cinta { top: -12px; left: 50%; translate: -50% 0; rotate: -2deg; }
+.video-caja { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+  border: 6px solid var(--sk-color-surface); border-radius: var(--bordes-m); background: var(--background-black);
+  box-shadow: var(--sk-shadow-raised); }
+.video-caja iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
 /* ── Módulo de vacantes: carpetas rectas (no clicables, sin hover) ── */
 .carpetas { display: grid; gap: var(--sk-space-xl) var(--sk-space-l); }
 @media (min-width: 768px) { .carpetas { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -136,6 +143,10 @@
   background: var(--sk-color-primary-active); border: 2px solid var(--sk-color-surface); box-shadow: var(--sk-shadow-subtle); }
 .alfiler::after { content: ""; position: absolute; left: 50%; top: 14px; height: 14px; border-left: 1px dashed var(--sk-color-primary-active); }
 .anio { color: var(--sk-color-primary-active); font-weight: var(--sk-font-weight-bold); }
+/* Logo de cada reconocimiento: en blanco y negro, toma color solo al pasar el mouse por la tarjeta */
+.reconocimientos .logo { display: block; width: 100%; max-width: 300px; height: auto; max-height: 120px; object-fit: contain; object-position: left center;
+  filter: grayscale(1) opacity(0.8); transition: filter var(--motion-lento) var(--curva); }
+.reconocimientos .pieza:hover .logo, .reconocimientos .pieza:focus-within .logo { filter: grayscale(0) opacity(1); }
 
 /* ── Actualidad: carrusel de polaroids (reemplazo de sk-carousel de la skill) ── */
 .cabeza-carrusel { display: flex; align-items: end; justify-content: space-between; gap: var(--sk-space-m); }
@@ -145,7 +156,9 @@
   overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: thin; }
 .carrusel > li { scroll-snap-align: start; }
 .polaroid { height: 100%; padding: var(--sk-space-s) var(--sk-space-s) var(--sk-space-m); }
-.polaroid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); border-radius: 2px; }
+.polaroid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; border-radius: 2px;
+  filter: grayscale(1) contrast(1.1); transition: filter var(--motion-lento) var(--curva); }
+.polaroid:hover img, .polaroid:focus-within img { filter: grayscale(0) contrast(1.05); }
 .polaroid figcaption { font-weight: var(--sk-font-weight-bold); color: var(--background-black); }
 .polaroid > .cinta { left: 50%; translate: -50% 0; }
 
