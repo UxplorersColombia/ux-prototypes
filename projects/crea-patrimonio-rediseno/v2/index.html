@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crea Patrimonio · Resultados del pre-work</title>
+
+  <!-- 1. Fuentes + tipografía de tags nativos -->
+  <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-fonts.css">
+  <link rel="stylesheet" href="https://skcoblobresources.blob.core.windows.net/digital-assets/icons/typography-blob/v1/sk-typography.css">
+  <!-- 2. Íconos (peer obligatorio, el bundle no los trae) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/primeicons@7/primeicons.css">
+  <!-- 3. Componentes sk-* (30 custom elements + tema Skandia) -->
+  <script src="https://skcostgblobresources.blob.core.windows.net/skco-lib-components/sk-components-elements.js"></script>
+
+  <style>
+    /* ── Tokens estáticos que el bundle NO define (espejo de sk-tokens.scss). NO BORRAR. ── */
+    :root {
+      --sk-space-zero: 0; --sk-space-xxs: 4px; --sk-space-xs: 8px; --sk-space-s: 12px; --sk-space-m: 16px;
+      --sk-space-l: 24px; --sk-space-xl: 32px; --sk-space-2xl: 40px; --sk-space-3xl: 48px;
+      --sk-space-4xl: 56px; --sk-space-5xl: 64px;
+      --sk-radius-sm: 4px; --sk-radius-md: 8px; --sk-radius-lg: 12px; --sk-radius-pill: 9999px;
+      --sk-shadow-subtle: 0 0 2px rgba(68, 68, 68, 0.15);
+      --sk-shadow-surface: 0 0 2px 0 rgba(61, 75, 92, 0.15);
+      --sk-shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.12);
+      --sk-shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.16);
+      --sk-font-title: 'Montserrat', sans-serif;
+      --sk-font-body: 'Open Sans', system-ui, sans-serif;
+      --sk-font-weight-regular: 400; --sk-font-weight-medium: 500; --sk-font-weight-bold: 700;
+      --sk-gradient-brand: linear-gradient(135deg, #00c73d 0%, #8fe000 100%);
+      --sk-control-height: 48px; --sk-control-height-sm: 40px;
+    }
+
+    /* ── Ancho completo. NO BORRAR. ── */
+    :root :is(sk-input-text, sk-input-number, sk-input-select, sk-textarea, sk-date-picker, sk-date-range-picker,
+              sk-file-upload, sk-listbox, sk-form-field, sk-select-button, sk-button, sk-paginator, sk-stepper,
+              sk-table, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) {
+      width: 100%; max-width: none; min-width: 0; box-sizing: border-box;
+    }
+    :root :is(sk-input-text, sk-input-select, sk-date-picker, sk-date-range-picker, sk-listbox, sk-form-field,
+              sk-button, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) { display: block; }
+    :root :is(sk-input-number, sk-textarea, sk-file-upload):not([data-ancho="auto"]) { display: flex; }
+    :root :is(.sk-input-select, .sk-listbox, .p-select, .p-listbox, .p-datepicker, .p-inputnumber, .p-fileupload) { width: 100%; max-width: none; }
+    :root sk-button:not([data-ancho="auto"]):not([label]) { display: inline-block; width: auto; }
+    :root sk-button:not([data-ancho="auto"])[label] .p-button { width: 100%; justify-content: center; }
+    :root sk-select-button:not([data-ancho="auto"]) { display: flex; }
+    :root sk-select-button:not([data-ancho="auto"]) .p-selectbutton { display: flex; width: 100%; }
+    :root sk-select-button:not([data-ancho="auto"]) .p-togglebutton { flex: 1 1 0; min-width: 0; justify-content: center; }
+    :root sk-form-field :is(input, select, textarea) { width: 100%; box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    /* ── Lienzo fijo 1280×720 que escala a la ventana ── */
+    :root { --cA: #00c73d; --cE: #404040; --cS: #aab0ab; --ink: #232323; --mut: #5c615d; --line: #dfe3df; --soft: #f2fcf4; }
+    html, body { margin: 0; height: 100%; }
+    body { background: #e9ede9; font-family: var(--sk-font-body); color: var(--ink); overflow: hidden; }
+    .deck { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; }
+    .stage { width: 1280px; height: 720px; position: relative; transform-origin: center center; transform: scale(var(--k, 1)); }
+    .slide {
+      position: absolute; inset: 0; box-sizing: border-box; display: none; flex-direction: column;
+      gap: var(--sk-space-l); padding: var(--sk-space-3xl) var(--sk-space-5xl) 84px;
+      background: #fff; border-radius: var(--sk-radius-lg); box-shadow: var(--sk-shadow-raised); overflow: hidden;
+    }
+    .slide.active { display: flex; animation: slin .5s ease both; }
+    .slide.dark { background: #232323; color: #fff; }
+    .slide.brand { background: var(--sk-gradient-brand); color: #232323; }
+    @keyframes slin { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+
+    /* Entrada escalonada: cada elemento .rv aparece con --d × 90 ms */
+    .slide.active .rv { animation: rv .65s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--d, 0) * 90ms + 120ms); }
+    @keyframes rv { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+    .top { display: flex; justify-content: space-between; align-items: center; gap: var(--sk-space-m); min-height: 32px; }
+    .tags { display: flex; gap: var(--sk-space-xs); align-items: center; }
+    .eyebrow { font-family: var(--sk-font-title); font-weight: 700; font-size: 15px; color: var(--mut); }
+    .dark .eyebrow { color: #bfe8c9; }
+
+    .slide h1, .slide h2 { font-family: var(--sk-font-title); font-weight: 700; margin: 0; color: inherit; letter-spacing: 0; }
+    .slide h1 { font-size: 60px; line-height: 1.08; max-width: 1020px; }
+    .slide h2 { font-size: 36px; line-height: 1.18; max-width: 1100px; }
+    .slide p { margin: 0; }
+    .lead { font-size: 22px; line-height: 1.45; color: var(--mut); max-width: 960px; }
+    .dark .lead { color: #d9dcd9; }
+    .brand .lead { color: #232323; }
+    .grow { flex: 1; min-height: 0; }
+    .mark { box-shadow: inset 0 -14px 0 #b9f3c8; }
+
+    .foot { position: absolute; left: var(--sk-space-5xl); right: var(--sk-space-5xl); bottom: 26px; display: flex;
+            justify-content: space-between; gap: var(--sk-space-l); font-size: 12.5px; line-height: 1.35; color: var(--mut); }
+    .foot span:first-child { max-width: 930px; }
+    .foot .pg { display: none; }
+    .dark .foot { color: #b8bcb8; }
+    .brand .foot { color: #232323; }
+
+    .so { border-left: 4px solid var(--sk-color-primary, #00c73d); padding: 2px 0 2px var(--sk-space-m); font-size: 20px; line-height: 1.45; max-width: 1080px; }
+    .so b { font-family: var(--sk-font-title); }
+    .quote { font-size: 19px; line-height: 1.5; font-style: italic; }
+    .quote small { display: block; font-style: normal; font-size: 13px; margin-top: 8px; color: var(--mut); font-weight: 700; letter-spacing: .02em; }
+    .dark .quote small { color: #bfe8c9; }
+
+    /* Cifras grandes */
+    .big { font-family: var(--sk-font-title); font-weight: 700; font-size: 104px; line-height: 1; letter-spacing: -1px; }
+    .big sup { font-size: 34px; font-weight: 600; letter-spacing: 0; color: var(--mut); vertical-align: baseline; margin-left: 8px; }
+    .dark .big sup { color: #b8bcb8; }
+    .big.md { font-size: 72px; }
+    .big-cap { font-size: 20px; line-height: 1.4; color: var(--mut); margin-top: var(--sk-space-xs); max-width: 440px; }
+    .dark .big-cap { color: #d9dcd9; }
+
+    /* Puntos: "n de N" como personas */
+    .dots { display: grid; grid-template-columns: repeat(14, 18px); gap: 8px; margin-top: var(--sk-space-m); }
+    .dots i { width: 18px; height: 18px; border-radius: 50%; background: var(--line); display: block; }
+    .dots i.on { background: var(--sk-color-primary, #00c73d); animation: pop .45s cubic-bezier(.3,1.6,.5,1) both; animation-delay: calc(var(--i) * 26ms + 350ms); }
+    .dots.dk i.on { background: var(--ink); }
+    .dark .dots i { background: #3d3d3d; }
+    @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    /* Filas por canal */
+    .rows { display: grid; gap: 12px; }
+    .crow { display: grid; grid-template-columns: var(--lw, 120px) 1fr 92px; column-gap: 14px; align-items: center; animation: rv .6s both; animation-delay: calc(var(--d, 0) * 110ms + 300ms); }
+    .crow .cl { font-family: var(--sk-font-title); font-weight: 700; font-size: 16px; line-height: 1.2; }
+    .crow .ctr { height: 26px; background: #eef1ee; border-radius: 6px; overflow: hidden; }
+    .crow .ctr i { display: block; height: 100%; width: var(--w, 0); border-radius: 6px; animation: grow 1s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--d, 0) * 110ms + 400ms); }
+    .crow .cv { font-size: 14px; color: var(--mut); text-align: right; white-space: nowrap; }
+    .crow .cv b { font-family: var(--sk-font-title); font-size: 22px; color: var(--ink); }
+    .wide { --lw: 250px; }
+    .dark .crow .ctr { background: #3d3d3d; }
+    .dark .crow .cv b { color: #fff; }
+    .dark .crow .cv { color: #c4c9c5; }
+    @keyframes grow { from { width: 0; } }
+
+    /* Barra apilada */
+    .stack { display: flex; height: 54px; border-radius: 10px; overflow: hidden; gap: 3px; }
+    .stack span { display: flex; align-items: center; padding-left: 14px; font-family: var(--sk-font-title); font-weight: 700; font-size: 22px; color: #fff; white-space: nowrap; flex: var(--f) 1 0; min-width: 0; animation: growx 1s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--d, 0) * 120ms + 300ms); transform-origin: left; }
+    @keyframes growx { from { transform: scaleX(0); opacity: 0; } }
+    .stack-leg { display: flex; gap: 6px; margin-top: 8px; }
+    .stack-leg span { flex: var(--f) 1 0; font-size: 14px; line-height: 1.3; color: var(--mut); min-width: 0; }
+    .stack-leg.s2 { gap: 3px; }
+
+    /* Columnas 1–5 */
+    .cols5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; align-items: end; height: 150px; border-bottom: 1px solid var(--line); }
+    .cols5 .c { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 6px; }
+    .cols5 .c b { font-family: var(--sk-font-title); font-size: 20px; }
+    .cols5 .c i { display: block; width: 100%; height: var(--h, 0); background: #c4c9c5; border-radius: 6px 6px 0 0; min-height: 3px; transform-origin: bottom; animation: growy 1s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--d, 0) * 100ms + 400ms); }
+    .cols5 .c.hi i { background: var(--sk-color-primary, #00c73d); }
+    .cols5-l { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 6px; text-align: center; font-size: 14px; color: var(--mut); }
+    .cols5-l span b { display: block; font-family: var(--sk-font-title); color: var(--ink); font-size: 16px; }
+    @keyframes growy { from { transform: scaleY(0); } }
+
+    /* Layouts */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sk-space-2xl); align-items: start; }
+    .cols-62 { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--sk-space-2xl); align-items: start; }
+    .panel { border: 1px solid var(--line); border-radius: var(--sk-radius-lg); padding: var(--sk-space-l); display: grid; gap: var(--sk-space-m); align-content: start; }
+    .panel h3 { font-family: var(--sk-font-title); font-weight: 700; font-size: 18px; margin: 0; line-height: 1.3; }
+    .panel .sub { font-size: 15px; color: var(--mut); line-height: 1.4; }
+    .tgl { max-width: 460px; }
+
+    .pill { display: inline-block; font-size: 12.5px; font-weight: 700; padding: 2px 10px; border-radius: var(--sk-radius-pill); background: #fff1cc; color: #6b4a00; }
+    .pill.g { background: #e0f7e7; color: #067a2a; }
+
+    /* Portada */
+    .orb { position: absolute; border-radius: 50%; background: var(--sk-gradient-brand); filter: blur(2px); opacity: .9; }
+    .o1 { width: 420px; height: 420px; right: -90px; top: -110px; animation: float 9s ease-in-out infinite; }
+    .o2 { width: 190px; height: 190px; right: 250px; bottom: 90px; opacity: .35; animation: float 7s ease-in-out infinite reverse; }
+    .o3 { width: 70px; height: 70px; right: 130px; top: 360px; opacity: .6; animation: float 5s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-22px) } }
+    .chips { display: flex; gap: var(--sk-space-s); flex-wrap: wrap; }
+
+    /* Índice */
+    .idx { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .ic { text-align: left; border: 1px solid var(--line); background: #fff; border-radius: var(--sk-radius-lg); padding: 18px 18px 16px; cursor: pointer;
+          display: grid; gap: 6px; align-content: start; font-family: inherit; color: inherit; transition: transform .25s, box-shadow .25s, border-color .25s; min-height: 0; }
+    .ic:hover, .ic:focus-visible { transform: translateY(-6px); box-shadow: var(--sk-shadow-raised); border-color: var(--sk-color-primary, #00c73d); outline: none; }
+    .ic .m { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+    .ic .n { font-family: var(--sk-font-title); font-weight: 700; font-size: 44px; line-height: 1; margin-top: 4px; }
+    .ic .n small { font-size: 18px; color: var(--mut); font-weight: 600; }
+    .ic .t { font-size: 16px; line-height: 1.3; font-weight: 600; }
+    .ic .k { font-size: 13px; color: var(--mut); line-height: 1.3; }
+    .ic.k1 .m { color: #067a2a; } .ic.k2 .m { color: #8a5a00; } .ic.k3 .m { color: #1f4fa0; }
+    .ic.sum { background: #232323; color: #fff; border-color: #232323; }
+    .ic.sum .m, .ic.sum .k { color: #bfe8c9; } .ic.sum .n small { color: #b8bcb8; }
+
+    /* Participación */
+    .tile { display: flex; gap: var(--sk-space-m); align-items: flex-start; }
+    .icon-dot { width: 52px; height: 52px; border-radius: var(--sk-radius-pill); background: var(--sk-gradient-brand); display: grid; place-items: center; color: #232323; font-size: 22px; flex: none; }
+    .tile h3 { font-family: var(--sk-font-title); font-weight: 700; font-size: 19px; margin: 0 0 4px; }
+    .tile p { font-size: 16px; line-height: 1.4; color: var(--mut); }
+
+    /* Perfil por canal */
+    .prof { display: grid; gap: 8px; align-content: start; }
+    .pr { display: grid; grid-template-columns: 250px 1fr 120px; column-gap: 16px; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--line); animation: rv .6s both; animation-delay: calc(var(--d, 0) * 100ms); }
+    .pr .q { font-size: 14px; color: var(--mut); line-height: 1.3; }
+    .pr .a { font-family: var(--sk-font-title); font-weight: 700; font-size: 19px; line-height: 1.2; }
+    .pr .v { text-align: right; font-size: 14px; color: var(--mut); }
+    .pr .v b { font-family: var(--sk-font-title); font-size: 30px; color: var(--ink); }
+    .pr .mt { grid-column: 2 / 4; height: 8px; border-radius: 4px; background: #eef1ee; overflow: hidden; margin-top: 2px; }
+    .pill { white-space: nowrap; }
+    .pr .mt i { display: block; height: 100%; width: var(--w); border-radius: 4px; animation: grow 1s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--d, 0) * 100ms + 200ms); }
+
+    /* Voces */
+    .vz { position: relative; flex: 1; display: grid; align-content: center; gap: var(--sk-space-l); }
+    .vq { font-family: var(--sk-font-title); font-weight: 600; font-size: 38px; line-height: 1.28; max-width: 1040px; animation: rv .6s both; }
+    .vq:before { content: '“'; display: block; font-size: 120px; line-height: .6; color: #8fe000; height: 52px; }
+    .vm { display: flex; gap: var(--sk-space-s); align-items: center; animation: rv .6s .1s both; }
+    .vdots { display: flex; gap: 10px; }
+    .vdots button { width: 14px; height: 14px; border-radius: 50%; border: 0; background: #565656; cursor: pointer; padding: 0; transition: transform .25s, background .25s; }
+    .vdots button.on { background: #8fe000; transform: scale(1.35); }
+
+    /* Retos (tarjetas que voltean) */
+    .flips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; perspective: 1200px; }
+    .fl { position: relative; height: 330px; cursor: pointer; border: 0; background: none; padding: 0; font-family: inherit; text-align: left; }
+    .fl .in { position: absolute; inset: 0; transition: transform .7s cubic-bezier(.3,.8,.3,1); transform-style: preserve-3d; }
+    .fl.flip .in { transform: rotateY(180deg); }
+    .fl .f, .fl .b { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: var(--sk-radius-lg); padding: 22px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
+    .fl .f { background: #fff; border: 1px solid var(--line); box-shadow: var(--sk-shadow-surface); }
+    .fl .b { background: #232323; color: #fff; transform: rotateY(180deg); }
+    .fl .tm { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #067a2a; }
+    .fl .rq { font-family: var(--sk-font-title); font-weight: 700; font-size: 21px; line-height: 1.3; }
+    .fl .hint { margin-top: auto; font-size: 13px; color: var(--mut); display: flex; gap: 6px; align-items: center; }
+    .fl .bn { font-family: var(--sk-font-title); font-weight: 700; font-size: 64px; line-height: 1; color: #8fe000; }
+    .fl .bc { font-size: 16px; line-height: 1.4; color: #e3e6e3; }
+    .fl:hover .f { border-color: var(--sk-color-primary, #00c73d); }
+
+    /* Línea del taller */
+    .tl { display: grid; grid-template-columns: 20fr 35fr 30fr 15fr; gap: 6px; }
+    .tl div { border-radius: 10px; padding: 12px 16px; background: #eef1ee; display: grid; gap: 2px; animation: growx .9s cubic-bezier(.2,.7,.2,1) both; transform-origin: left; }
+    .tl div:nth-child(2) { animation-delay: .1s; } .tl div:nth-child(3) { animation-delay: .2s; } .tl div:nth-child(4) { animation-delay: .3s; }
+    .tl div b { font-family: var(--sk-font-title); font-size: 18px; }
+    .tl div span { font-size: 14px; color: var(--mut); }
+    .tl div.on { background: var(--soft); border: 1px solid #b9f3c8; }
+    .dec { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .dc { border: 1px solid var(--line); border-radius: var(--sk-radius-lg); padding: 22px; display: grid; gap: 10px; align-content: start; }
+    .dc .nn { width: 40px; height: 40px; border-radius: 50%; background: var(--sk-gradient-brand); display: grid; place-items: center; font-family: var(--sk-font-title); font-weight: 700; font-size: 18px; }
+    .dc h3 { font-family: var(--sk-font-title); font-size: 20px; line-height: 1.25; margin: 0; }
+    .dc p { font-size: 16px; line-height: 1.4; color: var(--mut); }
+
+    /* Pedidos con panel de cita */
+    .ask { display: grid; gap: 10px; }
+    .ab { display: grid; grid-template-columns: 215px 1fr 70px; column-gap: 14px; align-items: center; border: 1px solid transparent; border-radius: 10px; padding: 8px 10px; background: none; cursor: pointer; font-family: inherit; text-align: left; color: inherit; transition: background .2s, border-color .2s; animation: rv .6s both; animation-delay: calc(var(--d, 0) * 100ms + 200ms); }
+    .ab:hover, .ab.on { background: var(--soft); border-color: #b9f3c8; outline: none; }
+    .ab .l { font-family: var(--sk-font-title); font-weight: 700; font-size: 17px; }
+    .ab .tr { height: 26px; background: #eef1ee; border-radius: 6px; overflow: hidden; }
+    .ab .tr i { display: block; height: 100%; width: var(--w); background: #c4c9c5; border-radius: 6px; animation: grow 1s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--d, 0) * 100ms + 400ms); transition: background .25s; }
+    .ab.on .tr i { background: var(--sk-color-primary, #00c73d); }
+    .ab .v { text-align: right; font-size: 14px; color: var(--mut); } .ab .v b { font-family: var(--sk-font-title); font-size: 22px; color: var(--ink); }
+    .qp { background: #232323; color: #fff; border-radius: var(--sk-radius-lg); padding: 28px; display: grid; gap: 14px; align-content: center; min-height: 280px; }
+    .qp .quote { font-size: 22px; animation: rv .5s both; }
+
+    /* Navegación */
+    .prog { position: fixed; left: 0; top: 0; height: 4px; background: var(--sk-gradient-brand); z-index: 9; transition: width .5s cubic-bezier(.2,.7,.2,1); }
+    .nav { position: fixed; right: 20px; bottom: 14px; display: flex; gap: var(--sk-space-xs); align-items: center; z-index: 5; }
+    .count { font-family: var(--sk-font-title); font-weight: 700; font-size: 14px; color: #404040; min-width: 56px; text-align: center; }
+    .keyhint { position: fixed; left: 50%; top: 10px; transform: translateX(-50%); font-size: 12px; color: #fff; background: rgba(35,35,35,.82); padding: 5px 14px; border-radius: 9999px; z-index: 9; pointer-events: none; animation: hintout 1s 6s both; }
+    @keyframes hintout { to { opacity: 0; visibility: hidden; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *:before, *:after { animation: none !important; transition: none !important; }
+    }
+    @media print {
+      @page { size: 1280px 720px; margin: 0; }
+      body { background: #fff; overflow: visible; }
+      .deck { position: static; display: block; overflow: visible; }
+      .stage { transform: none !important; height: auto; }
+      .slide { display: flex !important; position: relative; inset: auto; height: 720px; border-radius: 0; box-shadow: none; page-break-after: always; break-after: page; animation: none !important; }
+      .slide * { animation: none !important; }
+      .nav, .prog, .keyhint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main id="app"></main>
+
+  <template id="ui">
+    <div class="prog" id="prog"></div>
+    <div class="deck"><div class="stage" id="stage">
+
+      <!-- ═════════ 1 · PORTADA ═════════ -->
+      <section class="slide dark" data-title="Portada">
+        <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
+        <div class="top"><sk-logo sk-style="blanco" style="height: 30px"></sk-logo><span class="eyebrow">Resultados del pre-work · 17 de noviembre de 2026</span></div>
+        <div class="grow"></div>
+        <h1 class="rv" style="--d:0">Lo que nos contaron quienes venden Crea Patrimonio</h1>
+        <p class="lead rv" style="--d:1">Hallazgos del pre-work con asesores y líderes de tres canales.</p>
+        <div class="chips rv" style="--d:2">
+          <sk-chip label="46 personas terminaron" sk-style="primary" size="small"></sk-chip>
+          <sk-chip label="3 canales" sk-style="primary" size="small"></sk-chip>
+          <sk-chip label="17 preguntas" sk-style="primary" size="small"></sk-chip>
+          <sk-chip label="7 hallazgos" sk-style="primary" size="small"></sk-chip>
+        </div>
+        <div class="grow"></div>
+        <div class="foot"><span>Equipo UX · Producto · Uso interno</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 2 · QUIÉN RESPONDIÓ ═════════ -->
+      <section class="slide" data-title="Quién respondió">
+        <div class="top"><sk-tag sk-style="info" size="small">Punto de partida</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">46 de 88 invitados terminaron el pre-work.</h2>
+        <div class="cols-62 grow" style="align-items:center">
+          <div>
+            <p class="big rv" style="--d:1"><span data-count="46">0</span><sup>de 88</sup></p>
+            <p class="big-cap rv" style="--d:2">29 asesores y 17 líderes respondieron las 17 preguntas completas.</p>
+            <div class="rows rv" style="--d:3; margin-top:26px" data-rows='[["Agencias",28,40],["Empleados",12,25],["Seguros",6,23]]'></div>
+          </div>
+          <div style="display:grid; gap:22px">
+            <div class="tile rv" style="--d:2"><span class="icon-dot"><i class="pi pi-comments"></i></span><div><h3>Son percepciones</h3><p>Lo que ven quienes venden, no hechos del producto.</p></div></div>
+            <div class="tile rv" style="--d:3"><span class="icon-dot"><i class="pi pi-chart-bar"></i></span><div><h3>Cada canal pesa distinto</h3><p>Agencias es la voz sólida. Empleados orienta. Seguros es una señal.</p></div></div>
+            <div class="tile rv" style="--d:4"><span class="icon-dot"><i class="pi pi-lock"></i></span><div><h3>Sin nombres</h3><p>Todo se muestra por canal, nunca por persona.</p></div></div>
+          </div>
+        </div>
+        <div class="foot"><span>Fuente: proyecto Lovable «Pre-work Crea Patrimonio», respuestas terminadas, corte 17-nov-2026, noche. IFAs no entraron en esta ronda. «q» = numeración interna del instrumento.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 3 · ÍNDICE ═════════ -->
+      <section class="slide" data-title="Los hallazgos">
+        <div class="top"><sk-tag sk-style="info" size="small">Mapa</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Siete hallazgos para dos retos al mismo nivel: vender más y retener.</h2>
+        <div class="idx grow" id="idx">
+          <button class="ic k1 rv" style="--d:1" data-go="3"><span class="m">Crecer</span><span class="n">37<small>/46</small></span><span class="t">Vender cuesta por el compromiso</span><span class="k">plazo largo o penalidad primero</span></button>
+          <button class="ic k1 rv" style="--d:2" data-go="4"><span class="m">Crecer</span><span class="n">26<small>/46</small></span><span class="t">Piden más rentabilidad</span><span class="k">y ninguno lo ve por debajo</span></button>
+          <button class="ic k2 rv" style="--d:3" data-go="5"><span class="m">Quedarse</span><span class="n">40<small>/46</small></span><span class="t">Se van por la vida, no por el producto</span><span class="k">cambió su ingreso o situación</span></button>
+          <button class="ic k2 rv" style="--d:4" data-go="6"><span class="m">Quedarse</span><span class="n">22<small>/46</small></span><span class="t">Improvisan su salida</span><span class="k">el cliente que quiso irse dejó de pagar</span></button>
+          <button class="ic k2 rv" style="--d:5" data-go="7"><span class="m">Quedarse</span><span class="n">16<small>/46</small></span><span class="t">El acompañamiento depende del asesor</span><span class="k">no lo hacen ellos con regularidad</span></button>
+          <button class="ic k2 rv" style="--d:6" data-go="8"><span class="m">Quedarse</span><span class="n">25<small>/46</small></span><span class="t">El año 8 es una pregunta de salida</span><span class="k">«¿puedo sacar mi plata sin perder?»</span></button>
+          <button class="ic k3 rv" style="--d:7" data-go="9"><span class="m">Reglas del juego</span><span class="n">33<small>/46</small></span><span class="t">Conviene más vender una nueva</span><span class="k">que cuidar una de 9 años</span></button>
+          <button class="ic sum rv" style="--d:8" data-go="10"><span class="m">Síntesis</span><span class="n">30<small>/46</small></span><span class="t">Lo que piden</span><span class="k">flexibilidad, rentabilidad, coberturas…</span></button>
+        </div>
+        <div class="foot"><span>Haz clic en una tarjeta para ir al hallazgo. Cada cifra cuenta personas que respondieron «n de 46».</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 4 · H1 COMPROMISO ═════════ -->
+      <section class="slide" data-title="Compromiso">
+        <div class="top"><div class="tags"><sk-tag sk-style="success" size="small">Crecer</sk-tag><span class="pill">Percepción</span></div><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Vender cuesta por los años de compromiso y la penalidad por salir.</h2>
+        <div class="cols grow">
+          <div>
+            <p class="big rv" style="--d:1"><span data-count="37">0</span><sup>de 46</sup></p>
+            <p class="big-cap rv" style="--d:2">pusieron primero el plazo largo o la penalidad en lo más difícil de vender.</p>
+            <div class="dots" data-n="37" data-of="46"></div>
+          </div>
+          <div class="panel rv" style="--d:2">
+            <h3>Quién lo puso primero, por canal</h3>
+            <div class="rows" data-rows='[["Agencias",23,28],["Empleados",10,12],["Seguros",4,6]]'></div>
+            <p class="sub">En el otro extremo: <b>26 de 46</b> dejaron de último «lo que se reconoce al asesor por venderlo», y solo <b>8</b> dejaron de último «explicar cómo funciona».</p>
+          </div>
+        </div>
+        <p class="so rv" style="--d:4"><b>Y eso qué:</b> lo difícil no es explicar el producto. Es pedirle a alguien un compromiso largo con un costo por salir. <i style="color:var(--mut)">“…10 años parecen demasiado y eso asusta a muchas personas” · Agencias</i></p>
+        <div class="foot"><span>Fuente: q8, ranking de siete cosas que hacen difícil vender (primer lugar: plazo 21 + penalidad 16 = 37) · q8, último lugar.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 5 · H2 RENTABILIDAD ═════════ -->
+      <section class="slide" data-title="Rentabilidad">
+        <div class="top"><div class="tags"><sk-tag sk-style="success" size="small">Crecer</sk-tag><span class="pill">Percepción</span></div><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Piden más rentabilidad, aunque ninguno ve el producto por debajo de la competencia.</h2>
+        <div class="cols grow">
+          <div>
+            <p class="big rv" style="--d:1"><span data-count="26">0</span><sup>de 46</sup></p>
+            <p class="big-cap rv" style="--d:2">piden rentabilidad o rendimientos entre lo que les haría vender o retener más.</p>
+            <div class="dots" data-n="26" data-of="46"></div>
+          </div>
+          <div class="panel rv" style="--d:2">
+            <h3>¿Cómo se compara con la competencia?</h3>
+            <div class="cols5" id="c-q15" data-vals="[0,0,17,12,17]" data-hi="[2,3,4]"></div>
+            <div class="cols5-l"><span><b>1</b>por debajo</span><span><b>2</b></span><span><b>3</b>igual</span><span><b>4</b></span><span><b>5</b>por encima</span></div>
+            <p class="sub">Y <b>33 de 46</b> lo comparan sobre todo con el seguro o ahorro de otra aseguradora.</p>
+          </div>
+        </div>
+        <p class="so rv" style="--d:4"><b>Y eso qué:</b> puede ser más un argumento de venta que una brecha medida. Falta contrastarlo con datos antes de decidir.</p>
+        <div class="foot"><span>Fuente: q15 (escala 1 a 5) · q6 (con qué lo compara) · rentabilidad = menciones de «rentab-», «rendim-» o «S&amp;P» en q16 y q17 (búsqueda por palabras: Agencias 18, Empleados 5, Seguros 3).</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 6 · H3 VIDA ═════════ -->
+      <section class="slide" data-title="Se van por la vida">
+        <div class="top"><div class="tags"><sk-tag sk-style="warning" size="small">Quedarse</sk-tag><span class="pill">Percepción</span></div><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Los clientes se van por un cambio en su vida, no por el producto.</h2>
+        <div class="cols grow">
+          <div>
+            <p class="big rv" style="--d:1"><span data-count="40">0</span><sup>de 46</sup></p>
+            <p class="big-cap rv" style="--d:2">dicen que el último cliente que se fue en sus primeros 3 años cambió de ingreso o de situación.</p>
+            <div class="dots" data-n="40" data-of="46"></div>
+          </div>
+          <div>
+            <p class="big rv" style="--d:2"><span data-count="39">0</span><sup>de 46</sup></p>
+            <p class="big-cap rv" style="--d:3">dicen que Crea Patrimonio sí era el producto para ese cliente cuando empezó.</p>
+            <div class="dots dk" data-n="39" data-of="46"></div>
+          </div>
+        </div>
+        <p class="so rv" style="--d:4"><b>Y eso qué:</b> si el producto sí era para él, el reto no es convencer. Es qué pasa cuando su vida cambia. <i style="color:var(--mut)">“El cliente perdió su empleo y por la edad fue complicado conseguir uno rápidamente […] no logró mantener el producto” · Empleados</i></p>
+        <div class="foot"><span>Fuente: q3, «¿Qué pasó?» (respuesta múltiple) y «¿Era el producto para ese cliente?».</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 7 · H4 IMPROVISAN ═════════ -->
+      <section class="slide" data-title="Improvisan su salida">
+        <div class="top"><div class="tags"><sk-tag sk-style="warning" size="small">Quedarse</sk-tag><span class="pill">Percepción</span></div><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Los clientes ya improvisan su salida: dejan de pagar. Los asesores piden hacerla oficial.</h2>
+        <div class="cols-62 grow">
+          <div class="panel rv" style="--d:1">
+            <sk-select-button id="tg-salida" class="tgl" aria-label="Canal"></sk-select-button>
+            <h3>El último cliente de 7 años o más que quiso irse: ¿qué camino tomó?</h3>
+            <div class="rows wide" id="rows-salida"></div>
+            <p class="sub" id="sub-salida"></p>
+          </div>
+          <div>
+            <p class="big rv" style="--d:2"><span data-count="30">0</span><sup>de 46</sup></p>
+            <p class="big-cap rv" style="--d:3">piden flexibilidad con la cuota o el ahorro: bajarla, pausarla o retirar una parte.</p>
+            <p class="quote rv" style="--d:4; margin-top:18px">“Poder ofrecer un retiro parcial, por ejemplo de un 20 %, cuando el cliente necesita liquidez.”<small>EMPLEADOS</small></p>
+            <p class="so rv" style="--d:5; margin-top:22px; font-size:18px"><b>Y eso qué:</b> el cliente encuentra su propia salida y el asesor ve que hace falta una oficial.</p>
+          </div>
+        </div>
+        <div class="foot"><span>Fuente: q4 (camino que tomó; en total 22 de 46 «dejar de pagar un tiempo») · flexibilidad = menciones de ajustar, pausar, retirar o liquidez en q16 y q17 (búsqueda por palabras).</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 8 · H5 ACOMPAÑAMIENTO ═════════ -->
+      <section class="slide" data-title="Acompañamiento">
+        <div class="top"><div class="tags"><sk-tag sk-style="warning" size="small">Quedarse</sk-tag><span class="pill">Percepción</span></div><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Después de la venta, el acompañamiento depende de cada asesor.</h2>
+        <div class="rv" style="--d:1">
+          <p class="lead" style="font-size:18px; margin-bottom:10px">¿Quién habla con el cliente después de la venta y cada cuánto? <span style="font-size:14px">(1 de 46 respondió «No sé»)</span></p>
+          <div class="stack" id="stk-q9"></div>
+          <div class="stack-leg" id="stk-q9-l"></div>
+        </div>
+        <div class="cols grow" style="align-items:center">
+          <div>
+            <p class="big md rv" style="--d:3"><span data-count="6">0</span><sup>de 28 en Agencias</sup></p>
+            <p class="big-cap rv" style="--d:4">dicen que cuando un cliente quiere irse, nadie se entera hasta que deja de pagar.</p>
+          </div>
+          <p class="quote rv" style="--d:4">“Que le cancelen la póliza a los clientes sin avisarle al asesor es lo peor.”<small>AGENCIAS</small></p>
+        </div>
+        <p class="so rv" style="--d:5"><b>Y eso qué:</b> si el cuidado es personal, la señal de que alguien se va depende de quién esté mirando.</p>
+        <div class="foot"><span>Fuente: q9 (quién habla con el cliente, 46 respuestas) · q14 (quién se entera primero; «nadie, hasta que deja de pagar»: Agencias 6 de 28, Empleados 1 de 12, Seguros 0 de 6).</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 9 · H6 AÑO 8 ═════════ -->
+      <section class="slide" data-title="Año 8">
+        <div class="top"><div class="tags"><sk-tag sk-style="warning" size="small">Quedarse</sk-tag><span class="pill">Percepción</span></div><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">En el año 8 esperan una pregunta: «¿puedo sacar mi plata sin perder?».</h2>
+        <div class="cols grow">
+          <div class="panel rv" style="--d:1">
+            <h3>Cuando un cliente pregunta por el año 8, ¿qué quiere saber?</h3>
+            <div class="rows wide" id="rows-q11"></div>
+          </div>
+          <div class="panel rv" style="--d:2">
+            <h3>Y lo que ven en los clientes que ya llegaron</h3>
+            <p class="sub"><b>18 de 46</b> todavía no tienen clientes en el año 8. De los <b>28</b> que sí (1 más dice que pasan a otro producto):</p>
+            <div class="stack" id="stk-q10" style="height:44px"></div>
+            <div class="stack-leg s2" id="stk-q10-l"></div>
+            <p class="sub" style="margin-top:6px">Es lo que ven los asesores, y los datos del diagnóstico ubican el pico de salida en el año 9.</p>
+          </div>
+        </div>
+        <p class="so rv" style="--d:4"><b>Y eso qué:</b> el año 8 funciona en la conversación como una pregunta de salida, más que de permanencia.</p>
+        <div class="foot"><span>Fuente: q11 (qué quiere saber) · q10 (qué ven en clientes del año 8). Percepción de los asesores; no se contrastó con la book en esta pieza.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 10 · H7 INCENTIVO ═════════ -->
+      <section class="slide" data-title="Incentivo">
+        <div class="top"><div class="tags"><sk-tag sk-style="info" size="small">Reglas del juego</sk-tag><span class="pill">Percepción</span></div><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">La mayoría cree que al asesor le conviene más vender una póliza nueva que cuidar una de 9 años.</h2>
+        <div class="cols grow">
+          <div class="panel rv" style="--d:1">
+            <h3>¿Qué es mejor negocio para un asesor promedio?</h3>
+            <div class="cols5" id="c-q12" data-vals="[5,1,7,7,26]" data-hi="[3,4]"></div>
+            <div class="cols5-l"><span><b>1</b>cuidar la de 9 años</span><span><b>2</b></span><span><b>3</b></span><span><b>4</b></span><span><b>5</b>vender una nueva</span></div>
+          </div>
+          <div>
+            <p class="big rv" style="--d:2"><span data-count="33">0</span><sup>de 46</sup></p>
+            <p class="big-cap rv" style="--d:3">marcan 4 o 5: conviene más la venta nueva.</p>
+            <div class="rows rv" style="--d:4; margin-top:20px" data-rows='[["Agencias",18,28],["Empleados",11,12],["Seguros",4,6]]'></div>
+          </div>
+        </div>
+        <p class="so rv" style="--d:5"><b>Y eso qué:</b> el ingreso del asesor lo empuja a vender nuevo antes que a cuidar lo que ya existe. <i style="color:var(--mut)">“el front que paga una nueva póliza es mayor al mtto de una póliza antigua, es simplemente económico” · Agencias</i></p>
+        <div class="foot"><span>Fuente: q12, escala de 1 a 5 (promedio de las 46 respuestas: 4,0). Es percepción: las reglas de comisión se contrastan con el Excel de mapeo en el diagnóstico.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 11 · LO QUE PIDEN ═════════ -->
+      <section class="slide" data-title="Lo que piden">
+        <div class="top"><div class="tags"><sk-tag sk-style="info" size="small">Síntesis</sk-tag><span class="pill">Percepción</span></div><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Lo que piden para vender más y que más clientes se queden.</h2>
+        <div class="cols-62 grow" style="align-items:center">
+          <div class="ask" id="ask"></div>
+          <div class="qp rv" style="--d:2" id="ask-q"></div>
+        </div>
+        <div class="foot"><span>Fuente: q16 y q17, respuestas abiertas de las 46 personas; búsqueda por palabras, una persona puede pedir varias cosas. Pasa el cursor o haz clic en cada barra para ver una voz.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 12 · CANALES ═════════ -->
+      <section class="slide" data-title="Cada canal">
+        <div class="top"><sk-tag sk-style="info" size="small">Por canal</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Cada canal lo vive distinto.</h2>
+        <div class="rv" style="--d:1; display:flex; gap:var(--sk-space-l); align-items:center">
+          <sk-select-button id="tg-canal" class="tgl" aria-label="Canal"></sk-select-button>
+          <span id="canal-note"></span>
+        </div>
+        <div class="prof grow" id="prof"></div>
+        <div class="foot"><span>Fuente: q8, q1, q4, q9 y q12 por canal. Empleados (12) orienta; Seguros (6) es una señal, no una cifra. Cambia de canal con el selector.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 13 · VOCES ═════════ -->
+      <section class="slide dark" data-title="En sus palabras">
+        <div class="top"><span class="eyebrow">En sus palabras</span><sk-logo sk-style="blanco" style="height: 24px"></sk-logo></div>
+        <div class="vz" id="vz"></div>
+        <div class="vdots" id="vdots" style="position:absolute; left:64px; bottom:60px"></div>
+        <div class="foot"><span>Citas textuales de las respuestas abiertas; solo se ajustó la puntuación. Sin nombres.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 14 · RETOS ═════════ -->
+      <section class="slide" data-title="Retos">
+        <div class="top"><sk-tag sk-style="success" size="small">Hacia el taller</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">Cuatro retos para llevar al taller. Voltea cada uno para ver su evidencia.</h2>
+        <div class="flips grow" id="flips" style="align-content:center">
+          <button class="fl rv" style="--d:1"><span class="in"><span class="f"><span class="tm">Compromiso</span><span class="rq">¿Cómo podríamos hacer que comprometerse por muchos años se sienta menos riesgoso para quien compra?</span><span class="hint"><i class="pi pi-sync"></i>Voltear</span></span><span class="b"><span class="bn">37/46</span><span class="bc">pusieron el plazo largo o la penalidad primero en lo difícil de vender.</span></span></span></button>
+          <button class="fl rv" style="--d:2"><span class="in"><span class="f"><span class="tm">Cuando la vida cambia</span><span class="rq">¿Cómo podríamos acompañar al cliente cuando un cambio de ingresos lo lleva a dejar de pagar?</span><span class="hint"><i class="pi pi-sync"></i>Voltear</span></span><span class="b"><span class="bn">40/46</span><span class="bc">dicen que se fue por un cambio de ingreso o de situación, y 22 de 46 dejaron de pagar.</span></span></span></button>
+          <button class="fl rv" style="--d:3"><span class="in"><span class="f"><span class="tm">Flexibilidad</span><span class="rq">¿Cómo podríamos darle al cliente formas de ajustar su ahorro sin sentir que pierde lo que ya construyó?</span><span class="hint"><i class="pi pi-sync"></i>Voltear</span></span><span class="b"><span class="bn">30/46</span><span class="bc">piden bajar la cuota, pausarla o retirar una parte.</span></span></span></button>
+          <button class="fl rv" style="--d:4"><span class="in"><span class="f"><span class="tm">Incentivo del asesor</span><span class="rq">¿Cómo podríamos lograr que cuidar una póliza de años le convenga al asesor tanto como vender una nueva?</span><span class="hint"><i class="pi pi-sync"></i>Voltear</span></span><span class="b"><span class="bn">33/46</span><span class="bc">creen que conviene más vender una nueva (4 o 5 de 5).</span></span></span></button>
+        </div>
+        <div class="foot"><span>Retos por validar con Laura y Julián. Cifras sobre las 46 respuestas de los tres canales.</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 15 · DECISIONES ═════════ -->
+      <section class="slide" data-title="Decisiones">
+        <div class="top"><sk-tag sk-style="success" size="small">Siguiente paso</sk-tag><sk-logo style="height: 24px"></sk-logo></div>
+        <h2 class="rv" style="--d:0">El taller dura 100 minutos. Para llegar bien, necesitamos tres decisiones.</h2>
+        <div class="tl rv" style="--d:1">
+          <div><b>Partir</b><span>20 min · adivina y revela</span></div>
+          <div><b>Crear</b><span>35 min · ideas a partir de los retos</span></div>
+          <div><b>Decidir</b><span>30 min · monedas y mapa</span></div>
+          <div><b>Cerrar</b><span>15 min · compromisos</span></div>
+        </div>
+        <div class="dec grow" style="align-content:center">
+          <div class="dc rv" style="--d:2"><span class="nn">1</span><h3>Qué hacer con Seguros y Empleados</h3><p>Respondieron 6 de 23 y 12 de 25. ¿Esperamos más respuestas o trabajamos con Agencias como espejo?</p></div>
+          <div class="dc rv" style="--d:3"><span class="nn">2</span><h3>Validar los cuatro retos</h3><p>Revisarlos con Laura y Julián antes de que lleguen al grupo.</p></div>
+          <div class="dc rv" style="--d:4"><span class="nn">3</span><h3>Pasar de percepción a dato</h3><p>Contrastar con comisiones, incrementos y débitos rechazados. El acceso a esas tablas sigue pendiente.</p></div>
+        </div>
+        <div class="foot"><span>Fuente: guía de facilitación del taller (versión del 17-nov-2026).</span><span class="pg"></span></div>
+      </section>
+
+      <!-- ═════════ 16 · CIERRE ═════════ -->
+      <section class="slide brand" data-title="Cierre">
+        <div class="top"><sk-logo sk-style="blanco" style="height: 30px"></sk-logo><span class="eyebrow" style="color:#232323">Crea Patrimonio · Pre-work</span></div>
+        <div class="grow"></div>
+        <h1 class="rv" style="--d:0">Vender más y que se queden: dos retos al mismo nivel.</h1>
+        <p class="lead rv" style="--d:1">El pre-work dice dónde mirar. El taller decide qué probar.</p>
+        <div class="grow"></div>
+        <div class="foot"><span>Equipo UX · Producto · Uso interno</span><span class="pg"></span></div>
+      </section>
+
+    </div></div>
+
+    <div class="keyhint">← → para navegar · F pantalla completa</div>
+    <div class="nav">
+      <sk-button id="n-idx" icon="pi pi-th-large" sk-type="tertiary" aria-label="Ir al mapa de hallazgos"></sk-button>
+      <sk-button id="n-prev" icon="pi pi-chevron-left" sk-type="secondary" aria-label="Anterior"></sk-button>
+      <span class="count" id="count">1 / 16</span>
+      <sk-button id="n-next" icon="pi pi-chevron-right" aria-label="Siguiente"></sk-button>
+    </div>
+  </template>
+
+  <script>
+    customElements.whenDefined('sk-button').then(() => {
+      const ui = document.importNode(document.getElementById('ui').content, true);
+      const $ = (s) => ui.querySelector(s);
+
+      // ── 1. Datos complejos: SIEMPRE antes de montar ──
+      const CANALES = [{ label: 'Agencias', value: 'agencias' }, { label: 'Empleados', value: 'empleados' }, { label: 'Seguros', value: 'seguros' }];
+      $('#tg-salida').options = CANALES; $('#tg-salida').value = 'agencias';
+      $('#tg-canal').options = CANALES;  $('#tg-canal').value = 'agencias';
+
+      // ── 2. Datos del pre-work (46 terminadas, corte 17-nov-2026, noche) ──
+      const SALIDA = {
+        agencias:  { de: 28, rows: [['Dejar de pagar un tiempo', 16], ['Seguir igual', 4], ['Pasar a un fondo voluntario', 3], ['Retiro parcial', 2], ['Cancelar (abrir otra o llevarse la plata)', 3]], sub: 'Más de la mitad: dejar de pagar un tiempo.' },
+        empleados: { de: 12, rows: [['Préstamo', 5], ['Dejar de pagar un tiempo', 3], ['Seguir igual', 1], ['Sin respuesta', 3]], sub: 'Aquí pesa el préstamo: 9 de 12 lo ofrecieron y 5 lo tomaron.' },
+        seguros:   { de: 6,  rows: [['Dejar de pagar un tiempo', 3], ['Cancelar y llevarse la plata', 1], ['Seguir igual', 2]], sub: 'Solo 6 respuestas: una señal, no una cifra.' },
+      };
+      const Q9 = [['Yo, con regularidad', 30, '#00c73d'], ['Yo, solo si me busca', 9, '#404040'], ['Skandia (comunicaciones)', 6, '#8c928d']];
+      const Q10 = [['Siguen pagando igual', 18, '#00c73d'], ['Cancelan y se llevan la plata', 6, '#404040'], ['Cancelan y abren otra', 3, '#8c928d']];
+      const Q11 = [['Si puede sacar la plata sin perder', 25], ['Cuánto le devuelven', 12], ['Si le conviene seguir', 7], ['Si ya «cumplió»', 2]];
+      const PIDEN = [
+        { l: 'Flexibilidad', n: 30, q: 'Permitir ajustes de cuota y pausas temporales ante cambios en la capacidad de ahorro, sin perder los beneficios construidos.', c: 'Empleados' },
+        { l: 'Rentabilidad', n: 26, q: 'Rentabilidad: una indexación, por ejemplo, al S&P 500.', c: 'Agencias' },
+        { l: 'Incentivo al asesor', n: 19, q: 'Mejor comisión de mantenimiento que busca cuidar pólizas después del año 3.', c: 'Agencias' },
+        { l: 'Coberturas y beneficios', n: 18, q: 'Ampliar algunas coberturas: enfermedades graves, renta por hospitalización, posibilidad de proteger a los hijos.', c: 'Empleados' },
+        { l: 'Menor penalidad', n: 15, q: 'Que la penalización fuera más bajita.', c: 'Agencias' },
+      ];
+      const PERFIL = {
+        agencias: { nota: ['Voz sólida · 28 respuestas', 'g'], f: [
+          ['Lo que más frena vender', 'Penalidad y plazo', 23, 28],
+          ['Qué convenció en la última venta', 'El seguro', 18, 28],
+          ['Qué tomó quien quiso irse (7+ años)', 'Dejar de pagar un tiempo', 16, 28],
+          ['Quién acompaña con regularidad', 'El mismo asesor', 21, 28],
+          ['Conviene más vender una nueva', 'Marcan 4 o 5', 18, 28]] },
+        empleados: { nota: ['Orienta · 12 respuestas', ''], f: [
+          ['Lo que más frena vender', 'Penalidad y plazo', 10, 12],
+          ['Qué convenció en la última venta', 'La meta (educación u otra)', 8, 12],
+          ['Qué tomó quien quiso irse (7+ años)', 'Préstamo', 5, 12],
+          ['Quién acompaña con regularidad', 'El mismo asesor', 5, 12],
+          ['Conviene más vender una nueva', 'Marcan 4 o 5', 11, 12]] },
+        seguros: { nota: ['Solo una señal · 6 respuestas', ''], f: [
+          ['Lo que más frena vender', 'Penalidad y plazo', 4, 6],
+          ['Qué convenció en la última venta', 'La meta (educación u otra)', 4, 6],
+          ['Qué tomó quien quiso irse (7+ años)', 'Dejar de pagar un tiempo', 3, 6],
+          ['Quién acompaña con regularidad', 'El mismo asesor', 4, 6],
+          ['Conviene más vender una nueva', 'Marcan 4 o 5', 4, 6]] },
+      };
+      const VOCES = [
+        ['Compromiso', 'Agencias', '…10 años parecen demasiado y eso asusta a muchas personas'],
+        ['Cuando la vida cambia', 'Empleados', 'El cliente perdió su empleo y por la edad fue complicado conseguir uno rápidamente […] no logró mantener el producto'],
+        ['Flexibilidad', 'Seguros', 'Que puedan suspender temporalmente sus ahorros y al final del plan puedan aportar las cuotas faltantes'],
+        ['Aviso a tiempo', 'Agencias', 'Que le cancelen la póliza a los clientes sin avisarle al asesor es lo peor'],
+        ['Incentivo', 'Empleados', 'El mayor reconocimiento económico está en la venta nueva y no en la permanencia del cliente'],
+        ['Rentabilidad', 'Agencias', 'Siente que su dinero quedaría prácticamente quieto durante todo ese tiempo'],
+        ['Más valor', 'Agencias', 'Que el cliente se premie cada dos o tres años, algo así como un incentivo por su continuidad'],
+      ];
+
+      // ── 3. Renderizadores (todo se escribe en el fragmento ANTES de montar) ──
+      const colorOf = (l) => /^Ag/.test(l) ? 'var(--cA)' : /^Em/.test(l) ? 'var(--cE)' : /^Se/.test(l) ? 'var(--cS)' : 'var(--sk-color-primary,#00c73d)';
+      const rowsHTML = (data, hi) => data.map(([l, n, of], i) =>
+        `<div class="crow" style="--d:${i}"><span class="cl">${l}</span><span class="ctr"><i style="--w:${Math.round(n / of * 100)}%;background:${hi === undefined ? colorOf(l) : (i === 0 ? 'var(--sk-color-primary,#00c73d)' : '#aab0ab')}"></i></span><span class="cv"><b>${n}</b> de ${of}</span></div>`).join('');
+      ui.querySelectorAll('[data-rows]').forEach((el) => { el.innerHTML = rowsHTML(JSON.parse(el.dataset.rows)); });
+      ui.querySelectorAll('.dots[data-n]').forEach((el) => {
+        const n = +el.dataset.n, of = +el.dataset.of;
+        el.innerHTML = Array.from({ length: of }, (_, i) => `<i class="${i < n ? 'on' : ''}" style="--i:${i}"></i>`).join('');
+      });
+      const stackHTML = (data, total, sel, selL) => {
+        const el = $(sel), lg = $(selL);
+        el.innerHTML = data.map(([l, n, c], i) => `<span style="--f:${n};--d:${i};background:${c}">${n >= 3 ? n : ''}</span>`).join('');
+        lg.innerHTML = data.map(([l, n]) => `<span style="--f:${n}">${l}${n < 3 ? ' (' + n + ')' : ''}</span>`).join('');
+      };
+      stackHTML(Q9, 46, '#stk-q9', '#stk-q9-l');
+      stackHTML(Q10, 28, '#stk-q10', '#stk-q10-l');
+      $('#rows-q11').innerHTML = rowsHTML(Q11.map(([l, n]) => [l, n, 46]), 0);
+      ['c-q15', 'c-q12'].forEach((id) => {
+        const el = $('#' + id), vals = JSON.parse(el.dataset.vals), hi = JSON.parse(el.dataset.hi), mx = Math.max(...vals);
+        el.innerHTML = vals.map((v, i) => `<div class="c ${hi.includes(i) ? 'hi' : ''}"><b>${v}</b><i style="--h:${Math.round(v / mx * 100)}px;--d:${i}"></i></div>`).join('');
+      });
+
+      // ── 4. Montar ──
+      document.getElementById('app').append(ui);
+      setTimeout(() => document.activeElement?.closest?.('sk-input-number') && document.activeElement.blur(), 0);
+
+      // ── 5. Comportamiento (ya con el DOM montado) ──
+      const stage = document.getElementById('stage');
+      const slides = [...stage.querySelectorAll('.slide')];
+      const total = slides.length;
+      let cur = 0, vozIdx = 0, vozTimer = null;
+
+      const fit = () => document.documentElement.style.setProperty('--k', Math.min(innerWidth / 1280, innerHeight / 720));
+      addEventListener('resize', fit); fit();
+
+      // Salida por canal (diapositiva 7)
+      const renderSalida = (v) => {
+        const d = SALIDA[v];
+        document.getElementById('rows-salida').innerHTML = rowsHTML(d.rows.map(([l, n]) => [l, n, d.de]), 0);
+        document.getElementById('sub-salida').textContent = d.sub;
+      };
+      renderSalida('agencias');
+      document.getElementById('tg-salida').addEventListener('skChange', (e) => e.detail && renderSalida(e.detail));
+
+      // Perfil por canal (diapositiva 12)
+      const renderPerfil = (v) => {
+        const p = PERFIL[v];
+        document.getElementById('canal-note').innerHTML = `<span class="pill ${p.nota[1]}">${p.nota[0]}</span>`;
+        document.getElementById('prof').innerHTML = p.f.map(([q, a, n, of], i) =>
+          `<div class="pr" style="--d:${i}"><span class="q">${q}</span><span class="a">${a}</span><span class="v"><b>${n}</b> de ${of}</span><span class="mt"><i style="--w:${Math.round(n / of * 100)}%;background:${colorOf(v === 'agencias' ? 'Ag' : v === 'empleados' ? 'Em' : 'Se')}"></i></span></div>`).join('');
+      };
+      renderPerfil('agencias');
+      document.getElementById('tg-canal').addEventListener('skChange', (e) => e.detail && renderPerfil(e.detail));
+
+      // Lo que piden (diapositiva 11)
+      const askEl = document.getElementById('ask'), askQ = document.getElementById('ask-q');
+      askEl.innerHTML = PIDEN.map((p, i) => `<button class="ab ${i === 0 ? 'on' : ''}" data-i="${i}" style="--d:${i}"><span class="l">${p.l}</span><span class="tr"><i style="--w:${Math.round(p.n / 46 * 100)}%"></i></span><span class="v"><b>${p.n}</b> de 46</span></button>`).join('');
+      const showAsk = (i) => {
+        askEl.querySelectorAll('.ab').forEach((b, k) => b.classList.toggle('on', k === i));
+        const p = PIDEN[i];
+        askQ.innerHTML = `<span class="eyebrow" style="color:#bfe8c9">${p.l} · ${p.n} de 46</span><p class="quote">“${p.q}”<small style="color:#bfe8c9">${p.c.toUpperCase()}</small></p>`;
+      };
+      showAsk(0);
+      askEl.querySelectorAll('.ab').forEach((b) => {
+        b.addEventListener('mouseenter', () => showAsk(+b.dataset.i));
+        b.addEventListener('focus', () => showAsk(+b.dataset.i));
+        b.addEventListener('click', () => showAsk(+b.dataset.i));
+      });
+
+      // Voces (diapositiva 13)
+      const vz = document.getElementById('vz'), vd = document.getElementById('vdots');
+      vd.innerHTML = VOCES.map((_, i) => `<button aria-label="Cita ${i + 1}" data-i="${i}"></button>`).join('');
+      const showVoz = (i) => {
+        vozIdx = (i + VOCES.length) % VOCES.length;
+        const [t, c, q] = VOCES[vozIdx];
+        vz.innerHTML = `<p class="vq">${q}</p><div class="vm"><sk-tag sk-style="success" size="small">${t}</sk-tag><span class="eyebrow">${c}</span></div>`;
+        vd.querySelectorAll('button').forEach((b, k) => b.classList.toggle('on', k === vozIdx));
+      };
+      const stopVoz = () => { clearInterval(vozTimer); vozTimer = null; };
+      const startVoz = () => { stopVoz(); vozTimer = setInterval(() => showVoz(vozIdx + 1), 7000); };
+      vd.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { showVoz(+b.dataset.i); startVoz(); } });
+      showVoz(0);
+
+      // Retos que voltean (diapositiva 14)
+      document.querySelectorAll('#flips .fl').forEach((b) => b.addEventListener('click', () => b.classList.toggle('flip')));
+
+      // Índice: clic para saltar
+      document.querySelectorAll('#idx .ic').forEach((b) => b.addEventListener('click', () => go(+b.dataset.go)));
+
+      // Cuenta animada de números grandes
+      const countUp = (root) => root.querySelectorAll('[data-count]').forEach((el) => {
+        const to = +el.dataset.count, t0 = performance.now(), dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000;
+        if (!dur) { el.textContent = to; return; }
+        const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
+        el.textContent = '0'; requestAnimationFrame(step);
+      });
+
+      // Navegación
+      function go(i, silent) {
+        cur = Math.max(0, Math.min(total - 1, i));
+        slides.forEach((s, k) => s.classList.toggle('active', k === cur));
+        document.getElementById('count').textContent = `${cur + 1} / ${total}`;
+        document.getElementById('prog').style.width = `${(cur + 1) / total * 100}%`;
+        document.querySelectorAll('.pg').forEach((p) => { p.textContent = ''; });
+        slides[cur].querySelector('.pg').textContent = `${cur + 1} / ${total}`;
+        countUp(slides[cur]);
+        document.querySelectorAll('#flips .fl').forEach((b) => b.classList.remove('flip'));
+        if (slides[cur].dataset.title === 'En sus palabras') { showVoz(0); startVoz(); } else stopVoz();
+        if (!silent) history.replaceState(null, '', '#' + (cur + 1));
+      }
+      document.getElementById('n-prev').addEventListener('skClick', () => go(cur - 1));
+      document.getElementById('n-next').addEventListener('skClick', () => go(cur + 1));
+      document.getElementById('n-idx').addEventListener('skClick', () => go(2));
+      addEventListener('keydown', (e) => {
+        if (e.target.closest?.('sk-select-button, input, textarea')) return;
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+        else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+        else if (e.key === 'Home') go(0);
+        else if (e.key === 'End') go(total - 1);
+        else if (e.key.toLowerCase() === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+      });
+      let sx = null;
+      addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
+      addEventListener('touchend', (e) => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 60) go(cur + (dx < 0 ? 1 : -1)); sx = null; });
+      addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1), 10); if (n) go(n - 1, true); });
+
+      go((parseInt(location.hash.slice(1), 10) || 1) - 1, true);
+    });
+  </script>
+</body>
+</html>
