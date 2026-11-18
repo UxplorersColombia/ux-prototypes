@@ -2996,7 +2996,8 @@ html.embed .crumbs{padding-top:20px}
     if (a.getAttribute('aria-current')) return;
     // Sin plan no hay dueño: si se viene de esa vista, se entra como director
     const v = a.dataset.empresa === 'sin' && vista() !== 'director' ? 'director' : vista();
-    location.href = PAGINAS[a.dataset.empresa] + '?vista=' + v + (document.documentElement.classList.contains('embed') ? '&embed=1' : '') + '&v=20261118';
+    const tabAct = (tabs.find((x) => x.getAttribute('aria-selected') === 'true') || {}).id || 'tab-resumen';
+    location.href = PAGINAS[a.dataset.empresa] + '?vista=' + v + '&tab=' + tabAct.replace('tab-', '') + (document.documentElement.classList.contains('embed') ? '&embed=1' : '') + '&v=202611182';
   }));
   // Vista pedida al llegar desde la otra página
   const pedida = new URLSearchParams(location.search).get('vista');
@@ -3005,6 +3006,19 @@ html.embed .crumbs{padding-top:20px}
 
   // Al cargar, deja visible solo el panel de la pestaña activa en la vista inicial
   cambiarVista(document.body.dataset.view);
+
+  // Enlaces directos: abre la pestaña pedida (?tab=clientes…) y le avisa a Nuevo Contigo qué se está viendo
+  const tabPedida = new URLSearchParams(location.search).get('tab');
+  const tabLink = tabPedida && document.getElementById('tab-' + tabPedida);
+  if (tabLink && visibles().includes(tabLink)) { if (matchMedia('(max-width:768px)').matches) tabLink.click(); else select(tabLink, false); }
+  const PLAN_ACTUAL = /sin-pac/.test(location.pathname) ? 'sin' : 'con';
+  function avisarEstado() {
+    const t = tabs.find((x) => x.getAttribute('aria-selected') === 'true');
+    try { parent.postMessage({ nc: 'radio', plan: PLAN_ACTUAL, rol: vista(), tab: t ? t.id.replace('tab-', '') : 'resumen' }, '*'); } catch (_) {}
+  }
+  new MutationObserver(avisarEstado).observe(document.querySelector('[role="tablist"]'), { attributes: true, subtree: true, attributeFilter: ['aria-selected'] });
+  document.querySelectorAll('input[name="view"]').forEach((r) => r.addEventListener('change', () => setTimeout(avisarEstado, 0)));
+  avisarEstado();
 
   // ── Crear plan de acción: metas sugeridas que el director puede editar ──
   const overlay = document.getElementById('plan-overlay');
