@@ -1154,6 +1154,11 @@ body[data-view="dueno"] .tabs, body[data-view="fp"] .tabs { grid-template-column
   .aum-chart .aum-x { font-size: 19px; }
   .aum-chart .aum-dot { stroke-width: 4; }
 }
+
+/* Productos de la empresa: grupos que se expanden y se comprimen */
+.products button.acc-head { cursor: pointer; border-radius: 8px; }
+.products button.acc-head:focus-visible { outline: 2px solid var(--primary-00); outline-offset: 4px; }
+.products .acc-body[hidden] { display: none; }
 </style>
 <script>
 // Nuevo Contigo: la radiografía se ve dentro de Nuevo Contigo (iframe). Con ?embed se ocultan el riel y la barra propios
@@ -3288,7 +3293,7 @@ html.embed .crumbs{padding-top:20px}
     // Sin plan no hay dueño: si se viene de esa vista, se entra como director
     const v = a.dataset.empresa === 'sin' && vista() !== 'director' ? 'director' : vista();
     const tabAct = (tabs.find((x) => x.getAttribute('aria-selected') === 'true') || {}).id || 'tab-resumen';
-    location.href = PAGINAS[a.dataset.empresa] + '?vista=' + v + '&tab=' + tabAct.replace('tab-', '') + (document.documentElement.classList.contains('embed') ? '&embed=1' : '') + '&v=202611183';
+    location.href = PAGINAS[a.dataset.empresa] + '?vista=' + v + '&tab=' + tabAct.replace('tab-', '') + (document.documentElement.classList.contains('embed') ? '&embed=1' : '') + '&v=202611184';
   }));
   // Vista pedida al llegar desde la otra página
   const pedida = new URLSearchParams(location.search).get('vista');
@@ -4052,6 +4057,25 @@ function ncAmbitos(panelId, suf) {
 }
 ncAmbitos('panel-clientes', '');
 ncAmbitos('panel-clientes-own', '-own');
+</script>
+<script>
+// Productos de la empresa: cada grupo se expande y se comprime; por defecto solo Ahorro e inversión queda abierto
+(function () {
+  const ABIERTO = 'm15 6-6 6 6 6', CERRADO = 'm9 6 6 6-6 6';
+  let n = 0;
+  document.querySelectorAll('.products .acc-card').forEach((card) => {
+    const head = card.querySelector('button.acc-head'), body = card.querySelector('.acc-body');
+    if (!head || !body) return;
+    body.id = body.id || 'acc-prod-' + (++n);
+    head.setAttribute('aria-controls', body.id);
+    const pintar = (abierto) => {
+      head.setAttribute('aria-expanded', String(abierto)); body.hidden = !abierto;
+      const p = head.querySelector('.acc-chev path'); if (p) p.setAttribute('d', abierto ? ABIERTO : CERRADO);
+    };
+    pintar(head.querySelector('.acc-title').textContent.trim() === 'Ahorro e inversión');
+    head.addEventListener('click', () => pintar(head.getAttribute('aria-expanded') !== 'true'));
+  });
+})();
 </script>
 </body>
 </html>

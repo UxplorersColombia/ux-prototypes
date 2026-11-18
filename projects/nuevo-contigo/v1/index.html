@@ -2062,6 +2062,23 @@
   html.prueba .hello .avatar::after{content:attr(data-ini);display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background:#fff;color:var(--green);font:700 18px/1 Montserrat,sans-serif}
   .rc-sec{margin-top:8px;font-family:Montserrat,sans-serif;font-size:16px;line-height:24px;font-weight:700;color:#333}
   .rc-sec + p{margin-top:-14px;font-size:14px;line-height:22px;color:#666}
+
+  /* Registro del recorrido (testeo): botón para terminar y descargar */
+  .rec-fin{position:fixed;right:20px;bottom:20px;z-index:90;display:none;align-items:center;gap:8px;padding:8px 14px;border:1px solid #D8D8D8;border-radius:32px;background:#fff;color:#555;font:600 13px/20px 'Open Sans',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer}
+  html.prueba .rec-fin{display:inline-flex}
+  .rec-fin:hover{border-color:var(--green);color:#333}
+  .rec-fin i{width:8px;height:8px;border-radius:50%;background:#E03430;animation:recpulso 1.6s infinite}
+  @keyframes recpulso{50%{opacity:.35}}
+  .rec-ok{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
+  .rec-ok[hidden]{display:none}
+  .rec-ok>div{max-width:420px;margin:16px;padding:28px;border-radius:16px;background:#fff;text-align:center;font-family:'Open Sans',sans-serif;color:#404040}
+  .rec-ok h2{font:700 20px/28px Montserrat,sans-serif;color:#333;margin-bottom:8px}
+  .rec-ok p{font-size:14px;line-height:22px}
+  .rec-ok code{font-size:13px;background:#F5F5F5;padding:2px 6px;border-radius:4px;word-break:break-all}
+  .rec-ok .acciones{display:flex;gap:12px;justify-content:center;margin-top:20px}
+  .rec-ok button{padding:10px 20px;border-radius:32px;font:700 14px Montserrat,sans-serif;cursor:pointer;border:1px solid var(--green)}
+  .rec-ok .sec{background:#fff;color:var(--green)}
+  .rec-ok .pri{background:var(--green);color:#fff}
 </style>
 </head>
 <body>
@@ -2292,6 +2309,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       <h2 class="rc-sec">Testeo con FP Asignados</h2>
       <p>Una réplica de la radiografía por cada empresa del testeo. Cada enlace abre directo en la vista del FP Asignado.</p>
       <div class="rc-grid">
+        <a class="rc-card" href="https://claude.ai/artifact/7VyngVTrcCMX97NUQnCeWR" target="_blank" rel="noopener">
+          <div class="rc-top"><span class="rc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><h2>Resultados del recorrido</h2></div>
+          <p>Dashboard con los clics, clics erróneos, mapa de calor y tiempo por pestaña de cada FP en el testeo, para cruzar con lo cualitativo.</p>
+          <div class="rc-pie"><span class="rc-tag">Claude · enlace privado</span><span class="rc-ir">Abrir<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></div>
+        </a>
         <a class="rc-card" href="?p=radiografia&amp;prueba=telefonica" target="_blank" rel="noopener">
           <div class="rc-top"><span class="rc-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h4"/></svg></span><h2>Telefónica · Leopoldo</h2></div>
           <p>Radiografía de empresa como la vería el FP Asignado, con el nombre de Telefónica. Las cifras son de ejemplo.</p>
@@ -3706,7 +3728,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.ncRadioSrc=function(){
     const pr=q.get('prueba'), sin=!pr&&q.get('plan')==='sin', rol=pr?'dueno':q.get('rol'), tab=q.get('tab');
     const vista=sin?'director':(['dueno','fp'].includes(rol)?rol:'director');
-    return (sin?'radiografia-sin-pac.html':'radiografia.html')+'?vista='+vista+(tab?'&tab='+encodeURIComponent(tab):'')+(pr?'&prueba='+encodeURIComponent(pr):'')+'&embed=1&v=202611183';
+    return (sin?'radiografia-sin-pac.html':'radiografia.html')+'?vista='+vista+(tab?'&tab='+encodeURIComponent(tab):'')+(pr?'&prueba='+encodeURIComponent(pr):'')+'&embed=1&v=202611184';
   };
 })();
 </script>
@@ -4119,7 +4141,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function irEmpresa(){
     if(window.ncVolverAFicha) window.ncVolverAFicha();
     B.remove('vista-dash'); if(dash) dash.hidden=true;
-    if(!fr.getAttribute('src')) fr.src=window.ncRadioSrc?window.ncRadioSrc():'radiografia.html?vista=director&embed=1&v=202611183';
+    if(!fr.getAttribute('src')) fr.src=window.ncRadioSrc?window.ncRadioSrc():'radiografia.html?vista=director&embed=1&v=202611184';
     B.add('vista-empresa'); sec.hidden=false; scrollTo(0,0); alto();
     try{ sessionStorage.setItem('nc-vista','empresa'); }catch(e){}
   }
@@ -4203,6 +4225,60 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(d.nc==='url' && !EMBED && document.documentElement.classList.contains('pv-on')) history.replaceState(null,'',location.pathname+d.q+'#movil');
   });
   setTimeout(sync,0);
+});
+</script>
+<script>
+// Registro del recorrido del testeo (?prueba=…): clics, pestañas, ratón, scroll y atención.
+// Se guarda en este navegador mientras dura la sesión; "Terminar prueba" descarga el archivo para el dashboard de resultados
+document.addEventListener('DOMContentLoaded',()=>{
+  const prueba=new URLSearchParams(location.search).get('prueba');
+  if(!prueba || new URLSearchParams(location.search).has('embed')) return;
+  const KEY='nc-rec-'+prueba, B=document.body.classList;
+  let s=null; try{ s=JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){}
+  if(!s || s.fin){ s={v:1,prueba,inicio:Date.now(),pantalla:{w:screen.width,h:screen.height},ventana:{w:innerWidth,h:innerHeight},ua:navigator.userAgent,ev:[],atencion:{}}; }
+  const guardar=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(s)); }catch(e){} };
+  const t=ts=>(ts||Date.now())-s.inicio;
+  function vista(){ if(B.contains('lg-on')) return 'login'; if(B.contains('vista-recursos')) return 'recursos'; if(B.contains('vista-empresa')) return 'radiografia'; if(B.contains('vista-dash')) return 'inicio'; return 'ficha'; }
+  function push(ev){
+    if(ev.k==='atencion'){ for(const [k,a] of Object.entries(ev.d)){ const x=s.atencion[k]||(s.atencion[k]={h:0,v:0,lbl:a.lbl}); x.h+=a.h; x.v+=a.v; if(a.lbl) x.lbl=a.lbl; } return; }
+    ev.t=t(ev.ts); delete ev.ts; if(!ev.vista) ev.vista=vista(); s.ev.push(ev);
+  }
+  push({k:'carga',vista:vista()});
+  // Vistas de Nuevo Contigo
+  let ultV=vista();
+  new MutationObserver(()=>{ const v=vista(); if(v!==ultV){ ultV=v; push({k:'vista',vista:v}); } }).observe(document.body,{attributes:true,attributeFilter:['class']});
+  // Clics fuera de la radiografía (menú, header, buscador, recursos)
+  const INTER='a,button,input,select,textarea,label,summary,[role=button],[role=tab],[role=link],[onclick]';
+  addEventListener('click',e=>{
+    if(e.target.closest('.rec-fin,.rec-ok')) return;
+    const el=e.target.closest(INTER)||e.target;
+    let ok=e.target.closest(INTER)?'si':'no'; if(ok==='no'){ let x=e.target; for(let i=0;x&&i<4;i++,x=x.parentElement) if(getComputedStyle(x).cursor==='pointer'){ ok='si'; break; } }
+    push({k:'clic',src:'shell',ok,el:(el.getAttribute('aria-label')||el.innerText||el.textContent||'').replace(/\s+/g,' ').trim().slice(0,50),x:e.clientX,y:e.clientY,w:innerWidth});
+  },true);
+  // Eventos de la radiografía
+  addEventListener('message',e=>{ const d=e.data||{}; if(d.nc==='rec'&&d.ev){ d.ev.vista='radiografia'; push(d.ev); } });
+  setInterval(guardar,3000); addEventListener('pagehide',guardar);
+  // Terminar prueba
+  const btn=document.createElement('button'); btn.type='button'; btn.className='rec-fin'; btn.innerHTML='<i aria-hidden="true"></i>Terminar prueba';
+  const ok=document.createElement('div'); ok.className='rec-ok'; ok.hidden=true; ok.setAttribute('role','dialog'); ok.setAttribute('aria-modal','true');
+  document.body.append(btn,ok);
+  const nombre=()=>{ const d=new Date(s.inicio), z=n=>String(n).padStart(2,'0'); return 'recorrido-'+prueba+'-'+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes())+'.json'; };
+  function descargar(){
+    s.fin=Date.now(); s.duracion=s.fin-s.inicio; push({k:'fin'}); guardar();
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(s)],{type:'application/json'})); a.download=nombre(); document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+    ok.innerHTML='<div><h2>¡Gracias por tu tiempo!</h2><p>Se descargó el archivo <code>'+nombre()+'</code> con tu recorrido. Envíalo por el chat de la sesión.</p><div class="acciones"><button type="button" class="sec" data-otra>Descargar otra vez</button><button type="button" class="pri" data-cerrar>Listo</button></div></div>';
+    ok.querySelector('[data-otra]').onclick=()=>{ const b=document.createElement('a'); b.href=URL.createObjectURL(new Blob([JSON.stringify(s)],{type:'application/json'})); b.download=nombre(); b.click(); };
+    ok.querySelector('[data-cerrar]').onclick=()=>{ ok.hidden=true; };
+    ok.hidden=false; ok.querySelector('[data-cerrar]').focus();
+  }
+  btn.addEventListener('click',()=>{
+    ok.innerHTML='<div><h2>¿Terminaste la prueba?</h2><p>Se descargará un archivo con tu recorrido por el prototipo: dónde hiciste clic y qué secciones viste. No incluye datos personales.</p><div class="acciones"><button type="button" class="sec" data-no>Seguir navegando</button><button type="button" class="pri" data-si>Sí, terminar</button></div></div>';
+    ok.querySelector('[data-no]').onclick=()=>{ ok.hidden=true; };
+    ok.querySelector('[data-si]').onclick=descargar;
+    ok.hidden=false; ok.querySelector('[data-si]').focus();
+  });
+  ok.addEventListener('keydown',e=>{ if(e.key==='Escape') ok.hidden=true; });
+  window.ncRecorrido=()=>s;
 });
 </script>
 </body>

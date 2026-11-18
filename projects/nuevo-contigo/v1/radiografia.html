@@ -1183,6 +1183,11 @@ body[data-view="fp"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 /* Testeo con FP Asignados (?prueba=…): solo la vista del FP Asignado, sin el selector del prototipo */
 html.prueba .view-switch { display: none !important; }
 .prueba-aviso { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 60; padding: 8px 16px; border-radius: 32px; background: #333; color: #fff; font: 600 13px/20px 'Open Sans', sans-serif; box-shadow: 0 2px 10px rgba(0,0,0,.2); white-space: nowrap; }
+
+/* Productos de la empresa: grupos que se expanden y se comprimen */
+.products button.acc-head { cursor: pointer; border-radius: 8px; }
+.products button.acc-head:focus-visible { outline: 2px solid var(--primary-00); outline-offset: 4px; }
+.products .acc-body[hidden] { display: none; }
 </style>
 <script>
 // Nuevo Contigo: la radiografía se ve dentro de Nuevo Contigo (iframe). Con ?embed se ocultan el riel y la barra propios
@@ -3013,7 +3018,7 @@ html.embed .crumbs{padding-top:20px}
     // Sin plan no hay dueño: si se viene de esa vista, se entra como director
     const v = a.dataset.empresa === 'sin' && vista() !== 'director' ? 'director' : vista();
     const tabAct = (tabs.find((x) => x.getAttribute('aria-selected') === 'true') || {}).id || 'tab-resumen';
-    location.href = PAGINAS[a.dataset.empresa] + '?vista=' + v + '&tab=' + tabAct.replace('tab-', '') + (document.documentElement.classList.contains('embed') ? '&embed=1' : '') + '&v=202611183';
+    location.href = PAGINAS[a.dataset.empresa] + '?vista=' + v + '&tab=' + tabAct.replace('tab-', '') + (document.documentElement.classList.contains('embed') ? '&embed=1' : '') + '&v=202611184';
   }));
   // Vista pedida al llegar desde la otra página
   const pedida = new URLSearchParams(location.search).get('vista');
@@ -4012,6 +4017,93 @@ ncAmbitos('panel-clientes-own', '-own');
     })).observe(document.body, { subtree: true, childList: true, characterData: true });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(aplicar, 0)); else setTimeout(aplicar, 0);
+})();
+</script>
+<script>
+// Productos de la empresa: cada grupo se expande y se comprime; por defecto solo Ahorro e inversión queda abierto
+(function () {
+  const ABIERTO = 'm15 6-6 6 6 6', CERRADO = 'm9 6 6 6-6 6';
+  let n = 0;
+  document.querySelectorAll('.products .acc-card').forEach((card) => {
+    const head = card.querySelector('button.acc-head'), body = card.querySelector('.acc-body');
+    if (!head || !body) return;
+    body.id = body.id || 'acc-prod-' + (++n);
+    head.setAttribute('aria-controls', body.id);
+    const pintar = (abierto) => {
+      head.setAttribute('aria-expanded', String(abierto)); body.hidden = !abierto;
+      const p = head.querySelector('.acc-chev path'); if (p) p.setAttribute('d', abierto ? ABIERTO : CERRADO);
+    };
+    pintar(head.querySelector('.acc-title').textContent.trim() === 'Ahorro e inversión');
+    head.addEventListener('click', () => pintar(head.getAttribute('aria-expanded') !== 'true'));
+  });
+})();
+</script>
+<script>
+// Registro del recorrido (solo en los enlaces del testeo, ?prueba=…). Envía los eventos a Nuevo Contigo, que los guarda
+(function () {
+  if (!new URLSearchParams(location.search).get('prueba') || parent === window) return;
+  const BLK = '.identity, .page-head, [role="tablist"], .kpi, .card, .acc-card, .line, .modal, [role="dialog"]';
+  const enviar = (ev) => { try { parent.postMessage({ nc: 'rec', ev: Object.assign({ ts: Date.now() }, ev) }, '*'); } catch (_) {} };
+  let ids = new Map();
+  function numerar() { ids = new Map(); document.querySelectorAll(BLK).forEach((el, i) => ids.set(el, 'b' + i)); }
+  const tabActual = () => { const t = document.querySelector('[role="tab"][aria-selected="true"]'); return t ? t.id.replace('tab-', '') : ''; };
+  const etiqueta = (el) => { const h = el.querySelector('h2,h3,.kpi-label,.block-title,.acc-title,.line-name b,.modal-title'); return (((h && (h.innerText || h.textContent)) || el.getAttribute('aria-label') || '').split('\n')[0]).replace(/\s+/g, ' ').trim().slice(0, 60); };
+  function bloque(target, x, y) {
+    let el = target && target.closest ? target.closest(BLK) : null;
+    while (el && !ids.has(el)) el = el.parentElement && el.parentElement.closest(BLK);
+    if (!el) return { blk: 'doc', fx: +(x / document.documentElement.scrollWidth).toFixed(4), fy: Math.round(y) };
+    const r = el.getBoundingClientRect();
+    return { blk: ids.get(el), lbl: etiqueta(el), fx: +((x - r.left - scrollX) / r.width).toFixed(4), fy: +((y - r.top - scrollY) / r.height).toFixed(4) };
+  }
+  const INTER = 'a,button,input,select,textarea,label,summary,[role=button],[role=tab],[role=radio],[role=link],[role=switch],[onclick]';
+  function interactivo(t) {
+    if (t.closest('[aria-disabled="true"],[disabled]')) return 'bloqueado';
+    if (t.closest(INTER)) return 'si';
+    if (t.closest('[data-tip],[data-tt],.kpi-tt,.tt,[aria-describedby]')) return 'tooltip';
+    let e = t; for (let i = 0; e && i < 4; i++, e = e.parentElement) if (getComputedStyle(e).cursor === 'pointer') return 'si';
+    return 'no';
+  }
+  numerar();
+  setTimeout(numerar, 1500);
+  enviar({ k: 'inicio', w: innerWidth, h: innerHeight, tab: tabActual() });
+  // Clics
+  addEventListener('click', (e) => {
+    const b = bloque(e.target, e.pageX, e.pageY);
+    const tEl = e.target.closest(INTER) || e.target; const txt = (tEl.innerText || tEl.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 50);
+    enviar(Object.assign({ k: 'clic', src: 'radio', tab: tabActual(), ok: interactivo(e.target), el: txt, tag: e.target.tagName.toLowerCase() }, b));
+  }, true);
+  // Pestañas
+  let ultTab = tabActual();
+  new MutationObserver(() => { const t = tabActual(); if (t !== ultTab) { ultTab = t; enviar({ k: 'tab', tab: t }); } })
+    .observe(document.querySelector('[role="tablist"]') || document.body, { attributes: true, subtree: true, attributeFilter: ['aria-selected'] });
+  // Ratón: una muestra cada 400 ms mientras se mueve; el tiempo sobre cada bloque cuenta como atención
+  let ultMov = null, pts = [], aten = {};
+  addEventListener('mousemove', (e) => { ultMov = e; }, { passive: true });
+  setInterval(() => {
+    if (!ultMov || document.hidden) return;
+    const b = bloque(document.elementFromPoint(ultMov.clientX, ultMov.clientY) || document.body, ultMov.pageX, ultMov.pageY);
+    pts.push([b.blk, b.fx, b.fy]);
+    const k = tabActual() + '|' + b.blk; aten[k] = aten[k] || { h: 0, v: 0, lbl: b.lbl || '' }; aten[k].h += 400;
+  }, 400);
+  // Tiempo en pantalla de cada bloque (al menos la mitad visible)
+  const visibles = new Set();
+  const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.intersectionRatio >= 0.5) visibles.add(x.target); else visibles.delete(x.target); }), { threshold: [0, 0.5, 1] });
+  setTimeout(() => ids.forEach((_, el) => io.observe(el)), 1600);
+  setInterval(() => {
+    if (document.hidden) return;
+    visibles.forEach((el) => { if (!el.offsetParent && el.getClientRects().length === 0) return; const k = tabActual() + '|' + ids.get(el); aten[k] = aten[k] || { h: 0, v: 0, lbl: etiqueta(el) }; aten[k].v += 1000; });
+  }, 1000);
+  // Scroll máximo por pestaña
+  let maxScroll = {};
+  addEventListener('scroll', () => {
+    const t = tabActual(), pct = Math.round((scrollY + innerHeight) / document.documentElement.scrollHeight * 100);
+    if (pct >= (maxScroll[t] || 0) + 10) { maxScroll[t] = pct; enviar({ k: 'scroll', tab: t, pct }); }
+  }, { passive: true });
+  // Lotes cada 3 s
+  setInterval(() => {
+    if (pts.length) { enviar({ k: 'raton', tab: tabActual(), pts }); pts = []; }
+    if (Object.keys(aten).length) { enviar({ k: 'atencion', d: aten }); aten = {}; }
+  }, 3000);
 })();
 </script>
 </body>
