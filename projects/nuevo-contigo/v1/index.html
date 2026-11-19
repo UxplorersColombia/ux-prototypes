@@ -860,7 +860,7 @@
   .pp-fecha{white-space:nowrap}
   .pp-sub[hidden]{display:none}
   .pp-der{margin-left:auto}
-  .pp-tab{flex:none;display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:8px 14px 8px 8px;border-radius:16px 0 8px 0;background:#2b2b2b;color:#fff;font-family:Montserrat,sans-serif;font-size:14px;line-height:22px;font-weight:700}
+  .pp-tab{flex:none;display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:8px 14px 8px 8px;border-radius:16px 0 8px 0;background:#404040;color:#fff;font-family:Montserrat,sans-serif;font-size:14px;line-height:22px;font-weight:700}
   .pp-tab img{filter:drop-shadow(0 0 5px rgba(143,224,0,.6))}
   .pp-der{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
   .pp-saldo-l .pp-ojo-w{display:inline-flex;margin-left:2px}
@@ -886,6 +886,7 @@
   .pp-prog:focus-visible{outline:2px solid var(--blue,#0099DE);outline-offset:2px}
   .pp-prog-tt{left:auto;right:0;transform:none}
   .pp-prog-w.ver .pp-prog-tt{opacity:1;visibility:visible}
+  .pp-prog-w{display:none!important} /* 2026-11-19: se omite el 1/5 por ahora (Isa) */
   .pp-segs{display:flex;gap:3px}
   .pp-segs i{width:20px!important}
   .pp-segs i{width:12px;height:6px;border-radius:3px;background:#DADADA}
@@ -924,9 +925,20 @@
   .pp-dest{display:none}
   .pp-sem.amplio .pp-dest{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:16px;background:#fff;filter:drop-shadow(0 0 2px rgba(61,75,92,.15));align-self:stretch}
   .pp-sem.amplio .pp-dest .pp-acc{margin-top:auto}
+  /* PRUEBA 2026-11-19 (v2, menos agresiva): tarjeta clara con franja superior en el gris de Planeación Pro (#404040), etiqueta lima y borde verde suave */
+  .pp-sem.amplio .pp-dest{padding-top:0;overflow:hidden;border:1px solid rgba(0,199,61,.35);filter:none;box-shadow:0 0 0 0 transparent,0 0 24px rgba(0,199,61,.08)}
+  .pp-dest .pp-d-top{margin:0 -16px 4px;padding:10px 16px;background:#404040}
+  .pp-dest .pp-chip.alta{background:transparent;border:1px solid rgba(0,199,61,.45);color:#8fe000;gap:8px;letter-spacing:.04em}
+  .pp-dest .pp-chip.alta::before{content:"";width:7px;height:7px;border-radius:50%;background:#00C73D;box-shadow:0 0 8px #8fe000;animation:copBlink 1.6s ease-in-out 3}
+  .pp-dest .pp-chip.seg{background:transparent;border:1px solid rgba(0,240,224,.4);color:#00F0E0;letter-spacing:.04em}
+  .pp-dest .pp-plazo{color:#d0d3d5}
+  @media (prefers-reduced-motion:reduce){.pp-dest .pp-chip.alta::before{animation:none}}
   .pp-d-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .pp-plazo{font-size:12px;line-height:20px;color:#666}
   .pp-nom{margin:0;font-family:Montserrat,sans-serif;font-size:16px;line-height:24px;font-weight:700;color:#404040}
+  .pp-nom-link{color:#00C73D;text-decoration:underline;text-underline-offset:3px}
+  .pp-nom-link:hover{color:#03a835}
+  .pp-nom-link:focus-visible{outline:2px solid var(--blue,#0099DE);outline-offset:2px;border-radius:2px}
   .pp-segm{display:block;font-family:'Open Sans',sans-serif;font-size:12px;line-height:20px;font-weight:400;color:#666}
   .pp-dato{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;line-height:20px;color:#404040}
   .pp-dato svg{flex:none;color:#666}
@@ -934,7 +946,9 @@
   /* Oculto: el número se reemplaza por "$ ••••••" sin reservar su ancho, así el ojo queda pegado al texto visible */
   .pp-sem.oculto .pp-money{display:inline-flex;align-items:center;font-size:0;white-space:nowrap}
   .pp-sem.oculto .pp-money::after{content:"$ ••••••";font-size:13px;line-height:20px}
-  .pp-guia{margin:0;padding:8px 12px;border-radius:8px;background:#F6FCF2;font-size:13px;line-height:20px;color:#404040}
+  .pp-guia{display:flex;flex-direction:column;gap:4px;margin:0;padding:12px;border-radius:8px;background:#F6FCF2;font-size:13px;line-height:20px;color:#404040}
+  .pp-guia-t{font-family:Montserrat,sans-serif;font-size:14px;line-height:22px;font-weight:700}
+  .pp-guia p{margin:0}
   .pp-acc{display:flex;align-items:center;gap:8px;padding-top:4px}
   .pp-ini{padding:8px 20px;border:0;border-radius:9999px;background:#00C73D;color:#fff;font-family:Montserrat,sans-serif;font-size:14px;line-height:22px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background-color .15s,transform .1s}
   .pp-ini:hover{background:#03a835}
@@ -1503,7 +1517,16 @@
   .mis:only-child{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:40px;row-gap:10px;align-items:center}
   .mis:only-child>.mis-cat,.mis:only-child>.mis-t,.mis:only-child>.mis-d{grid-column:1;justify-self:start}
   .mis:only-child>.mis-d{max-width:70ch}
-  .mis:only-child>.mis-btn{grid-column:2;grid-row:1/5;align-self:center;justify-self:end;margin-top:0}
+  .mis:only-child>.mis-btn{grid-column:2;grid-row:1/4;align-self:center;justify-self:end;margin-top:0}
+  .mis:only-child>.mis-desc{grid-column:2;grid-row:4;justify-self:end;align-self:end} /* Descartar abajo a la derecha */
+  .mis-desc{padding:6px 12px;border:0;border-radius:9999px;background:transparent;color:#00C73D;font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+  .mis-desc:hover{background:rgba(0,199,61,.1)}
+  .mis-desc:focus-visible{outline:2px solid #0099de;outline-offset:2px}
+  .mis-descartada{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 24px;border-radius:16px;border:1px dashed #4a4a4a;color:#e3e5e7;font-size:14px;line-height:22px}
+  .mis-descartada b{color:#fff}
+  .mis-descartada button{padding:6px 12px;border:0;border-radius:9999px;background:transparent;color:#00C73D;font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+  .mis-descartada[hidden],.cop-mis .mis[hidden]{display:none!important} /* gana sobre .mis:only-child en pantallas angostas */
+  .cop-mis+.mis-descartada{margin:0 0 24px}
   .mis:only-child>.mis-conv{grid-column:1;grid-row:4;justify-self:start;margin:4px 0 0}
   @media (max-width:960px){.mis:only-child{display:flex;align-items:flex-start}}
   .panel-cop .mis-conv{font-family:'Open Sans',sans-serif;letter-spacing:0;color:#b5b9bc}
@@ -1533,6 +1556,7 @@
     .panel-cop .cop-otras{grid-template-columns:1fr}
     .panel-cop .mis{padding:18px 16px 20px}
     .panel-cop .mis .mis-btn,.panel-cop .mis:only-child>.mis-btn{align-self:stretch}
+    .panel-cop .mis .mis-desc{align-self:center}
   }
   /* Asesoría Pro: recoger la sección de saldos para ganar espacio */
   .saldos-tgl{display:none;margin-left:auto;align-items:center;gap:6px;border:0;background:none;padding:6px 10px;border-radius:8px;font-family:'Open Sans',sans-serif;font-size:14px;font-weight:600;color:#e3e5e7;cursor:pointer}
@@ -2527,18 +2551,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       </section>
       <button type="button" class="ds-add"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg><span>Arma tu inicio con los módulos que más usas</span><b>Agregar módulo</b></button>
       </div>
-      <div class="pp-md-velo" id="pp-desc" hidden>
-        <div class="pp-md" role="dialog" aria-modal="true" aria-labelledby="pp-desc-tit" aria-describedby="pp-desc-d">
-          <button type="button" class="pp-md-x" aria-label="Cerrar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-          <span class="pp-md-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg></span>
-          <h2 id="pp-desc-tit">¿Por qué descartas esta misión?</h2>
-          <p id="pp-desc-d">La misión con <b id="pp-desc-nom"></b> saldrá de tu semana. Tu respuesta queda registrada y nos ayuda a mejorar las misiones.</p>
-          <fieldset class="pp-md-ops"><legend class="sr-only">Motivo</legend><label class="pp-md-op"><input type="radio" name="pp-motivo" value="falsa"><span>Falsa alarma</span></label><label class="pp-md-op"><input type="radio" name="pp-motivo" value="norel"><span>No es relevante para mí</span></label><label class="pp-md-op"><input type="radio" name="pp-motivo" value="ya"><span>Ya realicé el acompañamiento antes</span></label><label class="pp-md-op"><input type="radio" name="pp-motivo" value="otro"><span>Otro</span></label></fieldset>
-          <div class="pp-md-otro" hidden><label for="pp-desc-tx">Cuéntanos el motivo</label><textarea id="pp-desc-tx" rows="2" maxlength="200"></textarea></div>
-          <button type="button" class="pp-md-ok" disabled>Descartar misión</button>
-        </div>
-      </div>
-      <div class="pp-toast" id="pp-toast" role="status" aria-live="polite"><span></span><button type="button" hidden>Deshacer</button></div>
       <section class="ds-logros oculto" aria-label="Logros del mes">
         <div class="ds-lg-h">
           <div class="ds-mes"><button type="button" class="ds-lg-tab" aria-haspopup="dialog" aria-expanded="false" aria-controls="ds-mp"><img src="assets/dash/star.svg" width="24" height="24" alt="">Logros en <span id="ds-mes-txt">octubre 2026</span><img class="ds-lg-chev" src="assets/dash/chev-down-verde.svg" width="16" height="16" alt=""></button><div class="ds-mp" id="ds-mp" role="dialog" aria-label="Elige el mes de los logros" hidden><div class="ds-mp-h"><span class="ds-mp-anio" id="ds-mp-anio" aria-live="polite">2026</span><span class="ds-mp-nav"><button type="button" data-anio="1" aria-label="Año siguiente"><img src="assets/dash/chev-arriba.svg" width="16" height="16" alt=""></button><button type="button" data-anio="-1" aria-label="Año anterior"><img src="assets/dash/chev-abajo.svg" width="16" height="16" alt=""></button></span></div><div class="ds-mp-grid" role="radiogroup" aria-labelledby="ds-mp-anio"></div></div></div>
@@ -2687,11 +2699,12 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="cop-b" data-cop-panel="journeys">
           <div class="cop-mis">
             <article class="mis mis-urg">
-              <span class="mis-cat">Prioridad alta · Sami ya le escribió</span>
+              <span class="mis-cat">Prioridad alta</span>
               <h4 class="mis-t">Revisa con Óscar su portafolio y sus objetivos</h4>
-              <p class="mis-d"><strong>Por qué:</strong> el modelo de Fligo lo identificó con alta probabilidad de retirar recursos de Multifund en los próximos 60 días. Habla de su situación actual y sus objetivos, sin mencionar el riesgo de retiro.</p>
-              <button class="mis-btn" type="button">Iniciar conversación</button>
-              <p class="mis-conv">Conversación: <b>Acompañamiento en el retiro</b></p>
+              <p class="mis-d">Nuestro modelo indica que podría retirar recursos de Multifund en los próximos 60 días. No menciones esta señal; si decide hacerlo, acompaña su decisión con las opciones que mejor se ajusten a sus objetivos.</p>
+              <button class="mis-btn" type="button">Iniciar acompañamiento</button>
+              <p class="mis-conv">Misión: <b>Acompañamiento al retirar</b></p>
+              <button class="mis-desc" type="button" aria-haspopup="dialog" aria-controls="pp-desc">Descartar</button>
             </article>
           </div>
 
@@ -2711,7 +2724,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         </div>
         <div class="cop-b" data-cop-panel="historial" hidden>
           <div class="cop-hist">
-            <div><span class="jy-t">Acompañamiento en el retiro</span><span class="jy-d">Conversación del 28/10/2026 · 12 min</span></div>
+            <div><span class="jy-t">Acompañamiento al retirar</span><span class="jy-d">Conversación del 28/10/2026 · 12 min</span></div>
             <span class="cop-estado">Completado</span>
           </div>
         </div>
@@ -2904,7 +2917,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="jy-modal" role="dialog" aria-modal="true" aria-labelledby="jm-tit">
     <header class="jm-top">
       <button type="button" class="jm-salir" data-jm-salir><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Regresar</button>
-      <h2 id="jm-tit" class="jm-tit">Acompañamiento en el retiro · Óscar Camilo Hernández Ramírez</h2>
+      <h2 id="jm-tit" class="jm-tit">Acompañamiento al retirar · Óscar Camilo Hernández Ramírez</h2>
     </header>
     <div class="jw-cab">
       <ol class="jw-pasos" aria-label="Etapas de la conversación"><li><button type="button" class="jw-p on" data-ir="1" aria-current="step"><span class="jw-n">1</span><span class="jw-pt">Entender</span></button></li><li><button type="button" class="jw-p" data-ir="2" disabled><span class="jw-n">2</span><span class="jw-pt">Situación</span></button></li><li><button type="button" class="jw-p" data-ir="3" disabled><span class="jw-n">3</span><span class="jw-pt">Opciones</span></button></li><li><button type="button" class="jw-p" data-ir="4" disabled><span class="jw-n">4</span><span class="jw-pt">Precauciones</span></button></li><li><button type="button" class="jw-p" data-ir="5" disabled><span class="jw-n">5</span><span class="jw-pt">Acuerdo</span></button></li></ol><p class="jw-cont" data-cont aria-hidden="true">Entender</p>
@@ -3050,7 +3063,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="jw-det-b" role="tabpanel" data-det-b></div>
       </section>
       <aside class="jw-sami" aria-label="SAMI te acompaña" hidden><!-- Panel de SAMI retirado del journey (2026-11-16); se conserva oculto para no romper la lógica -->
-        <div class="jw-sami-h"><img src="assets/sami-cabeza.png" alt="" width="34" height="25"><div><b>SAMI te acompaña</b><span>Acompañamiento en el retiro</span></div></div>
+        <div class="jw-sami-h"><img src="assets/sami-cabeza.png" alt="" width="34" height="25"><div><b>SAMI te acompaña</b><span>Acompañamiento al retirar</span></div></div>
         <div class="jw-sami-lista" aria-live="polite"></div>
         <div class="jw-sami-sug" data-sug><button type="button" data-sug-otro>Es por otra razón</button></div>
       </aside>
@@ -3873,8 +3886,24 @@ document.addEventListener('DOMContentLoaded',()=>{
     let est=tarjeta.querySelector('.mis-estado');
     if(!est){ est=document.createElement('span'); est.className='mis-estado'; tarjeta.querySelector('.mis-cat').after(est); }
     est.textContent = completada ? '✓ Misión completada' : 'En curso · '+hechas.size+' de 5 etapas';
-    tarjeta.querySelector('.mis-btn').textContent = completada ? 'Ver conversación' : 'Continuar conversación';
+    tarjeta.querySelector('.mis-btn').textContent = completada ? 'Ver acompañamiento' : 'Retomar acompañamiento';
   }
+});
+</script>
+<script>
+// Planeación Pro (ficha): descartar la misión de Óscar con la misma modal del dashboard
+document.addEventListener('DOMContentLoaded',()=>{
+  const card=document.querySelector('.cop-mis .mis'), btn=card&&card.querySelector('.mis-desc'); if(!btn) return;
+  const caja=document.createElement('div'); caja.className='mis-descartada'; caja.hidden=true; caja.setAttribute('role','status');
+  card.closest('.cop-mis').after(caja); // fuera de .cop-mis para no romper el diseño de una sola misión (:only-child)
+  btn.addEventListener('click',e=>{ e.stopPropagation(); if(window.ppDescartar) window.ppDescartar('oscar',btn); });
+  document.addEventListener('pp-descartada',e=>{ if(e.detail.id!=='oscar') return;
+    card.hidden=true; caja.hidden=false;
+    caja.innerHTML='<span>Descartaste esta misión. Motivo: <b></b></span><button type="button">Deshacer</button>';
+    caja.querySelector('b').textContent=e.detail.motivo||'—';
+    caja.querySelector('button').addEventListener('click',()=>{ const t=document.querySelector('#pp-toast button'); if(t&&!t.hidden) t.click(); else document.dispatchEvent(new CustomEvent('pp-restaurada',{detail:{id:'oscar'}})); });
+  });
+  document.addEventListener('pp-restaurada',e=>{ if(e.detail.id!=='oscar') return; card.hidden=false; caja.hidden=true; });
 });
 </script>
 <script>
@@ -4314,10 +4343,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     ampliar:sv('<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',20),
     reducir:sv('<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>',20)
   };
-  // Orden: 1) seguimientos acordados, 2) retiros radicados, 3) prioridad Fligo, 4) contactados por Sami / con lead, 5) proporción del saldo y días restantes
+  // Prototipo: Óscar va primero porque es el único con ficha de cliente. Orden real: 1) seguimientos acordados, 2) retiros radicados, 3) prioridad Fligo, 4) contactados por Sami / con lead, 5) proporción del saldo y días restantes
   const MIA=[
+{id:'oscar',n:'Óscar Camilo Hernández Ramírez',s:'Wealth Builders',chip:'alta',chipTx:'Alta',plazo:'Quedan 54 días',saldo:52732191,por:'sami',porTx:'Sami ya le escribió · en la lista desde el 12 nov'},
     {id:'pardo',n:'Luis Fernando Pardo Ruiz',s:'Stability Seekers',chip:'seg',chipTx:'Misión iniciada',plazo:'Quedan 31 días',saldo:90400000,por:'acuerdo',porTx:'Iniciaste la conversación el 14 nov'},
-    {id:'oscar',n:'Óscar Camilo Hernández Ramírez',s:'Wealth Builders',chip:'alta',chipTx:'Alta',plazo:'Quedan 54 días',saldo:52732191,por:'sami',porTx:'Sami ya le escribió'},
     {id:'mejia',n:'Carlos Andrés Mejía Torres',s:'Capital Investor',chip:'alta',chipTx:'Alta',plazo:'Quedan 9 días',saldo:310250000,por:'lista',porTx:'En la lista desde el 19 sep'},
     {id:'torres',n:'Ana María Torres Gil',s:'Family Guardians',chip:'alta',chipTx:'Alta',plazo:'Quedan 23 días',saldo:64800000,por:'lista',porTx:'En la lista desde el 3 oct'}
   ];
@@ -4385,16 +4414,16 @@ document.addEventListener('DOMContentLoaded',()=>{
     const m=L[sel];
     dest.hidden=!m;
     if(m) dest.innerHTML='<div class="pp-d-top"><span class="pp-chip '+m.chip+'">'+(m.chip==='seg'?'Misión iniciada':'Prioridad alta')+'</span><span class="pp-plazo">'+m.plazo+'</span></div>'+
-      '<h3 class="pp-nom">'+m.n+'<span class="pp-segm">'+m.s+'</span></h3>'+
+      '<h3 class="pp-nom"><a href="#" class="pp-nom-link">'+m.n+'</a><span class="pp-segm">'+m.s+'</span></h3>'+
       '<p class="pp-dato pp-saldo-l">'+IC.plata+'Saldo disponible para retiro: <b class="pp-money">'+fmt(m.saldo)+'</b></p>'+
-      '<p class="pp-dato">'+IC[m.por]+m.porTx+'</p>'+
-      '<p class="pp-guia"><b>Acompañamiento al retirar.</b> Revisa su portafolio y sus objetivos, sin mencionar el riesgo de retiro.</p>'+
-      '<div class="pp-acc"><button type="button" class="pp-ini">'+(m.chip==='seg'?'Retomar conversación':'Iniciar conversación')+'</button>'+
+      (m.por==='sami'?'':'<p class="pp-dato">'+IC[m.por]+m.porTx+'</p>')+
+      '<div class="pp-guia"><b class="pp-guia-t">Revisa con '+m.n.split(' ')[0]+' su portafolio y sus objetivos.</b><p>Nuestro modelo indica que podría retirar recursos de Multifund en los próximos 60 días. No menciones esta señal; si decide hacerlo, acompaña su decisión con las opciones que mejor se ajusten a sus objetivos.</p></div>'+
+      '<div class="pp-acc"><button type="button" class="pp-ini">'+'Ir a Planeación Pro'+'</button>'+
       '<span class="pp-pos-w"><button type="button" class="pp-pos" aria-haspopup="dialog" aria-controls="pp-desc">Descartar</button></span></div>';
     // El ojo vive solo junto al saldo de la misión destacada
     const sl=dest.querySelector('.pp-saldo-l'); if(sl) sl.appendChild(ojoW);
     const ocultas=Math.max(0,L.length-3);
-    filtro.textContent=amplio?((lectura?'El sistema eligió estas 5':'Elegimos estas 5')+' de '+estado.total+' clientes con Acompañamiento en el retiro.'+(estado.pos.length?' Descartadas: '+estado.pos.length+'.':'')):''; filtro.dataset.t=filtro.textContent; if(sec.classList.contains('m-todas')) filtro.textContent='';
+    filtro.textContent=amplio?((lectura?'El sistema eligió estas 5':'Elegimos estas 5')+' de '+estado.total+' clientes con Acompañamiento al retirar.'+(estado.pos.length?' Descartadas: '+estado.pos.length+'.':'')):''; filtro.dataset.t=filtro.textContent; if(sec.classList.contains('m-todas')) filtro.textContent='';
     mas.hidden=true;
     mas.textContent=sec.classList.contains('m-todas')?'Ver menos':'Ver la semana';
     if(sec.classList.contains('m-todas')) lista.querySelectorAll('li.extra').forEach(li=>li.style.display='block');
@@ -4426,6 +4455,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   dest.addEventListener('click',e=>{
     const m=estado.l[sel]; if(!m) return;
     if(e.target.closest('.pp-ini')){ abrir(m); return; }
+    // El nombre abre la ficha del cliente (Productos)
+    if(e.target.closest('.pp-nom-link')){ e.preventDefault();
+      if(m.id==='oscar'){ if(window.ncIrFicha) window.ncIrFicha(); const pr=document.querySelector('.tabs .tab[data-panel="productos"]'); if(pr) setTimeout(()=>pr.click(),0); }
+      else aviso('En el prototipo solo está disponible la ficha de Óscar.');
+      return; }
     if(e.target.closest('.pp-pos')) abrirDescartar(m, e.target.closest('.pp-pos'));
   });
   // Modal Descartar (patrón Figma Portal Clientes 2.0 · 67401:3430): motivo obligatorio, queda registrado
@@ -4452,7 +4486,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     const m=mdMision, idx=estado.l.indexOf(m); if(idx<0) return;
     m.motivo=r.value==='otro'?'otro: '+mdTx.value.trim():r.value;
     estado.l.splice(idx,1); estado.pos.push(m); cerrarDescartar(); pintar();
-    aviso('Descartaste la misión de '+m.n.split(' ')[0]+'. Registramos el motivo.',()=>{ estado.pos.splice(estado.pos.indexOf(m),1); estado.l.splice(idx,0,m); sel=idx; pintar(); });
+    const ETQ={falsa:'Falsa alarma',norel:'No es relevante para mí',ya:'Ya realicé el acompañamiento antes'};
+    document.dispatchEvent(new CustomEvent('pp-descartada',{detail:{id:m.id,motivo:r.value==='otro'?mdTx.value.trim():ETQ[r.value]}}));
+    aviso('Descartaste la misión de '+m.n.split(' ')[0]+'. Registramos el motivo.',()=>{ estado.pos.splice(estado.pos.indexOf(m),1); estado.l.splice(idx,0,m); sel=idx; pintar(); document.dispatchEvent(new CustomEvent('pp-restaurada',{detail:{id:m.id}})); });
   });
   // Tooltip de la diana: también con toque (pantallas táctiles); se cierra al tocar fuera
   progW.addEventListener('click',e=>{ e.stopPropagation(); progW.classList.toggle('ver'); });
@@ -4471,6 +4507,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   let antes=document.body.classList.contains('vista-dash');
   new MutationObserver(()=>{ const ahora=document.body.classList.contains('vista-dash'); if(ahora&&!antes) ojo(true); antes=ahora; }).observe(document.body,{attributes:true,attributeFilter:['class']});
   ojo(true);
+  // La ficha de Óscar también puede descartar su misión con la misma modal
+  window.ppDescartar=(id,btn)=>{ const m=MIA_ACT().find(x=>x.id===id); if(m) abrirDescartar(m,btn); };
+  function MIA_ACT(){ return lectura?[]:estado.l; }
   const prev=window.dsAsesor;
   window.dsAsesor=i=>{ if(prev) prev(i); cargar(i); };
   cargar(null); ponerTam(amplio);
@@ -4655,5 +4694,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.ncRecorrido=()=>s;
 });
 </script>
+<!-- Planeación Pro: modal Descartar y aviso, compartidos por el dashboard y la ficha -->
+      <div class="pp-md-velo" id="pp-desc" hidden>
+        <div class="pp-md" role="dialog" aria-modal="true" aria-labelledby="pp-desc-tit" aria-describedby="pp-desc-d">
+          <button type="button" class="pp-md-x" aria-label="Cerrar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+          <span class="pp-md-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg></span>
+          <h2 id="pp-desc-tit">¿Por qué descartas esta misión?</h2>
+          <p id="pp-desc-d">La misión con <b id="pp-desc-nom"></b> saldrá de tu semana. Tu respuesta queda registrada y nos ayuda a mejorar las misiones.</p>
+          <fieldset class="pp-md-ops"><legend class="sr-only">Motivo</legend><label class="pp-md-op"><input type="radio" name="pp-motivo" value="falsa"><span>Falsa alarma</span></label><label class="pp-md-op"><input type="radio" name="pp-motivo" value="norel"><span>No es relevante para mí</span></label><label class="pp-md-op"><input type="radio" name="pp-motivo" value="ya"><span>Ya realicé el acompañamiento antes</span></label><label class="pp-md-op"><input type="radio" name="pp-motivo" value="otro"><span>Otro</span></label></fieldset>
+          <div class="pp-md-otro" hidden><label for="pp-desc-tx">Cuéntanos el motivo</label><textarea id="pp-desc-tx" rows="2" maxlength="200"></textarea></div>
+          <button type="button" class="pp-md-ok" disabled>Descartar misión</button>
+        </div>
+      </div>
+      <div class="pp-toast" id="pp-toast" role="status" aria-live="polite"><span></span><button type="button" hidden>Deshacer</button></div>
 </body>
 </html>
