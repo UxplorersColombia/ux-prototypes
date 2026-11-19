@@ -925,13 +925,35 @@
   .pp-dest{display:none}
   .pp-sem.amplio .pp-dest{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:16px;background:#fff;filter:drop-shadow(0 0 2px rgba(61,75,92,.15));align-self:stretch}
   .pp-sem.amplio .pp-dest .pp-acc{margin-top:auto}
-  /* PRUEBA 2026-11-19 (v2, menos agresiva): tarjeta clara con franja superior en el gris de Planeación Pro (#404040), etiqueta lima y borde verde suave */
-  .pp-sem.amplio .pp-dest{padding-top:0;overflow:hidden;border:1px solid rgba(0,199,61,.35);filter:none;box-shadow:0 0 0 0 transparent,0 0 24px rgba(0,199,61,.08)}
-  .pp-dest .pp-d-top{margin:0 -16px 4px;padding:10px 16px;background:#404040}
-  .pp-dest .pp-chip.alta{background:transparent;border:1px solid rgba(0,199,61,.45);color:#8fe000;gap:8px;letter-spacing:.04em}
-  .pp-dest .pp-chip.alta::before{content:"";width:7px;height:7px;border-radius:50%;background:#00C73D;box-shadow:0 0 8px #8fe000;animation:copBlink 1.6s ease-in-out 3}
-  .pp-dest .pp-chip.seg{background:transparent;border:1px solid rgba(0,240,224,.4);color:#00F0E0;letter-spacing:.04em}
-  .pp-dest .pp-plazo{color:#d0d3d5}
+  /* 2026-11-19 (v3, elegida por Isa): tarjeta blanca con borde superior de 4 px en el degradado de marca verde→lima (--estilos-degrade de la librería) */
+  .pp-sem.amplio .pp-dest{position:relative;overflow:hidden;padding-top:20px}
+  /* Órbita punteada de Planeación Pro (como en el panel de la ficha), tenue en la esquina superior derecha */
+  .pp-orbita{position:absolute;top:4px;right:0;width:240px;height:160px;pointer-events:none;z-index:0}
+  .pp-giro{transform-origin:250px 34px;transform-box:view-box;animation:ppGiro 6s cubic-bezier(.2,.8,.2,1) 1 both}
+  .pp-giro circle{filter:drop-shadow(0 0 4px #8fe000)}
+  @keyframes ppGiro{from{transform:rotate(-35deg)}to{transform:rotate(0)}}
+  @media (prefers-reduced-motion:reduce){.pp-giro{animation:none}}
+  .pp-dest>*:not(.pp-orbita){position:relative;z-index:1}
+  /* PRUEBA dark (v4, 2026-11-19): se activa con la clase .pp-oscuro en #pp-sem; quitarla vuelve a la tarjeta clara */
+  .pp-oscuro.amplio .pp-dest{background:#383838;border:1px solid rgba(0,199,61,.35);filter:none;box-shadow:0 0 30px rgba(0,199,61,.08),inset 0 0 30px rgba(0,199,61,.04);color:#e3e5e7}
+  .pp-oscuro.amplio .pp-dest::before{display:none}
+  .pp-oscuro .pp-dest .pp-nom{color:#fff;font-size:18px;line-height:26px}
+  .pp-oscuro .pp-dest .pp-segm{color:#b5b9bc}
+  .pp-oscuro .pp-dest .pp-nom-link{color:#00C73D}
+  .pp-oscuro .pp-dest .pp-nom-link:hover{color:#2bd65c}
+  .pp-oscuro .pp-dest .pp-dato{color:#e3e5e7}
+  .pp-oscuro .pp-dest .pp-dato svg{color:#b5b9bc}
+  .pp-oscuro .pp-dest .pp-saldo-l .pp-ojo svg{color:#00C73D}
+  .pp-oscuro .pp-dest .pp-money{color:#fff}
+  .pp-oscuro .pp-dest .pp-guia{background:rgba(255,255,255,.04);border:1px solid #4a4a4a;color:#e3e5e7}
+  .pp-oscuro .pp-dest .pp-guia-sami{color:#b5b9bc}
+  .pp-oscuro .pp-dest .pp-guia-t{color:#fff}
+  .pp-oscuro .pp-dest .pp-ini{color:#03140a} /* botón verde sobre oscuro → texto oscuro */
+  .pp-oscuro .pp-dest .pp-pos:hover,.pp-oscuro .pp-dest .pp-ojo:hover{background:rgba(0,199,61,.12)}
+  .pp-oscuro .pp-dest .pp-orbita ellipse{stroke:rgba(255,255,255,.22)}
+  .pp-sem.amplio .pp-dest::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:#404040} /* franja en el gris Pro (antes degradado verde→lima) */
+  .pp-dest .pp-chip.alta{gap:6px}
+  .pp-dest .pp-chip.alta::before{content:"";width:7px;height:7px;border-radius:50%;background:#8fe000;box-shadow:0 0 6px #8fe000;animation:copBlink 1.6s ease-in-out 3}
   @media (prefers-reduced-motion:reduce){.pp-dest .pp-chip.alta::before{animation:none}}
   .pp-d-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .pp-plazo{font-size:12px;line-height:20px;color:#666}
@@ -947,6 +969,8 @@
   .pp-sem.oculto .pp-money{display:inline-flex;align-items:center;font-size:0;white-space:nowrap}
   .pp-sem.oculto .pp-money::after{content:"$ ••••••";font-size:13px;line-height:20px}
   .pp-guia{display:flex;flex-direction:column;gap:4px;margin:0;padding:12px;border-radius:8px;background:#F6FCF2;font-size:13px;line-height:20px;color:#404040}
+  .pp-guia-sami{display:flex;align-items:center;gap:6px;font-size:12px;line-height:20px;font-weight:600;color:#666}
+  .pp-guia-sami img{filter:drop-shadow(0 0 4px rgba(143,224,0,.65))}
   .pp-guia-t{font-family:Montserrat,sans-serif;font-size:14px;line-height:22px;font-weight:700}
   .pp-guia p{margin:0}
   .pp-acc{display:flex;align-items:center;gap:8px;padding-top:4px}
@@ -2526,7 +2550,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <span class="ds-aviso-tx">Será este 30 de diciembre de 00:00 a 06:00 am.<img src="assets/dash/chev-der.svg" width="16" height="16" alt=""></span>
       </a>
       <div class="ds-mods">
-      <section class="pp-sem oculto" id="pp-sem" aria-labelledby="pp-tit">
+      <section class="pp-sem oculto pp-oscuro" id="pp-sem" aria-labelledby="pp-tit">
         <div class="pp-h">
           <span class="pp-tab" id="pp-tit"><img src="assets/sami.png" width="24" height="24" alt="">Planeación Pro</span>
           <span class="pp-sub-tx"><span id="pp-quien">Tus misiones esta semana</span> <span class="pp-fecha"><span class="pp-sep">· </span><b>16 al 20 nov</b></span></span>
@@ -4413,11 +4437,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     // Misión destacada (solo ampliado)
     const m=L[sel];
     dest.hidden=!m;
-    if(m) dest.innerHTML='<div class="pp-d-top"><span class="pp-chip '+m.chip+'">'+(m.chip==='seg'?'Misión iniciada':'Prioridad alta')+'</span><span class="pp-plazo">'+m.plazo+'</span></div>'+
+    if(m) dest.innerHTML=/* sin etiqueta ni plazo: ya están en la lista de la izquierda */
+      '<svg class="pp-orbita" viewBox="0 0 240 160" aria-hidden="true"><g class="pp-giro"><ellipse cx="250" cy="34" rx="170" ry="62" fill="none" stroke="rgba(0,199,61,.45)" stroke-dasharray="2 6"/><circle cx="103" cy="65" r="4" fill="#8fe000"/></g></svg>'+
       '<h3 class="pp-nom"><a href="#" class="pp-nom-link">'+m.n+'</a><span class="pp-segm">'+m.s+'</span></h3>'+
       '<p class="pp-dato pp-saldo-l">'+IC.plata+'Saldo disponible para retiro: <b class="pp-money">'+fmt(m.saldo)+'</b></p>'+
       (m.por==='sami'?'':'<p class="pp-dato">'+IC[m.por]+m.porTx+'</p>')+
-      '<div class="pp-guia"><b class="pp-guia-t">Revisa con '+m.n.split(' ')[0]+' su portafolio y sus objetivos.</b><p>Nuestro modelo indica que podría retirar recursos de Multifund en los próximos 60 días. No menciones esta señal; si decide hacerlo, acompaña su decisión con las opciones que mejor se ajusten a sus objetivos.</p></div>'+
+      '<div class="pp-guia"><span class="pp-guia-sami"><img src="assets/sami.png" width="22" height="22" alt="">Sami te sugiere</span><b class="pp-guia-t">Revisa con '+m.n.split(' ')[0]+' su portafolio y sus objetivos.</b><p>Nuestro modelo indica que podría retirar recursos de Multifund en los próximos 60 días. No menciones esta señal; si decide hacerlo, acompaña su decisión con las opciones que mejor se ajusten a sus objetivos.</p></div>'+
       '<div class="pp-acc"><button type="button" class="pp-ini">'+'Ir a Planeación Pro'+'</button>'+
       '<span class="pp-pos-w"><button type="button" class="pp-pos" aria-haspopup="dialog" aria-controls="pp-desc">Descartar</button></span></div>';
     // El ojo vive solo junto al saldo de la misión destacada
