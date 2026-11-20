@@ -349,6 +349,12 @@
   .pf-copiar-w:hover .pf-copiar-tt,.pf-copiar:focus-visible+.pf-copiar-tt,.pf-copiar.ok+.pf-copiar-tt{opacity:1;visibility:visible}
   @media (hover:none){.pf-copiar:hover{background:transparent}.pf-copiar-w:hover .pf-copiar-tt{opacity:0;visibility:hidden}.pf-copiar.ok+.pf-copiar-tt{opacity:1;visibility:visible}}
   .pf-copiar-tx{display:none}
+  /* Encabezado de la tabla: título + copiar */
+  .pf-ind-h{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:32px}
+  .pf-ind-h[hidden]{display:none}
+  .pf-ind-h h3{margin:0;font-family:Montserrat,sans-serif;font-size:18px;line-height:26px;font-weight:500;color:var(--texts-dark,#404040)}
+  .pf-ind-h+.pf-comp{margin-top:16px}
+  @media (max-width:600px){.pf-ind-h h3{font-size:16px;line-height:24px;font-weight:500}}
   /* Total: "Total" en la columna Disponible y la suma debajo de Saldo (también en móvil, se ven juntos al deslizar) */
   .pf-tabla tfoot th.pf-total-lbl{background:transparent;text-align:center;font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--texts-dark,#404040)}
   body.m-pf-sec .pf-tabla tfoot td:not(.pf-col-saldo):not(.pf-izq),body.m-pf-sec .pf-tabla tfoot th.pf-total-lbl{background:transparent}
@@ -361,11 +367,9 @@
     .pf-caja>.pf-saf{order:2}
     .pf-caja>.pf-comp{display:contents}
     .pf-caja .pf-donut-comp{order:3;align-self:center;margin-top:24px}
-    .pf-caja .pf-copiar-w{order:4;align-self:flex-end;margin:16px 0 4px}
+    .pf-caja>.pf-ind-h{order:4;margin:24px 0 0}
     .pf-caja .pf-tabla-wrap{order:5}
     .pf-caja>.pf-vacio{order:7}
-    .pf-copiar{width:auto;min-height:44px;gap:8px;padding:0 12px;font-family:Montserrat,sans-serif;font-size:14px;font-weight:700}
-    .pf-copiar-tx{display:inline}
     .pf-copiar-tt{display:none}
   }
   @media (prefers-reduced-motion:reduce){.pf-copiar,.pf-copiar-tt{transition:none}}
@@ -413,6 +417,17 @@
     .pf-fecha-btn{width:100%}
     .pf-cal{left:0;right:auto;width:100%;max-width:304px}
   }
+  /* FIC: dos tarjetas arriba y pestaña Movimientos con tabla */
+  .pf-cards.pf-cards-2{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+  .pf-mov-h{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:8px}
+  .pf-mov-h h3{margin:0;font-family:Montserrat,sans-serif;font-size:20px;line-height:28px;font-weight:500;color:var(--texts-dark,#404040)}
+  .pf-mov-pag select{height:40px;padding:0 32px 0 12px;border:1px solid var(--stroke-default,#E3E5E7);border-radius:8px;background:#fff;font-family:'Open Sans',sans-serif;font-size:14px;color:var(--texts-dark,#404040)}
+  .pf-tabla.pf-mov{min-width:560px}
+  .pf-tabla.pf-mov th,.pf-tabla.pf-mov td{text-align:center}
+  .pf-tabla.pf-mov td:first-child{background:#fff;padding:8px 10px}
+  .pf-tabla.pf-mov .pf-desc{margin:0 auto}
+  .pf-dato .pf-big [data-pv]{font-size:inherit}
+  [data-solo][hidden]{display:none!important}
   /* Standing allocation: solo la dona y la leyenda */
   .pf-comp[hidden],.pf-caja>.pf-comp[hidden]{display:none!important}
   .pf-std{display:flex;align-items:center;gap:56px;margin-top:32px;padding:8px 0 16px}
@@ -2930,7 +2945,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div class="m-cliente"><a class="m-volver" href="#" aria-label="Volver al inicio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></a><span class="m-nombre">Óscar Camilo Hernández Ramírez</span></div>
     <div class="crumb">
       <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="#00C73D" stroke-width="2" stroke-linecap="round"><path d="M21 8H2M8 1L1 8l7 7"/></svg>
-      <span style="margin-left:4px">Inicio</span><span class="sep">/</span><a href="#" class="crumb-cliente">Óscar Camilo Hernández Ramírez</a><span class="crumb-prod"><span class="sep">/</span><b>#100000063061</b></span>
+      <span style="margin-left:4px">Inicio</span><span class="sep">/</span><a href="#" class="crumb-cliente">Óscar Camilo Hernández Ramírez</a><span class="crumb-prod"><span class="sep">/</span><b data-pv="num">#100000063061</b></span>
     </div>
 
     <div class="idbar">
@@ -3082,10 +3097,16 @@ document.addEventListener('DOMContentLoaded',()=>{
             Ahorro Voluntario e inversión
             <svg class="chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6"><path d="M6.5 1.5L3 5l3.5 3.5"/></svg>
           </div>
-          <div class="prod prod-click">
+          <div class="prod prod-click" data-producto="mf">
             <div class="t"><button type="button" class="prod-abrir" data-abre-producto aria-label="Ver ficha del producto Potencializar mi inversión, contrato #100000063061"><span class="ed">-ED</span><span class="nom">Potencializar mi inversión</span> <span class="n"><span class="n-sep">| </span>#100000063061</span></button><span class="prod-tag">Skandia Capital + Seguros</span>
               <button type="button" class="prod-abrir prod-chev" data-abre-producto aria-label="Ver ficha del producto"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6" style="margin-left:8px"><path d="M3 1.5L6.5 5 3 8.5"/></svg></button></div>
             <div class="d"><span class="d-fondo">Fondo Voluntario de Pensión Skandia Multifund</span><span class="d-sep">|</span><span>Saldo Total: <b>$52.732.191</b></span>
+              <a href="#"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="#0099DE" stroke-width="1.4"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>Más</a></div>
+          </div>
+          <div class="prod prod-click" data-producto="fic">
+            <div class="t"><button type="button" class="prod-abrir" data-abre-producto aria-label="Ver ficha del producto Viaje, contrato #301000052847"><span class="nom">Viaje <span aria-hidden="true">✈️</span></span> <span class="n"><span class="n-sep">| </span>#301000052847</span></button>
+              <button type="button" class="prod-abrir prod-chev" data-abre-producto aria-label="Ver ficha del producto"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#00C73D" stroke-width="1.6" style="margin-left:8px"><path d="M3 1.5L6.5 5 3 8.5"/></svg></button></div>
+            <div class="d"><span class="d-fondo">Fondo De Inversión Colectiva Skandia Efectivo</span><span class="d-sep">|</span><span>Saldo Total: <b>$8.415.300</b></span>
               <a href="#"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="#0099DE" stroke-width="1.4"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>Más</a></div>
           </div>
         </div>
@@ -3117,27 +3138,27 @@ document.addEventListener('DOMContentLoaded',()=>{
       <!-- Móvil: contrato como en Portal Clientes (identidad arriba, una tarjeta principal, beneficio compacto) -->
       <div class="m-pf">
         <div class="m-pf-id">
-          <h2 class="m-pf-nom">Potencializar mi inversión</h2>
-          <p class="m-pf-num">Contrato No. 100000063061</p>
-          <p>Fondo Voluntario de Pensión Skandia Multifund</p>
-          <p>Administrado por Skandia Pensiones y Cesantías S.A.</p>
+          <h2 class="m-pf-nom" data-pv="nom">Potencializar mi inversión</h2>
+          <p class="m-pf-num" data-pv="numLargo">Contrato No. 100000063061</p>
+          <p data-pv="fondo">Fondo Voluntario de Pensión Skandia Multifund</p>
+          <p data-pv="admin">Administrado por Skandia Pensiones y Cesantías S.A.</p>
         </div>
         <article class="m-pf-card">
           <img class="m-pf-marca m-pf-marca-izq" src="assets/pc-card-marca-izq.svg" width="112.517" height="157" alt="">
           <img class="m-pf-marca m-pf-marca-der" src="assets/pc-card-marca-der.svg" width="120.4" height="168" alt="">
-          <div class="m-pf-top"><span class="m-pf-lbl">Saldo total:</span><span class="prod-tag">Skandia Capital + Seguros</span></div>
-          <p class="m-pf-big">$52.732.191</p>
+          <div class="m-pf-top"><span class="m-pf-lbl">Saldo total:</span><span class="prod-tag" data-solo="mf">Skandia Capital + Seguros</span></div>
+          <p class="m-pf-big" data-pv="saldo">$52.732.191</p>
           <div class="m-pf-mid">
             <ul class="m-pf-ley">
-              <li><i style="background:var(--charts-c02)"></i>Capital: $47.483.281</li>
-              <li><i style="background:var(--charts-c01)"></i>Rendimientos: $5.248.910</li>
+              <li><i style="background:var(--charts-c02)"></i><span data-pv="capitalL">Capital: $47.483.281</span></li>
+              <li><i style="background:var(--charts-c01)"></i><span data-pv="rendL">Rendimientos: $5.248.910</span></li>
             </ul>
-            <div class="m-pf-dona" role="img" aria-label="90 % capital y 10 % rendimientos"></div>
+            <div class="m-pf-dona" data-pv-dona role="img" aria-label="90 % capital y 10 % rendimientos"></div>
           </div>
-          <a href="#" class="m-pf-link">Saldo para retiro: $147.650</a>
+          <a href="#" class="m-pf-link" data-pv="retiro">Saldo para retiro: $147.650</a>
           <button type="button" class="pf-pipeline">Ir a Pipeline</button>
         </article>
-        <details class="m-pf-benef">
+        <details class="m-pf-benef" data-solo="mf">
           <summary><span class="m-pf-benef-t"><b>Beneficio de permanencia</b><span>Saldo para retiro sin perderlo: <b>$0</b></span></span><svg class="m-pf-chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
           <div class="pf-dos">
             <div><span>Valor acumulado a alcanzar</span><b>$0</b></div>
@@ -3148,30 +3169,30 @@ document.addEventListener('DOMContentLoaded',()=>{
       </div>
       <div class="pf-cards">
         <article class="pf-card pf-principal">
-          <div class="pf-tit"><h2>Fondo Voluntario de Pensión Skandia Multifund</h2><span class="prod-tag">Skandia Capital + Seguros</span></div>
+          <div class="pf-tit"><h2 data-pv="fondo">Fondo Voluntario de Pensión Skandia Multifund</h2><span class="prod-tag" data-solo="mf">Skandia Capital + Seguros</span></div>
           <div class="pf-saldo">
             <div class="pf-saldo-izq">
-              <p class="pf-big">$52.732.191</p>
-              <a href="#" class="pf-retiro">Saldo para retiro: $147.650</a>
-              <p class="pf-meta">Saldo total <i aria-hidden="true"></i> Contrato #100000063061</p>
+              <p class="pf-big" data-pv="saldo">$52.732.191</p>
+              <a href="#" class="pf-retiro" data-pv="retiro">Saldo para retiro: $147.650</a>
+              <p class="pf-meta">Saldo total <i aria-hidden="true"></i> <span data-pv="numCorto">Contrato #100000063061</span></p>
             </div>
             <button type="button" class="pf-pipeline">Ir a Pipeline</button>
           </div>
-          <p class="pf-admin">Administrado por Skandia Pensiones y Cesantías S.A.</p>
+          <p class="pf-admin" data-pv="admin">Administrado por Skandia Pensiones y Cesantías S.A.</p>
         </article>
 
         <article class="pf-card">
           <h3 class="pf-h">Evolución histórica del contrato <span class="tip"><button class="tip-btn pf-ayuda" type="button" aria-label="¿Qué es la evolución histórica?" aria-describedby="tip-evo">?</button><span class="tip-box" role="tooltip" id="tip-evo">Muestra cuánto del saldo actual corresponde a lo que tu cliente ha aportado (capital) y cuánto a lo que ha ganado (rendimientos) desde que abrió el contrato.</span></span></h3>
           <div class="pf-evo">
             <div class="pf-datos">
-              <div class="pf-dato pf-dato-a"><span>Rendimientos totales</span><p class="pf-big">$5.248.910 <span class="trend" style="background:var(--green-soft)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#00C73D" stroke-width="1.5"><path d="M1 9l3-3 2 2 5-5"/><path d="M8 3h3v3"/></svg></span></p></div>
-              <div class="pf-dato"><span>Capital</span><p class="pf-num">$47.483.281</p></div>
+              <div class="pf-dato pf-dato-a"><span>Rendimientos totales</span><p class="pf-big"><span data-pv="rend">$5.248.910</span> <span class="trend" style="background:var(--green-soft)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#00C73D" stroke-width="1.5"><path d="M1 9l3-3 2 2 5-5"/><path d="M8 3h3v3"/></svg></span></p></div>
+              <div class="pf-dato"><span>Capital</span><p class="pf-num" data-pv="capital">$47.483.281</p></div>
             </div>
-            <div class="pf-donut pf-donut-evo" role="img" aria-label="10 % rendimientos y 90 % capital"></div>
+            <div class="pf-donut pf-donut-evo" data-pv-dona role="img" aria-label="10 % rendimientos y 90 % capital"></div>
           </div>
         </article>
 
-        <article class="pf-card">
+        <article class="pf-card" data-solo="mf">
           <h3 class="pf-h">Beneficio de permanencia</h3>
           <p class="pf-lbl">Saldo para retiro sin perder beneficio de permanencia</p>
           <p class="pf-big pf-alerta">$0 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Atención"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></p>
@@ -3182,17 +3203,16 @@ document.addEventListener('DOMContentLoaded',()=>{
         </article>
       </div>
 
-      <div class="pf-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
-      <div class="pf-tabs" role="tablist" aria-label="Secciones del producto"><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="comportamiento"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 6-6"/></svg>Comportamiento</button><button type="button" class="pf-tab on" role="tab" aria-selected="true" data-pf="composicion"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>Composición y saldos</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="movimientos"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/><path d="M16 16h5v5"/></svg>Movimientos</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="detalles"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 13h.01M12 13h.01M16 13h.01"/></svg>Detalles</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="cuentas"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>Cuentas y débito</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="actividad"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Actividad</button></div>
+      <div class="pf-dots" aria-hidden="true"><i class="on"></i><i></i><i data-solo="mf"></i></div>
+      <div class="pf-tabs" role="tablist" aria-label="Secciones del producto"><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="comportamiento" data-solo="mf"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 6-6"/></svg>Comportamiento</button><button type="button" class="pf-tab on" role="tab" aria-selected="true" data-pf="composicion"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>Composición y saldos</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="movimientos"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/><path d="M16 16h5v5"/></svg>Movimientos</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="retenciones" data-solo="fic" hidden><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>Retenciones</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="detalles"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 13h.01M12 13h.01M16 13h.01"/></svg>Detalles</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="cuentas"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg><span data-pv="cuentasTab">Cuentas y débito</span></button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="actividad"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Actividad</button></div>
       <div class="pf-panel" data-pf-panel="composicion">
         <div class="pf-caja">
           <div class="pf-barra">
-          <div class="pf-seg" role="tablist" aria-label="Tipo de composición">
+          <div class="pf-seg" role="tablist" aria-label="Tipo de composición" data-solo="mf">
             <button type="button" role="tab" aria-selected="true" data-seg="actual">Composición</button>
             <button type="button" role="tab" aria-selected="false" data-seg="standing">Standing allocation</button>
           </div>
           <p class="pf-corte" data-seg-solo="actual" aria-live="polite"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Saldos <b id="pf-corte-est">en efectivo</b> con corte al <b id="pf-corte-f">12/11/2026</b></span></p>
-          <span class="pf-copiar-w" data-seg-solo="actual"><button type="button" class="pf-copiar" aria-label="Copiar tabla" aria-describedby="pf-copiar-tt"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="pf-copiar-tx">Copiar tabla</span></button><span class="pf-copiar-tt" role="tooltip" id="pf-copiar-tt">Copiar tabla</span></span>
           </div>
           <div class="pf-saf pf-ctrl" data-seg-solo="actual" role="group" aria-labelledby="pf-saf-tit">
             <div class="pf-saf-t"><b id="pf-saf-tit">Saldos a otras fechas <span class="pf-tag-nuevo">Nuevo</span></b><span>Consulta los saldos y la composición en otra fecha</span></div>
@@ -3223,10 +3243,11 @@ document.addEventListener('DOMContentLoaded',()=>{
               </div>
             </div>
           </div>
+          <div class="pf-ind-h" data-seg-solo="actual"><h3>Indicadores por portafolio</h3><span class="pf-copiar-w"><button type="button" class="pf-copiar" aria-label="Copiar tabla" aria-describedby="pf-copiar-tt"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="pf-copiar-tx">Copiar tabla</span></button><span class="pf-copiar-tt" role="tooltip" id="pf-copiar-tt">Copiar tabla</span></span></div>
           <div class="pf-comp" data-seg-panel="actual">
             <div class="pf-donut pf-donut-comp" role="img" aria-label="Composición del contrato"></div>
             <div class="pf-tabla-wrap">
-              <table class="pf-tabla">
+              <table class="pf-tabla" data-contrato="100000063061">
                 <thead><tr><th scope="col"><span class="sr">Descargar</span></th><th scope="col" class="pf-izq">Portafolio</th><th scope="col">No. unidades</th><th scope="col">Valor unidad</th><th scope="col">Rendimientos</th><th scope="col">Rendimientos E.A.</th><th scope="col"><span class="pf-disp-h">Disponible</span></th><th scope="col">Saldo</th></tr></thead>
                 <tbody id="pf-tbody">
                   <tr class="pf-no"><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de FVP Especial CAT 4/02/2030"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c01)"></i><b>18.07 %</b> FVP Especial CAT 4/02/2030</td><td></td><td></td><td></td><td></td><td class="pf-disp">No</td><td class="pf-col-saldo"></td></tr>
@@ -3243,6 +3264,17 @@ document.addEventListener('DOMContentLoaded',()=>{
           <div class="pf-std" data-seg-panel="standing" hidden>
             <div class="pf-donut pf-donut-std" role="img" aria-label="Standing allocation: 100 % FVP Especial Skandia TS2026"></div>
             <ul class="pf-std-ley"><li><i></i><b>100%</b> FVP Especial Skandia TS2026</li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="pf-panel" data-pf-panel="movimientos" hidden>
+        <div class="pf-caja">
+          <div class="pf-mov-h"><h3>Movimientos</h3><label class="pf-mov-pag"><span class="sr">Movimientos por página</span><select><option>10</option><option>20</option><option>50</option></select></label></div>
+          <div class="pf-tabla-wrap">
+            <table class="pf-tabla pf-mov">
+              <thead><tr><th scope="col">Detalles</th><th scope="col">Tipo</th><th scope="col">Fecha</th><th scope="col">Valor bruto</th><th scope="col">Valor neto</th></tr></thead>
+              <tbody><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Adición del 05/11/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Adición</td><td>05/11/2026</td><td>$ 500.000</td><td>$ 500.000</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Retiro parcial del 21/10/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Retiro parcial</td><td>21/10/2026</td><td>$ -1.200.000</td><td>$ -1.195.200</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Adición del 05/10/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Adición</td><td>05/10/2026</td><td>$ 500.000</td><td>$ 500.000</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Ajuste del 30/09/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Ajuste</td><td>30/09/2026</td><td>$ 1.250</td><td>$ 1.250</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Adición del 05/09/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Adición</td><td>05/09/2026</td><td>$ 500.000</td><td>$ 500.000</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Retiro parcial del 18/08/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Retiro parcial</td><td>18/08/2026</td><td>$ -800.000</td><td>$ -796.800</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Adición del 05/08/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Adición</td><td>05/08/2026</td><td>$ 500.000</td><td>$ 500.000</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Adición del 05/07/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Adición</td><td>05/07/2026</td><td>$ 500.000</td><td>$ 500.000</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Retiro parcial del 12/06/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Retiro parcial</td><td>12/06/2026</td><td>$ -350.000</td><td>$ -348.600</td></tr><tr><td><button type="button" class="pf-desc" aria-label="Ver detalle: Adición del 05/06/2026"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td><td>Adición</td><td>05/06/2026</td><td>$ 500.000</td><td>$ 500.000</td></tr></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -3575,7 +3607,28 @@ document.addEventListener('DOMContentLoaded',()=>{
 document.addEventListener('DOMContentLoaded',()=>{
   const vista=document.getElementById('v-producto'); if(!vista) return;
   const nombre=document.querySelector('.m-nombre'); let nombreAntes='';
-  function abrir(){
+  // Datos de cada producto de Óscar (ejemplo). El FIC se homologa con Multifund: mismas tarjetas y Composición y saldos.
+  const PRODUCTOS={
+    mf:{nom:'Potencializar mi inversión',num:'#100000063061',numLargo:'Contrato No. 100000063061',numCorto:'Contrato #100000063061',fondo:'Fondo Voluntario de Pensión Skandia Multifund',admin:'Administrado por Skandia Pensiones y Cesantías S.A.',saldo:'$52.732.191',retiro:'Saldo para retiro: $147.650',rend:'$5.248.910',capital:'$47.483.281',rendL:'Rendimientos: $5.248.910',capitalL:'Capital: $47.483.281',pctRend:10,cuentasTab:'Cuentas y débito'},
+    fic:{nom:'Viaje ✈️',num:'#301000052847',numLargo:'Contrato No. 301000052847',numCorto:'Contrato #301000052847',fondo:'Fondo De Inversión Colectiva Skandia Efectivo',admin:'Administrado por Skandia Fiduciaria S.A.',saldo:'$8.415.300',retiro:'Saldo para retiro: $8.415.300',rend:'$612.480',capital:'$7.802.820',rendL:'Rendimientos: $612.480',capitalL:'Capital: $7.802.820',pctRend:7,cuentasTab:'Cuentas'}
+  };
+  function aplicar(k){
+    const P=PRODUCTOS[k]||PRODUCTOS.mf; vista.dataset.producto=k;
+    vista.setAttribute('aria-label','Ficha del producto '+P.nom.replace(/\s*✈️/,''));
+    document.querySelectorAll('[data-pv]').forEach(el=>{ const v=P[el.dataset.pv]; if(v!=null) el.textContent=v; });
+    document.querySelectorAll('[data-pv-dona]').forEach(el=>{ el.style.background='conic-gradient(var(--charts-c01) 0 '+P.pctRend+'%,var(--charts-c02) '+P.pctRend+'% 100%)'; el.setAttribute('aria-label',P.pctRend+' % rendimientos y '+(100-P.pctRend)+' % capital'); });
+    document.querySelectorAll('[data-solo]').forEach(el=>{ el.hidden=el.dataset.solo!==k; });
+    vista.querySelector('.pf-cards').classList.toggle('pf-cards-2',k==='fic');
+    const tabla=document.querySelector('.pf-tabla'); if(tabla) tabla.dataset.contrato=P.num.slice(1);
+    // Siempre abre en Composición y saldos, vista Composición
+    vista.querySelectorAll('.pf-tab').forEach(x=>{ const on=x.dataset.pf==='composicion'; x.classList.toggle('on',on); x.setAttribute('aria-selected',String(on)); });
+    vista.querySelectorAll('[data-pf-panel]').forEach(p=>p.hidden=p.dataset.pfPanel!=='composicion');
+    const segA=vista.querySelector('.pf-seg button[data-seg="actual"]'); if(segA) segA.click();
+    if(window.pfProducto) window.pfProducto(k);
+  }
+  const prodDe=el=>{ const c=el.closest('[data-producto]'); return c?c.dataset.producto:'mf'; };
+  function abrir(k){
+    aplicar(k||'mf');
     document.body.classList.add('vista-producto'); vista.hidden=false;
     scrollTo(0,0);
   }
@@ -3583,8 +3636,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.body.classList.remove('vista-producto','m-pf-sec'); vista.hidden=true;
     scrollTo(0,0);
   }
-  document.querySelectorAll('[data-abre-producto]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); abrir(); }));
-  document.querySelectorAll('.prod-click').forEach(f=>f.addEventListener('click',e=>{ if(!e.target.closest('a')) abrir(); }));
+  document.querySelectorAll('[data-abre-producto]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); abrir(prodDe(b)); }));
+  document.querySelectorAll('.prod-click').forEach(f=>f.addEventListener('click',e=>{ if(!e.target.closest('a')) abrir(prodDe(f)); }));
   document.querySelectorAll('.crumb > svg, .crumb-cliente').forEach(el=>el.addEventListener('click',e=>{
     if(document.body.classList.contains('vista-producto')){ e.preventDefault(); cerrar(); }
   }));
@@ -3608,7 +3661,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   const ptabs=[...vista.querySelectorAll('.pf-tab')];
   ptabs.forEach(t=>t.addEventListener('click',()=>{
     ptabs.forEach(x=>{ const on=x===t; x.classList.toggle('on',on); x.setAttribute('aria-selected',String(on)); });
-    vista.querySelectorAll('[data-pf-panel]').forEach(p=>p.hidden = p.dataset.pfPanel !== (t.dataset.pf==='composicion' ? 'composicion' : 'otros'));
+    const destino = t.dataset.pf==='composicion' ? 'composicion' : (t.dataset.pf==='movimientos' && vista.dataset.producto==='fic') ? 'movimientos' : 'otros';
+    vista.querySelectorAll('[data-pf-panel]').forEach(p=>p.hidden = p.dataset.pfPanel !== destino);
     if(mqp.matches){ document.body.classList.add('m-pf-sec'); scrollTo(0,0); }
   }));
   // Composición actual / Standing allocation
@@ -3625,14 +3679,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   const HOY=new Date(2026,10,12), MIN=new Date(2025,10,12);
   const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   // Portafolios de ejemplo (referencia de Isa: composición con FVP Especial CAT, renta fija y liquidez), escalados al saldo del contrato
-  const FONDOS=[
+  const PORT={mf:[
     {n:'FVP Especial CAT 4/02/2030',c:'var(--charts-c01)',u:869.6697,vu:10956.697029,saldo:9528707,rend:948478,ea:10.85,disp:false},
     {n:'FVP Especial CAT 4/11/2027',c:'var(--charts-c02)',u:860.8594,vu:10995.324876,saldo:9465428,rend:942179,ea:10.62,disp:false},
     {n:'FVP Especial CAT 30/04/2030',c:'var(--charts-c03)',u:1202.7212,vu:11276.694625,saldo:13562720,rend:1350020,ea:11.04,disp:false},
     {n:'FVP Especial CAT 12 meses - D',c:'var(--charts-c04)',u:1213.3410,vu:13824.728964,saldo:16774110,rend:1669678,ea:12.31,disp:false},
     {n:'FPV Strategist Liquidez Col',c:'var(--charts-c05)',u:51.8516,vu:2847.550228,saldo:147650,rend:14697,ea:7.49,disp:true},
     {n:'FVP Renta Fija Marzo 2029-I',c:'var(--charts-c06)',u:298.8594,vu:10886.643559,saldo:3253576,rend:323858,ea:9.76,disp:false}
-  ];
+  ],
+  // FIC Skandia Efectivo: un solo portafolio, disponible (liquidez a la vista)
+  fic:[
+    {n:'FIC Skandia Efectivo',c:'var(--charts-c01)',u:633.3326,vu:13287.4512,saldo:8415300,rend:612480,ea:9.12,disp:true}
+  ]};
+  let FONDOS=PORT.mf;
   const btn=caja.querySelector('.pf-fecha-btn'), cal=caja.querySelector('.pf-cal'), val=document.getElementById('pf-fecha-val');
   const mesTxt=cal.querySelector('.pf-cal-mes'), grid=cal.querySelector('.pf-cal-dias');
   const tbody=document.getElementById('pf-tbody'), tabla=document.querySelector('.pf-tabla'), dona=document.querySelector('.pf-donut-comp');
@@ -3687,6 +3746,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   function cerrar(foco){ cal.hidden=true; btn.setAttribute('aria-expanded','false'); if(foco) btn.focus(); }
   function elegir(d,sinFoco){ sel=d; pintar(d,true); cerrar(!sinFoco); }
   window.pfElegirFecha=d=>elegir(d,true);
+  // Cambiar de producto: rehace las filas de la tabla con los portafolios del producto
+  const DL='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>';
+  window.pfProducto=k=>{
+    FONDOS=PORT[k]||PORT.mf;
+    tbody.innerHTML=FONDOS.map(f=>'<tr'+(f.disp?'':' class="pf-no"')+'><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de '+f.n+'">'+DL+'</button></td><td class="pf-izq"></td><td></td><td></td><td></td><td></td><td class="pf-disp">'+(f.disp?'Sí':'No')+'</td><td class="pf-col-saldo"></td></tr>').join('');
+    sel=new Date(HOY); cerrar(false); pintar(sel,false);
+  };
   btn.addEventListener('click',()=>cal.hidden?abrir():cerrar(false));
   cal.querySelectorAll('.pf-cal-nav').forEach(n=>n.addEventListener('click',()=>{ vista.setMonth(vista.getMonth()+Number(n.dataset.mes)); render(); }));
   grid.addEventListener('click',e=>{ const b=e.target.closest('button[data-d]'); if(b&&!b.disabled) elegir(new Date(vista.getFullYear(),vista.getMonth(),Number(b.dataset.d))); });
@@ -3767,7 +3833,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const limpio=s=>s.replace(/\s+/g,' ').trim();
     const fecha=(document.getElementById('pf-fecha-val')||{}).textContent||'';
     const est=(document.querySelector('input[name="pf-estado"]:checked')||{}).value==='proceso'?'en proceso':'en efectivo';
-    const lin=['Composición del contrato #100000063061 · saldos '+est+' al '+fecha,'',['Portafolio','Participación','No. unidades','Valor unidad','Rendimientos','Rendimientos E.A.','Disponible','Saldo'].join('\t')];
+    const lin=['Composición del contrato #'+(tabla.dataset.contrato||'100000063061')+' · saldos '+est+' al '+fecha,'',['Portafolio','Participación','No. unidades','Valor unidad','Rendimientos','Rendimientos E.A.','Disponible','Saldo'].join('\t')];
     tabla.querySelectorAll('tbody tr').forEach(tr=>{
       const td=tr.querySelectorAll('td'), pct=limpio(td[1].querySelector('b').textContent), nom=limpio(td[1].textContent.replace(td[1].querySelector('b').textContent,''));
       lin.push([nom,pct,...[2,3,4,5,6,7].map(i=>limpio(td[i].textContent))].join('\t'));
@@ -4853,7 +4919,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const nivel=()=>B.contains('m-pf-sec')?3:B.contains('vista-producto')?2:B.contains('m-detalle')?1:0;
   function pintar(){
     const n=nivel(); caja.hidden=n===0; if(n===0) return;
-    const tab=txt(document.querySelector('.tabs .tab.on')), prod='Potencializar mi inversión';
+    const tab=txt(document.querySelector('.tabs .tab.on')), prod=txt(document.querySelector('.m-pf-nom'))||'Potencializar mi inversión';
     const migas=[];
     if(n>=2) migas.push([tab||'Productos',1]);
     if(n===3) migas.push([prod,2]);
