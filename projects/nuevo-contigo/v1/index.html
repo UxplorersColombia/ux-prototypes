@@ -2399,6 +2399,19 @@
   /* Solo lectura: controles atenuados (los enlaces, el panel y «Continuar a…» siguen activos) */
   #jm-velo.jw-solo .jw-etapas button:disabled:not(.jw-p),#jm-velo.jw-solo .jw-etapas input:disabled,#jm-velo.jw-solo .jw-etapas textarea:disabled{opacity:.6;cursor:default}
   #jm-velo.jw-solo .jw-btn.jw-cerrado:disabled{opacity:1}
+  /* Ventanas de carga en «modo misión», como en Angular (19 nov 2026): velo grafito con el halo de la página, no blanco */
+  .cop-intro,.jm-carga{background:radial-gradient(90% 60% at 85% 0%,rgba(56,56,56,.9) 0%,rgba(56,56,56,0) 60%),rgba(43,43,43,.96);color:#e3e5e7}
+  .cop-intro-ring,.jm-carga-sami .cop-intro-ring{border-color:rgba(255,255,255,.25)}
+  .cop-intro-ring i,.jm-carga-sami .cop-intro-ring i{background:#00C73D;box-shadow:0 0 8px rgba(0,199,61,.6)}
+  .cop-intro-orb img,.jm-carga-sami img{filter:drop-shadow(0 8px 12px rgba(0,0,0,.45))}
+  .jm-carga h2{color:#00C73D}
+  .jm-carga-sub{color:#a3a8ac}
+  .jm-carga-pasos li{color:#a3a8ac}
+  .jm-carga-pasos li.va{color:#e3e5e7}
+  .jm-carga-pasos li.on{color:#ffffff}
+  .jm-ck{border-color:#4a4a4a}
+  .jm-carga-pasos li.on .jm-ck{background:#00C73D;border-color:#00C73D;color:#1b1b1b}
+  .jm-carga-barra{background:#4a4a4a}
   /* Historial de la ficha: tonos de estado como en Angular */
   .panel-cop .cop-estado--seguimiento{background:rgba(232,155,0,.1);color:#f0b54a}
   .panel-cop .cop-estado--completado{background:rgba(0,199,61,.14);color:#8fe000}
@@ -3222,6 +3235,10 @@ document.addEventListener('DOMContentLoaded',()=>{
               <div class="jw-chips" role="group" data-tram-ops></div>
               <p class="jw-ayuda" data-tram-nota></p>
             </div>
+            <div class="jw-p4-acc jw-contador" data-contador hidden>
+              <button type="button" class="jw-btn jw-btn--sec jw-ro-ok" data-xls><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar detalle para el contador</button><span class="jw-ayuda">en Excel</span>
+              <label class="jw-check"><input type="checkbox" data-validar> Le recomendé validarlo</label>
+            </div>
             <div class="jw-bloque5">
               <p class="jw-qt">Próximos pasos</p>
               <label class="jw-check"><input type="checkbox" data-np="resumen"> Enviar resumen de la conversación al cliente</label>
@@ -3245,10 +3262,6 @@ document.addEventListener('DOMContentLoaded',()=>{
               <button type="button" class="jw-btn jw-btn--sec" data-cambiar-dec><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar decisión</button>
               <button type="button" class="jw-btn jw-btn--sec jw-ro-ok" data-enviar><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4Z"/></svg>Enviar resumen al cliente</button>
               <button type="button" class="jw-btn" data-cierre></button>
-            </div>
-            <div class="jw-p4-acc jw-contador" data-contador hidden>
-              <button type="button" class="jw-btn jw-btn--sec jw-ro-ok" data-xls><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar detalle para el contador</button><span class="jw-ayuda">en Excel</span>
-              <label class="jw-check"><input type="checkbox" data-validar> Le recomendé validarlo</label>
             </div>
           </div>
         </section>
@@ -3851,8 +3864,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   q('[data-pen-ops]').addEventListener('click',e=>{ const b=e.target.closest('[data-pen-v]'); if(!b||RO()) return; st.pen=b.dataset.penV; pintarTodo(); });
   q('[data-confirmar-ct]').addEventListener('click',()=>{
     const m=st.ctMarc||ordenFichas()[0].c.id;
-    if(st.ctConf===m||CT.length===1){ st.ctConf=m; irEtapa(3); return; }
-    st.ctConf=m; pintarTodo();
+    st.ctConf=m; irEtapa(3); // confirma y sigue a Opciones con el mismo clic
   });
 
   // ---- Opciones: cajas, renta exenta en la caja del retiro, preferencia ----
@@ -3920,7 +3932,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const falta=!(st.monto>0); vis('[data-o-falta]',falta); vis('[data-o-cuerpo]',!falta);
     if(falta){ vis('[data-pie3]',false); return; }
     const v=cajas(), cr=cred(), rxEn=cajaRx(v.list), kEval=prefEsRetiro()?retiroPref():v.k, conRx=tocaNoExento(kEval);
-    const al=q('[data-o-alcanza]'), credEleg=!v.viv&&cr.conPlazo&&cr.M>=(st.monto||0)-0.5;
+    const al=q('[data-o-alcanza]'), credEleg=!v.viv&&!st.noRepone&&cr.M>0&&cr.M>=(st.monto||0)-0.5;
     al.hidden=!(credEleg&&v.kt.R+v.kt.g<(st.monto||0)-0.5);
     if(!al.hidden) al.innerHTML=IC.info+'<span>Hoy puede retirar '+pesos(v.kt.R+v.kt.g)+'. Para cubrir '+pesos(st.monto)+', la opción es el crédito puente.</span>';
     ops3.innerHTML=v.list.map(t=>t==='credito'?cajaCredito(cr):t==='combo'?cajaCombo(v.cb,rxEn==='combo'&&conRx):cajaRetiro(t,t==='retiro'?v.k:v.kt,rxEn===t&&conRx)).join('')+(v.viv?'':cajaNoRetira(v.k));
@@ -4059,7 +4071,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           :st.pref==='credito'?'Crédito puente: recibe '+pesos(cr.M)+', costo estimado '+pesos(cr.costo)+' (intereses '+pesos(cr.int)+' y 4×1000 '+pesos(cr.gmf)+'), sigue invertido '+pesos(c.saldo)
           :'Retiro + crédito puente: retira '+pesos(v.cb.kt.D)+' del contrato y recibe '+pesos(v.cb.kt.R)+'; crédito puente por '+pesos(v.cb.M)+', costo estimado '+pesos(v.cb.cr.costo)+' (intereses '+pesos(v.cb.cr.int)+' y 4×1000 '+pesos(v.cb.cr.gmf)+'); recibe en total '+pesos(v.cb.recibe)+'; sigue invertido '+sigue(v.cb.kt.D));
       }
-      if(st.pref==='credito'||st.pref==='combo') add('Tipo de crédito','Crédito Impulso. Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A..');
+      if(st.pref==='credito'||st.pref==='combo') add('Tipo de crédito','Crédito Impulso. Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A.');
       if(st.plazo||st.noRepone) add('En cuánto tiempo podría reponerlo',st.noRepone?'No va a reponer el dinero':'Podría reponerlo en '+(st.plazo===1?'1 mes':st.plazo+' meses'));
       add('Lo que se retiene al retirar','Es un anticipo: se descuenta del impuesto en la declaración de renta. '+ADV_USTED);
       if(st.rx) add('¿Alguno de los aportes del retiro se usó como renta exenta?',RXTXT[st.rx]);
@@ -4069,7 +4081,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           :'Si usted o su contador no usaron los aportes como renta exenta: '+pesos(im.no)+'. Si usted o su contador sí usaron los aportes como renta exenta: '+pesos(im.si)+'. Año gravable 2026. Lo que se retiene hoy se descuenta de ese impuesto. No reemplaza la revisión que hagan usted o su contador.');
       }
     }
-    if(st.dec&&st.dec!=='fuera'){ if((st.dec==='credito'||st.dec==='combo')&&!(st.pref==='credito'||st.pref==='combo')) add('Tipo de crédito','Crédito Impulso. Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A..'); const s=saleDe(st.dec,v); if(s!=null) add('Sigue invertido',pesos(c.saldo-s)); }
+    if(st.dec&&st.dec!=='fuera'){ if((st.dec==='credito'||st.dec==='combo')&&!(st.pref==='credito'||st.pref==='combo')) add('Tipo de crédito','Crédito Impulso. Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A.'); const s=saleDe(st.dec,v); if(s!=null) add('Sigue invertido',pesos(c.saldo-s)); }
     if(st.validar) add('Validación tributaria','Se le recomendó validarlo antes de retirar, usted o con su contador. '+ADV_USTED);
     add('Etapas conversadas',st.visitadas.map(n=>ETAPAS_BD[n-1]).join(' → '));
     if(st.dec) add('Decisión del cliente',DEC_CAT[st.dec]);
@@ -4169,7 +4181,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const int=Math.round(cap*(Math.pow(1+TASA,dias/365)-1)); return {M,cap,dias,int,total:Math.floor(cap+int),intA,bajo,resp:Math.floor(cap*1.3)};
   }
   function tabCredito(){
-    let h='<h4 class="jw-cr-t">Así quedaría su crédito</h4><p class="jw-cr-sub">Revísenlo juntos: lo que recibe, lo que pagaría y el respaldo en su fondo. Desde WPP todavía no se solicita: muy pronto se podrá hacer desde aquí.</p>';
+    let h='<h4 class="jw-cr-t">Así quedaría su crédito</h4><p class="jw-cr-sub">Revísenlo juntos: lo que recibe, lo que pagaría y el respaldo en su fondo. Desde Planeación Pro todavía no se solicita: muy pronto se podrá hacer desde aquí.</p>';
     if(!(st.monto>0)||st.motivo==='vivienda') return h;
     const s=crPanel(), venc=masDias(360), pago=deIso(st.cr.fecha), alVenc=iso(pago)===iso(venc), ro=RO();
     let falta=s.resp; const bloq=RESPALDO.map(([id,disp])=>{ const b=Math.min(falta,disp); falta-=b; return {c:CT.find(x=>x.id===id),b,disp}; });
