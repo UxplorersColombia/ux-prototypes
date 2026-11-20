@@ -181,7 +181,7 @@
   :root{--charts-c01:#a1dd70;--charts-c02:#a4d7e1;--charts-c03:#60a9a6;--charts-c04:#ff9460;--charts-c05:#8ba2c1;--charts-c06:#d98bc0}
   .prod-abrir{border:0;background:none;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
   /* Hover del producto: toda la fila es clicable */
-  .prod.prod-click{cursor:pointer;margin-left:16px;padding:14px 12px 12px 10px;border-radius:0 8px 8px 0;transition:background-color .15s}
+  .prod.prod-click{align-self:stretch;cursor:pointer;margin-left:16px;padding:14px 12px 12px 10px;border-radius:0 8px 8px 0;transition:background-color .15s}
   .prod.prod-click .t{margin-top:0}
   .prod.prod-click .prod-abrir:not(.prod-chev){transition:color .15s}
   .prod.prod-click .prod-chev svg{transition:transform .15s}
@@ -428,6 +428,9 @@
   .pf-tabla.pf-mov .pf-desc{margin:0 auto}
   .pf-dato .pf-big [data-pv]{font-size:inherit}
   [data-solo][hidden]{display:none!important}
+  #v-producto[data-producto="fic"] .pf-saf{margin-top:0}
+  #v-producto[data-producto="fic"] .pf-barra{display:none} /* FIC: sin switch, no deja hueco arriba */
+  #v-producto[data-producto="fic"] .pf-tabla tfoot{display:none} /* FIC: un solo portafolio, el total sobra */
   /* Standing allocation: solo la dona y la leyenda */
   .pf-comp[hidden],.pf-caja>.pf-comp[hidden]{display:none!important}
   .pf-std{display:flex;align-items:center;gap:56px;margin-top:32px;padding:8px 0 16px}
@@ -3838,7 +3841,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const td=tr.querySelectorAll('td'), pct=limpio(td[1].querySelector('b').textContent), nom=limpio(td[1].textContent.replace(td[1].querySelector('b').textContent,''));
       lin.push([nom,pct,...[2,3,4,5,6,7].map(i=>limpio(td[i].textContent))].join('\t'));
     });
-    lin.push(['Total','100 %','','','','','',limpio(document.getElementById('pf-total').textContent)].join('\t'));
+    if((document.getElementById('v-producto')||{dataset:{}}).dataset.producto!=='fic') lin.push(['Total','100 %','','','','','',limpio(document.getElementById('pf-total').textContent)].join('\t'));
     return lin.join('\n');
   }
   async function copiar(){
