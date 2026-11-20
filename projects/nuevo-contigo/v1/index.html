@@ -1860,6 +1860,27 @@
   .cop-hist{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px;border:1px solid #e9e9e9;border-radius:8px}
   .cop-hist>div{display:flex;flex-direction:column;gap:2px}
   .cop-estado{font-size:12px;font-weight:600;color:#009a2f;background:var(--green-soft);border-radius:9999px;padding:3px 10px}
+  /* Planeación Pro alineada con Angular (2026-11-20): historial clicable, estados, «Próximamente» y misión vacía */
+  .cop-hist-lista{display:flex;flex-direction:column;gap:10px}
+  .cop-hud>span[hidden]{display:none}
+  .cop-hud>span[hidden]+span{padding-left:22px;border-left:0}
+  button.cop-hist{width:100%;font-family:'Open Sans',sans-serif;text-align:left;cursor:pointer;transition:border-color .2s}
+  .panel-cop button.cop-hist:hover{border-color:rgba(0,199,61,.55)}
+  button.cop-hist:focus-visible{outline:2px solid #0099de;outline-offset:2px}
+  .panel-cop .cop-hist .jy-t{font-size:15px;font-weight:600}
+  .panel-cop .cop-estado--abierto{background:transparent;border:1px solid rgba(0,199,61,.45);color:#8fe000}
+  .panel-cop .cop-otras .jy.jy-prox{opacity:.55;cursor:default}
+  .panel-cop .cop-otras .jy.jy-prox:hover{transform:none;border-color:#4a4a4a;box-shadow:none}
+  .panel-cop .jy-badge{background:rgba(255,255,255,.08);color:#d0d3d5}
+  .panel-cop .cop-vacio{background:transparent;border-color:#4a4a4a;color:#d0d3d5;font-size:14px}
+  .panel-cop .cop-vacio svg{color:#a3a8ac}
+  .cop-vacio--mis{margin:0 0 32px}
+  .cop-vacio[hidden]{display:none}
+  .panel-cop .mis-estado{margin:-4px 0 0;font-size:12px;color:#8fe000}
+  /* Con «En curso · n de m etapas» la tarjeta suma una fila: el pie y Descartar bajan una */
+  .mis--curso:only-child>.mis-estado{grid-column:1;justify-self:start}
+  .mis--curso:only-child>.mis-btn{grid-row:1/5}
+  .mis--curso:only-child>.mis-conv,.mis--curso:only-child>.mis-desc{grid-row:5}
   @media (max-width:960px){.cop-grid{grid-template-columns:1fr}}
 
 
@@ -2228,6 +2249,172 @@
   @media (hover:none){#jm-velo .jw-ct:hover,#jm-velo .jw-op:hover,#jm-velo .jw-chips button:hover,#jm-velo .jw-chip:hover,#jm-velo .jw-norep:hover{border-color:var(--bd)}#jm-velo .jw-ct:has(input:checked):hover{border-color:var(--lk)}#jm-velo .jw-chips button[aria-pressed="true"]:hover{border-color:var(--lk)}}
   /* 2026-11-17: botones primarios del journey con texto oscuro, como "Iniciar conversación" */
   #jm-velo .jw-btn:not(.jw-btn--sec):not(:disabled):not(.jw-cerrado){color:#03140a}
+  /* ===== Acompañamiento alineado con Angular (2026-11-20): v5 en cuatro partes, solo lectura, renta exenta en la caja del retiro ===== */
+  #jm-velo .jw-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  #jm-velo [hidden]{display:none!important} /* el script oculta piezas con hidden; ningún display de componente lo vence */
+  #jm-velo .jw-estado-conv{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin:6px 0 0;padding:3px 10px;border-radius:9999px;background:#444;font-size:11px;font-weight:600;color:var(--tx2)}
+  #jm-velo .jw-estado-conv[hidden],#jm-velo .jw-cierre-aviso[hidden],#jm-velo .jw-info[hidden],#jm-velo .jw-pen[hidden],#jm-velo .jw-nota-i[hidden],#jm-velo [data-o-cuerpo][hidden],#jm-velo .jw-nodisp[hidden],#jm-velo .jw-destacada[hidden],#jm-velo .jw-contador[hidden],#jm-velo [data-tram][hidden]{display:none}
+  #jm-velo .jw-cierre-aviso{margin:0 0 14px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);font-size:12px;line-height:18px;color:var(--tx2)}
+  #jm-velo .jw-cierre-aviso b{color:#fff}
+  #jm-velo .jw-nota-i,#jm-velo .jw-fuera-txt{display:flex;gap:8px;align-items:flex-start;margin:0;font-size:13px;line-height:20px;color:var(--tx2)}
+  #jm-velo .jw-nota-i{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.06)}
+  #jm-velo .jw-nota-i svg,#jm-velo .jw-fuera-txt svg{flex:none;margin-top:2px;color:#0099de}
+  #jm-velo .jw-fuera{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:10px;background:rgba(255,255,255,.06)}
+  #jm-velo .jw-fuera[hidden]{display:none}
+  #jm-velo .jw-fuera .jw-btn{align-self:flex-end;gap:8px}
+  #jm-velo .jw-area{width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--bd2);border-radius:8px;background:rgba(255,255,255,.05);font-family:'Open Sans',sans-serif;font-size:14px;color:#fff;resize:vertical}
+  #jm-velo .jw-area:focus-visible{outline:2px solid #0099de;outline-offset:1px}
+  #jm-velo .jw-chips button[aria-pressed="true"]::before{content:"✓";margin-right:6px;font-weight:700}
+  #jm-velo .jw-pen{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 12px;padding:10px 14px;border:1px solid var(--bd);border-radius:12px;background:var(--sf2)}
+  #jm-velo .jw-pen-t{margin:0;font-size:14px;color:#fff}
+  #jm-velo .jw-pen .jw-ayuda{flex-basis:100%;margin:0}
+  #jm-velo .jw-aviso{display:flex;gap:8px;align-items:flex-start}
+  #jm-velo .jw-aviso svg{flex:none;margin-top:3px;color:#f0b54a}
+  #jm-velo .jw-info{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px;padding:10px 14px;border:1px solid rgba(0,153,222,.3);border-radius:10px;background:rgba(0,153,222,.1);font-size:14px;font-weight:600;color:#ececec}
+  #jm-velo .jw-info svg{flex:none;margin-top:3px;color:#0099de}
+  #jm-velo .jw-nodisp{display:flex;gap:6px;align-items:flex-start;margin:0;font-size:12px;color:var(--tx3)}
+  #jm-velo .jw-nodisp b{font-weight:600;color:var(--tx2)}
+  #jm-velo .jw-nodisp svg{flex:none;margin-top:2px}
+  #jm-velo .jw-dest.jw-nodisp{padding:14px 18px;border-radius:12px}
+  #jm-velo .jw-ops3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:1180px){#jm-velo .jw-ops3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:900px){#jm-velo .jw-ops3{grid-template-columns:minmax(0,1fr)}}
+  #jm-velo .jw-o3,#jm-velo .jw-o3-cuerpo,#jm-velo .jw-adv,#jm-velo .jw-rx{min-width:0}
+  #jm-velo .jw-o3-sub{margin:4px 0 0;font-size:12px;font-weight:700;color:#fff}
+  #jm-velo .jw-o3 dd{font-variant-numeric:tabular-nums}
+  #jm-velo .jw-imp-nota{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:2px}
+  #jm-velo .jw-imp-nota .jw-link{padding:0;font-size:11px}
+  #jm-velo .jw-dian{padding:0 5px;border:1px solid var(--bd2);border-radius:4px;background:transparent;font-family:Montserrat,sans-serif;font-size:9px;font-weight:700;letter-spacing:.04em;line-height:14px;color:var(--tx2);cursor:help}
+  #jm-velo .jw-o3-nota b{color:#fff}
+  #jm-velo .jw-rx{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding-top:8px;border-top:1px solid var(--bd)}
+  #jm-velo .jw-rx--pide{padding:8px;border-radius:10px;box-shadow:0 0 0 1px var(--lk) inset}
+  #jm-velo .jw-rx-t{font-size:11px;font-weight:600;color:#fff}
+  #jm-velo .jw-i{display:grid;place-items:center;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:none;color:var(--tx3);cursor:pointer}
+  #jm-velo .jw-i:hover{color:#fff}
+  #jm-velo .jw-chips--xs{display:inline-flex;gap:6px}
+  #jm-velo .jw-chips--xs button{padding:3px 10px;font-size:12px}
+  #jm-velo .jw-pop{flex-basis:100%;margin:0;padding:8px 10px;border:1px solid #4a4a4a;border-radius:10px;background:#363636;font-size:12px;line-height:18px;color:var(--tx2)}
+  #jm-velo .jw-adv{display:flex;align-items:center;gap:6px;margin:0;padding:4px 8px;border:1px solid var(--warnb);border-radius:10px;background:var(--warn);font-size:11px;line-height:16px;color:var(--tx2)}
+  #jm-velo .jw-adv>span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #jm-velo .jw-adv.abierta{align-items:flex-start;padding:8px 10px;font-size:12px;line-height:18px}
+  #jm-velo .jw-adv.abierta>span{white-space:normal}
+  #jm-velo .jw-adv>svg{flex:none;color:#f0b54a}
+  #jm-velo .jw-adv .jw-link{flex:none;padding:0;font-size:11px;font-weight:600}
+  #jm-velo .jw-glosa{text-decoration:underline dotted;text-underline-offset:3px;cursor:help}
+  #jm-velo .jw-destacada{display:flex;flex-direction:column;gap:2px;padding:14px 18px;border-radius:12px;background:var(--sel)}
+  #jm-velo .jw-destacada b{font-family:Montserrat,sans-serif;font-size:26px;font-weight:700;line-height:32px;color:var(--vd)}
+  #jm-velo .jw-destacada span{font-size:14px;color:var(--tx2)}
+  #jm-velo .jw-contador{margin-top:4px}
+  #jm-velo .jw-a5-msg.ok{background:var(--sel);color:#ececec}
+  #jm-velo .jw-res-nom{padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer;text-align:left}
+  #jm-velo .jw-res-nom:disabled{cursor:default}
+  #jm-velo .jw-res-nom:not(:disabled):hover{text-decoration:underline}
+  #jm-velo .jw-res-h .jw-res-ed{margin-left:auto}
+  /* Avisos (abajo a la derecha) */
+  #jm-velo .jw-toasts{position:absolute;right:16px;bottom:16px;z-index:8;display:flex;flex-direction:column;gap:8px;width:min(360px,calc(100% - 32px))}
+  #jm-velo .jw-toast{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid #4a4a4a;border-radius:12px;background:#363636;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:13px;line-height:19px;color:var(--tx2)}
+  #jm-velo .jw-toast>svg{flex:none;margin-top:2px}
+  #jm-velo .jw-toast--exito>svg{color:#00C73D}
+  #jm-velo .jw-toast--info>svg{color:#0099de}
+  #jm-velo .jw-toast--error>svg{color:#f0b54a}
+  #jm-velo .jw-toast div{flex:1}
+  #jm-velo .jw-toast b{display:block;font-weight:600;color:#fff}
+  #jm-velo .jw-toast p{margin:2px 0 0}
+  #jm-velo .jw-toast-x{flex:none;width:24px;height:24px;padding:0;border:0;border-radius:6px;background:none;font-size:18px;line-height:1;color:var(--tx3);cursor:pointer}
+  /* Panel de detalle: segmentados, desglose, aportes, crédito e impuestos */
+  #jm-velo .jw-seg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px}
+  #jm-velo .jw-seg-t{margin-right:4px;font-size:12px;color:var(--tx3)}
+  #jm-velo .jw-seg button{padding:4px 12px;border:1px solid var(--bd2);border-radius:9999px;background:transparent;font-family:'Open Sans',sans-serif;font-size:12px;color:#e3e5e7;cursor:pointer}
+  #jm-velo .jw-seg button[aria-pressed="true"]{background:#00C73D;border-color:#00C73D;color:#03140a;font-weight:600}
+  #jm-velo .jw-port-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+  #jm-velo .jw-port-h p{margin:0}
+  #jm-velo .jw-desglose .tot{padding-top:6px;border-top:1px solid var(--bd)}
+  #jm-velo .jw-lista-calc>div+div{padding-top:4px;border-top:1px solid var(--bd)}
+  #jm-velo .jw-barra--sola{display:flex;margin-top:6px;height:6px}
+  #jm-velo .jw-apor p{margin:0}
+  #jm-velo .jw-tabla-acc{display:flex;gap:14px}
+  #jm-velo .jw-tabla-acc .jw-link{display:inline-flex;align-items:center;gap:6px;padding:0;font-size:13px}
+  #jm-velo .jw-tabla-wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:10px}
+  #jm-velo .jw-tabla tr.tot td{font-weight:700;color:#fff}
+  #jm-velo .jw-tabla tr.grupo td{padding-top:10px;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--tx3);text-align:left}
+  #jm-velo .jw-calc-h{display:flex;flex-direction:column;gap:2px}
+  #jm-velo .jw-calc-h span{font-size:12px;color:var(--tx3)}
+  #jm-velo .jw-cr-t{margin:0;font-family:Montserrat,sans-serif;font-size:16px;font-weight:700;color:#fff}
+  #jm-velo .jw-cr-sub{font-size:11px;line-height:16px;color:var(--tx3)}
+  #jm-velo .jw-cr-tope{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.06);font-size:13px;color:var(--tx2)}
+  #jm-velo .jw-cr-h{margin:6px 0 0;font-size:14px;font-weight:700;color:#fff}
+  #jm-velo .jw-cr-marco{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--bd);border-radius:16px;background:var(--sf2)}
+  #jm-velo .jw-cr-datos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #jm-velo .jw-cr-datos>div{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.05);font-size:13px}
+  #jm-velo .jw-cr-datos>div.tasa{background:var(--sel)}
+  #jm-velo .jw-cr-datos span{color:var(--tx2)}
+  #jm-velo .jw-cr-datos b{text-align:right;color:#fff}
+  #jm-velo .jw-cr-datos small{grid-column:1/-1;font-size:11px;line-height:15px;color:var(--tx3)}
+  #jm-velo .jw-cr-franja{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;background:var(--sel);font-size:13px;color:var(--tx2)}
+  #jm-velo .jw-cr-franja b{font-family:Montserrat,sans-serif;font-size:16px;color:var(--vd)}
+  #jm-velo .jw-cr-franja small{color:var(--tx3)}
+  #jm-velo .jw-cr-monto{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--tx2)}
+  #jm-velo .jw-cr-monto>span{display:flex;justify-content:space-between}
+  #jm-velo .jw-cr-monto b{color:#fff}
+  #jm-velo .jw-cr-monto input,#jm-velo .jw-cr-abono input[type="checkbox"]{accent-color:#00C73D}
+  #jm-velo .jw-cr-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  #jm-velo .jw-cr-abono{display:flex;flex-direction:column;gap:8px}
+  #jm-velo .jw-a5-campo span{display:inline-flex;align-items:center;gap:6px}
+  #jm-velo .jw-a5-campo input,#jm-velo .jw-a5-campo textarea{background:rgba(255,255,255,.05);border-color:var(--bd2);color:#fff;color-scheme:dark}
+  #jm-velo .jw-cr-sug{display:flex;gap:8px;align-items:flex-start;margin:0;font-size:13px;color:var(--tx2)}
+  #jm-velo .jw-cr-sug svg{flex:none;margin-top:2px;color:var(--vd)}
+  #jm-velo .jw-cr-ct{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;padding:10px 0;border-top:1px solid var(--bd)}
+  #jm-velo .jw-cr-ct>div{display:flex;flex-direction:column;gap:2px}
+  #jm-velo .jw-cr-ct b{color:#fff}
+  #jm-velo .jw-cr-ct small{font-size:12px;color:var(--tx3)}
+  #jm-velo .jw-cr-ct dl{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0;font-size:12px}
+  #jm-velo .jw-cr-ct dt{color:var(--tx3)}
+  #jm-velo .jw-cr-ct dd{margin:0;font-weight:600;color:#fff;text-align:right}
+  #jm-velo .jw-imp{display:flex;flex-direction:column;gap:12px}
+  #jm-velo .jw-imp-t{display:flex;align-items:center;gap:8px;margin:0;font-size:15px;font-weight:700;color:#fff}
+  #jm-velo .jw-imp-t svg{color:var(--vd)}
+  #jm-velo .jw-imp-cuerpo{display:flex;flex-direction:column;gap:10px;padding-top:10px;border-top:1px solid var(--bd)}
+  #jm-velo .jw-imp-tarifa{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:#fff}
+  #jm-velo .jw-campo--pct{width:96px;gap:4px}
+  #jm-velo .jw-campo--pct input{width:60px;text-align:right}
+  #jm-velo .jw-campo--pct.mal{border-color:#f0b54a}
+  #jm-velo .jw-imp-lista{display:flex;flex-direction:column;gap:6px;margin:0}
+  #jm-velo .jw-imp-lista>div{display:flex;justify-content:space-between;gap:12px;font-size:13px}
+  #jm-velo .jw-imp-lista dt{color:var(--tx2)}
+  #jm-velo .jw-imp-lista dt small{display:block;font-size:11px;color:var(--tx3)}
+  #jm-velo .jw-imp-lista dd{margin:0;font-weight:600;color:#ececec;white-space:nowrap}
+  #jm-velo .jw-imp-lista .tot{padding-top:8px;border-top:1px solid var(--bd)}
+  #jm-velo .jw-imp-lista .tot dt{font-weight:700;color:var(--vd)}
+  #jm-velo .jw-imp-lista .tot dd{font-size:14px;font-weight:700;color:var(--vd)}
+  #jm-velo .jw-imp-lista .atenuado{opacity:.5}
+  #jm-velo .jw-imp-lista .elegido dt,#jm-velo .jw-imp-lista .elegido dd{font-weight:700;color:#fff}
+  #jm-velo .jw-imp-res{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:1px solid var(--warnb);border-radius:12px;background:var(--warn)}
+  #jm-velo .jw-imp-res p{margin:0}
+  #jm-velo .jw-imp-res>p:first-child b{font-family:Montserrat,sans-serif;font-size:16px;color:var(--vd)}
+  #jm-velo .jw-chico{font-size:11px}
+  #jm-velo .jw-imp-ops{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  #jm-velo .jw-imp-ops .jw-op{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--bd2);border-radius:10px;background:transparent;text-align:left;cursor:pointer}
+  #jm-velo .jw-hecho--imp{margin:0}
+  @media (max-width:640px){#jm-velo .jw-cr-datos,#jm-velo .jw-cr-cols,#jm-velo .jw-imp-ops{grid-template-columns:1fr}}
+  /* Solo lectura: controles atenuados (los enlaces, el panel y «Continuar a…» siguen activos) */
+  #jm-velo.jw-solo .jw-etapas button:disabled:not(.jw-p),#jm-velo.jw-solo .jw-etapas input:disabled,#jm-velo.jw-solo .jw-etapas textarea:disabled{opacity:.6;cursor:default}
+  #jm-velo.jw-solo .jw-btn.jw-cerrado:disabled{opacity:1}
+  /* Ventanas de carga en «modo misión», como en Angular (19 nov 2026): velo grafito con el halo de la página, no blanco */
+  .cop-intro,.jm-carga{background:radial-gradient(90% 60% at 85% 0%,rgba(56,56,56,.9) 0%,rgba(56,56,56,0) 60%),rgba(43,43,43,.96);color:#e3e5e7}
+  .cop-intro-ring,.jm-carga-sami .cop-intro-ring{border-color:rgba(255,255,255,.25)}
+  .cop-intro-ring i,.jm-carga-sami .cop-intro-ring i{background:#00C73D;box-shadow:0 0 8px rgba(0,199,61,.6)}
+  .cop-intro-orb img,.jm-carga-sami img{filter:drop-shadow(0 8px 12px rgba(0,0,0,.45))}
+  .jm-carga h2{color:#00C73D}
+  .jm-carga-sub{color:#a3a8ac}
+  .jm-carga-pasos li{color:#a3a8ac}
+  .jm-carga-pasos li.va{color:#e3e5e7}
+  .jm-carga-pasos li.on{color:#ffffff}
+  .jm-ck{border-color:#4a4a4a}
+  .jm-carga-pasos li.on .jm-ck{background:#00C73D;border-color:#00C73D;color:#1b1b1b}
+  .jm-carga-barra{background:#4a4a4a}
+  /* Historial de la ficha: tonos de estado como en Angular */
+  .panel-cop .cop-estado--seguimiento{background:rgba(232,155,0,.1);color:#f0b54a}
+  .panel-cop .cop-estado--completado{background:rgba(0,199,61,.14);color:#8fe000}
 
   /* ===== Recursos (material interno del proceso de diseño) ===== */
   .v-recursos[hidden]{display:none}
@@ -2713,24 +2900,27 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="cop-h">
           <div class="cop-cab">
             <h3 class="cop-mis-tit cop-punto">Tu misión esta semana con Óscar</h3>
-            <div class="cop-hud"><span>En la lista desde el <b>12 nov</b> · quedan <b>54 días</b></span><span>Última conversación <b>28 oct</b></span><span class="cop-prog"><i><i style="width:0%"></i></i><b>0</b> de 1 completada esta semana</span></div>
+            <div class="cop-hud"><span data-hud-senal>Señal detectada el <b>12 nov</b></span><span>Última conversación <b data-hud-ultima>28 oct</b></span><span class="cop-prog"><i><i style="width:0%" data-prog-barra></i></i><b data-prog-hechas>0</b> <span data-prog-txt>de 1 completada esta semana</span></span></div>
           </div>
-          <div class="cop-seg" role="tablist" aria-label="Vista del copiloto">
+          <div class="cop-seg" role="tablist" aria-label="Vista de Planeación Pro">
             <button type="button" role="tab" aria-selected="true" data-cop="journeys">Conversaciones</button>
             <button type="button" role="tab" aria-selected="false" data-cop="historial">Historial</button>
           </div>
         </div>
         <div class="cop-b" data-cop-panel="journeys">
           <div class="cop-mis">
+            <!-- Tarjeta de misión como en Angular (SkCo.WealthPlanning.Contigo.Angular): señal de Dali Oportunidades
+                 (oportunidad 32, fuente OPPORTUNITY_BASE, prioridad Alta), que hoy no trae monto ni probabilidad -->
             <article class="mis mis-urg">
-              <span class="mis-cat">Prioridad alta</span>
-              <h4 class="mis-t">Revisa con Óscar su portafolio y sus objetivos</h4>
-              <p class="mis-d">Nuestro modelo indica que podría retirar recursos de Multifund en los próximos 60 días. No menciones esta señal; si decide hacerlo, acompaña su decisión con las opciones que mejor se ajusten a sus objetivos.</p>
-              <button class="mis-btn" type="button">Iniciar acompañamiento</button>
-              <p class="mis-conv">Misión: <b>Acompañamiento al retirar</b></p>
+              <span class="mis-cat">Necesita atención</span>
+              <h4 class="mis-t">Este cliente podría retirar su Fondo Voluntario de Pensión.</h4>
+              <p class="mis-d"><strong>Por qué:</strong> Señal de Fligoo: prioridad alta</p>
+              <button class="mis-btn" type="button">Iniciar conversación</button>
+              <p class="mis-conv">Conversación: <b>Acompañamiento en el retiro</b></p>
               <button class="mis-desc" type="button" aria-haspopup="dialog" aria-controls="pp-desc">Descartar</button>
             </article>
           </div>
+          <div class="cop-vacio cop-vacio--mis" data-mis-vacia hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/><path d="M4 6h.01"/><path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/><path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/><path d="M12 18h.01"/><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/><circle cx="12" cy="12" r="2"/><path d="m13.41 10.59 5.66-5.66"/></svg>No hay recomendaciones para este cliente hoy</div>
 
           <div class="cop-otras-h"><h3 class="cop-otras-tit">Otras conversaciones disponibles</h3></div>
           <div class="cop-filtros" role="group" aria-label="Filtrar conversaciones">
@@ -2738,18 +2928,24 @@ document.addEventListener('DOMContentLoaded',()=>{
             <button type="button" aria-pressed="false" data-f="inicio">Primeros pasos</button>
             <button type="button" aria-pressed="false" data-f="acomp">Acompañamiento</button>
           </div>
+          <!-- Como en Angular: orden por momento del cliente; el journey de la misión no se repite aquí y los que no
+               están activos salen con «Próximamente», sin clic. Si la misión ya no está, «Acompañamiento en el retiro»
+               vuelve a esta lista (data-jy-retiro). -->
           <div class="cop-otras">
-            <button class="jy" type="button" data-cat="acomp"><span class="jy-t">Caída relevante del portafolio</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
-            <button class="jy" type="button" data-cat="acomp"><span class="jy-t">Planeación de aportes voluntarios</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
-            <button class="jy" type="button" data-cat="acomp"><span class="jy-t">Revisión de portafolio y objetivos</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
-            <button class="jy" type="button" data-cat="inicio"><span class="jy-t">Primeros pasos del cliente</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
-            <button class="jy" type="button" data-cat="acomp"><span class="jy-t">Gestión de solicitudes</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="jy jy-prox" type="button" data-cat="inicio" disabled aria-disabled="true"><span class="jy-t">Primeros pasos del cliente <span class="jy-badge">Próximamente</span></span></button>
+            <button class="jy jy-prox" type="button" data-cat="acomp" disabled aria-disabled="true"><span class="jy-t">Planeación de aportes voluntarios <span class="jy-badge">Próximamente</span></span></button>
+            <button class="jy jy-prox" type="button" data-cat="acomp" disabled aria-disabled="true"><span class="jy-t">Revisión de portafolio y objetivos <span class="jy-badge">Próximamente</span></span></button>
+            <button class="jy jy-prox" type="button" data-cat="acomp" disabled aria-disabled="true"><span class="jy-t">Caída relevante del portafolio <span class="jy-badge">Próximamente</span></span></button>
+            <button class="jy" type="button" data-cat="acomp" data-jy-retiro hidden><span class="jy-t">Acompañamiento en el retiro</span><svg class="jy-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="jy jy-prox" type="button" data-cat="acomp" disabled aria-disabled="true"><span class="jy-t">Gestión de solicitudes <span class="jy-badge">Próximamente</span></span></button>
           </div>
         </div>
         <div class="cop-b" data-cop-panel="historial" hidden>
-          <div class="cop-hist">
-            <div><span class="jy-t">Acompañamiento al retirar</span><span class="jy-d">Conversación del 28/10/2026 · 12 min</span></div>
-            <span class="cop-estado">Completado</span>
+          <div class="cop-hist-lista" data-hist>
+            <button type="button" class="cop-hist" data-hist-fila="anterior">
+              <div><span class="jy-t">Acompañamiento en el retiro</span><span class="jy-d">Conversación del 28/10/2026 · 12 min</span></div>
+              <span class="cop-estado">Completado</span>
+            </button>
           </div>
         </div>
       </div>
@@ -2941,52 +3137,51 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="jy-modal" role="dialog" aria-modal="true" aria-labelledby="jm-tit">
     <header class="jm-top">
       <button type="button" class="jm-salir" data-jm-salir><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Regresar</button>
-      <h2 id="jm-tit" class="jm-tit">Acompañamiento al retirar · Óscar Camilo Hernández Ramírez</h2>
+      <h2 id="jm-tit" class="jm-tit">Acompañamiento en el retiro · Óscar Camilo Hernández Ramírez</h2>
     </header>
     <div class="jw-cab">
-      <ol class="jw-pasos" aria-label="Etapas de la conversación"><li><button type="button" class="jw-p on" data-ir="1" aria-current="step"><span class="jw-n">1</span><span class="jw-pt">Entender</span></button></li><li><button type="button" class="jw-p" data-ir="2" disabled><span class="jw-n">2</span><span class="jw-pt">Situación</span></button></li><li><button type="button" class="jw-p" data-ir="3" disabled><span class="jw-n">3</span><span class="jw-pt">Opciones</span></button></li><li><button type="button" class="jw-p" data-ir="4" disabled><span class="jw-n">4</span><span class="jw-pt">Precauciones</span></button></li><li><button type="button" class="jw-p" data-ir="5" disabled><span class="jw-n">5</span><span class="jw-pt">Acuerdo</span></button></li></ol><p class="jw-cont" data-cont aria-hidden="true">Entender</p>
+      <ol class="jw-pasos" aria-label="Progreso de la conversación"><li><button type="button" class="jw-p on" data-ir="1" aria-current="step"><span class="jw-n">1</span><span class="jw-pt">Entender</span></button></li><li><button type="button" class="jw-p" data-ir="2" disabled><span class="jw-n">2</span><span class="jw-pt">Situación</span></button></li><li><button type="button" class="jw-p" data-ir="3" disabled><span class="jw-n">3</span><span class="jw-pt">Opciones</span></button></li><li><button type="button" class="jw-p" data-ir="4" disabled><span class="jw-n">4</span><span class="jw-pt">Acuerdo</span></button></li></ol><p class="jw-cont" data-cont aria-hidden="true">Entender</p>
+      <p class="jw-estado-conv" data-estado-conv hidden><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span></span></p>
       <div class="jw-ctx" hidden><button type="button" class="jw-chip" data-ctx="necesidad">Desea retirar <b data-ctx-monto></b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button type="button" class="jw-chip" data-ctx="contrato" hidden>Contrato: <b data-ctx-contrato></b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>
     </div>
     <div class="jw-cuerpo">
       <div class="jw-scroll"><div class="jw-lienzo">
         <aside class="jw-res" aria-label="Resumen de la conversación" aria-live="polite" data-res></aside>
         <div class="jw-etapas">
+        <p class="jw-cierre-aviso" role="status" data-cierre-aviso hidden></p>
         <!-- Etapa 1 · Entender (datos del prototipo WPP: caso Jorge Iván Salazar) -->
         <section class="jw-etapa" data-etapa="1" aria-labelledby="jw-t1">
           <p class="jw-eb">Entender</p>
           <h3 class="jw-h" id="jw-t1"><label for="jw-monto">¿Cuánto desea retirar tu cliente?</label></h3>
-          <div class="jw-dest"><span class="jw-campo jw-campo--grande"><span aria-hidden="true">$</span><input id="jw-monto" inputmode="numeric" autocomplete="off" placeholder="0" aria-describedby="jw-monto-ayuda"></span><p id="jw-monto-ayuda">La señal de Fligo estima que podría retirar $216.900.000.</p></div>
+          <!-- Como en Angular: debajo del monto solo va «La señal de {fuente} estima que podría retirar $X» si la señal trae
+               el estimado. La de Dali Oportunidades todavía no lo trae, así que no se muestra. -->
+          <div class="jw-dest"><span class="jw-campo jw-campo--grande"><span aria-hidden="true">$</span><input id="jw-monto" inputmode="numeric" autocomplete="off" placeholder="0" aria-label="¿Cuánto desea retirar tu cliente?"></span></div>
 
           <div class="jw-q" data-q="motivo">
-            <p class="jw-qt">¿Qué lo lleva a pensar en retirar?</p>
-            <div class="jw-chips">
+            <p class="jw-qt" tabindex="-1">¿Qué lo lleva a pensar en retirar?</p>
+            <div class="jw-chips" role="group" aria-label="Motivo">
               <button type="button" data-v="liquidez">Necesidad de liquidez</button><button type="button" data-v="vivienda">Compra de vivienda</button><button type="button" data-v="objetivo">Objetivo personal</button><button type="button" data-v="rendimientos">Rendimientos o expectativas no cumplidas</button><button type="button" data-v="otro">Otro</button>
             </div>
             <div class="jw-fuera" hidden>
-              <p data-fuera-txt></p>
-              <button type="button" class="jw-btn jw-btn--sec" data-fuera>Cerrar como fuera de alcance</button>
+              <p class="jw-fuera-txt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span data-fuera-txt></span></p>
+              <textarea class="jw-area" rows="2" maxlength="300" placeholder="¿Qué motivo mencionó el cliente?" aria-label="Motivo que mencionó el cliente" data-fuera-nota></textarea>
+              <button type="button" class="jw-btn jw-btn--sec" data-fuera><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>Cerrar como fuera de alcance</button>
             </div>
           </div>
           <div class="jw-hecho" data-hecho="motivo" hidden><span>Motivo: <b></b></span><button type="button" class="jw-link" data-cambiar="motivo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
 
           <div class="jw-q" data-q="cuando" hidden>
-            <p class="jw-qt">¿Para cuándo lo necesita?</p>
+            <p class="jw-qt" tabindex="-1">¿Para cuándo lo necesita?</p>
             <p class="jw-ayuda">Con la fecha se sabe qué aportes dejan de tener retención antes de que la necesite.</p>
-            <div class="jw-chips">
+            <div class="jw-chips" role="group" aria-label="Para cuándo">
               <button type="button" data-v="esta-semana">Esta semana</button><button type="button" data-v="este-mes">Este mes</button><button type="button" data-v="en-meses">En unos meses</button><button type="button" data-v="fecha">Con fecha</button>
             </div>
             <div class="jw-fila" data-fecha hidden><span class="jw-campo jw-campo--fecha"><input type="date" id="jw-fecha" min="2026-11-16" aria-label="Fecha en que lo necesita"></span><button type="button" class="jw-btn" data-fecha-ok disabled>Continuar</button></div>
           </div>
           <div class="jw-hecho" data-hecho="cuando" hidden><span>Para cuándo: <b data-v-cuando></b></span><button type="button" class="jw-link" data-cambiar="cuando"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
 
-          <div class="jw-q" data-q="condicion" hidden>
-            <p class="jw-qt">¿Aplica alguna condición especial?</p>
-            <div class="jw-chips">
-              <button type="button" data-v="ninguna">Ninguna</button><button type="button" data-v="pension">Cumple requisitos de pensión</button><button type="button" data-v="vivienda">Retiro para compra de vivienda</button>
-            </div>
-            <p class="jw-ayuda">En Contigo el cliente no tiene la marca de beneficio tributario.</p>
-          </div>
-          <div class="jw-hecho" data-hecho="condicion" hidden><span>Condición especial: <b data-v-condicion></b></span><button type="button" class="jw-link" data-cambiar="condicion"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar</button></div>
+          <!-- En Angular la condición especial ya no se pregunta en Entender: vivienda sale del motivo y la pensión se pregunta en Situación -->
+          <p class="jw-nota-i" data-viv hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>En este caso el retiro no causa retención contingente.</p>
 
           <div class="jw-pie" data-pie hidden><button type="button" class="jw-btn" data-sig="2">Continuar a Situación <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
         </section>
@@ -2995,56 +3190,54 @@ document.addEventListener('DOMContentLoaded',()=>{
         <section class="jw-etapa jw-etapa--ancha" data-etapa="2" aria-labelledby="jw-t2" hidden>
           <p class="jw-eb">Situación</p>
           <h3 class="jw-h" id="jw-t2">¿De qué contrato conviene sacarlo?</h3>
-          <div class="jw-cts" role="radiogroup" aria-labelledby="jw-t2" data-cts></div>
-          <p class="jw-aviso" data-ninguno hidden>Ningún contrato alcanza por sí solo para el monto que desea retirar. Puedes continuar con el de mayor disponible y revisar en «Opciones» el crédito puente.</p>
-          <div class="jw-pie"><button type="button" class="jw-btn" data-sig="3">Continuar con este contrato <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <!-- Como en Angular: la pregunta de pensión va aquí (no en Entender); no se muestra si el motivo es vivienda -->
+          <div class="jw-pen" data-pen hidden>
+            <p class="jw-pen-t" id="jw-pen-t"><b>¿Cumple requisitos de pensión?</b></p>
+            <div class="jw-chips" role="group" aria-labelledby="jw-pen-t" data-pen-ops><button type="button" data-pen-v="si" aria-pressed="false">Sí</button><button type="button" data-pen-v="no" aria-pressed="false">No</button></div>
+            <p class="jw-ayuda" data-pen-nota></p>
+          </div>
+          <div class="jw-cts" role="radiogroup" aria-label="Contratos que se pueden retirar" data-cts></div>
+          <p class="jw-aviso" role="status" data-ninguno hidden></p>
+          <div class="jw-pie"><button type="button" class="jw-btn" data-confirmar-ct>Continuar con este contrato <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <div class="jw-pie" data-pie2 hidden><button type="button" class="jw-btn" data-sig="3">Continuar a Opciones <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
         </section>
-        <!-- Etapa 3 · Opciones (datos del prototipo WPP) -->
+        <!-- Etapa 3 · Opciones, como en Angular (v5): la pregunta de renta exenta y la advertencia van en la caja del retiro;
+             no hay etapa «Precauciones». Las cajas se arman en el script (pintarOpciones). -->
         <section class="jw-etapa jw-etapa--ancha" data-etapa="3" aria-labelledby="jw-t3" hidden>
           <p class="jw-eb">Opciones</p>
           <h3 class="jw-h" id="jw-t3">¿Qué puede hacer?</h3>
-          <div class="jw-ops3" data-ops3></div>
-          <p class="jw-ayuda">Lo que se retiene hoy es un anticipo: se descuenta del impuesto en la declaración de renta. El posible impuesto es una estimación orientativa con el IBC: no reemplaza la declaración de renta.</p>
-          <div class="jw-pref">
-            <p class="jw-qt" id="jw-pref-t">¿Cuál prefiere el cliente?</p>
-            <div class="jw-chips" role="group" aria-labelledby="jw-pref-t" data-pref></div>
-          </div>
-          <div class="jw-links3"><button type="button" class="jw-link" data-ver-calc>Ver cálculo</button><button type="button" class="jw-link" data-ver-cred>Ver detalle del crédito</button></div>
-          <div class="jw-pie" data-pie3 hidden><button type="button" class="jw-btn" data-sig3><span data-sig3-t>Continuar a Precauciones</span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-        </section>
-        <!-- Etapa 4 · Precauciones (datos del prototipo WPP) -->
-        <section class="jw-etapa jw-etapa--ancha" data-etapa="4" aria-labelledby="jw-t4" hidden>
-          <p class="jw-eb">Precauciones</p>
-          <h3 class="jw-h" id="jw-t4">¿Qué debe tener en cuenta?</h3>
-          <p class="jw-proximo" data-p4-cred hidden>Con el crédito no se retira del fondo: no hay retenciones ni impuesto por el retiro.</p>
-          <div class="jw-p4" data-p4-cuerpo>
-            <p class="jw-p4-anios" data-p4-anios></p>
+          <div class="jw-dest jw-nodisp" data-o-falta hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg><span><b>No disponible</b> · Falta el monto que necesita · Respóndalo en «Entender»</span></div>
+          <div data-o-cuerpo>
+            <p class="jw-info" role="status" data-o-alcanza hidden></p>
+            <div class="jw-ops3" data-ops3></div>
+            <p class="jw-ayuda" data-o-anticipo></p>
             <div class="jw-pref">
-              <p class="jw-qt" id="jw-rx-t">¿Alguno se usó como renta exenta?</p>
-              <div class="jw-chips" role="group" aria-labelledby="jw-rx-t" data-rx><button type="button" data-rx-v="si" aria-pressed="false">Sí</button><button type="button" data-rx-v="no" aria-pressed="false">No</button><button type="button" data-rx-v="nosabe" aria-pressed="false">No sabe</button></div>
+              <p class="jw-qt" id="jw-pref-t">¿Cuál prefiere el cliente?</p>
+              <div class="jw-chips" role="group" aria-labelledby="jw-pref-t" data-pref></div>
             </div>
-            <p class="jw-p4-imp" data-p4-imp aria-live="polite" hidden></p>
-            <div class="jw-p4-acc">
-              <button type="button" class="jw-btn jw-btn--sec" data-xls><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar detalle para el contador</button><span class="jw-ayuda">en Excel</span>
-              <label class="jw-check"><input type="checkbox" data-validar> Le recomendé validarlo</label>
-            </div>
-            <p class="jw-aviso jw-p4-aviso"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 7h14M7 21h10"/><path d="m5 7-3 7a3 3 0 0 0 6 0Z"/><path d="m19 7-3 7a3 3 0 0 0 6 0Z"/></svg><span>Desde Skandia no tenemos conocimiento del uso que el cliente dio a estos aportes como renta exenta en declaraciones pasadas. <span data-lm-mas hidden>Si los usó, lo que se retire sin cumplir requisitos (10 años de permanencia, cumplimiento de requisitos de pensión o vivienda) se convierte en ingreso en el año gravable del retiro.</span> <button type="button" class="jw-link" data-lm aria-expanded="false">Leer más</button></span></p>
-            <div class="jw-links3"><button type="button" class="jw-link" data-ver-calc4>Ver cálculo</button></div>
+            <div class="jw-links3"><button type="button" class="jw-link jw-ro-ok" data-ver-calc><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg>Ver cálculo</button><button type="button" class="jw-link jw-ro-ok" data-ver-cred><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg>Ver detalle del crédito</button></div>
           </div>
-          <div class="jw-pie" data-pie4 hidden><button type="button" class="jw-btn" data-sig4>Continuar a Acuerdo <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <div class="jw-pie" data-pie3 hidden><button type="button" class="jw-btn jw-ro-ok" data-sig="4">Continuar a Acuerdo <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
         </section>
-        <!-- Etapa 5 · Acuerdo (estructura y datos del prototipo WPP) -->
-        <section class="jw-etapa jw-etapa--ancha" data-etapa="5" aria-labelledby="jw-t5" hidden>
+        <!-- Etapa 4 · Acuerdo, como en Angular (v5): el detalle para el contador va al final, debajo de los botones -->
+        <section class="jw-etapa jw-etapa--ancha" data-etapa="4" aria-labelledby="jw-t4" hidden>
           <p class="jw-eb">Acuerdo</p>
-          <h3 class="jw-h" id="jw-t5" tabindex="-1">¿Qué decidió el cliente?</h3>
-          <div class="jw-dec" role="group" aria-labelledby="jw-t5" data-dec></div>
+          <h3 class="jw-h" id="jw-t4" tabindex="-1">¿Qué decidió el cliente?</h3>
+          <div class="jw-dest jw-destacada" data-a-dest hidden><b data-a-dest-v></b><span data-a-dest-t></span></div>
+          <div class="jw-dec" role="group" aria-labelledby="jw-t4" data-dec></div>
           <div class="jw-a5" data-a5 hidden>
             <div class="jw-bloque5" data-tram>
               <p class="jw-qt" data-tram-t></p>
+              <p class="jw-aviso" data-tram-alerta hidden></p>
               <p class="jw-a5-linea" data-tram-linea></p>
-              <p class="jw-ayuda" data-tram-viv hidden>El retiro para vivienda requiere documentos según el tipo: sin financiación, con crédito hipotecario, leasing habitacional o pago de cuota de crédito hipotecario.</p>
+              <p class="jw-a5-linea" data-tram-combo hidden></p>
+              <p class="jw-ayuda" data-tram-viv hidden>El retiro para vivienda requiere documentos según el tipo (sin financiación, con crédito hipotecario, leasing habitacional o pago de cuota de crédito hipotecario). <a class="jw-link" href="https://www.skandia.co/guia-transacciones-canales-y-servicios" target="_blank" rel="noopener noreferrer">Guía de transacciones, canales y servicios</a></p>
               <div class="jw-chips" role="group" data-tram-ops></div>
               <p class="jw-ayuda" data-tram-nota></p>
+            </div>
+            <div class="jw-p4-acc jw-contador" data-contador hidden>
+              <button type="button" class="jw-btn jw-btn--sec jw-ro-ok" data-xls><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Descargar detalle para el contador</button><span class="jw-ayuda">en Excel</span>
+              <label class="jw-check"><input type="checkbox" data-validar> Le recomendé validarlo</label>
             </div>
             <div class="jw-bloque5">
               <p class="jw-qt">Próximos pasos</p>
@@ -3060,37 +3253,33 @@ document.addEventListener('DOMContentLoaded',()=>{
               <div class="jw-juego" data-juego></div>
             </div>
             <details class="jw-resc" data-resc>
-              <summary>Ver resumen para el cliente</summary>
+              <summary class="jw-ro-ok">Ver resumen para el cliente</summary>
               <pre data-resc-txt></pre>
-              <button type="button" class="jw-link" data-copiar>Copiar</button>
+              <button type="button" class="jw-link jw-ro-ok" data-copiar><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copiar</span></button>
             </details>
             <p class="jw-proximo jw-a5-msg" data-a5-msg aria-live="polite" hidden></p>
             <div class="jw-pie jw-pie5">
-              <button type="button" class="jw-btn jw-btn--sec" data-cambiar-dec><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21v-4L16 4l4 4L7 21Z"/></svg>Cambiar decisión</button>
-              <button type="button" class="jw-btn jw-btn--sec" data-enviar><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4Z"/></svg>Enviar resumen al cliente</button>
-              <button type="button" class="jw-btn" data-cierre>Registrar cierre</button>
+              <button type="button" class="jw-btn jw-btn--sec" data-cambiar-dec><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Cambiar decisión</button>
+              <button type="button" class="jw-btn jw-btn--sec jw-ro-ok" data-enviar><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4Z"/></svg>Enviar resumen al cliente</button>
+              <button type="button" class="jw-btn" data-cierre></button>
             </div>
           </div>
         </section>
         </div></div>
       </div>
       <div class="jw-velo-det" data-det-velo hidden></div>
-      <section class="jw-det" role="dialog" aria-modal="false" aria-labelledby="jw-det-t" data-det hidden>
+      <section class="jw-det" role="dialog" aria-modal="true" aria-labelledby="jw-det-t" data-det hidden>
         <div class="jw-det-h">
           <h4 class="jw-det-t" id="jw-det-t">Detalle</h4>
           <label class="jw-det-sel"><span>Contrato</span><select data-det-ct></select></label>
-          <button type="button" class="jw-det-x" data-det-x aria-label="Cerrar detalle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+          <button type="button" class="jw-det-x" data-det-x aria-label="Cerrar el detalle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         </div>
         <div class="jw-det-tabs" role="tablist" aria-label="Detalle del contrato">
-          <button type="button" role="tab" aria-selected="true" data-tab="contrato">Contrato</button><button type="button" role="tab" aria-selected="false" data-tab="portafolios">Portafolios</button><button type="button" role="tab" aria-selected="false" data-tab="aportes">Aportes</button><button type="button" role="tab" aria-selected="false" data-tab="calculo">Cálculo</button><button type="button" role="tab" aria-selected="false" data-tab="credito">Crédito</button>
+          <button type="button" role="tab" aria-selected="true" data-tab="contrato">Contrato</button><button type="button" role="tab" aria-selected="false" data-tab="portafolios">Portafolios</button><button type="button" role="tab" aria-selected="false" data-tab="aportes">Aportes</button><button type="button" role="tab" aria-selected="false" data-tab="calculo">Cálculo</button><button type="button" role="tab" aria-selected="false" data-tab="credito">Crédito</button><button type="button" role="tab" aria-selected="false" data-tab="impuestos">Impuestos</button>
         </div>
         <div class="jw-det-b" role="tabpanel" data-det-b></div>
       </section>
-      <aside class="jw-sami" aria-label="SAMI te acompaña" hidden><!-- Panel de SAMI retirado del journey (2026-11-16); se conserva oculto para no romper la lógica -->
-        <div class="jw-sami-h"><img src="assets/sami-cabeza.png" alt="" width="34" height="25"><div><b>SAMI te acompaña</b><span>Acompañamiento al retirar</span></div></div>
-        <div class="jw-sami-lista" aria-live="polite"></div>
-        <div class="jw-sami-sug" data-sug><button type="button" data-sug-otro>Es por otra razón</button></div>
-      </aside>
+      <div class="jw-toasts" data-toasts aria-live="polite"></div>
     </div>
   </div>
 </div>
@@ -3383,133 +3572,107 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 <script>
-// Journey "Acompañamiento en el retiro" (del prototipo WPP): loading de SAMI y modal con navegación horizontal, una etapa a la vez
+// Acompañamiento en el retiro, alineado con Angular (SkCo.WealthPlanningJourney.Contigo.Angular, v5 del journey; 2026-11-20).
+// Cuatro partes: Entender · Situación · Opciones · Acuerdo (en la v5 no hay «Precauciones»: la renta exenta va en la caja
+// del retiro y el detalle para el contador, al final del Acuerdo). Datos ficticios: los 3 contratos del prototipo WPP.
+// También mueve la pestaña Planeación Pro de la ficha: estado de la misión, «n de 1 completada», catálogo e historial.
 document.addEventListener('DOMContentLoaded',()=>{
-  const CHECK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  const IC={
+    check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+    info:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+    off:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>',
+    balanza:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 7h14M7 21h10"/><path d="m5 7-3 7a3 3 0 0 0 6 0Z"/><path d="m19 7-3 7a3 3 0 0 0 6 0Z"/></svg>',
+    bajar:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>',
+    clip:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>',
+    ok:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>',
+    lapiz:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+    sube:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>',
+    alerta:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+    escudo:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
+    cal:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+    ext:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
+    chev:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+  };
   const carga=document.getElementById('jm-carga'), velo=document.getElementById('jm-velo');
   const pasosCarga=[...carga.querySelectorAll('.jm-carga-pasos li')], corto=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const navs=[...velo.querySelectorAll('.jw-p')], etapas=[...velo.querySelectorAll('.jw-etapa')];
-  const lista=velo.querySelector('.jw-sami-lista'), sug=velo.querySelector('[data-sug]'), ctx=velo.querySelector('.jw-ctx');
-  const q=sel=>velo.querySelector(sel);
-  let timers=[], st={}, hechas=new Set(), completada=false;
-  const pesos=n=>'$'+Math.round(n).toLocaleString('es-CO');
-  const CUANDO={'esta-semana':'esta semana','este-mes':'este mes','en-meses':'en unos meses'};
-  const MOTIVO={liquidez:'Necesidad de liquidez',vivienda:'Compra de vivienda',objetivo:'Objetivo personal',rendimientos:'Rendimientos o expectativas no cumplidas',otro:'Otro'};
-  const FUERA={rendimientos:'Este acompañamiento cubre retiros por una necesidad de dinero. Si lo que pesa es la rentabilidad o las expectativas, anota el motivo, cierra esta conversación y revisa con él su portafolio en «Revisión de portafolio y objetivos».',otro:'Este acompañamiento cubre retiros por una necesidad de dinero (liquidez, vivienda u objetivo personal). Si el motivo es otro (otra entidad, el servicio o un cambio de portafolio), anótalo y cierra la conversación como fuera de alcance.'};
-  let monto=0;
-  const CONDICION={ninguna:'Ninguna',pension:'Cumple requisitos de pensión',vivienda:'Retiro para compra de vivienda'};
-  // Textos de SAMI del prototipo WPP (en revisión de Cumplimiento)
-  const SAMI={
-    inicio:[{t:'rec',h:'Empieza por entender la necesidad, sin hablar todavía de productos. Estas preguntas te pueden ayudar:<ul><li>¿Para qué necesitas el dinero?</li><li>¿Cuánto deseas retirar, más o menos?</li><li>¿Te va a entrar dinero en los próximos meses con el que podrías reponerlo?</li></ul>'},
-            {t:'int',h:'Si es temporal, el crédito puente suele cuidar mejor su ahorro. Si es permanente o no lo sabe, lo compararemos igual, pero no como recomendación.'}],
-    faltaMonto:{t:'rec',h:'Anotado. Escribe cuánto desea retirar para continuar a «Situación».'},
-    vivienda:{t:'dato',h:'Si el retiro es para compra de vivienda, no causa retención contingente.'},
-    rendimientos:{t:'int',h:'Si lo que pesa es la rentabilidad, este acompañamiento no aplica. Anota el motivo y revisa con él su portafolio.'},
-    otro:{t:'int',h:'Este acompañamiento es para retiros por una necesidad de dinero. Anota el motivo y, si no hay una necesidad de dinero detrás, ciérralo como fuera de alcance.'},
-    'esta-semana':{t:'int',h:'Lo necesita pronto: en el comparador fíjate en qué opción se puede tramitar más rápido.'},
-    'este-mes':{t:'int',h:'Hay unas semanas de margen. Pregúntale si podrá reponer el dinero.'},
-    'en-meses':{t:'int',h:'Hay tiempo: si algún aporte cumple la permanencia antes de esa fecha, ese tramo ya no tendría retención contingente (si se usó como renta exenta, retirarlo aún puede generar impuesto).'},
-    condicion:{t:'dato',h:'Con esa condición especial el retiro no causa retención contingente.'},
-    sinCondicion:{t:'rec',h:'Listo, ya tenemos lo necesario. Continúa a «Situación» para ver de qué contrato conviene sacarlo.'}
-  };
-  const TAG={rec:['rec','Recomendación'],int:['int','Interpretación'],dato:['dato','Dato']};
-  function sami(m){ const d=document.createElement('div'); d.className='jw-msg'; d.innerHTML='<span class="jw-tag jw-tag--'+TAG[m.t][0]+'">'+TAG[m.t][1]+'</span><div>'+m.h+'</div>'; lista.appendChild(d); lista.scrollTop=lista.scrollHeight; }
-  // ---- Navegación horizontal ----
-  var etapaAct=1, resListo=false;
-  function irEtapa(n){
-    etapaAct=n;
-    const cont=q('[data-cont]'); if(cont) cont.textContent=['Entender','Situación','Opciones','Precauciones','Acuerdo'][n-1];
-    etapas.forEach(e=>e.hidden=+e.dataset.etapa!==n);
-    navs.forEach((b,k)=>{ const on=k+1===n; b.classList.toggle('on',on); if(on) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current'); });
-    q('.jw-scroll').scrollTop=0; const md=velo.querySelector('.jy-modal'); if(md) md.scrollTop=0;
-    if(n===2 && typeof pintarSituacion==='function'){ pintarSituacion(); if(!st.vio2){ st.vio2=true; SAMI.situacion.forEach(sami); } }
-    if(n===3 && typeof pintarOpciones==='function'){ st.vio3=true; pintarOpciones(); }
-    if(n===4 && typeof pintarPrecauciones==='function'){ st.vio4=true; pintarPrecauciones(); }
-    if(n===5 && typeof pintarAcuerdo==='function'){ st.vio5=true; pintarAcuerdo(); }
-    if(resListo) pintarResumen();
-  }
-  function marcar(n,ok){ const b=navs[n-1]; b.classList.toggle('ok',ok); b.disabled=false; b.querySelector('.jw-n').innerHTML= ok? CHECK : String(n); b.closest('li').classList.toggle('hecho',ok); ok?hechas.add(n):hechas.delete(n); }
-  navs.forEach(b=>b.addEventListener('click',()=>{ if(!b.disabled) irEtapa(+b.dataset.ir); }));
-  velo.querySelectorAll('[data-sig]').forEach(b=>b.addEventListener('click',()=>{ const n=+b.dataset.sig; navs[n-1].disabled=false; irEtapa(n); }));
-  velo.querySelectorAll('[data-ir-a]').forEach(b=>b.addEventListener('click',()=>irEtapa(+b.dataset.irA)));
-  // ---- Etapa 1 · Entender ----
-  const ORDEN=['motivo']; // por ahora se omiten 'cuando' y 'condicion'
+  const navs=[...velo.querySelectorAll('.jw-p')], etapas=[...velo.querySelectorAll('.jw-etapa')], ctx=velo.querySelector('.jw-ctx');
+  const q=sel=>velo.querySelector(sel), qa=sel=>[...velo.querySelectorAll(sel)];
   const vis=(sel,v)=>{ const e=q(sel); if(e) e.hidden=!v; };
-  function pintarDest(){
-    ctx.hidden=!(monto&&st.motivo);
-    q('[data-sig="2"]').disabled=!monto;
-    if(st.motivo){ marcar(1,!!monto); navs[1].disabled=!monto; }
-    if(!ctx.hidden){ q('[data-ctx-monto]').textContent=pesos(monto); }
-    if(resListo) pintarResumen();
-  }
-  function mostrarDesde(paso){ // abre la pregunta "paso" y oculta las siguientes
-    const k=ORDEN.indexOf(paso);
-    ORDEN.forEach((p,i)=>{ if(i>=k){ delete st[p]; vis('[data-hecho="'+p+'"]',false); vis('[data-q="'+p+'"]',i===k); } });
-    velo.querySelectorAll('[data-q="'+paso+'"] [aria-pressed]').forEach(x=>x.setAttribute('aria-pressed','false'));
-    if(paso==='motivo') vis('.jw-fuera',false);
-    if(paso==='cuando'){ vis('[data-fecha]',false); delete st.cuandoTxt; }
-    vis('[data-pie]',false); marcar(1,false); navs[1].disabled=true; pintarDest();
-  }
-  function cerrarPaso(paso,txt){ vis('[data-q="'+paso+'"]',false); const h=q('[data-hecho="'+paso+'"]'); if(txt!==undefined){ const b=h.querySelector('b'); b.textContent=txt; } h.hidden=false; const sig=ORDEN[ORDEN.indexOf(paso)+1]; if(sig) vis('[data-q="'+sig+'"]',true); }
-  velo.querySelectorAll('[data-q="motivo"] .jw-chips button').forEach(b=>b.addEventListener('click',()=>{
-    const v=b.dataset.v;
-    velo.querySelectorAll('[data-q="motivo"] .jw-chips button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
-    if(FUERA[v]){ delete st.motivo; vis('[data-pie]',false); marcar(1,false); navs[1].disabled=true; q('[data-fuera-txt]').textContent=FUERA[v]; vis('.jw-fuera',true); sami(SAMI[v]); pintarDest(); return; }
-    const antes=st.motivo; if(antes===v) return;
-    vis('.jw-fuera',false); st.motivo=v; sug.hidden=true;
-    if(v==='vivienda') sami(SAMI.vivienda);
-    if(!antes) sami(monto?SAMI.sinCondicion:SAMI.faltaMonto);
-    vis('[data-pie]',true); pintarDest();
-  }));
-  velo.querySelector('[data-sug-otro]').addEventListener('click',()=>velo.querySelector('[data-q="motivo"] [data-v="otro"]').click());
-  q('[data-fuera]').addEventListener('click',()=>cerrar());
-  const inp=q('#jw-monto');
-  inp.addEventListener('input',()=>{ monto=+inp.value.replace(/\D/g,''); inp.value=monto?monto.toLocaleString('es-CO'):''; pintarDest(); if(typeof pintarSituacion==='function') pintarSituacion(); });
-  function elegirCuando(v,txt){ st.cuando=v; st.cuandoTxt=txt; cerrarPaso('cuando',txt.charAt(0).toUpperCase()+txt.slice(1)); pintarDest(); sami(SAMI[v]||SAMI['en-meses']); }
-  velo.querySelectorAll('[data-q="cuando"] .jw-chips button').forEach(b=>b.addEventListener('click',()=>{
-    velo.querySelectorAll('[data-q="cuando"] .jw-chips button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
-    if(b.dataset.v==='fecha'){ vis('[data-fecha]',true); q('#jw-fecha').focus(); return; }
-    vis('[data-fecha]',false); elegirCuando(b.dataset.v,CUANDO[b.dataset.v]);
-  }));
-  const fecha=q('#jw-fecha'), okFecha=q('[data-fecha-ok]');
-  fecha.addEventListener('input',()=>okFecha.disabled=!fecha.value);
-  okFecha.addEventListener('click',()=>{ const d=new Date(fecha.value+'T12:00'); const txt='para el '+d.toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'}).replace('.',''); const dias=(d-new Date(2026,10,16))/864e5; elegirCuando(dias<=7?'esta-semana':dias<=31?'este-mes':'en-meses',txt); });
-  velo.querySelectorAll('[data-q="condicion"] .jw-chips button').forEach(b=>b.addEventListener('click',()=>{
-    velo.querySelectorAll('[data-q="condicion"] .jw-chips button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
-    st.condicion=b.dataset.v; cerrarPaso('condicion',CONDICION[b.dataset.v]);
-    sami(b.dataset.v==='ninguna'?SAMI.sinCondicion:SAMI.condicion);
-    vis('[data-pie]',true); marcar(1,true); navs[1].disabled=false;
-    setTimeout(()=>q('[data-sig="2"]').focus(),50);
-  }));
-  velo.querySelectorAll('[data-cambiar]').forEach(b=>b.addEventListener('click',()=>{ const p=b.dataset.cambiar; mostrarDesde(p); if(p==='motivo') sug.hidden=false; }));
-  q('[data-ctx="necesidad"]').addEventListener('click',()=>{ irEtapa(1); inp.focus(); inp.select(); });
-  function reiniciar(){
-    st={}; hechas.clear(); lista.innerHTML=''; ctSel=null; q('[data-ctx="contrato"]').hidden=true; det.hidden=true; detVelo.hidden=true; sug.hidden=false; monto=0; inp.value=''; fecha.value=''; okFecha.disabled=true;
-    mostrarDesde('motivo'); navs.forEach((b,k)=>{ if(k>0){ b.disabled=true; marcar(k+1,false); b.disabled=true; } });
-    irEtapa(1); SAMI.inicio.forEach(sami);
-  }
-  // ---- Etapa 2 · Situación (datos de los 3 contratos del prototipo WPP) ----
+  const pesos=n=>(n<0?'-$':'$')+Math.abs(Math.round(n)).toLocaleString('es-CO');
+  const pct=(v,d)=>v.toLocaleString('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d})+' %';
+  // «Hoy» del prototipo y fechas con la misma llamada de Angular (el formato depende del navegador)
+  const HOY=new Date(2026,10,16);
+  const masDias=d=>new Date(HOY.getFullYear(),HOY.getMonth(),HOY.getDate()+d);
+  const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const deIso=s=>{ const [a,m,d]=s.split('-').map(Number); return new Date(a,m-1,d); };
+  const fLarga=d=>d.toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'});
+  const fCorta=d=>d.toLocaleDateString('es-CO',{day:'numeric',month:'short'});
+  const NOMBRE='Óscar Camilo Hernández Ramírez';
+  const PARTES=['Entender','Situación','Opciones','Acuerdo'], ETAPAS_BD=['Necesidad','Lo que tiene y desde dónde','Comparador','Decisión y cierre'];
+  const MOTIVO={liquidez:'Necesidad de liquidez',vivienda:'Compra de vivienda',objetivo:'Objetivo personal',rendimientos:'Rendimientos o expectativas no cumplidas',otro:'Otro'};
+  const EN_ALCANCE=v=>v==='liquidez'||v==='vivienda'||v==='objetivo';
+  const FUERA={rendimientos:'Este acompañamiento cubre retiros por una necesidad de dinero. Si lo que pesa es la rentabilidad o las expectativas, anota el motivo, cierra esta conversación y revisa con él su portafolio en «Revisión de portafolio y objetivos».',otro:'Este acompañamiento cubre retiros por una necesidad de dinero (liquidez, vivienda u objetivo personal). Si el motivo es otro (otra entidad, el servicio o un cambio de portafolio), anótalo y cierra la conversación como fuera de alcance.'};
+  const ESTADO={propuesta:'Propuesto','en-curso':'En curso','cerrada-seguimiento':'Cerrado · en seguimiento',finalizada:'Completado',abandonada:'Abandonado',migrada:'Pasó a la versión nueva'};
+  const ADV_CORTA='Desde Skandia no tenemos conocimiento del uso que el cliente dio a estos aportes como renta exenta en declaraciones pasadas.';
+  const ADV_RESTO=' Si los usó, lo que se retire sin cumplir requisitos (10 años de permanencia, cumplimiento de requisitos de pensión o vivienda) se convierte en ingreso en el año gravable del retiro.';
+  const ADV_USTED='Desde Skandia no tenemos conocimiento del uso que usted dio a estos aportes como renta exenta en declaraciones pasadas.'+ADV_RESTO;
+  const GLOSA='Ingreso que no paga impuesto en la declaración de renta. Los aportes voluntarios pueden declararse como renta exenta, con límites y requisitos; eso solo lo saben usted o su contador.';
+  const DIAN='<button type="button" class="jw-dian jw-ro-ok" aria-label="Impuesto de la DIAN: Skandia no lo cobra" title="Este impuesto lo liquida el cliente en su declaración de renta y lo paga a la DIAN. Skandia no lo cobra.">DIAN</button>';
+  const fila=(dt,dd,cls)=>'<div'+(cls?' class="'+cls+'"':'')+'><dt>'+dt+'</dt><dd>'+dd+'</dd></div>';
+  const nodisp=(motivo,hacer)=>'<p class="jw-nodisp">'+IC.off+'<span><b>No disponible</b> · '+motivo+(hacer?' · '+hacer:'')+'</span></p>';
+
+  // ---- Contratos ficticios (prototipo WPP) ----
   const CT=[
     {id:'ahorro',nom:'Mi ahorro',num:'100007012618',prod:'Skandia Inversion Plus',saldo:211306589,disp:167661397,rcTodo:19972261,desde:'16 de mar de 2006',gan:118175577,retirado:217549852,rendSaldo:71626468,capRet:171000743,rendRet:46549109,
      ex:27472940,sr:64456893,cc:83611340,sc:35765415,rr:3352290/157195585,rc:3243295/65265752,exacto:{D:157195585,rc:3243295,rr:3352290},
-     port:[['FPV Acciones Nuevas Tecnología / FPV_GloNuevTecs',93548624,'44,3 %','11,27 %'],['FPV Acciones USA / FPV_USAAcciones',43998418,'20,8 %','12,56 %'],['FVP Skandia PRO / FVP_SKPRO',43820274,'20,7 %','10,95 %'],['FPV Strategist Liquidez Col / FPV_ColLiquidez',29939273,'14,2 %','6,52 %']],
+     port:[['FPV Acciones Nuevas Tecnología / FPV_GloNuevTecs',93548624,'44,3 %',11.27],['FPV Acciones USA / FPV_USAAcciones',43998418,'20,8 %',12.56],['FVP Skandia PRO / FVP_SKPRO',43820274,'20,7 %',10.95],['FPV Strategist Liquidez Col / FPV_ColLiquidez',29939273,'14,2 %',6.52]],
      anios:[[2016,27472940],[2018,55643715],[2020,24497456],[2024,49581475]]},
     {id:'pension',nom:'Pensión y seguro',num:'100007086103',prod:'Skandia Capital + Seguro',saldo:202580189,disp:177993757,rcTodo:7996800,desde:'4 de dic de 2019',gan:64323904,retirado:0,rendSaldo:64323904,capRet:0,rendRet:0,
      ex:18557538,sr:21737728,cc:162284923,sc:0,rr:3115105/159588458,rc:5873353/119293193,exacto:{D:159588458,rc:5873353,rr:3115105},perm:714000,cerrados:true,
-     port:[['FPV Strategist Liquidez Col / FPV_ColLiquidez',75262691,'37,2 %','—'],['FVP Skandia PRO / FVP_SKPRO',55354956,'27,3 %','—'],['FPV Acciones USA / FPV_USAAcciones',25130983,'12,4 %','—'],['FPV Acciones Nuevas Tecnología / FPV_GloNuevTecs',18689893,'9,2 %','—'],['FPV Acciones Global / FPV_GloAcciones',14645889,'7,2 %','—'],['FPV Especial Inmoval / FPV_ColInmoval',13495776,'6,7 %','—']],
+     port:[['FPV Strategist Liquidez Col / FPV_ColLiquidez',75262691,'37,2 %',null],['FVP Skandia PRO / FVP_SKPRO',55354956,'27,3 %',null],['FPV Acciones USA / FPV_USAAcciones',25130983,'12,4 %',null],['FPV Acciones Nuevas Tecnología / FPV_GloNuevTecs',18689893,'9,2 %',null],['FPV Acciones Global / FPV_GloAcciones',14645889,'7,2 %',null],['FPV Especial Inmoval / FPV_ColInmoval',13495776,'6,7 %',null]],
      anios:[[2016,18557538],[2021,14335735],[2022,48773899],[2023,75257146],[2024,1073253],[2025,891591],[2026,699296]]},
     {id:'finca',nom:'Proyecto finca',num:'100007600228',prod:'Skandia Inversion Plus',saldo:68199040,disp:16767240,rcTodo:204835,desde:'6 de oct de 2009',gan:53451225,retirado:92750189,rendSaldo:26602361,capRet:65901325,rendRet:26848864,
      ex:62580528,sr:0,cc:5618512,sc:0,rr:0,rc:0,cerrados:true,
-     port:[['FPV Especial Inmoval / FPV_ColInmoval',51431800,'75,4 %','—'],['FPV Strategist Liquidez Col / FPV_ColLiquidez',16767240,'24,6 %','—']],
+     port:[['FPV Especial Inmoval / FPV_ColInmoval',51431800,'75,4 %',null],['FPV Strategist Liquidez Col / FPV_ColLiquidez',16767240,'24,6 %',null]],
      anios:[[2015,3404283],[2016,13362956]]}
   ];
+  // Posible impuesto (estimado con el IBC) como proporción de lo que no es exento; rentabilidad de los últimos 12 meses
+  Object.assign(CT[0],{imp:30791218/(157195585-27472940),impExacto:30791218,rentTxt:'14,15'});
+  Object.assign(CT[1],{imp:33124226/(159588458-18557538),impExacto:33124226,rentTxt:'9,86'});
+  Object.assign(CT[2],{imp:0,rentTxt:'8,61'});
   const TIPOS=[['ex','Exento','Cumplió 10 años o requisitos: sale sin retención.'],['sr','Sin retención al retirar','Sale sin retención contingente, pero puede generar impuesto en la declaración.'],['cc','Con retención contingente','Si sale hoy, se le retiene un porcentaje: es un anticipo del impuesto.'],['sc','Sin certificar','No se puede retirar hasta que se certifique.']];
-  const NOTA_DISP='Desde Skandia no tenemos conocimiento del uso que el cliente dio a estos aportes como renta exenta en declaraciones pasadas. Si los usó, lo que se retire sin cumplir requisitos (10 años de permanencia, cumplimiento de requisitos de pensión o vivienda) se convierte en ingreso en el año gravable del retiro.';
-  SAMI.situacion=[{t:'dato',h:'Tiene $482.085.818 en sus 3 contratos, de los que $362.422.394 están disponibles para retirar.'},
-    {t:'rec',h:'Elige con él el contrato del que conviene sacarlo: las fichas van de menor a mayor descuento y cada una dice cuánto es exento, sin retención al retirar y con retención contingente. Los que no se pueden retirar quedan en una línea aparte.'},
-    {t:'int',h:NOTA_DISP}];
-  // Cuánto se descuenta del contrato para que el cliente reciba R (retención contingente solo sobre lo que sale de aportes con retención)
-  function calc(c,R){
+  // Escenarios de renta exenta (WPP: Mi ahorro con $150.000.000 → hasta $30.791.218 · Sí $17.382.058 · No $7.878.038)
+  const RX_SI=17382058/30791218, RX_NO=7878038/30791218, RXTXT={si:'Sí',no:'No',nosabe:'No sabe'};
+  const TASA=0.1778, TASA_TXT='17,78 % E.A.', TOPE_CRED=156000000, PLAZOS=[[1,'1 mes'],[3,'3 meses'],[6,'6 meses'],[12,'12 meses']];
+  const RESPALDO=[['pension',133212571],['ahorro',49904770],['finca',16373944]];
+  const URL_ESPECIFICADO='https://www.skandia.co/documents/39464/1536444/Solicitud-de-retiros-parciales-especificados-Fondo-Voluntario-de-Pension-Skandia-Multifund.pdf/129a497d-78ff-c3fe-c491-d08daf52dca5?version=3.0&t=1757703266312';
+
+  // ---- La conversación ----
+  const nuevo=()=>({etapa:1,visitadas:[1],monto:0,motivo:null,otro:'',cuando:null,fecha:'',fechaTipo:null,abierta:null,pen:null,ctMarc:null,ctConf:null,
+    pref:null,plazo:null,noRepone:false,rx:null,rxInfo:false,lm:false,dec:null,tram:null,np:{resumen:false,seguimiento:false},fseg:'',notas:'',validar:false,msg:null,
+    cerrado:false,fuera:false,estado:'en-curso',resultado:null,segHasta:'',enviado:false,segundos:0,
+    imp:{metodo:'preguntas',paso:1,ingreso:18500000,benef:null,otros:null,dep:null,tarifa:''},cr:null,apVista:'resumen',rentPer:'inicio',verCalc:false});
+  let st=nuevo(), activa=null, abiertaDesde=0;
+  const CONVS=[];
+  const esp=()=>st.motivo==='vivienda'||st.pen==='si';
+  const RO=()=>st.cerrado;
+  const ctId=()=>st.ctConf||st.ctMarc||ordenFichas()[0].c.id;
+  const ctSel=()=>CT.find(c=>c.id===ctId());
+  const c1=()=>EN_ALCANCE(st.motivo)&&st.monto>0&&!!st.cuando;
+  const c2=()=>c1()&&!!st.ctConf;
+  const prefEsRetiro=()=>st.pref==='retiro'||st.pref==='total'||st.pref==='combo';
+  const c3=()=>c2()&&!!st.pref&&!(prefEsRetiro()&&tocaNoExento(retiroPref())&&!st.rx);
+  const c4=()=>st.cerrado&&!st.fuera;
+  const completa=n=>[c1,c2,c3,c4][n-1]();
+  const habilitada=n=>RO()||[1,2,3].slice(0,n-1).every(completa);
+  const con=(s,fn)=>{ const p=st; st=s; try{ return fn(); } finally{ st=p; } };
+
+  // ---- Cálculos: lo que se descuenta del contrato para que el cliente reciba R ----
+  function calc(c,R,e){
+    if(e){ // condición especial (pensión o vivienda): sin retenciones; lo certificado cuenta como exento
+      let cubre=true, D=R*1.004; if(D>c.disp){ cubre=false; D=c.disp; R=Math.round(D/1.004); }
+      const g=Math.round(R*0.004); D=R+g; return {R,D,g,rcA:0,rrA:0,cubre,ex:D,sr:0,cc:0};
+    }
     const base=c.ex+c.sr; let cubre=true, D;
     if(R===150000000 && c.exacto){ D=c.exacto.D; }
     else { D=(R*1.004)/(1-c.rr); if(D>base && c.rc) D=(R*1.004-c.rc*base)/(1-c.rr-c.rc); }
@@ -3520,361 +3683,639 @@ document.addEventListener('DOMContentLoaded',()=>{
     const ex=Math.min(D,c.ex), sr=Math.min(D-ex,c.sr), cc=Math.max(0,D-ex-sr);
     return {R,D,g,rcA,rrA,cubre,ex,sr,cc};
   }
-  const ctsEl=q('[data-cts]'); let ctSel=null;
-  function pintarSituacion(){
-    const R=monto||0;
-    const filas=CT.map(c=>({c,k:calc(c,R)}));
-    const si=filas.filter(f=>f.k.cubre).sort((a,b)=>a.k.D-b.k.D), no=filas.filter(f=>!f.k.cubre).sort((a,b)=>b.c.disp-a.c.disp);
-    const orden=si.concat(no);
-    if(!ctSel || !CT.some(c=>c.id===ctSel)) ctSel=orden[0].c.id;
-    ctsEl.innerHTML=orden.map((f,ix)=>{
-      const c=f.c,k=f.k, tot=c.ex+c.sr+c.cc+c.sc;
-      const tags=k.cubre?'<span class="jw-tg jw-tg--ok">✓ Cubre el monto</span>'+(ix===0?'<span class="jw-tg jw-tg--menor">Menor descuento</span>':''):'<span class="jw-tg jw-tg--no">No alcanza</span>';
-      const tramos=TIPOS.filter(t=>c[t[0]]>0);
-      return '<label class="jw-ct"><span class="jw-ct-top"><input type="radio" name="jw-ct" value="'+c.id+'"'+(c.id===ctSel?' checked':'')+'><span class="jw-ct-nom">'+c.nom+'</span><span class="jw-ct-num">'+c.num+' · '+c.prod+'</span><span class="jw-ct-tags">'+tags+'</span></span>'
-        +'<p class="jw-ct-disp">Disponible <b>'+pesos(c.disp)+'</b></p>'
-        +'<span class="jw-barra" aria-hidden="true">'+tramos.map(t=>'<i class="c-'+t[0]+'" style="width:'+(c[t[0]]/tot*100).toFixed(2)+'%"></i>').join('')+'</span>'
-        +'<ul class="jw-ley">'+tramos.map(t=>'<li><span class="jw-cuad c-'+t[0]+'"></span>'+t[1]+' <b>'+pesos(c[t[0]])+'</b></li>').join('')+'</ul>'
-        +'<dl class="jw-ct-res"><div><dt>'+(k.cubre?'Recibe':'Recibe como máximo')+'</dt><dd>'+pesos(k.R)+'</dd></div><div><dt>Se descuenta del contrato</dt><dd>'+pesos(k.D)+'</dd></div><p>Incluye '+pesos(k.D-k.R)+' de retenciones y 4×1000</p></dl>'
-        +'<button type="button" class="jw-link" data-ver-pf="'+c.id+'" aria-label="Ver detalle de '+c.nom+'">Ver detalle</button></label>';
-    }).join('');
-    q('[data-ninguno]').hidden=si.length>0;
+  function retiro(c,total){
+    const e=esp(), k=calc(c,total?Infinity:(st.monto||0),e), exacto=!total&&!e&&k.cubre&&st.monto===150000000;
+    const imp=e?0:(exacto&&c.impExacto?c.impExacto:Math.round(c.imp*Math.max(0,k.D-k.ex)));
+    const noEx=e?0:Math.max(0,k.D-k.ex), srRend=Math.round(noEx*c.rendSaldo/c.saldo);
+    return Object.assign({imp,perm:c.perm?Math.round(c.perm*k.R/150000000):0,tasa:parseFloat(c.rentTxt.replace(',','.'))/100,noEx,srRend,srCap:noEx-srRend},k);
   }
-  ctsEl.addEventListener('change',e=>{ if(e.target.name==='jw-ct'){ ctSel=e.target.value; pintarResumen(); } });
-  ctsEl.addEventListener('click',e=>{ const b=e.target.closest('[data-ver-pf]'); if(b){ e.preventDefault(); abrirDet(b.dataset.verPf,'contrato'); } });
-  q('[data-sig="3"]').addEventListener('click',()=>{
-    const c=CT.find(x=>x.id===ctSel); marcar(2,true);
-    const ch=q('[data-ctx="contrato"]'); ch.hidden=false; q('[data-ctx-contrato]').textContent=c.nom+' · '+c.num;
-    pintarResumen();
-  });
-  q('[data-ctx="contrato"]').addEventListener('click',()=>irEtapa(2));
-  // ---- Resumen: se arma con lo que se va definiendo en cada etapa ----
+  const retiroPref=()=>st.pref==='retiro'?retiro(ctSel()):retiro(ctSel(),true);
+  const tocaNoExento=k=>!esp()&&k.noEx>0.5;
+  function credito(M){
+    const meses=st.plazo&&!st.noRepone?st.plazo:12, dias=meses*30, cap=Math.floor(M*1.004);
+    const int=Math.round(cap*(Math.pow(1+TASA,dias/365)-1)), total=Math.floor(cap+int), resp=Math.floor(cap*1.3);
+    let falta=resp; const bloq=RESPALDO.map(([id,disp])=>{ const b=Math.min(falta,disp); falta-=b; return {c:CT.find(x=>x.id===id),b,disp}; });
+    return {M,cap,dias,int,total,costo:total-M,gmf:cap-M,resp,bloq,faltaResp:Math.max(0,falta),pago:masDias(dias),conPlazo:!!(st.plazo&&!st.noRepone),tope:(st.monto||0)>TOPE_CRED};
+  }
+  const cred=()=>credito(Math.min(st.monto||0,TOPE_CRED));
+  function combo(c){ // Retiro + crédito puente: retira todo lo disponible y pide el crédito por lo que falta
+    const kt=retiro(c,true), falta=Math.round((st.monto||0)-kt.R);
+    if(falta<=0.5||kt.R<=0.5) return null;
+    const total=RESPALDO.reduce((a,x)=>a+x[1],0), ent=RESPALDO.find(x=>x[0]===c.id), queda=total-Math.min(ent?ent[1]:0,kt.R+kt.g);
+    const disp=Math.min(TOPE_CRED,Math.floor(queda/1.3/1.004)); if(disp<=0) return null;
+    const M=Math.min(falta,disp), cr=credito(M);
+    return {kt,falta,disp,M,cr,recibe:kt.R+M,cubre:M>=falta-0.5};
+  }
+  function ordenFichas(){
+    const R=st.monto||0, e=esp(), f=CT.map(c=>{ const k=calc(c,R,e); return {c,k,desc:k.D-k.R+(c.perm?Math.round(c.perm*k.R/150000000):0)}; });
+    return f.filter(x=>x.k.cubre).sort((a,b)=>a.desc-b.desc).concat(f.filter(x=>!x.k.cubre).sort((a,b)=>b.c.disp-a.c.disp));
+  }
+  function aniosDe(c,k){ const tot=c.anios.reduce((a,x)=>a+x[1],0); return c.anios.map(a=>[a[0],Math.round(a[1]*k.D/tot)]); }
+  function aniosTxt(c,k){ const an=aniosDe(c,k).map(a=>a[0]+' ('+pesos(a[1])+')'), ult=an.pop(); return 'Los '+pesos(k.D)+' salen de aportes de '+(an.length?an.join(', ')+' y ':'')+ult+'.'; }
+  // Posible impuesto: con el IBC (por defecto), con las respuestas de «Impuestos» o con la tarifa que ingresa el asesor
+  const tarifaNum=()=>{ const t=parseFloat(String(st.imp.tarifa).replace(',','.')); return isNaN(t)?null:t; };
+  const tarifaOk=()=>{ const t=tarifaNum(); return t!=null&&t>=0&&t<=39; };
+  const tarifaTxt=()=>String(tarifaNum()).replace('.',',');
+  const preguntasOk=()=>st.imp.paso>4;
+  function impuesto(k){
+    if(esp()) return {txt:pesos(0),nota:'con la condición especial',accion:'',min:0,max:0,no:0,si:0};
+    let v={tope:k.imp,si:Math.round(k.imp*RX_SI),no:Math.round(k.imp*RX_NO)}, nota='estimado con el IBC';
+    if(st.imp.metodo==='tarifa'&&tarifaOk()){ const t=tarifaNum()/100; v={tope:Math.round(t*(k.srCap+k.srRend)),si:Math.round(t*k.srCap),no:Math.round(t*k.srRend)}; nota='estimado con la tarifa de '+tarifaTxt()+'% ingresada por el asesor'; }
+    else if(preguntasOk()) nota='estimado con sus respuestas';
+    let txt,min,max;
+    if(k.noEx<=0.5){ txt=pesos(v.no); min=max=v.no; }
+    else if(!st.rx){ txt='hasta '+pesos(v.tope); min=Math.min(v.no,v.si); max=v.tope; }
+    else if(st.rx==='nosabe'){ min=Math.min(v.no,v.si); max=Math.max(v.no,v.si); txt=min===max?pesos(min):pesos(min)+' a '+pesos(max); }
+    else { min=max=st.rx==='si'?v.si:v.no; txt=pesos(min); }
+    return {txt,nota,accion:'Ajustar',min,max,no:v.no,si:v.si,tope:v.tope};
+  }
+
+  // ---- Navegación: barra de partes, resumen y barra de contexto ----
+  const etiquetaCuando=()=>st.cuando==='esta-semana'?'Esta semana':st.cuando==='este-mes'?'Este mes':st.fechaTipo==='fecha'?'Para el '+fLarga(deIso(st.fecha)):'En unos meses ('+fLarga(deIso(st.fecha))+')';
+  const cuandoTxt=()=>st.cuando==='esta-semana'?'esta semana':st.cuando==='este-mes'?'este mes':'para el '+fLarga(deIso(st.fecha));
+  function pintarNav(){
+    navs.forEach((b,i)=>{ const n=i+1, on=st.etapa===n, ok=completa(n);
+      b.classList.toggle('on',on); b.classList.toggle('ok',ok&&!on); b.disabled=on||!habilitada(n);
+      if(on) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current');
+      b.querySelector('.jw-n').innerHTML=String(n); b.closest('li').classList.toggle('hecho',ok);
+      const sr=b.querySelector('.jw-sr')||b.appendChild(Object.assign(document.createElement('span'),{className:'jw-sr'})); sr.textContent=on?' (actual)':ok?' (completa)':' (pendiente)'; });
+    const cont=q('[data-cont]'); if(cont) cont.textContent=PARTES[st.etapa-1];
+    // Barra de contexto (pantallas angostas)
+    const cm=q('[data-ctx="necesidad"]'), cc=q('[data-ctx="contrato"]');
+    cm.hidden=!(EN_ALCANCE(st.motivo)&&st.monto>0); q('[data-ctx-monto]').textContent=pesos(st.monto);
+    cc.hidden=!st.ctConf; if(st.ctConf){ const c=ctSel(); q('[data-ctx-contrato]').textContent=c.nom+' · '+c.num; }
+    ctx.hidden=cm.hidden&&cc.hidden;
+  }
+  function irEtapa(n){
+    if(!st.visitadas.includes(n)) st.visitadas.push(n);
+    st.etapa=n;
+    etapas.forEach(e=>e.hidden=+e.dataset.etapa!==n);
+    q('.jw-scroll').scrollTop=0; const md=velo.querySelector('.jy-modal'); if(md) md.scrollTop=0;
+    pintarTodo();
+  }
+  function pintarTodo(){ [pintarEntender,pintarSituacion,pintarOpciones,pintarAcuerdo][st.etapa-1](); pintarEstadoConv(); pintarNav(); pintarResumen(); aplicarRO(); }
+  navs.forEach(b=>b.addEventListener('click',()=>{ if(!b.disabled) irEtapa(+b.dataset.ir); }));
+  qa('[data-sig]').forEach(b=>b.addEventListener('click',()=>{ const n=+b.dataset.sig; if(habilitada(n)) irEtapa(n); }));
   const resEl=q('[data-res]');
-  const NOMBRES=['Entender','Situación','Opciones','Precauciones','Acuerdo'];
   function pintarResumen(){
-    const fila=(dt,dd,cls,div)=>'<div'+(div?' class="'+div+'"':'')+'><dt>'+dt+'</dt><dd'+(cls?' class="'+cls+'"':'')+'>'+dd+'</dd></div>';
-    let h='<h4 class="jw-res-t">Resumen</h4>';
-    NOMBRES.forEach((nom,i)=>{
-      const n=i+1, ok=hechas.has(n), on=etapaAct===n, visto=n===1||(n===2&&st.vio2)||(n===3&&st.vio3)||(n===4&&st.vio4&&st.pref!=='credito'&&st.pref!=='noretira')||(n===5&&st.vio5);
-      const est=ok?'ok':on?'on':visto?'':'pend';
-      const editar=(ok||visto)&&!on?'<button type="button" class="jw-res-ed" data-res-ir="'+n+'" aria-label="Editar '+nom+'" title="Editar '+nom+'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>':'';
-      h+='<section class="jw-res-sec '+est+'"><p class="jw-res-h"><span class="jw-res-n">'+(ok?'✓':n)+'</span>'+nom+editar+'</p>';
-      if(n===1){
-        h+='<dl>'+fila('Desea retirar',monto?pesos(monto):'Por definir',monto?'verde':'vacio')+fila('Motivo',st.motivo?MOTIVO[st.motivo]:'Por definir',st.motivo?'':'vacio')+'</dl>';
-      } else if(n===2 && st.vio2 && monto){
-        const c=CT.find(x=>x.id===ctSel)||CT[0], k=calc(c,monto);
-        h+='<dl>'+fila('Contrato',c.nom+' <small>· '+c.num+'</small>','','bloque')+fila(k.cubre?'Recibe':'Recibe como máximo',pesos(k.R),'verde')+fila('Se descuenta del contrato',pesos(k.D))+fila('Retenciones y 4×1000',pesos(k.D-k.R))+'</dl>'
-          +(k.cubre?'':'<p class="jw-res-alerta">Este contrato no alcanza para el monto completo.</p>');
-      } else if(n===3 && st.vio3 && monto){
-        const c=CT.find(x=>x.id===ctSel)||CT[0], k=retiro(c), cr=cred(), tRet=k.cubre?'Retiro':'Retiro total';
-        h+='<dl>'+fila('Prefiere',st.pref?(st.pref==='credito'?'Crédito puente':st.pref==='noretira'?'No retira':tRet):'Por definir',st.pref?'':'vacio')
-          +(st.pref==='credito'?fila('Plazo',(PLAZOS.find(x=>x[0]===cr.d)||[0,''])[1])+fila('Total a pagar',pesos(cr.total)):'')
-          +(st.pref==='noretira'?fila('Seguiría invertido',pesos(k.D))+fila('Rentaría en 12 meses',pesos(k.rentaria),'verde'):'')
-          +(st.pref==='retiro'?fila('Recibe',pesos(k.R),'verde')+fila('Posible impuesto',k.imp?'hasta '+pesos(k.imp):pesos(0)):'')
-          +(st.noRepone?fila('Crédito','No lo repondría'):'')+'</dl>';
-      } else if(n===4 && (st.pref==='credito'||st.pref==='noretira') && hechas.has(3)){
-        h+='<p class="jw-res-pend">'+(st.pref==='noretira'?'No aplica: no retira, sigue invertido.':'No aplica: con el crédito no se retira del fondo.')+'</p>';
-      } else if(n===5 && st.vio5 && st.dec){
-        const k5=retiro(CT.find(x=>x.id===ctSel)||CT[0]), ac=accionTxt();
-        h+='<dl>'+fila('Decisión',nomDec(st.dec,k5))+(ac?fila('Acción',ac):'')
-          +(st.np&&st.np.seguimiento?fila('Seguimiento',st.fseg?fechaTxt(st.fseg):'Por agendar',st.fseg?'':'vacio'):'')
-          +fila('Estado',st.cerrado?(st.enviado?'Cierre registrado · resumen enviado':'Cierre registrado'):'Por registrar',st.cerrado?'verde':'vacio')+'</dl>';
-      } else if(n===4 && st.vio4 && monto){
-        const c=CT.find(x=>x.id===ctSel)||CT[0], k=retiro(c);
-        h+='<dl>'+fila('Renta exenta',st.rx?RXTXT[st.rx]:'Por definir',st.rx?'':'vacio')
-          +(st.rx?fila('Posible impuesto',textoImp(rangoImp(c,k))):'')
-          +(st.validar?fila('Validación','Le recomendé validarlo'):'')+'</dl>';
-      } else {
-      }
+    const c=ctSel(), cr=cred();
+    const prefTxt={retiro:'Retiro por '+pesos(st.monto),total:'Retiro total',credito:'Crédito puente',combo:'Retiro + crédito puente'};
+    const recibeDe=()=>{ if(!st.pref) return null; if(st.pref==='combo'){ const cb=combo(c); return cb?pesos(cb.recibe):null; } return pesos((st.pref==='retiro'?retiro(c):retiro(c,true)).R); };
+    const FILAS=[
+      ()=>st.motivo&&!EN_ALCANCE(st.motivo)?[['Motivo',MOTIVO[st.motivo]+' (fuera de alcance)']]
+        :[['Desea retirar',st.monto>0?pesos(st.monto):null,true],['Motivo',st.motivo?MOTIVO[st.motivo]:null]].concat(EN_ALCANCE(st.motivo)&&st.cuando?[['Para cuándo',cuandoTxt()]]:[]),
+      ()=>{ const k=st.ctConf?retiro(c):null; return [['Contrato',st.ctConf?c.nom:null],['Recibe',k?pesos(k.R):null,true],['Se descuenta del contrato',k?pesos(k.D):null]].concat(st.pen?[['Requisitos de pensión',st.pen==='si'?'Sí':'No']]:[]); },
+      ()=>[['Prefiere',st.pref?prefTxt[st.pref]:null]].concat(st.pref==='credito'?[['Total a pagar',pesos(cr.total)]]:[['Recibe',recibeDe(),true]]),
+      ()=>{ const reg=st.cerrado&&!st.fuera; return [['Decisión',reg?DEC_CAT[st.dec]:null]].concat(reg?[['Seguimiento',fLarga(deIso(st.segHasta))]]:[]); }
+    ];
+    let h='<h2 class="jw-res-t">Resumen</h2>';
+    PARTES.forEach((nom,i)=>{
+      const n=i+1, ok=completa(n), on=st.etapa===n, hab=habilitada(n), est=on?'on':ok?'ok':'pend';
+      const ed=ok&&!on?'<button type="button" class="jw-res-ed jw-ro-ok" data-res-ir="'+n+'" aria-label="'+(RO()?'Ver ':'Editar ')+nom+'" title="'+(RO()?'Ver ':'Editar ')+nom+'">'+IC.lapiz+'</button>':'';
+      h+='<section class="jw-res-sec '+est+'"><p class="jw-res-h"><span class="jw-res-n">'+(ok&&!on?'✓':n)+'</span><button type="button" class="jw-res-nom jw-ro-ok" data-res-ir="'+n+'"'+(hab?'':' disabled')+'>'+nom+'</button>'+ed+'</p>';
+      if(on||ok){ const f=FILAS[i](); if(f.length) h+='<dl>'+f.map(([dt,dd,v])=>'<div><dt>'+(dt)+'</dt><dd class="'+(dd==null?'vacio':v?'verde':'')+'">'+(dd==null?'Por definir':dd)+'</dd></div>').join('')+'</dl>'; }
       h+='</section>';
     });
     resEl.innerHTML=h;
   }
-  resEl.addEventListener('click',e=>{ const b=e.target.closest('[data-res-ir]'); if(b) irEtapa(+b.dataset.resIr); });
-  resListo=true;
-  // ---- Etapa 3 · Opciones (datos del prototipo WPP) ----
-  // Posible impuesto (estimado con el IBC) como proporción de lo que no es exento; rentabilidad de los últimos 12 meses
-  Object.assign(CT[0],{imp:30791218/(157195585-27472940),impExacto:30791218,rent:22242148/157195585,rentTxt:'14,15 %',rentExacto:22242148});
-  Object.assign(CT[1],{imp:33124226/(159588458-18557538),impExacto:33124226,rent:15742989/159588458,rentTxt:'9,86 %',rentExacto:15742989});
-  Object.assign(CT[2],{imp:0,rent:1442990/16767240,rentTxt:'8,61 %',rentExacto:1442990});
-  const TASA=0.1778, TOPE_CRED=156000000, PLAZOS=[[30,'1 mes'],[90,'3 meses'],[180,'6 meses'],[360,'12 meses']];
-  // Respaldo del crédito: se bloquea en este orden hasta lo disponible de cada contrato
-  const RESPALDO=[['pension',133212571],['ahorro',49904770],['finca',16373944]];
-  function cred(){
-    const M=Math.min(monto||0,TOPE_CRED), d=st.plazo||360, base=M*1.004;
-    const int=Math.floor(base*(Math.pow(1+TASA,d/365)-1))+Math.round(M*0.004), resp=Math.round(base*1.3);
-    let falta=resp; const bloq=RESPALDO.map(([id,disp])=>{ const b=Math.min(falta,disp); falta-=b; return {c:CT.find(x=>x.id===id),b,disp}; });
-    const vence=new Date(2026,10,16+d);
-    return {M,d,int,total:M+int,resp,base:Math.round(base),bloq,tope:(monto||0)>TOPE_CRED,vence:vence.toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'}).replace('.','')};
+  resEl.addEventListener('click',e=>{ const b=e.target.closest('[data-res-ir]'); if(b&&!b.disabled&&habilitada(+b.dataset.resIr)) irEtapa(+b.dataset.resIr); });
+  q('[data-ctx="necesidad"]').addEventListener('click',()=>{ irEtapa(1); inp.focus(); inp.select(); });
+  q('[data-ctx="contrato"]').addEventListener('click',()=>irEtapa(2));
+
+  // ---- Entender: monto y motivo; «para cuándo» queda en «este mes» y se cambia con «Cambiar» ----
+  const inp=q('#jw-monto');
+  inp.addEventListener('input',()=>{ const v=+inp.value.replace(/\D/g,'').slice(0,15); inp.value=v?v.toLocaleString('es-CO'):''; });
+  function guardarMonto(){ const v=+inp.value.replace(/\D/g,''); if(v>0&&v!==st.monto){ st.monto=v; if(!st.cuando) st.cuando='este-mes'; } pintarTodo(); }
+  inp.addEventListener('blur',guardarMonto);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); guardarMonto(); } });
+  function pintarEntender(){
+    const ro=RO(), enA=EN_ALCANCE(st.motivo);
+    if(document.activeElement!==inp) inp.value=st.monto?st.monto.toLocaleString('es-CO'):''; inp.disabled=ro;
+    const motAbierta=!ro&&(!enA||st.abierta==='motivo');
+    vis('[data-q="motivo"]',motAbierta);
+    qa('[data-q="motivo"] .jw-chips button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.v===st.motivo)));
+    const fuera=st.motivo&&!enA; vis('.jw-fuera',fuera&&motAbierta);
+    if(fuera){ q('[data-fuera-txt]').textContent=FUERA[st.motivo]; const ta=q('[data-fuera-nota]'); if(ta.value!==st.otro) ta.value=st.otro; }
+    const hm=q('[data-hecho="motivo"]'); hm.hidden=!(st.motivo&&(ro||(enA&&st.abierta!=='motivo')));
+    hm.querySelector('b').textContent=st.motivo==='otro'&&ro&&st.otro.trim()?'Otro: '+st.otro.trim():(MOTIVO[st.motivo]||'');
+    const verCuando=enA&&st.monto>0&&!!st.cuando;
+    const hc=q('[data-hecho="cuando"]'); hc.hidden=!(verCuando&&(ro||st.abierta!=='cuando'));
+    if(verCuando) q('[data-v-cuando]').textContent=etiquetaCuando();
+    vis('[data-q="cuando"]',!ro&&verCuando&&st.abierta==='cuando');
+    const marcado=st.eligeFecha?'fecha':st.cuando==='en-meses'?(st.fechaTipo==='fecha'?'fecha':'en-meses'):st.cuando;
+    qa('[data-q="cuando"] .jw-chips button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.v===marcado)));
+    vis('[data-viv]',st.motivo==='vivienda'&&c1()&&st.abierta!=='motivo');
+    vis('[data-pie]',c1()||ro);
   }
-  function retiro(c){
-    const k=calc(c,monto||0), exacto=k.cubre&&monto===150000000;
-    const imp=exacto&&c.impExacto?c.impExacto:Math.round(c.imp*Math.max(0,k.D-k.ex));
-    const rentaria=exacto&&c.rentExacto?c.rentExacto:Math.round(c.rent*k.D);
-    return Object.assign({imp,rentaria,perm:c.perm?Math.round(c.perm*k.R/150000000):0},k);
+  qa('[data-q="motivo"] .jw-chips button').forEach(b=>b.addEventListener('click',()=>{
+    st.motivo=b.dataset.v; st.abierta=null;
+    if(EN_ALCANCE(st.motivo)&&!st.cuando) st.cuando='este-mes';
+    pintarTodo();
+  }));
+  q('[data-fuera-nota]').addEventListener('input',e=>{ st.otro=e.target.value.slice(0,300); });
+  q('[data-fuera]').addEventListener('click',()=>{
+    st.dec='fuera'; cerrarConversacion(true);
+    toast('info','Conversación cerrada como fuera de alcance','Queda registrada con el motivo que mencionó el cliente.');
+  });
+  qa('[data-cambiar]').forEach(b=>b.addEventListener('click',()=>{ st.abierta=b.dataset.cambiar; st.eligeFecha=false; vis('[data-fecha]',false); pintarTodo(); const t=q('[data-q="'+st.abierta+'"] .jw-qt'); if(t) t.focus({preventScroll:true}); }));
+  const fecha=q('#jw-fecha'), okFecha=q('[data-fecha-ok]');
+  fecha.min=iso(HOY);
+  qa('[data-q="cuando"] .jw-chips button').forEach(b=>b.addEventListener('click',()=>{
+    const v=b.dataset.v;
+    if(v==='fecha'){ st.eligeFecha=true; fecha.value=st.cuando==='en-meses'&&st.fecha?st.fecha:iso(masDias(91)); okFecha.disabled=!fecha.value; vis('[data-fecha]',true); pintarEntender(); fecha.focus(); return; }
+    st.eligeFecha=false; vis('[data-fecha]',false); st.cuando=v;
+    st.fecha=v==='esta-semana'?iso(masDias(7)):v==='en-meses'?iso(new Date(HOY.getFullYear(),HOY.getMonth()+3,HOY.getDate())):iso(new Date(HOY.getFullYear(),HOY.getMonth()+1,0));
+    st.fechaTipo=v==='en-meses'?'meses':null; st.abierta=null; pintarTodo();
+  }));
+  fecha.addEventListener('input',()=>okFecha.disabled=!fecha.value);
+  okFecha.addEventListener('click',()=>{ st.cuando='en-meses'; st.fecha=fecha.value; st.fechaTipo='fecha'; st.eligeFecha=false; vis('[data-fecha]',false); st.abierta=null; pintarTodo(); });
+
+  // ---- Situación: pregunta de pensión y fichas de contrato ----
+  const ctsEl=q('[data-cts]');
+  function pintarSituacion(){
+    const ro=RO(), ver=c1()||ro;
+    const pen=q('[data-pen]'); pen.hidden=!(ver&&st.motivo!=='vivienda'&&(CT.some(c=>c.cc>0)||st.pen));
+    if(!pen.hidden){
+      qa('[data-pen-v]').forEach(b=>{ b.setAttribute('aria-pressed',String(st.pen===b.dataset.penV)); b.disabled=ro; });
+      q('[data-pen-nota]').textContent=st.pen==='si'?'Con requisitos de pensión el retiro no causa retención contingente.':!st.pen?'En Contigo el cliente no tiene la marca de beneficio tributario.':'';
+    }
+    if(!ver){ ctsEl.innerHTML=''; vis('[data-ninguno]',false); vis('[data-confirmar-ct]',false); vis('[data-pie2]',false); return; }
+    const orden=ordenFichas(), varias=orden.length>1, e=esp();
+    if(!st.ctMarc) st.ctMarc=st.ctConf||orden[0].c.id;
+    ctsEl.innerHTML=orden.map((f,ix)=>{
+      const c=f.c,k=f.k, tramos=e?[['ex','Exento',TIPOS[0][2],c.ex+c.sr+c.cc],['sc','Sin certificar',TIPOS[3][2],c.sc]].filter(t=>t[3]>0):TIPOS.map(t=>[t[0],t[1],t[2],c[t[0]]]).filter(t=>t[3]>0);
+      const tot=tramos.reduce((a,t)=>a+t[3],0);
+      const tags=(k.cubre?'<span class="jw-tg jw-tg--ok">✓ Cubre el monto</span>':'<span class="jw-tg jw-tg--no">No alcanza</span>')+(varias&&ix===0&&k.cubre?'<span class="jw-tg jw-tg--menor">Menor descuento</span>':'');
+      return '<label class="jw-ct"><span class="jw-ct-top">'+(varias?'<input type="radio" name="jw-ct" value="'+c.id+'"'+(c.id===st.ctMarc?' checked':'')+(ro?' disabled':'')+'>':'<span></span>')
+        +'<span class="jw-ct-nom" title="'+c.nom+' · '+c.num+'">'+c.nom+'</span><span class="jw-ct-num">'+c.num+' · '+c.prod+'</span><span class="jw-ct-tags">'+tags+'</span></span>'
+        +'<p class="jw-ct-disp">Disponible <b>'+pesos(c.disp)+'</b></p>'
+        +'<span class="jw-barra" aria-hidden="true">'+tramos.map(t=>'<i class="c-'+t[0]+'" style="width:'+Math.max(2,t[3]/tot*100).toFixed(2)+'%"></i>').join('')+'</span>'
+        +'<ul class="jw-ley">'+tramos.map(t=>'<li title="'+t[2]+'"><span class="jw-cuad c-'+t[0]+'"></span>'+t[1]+' <b>'+pesos(t[3])+'</b></li>').join('')+'</ul>'
+        +'<dl class="jw-ct-res"><div><dt>'+(k.cubre?'Recibe':'Recibe como máximo')+'</dt><dd>'+pesos(k.R)+'</dd></div><div><dt>Se descuenta del contrato</dt><dd>'+pesos(k.D)+'</dd></div><p>Incluye '+pesos(k.D-k.R)+' de retenciones y 4×1000</p></dl>'
+        +'<button type="button" class="jw-link jw-ro-ok" data-ver-pf="'+c.id+'" aria-label="Ver detalle de '+c.nom+'">Ver detalle</button></label>';
+    }).join('');
+    const nin=q('[data-ninguno]'); nin.hidden=orden.some(f=>f.k.cubre);
+    if(!nin.hidden) nin.innerHTML=IC.info+'<span>Ningún contrato cubre '+pesos(st.monto)+': elija uno y el crédito puente puede cubrir lo que falta.</span>';
+    vis('[data-confirmar-ct]',!ro);
+    vis('[data-pie2]',c2()||ro);
   }
+  ctsEl.addEventListener('change',e=>{ if(e.target.name==='jw-ct'){ st.ctMarc=e.target.value; } });
+  ctsEl.addEventListener('click',e=>{ const b=e.target.closest('[data-ver-pf]'); if(b){ e.preventDefault(); abrirDet(b.dataset.verPf,'contrato'); } });
+  q('[data-pen-ops]').addEventListener('click',e=>{ const b=e.target.closest('[data-pen-v]'); if(!b||RO()) return; st.pen=b.dataset.penV; pintarTodo(); });
+  q('[data-confirmar-ct]').addEventListener('click',()=>{
+    const m=st.ctMarc||ordenFichas()[0].c.id;
+    st.ctConf=m; irEtapa(3); // confirma y sigue a Opciones con el mismo clic
+  });
+
+  // ---- Opciones: cajas, renta exenta en la caja del retiro, preferencia ----
   const ops3=q('[data-ops3]'), prefEl=q('[data-pref]');
-  function pintarOpciones(){
-    const c=CT.find(x=>x.id===ctSel)||CT[0], k=retiro(c), cr=cred();
-    const fila=(dt,dd,cls)=>'<div'+(cls?' class="'+cls+'"':'')+'><dt>'+dt+'</dt><dd>'+dd+'</dd></div>';
-    const tRet=k.cubre?'Retiro':'Retiro total';
-    const cRet='<article class="jw-o3'+(st.pref==='retiro'?' elegida':'')+'"><h4>'+tRet+'</h4><div class="jw-o3-cuerpo"><dl>'
+  const NOM_CAJA={retiro:'Retiro',credito:'Crédito puente',total:'Retiro total',combo:'Retiro + crédito puente'};
+  const DEC_DE={retiro:'retiro',total:'total',combo:'combo',credito:'credito'};
+  function cajas(){
+    const c=ctSel(), k=retiro(c), kt=retiro(c,true), unico=!k.cubre, viv=st.motivo==='vivienda', cb=viv?null:combo(c), out=[];
+    if(!unico) out.push('retiro');
+    if(!viv) out.push('credito');
+    if(unico||st.pref==='total'||(st.monto||0)>=0.9*(kt.R+kt.g)) out.push('total');
+    if(cb) out.push('combo');
+    return {c,k,kt,cb,unico,viv,list:unico?out.sort((a,b)=>(a==='credito'?-1:0)-(b==='credito'?-1:0)):out};
+  }
+  const cajaRx=list=>prefEsRetiro()?st.pref:list.find(x=>x!=='credito');
+  function filaImp(k,etq){
+    const im=impuesto(k);
+    return fila((etq||'Posible impuesto en la declaración')+'<small class="jw-imp-nota">'+DIAN+im.nota+(im.accion?' · <button type="button" class="jw-link jw-ro-ok" data-ajustar>'+im.accion+'</button>':'')+'</small>',im.txt);
+  }
+  function filaRx(k){
+    return '<div class="jw-rx'+(prefEsRetiro()&&!st.rx&&!RO()?' jw-rx--pide':'')+'" role="group" aria-label="¿Se usaron como renta exenta?"><span class="jw-rx-t">¿Se usaron como renta exenta?</span>'
+      +'<button type="button" class="jw-i jw-ro-ok" aria-label="Qué aportes toca el retiro" aria-expanded="'+(!!st.rxInfo)+'" data-rx-info>'+IC.info+'</button>'
+      +'<span class="jw-chips jw-chips--xs">'+[['si','Sí'],['no','No'],['nosabe','No sabe']].map(([v,t])=>'<button type="button" data-rx-v="'+v+'" aria-pressed="'+(st.rx===v)+'">'+t+'</button>').join('')+'</span>'
+      +(st.rxInfo?'<p class="jw-pop" role="note">'+aniosTxt(ctSel(),k)+'</p>':'')+'</div>'
+      +'<p class="jw-adv'+(st.lm?' abierta':'')+'">'+IC.balanza+'<span>'+(st.lm?ADV_CORTA.replace('renta exenta','<span class="jw-glosa" title="'+GLOSA+'">renta exenta</span>')+ADV_RESTO:ADV_CORTA)+'</span>'+(st.lm?'':'<button type="button" class="jw-link jw-ro-ok" data-lm>Leer más</button>')+'</p>';
+  }
+  const plazoHtml=()=>'<div class="jw-o3-plazo"><p>Plazo · elija en cuánto tiempo podría reponerlo (sin elegir, 12 meses)</p><div class="jw-chips" role="group" aria-label="Plazo del crédito">'+PLAZOS.map(([m,t])=>'<button type="button" data-plazo="'+m+'" aria-pressed="'+(st.plazo===m)+'"'+(st.noRepone?' disabled':'')+'>'+t+'</button>').join('')+'</div></div>';
+  function cajaRetiro(t,k,conRx){
+    const tit=NOM_CAJA[t];
+    if(k.R<=0.5) return '<article class="jw-o3"><h4>'+tit+'</h4>'+nodisp('Lo disponible para retirar es $0','Revise el contrato en «Ver detalle»')+'</article>';
+    let h='<article class="jw-o3'+(st.pref===t?' elegida':'')+'"><h4>'+tit+'</h4><div class="jw-o3-cuerpo"><dl>'
       +fila('Se descuenta del contrato',pesos(k.D))+fila('Retención contingente',pesos(k.rcA))+fila('Retención sobre rendimientos',pesos(k.rrA))+fila('4×1000',pesos(k.g))
-      +(k.perm?fila('Cobro por permanencia<small>capital más seguro · estimado</small>',pesos(k.perm)):'')
-      +fila('Recibe',pesos(k.R),'tot verde')
-      +fila('Posible impuesto en la declaración<small>estimado con el IBC</small>',k.imp?'hasta '+pesos(k.imp):pesos(0))+'</dl></div></article>';
-    const cCred='<article class="jw-o3'+(st.noRepone?' off':'')+(st.pref==='credito'?' elegida':'')+'"><h4>Crédito puente</h4><div class="jw-o3-cuerpo"><dl>'
-      +fila('Monto',pesos(cr.M))+fila('Respaldo requerido',pesos(cr.resp))+'</dl>'
-      +'<div class="jw-o3-plazo"><p>Plazo · elija en cuánto tiempo podría reponerlo (sin elegir, 12 meses)</p><div class="jw-chips" role="group" aria-label="Plazo del crédito">'
-      +PLAZOS.map(([d,t])=>'<button type="button" data-plazo="'+d+'" aria-pressed="'+(st.plazo===d)+'"'+(st.noRepone?' disabled':'')+'>'+t+'</button>').join('')+'</div></div>'
-      +'<dl>'+fila('Tasa','17,78 % E.A.')+fila('Intereses y 4×1000',pesos(cr.int))+fila('Total a pagar',pesos(cr.total),'tot')+'</dl>'
-      +(cr.tope?'<p class="jw-o3-nota">Puede pedir hasta '+pesos(TOPE_CRED)+'.</p>':'')+'</div>'
-      +'<button type="button" class="jw-norep" data-norep aria-pressed="'+(!!st.noRepone)+'">'+(st.noRepone?'✓ ':'')+'No lo repondría</button></article>';
-    const cNo='<article class="jw-o3'+(st.pref==='noretira'?' elegida':'')+'"><h4>Si no retira</h4><div class="jw-o3-cuerpo"><dl>'
-      +fila('Seguiría invertido',pesos(k.D))+fila('Rentabilidad de los últimos 12 meses',c.rentTxt+' E.A.')+fila('Rentaría en 12 meses',pesos(k.rentaria),'tot')+'</dl>'
-      +'<p class="jw-o3-nota">Estimado con la rentabilidad de los últimos 12 meses. No es una promesa de rendimiento.</p></div></article>';
-    ops3.innerHTML=k.cubre?cRet+cCred+cNo:cCred+cRet+cNo;
-    const prefs=(k.cubre?[['retiro',tRet],['credito','Crédito puente']]:[['credito','Crédito puente'],['retiro',tRet]]).concat([['noretira','No retira']]);
-    if(st.pref==='credito'&&st.noRepone) delete st.pref;
-    prefEl.innerHTML=prefs.map(([v,t])=>'<button type="button" data-pref-v="'+v+'" aria-pressed="'+(st.pref===v)+'"'+(v==='credito'&&st.noRepone?' disabled':'')+'>'+t+'</button>').join('');
-    q('[data-pie3]').hidden=!st.pref;
-    q('[data-sig3-t]').textContent=st.pref==='credito'||st.pref==='noretira'?'Continuar a Acuerdo':'Continuar a Precauciones';
-    if(resListo) pintarResumen();
+      +(k.perm>0.5?fila('Cobro por permanencia<small>capital más seguro · estimado</small>',pesos(k.perm)):'')
+      +fila('Recibe',pesos(k.R),'tot verde')+filaImp(k)+'</dl>';
+    if(conRx) h+=filaRx(k);
+    const faltan=(st.monto||0)-k.R; if(faltan>0.5) h+='<p class="jw-o3-nota">No alcanza: faltan <b>'+pesos(faltan)+'</b></p>';
+    return h+'</div></article>';
+  }
+  function cajaCredito(cr){
+    if(!(cr.M>0)) return '<article class="jw-o3"><h4>Crédito puente</h4>'+nodisp('No tiene crédito preaprobado con respaldo del fondo')+'</article>';
+    return '<article class="jw-o3'+(st.noRepone?' off':'')+(st.pref==='credito'?' elegida':'')+'"><h4>Crédito puente</h4><div class="jw-o3-cuerpo"><dl>'
+      +fila('Monto',pesos(cr.M))+fila('Respaldo requerido',pesos(cr.resp))+'</dl>'+plazoHtml()
+      +'<dl>'+fila('Tasa',TASA_TXT)+fila('Intereses y 4×1000',pesos(cr.costo))+fila('Total a pagar',pesos(cr.total),'tot')+'</dl>'
+      +(cr.tope?'<p class="jw-o3-nota">No alcanza: es el máximo preaprobado; faltan <b>'+pesos(st.monto-cr.M)+'</b></p>':'')+'</div>'
+      +'<button type="button" class="jw-norep" data-norep aria-pressed="'+(!!st.noRepone)+'">'+(st.noRepone?IC.check:'')+'No lo repondría</button></article>';
+  }
+  function cajaCombo(cb,conRx){
+    const kt=cb.kt, cr=cb.cr, im=impuesto(kt);
+    const costo=esp()?pesos(cr.costo):!st.rx?'hasta '+pesos(cr.costo+im.max):im.min===im.max?pesos(cr.costo+im.max):pesos(cr.costo+im.min)+' a '+pesos(cr.costo+im.max);
+    let h='<article class="jw-o3'+(st.pref==='combo'?' elegida':'')+'"><h4>Retiro + crédito puente</h4><div class="jw-o3-cuerpo">'
+      +'<h5 class="jw-o3-sub">Retiro</h5><dl>'+fila('Se descuenta del contrato',pesos(kt.D))+fila('Retenciones',pesos(kt.rcA+kt.rrA))+fila('4×1000',pesos(kt.g))+fila('Recibe',pesos(kt.R))+'</dl>'
+      +'<h5 class="jw-o3-sub">Crédito por lo que falta</h5><dl>'+fila('Monto',pesos(cr.M))+'</dl>'+plazoHtml()
+      +'<dl>'+fila('Tasa',TASA_TXT)+fila('Intereses y 4×1000',pesos(cr.costo))+fila('Recibe',pesos(cb.recibe),'tot verde')
+      +fila('Costo de la combinación<small class="jw-imp-nota">intereses más posible impuesto '+DIAN+im.nota+' · <button type="button" class="jw-link jw-ro-ok" data-ajustar>Ajustar</button></small>',costo)+'</dl>';
+    if(conRx) h+=filaRx(kt);
+    if(!cb.cubre) h+='<p class="jw-o3-nota">El crédito disponible ('+pesos(cb.disp)+') no cubre lo que falta ('+pesos(cb.falta)+').</p>';
+    return h+'</div></article>';
+  }
+  function cajaNoRetira(k){
+    const N=st.plazo&&!st.noRepone?st.plazo:12, rent=k.D*(Math.pow(1+k.tasa,N/12)-1);
+    return '<article class="jw-o3"><h4>Si no retira</h4><div class="jw-o3-cuerpo"><dl>'+fila('Seguiría invertido',pesos(k.D))+fila('Rentabilidad de los últimos 12 meses',pct(k.tasa*100,2)+' E.A.')
+      +fila(N===1?'Rentaría en 1 mes':'Rentaría en '+N+' meses',pesos(rent),'tot')+'</dl><p class="jw-o3-nota">Estimado con la rentabilidad de los últimos 12 meses. No es una promesa de rendimiento.</p></div></article>';
+  }
+  function pintarOpciones(){
+    const falta=!(st.monto>0); vis('[data-o-falta]',falta); vis('[data-o-cuerpo]',!falta);
+    if(falta){ vis('[data-pie3]',false); return; }
+    const v=cajas(), cr=cred(), rxEn=cajaRx(v.list), kEval=prefEsRetiro()?retiroPref():v.k, conRx=tocaNoExento(kEval);
+    const al=q('[data-o-alcanza]'), credEleg=!v.viv&&!st.noRepone&&cr.M>0&&cr.M>=(st.monto||0)-0.5;
+    al.hidden=!(credEleg&&v.kt.R+v.kt.g<(st.monto||0)-0.5);
+    if(!al.hidden) al.innerHTML=IC.info+'<span>Hoy puede retirar '+pesos(v.kt.R+v.kt.g)+'. Para cubrir '+pesos(st.monto)+', la opción es el crédito puente.</span>';
+    ops3.innerHTML=v.list.map(t=>t==='credito'?cajaCredito(cr):t==='combo'?cajaCombo(v.cb,rxEn==='combo'&&conRx):cajaRetiro(t,t==='retiro'?v.k:v.kt,rxEn===t&&conRx)).join('')+(v.viv?'':cajaNoRetira(v.k));
+    const ibc=v.list.filter(t=>t!=='credito').every(t=>impuesto(t==='retiro'?v.k:v.kt).nota==='estimado con el IBC');
+    q('[data-o-anticipo]').textContent='Lo que se retiene hoy es un anticipo: se descuenta del impuesto en la declaración de renta. El posible impuesto es una estimación orientativa'+(ibc?' con el IBC':'')+': no reemplaza la declaración de renta.';
+    const elegibles=v.list.filter(t=>t==='credito'?cr.M>0:t==='combo'?!!v.cb:(t==='retiro'?v.k:v.kt).R>0.5);
+    prefEl.innerHTML=elegibles.map(t=>'<button type="button" data-pref-v="'+t+'" aria-pressed="'+(st.pref===t)+'"'+(t==='credito'&&st.noRepone?' disabled':'')+'>'+NOM_CAJA[t]+'</button>').join('');
+    vis('[data-ver-cred]',!v.viv&&cr.M>0);
+    vis('[data-pie3]',c3()||RO());
   }
   ops3.addEventListener('click',e=>{
-    const pl=e.target.closest('[data-plazo]'); if(pl){ st.plazo=+pl.dataset.plazo; pintarOpciones(); return; }
-    if(e.target.closest('[data-norep]')){ st.noRepone=!st.noRepone; if(st.noRepone) delete st.plazo; pintarOpciones(); }
+    if(RO()&&!e.target.closest('.jw-ro-ok')) return;
+    const pl=e.target.closest('[data-plazo]'); if(pl&&!pl.disabled){ st.plazo=+pl.dataset.plazo; st.cr=null; pintarTodo(); return; }
+    if(e.target.closest('[data-norep]')){ st.noRepone=!st.noRepone; if(st.noRepone){ st.plazo=null; if(st.pref==='credito') st.pref=null; } pintarTodo(); return; }
+    const rx=e.target.closest('[data-rx-v]'); if(rx){ st.rx=rx.dataset.rxV; pintarTodo(); return; }
+    if(e.target.closest('[data-rx-info]')){ st.rxInfo=!st.rxInfo; pintarOpciones(); aplicarRO(); return; }
+    if(e.target.closest('[data-lm]')){ st.lm=true; pintarOpciones(); aplicarRO(); return; }
+    if(e.target.closest('[data-ajustar]')){ abrirDet(ctId(),'impuestos'); }
   });
-  prefEl.addEventListener('click',e=>{ const b=e.target.closest('[data-pref-v]'); if(!b||b.disabled) return; st.pref=b.dataset.prefV; if(hechas.has(3)) marcar(3,false); if(hechas.has(4)){ marcar(4,false); navs[3].disabled=true; navs[4].disabled=true; } pintarOpciones(); });
-  q('[data-sig3]').addEventListener('click',()=>{
-    marcar(3,true);
-    if(st.pref==='credito'||st.pref==='noretira'){ marcar(4,true); navs[4].disabled=false; irEtapa(5); }
-    else { navs[3].disabled=false; irEtapa(4); }
-  });
-  q('[data-ver-calc]').addEventListener('click',()=>abrirDet(ctSel,'calculo'));
-  q('[data-ver-cred]').addEventListener('click',()=>abrirDet(ctSel,'credito'));
-  // ---- Etapa 4 · Precauciones (datos del prototipo WPP) ----
-  // Posible impuesto según si usó los aportes como renta exenta (WPP: Mi ahorro con $150.000.000 → Sí $17.382.058 · No $7.878.038)
-  const RX_SI=17382058/30791218, RX_NO=7878038/30791218, RXTXT={si:'Sí',no:'No',nosabe:'No sabe'};
-  function rangoImp(c,k){
-    if(c.id==='ahorro' && k.cubre && monto===150000000) return {si:17382058,no:7878038};
-    return {si:Math.round(k.imp*RX_SI),no:Math.round(k.imp*RX_NO)};
-  }
-  function textoImp(r){ if(!r.si&&!r.no) return pesos(0); return st.rx==='si'?pesos(r.si):st.rx==='no'?pesos(r.no):pesos(r.no)+' a '+pesos(r.si); }
-  function aniosDe(c,k){ const totA=c.anios.reduce((a,x)=>a+x[1],0); return c.anios.map(a=>[a[0],Math.round(a[1]*k.D/totA)]); }
-  function pintarPrecauciones(){
-    const cred=st.pref==='credito'||st.pref==='noretira'; q('[data-p4-cred]').hidden=!cred; q('[data-p4-cuerpo]').hidden=cred;
-    q('[data-p4-cred]').textContent=st.pref==='noretira'?'Si no retira, su dinero sigue invertido: no hay retenciones ni impuesto por retiro.':'Con el crédito no se retira del fondo: no hay retenciones ni impuesto por el retiro.';
-    if(cred){ q('[data-pie4]').hidden=false; return; }
-    const c=CT.find(x=>x.id===ctSel)||CT[0], k=retiro(c), an=aniosDe(c,k).map(a=>a[0]+' ('+pesos(a[1])+')'), ult=an.pop();
-    q('[data-p4-anios]').textContent='Los '+pesos(k.D)+' salen de aportes de '+(an.length?an.join(', ')+' y ':'')+ult+'.';
-    velo.querySelectorAll('[data-rx-v]').forEach(b=>b.setAttribute('aria-pressed',String(st.rx===b.dataset.rxV)));
-    const imp=q('[data-p4-imp]'); imp.hidden=!st.rx;
-    if(st.rx) imp.innerHTML='Posible impuesto en la declaración <b>'+textoImp(rangoImp(c,k))+'</b> · estimado con el IBC';
-    q('[data-validar]').checked=!!st.validar;
-    q('[data-pie4]').hidden=!st.rx;
-    if(resListo) pintarResumen();
-  }
-  q('[data-rx]').addEventListener('click',e=>{ const b=e.target.closest('[data-rx-v]'); if(!b) return; st.rx=b.dataset.rxV; pintarPrecauciones(); });
-  q('[data-validar]').addEventListener('change',e=>{ st.validar=e.target.checked; pintarResumen(); });
-  const lm=q('[data-lm]');
-  lm.addEventListener('click',()=>{ const ab=lm.getAttribute('aria-expanded')!=='true'; lm.setAttribute('aria-expanded',String(ab)); q('[data-lm-mas]').hidden=!ab; lm.textContent=ab?'Leer menos':'Leer más'; });
-  q('[data-ver-calc4]').addEventListener('click',()=>abrirDet(ctSel,'calculo'));
-  q('[data-sig4]').addEventListener('click',()=>{ marcar(4,true); navs[4].disabled=false; irEtapa(5); });
-  // Detalle para el contador: archivo que abre en Excel (CSV con separador ;)
-  q('[data-xls]').addEventListener('click',()=>{
-    const c=CT.find(x=>x.id===ctSel)||CT[0], k=retiro(c), r=rangoImp(c,k);
-    const filas=[['Detalle del retiro para el contador'],['Cliente','Óscar Camilo Hernández Ramírez'],['Contrato',c.nom+' · '+c.num+' · '+c.prod],['Fecha','16/11/2026'],[],
-      ['Recibe',k.R],['Retención contingente',k.rcA],['Retención sobre rendimientos (7 %)',k.rrA],['4×1000 (estimado)',k.g],['Se descuenta del contrato',k.D],[],
-      ['Año del aporte','Valor que sale']].concat(aniosDe(c,k)).concat([[],['Tipo de aporte','Valor que sale'],['Exento',k.ex],['Sin retención al retirar',k.sr],['Con retención contingente',k.cc],[],
-      ['Posible impuesto si usó los aportes como renta exenta',r.si],['Posible impuesto si no los usó',r.no],[],
-      ['Lo que se retiene hoy es un anticipo: se descuenta del impuesto en la declaración de renta.'],['Estimación orientativa con el IBC: no reemplaza la declaración de renta ni la revisión del contador.']]);
-    const csv='﻿'+filas.map(f=>f.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download='detalle-retiro-'+c.num+'.csv';
-    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
-  });
-  // ---- Etapa 5 · Acuerdo (estructura y datos del prototipo WPP) ----
-  const SENAL=216900000, FECHA_HOY='16 de nov de 2026';
-  const DEC={retiro:null,credito:'Crédito puente',noretira:'No retira',pensara:'Lo va a pensar'};
-  const URL_ESPECIFICADO='https://www.skandia.co/documents/39464/1536444/Solicitud-de-retiros-parciales-especificados-Fondo-Voluntario-de-Pension-Skandia-Multifund.pdf/129a497d-78ff-c3fe-c491-d08daf52dca5?version=3.0&t=1757703266312';
+  prefEl.addEventListener('click',e=>{ const b=e.target.closest('[data-pref-v]'); if(!b||b.disabled||RO()) return; st.pref=b.dataset.prefV; st.dec=DEC_DE[st.pref]; st.tram=null; st.msg=null; pintarTodo(); });
+  q('[data-ver-calc]').addEventListener('click',()=>abrirDet(ctId(),'calculo'));
+  q('[data-ver-cred]').addEventListener('click',()=>abrirDet(ctId(),'credito'));
+
+  // ---- Acuerdo ----
+  const DEC_NOM={retiro:'Retiro',total:'Retiro total',combo:'Retiro + crédito puente',credito:'Crédito puente',noretira:'No retira',pensara:'Lo va a pensar',fuera:'Fuera de alcance'};
+  const DEC_CAT={retiro:'Retiro parcial',total:'Retiro total',combo:'Retiro + crédito puente',credito:'Toma el crédito puente',noretira:'No retira',pensara:'Lo va a pensar',fuera:'Fuera de alcance'};
   const decEl=q('[data-dec]');
-  function nomDec(v,k){ return v==='retiro'?(k.cubre?'Retiro':'Retiro total'):DEC[v]; }
-  function juego(c,k){
-    const sale=st.dec==='retiro'?k.D:0;
-    return {sigue:Math.max(0,c.saldo-sale),pres:Math.max(0,SENAL-sale),presDecl:Math.max(0,(monto||0)-sale)};
-  }
-  function accionTxt(){
-    if(st.dec==='retiro') return st.tram==='especificado'?'Retiro especificado (formato)':st.tram==='portal'?'Tramitar por el portal':'';
-    if(st.dec==='credito') return st.tram==='credito'?'Solicitar el crédito':'';
-    return '';
-  }
-  function fechaTxt(f){ if(!f) return ''; const [a,m,d]=f.split('-').map(Number); return new Date(a,m-1,d).toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'}).replace('.',''); }
-  function textoCliente(){
-    const c=CT.find(x=>x.id===ctSel)||CT[0], k=retiro(c), cr=cred(), j=juego(c,k), L=[];
-    L.push('Hola, Óscar. Este es el resumen de lo que conversamos hoy:');
-    L.push('');
-    L.push('• Lo que necesita: '+pesos(monto)+' · '+(MOTIVO[st.motivo]||''));
-    if(st.dec==='retiro'){
-      L.push('• Decisión: '+nomDec('retiro',k)+' de '+c.nom+' ('+c.num+').');
-      L.push('  Recibe '+pesos(k.R)+'. Del contrato se descuentan '+pesos(k.D)+', que incluyen '+pesos(k.D-k.R)+' de retenciones y 4×1000.');
-      if(st.rx) L.push('  Posible impuesto en la declaración: '+textoImp(rangoImp(c,k))+'. Le recomendamos validarlo con su contador.');
-      L.push('• Sigue invertido: '+pesos(j.sigue)+'.');
-    } else if(st.dec==='credito'){
-      L.push('• Decisión: crédito puente por '+pesos(cr.M)+' a '+((PLAZOS.find(x=>x[0]===cr.d)||[0,''])[1])+'.');
-      L.push('  Total a pagar al vencimiento ('+cr.vence+'): '+pesos(cr.total)+'. Tasa 17,78 % E.A.');
-      L.push('  Su ahorro sigue invertido: '+pesos(j.sigue)+' en '+c.nom+'. Mientras el crédito esté vigente se bloquean '+pesos(cr.resp)+' como respaldo.');
-    } else if(st.dec==='noretira'){
-      L.push('• Decisión: no retira. Su ahorro sigue invertido: '+pesos(j.sigue)+' en '+c.nom+'.');
-    } else if(st.dec==='pensara'){
-      L.push('• Decisión: lo va a pensar. Revisamos juntos las opciones: retiro, crédito puente o seguir invertido.');
-    }
-    const np=[]; if(st.np&&st.np.seguimiento) np.push('llamada de seguimiento'+(st.fseg?' el '+fechaTxt(st.fseg):''));
-    if(np.length) L.push('• Próximo paso: '+np.join(', ')+'.');
-    L.push('');
-    if(st.dec==='retiro') L.push('Lo que se retiene hoy es un anticipo: se descuenta del impuesto en la declaración de renta. Las cifras son una estimación orientativa y no reemplazan la declaración ni la revisión de su contador.');
-    L.push('Quedo atento a cualquier duda.');
-    return L.join('\n');
-  }
+  const esRetiro=d=>d==='retiro'||d==='total'||d==='combo';
+  function saleDe(d,v){ if(d==='retiro') return v.k.D; if(d==='total'||d==='combo') return v.kt.D; if(d==='credito'||d==='noretira') return 0; return null; }
+  const pagoTxt=cr=>cr.conPlazo?'Pago previsto: '+fLarga(cr.pago):'Pago al vencimiento (360 días)';
+  function respaldoTxt(cr){ const b=cr.bloq.filter(x=>x.b>0); return 'Respaldo: '+pesos(cr.resp)+' bloqueados en el contrato '+b.map((x,i)=>(i?'el contrato ':'')+x.c.num+' ('+pesos(x.b)+')').join(' y '); }
   function pintarAcuerdo(){
-    const c=CT.find(x=>x.id===ctSel)||CT[0], k=retiro(c), cr=cred();
-    if(st.dec===undefined && st.pref) st.dec=st.pref;
-    if(st.dec==='credito'&&st.noRepone) delete st.dec;
-    const cerr=!!st.cerrado;
-    const ops=[['retiro',nomDec('retiro',k),'Recibe '+pesos(k.R)+' de '+c.nom],
-               ['credito','Crédito puente',st.noRepone?'No lo repondría':'Total a pagar '+pesos(cr.total)],
-               ['noretira','No retira','Sigue invertido '+pesos(c.saldo)],
-               ['pensara','Lo va a pensar','Agenda un seguimiento']];
-    if(!k.cubre){ const a=ops[0]; ops[0]=ops[1]; ops[1]=a; }
-    decEl.innerHTML=ops.map(([v,t,d])=>'<button type="button" class="jw-op" data-dec-v="'+v+'" aria-pressed="'+(st.dec===v)+'"'+((v==='credito'&&st.noRepone)||cerr?' disabled':'')+'>'
-      +(st.pref===v?'<span class="jw-tg jw-tg--menor">Preferida</span>':'')+'<b>'+t+'</b><span>'+d+'</span></button>').join('');
-    q('[data-a5]').hidden=!st.dec;
-    if(!st.dec){ if(resListo) pintarResumen(); return; }
-    // Trámite
-    const tram=q('[data-tram]'), tOps=q('[data-tram-ops]'), conAccion=st.dec==='retiro'||st.dec==='credito';
-    tram.hidden=!conAccion;
-    if(st.dec==='retiro'){
+    const v=cajas(), c=v.c, cr=cred(), cerr=st.cerrado&&!st.fuera, ro=RO();
+    if(!st.dec&&st.pref&&!ro) st.dec=DEC_DE[st.pref];
+    const det={retiro:'Recibe '+pesos(v.k.R)+' de '+c.nom,total:'Recibe '+pesos(v.kt.R)+' de '+c.nom,combo:v.cb?'Recibe '+pesos(v.cb.recibe):'',credito:st.noRepone?'No lo repondría':'Total a pagar '+pesos(cr.total),noretira:'Sigue invertido '+pesos(c.saldo),pensara:'Agenda un seguimiento',fuera:''};
+    const ofr=v.list.filter(t=>t==='credito'?cr.M>0:t==='combo'?!!v.cb:(t==='retiro'?v.k:v.kt).R>0.5);
+    let lista=(ofr.includes('retiro')?['retiro','total','combo','credito']:['credito','total','combo']).filter(t=>ofr.includes(t)).concat(['noretira','pensara']);
+    if(st.dec&&st.dec!=='fuera'&&!lista.includes(st.dec)) lista.push(st.dec);
+    const sale=st.dec?saleDe(st.dec,v):null, dest=q('[data-a-dest]');
+    dest.hidden=!(st.dec&&st.dec!=='pensara'&&st.dec!=='fuera'&&sale!=null);
+    if(!dest.hidden){ q('[data-a-dest-v]').textContent=pesos(c.saldo-sale); q('[data-a-dest-t]').textContent=(cerr?'Sigue invertido con lo que decidió: ':'Sigue invertido si decide: ')+DEC_CAT[st.dec].toLowerCase(); }
+    decEl.innerHTML=lista.map(d=>'<button type="button" class="jw-op" data-dec-v="'+d+'" aria-pressed="'+(st.dec===d)+'"'+((d==='credito'&&st.noRepone&&st.dec!=='credito')||ro?' disabled':'')+'>'
+      +(DEC_DE[st.pref]===d?'<span class="jw-tg jw-tg--menor">Preferida</span>':'')+'<b>'+DEC_NOM[d]+'</b><span>'+det[d]+'</span></button>').join('');
+    vis('[data-a5]',!!st.dec&&st.dec!=='fuera');
+    if(!st.dec||st.dec==='fuera') return;
+    // Cómo se tramita
+    const ret=esRetiro(st.dec), esCr=st.dec==='credito', viv=st.motivo==='vivienda', tOps=q('[data-tram-ops]');
+    vis('[data-tram]',ret||esCr);
+    const alr=q('[data-tram-alerta]'); alr.hidden=!(ret&&c.sc>0); if(!alr.hidden) alr.innerHTML=IC.alerta+'<span>Aportes por certificar ('+pesos(c.sc)+'): no se pueden retirar hasta que se certifiquen.</span>';
+    const cmb=q('[data-tram-combo]'); cmb.hidden=st.dec!=='combo';
+    if(ret){
+      const rec=st.dec==='retiro'?v.k.R:v.kt.R;
       q('[data-tram-t]').textContent='¿Cómo se tramita el retiro?';
-      q('[data-tram-linea]').innerHTML='<b>'+c.nom+'</b> · '+c.num+' · recibe <b>'+pesos(k.R)+'</b>';
-      q('[data-tram-viv]').hidden=st.motivo!=='vivienda';
+      q('[data-tram-linea]').textContent=c.nom+' · '+c.num+' · recibe '+pesos(rec);
+      if(st.dec==='combo'&&v.cb){ const cc=v.cb.cr; cmb.innerHTML='<b>Y solicitar crédito:</b> Monto: '+pesos(cc.M)+' · con GMF '+pesos(cc.cap)+' · Tasa: '+TASA_TXT+' · '+pagoTxt(cc)+' · '+respaldoTxt(cc)+' · Sin cuotas mensuales'; }
+      vis('[data-tram-viv]',viv);
       tOps.setAttribute('aria-label','Cómo se tramita el retiro');
-      tOps.innerHTML='<button type="button" data-tram-v="portal" aria-pressed="'+(st.tram==='portal')+'"'+(cerr?' disabled':'')+'>Tramitar por el portal</button>'
-        +'<button type="button" data-tram-v="especificado" aria-pressed="'+(st.tram==='especificado')+'"'+(cerr?' disabled':'')+'>Retiro especificado</button>';
-      q('[data-tram-nota]').innerHTML='Queda como acción pendiente al registrar el cierre. El retiro especificado tarda unos 3 días'
-        +(st.tram==='especificado'?' · <a class="jw-link" href="'+URL_ESPECIFICADO+'" target="_blank" rel="noopener noreferrer">'+BAJAR5+'Descargar formato</a>':'.');
-    } else if(st.dec==='credito'){
+      tOps.innerHTML='<button type="button" data-tram-v="portal" aria-pressed="'+(st.tram==='portal')+'">Tramitar por el portal</button>'+(viv?'':'<button type="button" data-tram-v="especificado" aria-pressed="'+(st.tram==='especificado')+'">Retiro especificado</button>');
+      q('[data-tram-nota]').innerHTML=viv?'Queda como acción pendiente al registrar el cierre.':'Queda como acción pendiente al registrar el cierre. El retiro especificado tarda unos 3 días'+(st.tram==='especificado'?' · <a class="jw-link jw-ro-ok" href="'+URL_ESPECIFICADO+'" target="_blank" rel="noopener noreferrer">'+IC.bajar+'Descargar formato</a>':'.');
+    } else if(esCr){
       q('[data-tram-t]').textContent='Solicitar el crédito';
-      q('[data-tram-linea]').innerHTML='Crédito Impulso · <b>'+pesos(cr.M)+'</b> · '+((PLAZOS.find(x=>x[0]===cr.d)||[0,''])[1])+' · total a pagar <b>'+pesos(cr.total)+'</b>';
-      q('[data-tram-viv]').hidden=true;
+      q('[data-tram-linea]').textContent='Crédito Impulso · Monto: '+pesos(cr.M)+' · con GMF '+pesos(cr.cap)+' · Tasa: '+TASA_TXT+' · '+pagoTxt(cr)+' · '+respaldoTxt(cr)+' · Sin cuotas mensuales';
+      vis('[data-tram-viv]',false);
       tOps.setAttribute('aria-label','Solicitud del crédito');
-      tOps.innerHTML='<button type="button" data-tram-v="credito" aria-pressed="'+(st.tram==='credito')+'"'+(cerr?' disabled':'')+'>Solicitar el crédito</button>';
+      tOps.innerHTML='<button type="button" data-tram-v="credito" aria-pressed="'+(st.tram==='credito')+'">Solicitar el crédito</button>';
       q('[data-tram-nota]').textContent='Queda como acción pendiente al registrar el cierre. Desde aquí todavía no se solicita.';
     }
     // Próximos pasos
-    st.np=st.np||{resumen:true,seguimiento:st.dec==='pensara'};
-    velo.querySelectorAll('[data-np]').forEach(i=>{ i.checked=!!st.np[i.dataset.np]; i.disabled=cerr; });
-    const fs=q('[data-fseg]'); fs.value=st.fseg||''; fs.disabled=cerr;
-    const nt=q('[data-notas]'); if(nt.value!==(st.notas||'')) nt.value=st.notas||''; nt.disabled=cerr;
-    // Lo que está en juego
-    const j=juego(c,k);
-    q('[data-juego]').innerHTML='<div><small>En riesgo (señal)</small><b>'+pesos(SENAL)+'</b></div>'
-      +'<div><small>Desea retirar</small><b>'+pesos(monto)+'</b></div>'
-      +'<div><small>Sigue invertido</small><b>'+pesos(j.sigue)+'</b><span>en '+c.nom+'</span></div>'
-      +'<div class="verde"><small>Preservado</small><b>'+pesos(j.pres)+'</b><span>frente a lo que desea retirar: '+pesos(j.presDecl)+'</span></div>';
+    qa('[data-np]').forEach(i=>{ i.checked=!!st.np[i.dataset.np]; });
+    const fs=q('[data-fseg]'); fs.min=iso(HOY); fs.value=st.fseg||'';
+    const nt=q('[data-notas]'); if(nt.value!==st.notas) nt.value=st.notas;
+    // Lo que está en juego (la señal de Dali Oportunidades no trae el monto estimado: «En riesgo» queda en «—»)
+    q('[data-juego]').innerHTML='<div><small>En riesgo (señal)</small><b>—</b></div><div><small>Desea retirar</small><b>'+pesos(st.monto)+'</b></div>'
+      +'<div><small>Sigue invertido</small><b>'+(sale==null?'—':pesos(c.saldo-sale))+'</b><span>en '+c.nom+'</span></div>'
+      +'<div class="verde"><small>Preservado</small><b>'+(sale==null?'—':pesos(Math.max(0,(st.monto||0)-sale)))+'</b></div>';
     q('[data-resc-txt]').textContent=textoCliente();
-    // Botones
-    q('[data-cambiar-dec]').hidden=cerr;
-    const bc=q('[data-cierre]'); bc.disabled=cerr; bc.classList.toggle('jw-cerrado',cerr); bc.innerHTML=cerr?CHK5+'Cierre registrado':'Registrar cierre';
-    if(resListo) pintarResumen();
+    const m=q('[data-a5-msg]'); m.hidden=!st.msg; if(st.msg){ m.textContent=st.msg.t; m.classList.toggle('ok',!!st.msg.ok); }
+    vis('[data-cambiar-dec]',!ro);
+    const bc=q('[data-cierre]'); bc.disabled=ro; bc.classList.toggle('jw-cerrado',ro); bc.innerHTML=ro?IC.ok+'Cierre registrado':IC.clip+'Registrar cierre';
+    vis('[data-contador]',ret&&tocaNoExento(st.dec==='retiro'?v.k:v.kt));
+    q('[data-validar]').checked=!!st.validar;
   }
-  const BAJAR5='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>';
-  const CHK5='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
-  function msg5(t,ok){ const m=q('[data-a5-msg]'); m.textContent=t; m.classList.toggle('ok',!!ok); m.hidden=!t; }
-  decEl.addEventListener('click',e=>{ const b=e.target.closest('[data-dec-v]'); if(!b||b.disabled||st.cerrado) return; if(st.dec!==b.dataset.decV){ st.dec=b.dataset.decV; delete st.tram; if(st.np) st.np.seguimiento=st.np.seguimiento||st.dec==='pensara'; } msg5(''); pintarAcuerdo(); });
-  q('[data-tram-ops]').addEventListener('click',e=>{ const b=e.target.closest('[data-tram-v]'); if(!b||b.disabled) return; st.tram=b.dataset.tramV; pintarAcuerdo(); });
-  velo.querySelectorAll('[data-np]').forEach(i=>i.addEventListener('change',()=>{ st.np[i.dataset.np]=i.checked; pintarAcuerdo(); }));
-  q('[data-fseg]').addEventListener('change',e=>{ st.fseg=e.target.value; if(st.fseg) st.np.seguimiento=true; pintarAcuerdo(); });
+  decEl.addEventListener('click',e=>{ const b=e.target.closest('[data-dec-v]'); if(!b||b.disabled||RO()) return; if(st.dec!==b.dataset.decV){ st.dec=b.dataset.decV; st.tram=null; } st.msg=null; pintarTodo(); });
+  q('[data-tram-ops]').addEventListener('click',e=>{ const b=e.target.closest('[data-tram-v]'); if(!b||b.disabled||RO()) return; st.tram=b.dataset.tramV; st.msg=null; pintarAcuerdo(); aplicarRO(); });
+  qa('[data-np]').forEach(i=>i.addEventListener('change',()=>{ st.np[i.dataset.np]=i.checked; pintarAcuerdo(); }));
+  q('[data-fseg]').addEventListener('change',e=>{ st.fseg=e.target.value; pintarAcuerdo(); });
   q('[data-notas]').addEventListener('input',e=>{ st.notas=e.target.value.slice(0,500); });
-  q('[data-copiar]').addEventListener('click',async e=>{ const b=e.currentTarget; try{ await navigator.clipboard.writeText(textoCliente()); b.textContent='Copiado'; }catch(_){ b.textContent='No se pudo copiar'; } setTimeout(()=>b.textContent='Copiar',1500); });
-  q('[data-cambiar-dec]').addEventListener('click',()=>{ const h=q('#jw-t5'); h.scrollIntoView({behavior:corto?'auto':'smooth',block:'center'}); h.focus({preventScroll:true}); });
+  q('[data-validar]').addEventListener('change',e=>{ st.validar=e.target.checked; pintarAcuerdo(); });
+  q('[data-copiar]').addEventListener('click',async e=>{ const b=e.currentTarget, s=b.querySelector('span'); try{ await navigator.clipboard.writeText(textoCliente()); s.textContent='Copiado'; }catch(_){ s.textContent='No se pudo copiar'; } setTimeout(()=>s.textContent='Copiar',1500); });
+  q('[data-cambiar-dec]').addEventListener('click',()=>{ const h=q('#jw-t4'); h.scrollIntoView({behavior:corto?'auto':'smooth',block:'center'}); const b=decEl.querySelector('button'); (b||h).focus({preventScroll:true}); });
   q('[data-enviar]').addEventListener('click',()=>{
-    if(!st.cerrado){ msg5('Registra el cierre primero: el resumen se genera al registrar la decisión.'); return; }
-    st.enviado=true; msg5('Resumen enviado al cliente. Queda registrado el envío; en este prototipo el envío real no está conectado.',true); pintarResumen();
+    if(!st.cerrado){ toast('info','Registra el cierre primero','El resumen se genera al registrar la decisión.'); return; }
+    st.enviado=true; toast('exito','Resumen enviado al cliente','Queda registrado el envío; el envío real al cliente aún no está conectado.');
   });
   q('[data-cierre]').addEventListener('click',()=>{
     if(!st.dec||st.cerrado) return;
-    if((st.dec==='retiro'||st.dec==='credito')&&!st.tram){ msg5(st.dec==='retiro'?'Elige cómo se tramita el retiro antes de registrar el cierre.':'Confirma la solicitud del crédito antes de registrar el cierre.'); q('[data-tram-ops] button').focus(); return; }
-    st.cerrado=true; marcar(5,true);
-    const pend=[accionTxt()].concat(st.np.resumen?['Enviar resumen al cliente']:[]).concat(st.np.seguimiento?['Llamada de seguimiento'+(st.fseg?' el '+fechaTxt(st.fseg):'')]:[]).filter(Boolean);
-    msg5('Cierre registrado: '+nomDec(st.dec,retiro(CT.find(x=>x.id===ctSel)||CT[0]))+'.'+(pend.length?' Quedan pendientes: '+pend.join(' · ')+'.':''),true);
-    pintarAcuerdo(); q('[data-cierre]').focus();
+    const ret=esRetiro(st.dec), esCr=st.dec==='credito';
+    if((ret||esCr)&&!st.tram){ st.msg={t:ret?'Elige cómo se tramita el retiro antes de registrar el cierre.':'Confirma la solicitud del crédito antes de registrar el cierre.'}; pintarAcuerdo(); const b=q('[data-tram-ops] button'); if(b) b.focus(); return; }
+    const accion=ret?(st.tram==='especificado'?'Retiro especificado: descargar formato':'Tramitar por el portal'):esCr?'Solicitar el crédito':'';
+    const pasos=[]; if(st.np.resumen) pasos.push('Enviar resumen de la conversación al cliente'); if(st.np.seguimiento) pasos.push('Agendar llamada de seguimiento');
+    const pend=[accion].concat(pasos).filter(Boolean);
+    st.msg={ok:true,t:'Cierre registrado: '+DEC_NOM[st.dec]+'.'+(pend.length?' Quedan pendientes: '+pend.join(' · ')+(st.np.seguimiento&&st.fseg?' (seguimiento el '+fLarga(deIso(st.fseg))+')':'')+'.':'')};
+    cerrarConversacion(false); q('[data-cierre]').focus();
   });
-  // ---- Panel de detalle: Contrato / Portafolios / Aportes / Cálculo ----
+  // Detalle de aportes para el contador (en Angular es un Excel; aquí se simula con un CSV que abre en Excel)
+  q('[data-xls]').addEventListener('click',()=>{
+    const c=ctSel(), k=st.dec==='retiro'?retiro(c):retiro(c,true);
+    const filas=[['Detalle de aportes para usted o su contador'],['Generado el '+fLarga(HOY)+' · Contratos: '+c.num],[],['Contrato','Año del aporte','Valor que sale','Estado']]
+      .concat(aniosDe(c,k).map(a=>[c.num,a[0],a[1],a[0]<=2016?'Exento':c.cc>0?'Con retención contingente':'Sin retención al retirar']))
+      .concat([[],['Cifras de Contigo a la fecha de generación. Es información de apoyo: no reemplaza la asesoría tributaria.']]);
+    const csv='﻿'+filas.map(f=>f.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(';')).join('\r\n');
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download='detalle-de-aportes-'+iso(HOY)+'.csv';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
+  });
+  function regla(v,cr){ // «Lectura de las cifras»: solo va en el resumen para el cliente
+    if(!cr.conPlazo||!(cr.M>0)||esp()) return null;
+    const im=impuesto(v.k), base=v.k.perm+v.k.g, min=base+Math.min(im.no,im.si), max=base+Math.max(im.no,im.si,im.tope||0);
+    if(cr.costo<min) return 'Con estas cifras, el crédito suma menos que el posible impuesto y los cargos del retiro.';
+    if(cr.costo>max) return 'Con estas cifras, el posible impuesto y los cargos del retiro suman menos que el crédito.';
+    return 'Si usaron estos aportes como renta exenta, el crédito suma menos. Valídelo antes de decidir.';
+  }
+  function textoCliente(){
+    const L=['Acompañamiento en el retiro · '+NOMBRE], add=(l,x)=>L.push(l+': '+x), c=ctSel(), v=cajas(), cr=cred();
+    if(st.motivo&&!EN_ALCANCE(st.motivo)) add('Motivo',st.otro.trim()?MOTIVO[st.motivo]+': '+st.otro.trim():MOTIVO[st.motivo]+' (fuera de alcance)');
+    else if(st.motivo){
+      add('Motivo',MOTIVO[st.motivo]); add('Necesidad',st.monto>0?'Recibir '+pesos(st.monto)+(st.cuando?' '+cuandoTxt():''):'Liquidez (sin monto)');
+      const cond=[]; if(st.pen==='si') cond.push('Cumple requisitos de pensión'); if(st.motivo==='vivienda') cond.push('Retiro para compra de vivienda'); if(cond.length) add('Condición especial',cond.join(', '));
+    }
+    if(st.ctConf) add('Contrato elegido',c.nom+' · '+c.num+' ('+pesos(c.saldo)+')');
+    if(st.visitadas.includes(3)&&st.monto>0){
+      const rg=regla(v,cr); if(rg) add('Lectura de las cifras',rg);
+      if(st.pref){
+        const sigue=x=>pesos(c.saldo-x);
+        const desc=k=>': se descuentan '+pesos(k.D)+' del contrato y recibe '+pesos(k.R)+'; se retiene hoy '+pesos(k.rcA+k.rrA)+' (retención contingente '+pesos(k.rcA)+' y retención sobre rendimientos '+pesos(k.rrA)+')'+(k.g>0.5?'; 4×1000 '+pesos(k.g):'')+'; sigue invertido '+sigue(k.D);
+        add('Opción que prefiere',st.pref==='retiro'?'Retiro por '+pesos(st.monto)+desc(v.k):st.pref==='total'?'Retiro total'+desc(v.kt)
+          :st.pref==='credito'?'Crédito puente: recibe '+pesos(cr.M)+', costo estimado '+pesos(cr.costo)+' (intereses '+pesos(cr.int)+' y 4×1000 '+pesos(cr.gmf)+'), sigue invertido '+pesos(c.saldo)
+          :'Retiro + crédito puente: retira '+pesos(v.cb.kt.D)+' del contrato y recibe '+pesos(v.cb.kt.R)+'; crédito puente por '+pesos(v.cb.M)+', costo estimado '+pesos(v.cb.cr.costo)+' (intereses '+pesos(v.cb.cr.int)+' y 4×1000 '+pesos(v.cb.cr.gmf)+'); recibe en total '+pesos(v.cb.recibe)+'; sigue invertido '+sigue(v.cb.kt.D));
+      }
+      if(st.pref==='credito'||st.pref==='combo') add('Tipo de crédito','Crédito Impulso. Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A.');
+      if(st.plazo||st.noRepone) add('En cuánto tiempo podría reponerlo',st.noRepone?'No va a reponer el dinero':'Podría reponerlo en '+(st.plazo===1?'1 mes':st.plazo+' meses'));
+      add('Lo que se retiene al retirar','Es un anticipo: se descuenta del impuesto en la declaración de renta. '+ADV_USTED);
+      if(st.rx) add('¿Alguno de los aportes del retiro se usó como renta exenta?',RXTXT[st.rx]);
+      if(!esp()&&(preguntasOk()||(st.imp.metodo==='tarifa'&&tarifaOk()))){
+        const im=impuesto(prefEsRetiro()?retiroPref():v.k), dos=[im.no,im.si].sort((a,b)=>a-b);
+        add('Posible impuesto en la declaración (estimación orientativa)',st.imp.metodo==='tarifa'&&tarifaOk()?im.txt+'. Estimado con la tarifa de '+tarifaTxt()+'% ingresada por el asesor. Lo que se retiene hoy se descuenta de ese impuesto. No reemplaza la revisión que hagan usted o su contador.'
+          :'Si usted o su contador no usaron los aportes como renta exenta: '+pesos(im.no)+'. Si usted o su contador sí usaron los aportes como renta exenta: '+pesos(im.si)+'. Año gravable 2026. Lo que se retiene hoy se descuenta de ese impuesto. No reemplaza la revisión que hagan usted o su contador.');
+      }
+    }
+    if(st.dec&&st.dec!=='fuera'){ if((st.dec==='credito'||st.dec==='combo')&&!(st.pref==='credito'||st.pref==='combo')) add('Tipo de crédito','Crédito Impulso. Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A.'); const s=saleDe(st.dec,v); if(s!=null) add('Sigue invertido',pesos(c.saldo-s)); }
+    if(st.validar) add('Validación tributaria','Se le recomendó validarlo antes de retirar, usted o con su contador. '+ADV_USTED);
+    add('Etapas conversadas',st.visitadas.map(n=>ETAPAS_BD[n-1]).join(' → '));
+    if(st.dec) add('Decisión del cliente',DEC_CAT[st.dec]);
+    const np=[]; if(st.np.resumen) np.push('Enviar resumen de la conversación al cliente'); if(st.np.seguimiento) np.push('Agendar llamada de seguimiento'); if(np.length) add('Próximos pasos',np.join('; '));
+    if(st.fseg) add('Seguimiento',fLarga(deIso(st.fseg)));
+    if(st.notas.trim()) add('Notas',st.notas.trim());
+    return L.join('\n');
+  }
+
+  // ---- Cierre, solo lectura y avisos ----
+  function cerrarConversacion(fuera){
+    st.cerrado=true; st.fuera=!!fuera; st.estado='cerrada-seguimiento'; st.segHasta=st.fseg||iso(masDias(30)); st.abierta=null;
+    pintarTodo(); sincronizarFicha();
+  }
+  function pintarEstadoConv(){
+    const p=q('[data-estado-conv]'), a=q('[data-cierre-aviso]');
+    p.hidden=!st.cerrado; if(st.cerrado) p.querySelector('span').textContent=ESTADO[st.estado];
+    a.hidden=!(st.cerrado&&(st.estado==='cerrada-seguimiento'||st.estado==='finalizada'));
+    if(!a.hidden) a.innerHTML=st.estado==='finalizada'?'Journey finalizado. Resultado observado: <b>'+st.resultado+'</b> · coincide con la decisión.':'Cierre registrado. El journey queda en seguimiento hasta el '+fCorta(deIso(st.segHasta))+' para observar el resultado en la transaccionalidad.';
+  }
+  function aplicarRO(){
+    const ro=RO(); velo.classList.toggle('jw-solo',ro);
+    qa('[data-cambiar]').forEach(b=>b.hidden=ro);
+    if(!ro) return;
+    qa('.jw-etapas button,.jw-etapas input,.jw-etapas textarea,.jw-etapas select').forEach(el=>{ if(el.classList.contains('jw-ro-ok')||el.closest('.jw-ro-ok')||el.matches('[data-sig]')) return; el.disabled=true; });
+  }
+  const toasts=q('[data-toasts]');
+  function toast(tipo,titulo,desc){
+    const t=document.createElement('div'); t.className='jw-toast jw-toast--'+tipo; t.setAttribute('role',tipo==='error'?'alert':'status');
+    t.innerHTML=(tipo==='exito'?IC.ok:tipo==='error'?IC.alerta:IC.info)+'<div><b>'+titulo+'</b><p>'+desc+'</p></div><button type="button" class="jw-toast-x" aria-label="Cerrar el aviso">×</button>';
+    t.querySelector('button').addEventListener('click',()=>t.remove()); toasts.appendChild(t);
+    if(tipo!=='error') setTimeout(()=>t.remove(),5000);
+  }
+
+  // ---- Panel de detalle: Contrato · Portafolios · Aportes · Cálculo · Crédito · Impuestos ----
   const det=q('[data-det]'), detVelo=q('[data-det-velo]'), detSel=q('[data-det-ct]'), detB=q('[data-det-b]'), tabs=[...det.querySelectorAll('[data-tab]')];
   detSel.innerHTML=CT.map(c=>'<option value="'+c.id+'">'+c.nom+' · '+c.num+'</option>').join('');
   let detCt='ahorro', detTab='contrato', detVolver=null;
-  function pintarDet(){
-    const c=CT.find(x=>x.id===detCt), k=calc(c,monto||0);
-    tabs.forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===detTab)));
-    let h='';
-    if(detTab==='contrato'){
-      h='<p class="jw-det-tit"><b>'+c.nom+' · '+c.num+'</b><span>'+c.prod+'</span></p>'
-       +'<div class="jw-kpis"><div><small>Saldo</small><b>'+pesos(c.saldo)+'</b><span>en su contrato</span></div><div><small>Disponible para retiro</small><b>'+pesos(c.disp)+'</b><button type="button" class="jw-link" data-ir-tab="calculo">Ver cómo se calcula</button></div><div><small>Retención contingente</small><b class="jw-naranja">'+pesos(c.rcTodo)+'</b><span>Si retirara todo hoy (estimado)</span></div></div>'
-       +'<p class="jw-nota"><span><b>Disponible para retiro:</b> es el monto que se puede retirar operativamente. '+NOTA_DISP+'</span></p>'
-       +'<div class="jw-caja"><h5>Lo que ha ganado</h5><p>Desde el '+c.desde+' ha ganado <span class="jw-verde">'+pesos(c.gan)+'</span> en rendimientos'+(c.retirado?' y ya retiró <b>'+pesos(c.retirado)+'</b>.':' y no ha hecho retiros.')+'</p>'
-       +'<div class="jw-trio"><span>Rendimientos en el saldo<b>'+pesos(c.rendSaldo)+'</b></span><span>Capital retirado<b>'+pesos(c.capRet)+'</b></span><span>Rendimientos retirados<b>'+pesos(c.rendRet)+'</b></span></div></div>'
-       +(c.sc?'<p class="jw-nota jw-nota--alerta"><span><b>Aportes por certificar ('+pesos(c.sc)+'):</b> no se pueden retirar hasta que se certifiquen.</span></p>':'');
-    } else if(detTab==='portafolios'){
-      h='<p>Saldo <b>'+pesos(c.port.reduce((a,x)=>a+x[1],0))+'</b> · '+c.port.length+' portafolios</p>'
-       +(c.cerrados?'<p class="jw-nota"><span>Algunos portafolios de este contrato están cerrados y su valor puede reflejar valoración de mercado.</span></p>':'')
-       +'<table class="jw-tabla"><thead><tr><th scope="col">Portafolio</th><th scope="col">Saldo</th><th scope="col">Participación</th><th scope="col">Rentabilidad E.A.</th></tr></thead><tbody>'
-       +c.port.map(x=>'<tr><td>'+x[0]+'<span class="jw-sale">Sale del retiro</span></td><td>'+pesos(x[1])+'</td><td>'+x[2]+'</td><td>'+x[3]+'</td></tr>').join('')+'</tbody></table>';
-    } else if(detTab==='aportes'){
-      h='<p><b>Aportes del contrato '+c.num+'</b></p>'
-       +(c.perm?'<p class="jw-nota"><span>En capital más seguro, el 2,5 % de cada aporte se descuenta al aportar y se devuelve al cumplir 3 años de permanencia. Si se retira antes, no se devuelve: es lo que deja de recibir, no se descuenta de lo que recibe.</span></p>':'')
-       +'<div class="jw-apor">'+TIPOS.map(t=>'<div><span class="jw-cuad c-'+t[0]+'"></span><p><b>'+t[1]+'</b><br><span>'+t[2]+'</span></p><b class="v">'+pesos(c[t[0]])+'</b></div>').join('')+'</div>'
-       +(monto?'<p class="jw-nota"><span>Para que reciba '+pesos(k.R)+' saldrían '+pesos(k.ex)+' de exento, '+pesos(k.sr)+' de sin retención y '+pesos(k.cc)+' de con retención.</span></p>':'');
-    } else if(detTab==='credito'){
-      if(!monto){ h='<p class="jw-nota"><span>Escribe en «Entender» cuánto desea retirar para ver el crédito.</span></p>'; }
-      else {
-        const cr=cred();
-        h='<p><b>Así quedaría su crédito</b></p><p class="jw-nota"><span>Revísenlo juntos: lo que recibe, lo que pagaría y el respaldo en su fondo. Desde aquí todavía no se solicita.</span></p>'
-         +'<p>Puede pedir hasta <b>'+pesos(TOPE_CRED)+'</b> · a 360 días, sin cuotas</p>'
-         +'<div class="jw-pasos-calc"><div><span>Tipo de crédito</span><b>Crédito Impulso</b></div><div><span>Tasa <em>Para desembolso del 16 de nov de 2026</em></span><span>17,78 % E.A.</span></div><div><span>¿Cuánto pide?</span><span>'+pesos(cr.M)+'</span></div><div><span>Con el GMF (4 × 1.000), el crédito es de</span><span>'+pesos(cr.base)+'</span></div><div><span>Intereses a pagar al vencimiento <em>'+cr.d+' días</em></span><span>'+pesos(cr.int-Math.round(cr.M*0.004))+'</span></div><div class="tot"><span>Total a pagar al vencimiento · '+cr.vence+'</span><span>'+pesos(cr.total)+'</span></div></div>'
-         +'<p class="jw-ayuda">Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A.</p>'
-         +'<div class="jw-caja"><h5>Contratos que respaldarían su crédito</h5><p>Respaldo requerido <b>'+pesos(cr.resp)+'</b> (130 % de '+pesos(cr.base)+'). Este monto quedaría bloqueado para transacciones en los contratos que respaldan el crédito, mientras esté vigente. Su ahorro sigue invertido.</p>'
-         +'<table class="jw-tabla"><thead><tr><th scope="col">Contrato</th><th scope="col">Saldo a bloquear</th><th scope="col">Disponible para bloquear</th></tr></thead><tbody>'
-         +cr.bloq.map(x=>'<tr><td>'+x.c.nom+'<br><span class="jw-ayuda">'+x.c.prod+' · '+x.c.num+'</span></td><td>'+pesos(x.b)+'</td><td>'+pesos(x.disp)+'</td></tr>').join('')+'</tbody></table></div>'
-         +'<p class="jw-ayuda">Sin cuotas mensuales: los intereses se causan a diario y se pagan al vencimiento o cuando pague antes. Su ahorro sigue invertido y conserva el beneficio tributario.</p>';
-      }
-    } else {
-      if(!monto){ h='<p class="jw-nota"><span>Escribe en «Entender» cuánto desea retirar para ver el cálculo.</span></p>'; }
-      else {
-        const totP=c.port.reduce((a,x)=>a+x[1],0), totA=c.anios.reduce((a,x)=>a+x[1],0);
-        const anios=c.anios.map(a=>a[0]+' ('+pesos(a[1]*k.D/totA)+')'), ultimo=anios.pop();
-        h='<p><b>El retiro paso a paso</b> · Contrato '+c.num+'</p>'
-         +'<div class="jw-pasos-calc"><div><span>Recibe</span><b>'+pesos(k.R)+'</b></div><div><span>+ Retención contingente</span><span>'+pesos(k.rcA)+'</span></div><div><span>+ Retención sobre rendimientos (7 %)</span><span>'+pesos(k.rrA)+'</span></div><div><span>+ 4×1000<em>Estimado</em></span><span>'+pesos(k.g)+'</span></div><div class="tot"><span>= Se descuenta del contrato</span><span>'+pesos(k.D)+'</span></div></div>'
-         +(k.cubre?'':'<p class="jw-nota jw-nota--alerta"><span>Lo disponible no alcanza: faltan '+pesos(monto-k.R)+'.</span></p>')
-         +(c.perm?'<p class="jw-nota"><span>Cobro por permanencia (capital más seguro) '+pesos(c.perm*k.R/150000000)+' · estimado. En capital más seguro, el 2,5 % de cada aporte se descuenta al aportar y se devuelve al cumplir 3 años de permanencia. Si se retira antes, no se devuelve: es lo que deja de recibir, no se descuenta de lo que recibe.</span></p>':'')
-         +'<div class="jw-caja"><h5>De qué portafolios sale</h5><div class="jw-lista-calc">'+c.port.map(x=>'<div><span>'+x[0]+'</span><b>'+pesos(x[1]*k.D/totP)+'</b></div>').join('')+'</div></div>'
-         +'<div class="jw-caja"><h5>De qué aportes sale</h5><p>Exento '+pesos(k.ex)+' · Sin retención al retirar '+pesos(k.sr)+' · Con retención contingente '+pesos(k.cc)+'</p><p>Los '+pesos(k.D)+' salen de aportes de '+(anios.length?anios.join(', ')+' y ':'')+ultimo+'.</p></div>'
-         +'<p class="jw-ayuda">Lo que se retiene hoy es un anticipo: se descuenta del impuesto en la declaración de renta. 4×1000 sobre lo que recibe: supuesto de la práctica de las asesoras, por confirmar con operación.</p>';
-      }
-    }
-    detB.innerHTML=h; detB.scrollTop=0;
+  const RENT_PER=[['inicio','Desde el inicio',0],['12','12 meses',1.6],['6','6 meses',-1.1],['3','3 meses',0.7]]; // orden fijo (las claves numéricas de un objeto se reordenan)
+  function tabContrato(c,k){
+    const e=esp(), cerr=Math.max(0,c.saldo-c.sc-c.disp);
+    return '<p class="jw-det-tit"><b>'+c.nom+' · '+c.num+'</b><span>'+c.prod+'</span></p>'
+      +'<div class="jw-kpis"><div><small>Saldo</small><b>'+pesos(c.saldo)+'</b><span>en su contrato</span></div>'
+      +'<div><small>Disponible para retiro</small><b>'+pesos(c.disp)+'</b><button type="button" class="jw-link" data-ver-desglose aria-expanded="'+st.verCalc+'">'+(st.verCalc?'Ocultar cálculo':'Ver cómo se calcula')+'</button></div>'
+      +'<div><small>Retención contingente</small><b class="'+(e?'':'jw-naranja')+'">'+pesos(e?0:c.rcTodo)+'</b><span>'+(e?'No aplica: condición especial':'Si retirara todo hoy (estimado)')+'</span></div></div>'
+      +'<p class="jw-nota">'+IC.info+'<span><b>Disponible para retiro:</b> es el monto que se puede retirar operativamente. '+ADV_USTED+'</span></p>'
+      +'<div class="jw-caja"><h5>'+IC.sube+' Lo que ha ganado</h5><p>Desde el '+c.desde+' ha ganado <span class="jw-verde">'+pesos(c.gan)+'</span> en rendimientos'+(c.retirado?' y ya retiró <b>'+pesos(c.retirado)+'</b>.':' y no ha hecho retiros.')+'</p>'
+      +'<div class="jw-trio"><span>Rendimientos en el saldo<b>'+pesos(c.rendSaldo)+'</b></span><span>Capital retirado<b>'+pesos(c.capRet)+'</b></span><span>Rendimientos retirados<b>'+pesos(c.rendRet)+'</b></span></div></div>'
+      +(st.verCalc?'<div class="jw-caja jw-desglose"><div class="jw-lista-calc"><div><span>Saldo total</span><b>'+pesos(c.saldo)+'</b></div>'+(cerr>0.5?'<div title="Certificados a término y otros portafolios que no se pueden retirar hasta su vencimiento."><span>(-) Saldo en fondos cerrados</span><span>'+pesos(cerr)+'</span></div>':'')
+        +(c.sc?'<div><span>(-) Aportes sin certificar</span><span>'+pesos(c.sc)+'</span></div>':'')+'<div class="tot"><span>Saldo disponible para retiro</span><b class="jw-verde">'+pesos(c.disp)+'</b></div></div><p class="jw-ayuda">Retiro parcial, según Contigo</p></div>':'')
+      +(c.sc?'<p class="jw-nota jw-nota--alerta">'+IC.alerta+'<span><b>Aportes por certificar ('+pesos(c.sc)+')</b>: no se pueden retirar hasta que se certifiquen. Los aportes vigentes no traen el detalle de estos aportes.</span></p>':'');
   }
-  function abrirDet(id,tab){ detVolver=document.activeElement; detCt=id||'ahorro'; detTab=tab||'contrato'; detSel.value=detCt; pintarDet(); det.hidden=false; detVelo.hidden=false; det.querySelector('[data-det-x]').focus(); }
+  function tabPortafolios(c){
+    const tot=c.port.reduce((a,x)=>a+x[1],0), adj=RENT_PER.find(r=>r[0]===st.rentPer)[2];
+    return '<div class="jw-port-h"><p>Saldo <b>'+pesos(tot)+'</b> · '+c.port.length+' portafolios</p><span class="jw-seg" role="group" aria-label="Rentabilidad"><span class="jw-seg-t">Rentabilidad</span>'
+      +RENT_PER.map(([k,t])=>'<button type="button" data-rent="'+k+'" aria-pressed="'+(st.rentPer===k)+'">'+t+'</button>').join('')+'</span></div>'
+      +(c.cerrados?'<p class="jw-nota"><span>Algunos portafolios de este contrato están cerrados y su valor puede reflejar valoración de mercado.</span></p>':'')
+      +'<table class="jw-tabla"><thead><tr><th scope="col">Portafolio</th><th scope="col">Saldo</th><th scope="col">Participación</th><th scope="col">Rentabilidad E.A.</th></tr></thead><tbody>'
+      +c.port.map(x=>'<tr><td>'+x[0]+(st.monto>0?'<span class="jw-sale">Sale del retiro</span>':'')+'</td><td>'+pesos(x[1])+'</td><td>'+x[2]+'</td><td>'+(x[3]==null?'—':pct(x[3]+adj,2))+'</td></tr>').join('')+'</tbody></table>';
+  }
+  function aportesDe(c){ // un aporte ficticio por año, con el estado que corresponde a su antigüedad
+    return c.anios.map(([a,v])=>{ const est=a<=2016?'ex':c.cc>0?'cc':'sr', val=Math.round(v*.78); return {fecha:'15/03/'+a,valor:val,rend:v-val,saldo:v,est,cert:'Sí',tras:'No',rc:est==='cc'?Math.round(v*.04):0,cumple:a<=2016?'Sí':'No'}; });
+  }
+  function tabAportes(c,k){
+    let h='<p><b>Aportes del contrato '+c.num+'</b></p><span class="jw-seg" role="group" aria-label="Cómo ver los aportes">'+[['resumen','Resumen'],['tabla','Tabla']].map(([v,t])=>'<button type="button" data-apv="'+v+'" aria-pressed="'+(st.apVista===v)+'">'+t+'</button>').join('')+'</span>';
+    if(st.apVista==='resumen'){
+      const tot=c.ex+c.sr+c.cc+c.sc;
+      h+='<div class="jw-apor">'+TIPOS.filter(t=>c[t[0]]>0).map(t=>'<div><span class="jw-cuad c-'+t[0]+'"></span><p><b>'+t[1]+'</b> <span>· '+t[2]+'</span><span class="jw-barra jw-barra--sola"><i class="c-'+t[0]+'" style="width:'+(c[t[0]]/tot*100).toFixed(1)+'%"></i></span></p><b class="v">'+pesos(c[t[0]])+'</b></div>').join('')+'</div>';
+      if(st.monto>0){ const tr=[['exento',k.ex],['sin retención',k.sr],['con retención',k.cc]].filter(x=>x[1]>0.5).map(x=>pesos(x[1])+' de '+x[0]), ult=tr.pop(); h+='<p class="jw-nota"><span>Para recibir <b>'+pesos(k.R)+'</b> saldrían '+(tr.length?tr.join(', ')+' y ':'')+ult+'.</span></p>'; }
+    } else {
+      const ap=aportesDe(c), ET={ex:'Exento',sr:'Sin retención al retirar',cc:'Con retención contingente'};
+      h+='<div class="jw-tabla-acc"><button type="button" class="jw-link" data-ap-copiar>Copiar</button><button type="button" class="jw-link" data-ap-xls>'+IC.bajar+'Descargar Excel</button></div>'
+        +'<div class="jw-tabla-wrap"><table class="jw-tabla"><thead><tr>'+['Fecha','Valor','Rendimientos','Saldo','Estado','Certificado','Trasladado','Retención contingente','Cumple 10 años'].map(t=>'<th scope="col">'+t+'</th>').join('')+'</tr></thead><tbody>'
+        +'<tr class="tot"><td>'+ap.length+' aportes</td><td>'+pesos(ap.reduce((a,x)=>a+x.valor,0))+'</td><td>'+pesos(ap.reduce((a,x)=>a+x.rend,0))+'</td><td>'+pesos(ap.reduce((a,x)=>a+x.saldo,0))+'</td><td colspan="5"></td></tr>'
+        +ap.map(x=>'<tr class="grupo"><td colspan="9">'+x.fecha.slice(-4)+' · 1 aporte</td></tr><tr><td>'+x.fecha+'</td><td>'+pesos(x.valor)+'</td><td>'+pesos(x.rend)+'</td><td>'+pesos(x.saldo)+'</td><td>'+ET[x.est]+'</td><td>'+x.cert+'</td><td>'+x.tras+'</td><td>'+(x.rc?pesos(x.rc):'—')+'</td><td>'+x.cumple+'</td></tr>').join('')
+        +'</tbody></table></div>';
+    }
+    return h;
+  }
+  function tabCalculo(c,k){
+    if(!(st.monto>0)) return nodisp('Falta el monto que necesita','Complete «Entender»');
+    const e=esp(), totP=c.port.reduce((a,x)=>a+x[1],0), tr=[['Exento',k.ex],['Sin retención al retirar',k.sr],['Con retención contingente',k.cc]].filter(x=>x[1]>0.5);
+    return '<p class="jw-calc-h"><b>El retiro paso a paso</b><span>Contrato '+c.num+'</span></p>'
+      +'<div class="jw-pasos-calc"><div><span>Recibe</span><b>'+pesos(k.R)+'</b></div><div><span>+ Retención contingente</span><span>'+pesos(k.rcA)+'</span></div><div><span>+ Retención sobre rendimientos'+(e?'':' (7 %)')+'</span><span>'+pesos(k.rrA)+'</span></div><div><span>+ 4×1000<em>Estimado</em></span><span>'+pesos(k.g)+'</span></div><div class="tot"><span>= Se descuenta del contrato</span><span>'+pesos(k.D)+'</span></div></div>'
+      +(k.cubre?'':'<p class="jw-nota jw-nota--alerta"><span>Lo disponible no alcanza: faltan <b>'+pesos(st.monto-k.R)+'</b>.</span></p>')
+      +(c.perm?'<p class="jw-nota"><span>Cobro por permanencia (capital más seguro) <b>'+pesos(c.perm*k.R/150000000)+'</b> · estimado. En capital más seguro, el 2,5 % de cada aporte se descuenta al aportar y se devuelve al cumplir 3 años de permanencia. Si se retira antes, no se devuelve: es lo que deja de recibir, no se descuenta de lo que recibe.</span></p>':'')
+      +'<div class="jw-caja"><h5>De qué portafolios sale</h5><div class="jw-lista-calc">'+c.port.map(x=>'<div><span>'+x[0]+'</span><b>'+pesos(x[1]*k.D/totP)+'</b></div>').join('')+'</div></div>'
+      +'<div class="jw-caja"><h5>De qué aportes sale</h5><p>'+tr.map(x=>x[0]+' <b>'+pesos(x[1])+'</b>').join(' · ')+'</p><p>'+aniosTxt(c,k)+'</p></div>'
+      +'<p class="jw-ayuda">Lo que se retiene hoy es un anticipo: se descuenta del impuesto en la declaración de renta.</p>';
+  }
+  function crPanel(){ // el simulador del panel parte del crédito de la caja y se ajusta aquí
+    const base=cred(); if(!st.cr||st.cr.para!==st.monto) st.cr={para:st.monto,monto:base.M,fecha:iso(base.pago),abono:false,fAbono:iso(HOY),vAbono:Math.round(base.M/2/100000)*100000};
+    const M=st.cr.monto, cap=Math.floor(M*1.004), dias=Math.max(1,Math.round((deIso(st.cr.fecha)-HOY)/864e5));
+    let capF=cap, intA=0, bajo=0;
+    if(st.cr.abono){ const da=Math.max(0,Math.round((deIso(st.cr.fAbono)-HOY)/864e5)); intA=Math.round(cap*(Math.pow(1+TASA,da/365)-1)); bajo=Math.max(0,Math.min(cap,st.cr.vAbono-intA)); capF=cap-bajo;
+      const int2=Math.round(capF*(Math.pow(1+TASA,(dias-da)/365)-1)); return {M,cap,dias,int:int2,total:capF+int2,intA,bajo,resp:Math.floor(cap*1.3)}; }
+    const int=Math.round(cap*(Math.pow(1+TASA,dias/365)-1)); return {M,cap,dias,int,total:Math.floor(cap+int),intA,bajo,resp:Math.floor(cap*1.3)};
+  }
+  function tabCredito(){
+    let h='<h4 class="jw-cr-t">Así quedaría su crédito</h4><p class="jw-cr-sub">Revísenlo juntos: lo que recibe, lo que pagaría y el respaldo en su fondo. Desde Planeación Pro todavía no se solicita: muy pronto se podrá hacer desde aquí.</p>';
+    if(!(st.monto>0)||st.motivo==='vivienda') return h;
+    const s=crPanel(), venc=masDias(360), pago=deIso(st.cr.fecha), alVenc=iso(pago)===iso(venc), ro=RO();
+    let falta=s.resp; const bloq=RESPALDO.map(([id,disp])=>{ const b=Math.min(falta,disp); falta-=b; return {c:CT.find(x=>x.id===id),b,disp}; });
+    h+='<p class="jw-cr-tope">Puede pedir hasta <b>'+pesos(TOPE_CRED)+'</b> · a 360 días, sin cuotas</p>'
+      +'<h3 class="jw-cr-h">Resumen del crédito</h3><div class="jw-cr-marco"><div class="jw-cr-datos">'
+      +'<div><span>Tipo de crédito:</span><b>Crédito Impulso</b><small>Otorgado por el Fondo de Capital Privado Skandia Alternativo - Crédito Impulso administrado por Skandia Fiduciaria S.A.</small></div>'
+      +'<div class="tasa"><span>Tasa:</span><b>'+TASA_TXT+'</b><small>Para desembolso del '+fLarga(HOY)+'</small></div>'
+      +'<div><span>¿Cuánto pide?:</span><b>'+pesos(s.M)+'</b><small>Con el GMF (4 × 1.000), el crédito es de '+pesos(s.cap)+'</small></div>'
+      +'<div><span>'+(alVenc?'Intereses a pagar al vencimiento:':'Intereses a pagar el '+fLarga(pago)+':')+'</span><b>'+pesos(s.int)+'</b><small>'+s.dias+' días</small></div></div>'
+      +'<div class="jw-cr-franja"><span>'+(alVenc?'Total a pagar al vencimiento':'Total a pagar el '+fLarga(pago))+'</span><b>'+pesos(s.total)+'</b></div></div>'
+      +'<h3 class="jw-cr-h">Ajústenlo en la conversación</h3><div class="jw-cr-marco">'
+      +'<label class="jw-cr-monto"><span>Monto que pide <b>'+pesos(s.M)+'</b></span><input type="range" min="'+Math.min(1000000,TOPE_CRED)+'" max="'+TOPE_CRED+'" step="500000" value="'+s.M+'" data-cr-monto'+(ro?' disabled':'')+'></label>'
+      +'<div class="jw-cr-cols"><label class="jw-a5-campo"><span>'+IC.cal+' Fecha en que lo paga</span><input type="date" min="'+iso(HOY)+'" max="'+iso(venc)+'" value="'+st.cr.fecha+'" data-cr-fecha'+(ro?' disabled':'')+'><small class="jw-ayuda">Vence el '+fLarga(venc)+'</small></label>'
+      +'<div class="jw-cr-abono"><label class="jw-check"><input type="checkbox" role="switch" data-cr-abono'+(st.cr.abono?' checked':'')+(ro?' disabled':'')+'> Abono parcial antes de pagar</label>'
+      +(st.cr.abono?'<label class="jw-a5-campo"><span>Fecha del abono</span><input type="date" min="'+iso(HOY)+'" max="'+st.cr.fecha+'" value="'+st.cr.fAbono+'" data-cr-fabono'+(ro?' disabled':'')+'></label><label class="jw-a5-campo"><span>Monto del abono</span><input type="number" step="100000" min="0" value="'+st.cr.vAbono+'" data-cr-vabono'+(ro?' disabled':'')+'></label>':'')+'</div></div>'
+      +(st.cr.abono?'<p class="jw-ayuda">El abono del '+fLarga(deIso(st.cr.fAbono))+' cubre primero '+pesos(s.intA)+' de intereses causados y baja el capital en '+pesos(s.bajo)+'.</p>':'')+'</div>'
+      +'<h3 class="jw-cr-h">Contratos que respaldarían su crédito</h3><div class="jw-cr-marco">'
+      +'<div class="jw-cr-franja"><span>Respaldo requerido <small>(130 % de '+pesos(s.cap)+')</small></span><b>'+pesos(s.resp)+'</b></div>'
+      +'<p class="jw-ayuda">Este monto quedaría bloqueado para transacciones en los contratos que respaldan el crédito, mientras esté vigente. Su ahorro sigue invertido.</p>'
+      +'<p class="jw-cr-sug">'+IC.escudo+'<span><b>Contratos sugeridos</b><br>Producto de respaldo: Fondo Voluntario de Pensión Skandia Multifund*</span></p>'
+      +bloq.map(x=>'<div class="jw-cr-ct"><div><b>'+x.c.nom+'</b><small>'+x.c.prod+' · Contrato: '+x.c.num+'</small></div><dl><div><dt>Saldo a bloquear</dt><dd>'+pesos(x.b)+'</dd></div><div><dt>** Disponible para bloquear</dt><dd>'+pesos(x.disp)+'</dd></div><div><dt>Saldo del contrato</dt><dd>'+pesos(x.c.saldo)+'</dd></div></dl></div>').join('')
+      +(falta>0?'<p class="jw-nota jw-nota--alerta">'+IC.alerta+'<span>El disponible para bloquear no alcanza: faltan '+pesos(falta)+' de respaldo. Baje el monto del crédito.</span></p>':'')
+      +'<a class="jw-link" href="https://www.skandia.co/creditos/admisibilidad-de-portafolios" target="_blank" rel="noopener noreferrer">Consulta aquí los portafolios admitidos para usar como respaldo '+IC.ext+'</a>'
+      +'<p class="jw-ayuda">* Administrado por: Skandia AFP - ACCAI S.A.</p><p class="jw-ayuda">** Corresponde al saldo del contrato menos cuenta contingente, retención sobre rendimientos, otras garantías de créditos, portafolios no admitidos, aportes en canje y retiros pendientes de aprobación.</p></div>'
+      +'<p class="jw-nota">'+IC.info+'<span>Sin cuotas mensuales: los intereses se causan a diario y se pagan al vencimiento o cuando pague antes. Al vencimiento se puede renovar pagando los intereses causados ('+pesos(Math.floor(s.cap*(Math.pow(1+TASA,360/365)-1)))+' si no hace abonos). Su ahorro sigue invertido y conserva el beneficio tributario.</span></p>';
+    return h;
+  }
+  function tabImpuestos(){
+    const v=cajas(), k=prefEsRetiro()?retiroPref():v.k, ro=RO(), im=impuesto(k), I=st.imp, ret=prefEsRetiro()&&st.pref!=='retiro'?'retiro total':'retiro por '+pesos(st.monto);
+    let h='<section class="jw-imp" id="detalle-impuestos"><div class="jw-caja"><h3 class="jw-imp-t">'+IC.balanza+'Posible impuesto en la declaración</h3>'
+      +(I.metodo==='preguntas'?'<p class="jw-ayuda">Con estas respuestas se calcula el posible impuesto en la declaración, en lugar del IBC: si usted o su contador usaron los aportes como renta exenta y si no los usaron.</p>':'')
+      +'<span class="jw-seg" role="group" aria-label="Cómo estimar el posible impuesto">'+[['preguntas','Calcular con preguntas'],['tarifa','Ingresar la tarifa del cliente']].map(([m,t])=>'<button type="button" data-imp-m="'+m+'" aria-pressed="'+(I.metodo===m)+'"'+(ro?' disabled':'')+'>'+t+'</button>').join('')+'</span><div class="jw-imp-cuerpo">';
+    if(!(st.monto>0)) return h+'<p class="jw-ayuda">Registre en «Entender» cuánto necesita el cliente para estimar el posible impuesto.</p></div></div></section>';
+    if(I.metodo==='tarifa'){
+      const ok=tarifaOk()||I.tarifa==='';
+      h+='<label class="jw-imp-tarifa"><span>Tarifa marginal de renta</span><span class="jw-campo jw-campo--pct'+(ok?'':' mal')+'"><input inputmode="decimal" aria-label="Tarifa marginal de renta del cliente" value="'+I.tarifa+'" data-imp-tarifa'+(ro?' disabled':'')+'>%</span></label>'
+        +'<p class="jw-ayuda">'+(ok?'Tarifa marginal de renta del cliente. La retención de hoy (7% o contingente) es un anticipo de este impuesto.':'Ingrese una tarifa entre 0% y 39%.')+'</p>';
+      if(esp()) h+='<p class="jw-ayuda">Con la condición especial, el retiro no causa impuesto.</p>';
+      else if(tarifaOk()) h+='<dl class="jw-imp-lista">'+(k.noEx>0.5?fila('Si usted o su contador no usaron los aportes como renta exenta',pesos(im.no))+fila('Si usted o su contador sí usaron los aportes como renta exenta',pesos(im.si)):fila('Posible impuesto en la declaración',pesos(im.no)))
+        +fila('Se retiene hoy<small>anticipo que se descuenta de este impuesto</small>',pesos(k.rcA+k.rrA))+'</dl><p class="jw-ayuda">Estimado con la tarifa de '+tarifaTxt()+'% ingresada por el asesor.</p>';
+    } else {
+      const P=[
+        ['Ingreso laboral mensual','¿Cuánto recibe al mes por su trabajo, más o menos?',()=>pesos(I.ingreso)],
+        ['Beneficios al tope','¿Ya usa sus beneficios tributarios al tope (pensión voluntaria, AFC)?',()=>({si:'Sí, al tope',no:'No',nosabe:'No sabe'})[I.benef]],
+        ['Otros ingresos de capital','¿Tiene otros ingresos de capital este año (arriendos, intereses, dividendos)?',()=>I.otros?pesos(I.otros):'No tiene o no sabe'],
+        ['Dependientes','¿Tiene personas a cargo (dependientes)?',()=>I.dep==='si'?'Sí':'No']];
+      P.forEach(([et,pr,val],i)=>{
+        const n=i+1;
+        if(n<I.paso) h+='<p class="jw-hecho jw-hecho--imp"><span>'+et+': <b>'+val()+'</b></span>'+(ro?'':'<button type="button" class="jw-link" data-imp-cambiar="'+n+'">'+IC.lapiz+'Cambiar</button>')+'</p>';
+        else if(n===I.paso&&!ro){
+          h+='<div class="jw-q"><p class="jw-qt">'+pr+'</p>';
+          if(n===1) h+='<div class="jw-fila"><span class="jw-campo"><span aria-hidden="true">$</span><input inputmode="numeric" placeholder="Ingreso mensual en pesos" value="'+(I.ingreso?I.ingreso.toLocaleString('es-CO'):'')+'" data-imp-ingreso></span><button type="button" class="jw-btn" data-imp-sig="1"'+(I.ingreso?'':' disabled')+'>Continuar</button></div><p class="jw-ayuda">Prellenado con el IBC de su última cotización en Skandia. Verifícalo con el cliente.</p>';
+          if(n===2) h+='<div class="jw-imp-ops">'+[['si','Sí, al tope','Ya llena el límite: el retiro entra completo a la base'],['no','No','No aporta a pensión voluntaria ni AFC'],['nosabe','No sabe','Calculamos los dos casos y mostramos el rango']].map(([v,t,d])=>'<button type="button" class="jw-op" data-imp-benef="'+v+'"><b>'+t+'</b><span>'+d+'</span></button>').join('')+'</div>';
+          if(n===3) h+='<div class="jw-fila"><span class="jw-campo"><span aria-hidden="true">$</span><input inputmode="numeric" placeholder="Total del año, aproximado" value="'+(I.otrosTmp?I.otrosTmp.toLocaleString('es-CO'):'')+'" data-imp-otros></span><button type="button" class="jw-btn" data-imp-sig="3"'+(I.otrosTmp?'':' disabled')+'>Continuar</button><button type="button" class="jw-btn jw-btn--sec" data-imp-sinotros>No tiene o no sabe</button></div>';
+          if(n===4) h+='<div class="jw-chips">'+[['si','Sí'],['no','No']].map(([v,t])=>'<button type="button" data-imp-dep="'+v+'">'+t+'</button>').join('')+'</div>';
+          h+='</div>';
+        }
+      });
+      if(preguntasOk()){
+        const dos=[['Si usted o su contador no usaron los aportes como renta exenta',im.no,'no','Impuesto sobre los rendimientos'],['Si usted o su contador sí usaron los aportes como renta exenta',im.si,'si','']].sort((a,b)=>a[1]-b[1]);
+        h+='<div class="jw-imp-res"><p>Posible impuesto en la declaración por el '+ret+' (estimado): <b>'+(esp()?pesos(0):st.rx==='si'||st.rx==='no'?pesos(st.rx==='si'?im.si:im.no):im.no===im.si?pesos(im.no):pesos(Math.min(im.no,im.si))+' a '+pesos(Math.max(im.no,im.si)))+'</b></p>'
+          +(st.rx==='si'||st.rx==='no'?'<p class="jw-ayuda">Con la respuesta: si usted o su contador '+(st.rx==='si'?'sí':'no')+' usaron los aportes como renta exenta'+(st.rx==='no'?' · impuesto sobre los rendimientos':'')+'.</p>':'')
+          +'<dl class="jw-imp-lista">'+dos.map(([t,x,id,et])=>'<div class="'+(st.rx&&st.rx!=='nosabe'&&st.rx!==id?'atenuado':st.rx===id?'elegido':'')+'"><dt>'+t+(et?'<small>'+et+'</small>':'')+'</dt><dd>'+pesos(x)+'</dd></div>').join('')+'</dl>'
+          +'<p class="jw-ayuda">Se descuentan '+pesos(k.D)+' del contrato y recibe '+pesos(k.R)+'. Se retiene hoy: '+pesos(k.rcA+k.rrA)+'. Es un anticipo: se descuenta del impuesto en la declaración de renta.'+(k.noEx>0.5?' Salen sin cumplir requisitos '+pesos(k.srCap)+' de capital y '+pesos(k.srRend)+' de rendimientos.':' Todo lo que sale ya cumplió requisitos.')+'</p>'
+          +'<p class="jw-ayuda jw-chico">UVT de $52.374 · año gravable 2026. Si usted o su contador usaron los aportes como renta exenta, el capital que sale sin cumplir requisitos se declara como ingreso, sin rentas exentas adicionales. Si no los usaron, se declaran sus rendimientos como renta de capital.</p></div>';
+      }
+      h+='<p class="jw-nota">'+IC.info+'<span>Estimación orientativa. No reemplaza la declaración de renta ni la revisión que hagan el cliente o su contador.</span></p>';
+    }
+    h+='</div></div>';
+    if(!(I.metodo==='tarifa')&&!esp()){
+      const sin=41870000;
+      h+='<div class="jw-caja"><dl class="jw-imp-lista">'+fila('Impuesto del año sin retirar',pesos(sin))+fila('Impuesto del año si retira',im.txt.startsWith('hasta')?'hasta '+pesos(sin+im.max):im.min===im.max?pesos(sin+im.max):pesos(sin+im.min)+' a '+pesos(sin+im.max))
+        +fila('Diferencia: posible impuesto en la declaración',im.txt,'tot verde')+'</dl><p class="jw-ayuda">Año gravable 2026 · '+(preguntasOk()?'estimado con sus respuestas':'estimado con el IBC')+'</p></div>';
+    }
+    return h+'</section>';
+  }
+  function pintarDet(){
+    const c=CT.find(x=>x.id===detCt), kk=retiro(c);
+    tabs.forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===detTab)));
+    detB.innerHTML=detTab==='contrato'?tabContrato(c,kk):detTab==='portafolios'?tabPortafolios(c):detTab==='aportes'?tabAportes(c,kk):detTab==='calculo'?tabCalculo(c,kk):detTab==='credito'?tabCredito():tabImpuestos();
+    detB.scrollTop=0;
+  }
+  function abrirDet(id,tab){ detVolver=document.activeElement; detCt=id||ctId(); detTab=tab||'contrato'; detSel.value=detCt; pintarDet(); det.hidden=false; detVelo.hidden=false; det.querySelector('[data-det-x]').focus(); }
   function cerrarDet(){ det.hidden=true; detVelo.hidden=true; if(detVolver&&detVolver.isConnected) detVolver.focus(); }
   detSel.addEventListener('change',()=>{ detCt=detSel.value; pintarDet(); });
   tabs.forEach(t=>t.addEventListener('click',()=>{ detTab=t.dataset.tab; pintarDet(); }));
   det.querySelector('.jw-det-tabs').addEventListener('keydown',e=>{ const i=tabs.findIndex(t=>t.dataset.tab===detTab); if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ const n=(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length; detTab=tabs[n].dataset.tab; pintarDet(); tabs[n].focus(); } });
-  detB.addEventListener('click',e=>{ const b=e.target.closest('[data-ir-tab]'); if(b){ detTab=b.dataset.irTab; pintarDet(); } });
+  const repintar=()=>{ const y=detB.scrollTop; pintarDet(); detB.scrollTop=y; if(!velo.hidden) pintarTodo(); };
+  detB.addEventListener('click',e=>{
+    const t=e.target;
+    if(t.closest('[data-ver-desglose]')){ st.verCalc=!st.verCalc; repintar(); return; }
+    const r=t.closest('[data-rent]'); if(r){ st.rentPer=r.dataset.rent; repintar(); return; }
+    const a=t.closest('[data-apv]'); if(a){ st.apVista=a.dataset.apv; repintar(); return; }
+    if(t.closest('[data-ap-copiar]')){ const b=t.closest('[data-ap-copiar]'); b.textContent='Copiado'; setTimeout(()=>b.textContent='Copiar',2000); return; }
+    if(t.closest('[data-ap-xls]')){ toast('info','Descarga simulada','En el prototipo no se genera el Excel de aportes.'); return; }
+    if(RO()) return;
+    const m=t.closest('[data-imp-m]'); if(m){ st.imp.metodo=m.dataset.impM; repintar(); return; }
+    const ca=t.closest('[data-imp-cambiar]'); if(ca){ st.imp.paso=+ca.dataset.impCambiar; repintar(); return; }
+    const sg=t.closest('[data-imp-sig]'); if(sg&&!sg.disabled){ if(sg.dataset.impSig==='3') st.imp.otros=st.imp.otrosTmp; st.imp.paso=+sg.dataset.impSig+1; repintar(); return; }
+    if(t.closest('[data-imp-sinotros]')){ st.imp.otros=null; st.imp.otrosTmp=0; st.imp.paso=4; repintar(); return; }
+    const bf=t.closest('[data-imp-benef]'); if(bf){ st.imp.benef=bf.dataset.impBenef; st.imp.paso=3; repintar(); return; }
+    const dp=t.closest('[data-imp-dep]'); if(dp){ st.imp.dep=dp.dataset.impDep; st.imp.paso=5; repintar(); return; }
+  });
+  detB.addEventListener('input',e=>{
+    const t=e.target, num=()=>+t.value.replace(/\D/g,'');
+    if(t.matches('[data-imp-ingreso]')){ st.imp.ingreso=num(); t.value=st.imp.ingreso?st.imp.ingreso.toLocaleString('es-CO'):''; const b=detB.querySelector('[data-imp-sig="1"]'); if(b) b.disabled=!st.imp.ingreso; }
+    if(t.matches('[data-imp-otros]')){ st.imp.otrosTmp=num(); t.value=st.imp.otrosTmp?st.imp.otrosTmp.toLocaleString('es-CO'):''; const b=detB.querySelector('[data-imp-sig="3"]'); if(b) b.disabled=!st.imp.otrosTmp; }
+    if(t.matches('[data-imp-tarifa]')){ st.imp.tarifa=t.value.replace(/[^\d.,]/g,''); if(!velo.hidden) pintarTodo(); }
+    if(t.matches('[data-cr-monto]')){ st.cr.monto=+t.value; const b=t.closest('label').querySelector('b'); if(b) b.textContent=pesos(st.cr.monto); }
+  });
+  detB.addEventListener('change',e=>{
+    const t=e.target;
+    if(t.matches('[data-cr-monto]')){ st.cr.monto=+t.value; repintar(); const s=detB.querySelector('[data-cr-monto]'); if(s) s.focus(); return; }
+    if(t.matches('[data-imp-tarifa]')){ repintar(); return; }
+    if(t.matches('[data-cr-fecha]')&&t.value){ st.cr.fecha=t.value; repintar(); }
+    if(t.matches('[data-cr-abono]')){ st.cr.abono=t.checked; repintar(); }
+    if(t.matches('[data-cr-fabono]')&&t.value){ st.cr.fAbono=t.value; repintar(); }
+    if(t.matches('[data-cr-vabono]')){ st.cr.vAbono=Math.max(0,+t.value||0); repintar(); }
+  });
   det.querySelector('[data-det-x]').addEventListener('click',cerrarDet);
   detVelo.addEventListener('click',cerrarDet);
   det.addEventListener('keydown',e=>{ if(e.key==='Escape'){ e.stopPropagation(); cerrarDet(); } });
-  // ---- Abrir / cerrar (loading de SAMI ≈2,6 s) ----
-  function abrir(){
-    if(!velo.hidden || !carga.hidden) return;
-    if(!Object.keys(st).length && !lista.children.length) reiniciar();
+
+  // ---- Abrir y cerrar (carga de SAMI ≈2,6 s) ----
+  let timers=[];
+  function prepararDom(){ // los controles fijos vuelven a su estado antes de pintar otra conversación
+    qa('.jw-etapas button,.jw-etapas input,.jw-etapas textarea,.jw-etapas select').forEach(el=>{ el.disabled=false; });
+    vis('[data-fecha]',false); det.hidden=true; detVelo.hidden=true; toasts.innerHTML=''; st.eligeFecha=false;
+    okFecha.disabled=true; q('[data-resc]').open=false;
+  }
+  function abrir(cv){
+    if(!velo.hidden||!carga.hidden) return;
+    activa=cv; st=cv.st; prepararDom(); irEtapa(st.etapa);
+    if(cv.estado!=='finalizada'&&!st.cerrado) { cv.actualizada=true; sincronizarFicha(); }
     pasosCarga.forEach(li=>li.classList.remove('on','va')); carga.classList.remove('corre');
     carga.hidden=false; void carga.offsetWidth; carga.classList.add('corre');
     const t=corto?[0,150,300,450]:[100,800,1500,2600];
@@ -3883,11 +4324,14 @@ document.addEventListener('DOMContentLoaded',()=>{
       setTimeout(()=>{pasosCarga[0].classList.replace('va','on'); pasosCarga[1].classList.add('va');},t[1]),
       setTimeout(()=>{pasosCarga[1].classList.replace('va','on'); pasosCarga[2].classList.add('va');},t[2]),
       setTimeout(()=>{pasosCarga[2].classList.replace('va','on');},t[3]-300),
-      setTimeout(()=>{carga.hidden=true; claro(true); encajar(); velo.hidden=false; document.body.style.overflow='hidden'; velo.querySelector('[data-jm-salir]').focus();},t[3])
+      setTimeout(()=>{carga.hidden=true; document.body.classList.add('jw-abierto'); encajar(); velo.hidden=false; document.body.style.overflow='hidden'; abiertaDesde=Date.now(); velo.querySelector('[data-jm-salir]').focus();},t[3])
     ];
   }
-  function cerrar(){ claro(false); timers.forEach(clearTimeout); carga.hidden=true; velo.hidden=true; document.body.style.overflow=''; progreso(); }
-  // El journey se ubica debajo del header y a la derecha del menú lateral
+  function cerrar(){
+    if(abiertaDesde){ st.segundos+=Math.round((Date.now()-abiertaDesde)/1000); abiertaDesde=0; }
+    if(document.activeElement===inp) guardarMonto();
+    document.body.classList.remove('jw-abierto'); timers.forEach(clearTimeout); carga.hidden=true; velo.hidden=true; document.body.style.overflow=''; sincronizarFicha();
+  }
   function encajar(){
     const h=document.querySelector('.wrap > header'), sd=document.querySelector('.side');
     const top=h?Math.max(0,Math.round(h.getBoundingClientRect().bottom)):0;
@@ -3895,23 +4339,51 @@ document.addEventListener('DOMContentLoaded',()=>{
     velo.style.setProperty('--jw-top',top+'px'); velo.style.setProperty('--jw-left',left+'px');
   }
   addEventListener('resize',()=>{ if(!velo.hidden) encajar(); });
-  // Mientras el journey está abierto, el entorno (header y menú) vuelve al modo claro de Portal Contigo
-  let eraMision=false;
-  function claro(on){ /* el journey conserva el modo oscuro de Planeación Pro; la ficha se oculta detrás para que no se trasluzca bajo el header */ document.body.classList.toggle('jw-abierto',!!on); }
-  window.ncJourney={abrir,cerrar,reiniciar};
-  document.querySelectorAll('.cop-mis .mis-btn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation(); abrir();}));
-  document.querySelectorAll('.cop-mis .mis').forEach(c=>c.addEventListener('click',abrir));
   velo.querySelector('[data-jm-salir]').addEventListener('click',cerrar);
   velo.addEventListener('click',e=>{ if(e.target===velo) cerrar(); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !velo.hidden && det.hidden) cerrar(); });
-  function progreso(){
-    const tarjeta=document.querySelector('.cop-mis .mis'); if(!tarjeta) return;
-    if(!hechas.size && !Object.keys(st).length) return;
-    let est=tarjeta.querySelector('.mis-estado');
-    if(!est){ est=document.createElement('span'); est.className='mis-estado'; tarjeta.querySelector('.mis-cat').after(est); }
-    est.textContent = completada ? '✓ Misión completada' : 'En curso · '+hechas.size+' de 5 etapas';
-    tarjeta.querySelector('.mis-btn').textContent = completada ? 'Ver acompañamiento' : 'Retomar acompañamiento';
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!velo.hidden&&det.hidden) cerrar(); });
+
+  // ---- La pestaña de la ficha: misión, «n de 1 completada», catálogo e historial (como en Angular) ----
+  // Conversación anterior del historial (28/10/2026, ya finalizada): se abre en solo lectura
+  const ANTERIOR={origen:'historial',estado:'finalizada',creada:new Date(2026,9,28),st:Object.assign(nuevo(),{etapa:4,visitadas:[1,2,3,4],monto:150000000,motivo:'liquidez',cuando:'este-mes',fecha:'2026-10-31',ctMarc:'ahorro',ctConf:'ahorro',
+    pref:'retiro',rx:'no',dec:'retiro',tram:'portal',np:{resumen:true,seguimiento:false},cerrado:true,estado:'finalizada',resultado:'Retiro parcial',segHasta:'2026-11-27',segundos:720})};
+  const card=document.querySelector('.cop-mis .mis'), vacia=document.querySelector('[data-mis-vacia]'), catRetiro=document.querySelector('[data-jy-retiro]'), histEl=document.querySelector('[data-hist]');
+  const TONO={'en-curso':['En curso','abierto'],propuesta:['Propuesto','abierto'],'cerrada-seguimiento':['En seguimiento','seguimiento'],finalizada:['Completado','completado']};
+  const estadoDe=cv=>cv.estado==='finalizada'?'finalizada':cv.st.cerrado?'cerrada-seguimiento':'en-curso';
+  function filaHist(cv,i){
+    const [et,tono]=TONO[estadoDe(cv)], min=cv.st.segundos>0?Math.max(1,Math.round(cv.st.segundos/60)):0, f=cv.creada;
+    return '<button type="button" class="cop-hist" data-hist-i="'+i+'"><div><span class="jy-t">Acompañamiento en el retiro</span><span class="jy-d">Conversación del '+String(f.getDate()).padStart(2,'0')+'/'+String(f.getMonth()+1).padStart(2,'0')+'/'+f.getFullYear()+(min?' · '+min+' min':'')+'</span></div><span class="cop-estado cop-estado--'+tono+'">'+et+'</span></button>';
   }
+  function sincronizarFicha(){
+    const mision=CONVS.find(cv=>cv.origen==='mision'), gestionada=!!(mision&&mision.st.cerrado), descartada=card&&card.dataset.descartada==='1';
+    if(card){
+      card.hidden=gestionada||descartada;
+      let est=card.querySelector('.mis-estado'); const enCurso=mision&&!gestionada;
+      if(enCurso){ if(!est){ est=document.createElement('p'); est.className='mis-estado'; card.querySelector('.mis-cat').after(est); } est.textContent='En curso · '+con(mision.st,()=>[1,2,3,4].filter(completa).length)+' de 4 etapas'; }
+      else if(est) est.remove();
+      card.classList.toggle('mis--curso',!!enCurso);
+      card.querySelector('.mis-btn').textContent=enCurso?'Continuar conversación':'Iniciar conversación';
+    }
+    if(vacia) vacia.hidden=!gestionada;
+    if(catRetiro) catRetiro.hidden=!(gestionada||descartada);
+    const hs=document.querySelector('[data-hud-senal]'); if(hs) hs.hidden=gestionada;
+    const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']; // fechaCorta de la pestaña en Angular
+    const hu=document.querySelector('[data-hud-ultima]'); if(hu) hu.textContent=CONVS.length?HOY.getDate()+' '+MESES[HOY.getMonth()]:'28 oct';
+    const hechas=gestionada?1:0, b=document.querySelector('[data-prog-barra]');
+    if(b){ b.style.width=(hechas*100)+'%'; document.querySelector('[data-prog-hechas]').textContent=hechas; }
+    // Historial: abiertas primero, luego en seguimiento y al final las cerradas
+    const peso={'en-curso':0,'cerrada-seguimiento':1,finalizada:2}, todas=CONVS.concat([ANTERIOR]);
+    const orden=todas.map((cv,i)=>({cv,i})).sort((a,b)=>peso[estadoDe(a.cv)]-peso[estadoDe(b.cv)]);
+    if(histEl) histEl.innerHTML=orden.map(x=>filaHist(x.cv,x.i)).join('');
+  }
+  function abrirMision(){ let cv=CONVS.find(x=>x.origen==='mision'); if(!cv){ cv={origen:'mision',estado:'en-curso',creada:HOY,st:nuevo()}; CONVS.unshift(cv); } abrir(cv); }
+  if(card){ card.querySelector('.mis-btn').addEventListener('click',e=>{ e.stopPropagation(); abrirMision(); }); card.addEventListener('click',abrirMision); }
+  if(catRetiro) catRetiro.addEventListener('click',()=>{ let cv=CONVS.find(x=>x.origen==='catalogo'&&!x.st.cerrado); if(!cv){ cv={origen:'catalogo',estado:'en-curso',creada:HOY,st:nuevo()}; CONVS.unshift(cv); } abrir(cv); });
+  if(histEl) histEl.addEventListener('click',e=>{ const b=e.target.closest('[data-hist-i]'); if(!b) return; const todas=CONVS.concat([ANTERIOR]); abrir(todas[+b.dataset.histI]); });
+  document.addEventListener('pp-descartada',e=>{ if(e.detail.id==='oscar'&&card){ card.dataset.descartada='1'; sincronizarFicha(); } });
+  document.addEventListener('pp-restaurada',e=>{ if(e.detail.id==='oscar'&&card){ card.dataset.descartada=''; sincronizarFicha(); } });
+  sincronizarFicha();
+  window.ncJourney={abrir:abrirMision,cerrar};
 });
 </script>
 <script>
