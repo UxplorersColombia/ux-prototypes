@@ -178,7 +178,7 @@
 
   /* ===== Ficha del producto (Potencializar mi inversión) ===== */
   /* Paleta de gráficas del DS (Tokens/semantic-color.css → primitive-color.css) */
-  :root{--charts-c01:#a1dd70;--charts-c02:#a4d7e1;--charts-c03:#60a9a6;--charts-c04:#ff9460;--charts-c05:#8ba2c1}
+  :root{--charts-c01:#a1dd70;--charts-c02:#a4d7e1;--charts-c03:#60a9a6;--charts-c04:#ff9460;--charts-c05:#8ba2c1;--charts-c06:#d98bc0}
   .prod-abrir{border:0;background:none;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
   /* Hover del producto: toda la fila es clicable */
   .prod.prod-click{cursor:pointer;margin-left:16px;padding:14px 12px 12px 10px;border-radius:0 8px 8px 0;transition:background-color .15s}
@@ -239,6 +239,33 @@
   .pf-tab:not(.on):hover svg{stroke:var(--green)}
   .pf-tab.on{background:var(--Primary-Green-N00,#00C73D);color:#fff;box-shadow:0 0 4px 0 rgba(61,75,92,.15)}
   .pf-tab.on svg{stroke:#fff}
+  /* Globo de novedad sobre el tab Composición y saldos: sutil, se apaga al usar la función o al cerrarlo */
+  .pf-tabs-w{position:relative}
+  .pf-globo{position:absolute;z-index:5;display:flex;align-items:center;gap:2px;padding:0 2px 0 0;border-radius:8px;background:var(--texts-dark,#404040);color:#fff;font-family:'Open Sans',sans-serif;font-size:12px;line-height:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.18);animation:pfGlobo .35s ease-out both}
+  .pf-globo::after{content:"";position:absolute;top:100%;left:var(--pf-globo-x,50%);transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--texts-dark,#404040)}
+  .pf-globo[hidden]{display:none}
+  .pf-globo-ir{display:flex;align-items:center;gap:4px;min-height:28px;padding:4px 4px 4px 10px;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer}
+  .pf-globo-ico{flex:none;margin-right:2px;color:var(--icon-brand,#00C73D)}
+  .pf-globo-ir b{font-weight:700;color:var(--icon-brand,#00C73D)}
+  .pf-globo-x{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer}
+  .pf-globo-x:hover,.pf-globo-ir:hover b{text-decoration:underline}
+  .pf-globo-x:hover{text-decoration:none;background:rgba(255,255,255,.12)}
+  .pf-globo-ir:focus-visible,.pf-globo-x:focus-visible{outline:2px solid #fff;outline-offset:1px;border-radius:6px}
+  @keyframes pfGlobo{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.pf-globo{animation:none}}
+  body.m-pf-sec .pf-globo{display:none!important}
+  .pf-tab-col,.pf-tab-l1{display:contents}
+  .pf-tab-tag,.pf-tab-sub{display:none}
+  @media (max-width:600px){
+    .pf-globo{display:none!important}
+    .pf-tab.pf-tab-con-nov,body.vista-producto .pf-tab.pf-tab-con-nov{height:auto;min-height:72px;padding-top:12px;padding-bottom:12px}
+    .pf-tab-con-nov .pf-tab-col{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;text-align:left}
+    .pf-tab-con-nov .pf-tab-l1{display:flex;align-items:center;gap:8px}
+    .pf-tab-con-nov .pf-tab-tag{display:inline-flex;align-items:center;padding:0 8px;border-radius:8px;background:var(--feedback-info-light,#EBF4FF);color:var(--feedback-info-dark,#0099DE);font-family:Montserrat,sans-serif;font-size:12px;line-height:20px;font-weight:700}
+    .pf-tab-con-nov .pf-tab-sub{display:flex;align-items:center;gap:6px;font-family:'Open Sans',sans-serif;font-size:12px;line-height:20px;font-weight:400;color:var(--texts-medium,#666);white-space:normal}
+    .pf-tab-con-nov .pf-tab-sub b{font-weight:700;color:var(--texts-dark,#404040)}
+    .pf-tab-con-nov .pf-tab-sub svg.pf-globo-ico{width:14px;height:14px;stroke:var(--icon-brand,#00C73D);margin:0}
+  }
   .pf-tab:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
   .pf-panel{position:relative;z-index:1;background:var(--Secondary-Neutral-00,#FFF);border-radius:0 16px 16px 16px;box-shadow:0 0 4px 0 rgba(61,75,92,.15);padding:16px 16px 32px 16px}
   .pf-caja{background:var(--Background-Grey-Light,#F7F7F7);border-radius:16px;padding:20px 28px 40px}
@@ -269,6 +296,79 @@
   .pf-desc{border:0;background:none;padding:2px;cursor:pointer;display:flex;border-radius:4px}
   .pf-desc:focus-visible{outline:2px solid var(--blue)}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  /* Saldos a la fecha (referencia de Isa, 2026-11-20): caja verde con fecha, estado y atajos */
+  .pf-saf{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px;margin:24px 0 0;padding:16px 24px;border:0;border-radius:var(--bordes-m,16px);background:var(--background-principal,#fff);box-shadow:0 0 4px 0 rgba(61,75,92,.15);font-family:'Open Sans',sans-serif;color:var(--texts-dark,#404040)} /* barra de filtro neutra (no alerta): blanca con la sombra de las tarjetas; escala del DS */
+  .pf-saf[hidden]{display:none}
+  .pf-saf-ico{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--background-brand-light,#F6FCF2);color:var(--icon-brand,#00C73D)}
+  .pf-saf-ico svg{width:24px;height:24px}
+  .pf-saf-t{display:flex;flex-direction:column;min-width:0}
+  .pf-saf-t b{font-family:Montserrat,sans-serif;font-size:16px;line-height:24px;font-weight:700}
+  .pf-saf-t b{display:flex;align-items:center;gap:8px}
+  .pf-saf-t b .pf-tag-nuevo{display:inline-flex;align-items:center;padding:2px 8px;border-radius:8px;background:var(--feedback-info-light,#EBF4FF);color:var(--feedback-info-dark,#0099DE);font-family:Montserrat,sans-serif;font-size:12px;line-height:20px;font-weight:700} /* tag tipo "Beta": feedback info */
+  .pf-saf-t span{font-size:12px;line-height:20px;font-weight:500;color:var(--texts-medium,#666)} /* caption body 3 */
+  .pf-saf-ctrl{flex:1;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px 20px}
+  .pf-saf-lbl{font-size:14px;line-height:22px;font-weight:700} /* label bold */
+  .pf-saf .pf-fecha-btn{min-width:160px}
+  .pf-atajos{display:flex;flex-wrap:wrap;gap:8px}
+  .pf-atajos[hidden]{display:none} /* 2026-11-20: se omiten los atajos por ahora (Isa) */
+  .pf-atajo{padding:4px 12px;border:1px solid var(--stroke-grey-light,#ddd);border-radius:9999px;background:#fff;font-family:'Open Sans',sans-serif;font-size:12px;line-height:20px;font-weight:600;color:var(--Texts-Dark,#404040);cursor:pointer}
+  .pf-atajo:hover{border-color:var(--green);color:var(--green)}
+  .pf-atajo[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+  .pf-atajo:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .pf-corte{display:inline-flex;align-items:center;gap:8px;margin:0;padding:6px 14px;border-radius:9999px;background:#fff;font-family:'Open Sans',sans-serif;font-size:12px;line-height:20px;color:var(--Texts-Dark,#404040)}
+  .pf-corte svg{color:var(--green);flex:none}
+  .pf-corte{display:none!important} /* 2026-11-20: se omite la etiqueta del corte por ahora (Isa) */
+  /* Columna Disponible: los portafolios no disponibles para retiro van en rojo (feedback error del DS) */
+  .pf-tabla tr.pf-no td:not(:first-child),.pf-tabla tr.pf-no td.pf-izq b{color:var(--feedback-error-dark,#e03430)}
+  .pf-tabla td.pf-disp{font-weight:600}
+  /* Con 8 columnas la tabla necesita más espacio: dona más pequeña y celdas más compactas (solo en escritorio ancho) */
+  @media (min-width:1101px){
+    .pf-comp{gap:24px}
+    .pf-donut-comp{flex:none;width:168px;height:168px;-webkit-mask:radial-gradient(circle,transparent 47px,#000 48px);mask:radial-gradient(circle,transparent 47px,#000 48px)}
+    .pf-tabla{border-spacing:4px 10px}
+    .pf-tabla th,.pf-tabla td{padding:8px 8px}
+    .pf-panel[data-pf-panel="composicion"] .pf-caja{padding-left:20px;padding-right:20px}
+  }
+  @media (hover:none){.pf-atajo:hover{border-color:var(--stroke-grey-light,#ddd);color:var(--Texts-Dark,#404040)}.pf-atajo[aria-pressed="true"]:hover{border-color:var(--green);color:#fff}}
+  @media (max-width:600px){.pf-saf{padding:16px}.pf-saf-ctrl{justify-content:flex-start;flex-direction:column;align-items:stretch}.pf-saf .pf-fecha-btn{width:100%}}
+  /* Fila Total y botón Copiar tabla */
+  .pf-tabla tfoot th,.pf-tabla tfoot td{font-weight:700}
+  .pf-tabla tfoot th.pf-izq{background:transparent;padding-left:0;font-family:Montserrat,sans-serif;font-size:14px}
+  .pf-tabla tfoot td{background:transparent}
+  .pf-tabla tfoot td.pf-col-saldo{background:var(--background-brand-light,#F6FCF2);color:var(--texts-dark,#404040);font-family:Montserrat,sans-serif;font-size:13px}
+  .pf-tabla td.pf-col-saldo{font-weight:600}
+  body.m-pf-sec .pf-tabla tfoot td:not(.pf-col-saldo){background:transparent}
+  .pf-barra{position:relative}
+  .pf-copiar-w{position:relative;display:flex;margin-left:auto}
+  .pf-copiar-w[hidden]{display:none}
+  .pf-copiar{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:var(--bordes-m,16px);background:transparent;color:var(--icon-brand,#00C73D);cursor:pointer;transition:background-color .15s} /* solo ícono, sin fondo */
+  .pf-copiar:hover{background:var(--background-brand-light,#F6FCF2)}
+  .pf-copiar.ok{background:var(--background-brand-light,#F6FCF2)}
+  .pf-copiar:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .pf-copiar-tt{position:absolute;bottom:calc(100% + 6px);right:0;z-index:30;width:max-content;padding:4px 8px;border-radius:4px;background:#444;color:#fff;font-family:'Open Sans',sans-serif;font-size:14px;line-height:22px;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .15s,visibility .15s}
+  .pf-copiar-w:hover .pf-copiar-tt,.pf-copiar:focus-visible+.pf-copiar-tt,.pf-copiar.ok+.pf-copiar-tt{opacity:1;visibility:visible}
+  @media (hover:none){.pf-copiar:hover{background:transparent}.pf-copiar-w:hover .pf-copiar-tt{opacity:0;visibility:hidden}.pf-copiar.ok+.pf-copiar-tt{opacity:1;visibility:visible}}
+  .pf-copiar-tx{display:none}
+  /* Total: "Total" en la columna Disponible y la suma debajo de Saldo (también en móvil, se ven juntos al deslizar) */
+  .pf-tabla tfoot th.pf-total-lbl{background:transparent;text-align:center;font-family:Montserrat,sans-serif;font-size:14px;font-weight:700;color:var(--texts-dark,#404040)}
+  body.m-pf-sec .pf-tabla tfoot td:not(.pf-col-saldo):not(.pf-izq),body.m-pf-sec .pf-tabla tfoot th.pf-total-lbl{background:transparent}
+  body.m-pf-sec .pf-tabla tfoot td.pf-col-saldo{background:var(--background-brand-light,#F6FCF2)}
+  /* Móvil: switch a todo el ancho; Copiar tabla baja, con texto, justo encima de la tabla */
+  @media (max-width:600px){
+    .pf-panel[data-pf-panel="composicion"] .pf-caja{display:flex;flex-direction:column}
+    .pf-caja>.pf-barra{display:contents}
+    .pf-caja .pf-seg{order:1}
+    .pf-caja>.pf-saf{order:2}
+    .pf-caja>.pf-comp{display:contents}
+    .pf-caja .pf-donut-comp{order:3;align-self:center;margin-top:24px}
+    .pf-caja .pf-copiar-w{order:4;align-self:flex-end;margin:16px 0 4px}
+    .pf-caja .pf-tabla-wrap{order:5}
+    .pf-caja>.pf-vacio{order:7}
+    .pf-copiar{width:auto;min-height:44px;gap:8px;padding:0 12px;font-family:Montserrat,sans-serif;font-size:14px;font-weight:700}
+    .pf-copiar-tx{display:inline}
+    .pf-copiar-tt{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){.pf-copiar,.pf-copiar-tt{transition:none}}
   /* Fecha de corte (calendario) de Composición */
   .pf-barra{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
   .pf-ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:24px}
@@ -313,6 +413,16 @@
     .pf-fecha-btn{width:100%}
     .pf-cal{left:0;right:auto;width:100%;max-width:304px}
   }
+  /* Standing allocation: solo la dona y la leyenda */
+  .pf-comp[hidden],.pf-caja>.pf-comp[hidden]{display:none!important}
+  .pf-std{display:flex;align-items:center;gap:56px;margin-top:32px;padding:8px 0 16px}
+  .pf-std[hidden]{display:none}
+  .pf-donut-std{width:200px;height:200px;background:var(--charts-c05);-webkit-mask:radial-gradient(circle,transparent 56px,#000 57px);mask:radial-gradient(circle,transparent 56px,#000 57px)}
+  .pf-std-ley{margin:0;padding:0;list-style:none;font-family:'Open Sans',sans-serif;font-size:14px;line-height:22px;color:var(--texts-dark,#404040)}
+  .pf-std-ley li{display:flex;align-items:center;gap:8px}
+  .pf-std-ley i{width:12px;height:12px;border-radius:50%;background:var(--charts-c05)}
+  .pf-std-ley b{font-weight:700}
+  @media (max-width:600px){.pf-caja>.pf-std{order:7;flex-direction:column;gap:24px;margin-top:24px}.pf-donut-std{width:180px;height:180px;-webkit-mask:radial-gradient(circle,transparent 50px,#000 51px);mask:radial-gradient(circle,transparent 50px,#000 51px)}}
   .pf-vacio p{margin:24px 0 0;font-family:'Open Sans',sans-serif;font-size:14px;color:var(--Texts-Dark,#404040)}
   .pf-caja.pf-vacio p{margin:0}
   @media (max-width:1100px){
@@ -2818,7 +2928,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             </ul>
             <div class="m-pf-dona" role="img" aria-label="90 % capital y 10 % rendimientos"></div>
           </div>
-          <a href="#" class="m-pf-link">Saldo para retiro: $52.732.191</a>
+          <a href="#" class="m-pf-link">Saldo para retiro: $147.650</a>
           <button type="button" class="pf-pipeline">Ir a Pipeline</button>
         </article>
         <details class="m-pf-benef">
@@ -2836,7 +2946,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           <div class="pf-saldo">
             <div class="pf-saldo-izq">
               <p class="pf-big">$52.732.191</p>
-              <a href="#" class="pf-retiro">Saldo para retiro: $52.732.191</a>
+              <a href="#" class="pf-retiro">Saldo para retiro: $147.650</a>
               <p class="pf-meta">Saldo total <i aria-hidden="true"></i> Contrato #100000063061</p>
             </div>
             <button type="button" class="pf-pipeline">Ir a Pipeline</button>
@@ -2870,13 +2980,18 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div class="pf-tabs" role="tablist" aria-label="Secciones del producto"><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="comportamiento"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 6-6"/></svg>Comportamiento</button><button type="button" class="pf-tab on" role="tab" aria-selected="true" data-pf="composicion"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>Composición y saldos</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="movimientos"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-15-6.7L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/><path d="M16 16h5v5"/></svg>Movimientos</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="detalles"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 13h.01M12 13h.01M16 13h.01"/></svg>Detalles</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="cuentas"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>Cuentas y débito</button><button type="button" class="pf-tab" role="tab" aria-selected="false" data-pf="actividad"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Actividad</button></div>
       <div class="pf-panel" data-pf-panel="composicion">
         <div class="pf-caja">
-          <div class="pf-aviso" role="note"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/></svg><p>Consulta los saldos y la composición de portafolios en una fecha determinada (<b>Saldos a la fecha</b>).</p></div>
           <div class="pf-barra">
           <div class="pf-seg" role="tablist" aria-label="Tipo de composición">
             <button type="button" role="tab" aria-selected="true" data-seg="actual">Composición</button>
             <button type="button" role="tab" aria-selected="false" data-seg="standing">Standing allocation</button>
           </div>
-          <div class="pf-ctrl" data-seg-solo="actual">
+          <p class="pf-corte" data-seg-solo="actual" aria-live="polite"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Saldos <b id="pf-corte-est">en efectivo</b> con corte al <b id="pf-corte-f">12/11/2026</b></span></p>
+          <span class="pf-copiar-w" data-seg-solo="actual"><button type="button" class="pf-copiar" aria-label="Copiar tabla" aria-describedby="pf-copiar-tt"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span class="pf-copiar-tx">Copiar tabla</span></button><span class="pf-copiar-tt" role="tooltip" id="pf-copiar-tt">Copiar tabla</span></span>
+          </div>
+          <div class="pf-saf pf-ctrl" data-seg-solo="actual" role="group" aria-labelledby="pf-saf-tit">
+            <div class="pf-saf-t"><b id="pf-saf-tit">Saldos a la fecha <span class="pf-tag-nuevo">Nuevo</span></b><span>Consulta los saldos y la composición en otra fecha</span></div>
+            <div class="pf-saf-ctrl">
+              <span class="pf-saf-lbl">Consultar saldos al</span>
           <div class="pf-fecha">
             <span class="pf-fecha-lbl sr" id="pf-fecha-lbl">Fecha de corte</span>
             <button type="button" class="pf-fecha-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="pf-cal" aria-labelledby="pf-fecha-lbl pf-fecha-val"><span id="pf-fecha-val">12/11/2026</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></button>
@@ -2895,21 +3010,34 @@ document.addEventListener('DOMContentLoaded',()=>{
             <label class="pf-radio"><input type="radio" name="pf-estado" value="proceso"><span>En proceso</span></label>
             <label class="pf-radio"><input type="radio" name="pf-estado" value="efectivo" checked><span>Efectivo</span></label>
           </div>
-          </div>
+              <div class="pf-atajos" role="group" aria-label="Fechas rápidas" hidden>
+                <button type="button" class="pf-atajo" data-atajo="corte" aria-pressed="true">Último corte</button>
+                <button type="button" class="pf-atajo" data-atajo="mes" aria-pressed="false">Fin de mes anterior</button>
+                <button type="button" class="pf-atajo" data-atajo="anio" aria-pressed="false">Fin de año anterior</button>
+              </div>
+            </div>
           </div>
           <div class="pf-comp" data-seg-panel="actual">
-            <div class="pf-donut pf-donut-comp" role="img" aria-label="Composición: 65 % Skandia Renta Fija Pesos, 35 % FPV Strategist Liquidez Col"></div>
+            <div class="pf-donut pf-donut-comp" role="img" aria-label="Composición del contrato"></div>
             <div class="pf-tabla-wrap">
               <table class="pf-tabla">
-                <thead><tr><th scope="col"><span class="sr">Descargar</span></th><th scope="col" class="pf-izq">Portafolio</th><th scope="col">No. unidades</th><th scope="col">Valor unidad</th><th scope="col">Saldo</th><th scope="col">Rendimientos</th><th scope="col">Rendimientos E.A.</th></tr></thead>
+                <thead><tr><th scope="col"><span class="sr">Descargar</span></th><th scope="col" class="pf-izq">Portafolio</th><th scope="col">No. unidades</th><th scope="col">Valor unidad</th><th scope="col">Rendimientos</th><th scope="col">Rendimientos E.A.</th><th scope="col"><span class="pf-disp-h">Disponible</span></th><th scope="col">Saldo</th></tr></thead>
                 <tbody id="pf-tbody">
-                  <tr><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de Skandia Renta Fija Pesos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c01)"></i><b>65 %</b> Skandia Renta Fija Pesos</td><td>1.222,77</td><td>$ 28.031,45</td><td>$ 34.275.924</td><td>$ 3.150.000</td><td>9,12 %</td></tr>
-                  <tr><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de FPV Strategist Liquidez Col"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c02)"></i><b>35 %</b> FPV Strategist Liquidez Col</td><td>6.584,07</td><td>$ 2.803,14</td><td>$ 18.456.267</td><td>$ 2.098.910</td><td>7,49 %</td></tr>
+                  <tr class="pf-no"><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de FVP Especial CAT 4/02/2030"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c01)"></i><b>18.07 %</b> FVP Especial CAT 4/02/2030</td><td></td><td></td><td></td><td></td><td class="pf-disp">No</td><td class="pf-col-saldo"></td></tr>
+                  <tr class="pf-no"><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de FVP Especial CAT 4/11/2027"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c02)"></i><b>17.95 %</b> FVP Especial CAT 4/11/2027</td><td></td><td></td><td></td><td></td><td class="pf-disp">No</td><td class="pf-col-saldo"></td></tr>
+                  <tr class="pf-no"><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de FVP Especial CAT 30/04/2030"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c03)"></i><b>25.72 %</b> FVP Especial CAT 30/04/2030</td><td></td><td></td><td></td><td></td><td class="pf-disp">No</td><td class="pf-col-saldo"></td></tr>
+                  <tr class="pf-no"><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de FVP Especial CAT 12 meses - D"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c04)"></i><b>31.81 %</b> FVP Especial CAT 12 meses - D</td><td></td><td></td><td></td><td></td><td class="pf-disp">No</td><td class="pf-col-saldo"></td></tr>
+                  <tr><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de FPV Strategist Liquidez Col"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c05)"></i><b>0.28 %</b> FPV Strategist Liquidez Col</td><td></td><td></td><td></td><td></td><td class="pf-disp">Sí</td><td class="pf-col-saldo"></td></tr>
+                  <tr class="pf-no"><td><button type="button" class="pf-desc" aria-label="Descargar ficha técnica de FVP Renta Fija Marzo 2029-I"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C73D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></button></td><td class="pf-izq"><i style="background:var(--charts-c06)"></i><b>6.17 %</b> FVP Renta Fija Marzo 2029-I</td><td></td><td></td><td></td><td></td><td class="pf-disp">No</td><td class="pf-col-saldo"></td></tr>
                 </tbody>
+                <tfoot><tr class="pf-total"><td></td><td></td><td></td><td></td><td></td><td></td><th scope="row" class="pf-total-lbl">Total</th><td class="pf-col-saldo" id="pf-total"></td></tr></tfoot>
               </table>
             </div>
           </div>
-          <div class="pf-vacio" data-seg-panel="standing" hidden></div>
+          <div class="pf-std" data-seg-panel="standing" hidden>
+            <div class="pf-donut pf-donut-std" role="img" aria-label="Standing allocation: 100 % FVP Especial Skandia TS2026"></div>
+            <ul class="pf-std-ley"><li><i></i><b>100%</b> FVP Especial Skandia TS2026</li></ul>
+          </div>
         </div>
       </div>
       <div class="pf-panel" data-pf-panel="otros" hidden><div class="pf-caja pf-vacio"><p>Contenido de esta sección en construcción.</p></div></div>
@@ -3297,9 +3425,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   const caja=document.querySelector('.pf-fecha'); if(!caja) return;
   const HOY=new Date(2026,10,12), MIN=new Date(2025,10,12);
   const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  // Portafolios de ejemplo (referencia de Isa: composición con FVP Especial CAT, renta fija y liquidez), escalados al saldo del contrato
   const FONDOS=[
-    {n:'Skandia Renta Fija Pesos',c:'var(--charts-c01)',u:1222.77,vu:28031.45,saldo:34275924,rend:3150000,ea:9.12},
-    {n:'FPV Strategist Liquidez Col',c:'var(--charts-c02)',u:6584.07,vu:2803.14,saldo:18456267,rend:2098910,ea:7.49}
+    {n:'FVP Especial CAT 4/02/2030',c:'var(--charts-c01)',u:869.6697,vu:10956.697029,saldo:9528707,rend:948478,ea:10.85,disp:false},
+    {n:'FVP Especial CAT 4/11/2027',c:'var(--charts-c02)',u:860.8594,vu:10995.324876,saldo:9465428,rend:942179,ea:10.62,disp:false},
+    {n:'FVP Especial CAT 30/04/2030',c:'var(--charts-c03)',u:1202.7212,vu:11276.694625,saldo:13562720,rend:1350020,ea:11.04,disp:false},
+    {n:'FVP Especial CAT 12 meses - D',c:'var(--charts-c04)',u:1213.3410,vu:13824.728964,saldo:16774110,rend:1669678,ea:12.31,disp:false},
+    {n:'FPV Strategist Liquidez Col',c:'var(--charts-c05)',u:51.8516,vu:2847.550228,saldo:147650,rend:14697,ea:7.49,disp:true},
+    {n:'FVP Renta Fija Marzo 2029-I',c:'var(--charts-c06)',u:298.8594,vu:10886.643559,saldo:3253576,rend:323858,ea:9.76,disp:false}
   ];
   const btn=caja.querySelector('.pf-fecha-btn'), cal=caja.querySelector('.pf-cal'), val=document.getElementById('pf-fecha-val');
   const mesTxt=cal.querySelector('.pf-cal-mes'), grid=cal.querySelector('.pf-cal-dias');
@@ -3322,16 +3455,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   function pintar(d,animar){
     const fs=datos(d), tot=fs.reduce((a,f)=>a+f.saldo,0);
-    let pcts=fs.map(f=>Math.round(f.saldo/tot*100)); pcts[pcts.length-1]=100-pcts.slice(0,-1).reduce((a,b)=>a+b,0);
+    const pcts=fs.map(f=>f.saldo/tot*100);
     const filas=tbody.querySelectorAll('tr');
     fs.forEach((f,i)=>{
       const td=filas[i].querySelectorAll('td');
-      td[1].innerHTML='<i style="background:'+f.c+'"></i><b>'+pcts[i]+' %</b> '+f.n;
-      td[2].textContent=dec(f.u,2); td[3].textContent='$ '+dec(f.vu,2); td[4].textContent=pesos(f.saldo);
-      td[5].textContent=pesos(f.rend); td[6].textContent=dec(f.ea,2)+' %';
+      td[1].innerHTML='<i style="background:'+f.c+'"></i><b>'+dec(pcts[i],2)+' %</b> '+f.n;
+      td[2].textContent=dec(f.u,2); td[3].textContent='$ '+dec(f.vu,2);
+      td[4].textContent=pesos(f.rend); td[5].textContent=dec(f.ea,2)+' %'; td[7].textContent=pesos(f.saldo);
     });
-    dona.style.background='conic-gradient('+fs[0].c+' 0 '+pcts[0]+'%,'+fs[1].c+' '+pcts[0]+'% 100%)';
-    dona.setAttribute('aria-label','Composición al '+fLarga(d)+': '+fs.map((f,i)=>pcts[i]+' % '+f.n).join(', '));
+    const totEl=document.getElementById('pf-total'); if(totEl) totEl.textContent=pesos(tot);
+    let acc=0; dona.style.background='conic-gradient('+fs.map((f,i)=>{ const a=acc; acc+=pcts[i]; return f.c+' '+a+'% '+acc+'%'; }).join(',')+')';
+    dona.setAttribute('aria-label','Composición al '+fLarga(d)+': '+fs.map((f,i)=>dec(pcts[i],2)+' % '+f.n+(f.disp?' (disponible)':' (no disponible)')).join(', '));
+    document.dispatchEvent(new CustomEvent('pf-fecha',{detail:d}));
     val.textContent=fCorta(d);
     if(animar){ [tabla,dona].forEach(el=>{ el.classList.remove('actualiza'); void el.offsetWidth; el.classList.add('actualiza'); }); }
   }
@@ -3351,7 +3486,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   function abrir(){ vista=new Date(sel.getFullYear(),sel.getMonth(),1); render(); cal.hidden=false; btn.setAttribute('aria-expanded','true');
     const b=grid.querySelector('[aria-selected="true"]')||grid.querySelector('button:not(:disabled)'); if(b) b.focus(); }
   function cerrar(foco){ cal.hidden=true; btn.setAttribute('aria-expanded','false'); if(foco) btn.focus(); }
-  function elegir(d){ sel=d; pintar(d,true); cerrar(true); }
+  function elegir(d,sinFoco){ sel=d; pintar(d,true); cerrar(!sinFoco); }
+  window.pfElegirFecha=d=>elegir(d,true);
   btn.addEventListener('click',()=>cal.hidden?abrir():cerrar(false));
   cal.querySelectorAll('.pf-cal-nav').forEach(n=>n.addEventListener('click',()=>{ vista.setMonth(vista.getMonth()+Number(n.dataset.mes)); render(); }));
   grid.addEventListener('click',e=>{ const b=e.target.closest('button[data-d]'); if(b&&!b.disabled) elegir(new Date(vista.getFullYear(),vista.getMonth(),Number(b.dataset.d))); });
@@ -3361,6 +3497,93 @@ document.addEventListener('DOMContentLoaded',()=>{
   // La fecha solo aplica a Composición actual
   document.querySelectorAll('.pf-seg button').forEach(b=>b.addEventListener('click',()=>{ const ctrl=caja.closest('.pf-ctrl')||caja; ctrl.hidden = b.dataset.seg!=='actual'; if(ctrl.hidden) cerrar(false); }));
   pintar(sel,false);
+});
+</script>
+<script>
+// Saldos a la fecha: atajos (último corte, fin de mes y de año anteriores), etiqueta del corte y estado en proceso / efectivo
+document.addEventListener('DOMContentLoaded',()=>{
+  const saf=document.querySelector('.pf-saf'); if(!saf) return;
+  const HOY=new Date(2026,10,12), dd=n=>String(n).padStart(2,'0'), f=d=>dd(d.getDate())+'/'+dd(d.getMonth()+1)+'/'+d.getFullYear();
+  const ATAJO={corte:HOY, mes:new Date(HOY.getFullYear(),HOY.getMonth(),0), anio:new Date(HOY.getFullYear()-1,11,31)};
+  const chips=[...saf.querySelectorAll('.pf-atajo')], corteF=document.getElementById('pf-corte-f'), corteE=document.getElementById('pf-corte-est');
+  chips.forEach(c=>c.addEventListener('click',()=>{ if(window.pfElegirFecha) window.pfElegirFecha(new Date(ATAJO[c.dataset.atajo])); }));
+  document.addEventListener('pf-fecha',e=>{ const d=e.detail; corteF.textContent=f(d);
+    chips.forEach(c=>c.setAttribute('aria-pressed',String(f(ATAJO[c.dataset.atajo])===f(d)))); });
+  saf.querySelectorAll('input[name="pf-estado"]').forEach(r=>r.addEventListener('change',()=>{ corteE.textContent=r.value==='proceso'?'en proceso':'en efectivo'; }));
+  // Con Standing allocation se ocultan el bloque y la etiqueta del corte
+  document.querySelectorAll('.pf-seg button').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('[data-seg-solo="actual"]').forEach(el=>el.hidden=b.dataset.seg!=='actual'); }));
+});
+</script>
+<script>
+// Novedad: globo "Ahora en Contigo: Saldos a la fecha" sobre el tab Composición y saldos.
+// Aparece en cada carga de la pantalla; se oculta al cerrarlo o al usar la función (calendario o En proceso / Efectivo).
+document.addEventListener('DOMContentLoaded',()=>{
+  const tabs=document.querySelector('.pf-tabs'), tab=tabs&&tabs.querySelector('.pf-tab[data-pf="composicion"]'); if(!tab) return;
+  const w=document.createElement('div'); w.className='pf-tabs-w'; tabs.before(w); w.appendChild(tabs);
+  const g=document.createElement('div'); g.className='pf-globo'; g.setAttribute('role','status');
+  // Ícono de novedad: megáfono por defecto; ?icono=roseta muestra la alternativa para comparar
+  const ICO=new URLSearchParams(location.search).get('icono')==='roseta'?'<svg class="pf-globo-ico" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4" fill="none" stroke="#404040" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg class="pf-globo-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>';
+  g.innerHTML='<button type="button" class="pf-globo-ir">'+ICO+'Ahora en Contigo: <b>Saldos a la fecha</b></button><button type="button" class="pf-globo-x" aria-label="Cerrar aviso"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>';
+  w.appendChild(g);
+  // Móvil: la novedad va dentro de la tarjeta del tab (tag Nuevo + línea con megáfono), sin globo flotante
+  const nodo=[...tab.childNodes].find(n=>n.nodeType===3&&n.textContent.trim());
+  const col=document.createElement('span'); col.className='pf-tab-col';
+  col.innerHTML='<span class="pf-tab-l1"><span class="pf-tab-tx"></span><span class="pf-tab-tag">Nuevo</span></span><span class="pf-tab-sub">'+ICO+'<span>Ahora en Contigo: <b>Saldos a la fecha</b></span></span>';
+  col.querySelector('.pf-tab-tx').textContent=nodo.textContent.trim(); nodo.replaceWith(col);
+  tab.classList.add('pf-tab-con-nov');
+  const movil=()=>window.matchMedia('(max-width:600px)').matches;
+  function ubicar(){
+    if(g.hidden) return;
+    const r=tab.getBoundingClientRect(), rw=w.getBoundingClientRect(), gw=g.offsetWidth;
+    let left, x;
+    if(movil()){ left=r.right-rw.left-gw-40; x=gw-28; }          // móvil: colgado del borde superior, a la derecha
+    else { left=r.left-rw.left+r.width/2-gw/2; x=gw/2; }          // escritorio: centrado sobre el tab
+    left=Math.max(0,Math.min(left,rw.width-gw)); x=r.left-rw.left+(movil()?r.width-68:r.width/2)-left;
+    g.style.left=left+'px'; g.style.top=(r.top-rw.top-g.offsetHeight-(movil()?-8:8))+'px';
+    g.style.setProperty('--pf-globo-x',Math.max(14,Math.min(x,gw-14))+'px');
+    g.classList.toggle('pf-globo-m',movil());
+  }
+  const apagar=()=>{ g.hidden=true; tab.classList.remove('pf-tab-con-nov'); };
+  g.querySelector('.pf-globo-x').addEventListener('click',apagar);
+  g.querySelector('.pf-globo-ir').addEventListener('click',()=>{
+    tab.click(); apagar();
+    setTimeout(()=>{ const s=document.querySelector('.pf-saf'); if(s&&!movil()){ s.scrollIntoView({behavior:'smooth',block:'center'}); } (document.querySelector('.pf-fecha-btn')||{}).focus?.({preventScroll:true}); },150);
+  });
+  tab.addEventListener('click',()=>{ if(movil()) apagar(); });
+  document.querySelector('.pf-fecha-btn')?.addEventListener('click',apagar);
+  document.querySelectorAll('input[name="pf-estado"]').forEach(r=>r.addEventListener('change',apagar));
+  tabs.addEventListener('scroll',ubicar,{passive:true});
+  window.addEventListener('resize',ubicar);
+  new ResizeObserver(ubicar).observe(w);
+  ubicar();
+});
+</script>
+<script>
+// Composición: copiar la tabla (texto separado por tabulaciones, se pega directo en Excel o en un correo)
+document.addEventListener('DOMContentLoaded',()=>{
+  const btn=document.querySelector('.pf-copiar'), tabla=document.querySelector('.pf-tabla'); if(!btn||!tabla) return;
+  const tt=document.getElementById('pf-copiar-tt');
+  function aviso(tx){ const t=document.getElementById('pp-toast'); if(!t) return; t.querySelector('span').textContent=tx; t.querySelector('button').hidden=true; t.classList.add('on'); clearTimeout(aviso.t); aviso.t=setTimeout(()=>t.classList.remove('on'),3000); }
+  function texto(){
+    const limpio=s=>s.replace(/\s+/g,' ').trim();
+    const fecha=(document.getElementById('pf-fecha-val')||{}).textContent||'';
+    const est=(document.querySelector('input[name="pf-estado"]:checked')||{}).value==='proceso'?'en proceso':'en efectivo';
+    const lin=['Composición del contrato #100000063061 · saldos '+est+' al '+fecha,'',['Portafolio','Participación','No. unidades','Valor unidad','Rendimientos','Rendimientos E.A.','Disponible','Saldo'].join('\t')];
+    tabla.querySelectorAll('tbody tr').forEach(tr=>{
+      const td=tr.querySelectorAll('td'), pct=limpio(td[1].querySelector('b').textContent), nom=limpio(td[1].textContent.replace(td[1].querySelector('b').textContent,''));
+      lin.push([nom,pct,...[2,3,4,5,6,7].map(i=>limpio(td[i].textContent))].join('\t'));
+    });
+    lin.push(['Total','100 %','','','','','',limpio(document.getElementById('pf-total').textContent)].join('\t'));
+    return lin.join('\n');
+  }
+  async function copiar(){
+    const s=texto();
+    try{ await navigator.clipboard.writeText(s); }
+    catch(e){ const ta=document.createElement('textarea'); ta.value=s; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} ta.remove(); }
+    btn.classList.add('ok'); tt.textContent='¡Copiada!'; aviso('Copiaste la tabla. Puedes pegarla en Excel o en un correo.');
+    setTimeout(()=>{ btn.classList.remove('ok'); tt.textContent='Copiar tabla'; },2000);
+  }
+  btn.addEventListener('click',copiar);
 });
 </script>
 <script>
@@ -4143,7 +4366,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 document.addEventListener('DOMContentLoaded',()=>{
   const caja=document.getElementById('m-seccion'); if(!caja) return;
   const ruta=caja.querySelector('.m-ruta'), tit=caja.querySelector('.m-sec-tit'), B=document.body.classList;
-  const txt=el=>el?el.textContent.replace(/\s+/g,' ').trim():'';
+  const txt=el=>el?((el.querySelector&&el.querySelector('.pf-tab-tx'))||el).textContent.replace(/\s+/g,' ').trim():'';
   const nivel=()=>B.contains('m-pf-sec')?3:B.contains('vista-producto')?2:B.contains('m-detalle')?1:0;
   function pintar(){
     const n=nivel(); caja.hidden=n===0; if(n===0) return;
