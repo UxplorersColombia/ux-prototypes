@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrevistas FP Skandia Generaciones</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: herramienta de trabajo en columna de 1040 px; pestañas y reloj de la entrevista fijos arriba; la guía se lee y se conduce desde el mismo orden de bloques.
+   Tokens del Skandia Design System (línea Skandia), como el kit del proyecto. Tema claro único por decisión: el DS es claro. */
+:root{
+  --verde:#00c73d; --verde-hover:#03a835; --verde-texto:#007c26; --verde-oscuro:#006e22; --verde-claro:#caf9cb; --verde-suave:#f6fcf2;
+  --tinta-fuerte:#232323; --tinta:#404040; --tinta-media:#666666; --tinta-suave:#878787;
+  --fondo:#ffffff; --fondo-gris:#f7f7f7; --linea:#dddddd; --linea-media:#c5c5c5;
+  --aviso:#ffae08; --aviso-fondo:#fff3e0; --aviso-texto:#a36100; --aviso-borde:#ffe1a6;
+  --info-fondo:#ebf4ff; --info-texto:#0066a0; --info-borde:#cfe6fb;
+  --error:#e03430; --error-fondo:#fff5f4; --error-texto:#b3241f; --error-borde:#f7c9c7;
+  --neutro-fondo:#f2f2f2; --neutro-texto:#555555;
+  --titulo:'Montserrat','Segoe UI',Arial,sans-serif;
+  --cuerpo:'Open Sans','Segoe UI',Arial,sans-serif;
+  --sombra:0 4px 12px -2px rgba(0,0,0,.08),0 2px 4px -1px rgba(0,0,0,.04);
+  --sombra-alta:0 18px 40px -12px rgba(0,40,15,.18),0 4px 10px -4px rgba(0,0,0,.06);
+  /* Verde de acción: el #00c73d de marca no da contraste AA con texto blanco; los botones usan el verde de texto del DS */
+  --verde-accion:#007c26; --verde-accion-hover:#006e22;
+  --vidrio:rgba(255,255,255,.78);
+  /* Resorte críticamente amortiguado (sin rebote), para lo que se mueve en el espacio */
+  --resorte:linear(0, .032, .106, .2, .301, .4, .491, .573, .645, .708, .76, .805, .841, .872, .897, .917, .934, .947, .958, .967, .973, .979, .983, .987, 1);
+  --salida:cubic-bezier(.2,.8,.2,1);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--cuerpo);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--fondo)}
+h1,h2,h3,h4{font-family:var(--titulo);font-weight:700;color:var(--tinta-fuerte);margin:0;text-wrap:balance}
+h1{font-size:clamp(1.6rem,1.2rem + 1.6vw,2.25rem);line-height:1.12;letter-spacing:-.02em}
+h2{font-size:1.375rem;line-height:1.3;letter-spacing:-.01em}
+h3{font-size:1.0625rem;line-height:1.45}
+p,ul,ol{margin:0}
+ul,ol{padding-left:1.2rem}
+li+li{margin-top:4px}
+strong{color:var(--tinta-fuerte)}
+a{color:var(--info-texto)}
+:focus-visible{outline:2px solid var(--verde);outline-offset:2px;border-radius:4px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--tinta-media)}
+.small{font-size:.875rem;line-height:1.55}
+.caption{font-size:.8125rem;line-height:1.5;color:var(--tinta-media)}
+.eyebrow{font-size:.8125rem;font-weight:700;color:var(--verde-texto);letter-spacing:.04em;text-transform:uppercase}
+.wrap{max-width:1040px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.icon{width:1.05em;height:1.05em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* Cabecera */
+.cabecera .wrap{padding-block:22px 18px;display:flex;flex-direction:column;gap:10px}
+.marca{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--tinta-media);font-size:.875rem}
+.marca img{height:22px;width:auto;display:block}
+.marca__sep{width:1px;height:18px;background:var(--linea)}
+.lead{color:var(--tinta-media);max-width:68ch}
+
+/* Pestañas + reloj fijos: capa de vidrio, el contenido pasa por debajo */
+.barra{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--vidrio);-webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%);box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.tabs{position:relative;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-block:8px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs__ind{position:absolute;left:0;top:8px;height:calc(100% - 16px);width:0;border-radius:100px;background:var(--verde-claro);transition:transform 420ms var(--resorte),width 420ms var(--resorte);z-index:0;pointer-events:none}
+.tab{position:relative;z-index:1;flex:none;padding:8px 14px;border-radius:100px;color:var(--tinta);font-weight:600;font-size:.9375rem;text-decoration:none;white-space:nowrap;transition:color 160ms ease-out,background-color 160ms ease-out,transform 100ms ease-out}
+.tab:hover:not([aria-current="page"]){background:rgba(0,199,61,.07)}
+.tab:active{transform:scale(.97)}
+.tab[aria-current="page"]{color:var(--verde-oscuro)}
+@media (prefers-reduced-transparency:reduce){.barra{background:var(--fondo);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 1px 0 var(--linea)}}
+.reloj{border-top:1px solid var(--linea);padding-block:8px 10px;display:flex;flex-direction:column;gap:6px}
+.reloj__top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.reloj__t{font-family:var(--titulo);font-weight:700;font-size:1.125rem;color:var(--tinta-fuerte)}
+.reloj__t.pasado{color:var(--error-texto)}
+.reloj__bloque{font-size:.875rem;color:var(--tinta-media);flex:1 1 220px;min-width:0}
+.reloj__bloque b{color:var(--tinta-fuerte)}
+.reloj__barra{position:relative;display:flex;gap:2px;height:8px}
+.reloj__seg{background:var(--neutro-fondo);border-radius:2px;position:relative;overflow:hidden}
+.reloj__seg i{position:absolute;inset:0 auto 0 0;background:var(--verde);width:0}
+.reloj__seg.actual{outline:1px solid var(--verde-texto)}
+
+/* Botones y controles */
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 .9375rem/1.2 var(--cuerpo);padding:9px 16px;border-radius:100px;border:1px solid transparent;cursor:pointer;background:var(--verde-accion);color:#fff;text-decoration:none;transition:background-color 140ms ease-out,transform 100ms ease-out,box-shadow 140ms ease-out;-webkit-tap-highlight-color:transparent}
+.btn:hover{background:var(--verde-accion-hover)}
+.btn:active:not(:disabled),.chip:active,.seg button:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn--sec{background:var(--fondo);color:var(--tinta-fuerte);border-color:var(--linea-media)}
+.btn--sec:hover{background:var(--fondo-gris)}
+.btn--peq{padding:6px 12px;font-size:.8125rem}
+.btn--peligro{background:var(--fondo);color:var(--error-texto);border-color:var(--error-borde)}
+.btn--peligro:hover{background:var(--error-fondo)}
+.btn--peligro.armado{background:var(--error);color:#fff;border-color:var(--error)}
+label.campo{display:flex;flex-direction:column;gap:4px;font-size:.8125rem;font-weight:600;color:var(--tinta-media);min-width:0}
+input[type=text],input[type=date],input[type=time],input[type=url],select,textarea{font:400 .9375rem/1.45 var(--cuerpo);color:var(--tinta-fuerte);background:var(--fondo);border:1px solid var(--linea-media);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:64px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--verde);outline-offset:0;border-color:var(--verde)}
+.grid-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+
+/* Chips, badges, segmentados */
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 .8125rem/1.25 var(--cuerpo);padding:5px 11px;border-radius:100px;border:1px solid var(--linea);background:var(--fondo);color:var(--tinta);cursor:pointer;text-decoration:none;transition:background-color 140ms ease-out,border-color 140ms ease-out,color 140ms ease-out,transform 100ms ease-out;-webkit-tap-highlight-color:transparent}
+.chip .cuenta{font-weight:600;color:var(--tinta-suave);font-variant-numeric:tabular-nums}
+.chip.completo .cuenta{color:var(--verde-texto)}
+.chip:hover{border-color:var(--linea-media)}
+.chip[aria-pressed="true"]{background:var(--verde-claro);border-color:var(--verde);color:var(--verde-oscuro)}
+.chip--tag[data-v="Dolor"][aria-pressed="true"]{background:var(--error-fondo);border-color:var(--error-borde);color:var(--error-texto)}
+.chip--tag[data-v="Objeción"][aria-pressed="true"]{background:var(--aviso-fondo);border-color:var(--aviso-borde);color:var(--aviso-texto)}
+.chip--tag[data-v="Idea"][aria-pressed="true"]{background:var(--info-fondo);border-color:var(--info-borde);color:var(--info-texto)}
+.chip--tag[data-v="Riesgo"][aria-pressed="true"]{background:#f3ecff;border-color:#dccbfa;color:#5b2ea6}
+.badge{display:inline-block;font-size:.75rem;font-weight:700;line-height:1.4;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.b-verde{background:#ecfdf3;color:var(--verde-texto)}
+.b-aviso{background:var(--aviso-fondo);color:var(--aviso-texto)}
+.b-error{background:var(--error-fondo);color:var(--error-texto)}
+.b-info{background:var(--info-fondo);color:var(--info-texto)}
+.b-neutro{background:var(--neutro-fondo);color:var(--neutro-texto)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px}
+.seg button{font:600 .8125rem/1.2 var(--cuerpo);padding:6px 10px;border-radius:6px;border:1px solid var(--linea);background:var(--fondo);color:var(--tinta);cursor:pointer;min-width:2.25rem;transition:background-color 140ms ease-out,border-color 140ms ease-out,color 140ms ease-out,transform 100ms ease-out;-webkit-tap-highlight-color:transparent}
+.seg button[aria-pressed="true"][data-v="confirma"],.seg button[aria-pressed="true"][data-v="mucho"]{background:#ecfdf3;border-color:var(--verde);color:var(--verde-texto)}
+.seg button[aria-pressed="true"][data-v="matiza"],.seg button[aria-pressed="true"][data-v="algo"]{background:var(--aviso-fondo);border-color:var(--aviso);color:var(--aviso-texto)}
+.seg button[aria-pressed="true"][data-v="refuta"],.seg button[aria-pressed="true"][data-v="nada"]{background:var(--error-fondo);border-color:var(--error);color:var(--error-texto)}
+.seg button[aria-pressed="true"][data-v="no-salio"]{background:var(--neutro-fondo);border-color:var(--tinta-suave);color:var(--neutro-texto)}
+.seg button[aria-pressed="true"]{background:var(--verde-claro);border-color:var(--verde);color:var(--verde-oscuro)}
+
+/* Paneles */
+main{padding-block:24px 64px}
+.panel{border:1px solid var(--linea);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;background:var(--fondo)}
+.panel--gris{background:var(--fondo-gris);border-color:transparent}
+.aviso{border:1px solid var(--aviso-borde);background:var(--aviso-fondo);color:var(--aviso-texto);border-radius:10px;padding:12px 14px;font-size:.875rem}
+.vacio{border:1px dashed var(--linea-media);border-radius:12px;padding:28px 18px;text-align:center;color:var(--tinta-media);display:flex;flex-direction:column;gap:10px;align-items:center}
+
+/* Lista de entrevistas */
+.lista{display:flex;flex-direction:column;border:1px solid var(--linea);border-radius:12px;overflow:hidden}
+.item{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.3fr) auto auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--linea)}
+.item:first-child{border-top:0}
+.item__fp{font-weight:700;color:var(--tinta-fuerte);overflow-wrap:anywhere}
+.item__meta{font-size:.8125rem;color:var(--tinta-media)}
+.progreso{font-size:.8125rem;color:var(--tinta-media);display:flex;flex-direction:column;gap:6px;min-width:0}
+.progreso__barra{height:4px;border-radius:4px;background:var(--neutro-fondo);overflow:hidden}
+.progreso__barra i{display:block;height:100%;border-radius:4px;background:var(--verde);transition:width 420ms var(--resorte)}
+.hdots{display:flex;gap:3px;align-items:center}
+.hdots span{width:8px;height:8px;border-radius:50%;background:var(--fondo);box-shadow:inset 0 0 0 1px var(--linea-media)}
+.hdots .v-confirma{background:#1a9a47;box-shadow:none}
+.hdots .v-matiza{background:#e3a008;box-shadow:none}
+.hdots .v-refuta{background:#d6453d;box-shadow:none}
+.hdots .v-no-salio{background:#a3a3a3;box-shadow:none}
+.item{transition:background-color 140ms ease-out}
+.item:hover{background:var(--fondo-gris)}
+@media (max-width:640px){.item{grid-template-columns:1fr auto}.item .progreso{grid-column:1}}
+
+/* Conducir */
+.bloque{display:flex;flex-direction:column;gap:12px;scroll-margin-top:150px}
+.bloque__cab{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding-top:12px;border-top:2px solid var(--tinta-fuerte)}
+.bloque__cab .min{font-size:.875rem;color:var(--tinta-media)}
+.bloque__cab .ahora{margin-left:auto}
+.busca{font-size:.875rem;color:var(--tinta-media)}
+.guion{border-left:3px solid var(--verde);background:var(--verde-suave);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.9375rem;color:var(--tinta-fuerte)}
+.guion p+p{margin-top:6px}
+.nota-mod{font-size:.875rem;font-style:italic;color:var(--tinta-media)}
+.q{border:1px solid var(--linea);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;transition:border-color 200ms ease-out,box-shadow 200ms ease-out}
+.q:focus-within{border-color:var(--verde);box-shadow:0 0 0 4px rgba(0,199,61,.12)}
+.q.lleno .q__n::after{content:"";display:inline-block;width:.5em;height:.5em;margin-left:.3em;border-radius:50%;background:var(--verde);vertical-align:.15em}
+.q textarea{field-sizing:content;min-height:4.6em;max-height:50vh}
+.q__cab{display:flex;gap:10px;align-items:flex-start}
+.q__n{font-family:var(--titulo);font-weight:700;color:var(--verde-texto);min-width:2.4em;font-variant-numeric:tabular-nums}
+.q__t{font-weight:600;color:var(--tinta-fuerte);flex:1;min-width:0}
+.q__t .estrella{color:var(--aviso);margin-left:4px}
+.q__sondeos{font-size:.875rem;color:var(--tinta-media);margin-left:calc(2.4em + 10px)}
+.q__hip{display:flex;gap:4px;flex-wrap:wrap;flex:none}
+.q__cuerpo{display:flex;flex-direction:column;gap:8px;margin-left:calc(2.4em + 10px)}
+@media (max-width:640px){.q__sondeos,.q__cuerpo{margin-left:0}}
+.palabras{display:flex;flex-wrap:wrap;gap:6px}
+.chip--neg[aria-pressed="true"]{background:var(--error-fondo);border-color:var(--error-borde);color:var(--error-texto)}
+.hip-tabla{display:flex;flex-direction:column;gap:10px}
+.hip-fila{display:grid;grid-template-columns:3em minmax(0,1fr);gap:4px 10px;padding:10px 0;border-top:1px solid var(--linea)}
+.hip-fila:first-child{border-top:0}
+.hip-fila .hn{font-family:var(--titulo);font-weight:700;color:var(--tinta-fuerte)}
+.hip-fila .hc{display:flex;flex-direction:column;gap:8px;min-width:0}
+.estado-guardado{display:inline-flex;align-items:center;gap:6px;font-size:.8125rem;color:var(--tinta-media);padding:4px 10px;border-radius:100px;background:var(--fondo)}
+.estado-guardado::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--verde);transition:background-color 200ms ease-out}
+.estado-guardado[data-e="guardando"]::before{background:var(--aviso);animation:latido 1s ease-in-out infinite}
+.estado-guardado[data-e="error"]::before{background:var(--error)}
+@keyframes latido{50%{opacity:.35}}
+/* Entrada de cada vista */
+[data-vista]:not([hidden]){animation:entra 260ms var(--salida)}
+@keyframes entra{from{opacity:0;transform:translateY(6px)}}
+
+/* Síntesis */
+.tabla-wrap{overflow-x:auto;border:1px solid var(--linea);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:.875rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--linea);text-align:left;vertical-align:top}
+thead th{background:var(--fondo-gris);font-weight:700;color:var(--tinta-fuerte);white-space:nowrap}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
+.celda{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;font-weight:700;font-size:.75rem}
+.c-confirma{background:#ecfdf3;color:var(--verde-texto)}
+.c-matiza{background:var(--aviso-fondo);color:var(--aviso-texto)}
+.c-refuta{background:var(--error-fondo);color:var(--error-texto)}
+.c-no-salio{background:var(--neutro-fondo);color:var(--neutro-texto)}
+.c-vacia{background:transparent;color:var(--linea-media);border:1px dashed var(--linea)}
+.apilada{display:flex;gap:2px;height:12px;min-width:120px;border-radius:4px;overflow:hidden;background:var(--neutro-fondo)}
+.apilada i{display:block;height:100%}
+.apilada .v-confirma{background:#1a9a47}.apilada .v-matiza{background:#e3a008}.apilada .v-refuta{background:#d6453d}.apilada .v-no-salio{background:#a3a3a3}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8125rem;color:var(--tinta-media)}
+.leyenda span{display:inline-flex;align-items:center;gap:6px}
+.leyenda i{width:10px;height:10px;border-radius:3px}
+.titular{font:700 1.0625rem/1.4 var(--titulo);color:var(--tinta-fuerte);letter-spacing:-.005em}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.barras{display:flex;flex-direction:column;gap:6px}
+.barra-f{display:grid;grid-template-columns:7.5em minmax(0,1fr) 2em;gap:8px;align-items:center;font-size:.8125rem}
+.barra-f .pista{height:10px;background:var(--neutro-fondo);border-radius:3px;overflow:hidden}
+.barra-f .pista i{display:block;height:100%;background:var(--verde)}
+.barra-f.neg .pista i{background:var(--error)}
+.cita{border-left:3px solid var(--linea-media);padding:6px 12px;display:flex;flex-direction:column;gap:4px}
+.cita p{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--tinta-fuerte)}
+.cita .caption{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+
+/* Guía y mensajes */
+.doc{display:flex;flex-direction:column;gap:22px;max-width:78ch}
+.doc section{display:flex;flex-direction:column;gap:10px}
+.doc table{font-size:.875rem}
+.msg{white-space:pre-wrap;font-size:.9375rem;color:var(--tinta-fuerte);background:var(--fondo-gris);border-radius:10px;padding:14px;overflow-wrap:anywhere}
+.fuente{font-size:.8125rem;color:var(--tinta-media);font-style:italic}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Presentación (guía y método) */
+.pres{display:flex;flex-direction:column;gap:12px}
+.pres__barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.pres__ir{width:auto;max-width:15rem;padding:6px 10px;font-size:.8125rem}
+.pres__notas{border-left:3px solid var(--aviso);background:var(--aviso-fondo);padding:10px 14px;border-radius:0 8px 8px 0;display:flex;flex-direction:column;gap:4px;color:var(--tinta-fuerte)}
+.escenario{display:grid;place-items:center;background:var(--fondo)}
+.escenario:fullscreen{width:100vw;height:100vh}
+.mazo{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;container-type:inline-size;border:1px solid var(--linea);border-radius:14px;overflow:hidden;background:var(--fondo);box-shadow:var(--sombra-alta);cursor:pointer;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.escenario:fullscreen .mazo{width:min(100vw,calc(100vh * 16 / 9));border:0;border-radius:0;box-shadow:none}
+.mazo__prog{position:absolute;left:0;top:0;height:.4cqw;min-height:3px;width:0;background:var(--verde);z-index:3;transition:width 420ms var(--resorte)}
+/* Las diapositivas viven en una fila: la anterior a la izquierda, la siguiente a la derecha. Entran y salen por el mismo camino. */
+.diapo{position:absolute;inset:0;padding:4cqw 5.4cqw 2.6cqw;display:flex;flex-direction:column;gap:1.6cqw;font-size:1.7cqw;line-height:1.42;color:var(--tinta);background:var(--fondo);transform:translateX(var(--x,0%));transition:transform 460ms var(--resorte),opacity 300ms var(--salida)}
+.diapo[data-pos="antes"]{--x:-100%}
+.diapo[data-pos="despues"]{--x:100%}
+.diapo[data-pos="lejos-antes"]{--x:-100%;visibility:hidden;transition:none}
+.diapo[data-pos="lejos-despues"]{--x:100%;visibility:hidden;transition:none}
+.mazo.arrastrando .diapo{transition:none}
+.diapo.entra .d-grid > *,.diapo.entra .d-dos > *,.diapo.entra .d-q li,.diapo.entra .d-reglas li,.diapo.entra .d-grande,.diapo.entra .d-frase,.diapo.entra .d-tiempo{animation:sube 420ms var(--salida) both}
+.diapo.entra :is(.d-grid,.d-q,.d-reglas,.d-dos) > :nth-child(2){animation-delay:50ms}
+.diapo.entra :is(.d-grid,.d-q,.d-reglas,.d-dos) > :nth-child(3){animation-delay:100ms}
+.diapo.entra :is(.d-grid,.d-q,.d-reglas,.d-dos) > :nth-child(4){animation-delay:150ms}
+.diapo.entra :is(.d-grid,.d-q,.d-reglas,.d-dos) > :nth-child(n+5){animation-delay:200ms}
+@keyframes sube{from{opacity:0;transform:translateY(1.2cqw)}}
+/* Vista general */
+.general{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.mini{display:flex;flex-direction:column;gap:6px;cursor:pointer;background:none;border:0;padding:0;text-align:left;font:inherit;color:inherit}
+.mini__lienzo{position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;border:1px solid var(--linea);border-radius:8px;overflow:hidden;background:var(--fondo);transition:transform 160ms var(--salida),box-shadow 160ms var(--salida)}
+.mini:hover .mini__lienzo{transform:translateY(-2px);box-shadow:var(--sombra)}
+.mini:active .mini__lienzo{transform:scale(.98)}
+.mini[aria-current="true"] .mini__lienzo{outline:2px solid var(--verde);outline-offset:2px}
+.mini .diapo{transition:none;pointer-events:none}
+.mini__t{font-size:.8125rem;color:var(--tinta-media)}
+.mini__t b{color:var(--tinta-fuerte);font-variant-numeric:tabular-nums}
+/* El cuerpo es un área fija; si el contenido no cabe, se escala en proporción (--k) en vez de montarse sobre el pie */
+.diapo__cuerpo{flex:1;min-height:0;overflow:hidden;position:relative}
+.diapo__escala{display:flex;flex-direction:column;gap:1.8cqw;width:calc(100% / var(--k,1));min-height:calc(100% / var(--k,1));transform:scale(var(--k,1));transform-origin:0 0}
+.diapo__cab{display:flex;flex-direction:column;gap:.6cqw}
+.diapo .eyebrow{font-size:1.25cqw}
+.diapo h2{font-size:3.1cqw;line-height:1.15}
+.diapo h3{font-size:1.75cqw;line-height:1.25}
+.diapo p,.diapo li{font-size:1.5cqw;line-height:1.42}
+.diapo ul{padding-left:2cqw;display:flex;flex-direction:column;gap:.5cqw}
+.diapo li+li{margin-top:0}
+.diapo__pie{display:flex;justify-content:space-between;align-items:center;gap:2cqw;font-size:1.1cqw;color:var(--tinta-media);border-top:1px solid var(--linea);padding-top:1.1cqw}
+.d-marca{display:flex;align-items:center;gap:1cqw}
+.d-marca img{height:1.5cqw;width:auto}
+.d-grid{display:grid;gap:1.4cqw;padding:0;list-style:none}
+.d-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.d-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.d-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.d-dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2cqw;align-items:start}
+.d-tile{border:1px solid var(--linea);border-radius:1.1cqw;padding:1.5cqw 1.8cqw;display:flex;flex-direction:column;gap:.6cqw;min-width:0;margin:0;background:var(--fondo)}
+.d-tile--verde{background:var(--verde-suave);border-color:var(--verde-claro)}
+.d-tile--gris{background:var(--fondo-gris);border-color:var(--fondo-gris)}
+.d-num{font:700 2.3cqw/1 var(--titulo);color:var(--verde-texto)}
+.d-enorme{font:700 7cqw/1 var(--titulo);color:var(--verde-oscuro)}
+.d-centro{justify-content:center;gap:1.2cqw;padding:3cqw}
+.d-tag{align-self:flex-start;font:700 1.1cqw/1.3 var(--cuerpo);text-transform:uppercase;letter-spacing:.06em;color:var(--verde-texto)}
+.d-decide{color:var(--verde-texto);font-weight:600;margin-top:auto}
+.d-fuente{font-size:1.2cqw!important;color:var(--tinta-media);font-style:italic;margin-top:auto}
+.d-nota{font-size:1.3cqw!important;color:var(--tinta-media)}
+.d-frase{font:700 2.3cqw/1.3 var(--titulo);color:var(--tinta-fuerte)}
+.d-grande{font:700 3.3cqw/1.25 var(--titulo);color:var(--tinta-fuerte);max-width:42ch;text-wrap:balance}
+.d-cita{font-size:1.9cqw!important;line-height:1.4;color:var(--tinta-fuerte);font-weight:600}
+.d-hcab{display:flex;justify-content:space-between;align-items:baseline;gap:1cqw}
+.d-ht{color:var(--tinta-fuerte)}
+.d-portada{flex:1;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:4cqw;align-items:center}
+.d-portada__txt{display:flex;flex-direction:column;gap:1.8cqw}
+.d-h1{font-size:4.6cqw!important;line-height:1.08!important}
+.d-lead{font-size:2cqw!important;color:var(--tinta-media)}
+.d-portada__datos{display:flex;flex-direction:column;gap:1.2cqw}
+.d-portada__datos .d-tile{flex-direction:row;align-items:center;gap:1.6cqw}
+.d-portada__datos .d-num{min-width:7.5cqw;font-size:2.8cqw}
+.diapo--portada{background:linear-gradient(180deg,var(--fondo) 0 82%,var(--verde-suave) 82% 100%)}
+.d-pasos .d-tile{gap:.8cqw}
+.d-q{list-style:none;padding:0!important;display:flex;flex-direction:column;gap:1.1cqw!important}
+.d-q li{display:grid;grid-template-columns:3.8cqw minmax(0,1fr);gap:1cqw;color:var(--tinta-fuerte)}
+.d-qn{font:700 1.5cqw/1.42 var(--titulo);color:var(--verde-texto)}
+.d-tiempo{display:flex;flex-direction:column;gap:.5cqw}
+.d-tbar{display:flex;gap:.3cqw;height:4.4cqw}
+.d-tseg{background:var(--verde-claro);color:var(--verde-oscuro);border-radius:.6cqw;display:flex;align-items:center;justify-content:center;font:700 1.6cqw/1 var(--titulo)}
+.d-tseg--fuerte{background:var(--verde-accion);color:#fff}
+.diapo h2{letter-spacing:-.015em}
+.d-h1{letter-spacing:-.025em}
+.d-tticks{position:relative;height:2cqw}
+.d-tticks span{position:absolute;top:0;transform:translateX(-50%);font-size:1.1cqw;color:var(--tinta-media);font-variant-numeric:tabular-nums}
+.d-tticks span:first-child{transform:none}
+.d-tticks span:last-child{transform:translateX(-100%)}
+.d-bloques .d-tile{padding:1.2cqw 1.5cqw}
+.d-pal{display:flex;flex-wrap:wrap;gap:.6cqw}
+.d-chip{font-size:1.2cqw;font-weight:600;padding:.3cqw .9cqw;border-radius:100px;background:var(--fondo);border:1px solid var(--verde-claro);color:var(--verde-oscuro)}
+.d-chip--neg{border-color:var(--error-borde);color:var(--error-texto)}
+.d-reglas{list-style:none;padding:0!important;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.6cqw 2.4cqw!important;counter-reset:r}
+.d-reglas--1{grid-template-columns:minmax(0,1fr);gap:1.2cqw!important}
+.d-reglas li{counter-increment:r;display:grid;grid-template-columns:3cqw minmax(0,1fr);gap:1cqw;font-size:1.6cqw;color:var(--tinta-fuerte)}
+.d-reglas li::before{content:counter(r);font:700 2.2cqw/1 var(--titulo);color:var(--verde-texto)}
+/* Menos movimiento: nada se desliza ni crece; las diapositivas cambian con un fundido corto */
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important}
+  .tabs__ind,.btn,.chip,.seg button,.tab,.q,.item,.mini__lienzo,.progreso__barra i,.mazo__prog{transition:none!important}
+  .btn:active,.chip:active,.seg button:active,.tab:active,.mini:active .mini__lienzo{transform:none}
+  .diapo{transform:none!important;transition:opacity 200ms linear!important}
+  .diapo[data-pos="antes"],.diapo[data-pos="despues"],.diapo[data-pos^="lejos"]{opacity:0!important;visibility:hidden}
+}
+</style>
+
+<header class="cabecera">
+  <div class="wrap">
+    <div class="marca"><img src="marca/logo-color.svg" alt="Skandia"><span class="marca__sep" aria-hidden="true"></span><span>Skandia Generaciones · Equipo UX</span></div>
+    <h1>Entrevistas con FPs después del prototipo</h1>
+    <p class="lead">45 minutos con cada FP que recorrió el prototipo en UseBerry. Aquí se conduce la entrevista, se toman las notas por pregunta y se marca cada hipótesis. La síntesis se arma sola con lo que todo el equipo registre.</p>
+    <div class="row" id="resumen-chips"></div>
+  </div>
+</header>
+
+<div class="barra">
+  <div class="wrap">
+    <nav class="tabs" aria-label="Secciones">
+      <span class="tabs__ind" id="tabs-ind" aria-hidden="true"></span>
+      <a class="tab" href="#entrevistas" data-ruta="entrevistas">Entrevistas</a>
+      <a class="tab" href="#conducir" data-ruta="conducir">Conducir</a>
+      <a class="tab" href="#sintesis" data-ruta="sintesis">Síntesis</a>
+      <a class="tab" href="#guia" data-ruta="guia">Presentación del método</a>
+      <a class="tab" href="#mensajes" data-ruta="mensajes">Mensajes y UseBerry</a>
+    </nav>
+    <div class="reloj" id="reloj" hidden>
+      <div class="reloj__top">
+        <span class="reloj__t num" id="reloj-t">00:00 / 45:00</span>
+        <span class="reloj__bloque" id="reloj-bloque">Inicia el reloj cuando arranques la apertura.</span>
+        <span class="row">
+          <button class="btn btn--peq" id="reloj-play" type="button">Iniciar</button>
+          <button class="btn btn--sec btn--peq" id="reloj-reset" type="button">Reiniciar</button>
+        </span>
+      </div>
+      <div class="reloj__barra" id="reloj-barra" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="banner"></div>
+
+  <!-- ENTREVISTAS -->
+  <section data-vista="entrevistas" class="stack">
+    <div class="panel panel--gris">
+      <h2>Nueva entrevista</h2>
+      <form id="form-nueva" class="stack" autocomplete="off">
+        <div class="grid-form">
+          <label class="campo" for="n-fp">FP entrevistado
+            <input type="text" id="n-fp" required placeholder="Nombre del comercial">
+          </label>
+          <label class="campo" for="n-fecha">Fecha
+            <input type="date" id="n-fecha">
+          </label>
+          <label class="campo" for="n-hora">Hora
+            <input type="time" id="n-hora">
+          </label>
+          <label class="campo" for="n-ent">Entrevista (UX)
+            <input type="text" id="n-ent" placeholder="Julian, Javi…">
+          </label>
+          <label class="campo" for="n-obs">Observa (producto)
+            <input type="text" id="n-obs" placeholder="Persona del equipo del proyecto">
+          </label>
+        </div>
+        <div class="row"><button class="btn" type="submit" id="n-crear">Crear y abrir</button><span class="caption" id="n-msg"></span></div>
+      </form>
+    </div>
+    <div class="stack">
+      <div class="row" style="justify-content:space-between"><h2>Agenda y avance</h2><span class="caption">Meta: 5 entrevistas</span></div>
+      <div id="lista"></div>
+    </div>
+  </section>
+
+  <!-- CONDUCIR -->
+  <section data-vista="conducir" class="stack" hidden>
+    <div id="conducir"></div>
+  </section>
+
+  <!-- SÍNTESIS -->
+  <section data-vista="sintesis" class="stack" hidden>
+    <div id="sintesis"></div>
+  </section>
+
+  <!-- GUÍA -->
+  <section data-vista="guia" hidden>
+    <div class="pres">
+      <div class="pres__barra">
+        <div class="row">
+          <button class="btn btn--sec btn--peq" id="pres-ant" type="button" aria-label="Diapositiva anterior">← Anterior</button>
+          <span class="num small" id="pres-cont" aria-live="polite">1 / 16</span>
+          <button class="btn btn--peq" id="pres-sig" type="button" aria-label="Diapositiva siguiente">Siguiente →</button>
+        </div>
+        <div class="row">
+          <label class="sr" for="ir-a">Ir a la diapositiva</label>
+          <select id="ir-a" class="pres__ir"></select>
+          <button class="btn btn--sec btn--peq" id="pres-general" type="button" aria-pressed="false">Vista general</button>
+          <button class="btn btn--sec btn--peq" id="pres-notas" type="button" aria-pressed="false">Notas</button>
+          <button class="btn btn--sec btn--peq" id="pres-full" type="button">Pantalla completa</button>
+        </div>
+      </div>
+      <div class="escenario" id="escenario">
+        <div class="mazo" id="mazo" aria-roledescription="presentación" aria-label="Presentación del método de las entrevistas"></div>
+      </div>
+      <div class="general" id="general" hidden></div>
+      <p class="aviso" id="pres-aviso" hidden>Esta vista no permite pantalla completa. Usa la pantalla completa del navegador (F11).</p>
+      <div class="pres__notas" id="pres-notas-p" hidden><span class="eyebrow">Para quien presenta</span><p id="pres-notas-t"></p></div>
+      <p class="caption">Avanza con las flechas, con un clic (a la izquierda vuelve) o deslizando la diapositiva. Atajos: F pantalla completa, N notas, G vista general. La guía completa, pregunta por pregunta, está en la pestaña Conducir.</p>
+    </div>
+  </section>
+
+  <!-- MENSAJES -->
+  <section data-vista="mensajes" hidden>
+    <div class="doc" id="mensajes"></div>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Contenido del instrumento ---------- */
+const HIP = [
+  {id:"H1", t:"El tema aparece con clientes Wealth, pero el FP no tiene una forma ordenada de abordarlo y lo aplaza o lo deriva.", o:"Research del Reto 3 y taller del 27-ago", q:"2.1, 2.2, 2.5"},
+  {id:"H2", t:"Hablar de la familia y de la muerte incomoda; el FP necesita una puerta de entrada que no suene a venta.", o:"Research del Reto 3 y lenguaje de la guía", q:"2.3, 3.6"},
+  {id:"H3", t:"El cliente no cuenta lo que tiene por fuera de Skandia, y sin eso el diagnóstico pierde valor.", o:"Acta del 13-nov", q:"2.4, 3.4"},
+  {id:"H4", t:"El FP teme cruzar a la asesoría legal o tributaria y prefiere no hablar de cifras.", o:"Marco legal del Reto 3", q:"2.3, 3.5, 5.2"},
+  {id:"H5", t:"Cuando la herramienta sugiere el seguro, el cliente puede leerlo como venta oportunista; el FP necesita cómo presentarlo.", o:"Acta del 13-nov", q:"3.6"},
+  {id:"H6", t:"Clientes, y algunos FPs, creen cosas que no son sobre qué pasa con sus productos si faltan.", o:"Research del Reto 3 (concepto SFC de 2002, por confirmar con Legal)", q:"2.6, 2.7"},
+  {id:"H7", t:"La bóveda y la persona designada dan algo que el cliente no encuentra con el abogado ni con el banco.", o:"Acta del 13-nov", q:"3.7"},
+  {id:"H8", t:"Un diagnóstico con muchos campos del mismo peso no cabe en una reunión normal con el cliente.", o:"Observación de UX en la demo del 13-nov", q:"3.4, 4.2"}
+];
+const OBJ = [
+  ["O1","Dolores","Cómo vive hoy el FP la conversación sobre patrimonio y familia: cuándo aparece, qué hace, dónde se traba y con qué lo resuelve hoy.","Si el problema existe y vale la pena"],
+  ["O2","Comprensión","Qué entendió del prototipo y por qué se trabó donde se trabó en UseBerry.","Qué se ajusta en las pantallas"],
+  ["O3","Valor","Qué tarea le quita o le facilita frente a lo que hace hoy.","El argumento para el comercial"],
+  ["O4","Encaje","Con qué clientes, en qué momento de la relación y en cuánto tiempo de reunión.","Dónde vive la herramienta en el proceso comercial"],
+  ["O5","Riesgos","La frontera de la asesoría, la sugerencia de producto, los datos sensibles y la confianza del cliente.","Qué se cuida antes de la prueba con clientes"],
+  ["O6","Adopción","Qué tendría que pasar para que la use la próxima semana y qué lo frenaría.","El plan de adopción"]
+];
+const TAGS = ["Dolor","Objeción","Idea","Riesgo","Cita literal"];
+const PAL_POS = ["Útil","Clara","Confiable","Valiosa","Oportuna","Humana","Sencilla","Completa","Ordenada","Tranquilizadora"];
+const PAL_NEG = ["Confusa","Larga","Invasiva","Comercial","Complicada","Fría","Riesgosa","Innecesaria","Abrumadora","Técnica"];
+const VEREDICTOS = [["confirma","Confirma","C"],["matiza","Matiza","M"],["refuta","Refuta","R"],["no-salio","No salió","–"]];
+
+const BLOQUES = [
+  {id:"b1", n:1, t:"Apertura", min:3,
+   guion:["Gracias por este tiempo. Soy ___, del equipo de UX. Nos acompaña ___, del equipo de Skandia Generaciones, que va a escuchar y al final te resuelve las dudas que tengas.","Esta conversación no te evalúa a ti: evaluamos la herramienta. Lo que más nos sirve es lo que no funciona, así que si algo no te convence, dilo tal cual. No hay respuestas correctas.","¿Nos autorizas a grabar? Es para no perder tus palabras. Se usa solo dentro del equipo, y lo que reportemos va sin tu nombre."],
+   qs:[{id:"q1_1", n:"1.1", t:"Para ubicarme: ¿cuánto llevas como FP y cómo es tu cartera hoy?", s:["Cuántos clientes Wealth, más o menos, y de qué perfil."]}]},
+  {id:"b2", n:2, t:"Tu trabajo hoy, antes de la herramienta", min:12, busca:"O1 · H1, H2, H3, H4, H6",
+   nota:"En este bloque no se habla del prototipo. Si el FP lo trae: “ya llegamos a eso; primero quiero entender cómo es hoy”.",
+   qs:[
+    {id:"q2_1", n:"2.1", e:1, h:["H1"], t:"Piensa en la última vez que un cliente te habló de su familia, de su patrimonio o de qué pasa con su plata si él falta. Cuéntame cómo fue.", s:["¿Quién sacó el tema? ¿En qué momento de la reunión?","¿Qué palabras usó el cliente?","¿Qué hiciste tú? ¿Cómo terminó? ¿Qué pasó después?"]},
+    {id:"q2_2", n:"2.2", h:["H1"], t:"¿Qué tan seguido te pasa? ¿Con qué clientes o en qué momentos de su vida aparece?", s:["Pensión, venta de la empresa, un nieto, una enfermedad, la muerte de alguien cercano."]},
+    {id:"q2_3", n:"2.3", e:1, h:["H2","H4"], t:"Cuando el tema aparece, ¿qué es lo más difícil para ti de esa conversación?", s:["¿Qué te frena para profundizar?","¿Qué te preocupa decir mal?"]},
+    {id:"q2_4", n:"2.4", h:["H3"], t:"Cuando necesitas saber todo lo que tiene el cliente, también por fuera de Skandia, ¿cómo lo haces hoy? ¿Qué te cuenta y qué no?"},
+    {id:"q2_5", n:"2.5", e:1, h:["H1"], t:"Hoy, cuando un cliente quiere dejar esto organizado, ¿a dónde lo mandas o qué usas?", s:["Abogado, notaría, otra entidad, un Excel o nada.","¿Qué funciona de eso y qué no?"]},
+    {id:"q2_6", n:"2.6", h:["H6"], t:"(Opcional, sensible) ¿Te ha tocado acompañar a una familia después de que el cliente faltó? ¿Qué pasó con sus productos en Skandia?", s:["¿Qué creía la familia que iba a pasar y qué pasó de verdad?"]},
+    {id:"q2_7", n:"2.7", h:["H6"], t:"¿Qué creen tus clientes que pasa con su voluntario, sus fondos o sus seguros si ellos faltan?", s:["No corrijas. Anota."]}
+   ]},
+  {id:"b3", n:3, t:"Lo que viste en el prototipo", min:14, busca:"O2 · H3, H4, H5, H7, H8",
+   qs:[
+    {id:"q3_1", n:"3.1", e:1, t:"Antes de abrirlo otra vez: en tus palabras, ¿qué hace esta herramienta y para quién es?"},
+    {id:"q3_2", n:"3.2", t:"¿Qué fue lo primero que pensaste cuando la recorriste? ¿Y después?"},
+    {id:"q3_3", n:"3.3", e:1, t:"(Comparte las 2 o 3 pantallas que elegiste de UseBerry) Acá te demoraste más (o saliste). ¿Qué estabas buscando? ¿Qué esperabas que pasara?", s:["Nunca “te equivocaste”. Siempre “¿qué esperabas?”."]},
+    {id:"q3_4", n:"3.4", h:["H3","H8"], t:"Si hicieras este diagnóstico con un cliente tuyo, ¿qué preguntas harías tal cual?", s:["¿Cuáles te saltarías o no te atreverías a hacer?","¿Cuánto tiempo crees que toma con un cliente?"]},
+    {id:"q3_5", n:"3.5", e:1, h:["H4"], t:"Mira el resultado: el costo de la sucesión si no se hace nada. ¿Cómo se lo explicarías a tu cliente? ¿Qué crees que te preguntaría?", s:["¿Se entiende la escala de las cifras (millones o miles de millones)?","¿Tu cliente le creería?"]},
+    {id:"q3_6", n:"3.6", e:1, h:["H2","H5"], t:"Al final, la herramienta sugiere un seguro. ¿Cómo crees que lo recibiría tu cliente? ¿Cómo lo llevarías tú?", s:["¿En qué momento se sentiría como venta?","¿Te sentirías cómodo?"]},
+    {id:"q3_7", n:"3.7", h:["H7"], t:"¿Para qué le serviría la bóveda a tu cliente? ¿A quién designaría?", s:["¿Qué guardaría ahí y qué no guardaría nunca?"]},
+    {id:"q3_8", n:"3.8", t:"¿Qué te faltó ver o qué sobra?"}
+   ]},
+  {id:"b4", n:4, t:"El valor en tu trabajo", min:10, busca:"O3, O4, O6 · H1, H8",
+   qs:[
+    {id:"q4_1", n:"4.1", e:1, t:"Piensa en un cliente concreto de tu cartera, sin decirme el nombre. ¿Usarías esto con él? ¿Por qué con él?", s:["¿Y con quién no?"]},
+    {id:"q4_2", n:"4.2", h:["H8"], t:"¿En qué momento de la relación la sacarías? ¿En la primera reunión, en una revisión o cuando pasa algo en su vida?"},
+    {id:"q4_3", n:"4.3", e:1, h:["H1"], t:"¿Qué parte de tu trabajo te quita o te facilita esto? ¿Qué harías distinto la próxima vez que salga el tema?"},
+    {id:"q4_4", n:"4.4", t:"(Escalera) Dijiste que ___ te sirve. ¿Por qué es importante eso para ti? ¿Y para tu cliente?"},
+    {id:"q4_5", n:"4.5", e:1, w:"decepcion", t:"Si mañana te dijeran que la herramienta no sale, ¿qué tan decepcionado quedarías: mucho, algo o nada? ¿Por qué?"},
+    {id:"q4_6", n:"4.6", w:"palabras", t:"De esta lista, escoge las 3 palabras que mejor describen la herramienta para ti, y cuéntame por qué cada una."},
+    {id:"q4_7", n:"4.7", w:"escalas", t:"De 1 a 5, ¿qué tan útil es para tu trabajo? ¿Y qué tan fácil sería llevarla en una reunión con un cliente? ¿Por qué esos números?"}
+   ]},
+  {id:"b5", n:5, t:"Riesgos y límites", min:4, busca:"O5 · H4, H5",
+   qs:[
+    {id:"q5_1", n:"5.1", t:"¿Qué podría salir mal si la usas con un cliente? ¿Qué podría hacer que pierdas su confianza?"},
+    {id:"q5_2", n:"5.2", h:["H4"], t:"¿Hasta dónde te sientes cómodo hablando de cifras de sucesión e impuestos? ¿En qué momento llamarías a un abogado?"},
+    {id:"q5_3", n:"5.3", t:"¿Hay clientes o familias con los que nunca la usarías?"}
+   ]},
+  {id:"b6", n:6, t:"Cierre", min:2,
+   qs:[
+    {id:"q6_1", n:"6.1", e:1, t:"Si pudieras cambiar una sola cosa antes de llevarla a tus clientes, ¿cuál sería?"},
+    {id:"q6_2", n:"6.2", t:"¿Qué no te pregunté y debí preguntarte?"},
+    {id:"q6_3", n:"6.3", t:"En la siguiente fase vas a probarla con 2 clientes. Sin nombres, ¿con qué perfiles te lo imaginas?"}
+   ],
+   cierre:"Gracias. Ahora sí, ___ te resuelve las dudas que te hayan quedado de la herramienta."}
+];
+const TODAS_Q = BLOQUES.flatMap(b => b.qs.map(q => Object.assign({b:b.n, bt:b.t}, q)));
+const TOTAL_MIN = BLOQUES.reduce((a,b)=>a+b.min,0);
+const ESTADOS = [["por-agendar","Por agendar","b-neutro"],["agendada","Agendada","b-info"],["hecha","Hecha","b-verde"]];
+
+/* ---------- Utilidades ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+function el(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs){
+    const v = attrs[k];
+    if (v == null || v === false) continue;
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? "" : String(v));
+  }
+  for (const c of kids.flat()){ if (c == null || c === false) continue; n.append(c.nodeType ? c : document.createTextNode(String(c))); }
+  return n;
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function getIn(o, path){ return path.split(".").reduce((a,k)=> (a && typeof a === "object") ? a[k] : undefined, o); }
+function setIn(o, path, v){ const ks = path.split("."); let a = o; for (let i=0;i<ks.length-1;i++){ if (!a[ks[i]] || typeof a[ks[i]] !== "object" || Array.isArray(a[ks[i]])) a[ks[i]] = {}; a = a[ks[i]]; } a[ks[ks.length-1]] = v; }
+function merge(a, b){ const out = Array.isArray(a) ? a.slice() : Object.assign({}, a); for (const k in b){ const v = b[k]; if (v && typeof v === "object" && !Array.isArray(v) && out[k] && typeof out[k] === "object" && !Array.isArray(out[k])) out[k] = merge(out[k], v); else out[k] = Array.isArray(v) ? v.slice() : (v && typeof v === "object" ? merge({}, v) : v); } return out; }
+function clone(o){ return JSON.parse(JSON.stringify(o || {})); }
+function fechaCorta(f, h){ if (!f) return "Sin fecha"; const [y,m,d] = f.split("-").map(Number); const meses=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]; return d+"-"+meses[m-1]+(h?" · "+h:""); }
+const TEST_PROTOTIPO = "https://app.useberry.com/t/5nFYPRbd4gQGWa/";
+const ls = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+
+/* ---------- Estado ---------- */
+const S = { db:null, dl:null, cargado:false, sinDb:false, ent:new Map(), config:{}, sel: ls.get("eFP.sel"), pend:new Map(), guardando:new Set(), timers:{} };
+
+/* ---------- Guardado ---------- */
+function setGuardado(t, e){ const n = $("#estado-guardado"); if (!n) return; n.textContent = t; n.dataset.e = e || (/Guardando|reintentando/.test(t) ? "guardando" : /No |permiso/.test(t) ? "error" : "ok"); }
+function cambiar(id, path, valor){
+  const p = S.pend.get(id) || {}; setIn(p, path, valor); S.pend.set(id, p);
+  const d = S.ent.get(id); if (d) setIn(d, path, valor);
+  clearTimeout(S.timers[id]); S.timers[id] = setTimeout(()=>vaciar(id), 700);
+  setGuardado("Guardando…");
+  if (path.startsWith("estado") || path === "fp" || path === "fecha" || path === "hora") { renderLista(); renderChips(); }
+}
+async function vaciar(id){
+  if (!S.db) return;
+  if (S.guardando.has(id)){ clearTimeout(S.timers[id]); S.timers[id] = setTimeout(()=>vaciar(id), 500); return; }
+  const p = S.pend.get(id); if (!p) return;
+  S.pend.delete(id); S.guardando.add(id);
+  try {
+    p.actualizada = new Date().toISOString();
+    await S.db.doc("entrevistas/"+id).update(p);
+    setGuardado("Guardado");
+  } catch(e){
+    S.pend.set(id, merge(p, S.pend.get(id) || {}));
+    if (e && e.code === "unavailable"){ setGuardado("Sin conexión, reintentando…"); setTimeout(()=>vaciar(id), 2000 + Math.random()*1500); }
+    else if (e && e.code === "invalid_argument"){ setGuardado("No tienes permiso para guardar aquí. Pide acceso de colaborador a Julian."); }
+    else setGuardado("No se pudo guardar. Revisa la conexión.");
+  } finally {
+    S.guardando.delete(id);
+  }
+}
+
+/* ---------- Rutas ---------- */
+const RUTAS = ["entrevistas","conducir","sintesis","guia","mensajes"];
+function ruta(){ const r = location.hash.slice(1); return RUTAS.includes(r) ? r : "entrevistas"; }
+function mostrar(){
+  const r = ruta();
+  $$("[data-vista]").forEach(s => s.hidden = s.dataset.vista !== r);
+  $$(".tab").forEach(t => t.toggleAttribute("aria-current", t.dataset.ruta === r));
+  $$(".tab").forEach(t => { if (t.dataset.ruta === r) t.setAttribute("aria-current","page"); });
+  $("#reloj").hidden = !(r === "conducir" && S.sel && S.ent.has(S.sel));
+  if (r === "conducir") renderConducir();
+  if (r === "sintesis") renderSintesis();
+  if (r === "guia" && typeof ajustarLuego === "function") ajustarLuego();
+  moverIndicador();
+}
+window.addEventListener("hashchange", mostrar);
+let indListo = false;
+function moverIndicador(){
+  const ind = $("#tabs-ind"), t = $('.tab[aria-current="page"]'); if (!ind || !t) return;
+  if (!indListo){ ind.style.transition = "none"; }
+  ind.style.width = t.offsetWidth + "px";
+  ind.style.transform = "translateX(" + t.offsetLeft + "px)";
+  if (!indListo){ void ind.offsetWidth; ind.style.transition = ""; indListo = true; }
+  const nav = t.parentElement; if (t.offsetLeft < nav.scrollLeft || t.offsetLeft + t.offsetWidth > nav.scrollLeft + nav.clientWidth) nav.scrollTo({left: t.offsetLeft - 16, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+}
+window.addEventListener("resize", () => { indListo = false; moverIndicador(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { indListo = false; moverIndicador(); });
+
+/* ---------- Encabezado ---------- */
+function renderChips(){
+  const c = $("#resumen-chips"); c.textContent = "";
+  const lista = Array.from(S.ent.values());
+  const hechas = lista.filter(e => e.estado === "hecha").length;
+  const ag = lista.filter(e => e.estado === "agendada").length;
+  c.append(el("span",{class:"badge b-verde"}, hechas+" hechas"), el("span",{class:"badge b-info"}, ag+" agendadas"));
+  const link = S.config.useberry || TEST_PROTOTIPO;
+  c.append(link ? el("span",{class:"badge b-verde"},"Test de prototipo listo") : el("a",{class:"badge b-aviso", href:"#mensajes"},"Falta el test de prototipo"));
+}
+
+/* ---------- Lista ---------- */
+function conteos(e){
+  const r = e.respuestas || {};
+  const conNota = TODAS_Q.filter(q => r[q.id] && (r[q.id].nota || "").trim()).length;
+  const hip = HIP.filter(h => e.hipotesis && e.hipotesis[h.id] && e.hipotesis[h.id].v).length;
+  return {conNota, hip};
+}
+function progreso(e){ const c = conteos(e); return c.conNota+"/"+TODAS_Q.length+" preguntas · "+c.hip+"/8 hipótesis"; }
+function progresoEl(e){
+  const c = conteos(e);
+  return el("div",{class:"progreso"},
+    el("span",{class:"num", text:c.conNota+" de "+TODAS_Q.length+" preguntas con nota"}),
+    el("span",{class:"progreso__barra", "aria-hidden":"true"}, el("i",{style:"width:"+(c.conNota/TODAS_Q.length*100)+"%"})),
+    el("span",{class:"hdots", title:"Hipótesis marcadas: "+c.hip+" de 8"}, HIP.map(h => { const v = ((e.hipotesis||{})[h.id]||{}).v; return el("span",{class: v ? "v-"+v : "", "aria-hidden":"true"}); }), el("span",{class:"sr", text:c.hip+" de 8 hipótesis marcadas"}))
+  );
+}
+function ordenadas(){
+  return Array.from(S.ent.entries()).sort((a,b)=>{
+    const fa = (a[1].fecha||"9999")+(a[1].hora||""), fb = (b[1].fecha||"9999")+(b[1].hora||"");
+    return fa < fb ? -1 : fa > fb ? 1 : 0;
+  });
+}
+function renderLista(){
+  const c = $("#lista"); c.textContent = "";
+  if (S.sinDb){ c.append(el("div",{class:"vacio"}, el("strong",{text:"No hay conexión con el almacenamiento del equipo."}), el("span",{text:"Puedes leer la guía y los mensajes. Para registrar entrevistas, abre esta página desde claude.ai con tu cuenta de Skandia."}))); return; }
+  if (!S.cargado){ c.append(el("div",{class:"vacio", id:"cargando"}, el("span",{text:"Cargando las entrevistas del equipo…"}))); return; }
+  if (!S.ent.size){ c.append(el("div",{class:"vacio"}, el("strong",{text:"Todavía no hay entrevistas."}), el("span",{text:"Crea la primera arriba con el nombre del FP. Queda visible para todo el equipo y la puedes abrir para conducirla."}), el("a",{class:"btn btn--sec btn--peq", href:"#guia"},"Ver la presentación del método"))); return; }
+  const l = el("div",{class:"lista"});
+  for (const [id, e] of ordenadas()){
+    const est = ESTADOS.find(x => x[0] === e.estado) || ESTADOS[0];
+    l.append(el("div",{class:"item"},
+      el("div",null, el("div",{class:"item__fp", text:e.fp || "Sin nombre"}), el("div",{class:"item__meta", text: fechaCorta(e.fecha, e.hora) + (e.entrevistador ? " · entrevista "+e.entrevistador : "") + (e.observador ? " · observa "+e.observador : "")})),
+      progresoEl(e),
+      el("span",{class:"badge "+est[2], text:est[1]}),
+      el("button",{class:"btn btn--sec btn--peq", type:"button", onclick:()=>abrir(id)},"Abrir")
+    ));
+  }
+  c.append(l);
+}
+function abrir(id){ S.sel = id; ls.set("eFP.sel", id); construidoPara = null; if (location.hash !== "#conducir") location.hash = "conducir"; else mostrar(); window.scrollTo(0,0); }
+
+$("#form-nueva").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const msg = $("#n-msg");
+  if (!S.db){ msg.textContent = "Sin conexión con el almacenamiento: no se puede crear."; return; }
+  const fp = $("#n-fp").value.trim(); if (!fp){ msg.textContent = "Escribe el nombre del FP."; $("#n-fp").focus(); return; }
+  const fecha = $("#n-fecha").value, hora = $("#n-hora").value;
+  const ahora = new Date().toISOString();
+  const doc = { fp, fecha, hora, entrevistador:$("#n-ent").value.trim(), observador:$("#n-obs").value.trim(), estado: fecha ? "agendada" : "por-agendar", useberry:"", respuestas:{}, hipotesis:{}, palabras:[], escalas:{}, hallazgos:{}, creada:ahora, actualizada:ahora };
+  $("#n-crear").disabled = true; msg.textContent = "Creando…";
+  try {
+    const ref = await S.db.collection("entrevistas").add(doc);
+    S.ent.set(ref.id, clone(doc));
+    $("#form-nueva").reset(); msg.textContent = "";
+    abrir(ref.id);
+  } catch(e){
+    msg.textContent = e && e.code === "invalid_argument" ? "No tienes permiso para crear entrevistas. Pide acceso de colaborador." : e && e.code === "quota_exceeded" ? "El almacenamiento está lleno." : "No se pudo crear. Intenta de nuevo.";
+  } finally { $("#n-crear").disabled = false; }
+});
+
+/* ---------- Conducir ---------- */
+let construidoPara = null;
+function renderConducir(){
+  const c = $("#conducir");
+  if (!S.sel || !S.ent.has(S.sel)){
+    construidoPara = null; c.textContent = "";
+    $("#reloj").hidden = true;
+    const box = el("div",{class:"stack"}, el("h2",{text:"Elige la entrevista que vas a conducir"}));
+    if (!S.ent.size) box.append(el("div",{class:"vacio"}, el("span",{text: S.cargado || S.sinDb ? "No hay entrevistas creadas todavía." : "Cargando…"}), el("a",{class:"btn btn--peq", href:"#entrevistas"},"Crear una entrevista")));
+    else { const l = el("div",{class:"lista"}); for (const [id,e] of ordenadas()) l.append(el("div",{class:"item"}, el("div",null, el("div",{class:"item__fp", text:e.fp}), el("div",{class:"item__meta", text:fechaCorta(e.fecha,e.hora)})), el("div",{class:"progreso num", text:progreso(e)}), el("span"), el("button",{class:"btn btn--peq", type:"button", onclick:()=>abrir(id)},"Conducir"))); box.append(l); }
+    c.append(box); return;
+  }
+  if (construidoPara !== S.sel){ construir(); construidoPara = S.sel; relojMontar(); }
+  pintar();
+}
+
+function campo(label, id, path, tipo, extra){
+  const inp = tipo === "textarea" ? el("textarea", Object.assign({id, "data-path":path, rows:3}, extra||{})) :
+              tipo === "select" ? el("select", {id, "data-path":path}, ESTADOS.map(e => el("option",{value:e[0]}, e[1]))) :
+              el("input", Object.assign({type:tipo, id, "data-path":path}, extra||{}));
+  return el("label",{class:"campo", for:id}, label, inp);
+}
+function construir(){
+  const c = $("#conducir"); c.textContent = "";
+  const e = S.ent.get(S.sel);
+  const borrar = el("button",{class:"btn btn--peligro btn--peq", type:"button"},"Eliminar entrevista");
+  borrar.addEventListener("click", async () => {
+    if (!borrar.classList.contains("armado")){ borrar.classList.add("armado"); borrar.textContent = "Confirmar: eliminar"; setTimeout(()=>{ borrar.classList.remove("armado"); borrar.textContent = "Eliminar entrevista"; }, 4000); return; }
+    try { await S.db.doc("entrevistas/"+S.sel).delete(); S.ent.delete(S.sel); S.sel = null; ls.set("eFP.sel", null); location.hash = "entrevistas"; renderLista(); renderChips(); }
+    catch(err){ setGuardado("No se pudo eliminar."); }
+  });
+  c.append(el("div",{class:"panel panel--gris"},
+    el("div",{class:"row", style:"justify-content:space-between"}, el("div",{class:"stack", style:"gap:2px"}, el("span",{class:"eyebrow", text:"Entrevista"}), el("h2",{id:"c-titulo", text:e.fp || "Sin nombre"})), el("div",{class:"row"}, el("span",{class:"estado-guardado", id:"estado-guardado", text:"Todo guardado"}), borrar)),
+    el("div",{class:"grid-form"}, campo("FP entrevistado","c-fp","fp","text"), campo("Fecha","c-fecha","fecha","date"), campo("Hora","c-hora","hora","time"), campo("Entrevista (UX)","c-ent","entrevistador","text"), campo("Observa (producto)","c-obs","observador","text"), campo("Estado","c-estado","estado","select")),
+    campo("Antes de entrar: lo que viste en UseBerry y las 2 o 3 pantallas que vas a mostrar en el bloque 3","c-ub","useberry","textarea",{placeholder:"Tareas que completó, tiempos, dónde se salió, qué respondió en las preguntas…"})
+  ));
+  // Índice de bloques
+  c.append(el("nav",{class:"row", "aria-label":"Bloques"}, BLOQUES.map(b => el("a",{class:"chip", "data-bchip":b.id, href:"#conducir", onclick:(ev)=>{ev.preventDefault(); document.getElementById("blq-"+b.id).scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});}}, b.n+" · "+b.t, el("span",{class:"cuenta"}))), el("a",{class:"chip", "data-bchip":"despues", href:"#conducir", onclick:(ev)=>{ev.preventDefault(); document.getElementById("blq-despues").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});}}, "Después", el("span",{class:"cuenta"}))));
+
+  for (const b of BLOQUES){
+    const sec = el("section",{class:"bloque", id:"blq-"+b.id},
+      el("div",{class:"bloque__cab"}, el("h3",{text:"Bloque "+b.n+" · "+b.t}), el("span",{class:"min num", text:b.min+" min"}), el("span",{class:"badge b-verde ahora", "data-ahora":b.id, hidden:true}, "Ahora")),
+      b.busca ? el("p",{class:"busca", text:"Busca: "+b.busca}) : null,
+      b.guion ? el("div",{class:"guion"}, b.guion.map(p => el("p",{text:"“"+p+"”"}))) : null,
+      b.nota ? el("p",{class:"nota-mod", text:b.nota}) : null
+    );
+    for (const q of b.qs) sec.append(pregunta(q));
+    if (b.cierre) sec.append(el("div",{class:"guion"}, el("p",{text:"“"+b.cierre+"”"})));
+    c.append(sec);
+  }
+  // Después
+  const hipBox = el("div",{class:"hip-tabla"});
+  for (const h of HIP){
+    hipBox.append(el("div",{class:"hip-fila"},
+      el("span",{class:"hn", text:h.id}),
+      el("div",{class:"hc"}, el("span",{class:"small", text:h.t}),
+        el("div",{class:"seg", role:"group", "aria-label":"Veredicto "+h.id}, VEREDICTOS.map(v => el("button",{type:"button", "data-seg":"hipotesis."+h.id+".v", "data-v":v[0], "aria-pressed":"false"}, v[1]))),
+        el("input",{type:"text", id:"ev-"+h.id, "data-path":"hipotesis."+h.id+".ev", placeholder:"Evidencia en una línea (cita o hecho)", "aria-label":"Evidencia "+h.id}))
+    ));
+  }
+  c.append(el("section",{class:"bloque", id:"blq-despues"},
+    el("div",{class:"bloque__cab"}, el("h3",{text:"Después de la entrevista · 10 min"})),
+    el("p",{class:"busca", text:"Llénalo apenas cierres la llamada, mientras está fresco."}),
+    el("div",{class:"panel"}, el("h3",{text:"Hipótesis"}), hipBox),
+    el("div",{class:"panel"}, el("h3",{text:"Los 3 hallazgos que más te llamaron la atención"}),
+      [1,2,3].map(i => el("input",{type:"text", id:"hz-"+i, "data-path":"hallazgos.h"+i, placeholder:"Hallazgo "+i, "aria-label":"Hallazgo "+i}))),
+    el("div",{class:"row"}, el("button",{class:"btn", type:"button", onclick:()=>{ cambiar(S.sel,"estado","hecha"); pintar(); setGuardado("Marcada como hecha"); }}, "Marcar como hecha"), el("span",{class:"caption", text:"Guarda la transcripción .vtt de Teams en la carpeta del proyecto."}))
+  ));
+}
+function pregunta(q){
+  const body = el("div",{class:"q__cuerpo"});
+  if (q.w === "decepcion") body.append(el("div",{class:"seg", role:"group", "aria-label":"Qué tan decepcionado"}, [["mucho","Mucho"],["algo","Algo"],["nada","Nada"]].map(v => el("button",{type:"button","data-seg":"escalas.decepcion","data-v":v[0],"aria-pressed":"false"}, v[1]))));
+  if (q.w === "palabras") body.append(
+    el("div",{class:"palabras", role:"group", "aria-label":"Palabras positivas"}, PAL_POS.map(p => el("button",{type:"button", class:"chip", "data-word":p, "aria-pressed":"false"}, p))),
+    el("div",{class:"palabras", role:"group", "aria-label":"Palabras negativas"}, PAL_NEG.map(p => el("button",{type:"button", class:"chip chip--neg", "data-word":p, "aria-pressed":"false"}, p))),
+    el("span",{class:"caption", id:"pal-msg", text:"Elige hasta 3."}));
+  if (q.w === "escalas") body.append(
+    el("div",{class:"row"}, el("span",{class:"small", style:"min-width:9em", text:"Útil para su trabajo"}), el("div",{class:"seg", role:"group", "aria-label":"Utilidad"}, [1,2,3,4,5].map(n => el("button",{type:"button","data-seg":"escalas.utilidad","data-v":String(n),"aria-pressed":"false"}, String(n))))),
+    el("div",{class:"row"}, el("span",{class:"small", style:"min-width:9em", text:"Fácil con un cliente"}), el("div",{class:"seg", role:"group", "aria-label":"Facilidad"}, [1,2,3,4,5].map(n => el("button",{type:"button","data-seg":"escalas.facilidad","data-v":String(n),"aria-pressed":"false"}, String(n))))));
+  body.append(
+    el("textarea",{id:"nt-"+q.id, "data-path":"respuestas."+q.id+".nota", rows:3, placeholder:"Lo que dijo, con sus palabras. Las citas literales entre comillas.", "aria-label":"Notas "+q.n}),
+    el("div",{class:"row", role:"group", "aria-label":"Etiquetas"}, TAGS.map(t => el("button",{type:"button", class:"chip chip--tag", "data-tag":"respuestas."+q.id+".tags", "data-v":t, "aria-pressed":"false"}, t)))
+  );
+  return el("div",{class:"q", "data-q":q.id},
+    el("div",{class:"q__cab"}, el("span",{class:"q__n", text:q.n}), el("span",{class:"q__t"}, q.t, q.e ? el("span",{class:"estrella", title:"Esencial: no la saltes", "aria-label":"esencial"},"★") : null), q.h ? el("span",{class:"q__hip"}, q.h.map(h => el("span",{class:"badge b-neutro", title:(HIP.find(x=>x.id===h)||{}).t, text:h}))) : null),
+    q.s ? el("ul",{class:"q__sondeos"}, q.s.map(s => el("li",{text:s}))) : null,
+    body
+  );
+}
+function pintar(){
+  const e = S.ent.get(S.sel); if (!e) return;
+  const t = $("#c-titulo"); if (t) t.textContent = e.fp || "Sin nombre";
+  $$("#conducir [data-path]").forEach(n => { if (n === document.activeElement) return; const v = getIn(e, n.dataset.path); const s = v == null ? "" : String(v); if (n.value !== s) n.value = s; });
+  $$("#conducir [data-seg]").forEach(n => n.setAttribute("aria-pressed", String(getIn(e, n.dataset.seg)) === n.dataset.v ? "true" : "false"));
+  $$("#conducir [data-tag]").forEach(n => { const a = getIn(e, n.dataset.tag); n.setAttribute("aria-pressed", Array.isArray(a) && a.includes(n.dataset.v) ? "true" : "false"); });
+  const pal = Array.isArray(e.palabras) ? e.palabras : [];
+  $$("#conducir [data-word]").forEach(n => n.setAttribute("aria-pressed", pal.includes(n.dataset.word) ? "true" : "false"));
+  const pm = $("#pal-msg"); if (pm) pm.textContent = pal.length ? "Elegidas: "+pal.join(", ")+(pal.length>=3?" (máximo 3)":"") : "Elige hasta 3.";
+  const r = e.respuestas || {};
+  $$("#conducir .q[data-q]").forEach(n => n.classList.toggle("lleno", !!(r[n.dataset.q] && (r[n.dataset.q].nota||"").trim())));
+  for (const b of BLOQUES){
+    const ch = $('#conducir [data-bchip="'+b.id+'"]'); if (!ch) continue;
+    const hechas = b.qs.filter(q => r[q.id] && (r[q.id].nota||"").trim()).length;
+    ch.querySelector(".cuenta").textContent = hechas+"/"+b.qs.length; ch.classList.toggle("completo", hechas === b.qs.length);
+  }
+  const chD = $('#conducir [data-bchip="despues"]');
+  if (chD){ const h = HIP.filter(x => ((e.hipotesis||{})[x.id]||{}).v).length; chD.querySelector(".cuenta").textContent = h+"/8"; chD.classList.toggle("completo", h === 8); }
+}
+const cond = $("#conducir");
+cond.addEventListener("input", ev => { const n = ev.target.closest("[data-path]"); if (!n || !S.sel) return; cambiar(S.sel, n.dataset.path, n.value); if (n.dataset.path === "fp"){ const t=$("#c-titulo"); if (t) t.textContent = n.value || "Sin nombre"; } if (/\.nota$/.test(n.dataset.path)){ const q = n.closest(".q"); if (q) q.classList.toggle("lleno", !!n.value.trim()); } });
+cond.addEventListener("focusout", ev => { if (ev.target.matches && ev.target.matches("textarea[data-path]")) pintar(); });
+cond.addEventListener("click", ev => {
+  if (!S.sel) return; const e = S.ent.get(S.sel); if (!e) return;
+  const s = ev.target.closest("[data-seg]");
+  if (s){ const cur = getIn(e, s.dataset.seg); cambiar(S.sel, s.dataset.seg, String(cur) === s.dataset.v ? "" : s.dataset.v); pintar(); return; }
+  const t = ev.target.closest("[data-tag]");
+  if (t){ const a = (getIn(e, t.dataset.tag) || []).slice(); const i = a.indexOf(t.dataset.v); if (i>=0) a.splice(i,1); else a.push(t.dataset.v); cambiar(S.sel, t.dataset.tag, a); pintar(); return; }
+  const w = ev.target.closest("[data-word]");
+  if (w){ const a = (Array.isArray(e.palabras) ? e.palabras : []).slice(); const i = a.indexOf(w.dataset.word); if (i>=0) a.splice(i,1); else { if (a.length>=3) { $("#pal-msg").textContent = "Ya hay 3. Quita una para cambiarla."; return; } a.push(w.dataset.word); } cambiar(S.sel, "palabras", a); pintar(); }
+});
+
+/* ---------- Reloj (por persona, en este navegador) ---------- */
+let R = {acc:0, ini:null}, tick = null;
+function relojKey(){ return "eFP.reloj."+S.sel; }
+function relojMontar(){
+  R = ls.get(relojKey()) || {acc:0, ini:null};
+  const bar = $("#reloj-barra"); bar.textContent = "";
+  for (const b of BLOQUES) bar.append(el("div",{class:"reloj__seg", "data-b":b.id, style:"flex:"+b.min}, el("i")));
+  relojPintar(); clearInterval(tick); tick = setInterval(relojPintar, 1000);
+}
+function transcurrido(){ return R.acc + (R.ini ? Date.now() - R.ini : 0); }
+function mmss(ms){ const s = Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+function relojPintar(){
+  const ms = transcurrido(), min = ms/60000;
+  const t = $("#reloj-t"); t.textContent = mmss(ms)+" / "+TOTAL_MIN+":00"; t.classList.toggle("pasado", min > TOTAL_MIN);
+  $("#reloj-play").textContent = R.ini ? "Pausar" : (ms ? "Seguir" : "Iniciar");
+  let acum = 0, actual = null;
+  for (const b of BLOQUES){
+    const seg = $('#reloj-barra [data-b="'+b.id+'"]'); const f = Math.max(0, Math.min(1, (min - acum)/b.min));
+    if (seg){ seg.firstChild.style.width = (f*100)+"%"; seg.classList.toggle("actual", min >= acum && min < acum + b.min && ms > 0); }
+    if (!actual && min < acum + b.min) actual = {b, resta: acum + b.min - min};
+    acum += b.min;
+  }
+  $$("[data-ahora]").forEach(n => n.hidden = !(ms > 0 && actual && n.dataset.ahora === actual.b.id));
+  const lb = $("#reloj-bloque"); lb.textContent = "";
+  if (!ms) lb.append("Inicia el reloj cuando arranques la apertura.");
+  else if (actual) lb.append(el("b",{text:"Bloque "+actual.b.n+" · "+actual.b.t}), " · quedan "+Math.max(1, Math.ceil(actual.resta))+" min del bloque");
+  else lb.append(el("b",{text:"Tiempo cumplido."}), " Cierra con la 6.1 y pasa a las dudas con producto.");
+}
+$("#reloj-play").addEventListener("click", () => { if (R.ini){ R.acc += Date.now() - R.ini; R.ini = null; } else R.ini = Date.now(); ls.set(relojKey(), R); relojPintar(); });
+$("#reloj-reset").addEventListener("click", () => { R = {acc:0, ini:null}; ls.set(relojKey(), R); relojPintar(); });
+
+/* ---------- Síntesis ---------- */
+let filtroTag = "Todas";
+function renderSintesis(){
+  const c = $("#sintesis"); c.textContent = "";
+  const lista = ordenadas();
+  if (!lista.length){ c.append(el("div",{class:"vacio"}, el("strong",{text:"La síntesis aparece cuando haya entrevistas registradas."}), el("span",{text:"Cada nota, etiqueta y marca de hipótesis llega aquí sola, de todo el equipo."}))); return; }
+  const hechas = lista.filter(([,e]) => e.estado === "hecha").length;
+  const exp = el("button",{class:"btn btn--sec btn--peq", type:"button", onclick:exportar},"Descargar todo en CSV");
+  c.append(el("div",{class:"row", style:"justify-content:space-between"}, el("div",null, el("h2",{text:"Síntesis"}), el("p",{class:"caption", text: lista.length+" entrevistas registradas, "+hechas+" hechas. Con pocas entrevistas, lee los conteos como señal y no como porcentaje."})), el("div",{class:"row"}, exp, el("span",{class:"caption", id:"exp-msg"}))));
+
+  // Matriz de hipótesis
+  // Avance hacia la meta
+  c.append(el("div",{class:"panel panel--gris"}, el("p",{class:"titular", text: hechas+" de 12 entrevistas hechas"+(hechas >= 12 ? ": meta cumplida." : hechas >= 6 ? ": ya deberían repetirse los temas principales." : ".")}), el("span",{class:"progreso__barra", "aria-hidden":"true"}, el("i",{style:"width:"+Math.min(100, hechas/12*100)+"%"}))));
+
+  // Matriz de hipótesis
+  const thead = el("tr",null, el("th",{text:"Hipótesis"}), lista.map(([,e]) => el("th",{title:e.fp, text:(e.fp||"—").split(" ")[0]})), el("th",{text:"Reparto"}));
+  const tb = el("tbody");
+  const resumenH = [];
+  for (const h of HIP){
+    const cnt = {confirma:0, matiza:0, refuta:0, "no-salio":0};
+    const tds = lista.map(([,e]) => { const r = (e.hipotesis||{})[h.id] || {}; const v = VEREDICTOS.find(x => x[0] === r.v); if (v) cnt[v[0]]++; return el("td",null, el("span",{class:"celda "+(v ? "c-"+v[0] : "c-vacia"), title:(v?v[1]:"Sin marcar")+(r.ev?": "+r.ev:"")}, v ? v[2] : "·")); });
+    const tot = cnt.confirma + cnt.matiza + cnt.refuta + cnt["no-salio"];
+    resumenH.push({h, cnt, tot});
+    const barra = el("div",{class:"apilada", title: VEREDICTOS.map(v => v[1]+": "+cnt[v[0]]).join(" · ")}, VEREDICTOS.filter(v => cnt[v[0]]).map(v => el("i",{class:"v-"+v[0], style:"flex:"+cnt[v[0]]})));
+    tb.append(el("tr",null, el("th",{scope:"row", style:"min-width:16em;font-weight:400"}, el("strong",{text:h.id+" "}), h.t), tds,
+      el("td",null, el("div",{class:"stack", style:"gap:4px"}, tot ? barra : el("span",{class:"caption", text:"Sin marcar"}), tot ? el("span",{class:"caption num", text:"C "+cnt.confirma+" · M "+cnt.matiza+" · R "+cnt.refuta+" · – "+cnt["no-salio"]}) : null))));
+  }
+  const marcadas = resumenH.filter(x => x.tot);
+  let titularH = "Todavía no hay hipótesis marcadas.";
+  if (marcadas.length){
+    const top = marcadas.slice().sort((a,b) => b.cnt.confirma - a.cnt.confirma)[0];
+    const ref = marcadas.slice().sort((a,b) => b.cnt.refuta - a.cnt.refuta)[0];
+    titularH = (top.cnt.confirma ? "La más confirmada es "+top.h.id+" ("+top.cnt.confirma+" de "+top.tot+")" : "Ninguna hipótesis se ha confirmado todavía") + (ref.cnt.refuta ? "; la más refutada, "+ref.h.id+" ("+ref.cnt.refuta+" de "+ref.tot+")." : ", y ninguna se ha refutado.");
+  }
+  const leyenda = el("div",{class:"leyenda"}, VEREDICTOS.map(v => el("span",null, el("i",{class:"v-"+v[0], style:"background:"+({confirma:"#1a9a47",matiza:"#e3a008",refuta:"#d6453d","no-salio":"#a3a3a3"})[v[0]]}), v[2]+" "+v[1].toLowerCase())));
+  c.append(el("div",{class:"stack", style:"gap:8px"}, el("h3",{text:"Hipótesis por FP"}), el("p",{class:"titular", text:titularH}), leyenda, el("p",{class:"caption", text:"Pasa el cursor sobre una celda para ver la evidencia."}), el("div",{class:"tabla-wrap"}, el("table",null, el("thead",null, thead), tb))));
+
+  // Indicadores
+  const dec = {mucho:0, algo:0, nada:0}, ut = [0,0,0,0,0], fa = [0,0,0,0,0], pal = {};
+  for (const [,e] of lista){ const s = e.escalas || {}; if (dec[s.decepcion] != null) dec[s.decepcion]++; if (+s.utilidad) ut[+s.utilidad-1]++; if (+s.facilidad) fa[+s.facilidad-1]++; (e.palabras||[]).forEach(p => pal[p] = (pal[p]||0)+1); }
+  const barras = (pares, neg) => { const max = Math.max(1, ...pares.map(p=>p[1])); return el("div",{class:"barras"}, pares.map(([k,v]) => el("div",{class:"barra-f"+(neg && neg(k) ? " neg":"")}, el("span",{text:k}), el("span",{class:"pista"}, el("i",{style:"width:"+(v/max*100)+"%"})), el("span",{class:"num", text:v})))); };
+  const palOrden = Object.entries(pal).sort((a,b)=>b[1]-a[1]);
+  const nDec = dec.mucho + dec.algo + dec.nada;
+  const mediana = arr => { const xs = []; arr.forEach((v,i) => { for (let k=0;k<v;k++) xs.push(i+1); }); if (!xs.length) return null; const m = Math.floor(xs.length/2); return xs.length % 2 ? xs[m] : (xs[m-1]+xs[m])/2; };
+  const mUt = mediana(ut), mFa = mediana(fa), nUt = ut.reduce((a,b)=>a+b,0), nFa = fa.reduce((a,b)=>a+b,0);
+  const tit = t => el("p",{class:"titular", text:t});
+  c.append(el("div",{class:"kpis"},
+    el("div",{class:"panel"}, el("h3",{class:"caption", text:"Si la herramienta no saliera"}), tit(nDec ? dec.mucho+" de "+nDec+" quedarían muy decepcionados." : "Sin respuestas todavía."), barras([["Mucho",dec.mucho],["Algo",dec.algo],["Nada",dec.nada]])),
+    el("div",{class:"panel"}, el("h3",{class:"caption", text:"Útil para su trabajo (1 a 5)"}), tit(mUt != null ? "Mediana: "+String(mUt).replace(".",",")+" de 5, con "+nUt+" respuestas." : "Sin respuestas todavía."), barras(ut.map((v,i)=>[String(i+1),v]))),
+    el("div",{class:"panel"}, el("h3",{class:"caption", text:"Fácil con un cliente (1 a 5)"}), tit(mFa != null ? "Mediana: "+String(mFa).replace(".",",")+" de 5, con "+nFa+" respuestas." : "Sin respuestas todavía."), barras(fa.map((v,i)=>[String(i+1),v]))),
+    el("div",{class:"panel"}, el("h3",{class:"caption", text:"Palabras elegidas"}), tit(palOrden.length ? "La más elegida: «"+palOrden[0][0]+"» ("+palOrden[0][1]+")." : "Todavía nadie eligió palabras."), palOrden.length ? barras(palOrden, k => PAL_NEG.includes(k)) : null)
+  ));
+
+  // Notas por etiqueta
+  const filtros = el("div",{class:"row", role:"group", "aria-label":"Filtrar notas"}, ["Todas"].concat(TAGS).map(t => el("button",{type:"button", class:"chip", "aria-pressed": String(filtroTag === t), onclick:()=>{ filtroTag = t; renderSintesis(); }}, t)));
+  const notas = el("div",{class:"stack", style:"gap:10px"});
+  let n = 0;
+  for (const q of TODAS_Q){
+    const items = lista.map(([,e]) => ({e, r:(e.respuestas||{})[q.id]})).filter(x => x.r && (x.r.nota||"").trim() && (filtroTag === "Todas" || (x.r.tags||[]).includes(filtroTag)));
+    if (!items.length) continue;
+    notas.append(el("h4",{class:"small", style:"margin-top:6px"}, el("strong",{text:q.n+" "}), q.t));
+    for (const {e, r} of items){ n++; notas.append(el("div",{class:"cita"}, el("p",{text:r.nota}), el("span",{class:"caption"}, el("span",{text:e.fp}), (r.tags||[]).map(t => el("span",{class:"badge b-neutro", text:t}))))); }
+  }
+  if (!n) notas.append(el("p",{class:"caption", text: filtroTag === "Todas" ? "Aún no hay notas." : "No hay notas con la etiqueta «"+filtroTag+"»."}));
+  c.append(el("div",{class:"stack", style:"gap:10px"}, el("h3",{text:"Notas por pregunta"}), filtros, notas));
+
+  // Hallazgos
+  const hz = el("div",{class:"stack", style:"gap:8px"});
+  for (const [,e] of lista){ const h = e.hallazgos || {}; ["h1","h2","h3"].forEach(k => { if ((h[k]||"").trim()) hz.append(el("div",{class:"cita"}, el("p",{text:h[k]}), el("span",{class:"caption", text:e.fp}))); }); }
+  if (!hz.childNodes.length) hz.append(el("p",{class:"caption", text:"Aún no hay hallazgos."}));
+  c.append(el("div",{class:"stack", style:"gap:10px"}, el("h3",{text:"Hallazgos de cada entrevista"}), hz));
+}
+function csvCelda(v){ const s = v == null ? "" : String(v); return /[",\n;]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; }
+async function exportar(){
+  const m = $("#exp-msg");
+  const filas = [["fp","fecha","hora","entrevista","observa","estado","bloque","pregunta","texto","nota","etiquetas"]];
+  for (const [,e] of ordenadas()){
+    const base = [e.fp, e.fecha, e.hora, e.entrevistador, e.observador, e.estado];
+    filas.push(base.concat(["0","UseBerry","Lo que vio en UseBerry", e.useberry||"", ""]));
+    for (const q of TODAS_Q){ const r = (e.respuestas||{})[q.id] || {}; filas.push(base.concat([q.b, q.n, q.t, r.nota||"", (r.tags||[]).join(" | ")])); }
+    const s = e.escalas || {};
+    filas.push(base.concat(["4","4.5","Decepción", s.decepcion||"", ""]));
+    filas.push(base.concat(["4","4.6","Palabras", (e.palabras||[]).join(" | "), ""]));
+    filas.push(base.concat(["4","4.7","Utilidad / Facilidad", (s.utilidad||"")+" / "+(s.facilidad||""), ""]));
+    for (const h of HIP){ const r = (e.hipotesis||{})[h.id] || {}; const v = VEREDICTOS.find(x => x[0] === r.v); filas.push(base.concat(["Hipótesis", h.id, h.t, r.ev||"", v ? v[1] : ""])); }
+    ["h1","h2","h3"].forEach((k,i) => filas.push(base.concat(["Hallazgos", "Hallazgo "+(i+1), "", (e.hallazgos||{})[k]||"", ""])));
+  }
+  const csv = "﻿" + filas.map(f => f.map(csvCelda).join(",")).join("\r\n");
+  if (!S.dl){ m.textContent = "La descarga no está disponible en esta vista."; return; }
+  try { await S.dl.save({filename:"entrevistas-fp-skandia-generaciones.csv", data:csv}); m.textContent = "Descargado."; }
+  catch(e){ m.textContent = e && e.code === "declined" ? "" : "No se pudo descargar."; }
+}
+
+/* ---------- Guía y método: presentación ---------- */
+const Q = id => TODAS_Q.find(q => q.id === id);
+const qli = id => { const q = Q(id); return '<li><b class="d-qn">'+q.n+'</b><span>'+esc(q.t.replace(/^\([^)]*\)\s*/,""))+'</span></li>'; };
+const cab = (eyebrow, titulo) => '<div class="diapo__cab"><span class="eyebrow">'+eyebrow+'</span><h2>'+titulo+'</h2></div>';
+const BLQ_DESC = {
+  b1:"Confianza, permiso para grabar y una invitación explícita a criticar.",
+  b2:"La última vez que el tema salió con un cliente. Sin hablar del prototipo.",
+  b3:"Qué entendió, dónde se trabó y por qué. El resultado, el seguro y la bóveda.",
+  b4:"Con qué cliente concreto, en qué momento y qué tarea le quita.",
+  b5:"La frontera de la asesoría y la confianza del cliente.",
+  b6:"Una sola cosa que cambiaría y con qué perfiles haría la prueba."
+};
+const DIAPOS = [
+  { t:"Portada", n:"Arranca con el giro: los FPs ya no solo cuentan historias, ahora ven el prototipo. Esta es la forma en que proponemos escucharlos después de UseBerry.",
+    h:'<div class="d-portada"><div class="d-portada__txt"><span class="eyebrow">Skandia Generaciones · Equipo UX · 24 de noviembre de 2026</span><h2 class="d-h1">Escuchar a los FPs después del prototipo</h2><p class="d-lead">Cómo vamos a entender lo que vive el comercial con sus clientes y qué tan bien le responde la herramienta.</p></div><div class="d-portada__datos"><div class="d-tile d-tile--verde"><span class="d-num">15′</span><p>Recorrido del prototipo en UseBerry</p></div><div class="d-tile d-tile--verde"><span class="d-num">45′</span><p>Entrevista a profundidad con UX, más 10 a 15 de dudas con producto</p></div><div class="d-tile d-tile--verde"><span class="d-num">5</span><p>FPs entrevistados a profundidad; UseBerry cubre a todos los invitados</p></div></div></div>' },
+  { t:"Cómo encaja", n:"Lo importante: UseBerry y la entrevista se complementan. UseBerry mide; la entrevista explica. Por eso revisamos UseBerry antes de cada entrevista.",
+    h: cab("El recorrido del FP","Cuatro momentos, de la presentación a la prueba con clientes") +
+      '<ol class="d-grid d-4 d-pasos"><li class="d-tile"><span class="d-num">1</span><h3>Presentación</h3><p>24-nov, 8:00 a. m. El equipo de Skandia Generaciones muestra el prototipo a los comerciales.</p></li><li class="d-tile"><span class="d-num">2</span><h3>UseBerry · 15′</h3><p>Cada FP entra por un link, se registra, hace tres tareas cortas y responde unas preguntas básicas.</p></li><li class="d-tile d-tile--verde"><span class="d-num">3</span><h3>Entrevista · 45′</h3><p>UX profundiza en lo que vivió con el prototipo y lo contrasta con su trabajo real.</p></li><li class="d-tile"><span class="d-num">4</span><h3>Prueba con clientes</h3><p>Cada FP lleva la herramienta a 2 clientes, con la guía de la fase 2.</p></li></ol>' +
+      '<p class="d-frase">UseBerry nos dice qué pasó. La entrevista nos dice por qué pasó y si resuelve un problema real.</p>' },
+  { t:"Pregunta central", n:"Si al final del ciclo no podemos responder esta pregunta con evidencia, la investigación no cumplió.",
+    h: cab("Lo que queremos entender","La pregunta central") +
+      '<p class="d-grande">¿Skandia Generaciones le resuelve al FP un problema real con sus clientes Wealth, y qué tendría que cambiar para que la lleve a ellos?</p>' +
+      '<div class="d-grid d-3"><div class="d-tile d-tile--gris"><h3>Si el problema existe</h3><p>Y si vale la pena para el comercial y para el cliente.</p></div><div class="d-tile d-tile--gris"><h3>Qué ajustamos</h3><p>En las pantallas, antes de llevarlas a clientes.</p></div><div class="d-tile d-tile--gris"><h3>Cómo se adopta</h3><p>En qué momento del trabajo del FP vive la herramienta.</p></div></div>' },
+  { t:"Seis objetivos", n:"Cada objetivo responde una decisión distinta. Las preguntas de la guía están amarradas a estos objetivos.",
+    h: cab("Objetivos","Seis cosas que tenemos que saber") +
+      '<div class="d-grid d-3">' + OBJ.map(o => '<div class="d-tile"><span class="d-tag">'+o[0]+'</span><h3>'+esc(o[1])+'</h3><p>'+esc(o[2])+'</p><p class="d-decide">Decide: '+esc(o[3])+'</p></div>').join("") + '</div>' },
+  { t:"Hipótesis 1 a 4", n:"Son supuestos que salen del Reto 3, del acta del 13-nov y de la demo. No son hallazgos. Cada entrevista los marca.",
+    h: cab("Hipótesis · 1 de 2","Lo que creemos y vamos a poner a prueba") +
+      '<p class="d-nota">Cada entrevista termina con una marca por hipótesis: <b>confirma</b>, <b>matiza</b>, <b>refuta</b> o <b>no salió</b>, con la evidencia en una línea.</p>' +
+      '<div class="d-grid d-2">' + HIP.slice(0,4).map(h => '<div class="d-tile"><div class="d-hcab"><span class="d-num">'+h.id+'</span><span class="d-nota">Se prueba en '+h.q+'</span></div><p class="d-ht">'+esc(h.t)+'</p><p class="d-fuente">Sale de: '+esc(h.o)+'</p></div>').join("") + '</div>' },
+  { t:"Hipótesis 5 a 8", n:"La H6 depende de Legal: el concepto de la SFC sobre el voluntario es de 2002 y hay que confirmar su vigencia. En la entrevista no se corrige al FP; se anota lo que cree.",
+    h: cab("Hipótesis · 2 de 2","Lo que creemos y vamos a poner a prueba") +
+      '<div class="d-grid d-2">' + HIP.slice(4).map(h => '<div class="d-tile"><div class="d-hcab"><span class="d-num">'+h.id+'</span><span class="d-nota">Se prueba en '+h.q+'</span></div><p class="d-ht">'+esc(h.t)+'</p><p class="d-fuente">Sale de: '+esc(h.o)+'</p></div>').join("") + '</div>' },
+  { t:"Por qué está hecha así", n:"Si preguntan por qué no basta con UseBerry: UseBerry no explica el porqué ni la práctica real del FP. Si preguntan por qué no es una encuesta: las encuestas recogen opiniones, y aquí buscamos hechos.",
+    h: cab("Método","Seis decisiones de diseño, cada una con su base") +
+      '<div class="d-grid d-3 d-metodo">' +
+      [["En embudo","De su trabajo al prototipo, para que lo que vio no contamine lo que cuenta de su práctica.","Kvale y Brinkmann, InterViews"],
+       ["Hechos, no promesas","“La última vez que…” en lugar de “¿la usarías?”. Lo concreto trae el contexto y las palabras reales.","Flanagan, 1954 · Fitzpatrick, 2013 · Torres, 2021"],
+       ["Fuerzas del cambio","El empuje del problema y la atracción de la herramienta contra la ansiedad por lo nuevo y el hábito.","Moesta y Spiek, Jobs to be Done"],
+       ["Volver a la pantalla","Revisamos con el FP las pantallas donde UseBerry muestra que se demoró o se salió.","Retrospective think-aloud"],
+       ["Utilidad y facilidad","Los dos predictores clásicos de que una herramienta se adopte.","Davis, 1989 · Technology Acceptance Model"],
+       ["Palabras y escalera","Tres palabras de una lista mixta y “¿por qué es importante eso?”, para llegar del atributo al valor.","Benedek y Miner, 2002 · Reynolds y Gutman, 1988"]]
+      .map(m => '<div class="d-tile"><h3>'+m[0]+'</h3><p>'+m[1]+'</p><p class="d-fuente">'+m[2]+'</p></div>').join("") + '</div>' },
+  { t:"Cuántas y sesgos", n:"Si preguntan por qué 5: es lo que cabe en el tiempo y basta para los problemas de uso. Para los temas de fondo, la literatura habla de 6 en adelante, así que lo que salga en una sola entrevista queda como señal. Si hay agenda, sumamos 1 o 2. La complacencia es el riesgo más grande: son colegas y el producto es de la casa. Por eso la apertura pide críticas de forma explícita.",
+    h: cab("Rigor","Cuántas entrevistas y qué sesgos cuidamos") +
+      '<div class="d-dos"><div class="d-tile d-tile--verde d-centro"><span class="d-enorme">5</span><p>entrevistas como primera ronda. Alcanzan para encontrar la mayoría de los problemas de uso. Los temas de fondo se leen como señal, no como conclusión. UseBerry pone las cifras con todos los FPs.</p><p class="d-fuente">Nielsen y Landauer, 1993 · Guest, Bunce y Johnson, 2006</p></div>' +
+      '<div class="d-grid" style="grid-template-columns:1fr"><div class="d-tile"><h3>Complacencia</h3><p>Son colegas y el producto es de la casa. La apertura pide críticas y el observador no defiende la herramienta.</p></div><div class="d-tile"><h3>Preguntas hipotéticas</h3><p>“¿La usarías?” casi siempre recibe un sí. Siempre aterrizamos en un cliente concreto.</p></div><div class="d-tile"><h3>Guiar la respuesta</h3><p>No nombramos el problema antes de que el FP lo nombre.</p></div></div></div>' },
+  { t:"Roles", n:"Este es el pedido más importante al equipo del proyecto: durante los 45 minutos, escuchar sin defender. Al final tienen 10 a 15 minutos para resolver dudas.",
+    h: cab("Roles y logística","Tres roles en cada entrevista") +
+      '<div class="d-grid d-3"><div class="d-tile d-tile--verde"><span class="d-tag">UX</span><h3>Entrevista</h3><p>Conduce la conversación, cuida el tiempo y no explica la herramienta.</p></div><div class="d-tile"><span class="d-tag">Equipo del proyecto</span><h3>Observa</h3><p>Una persona del equipo del proyecto. Escucha, anota y guarda las dudas para el final.</p></div><div class="d-tile"><span class="d-tag">Herramienta</span><h3>Registra</h3><p>Notas por pregunta, citas literales y la marca de cada hipótesis. La grabación de Teams queda de respaldo.</p></div></div>' +
+      '<div class="d-tile d-tile--gris"><p><b>Por Teams</b>, con el prototipo listo para compartir pantalla · <b>Grabación solo con autorización</b>, y lo que se reporta va sin el nombre del FP · <b>10 minutos antes</b>, revisamos sus respuestas en UseBerry y elegimos 2 o 3 pantallas.</p></div>' },
+  { t:"La entrevista en 45 minutos", n:"La barra está a escala. Los bloques 2 y 3 son el corazón: 26 de los 45 minutos.",
+    h: cab("La guía","La entrevista en 45 minutos") +
+      (function(){ let acc = 0; const ticks = [0]; BLOQUES.forEach(b => { acc += b.min; ticks.push(acc); });
+        return '<div class="d-tiempo"><div class="d-tbar">' + BLOQUES.map(b => '<div class="d-tseg'+(b.min>=10?' d-tseg--fuerte':'')+'" style="flex:'+b.min+'">'+b.n+'</div>').join("") + '</div><div class="d-tticks">' + ticks.map(t => '<span style="left:'+(t/TOTAL_MIN*100)+'%">'+t+'′</span>').join("") + '</div></div>'; })() +
+      '<div class="d-grid d-3 d-bloques">' + BLOQUES.map(b => '<div class="d-tile"><div class="d-hcab"><h3>'+b.n+' · '+esc(b.t)+'</h3><span class="d-nota">'+b.min+'′</span></div><p>'+BLQ_DESC[b.id]+'</p></div>').join("") + '</div>' },
+  { t:"Bloques 1 y 2", n:"La regla del bloque 2: no se habla del prototipo. Si el FP lo trae, “ya llegamos a eso; primero quiero entender cómo es hoy”. Las ★ son las que no se saltan.",
+    h: cab("Bloques 1 y 2 · 15 minutos","Primero su trabajo, después la herramienta") +
+      '<div class="d-dos"><div class="d-tile d-tile--verde"><span class="d-tag">Apertura</span><p class="d-cita">“Esta conversación no te evalúa a ti: evaluamos la herramienta. Lo que más nos sirve es lo que no funciona, así que si algo no te convence, dilo tal cual.”</p></div>' +
+      '<ul class="d-q">' + ["q2_1","q2_3","q2_5","q2_7"].map(qli).join("") + '</ul></div>' },
+  { t:"Bloque 3", n:"La 3.3 usa lo que vimos en UseBerry: volvemos a las pantallas donde se demoró o se salió. Nunca “te equivocaste”; siempre “¿qué esperabas?”.",
+    h: cab("Bloque 3 · 14 minutos","Volver al prototipo con los ojos del FP") +
+      '<div class="d-dos"><ul class="d-q">' + ["q3_1","q3_3","q3_5","q3_6","q3_7"].map(qli).join("") + '</ul>' +
+      '<div class="d-tile d-tile--gris"><h3>Lo que miramos</h3><ul><li>Si entiende qué hace la herramienta sin volver a verla</li><li>Si la escala de las cifras se entiende: millones o miles de millones</li><li>Si el seguro se lee como consejo o como venta</li><li>Qué guardaría el cliente en la bóveda, y qué no</li></ul></div></div>' },
+  { t:"Bloques 4, 5 y 6", n:"La 4.5 es la señal más fuerte de valor: “¿qué tan decepcionado quedarías si no sale?”. Con pocas entrevistas se lee como señal, no como porcentaje.",
+    h: cab("Bloques 4, 5 y 6 · 16 minutos","Del “me gusta” al uso real") +
+      '<div class="d-dos"><ul class="d-q">' + ["q4_1","q4_3","q4_5","q5_2","q6_1"].map(qli).join("") + '</ul>' +
+      '<div class="d-tile d-tile--gris"><h3>4.6 · Tres palabras</h3><p class="d-pal">'+PAL_POS.map(p=>'<span class="d-chip">'+p+'</span>').join("")+'</p><p class="d-pal">'+PAL_NEG.map(p=>'<span class="d-chip d-chip--neg">'+p+'</span>').join("")+'</p><p class="d-nota">Escoge tres y explica por qué cada una.</p></div></div>' },
+  { t:"Reglas del entrevistador", n:"Aplican también al observador. La regla 5 es clave: lo que el FP cree de lo legal se anota, no se corrige.",
+    h: cab("Cómo conversamos","Nueve reglas para quien entrevista") +
+      '<ol class="d-reglas">' + ["Pregunta por la última vez, no por lo que haría.","Deja 5 segundos de silencio antes de volver a preguntar.","Devuelve la pregunta: “¿Tú qué crees?”.","No defiendas ni expliques la herramienta.","No corrijas lo que cree de lo legal o lo tributario. Anótalo.","Anota las frases literales entre comillas.","Si dice “está bien”, pide el ejemplo: “¿qué parte, con qué cliente?”.","Habla de “lo que el cliente deja listo para los suyos”.","Si falta tiempo, quédate con las preguntas ★."].map(r => '<li>'+r+'</li>').join("") + '</ol>' },
+  { t:"Qué sale de esto", n:"Muestra la herramienta en vivo: pestañas Conducir y Síntesis. El ejemplo de decisión es de formato, no un hallazgo.",
+    h: cab("Registro y síntesis","Todo queda en una herramienta compartida") +
+      '<div class="d-grid d-3"><div class="d-tile"><h3>Conducir</h3><p>La guía pregunta por pregunta, con reloj por bloque, notas, etiquetas y la marca de cada hipótesis.</p></div><div class="d-tile"><h3>Síntesis</h3><p>Se arma sola: hipótesis por FP, notas por etiqueta, palabras y escalas, y descarga en CSV.</p></div><div class="d-tile"><h3>Mensajes</h3><p>El test de prototipo, el mensaje de contexto y el recordatorio, listos para copiar.</p></div></div>' +
+      '<div class="d-tile d-tile--verde"><p class="d-frase" style="font-size:2cqw">Cada conclusión se escribe como decisión: X, que significa Y, así que hacemos Z.</p><p class="d-nota">Ejemplo de formato: “La mayoría de los FPs no se atreve a preguntar por los bienes por fuera de Skandia, lo que significa que el diagnóstico arranca por lo que no sabe, así que el primer paso muestra solo lo que ya está en Skandia”.</p></div>' },
+  { t:"Lo que necesitamos", n:"Cierra pidiendo responsables y fechas para cada punto de la izquierda.",
+    h: cab("Siguientes pasos","Lo que necesitamos de ustedes") +
+      '<div class="d-dos"><ol class="d-reglas d-reglas--1">' + ["El test de prototipo y cómo queda el registro de los FPs.","Validar o ajustar las preguntas de UseBerry.","La lista de FPs y la agenda de las entrevistas: la meta es de 5.","Una persona del equipo del proyecto como observadora en cada entrevista.","Antes de la prueba con clientes: el concepto del abogado y dónde se guardan los datos (Ley 1581)."].map(r => '<li>'+r+'</li>').join("") + '</ol>' +
+      '<div class="d-tile d-tile--verde"><h3>Lo que entregamos</h3><ul><li>La matriz de hipótesis con su evidencia</li><li>El banco de citas de los FPs</li><li>Los ajustes a las pantallas, priorizados</li><li>Las decisiones para la prueba con clientes</li></ul><p class="d-nota">La semana siguiente a la última entrevista.</p></div></div>' }
+];
+
+let iDiapo = Math.min(Math.max(0, +(ls.get("eFP.diapo") || 0)), DIAPOS.length - 1);
+const htmlDiapo = (d, i) => '<div class="diapo__cuerpo"><div class="diapo__escala">'+d.h+'</div></div><div class="diapo__pie"><span class="d-marca"><img src="marca/logo-color.svg" alt="Skandia"> Skandia Generaciones · Entrevistas con FPs</span><span class="num">'+(i+1)+' / '+DIAPOS.length+'</span></div>';
+function renderGuia(){
+  const mazo = $("#mazo"); mazo.textContent = "";
+  mazo.append(el("div",{class:"mazo__prog", id:"mazo-prog", "aria-hidden":"true"}));
+  DIAPOS.forEach((d, i) => {
+    const s = document.createElement("section");
+    s.className = "diapo" + (i === 0 ? " diapo--portada" : "");
+    s.setAttribute("aria-roledescription","diapositiva");
+    s.setAttribute("aria-label", (i+1)+" de "+DIAPOS.length+": "+d.t);
+    s.innerHTML = htmlDiapo(d, i);
+    mazo.append(s);
+  });
+  const g = $("#general"); g.textContent = "";
+  DIAPOS.forEach((d, i) => {
+    const lienzo = el("div",{class:"mini__lienzo"});
+    const s = document.createElement("section"); s.className = "diapo" + (i === 0 ? " diapo--portada" : ""); s.innerHTML = htmlDiapo(d, i); lienzo.append(s);
+    g.append(el("button",{type:"button", class:"mini", "aria-label":"Ir a la diapositiva "+(i+1)+": "+d.t, onclick:() => { vistaGeneral(false); irA(i, true); }}, lienzo, el("span",{class:"mini__t"}, el("b",{text:(i+1)+" · "}), d.t)));
+  });
+  const sel = $("#ir-a"); sel.textContent = "";
+  DIAPOS.forEach((d, i) => sel.append(el("option",{value:String(i)}, (i+1)+". "+d.t)));
+  irA(iDiapo, false);
+}
+/* Ajuste: mide cada diapositiva y reduce su contenido lo justo para que quepa. Todo está en cqw, así que la escala vale igual para las miniaturas. */
+let ajusteT = null;
+function ajustarDiapos(){
+  const mazo = $("#mazo"); if (!mazo || !mazo.offsetWidth) return;
+  const ds = $$("#mazo .diapo"), minis = $$("#general .diapo");
+  ds.forEach((s, i) => {
+    const cu = s.querySelector(".diapo__cuerpo"), es = s.querySelector(".diapo__escala"); if (!cu || !es) return;
+    let k = 1; es.style.setProperty("--k", "1");
+    const A = cu.clientHeight;
+    for (let n = 0; n < 8; n++){
+      const H = es.offsetHeight;
+      if (H * k <= A + 1) break;
+      k = Math.max(0.55, k * (A / (H * k)) * 0.99);
+      es.style.setProperty("--k", k.toFixed(4));
+    }
+    const m = minis[i] && minis[i].querySelector(".diapo__escala"); if (m) m.style.setProperty("--k", k.toFixed(4));
+  });
+}
+function ajustarLuego(){ clearTimeout(ajusteT); ajusteT = setTimeout(() => requestAnimationFrame(ajustarDiapos), 60); }
+window.addEventListener("resize", ajustarLuego);
+document.addEventListener("fullscreenchange", ajustarLuego);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarLuego);
+function posDe(k){ const d = k - iDiapo; return d === 0 ? "actual" : d === -1 ? "antes" : d === 1 ? "despues" : d < 0 ? "lejos-antes" : "lejos-despues"; }
+function irA(i, animar){
+  const previa = iDiapo;
+  iDiapo = Math.min(Math.max(0, i), DIAPOS.length - 1); ls.set("eFP.diapo", iDiapo);
+  const ds = $$("#mazo .diapo");
+  ds.forEach((s, k) => { s.style.removeProperty("--x"); s.dataset.pos = posDe(k); s.setAttribute("aria-hidden", k === iDiapo ? "false" : "true"); s.classList.remove("entra"); });
+  if (animar && previa !== iDiapo){ const s = ds[iDiapo]; void s.offsetWidth; s.classList.add("entra"); }
+  const prog = $("#mazo-prog"); if (prog) prog.style.width = ((iDiapo+1)/DIAPOS.length*100)+"%";
+  $("#pres-cont").textContent = (iDiapo+1)+" / "+DIAPOS.length;
+  $("#ir-a").value = String(iDiapo);
+  $("#pres-ant").disabled = iDiapo === 0; $("#pres-sig").disabled = iDiapo === DIAPOS.length - 1;
+  $("#pres-notas-t").textContent = DIAPOS[iDiapo].n;
+  $$("#general .mini").forEach((m, k) => m.setAttribute("aria-current", k === iDiapo ? "true" : "false"));
+}
+function vistaGeneral(on){
+  $("#general").hidden = !on; $("#escenario").hidden = on;
+  $("#pres-general").setAttribute("aria-pressed", String(on));
+  $("#pres-general").textContent = on ? "Volver a la diapositiva" : "Vista general";
+  if (on){ const m = $$("#general .mini")[iDiapo]; if (m) m.focus({preventScroll:true}); }
+}
+$("#pres-ant").addEventListener("click", () => irA(iDiapo - 1, true));
+$("#pres-sig").addEventListener("click", () => irA(iDiapo + 1, true));
+$("#ir-a").addEventListener("change", ev => irA(+ev.target.value, true));
+$("#pres-general").addEventListener("click", () => vistaGeneral($("#general").hidden));
+$("#pres-notas").addEventListener("click", ev => { const p = $("#pres-notas-p"); p.hidden = !p.hidden; ev.currentTarget.setAttribute("aria-pressed", String(!p.hidden)); });
+function pantallaCompleta(){
+  const esc_ = $("#escenario"), av = $("#pres-aviso");
+  if (document.fullscreenElement){ document.exitFullscreen().catch(()=>{}); return; }
+  if (!esc_.requestFullscreen){ av.hidden = false; return; }
+  esc_.requestFullscreen().catch(() => { av.hidden = false; });
+}
+$("#pres-full").addEventListener("click", pantallaCompleta);
+document.addEventListener("fullscreenchange", () => { $("#pres-full").textContent = document.fullscreenElement ? "Salir de pantalla completa" : "Pantalla completa"; });
+
+/* Arrastre de diapositivas: sigue al puntero 1:1, resiste en los extremos y decide con la velocidad proyectada */
+(function(){
+  const mazo = $("#mazo");
+  let ini = null, dx = 0, arrastrando = false, hubo = false, hist = [];
+  const proyectar = (v, d = 0.998) => (v / 1000) * d / (1 - d);
+  const goma = (o, dim, c = 0.55) => (o * dim * c) / (dim + c * Math.abs(o));
+  mazo.addEventListener("pointerdown", ev => {
+    if (ev.button !== 0 || ev.target.closest("a,button")) return;
+    ini = {x: ev.clientX, y: ev.clientY, w: mazo.clientWidth, id: ev.pointerId}; dx = 0; arrastrando = false; hist = [{x: ev.clientX, t: ev.timeStamp}];
+  });
+  mazo.addEventListener("pointermove", ev => {
+    if (!ini || ev.pointerId !== ini.id) return;
+    let d = ev.clientX - ini.x;
+    if (!arrastrando){
+      if (Math.abs(d) < 10) return;
+      if (Math.abs(ev.clientY - ini.y) > Math.abs(d)){ ini = null; return; }
+      arrastrando = true; mazo.setPointerCapture(ev.pointerId); mazo.classList.add("arrastrando");
+    }
+    hist.push({x: ev.clientX, t: ev.timeStamp}); if (hist.length > 6) hist.shift();
+    if ((iDiapo === 0 && d > 0) || (iDiapo === DIAPOS.length - 1 && d < 0)) d = goma(d, ini.w);
+    dx = d;
+    const pct = d / ini.w * 100, ds = $$("#mazo .diapo");
+    const fija = (k, base) => { if (ds[k]){ ds[k].style.setProperty("--x", (base + pct) + "%"); if (ds[k].dataset.pos.startsWith("lejos")) ds[k].dataset.pos = base < 0 ? "antes" : "despues"; } };
+    fija(iDiapo, 0); fija(iDiapo - 1, -100); fija(iDiapo + 1, 100);
+  });
+  const soltar = ev => {
+    if (!ini) return;
+    const w = ini.w; ini = null;
+    if (!arrastrando) return;
+    hubo = true; arrastrando = false; mazo.classList.remove("arrastrando");
+    const a = hist[0], b = hist[hist.length - 1], dt = Math.max(1, b.t - a.t);
+    const v = (b.x - a.x) / dt * 1000;
+    const destino = dx + proyectar(v);
+    if (destino < -w / 2 && iDiapo < DIAPOS.length - 1) irA(iDiapo + 1, true);
+    else if (destino > w / 2 && iDiapo > 0) irA(iDiapo - 1, true);
+    else irA(iDiapo, false);
+  };
+  mazo.addEventListener("pointerup", soltar);
+  mazo.addEventListener("pointercancel", soltar);
+  mazo.addEventListener("click", ev => {
+    if (hubo){ hubo = false; return; }
+    if (ev.target.closest("a,button")) return;
+    const r = mazo.getBoundingClientRect();
+    irA(ev.clientX - r.left < r.width * 0.3 ? iDiapo - 1 : iDiapo + 1, true);
+  });
+})();
+
+document.addEventListener("keydown", ev => {
+  if (ruta() !== "guia") return;
+  if (ev.target.closest && ev.target.closest("input,textarea,select")) return;
+  if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  const k = ev.key;
+  if (k === "Escape" && !$("#general").hidden){ vistaGeneral(false); return; }
+  if (k === "g" || k === "G"){ ev.preventDefault(); vistaGeneral($("#general").hidden); return; }
+  if (k === "n" || k === "N"){ ev.preventDefault(); $("#pres-notas").click(); return; }
+  if (k === "f" || k === "F"){ ev.preventDefault(); pantallaCompleta(); return; }
+  if (!$("#general").hidden) return;
+  if (["ArrowRight","PageDown"," "].includes(k)){ if (ev.target.closest && ev.target.closest("button,a") && k === " ") return; ev.preventDefault(); irA(iDiapo + 1, true); }
+  else if (["ArrowLeft","PageUp"].includes(k)){ ev.preventDefault(); irA(iDiapo - 1, true); }
+  else if (k === "Home"){ ev.preventDefault(); irA(0, true); }
+  else if (k === "End"){ ev.preventDefault(); irA(DIAPOS.length - 1, true); }
+});
+
+/* ---------- Mensajes ---------- */
+function plantillas(){
+  const link = S.config.useberry || TEST_PROTOTIPO;
+  const fecha = S.config.fecha ? fechaCorta(S.config.fecha) : "[fecha]";
+  return [
+    ["1 · Para enviar el link (lo manda producto)", "Hola, [nombre]. Como vimos en la sesión, ya puedes recorrer Skandia Generaciones. Te toma unos 15 minutos.\n\n1. Entra al test de prototipo: "+link+"\n2. Regístrate con tu nombre y tu correo de Skandia.\n3. Sigue las instrucciones: haces unas tareas cortas en el prototipo y al final respondes unas preguntas.\n\nHazlo desde el computador, ojalá antes del "+fecha+". Los datos del prototipo son de ejemplo: no escribas información de tus clientes.\n\nDespués te vamos a invitar a una conversación de 45 minutos con el equipo de UX para profundizar en lo que viste. ¡Gracias!", "Ajusta el paso 2 a como quede el registro en UseBerry, por ejemplo si cada FP elige su nombre de una lista."],
+    ["2 · Contexto al terminar UseBerry (pantalla final o mensaje aparte)", "Gracias por recorrer Skandia Generaciones. Lo que respondiste ya nos llegó.\n\nEl siguiente paso es una conversación de 45 minutos por Teams con alguien del equipo de UX. Queremos entender cómo vives hoy con tus clientes el tema de dejar organizado el patrimonio para la familia, y qué tan bien responde la herramienta a eso.\n\n• No tienes que preparar nada. Solo ten en mente uno o dos clientes con los que el tema haya salido.\n• No te evaluamos a ti: evaluamos la herramienta. Lo que no te funcionó es lo que más nos sirve.\n• Al final, alguien del equipo de Skandia Generaciones te resuelve las dudas que te queden.\n\nTe escribimos para agendar.", ""],
+    ["3 · Recordatorio un día antes", "Hola, [nombre]. Te recuerdo nuestra conversación de mañana a las [hora], 45 minutos por Teams, sobre Skandia Generaciones. No tienes que preparar nada: solo ten en mente uno o dos clientes con los que el tema haya salido. ¡Nos vemos!", ""]
+  ];
+}
+let configBorrador = null;
+function renderMensajes(){
+  const m = $("#mensajes");
+  const activo = document.activeElement && m.contains(document.activeElement) && document.activeElement.matches("input");
+  if (activo) { pintarPlantillas(); return; }
+  m.textContent = "";
+  const link = el("input",{type:"url", id:"cfg-link", placeholder:"https://…", value:S.config.useberry || TEST_PROTOTIPO});
+  const fecha = el("input",{type:"date", id:"cfg-fecha", value:S.config.fecha || ""});
+  const est = el("span",{class:"caption", id:"cfg-msg"});
+  const guardar = el("button",{class:"btn btn--peq", type:"button"},"Guardar para todo el equipo");
+  guardar.addEventListener("click", async () => {
+    const v = link.value.trim();
+    if (v && !/^https:\/\//.test(v)){ est.textContent = "El link debe empezar por https://"; return; }
+    if (!S.db){ est.textContent = "Sin conexión con el almacenamiento."; return; }
+    try { await S.db.doc("config/general").set({useberry:v, fecha:fecha.value, actualizada:new Date().toISOString()}); est.textContent = "Guardado. Los mensajes ya lo usan."; }
+    catch(e){ est.textContent = e && e.code === "invalid_argument" ? "No tienes permiso para guardar." : "No se pudo guardar."; }
+  });
+  m.append(el("section",null, el("h2",{text:"Test de prototipo"}), el("p",{class:"small muted", text:"Queda guardado para todo el equipo y entra solo en el mensaje 1."}),
+    el("div",{class:"grid-form"}, el("label",{class:"campo", for:"cfg-link"},"Link del test de prototipo", link), el("label",{class:"campo", for:"cfg-fecha"},"Fecha límite para recorrerlo", fecha)),
+    el("div",{class:"row"}, guardar, est)));
+  m.append(el("section",{id:"plantillas"}));
+  pintarPlantillas();
+  const ub = el("section",null, el("h2",{text:"Preguntas sugeridas para UseBerry"}),
+    el("p",{class:"small muted", text:"Propuesta para el equipo de producto. Si las preguntas ya están cerradas, la entrevista funciona igual: solo hay que revisar las respuestas de cada FP antes de entrar."}));
+  ub.insertAdjacentHTML("beforeend",
+    '<h3>Escenario para las tareas (cliente ficticio)</h3><div class="guion"><p>Vas a trabajar con Ricardo, un cliente ficticio: 58 años, casado, dos hijos adultos, un apartamento, una participación en la empresa familiar y su voluntario en Skandia.</p></div>' +
+    '<h3>Tareas</h3><ol><li>Haz el diagnóstico de Ricardo hasta ver su resultado.</li><li>Muéstrale a Ricardo qué alternativas tiene para dejar todo organizado.</li><li>Entra a la bóveda y elige a la persona que recibiría la información.</li></ol>' +
+    '<p><strong>Después de cada tarea:</strong> ¿Qué tan fácil o difícil fue? Escala de 1 (muy difícil) a 7 (muy fácil). <span class="fuente">Single Ease Question, Sauro y Dumas, 2009.</span></p>' +
+    '<h3>Al final del recorrido</h3><ol><li>En una frase, ¿para qué sirve esta herramienta? <span class="muted">(abierta)</span></li><li>¿Qué fue lo más confuso? <span class="muted">(abierta)</span></li><li>¿Con qué tipo de cliente tuyo la usarías? <span class="muted">(opción múltiple: casado con hijos, unión marital, empresario, pensionado o cerca de pensionarse, con bienes por fuera de Skandia, ninguno, otro)</span></li><li>¿Qué tan útil sería para tu trabajo con clientes? <span class="muted">(1 a 5)</span></li><li>¿Qué tan seguido te habla un cliente de su familia, su patrimonio o lo que pasa si falta? <span class="muted">(nunca, una vez al año, varias veces al año, cada mes, cada semana)</span></li></ol>');
+  m.append(ub);
+}
+function pintarPlantillas(){
+  const p = $("#plantillas"); if (!p) return; p.textContent = "";
+  p.append(el("h2",{text:"Mensajes para los FPs"}));
+  for (const [t, texto, nota] of plantillas()){
+    const pre = el("div",{class:"msg", text:texto});
+    const st = el("span",{class:"caption"});
+    const btn = el("button",{class:"btn btn--sec btn--peq", type:"button"},"Copiar");
+    btn.addEventListener("click", () => {
+      const ok = () => { st.textContent = "Copiado."; };
+      const fallo = () => { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); st.textContent = "Texto seleccionado: cópialo con Ctrl+C."; };
+      try { navigator.clipboard.writeText(texto).then(ok, fallo); } catch(e){ fallo(); }
+    });
+    p.append(el("div",{class:"stack", style:"gap:8px;margin-top:12px"}, el("h3",{text:t}), pre, nota ? el("p",{class:"caption", text:nota}) : null, el("div",{class:"row"}, btn, st)));
+  }
+}
+
+/* ---------- Arranque ---------- */
+renderGuia(); renderMensajes(); renderLista(); renderChips(); mostrar();
+
+(async function(){
+  const claude = window.claude;
+  if (!claude || !claude.use){ S.sinDb = true; const av = el("div",{class:"aviso", style:"margin-bottom:16px"}); av.append("Esta es la copia de consulta: la guía, los mensajes y la presentación se leen igual. Para registrar entrevistas y ver la síntesis del equipo, abre la ", el("a",{href:"https://claude.ai/artifact/WY9i2LpNikuF4e1oLKSaUk", target:"_blank", rel:"noopener"},"herramienta en claude.ai"), "."); $("#banner").replaceChildren(av); renderLista(); mostrar(); return; }
+  claude.use("downloads").then(d => { S.dl = d; }).catch(()=>{});
+  let db = null;
+  try { db = await claude.use("db"); } catch(e){ db = null; }
+  if (!db){ S.sinDb = true; $("#banner").replaceChildren(el("div",{class:"aviso", style:"margin-bottom:16px", text:"Esta vista no tiene conexión con el almacenamiento del equipo. La guía y los mensajes se leen igual; para registrar entrevistas, abre la página desde claude.ai con tu cuenta."})); renderLista(); mostrar(); return; }
+  S.db = db;
+  const espera = setTimeout(() => { if (!S.cargado){ const n = $("#cargando"); if (n) n.textContent = "No se pudo cargar todavía. Sigue intentando; revisa tu conexión."; } }, 10000);
+  db.collection("entrevistas").onSnapshot(snap => {
+    if (!snap.metadata.fromCache){ S.cargado = true; clearTimeout(espera); }
+    else if (snap.size) S.cargado = true;
+    const nuevo = new Map();
+    for (const d of snap.docs){ let data = clone(d.data()); const p = S.pend.get(d.id); if (p) data = merge(data, p); nuevo.set(d.id, data); }
+    S.ent = nuevo;
+    renderLista(); renderChips();
+    const r = ruta();
+    if (r === "conducir") renderConducir();
+    if (r === "sintesis") renderSintesis();
+    $("#reloj").hidden = !(r === "conducir" && S.sel && S.ent.has(S.sel));
+  }, err => {
+    clearTimeout(espera); S.cargado = true;
+    $("#banner").replaceChildren(el("div",{class:"aviso", style:"margin-bottom:16px", text:"Se perdió la conexión con las entrevistas. Recarga la página para volver a intentarlo."}));
+    renderLista();
+  });
+  db.doc("config/general").onSnapshot(s => { S.config = s.exists ? clone(s.data()) : {}; renderChips(); renderMensajes(); }, () => {});
+})();
+})();
+</script>
+
+</html>
