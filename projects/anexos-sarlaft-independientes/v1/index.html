@@ -1,0 +1,491 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>
+<title>Anexos para independientes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="vendor/sk/sk-fonts.css">
+<link rel="stylesheet" href="vendor/sk/sk-typography.css">
+<link rel="stylesheet" href="vendor/primeicons/primeicons.css">
+<script src="vendor/sk/sk-components-elements.js"></script>
+
+<style>
+  /* Layout: mesa de trabajo (controles del prototipo + marco del producto + notas). El marco reproduce el flujo real
+     "Traslado digital de tu pensión obligatoria": barra con logo, tarjeta gris de progreso, tarjeta blanca con sombra suave. */
+  :root {
+    color-scheme: light;
+    --pg-bg: #f4f6f4;
+    --pg-surface: #ffffff;
+    --pg-ink: #2e2e2e;
+    --pg-muted: #6b6f6b;
+    --pg-line: #dfe3df;
+    --pg-brand: #00a935;
+    --pg-brand-soft: #e8f7ed;
+    --pg-card-grey: #f6f6f6;
+    --pg-proto: #fff8e6;
+    --pg-proto-line: #e8d9a8;
+
+    --sk-space-zero: 0; --sk-space-xxs: 4px; --sk-space-xs: 8px; --sk-space-s: 12px; --sk-space-m: 16px;
+    --sk-space-l: 24px; --sk-space-xl: 32px; --sk-space-2xl: 40px; --sk-space-3xl: 48px;
+    --sk-space-4xl: 56px; --sk-space-5xl: 64px;
+    --sk-radius-sm: 4px; --sk-radius-md: 8px; --sk-radius-lg: 12px; --sk-radius-pill: 9999px;
+    --sk-shadow-subtle: 0 0 2px rgba(68, 68, 68, 0.15);
+    --sk-shadow-surface: 0 0 2px 0 rgba(61, 75, 92, 0.15);
+    --sk-shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --sk-shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.16);
+    --sk-font-title: 'Montserrat', sans-serif;
+    --sk-font-body: 'Open Sans', system-ui, sans-serif;
+    --sk-font-weight-regular: 400; --sk-font-weight-medium: 500; --sk-font-weight-bold: 700;
+    --sk-gradient-brand: linear-gradient(135deg, #00c73d 0%, #8fe000 100%);
+    --sk-control-height: 48px; --sk-control-height-sm: 40px;
+  }
+
+  :root :is(sk-input-text, sk-input-number, sk-input-select, sk-textarea, sk-date-picker, sk-date-range-picker,
+            sk-file-upload, sk-listbox, sk-form-field, sk-select-button, sk-button, sk-paginator, sk-stepper,
+            sk-table, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) {
+    width: 100%; max-width: none; min-width: 0; box-sizing: border-box;
+  }
+  :root :is(sk-input-text, sk-input-select, sk-date-picker, sk-date-range-picker, sk-listbox, sk-form-field,
+            sk-button, sk-alert, sk-card, sk-progress-bar):not([data-ancho="auto"]) { display: block; }
+  :root :is(sk-input-number, sk-textarea, sk-file-upload):not([data-ancho="auto"]) { display: flex; }
+  :root :is(.sk-input-select, .sk-listbox, .p-select, .p-listbox, .p-datepicker, .p-inputnumber, .p-fileupload) { width: 100%; max-width: none; }
+  :root sk-button:not([data-ancho="auto"]):not([label]) { display: inline-block; width: auto; }
+  :root sk-button:not([data-ancho="auto"])[label] .p-button { width: 100%; justify-content: center; }
+  :root sk-select-button:not([data-ancho="auto"]) { display: flex; }
+  :root sk-select-button:not([data-ancho="auto"]) .p-selectbutton { display: flex; width: 100%; }
+  :root sk-select-button:not([data-ancho="auto"]) .p-togglebutton { flex: 1 1 0; min-width: 0; justify-content: center; }
+  :root sk-form-field :is(input, select, textarea) { width: 100%; box-sizing: border-box; }
+
+  [hidden], :root [hidden] { display: none !important; }
+  html, body { background: var(--pg-bg); color: var(--pg-ink); }
+  body { margin: 0; }
+  .page {
+    max-width: 920px; margin: 0 auto; display: grid; gap: var(--sk-space-l);
+    padding-block: var(--sk-space-l) var(--sk-space-5xl);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .page > * { min-width: 0; }
+  .intro h1 { margin: 0 0 var(--sk-space-xs); text-wrap: balance; }
+  .intro p { margin: 0; color: var(--pg-muted); max-width: 68ch; }
+
+  /* Controles del prototipo: se ven distintos al producto a propósito */
+  .proto { background: var(--pg-proto); border: 1px dashed var(--pg-proto-line); border-radius: var(--sk-radius-lg);
+    padding: var(--sk-space-m); display: grid; gap: var(--sk-space-m); }
+  .proto-title { font-family: var(--sk-font-title); font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #7a6416; margin: 0; }
+  .proto-grid { display: grid; grid-template-columns: 1fr; gap: var(--sk-space-m) var(--sk-space-l); }
+  .proto-grid label { display: block; margin-bottom: var(--sk-space-xs); font-size: 13px; color: #5c5122; }
+
+  /* ── Marco del producto (réplica del flujo de traslado) ── */
+  .frame { background: var(--pg-surface); border-radius: 16px; box-shadow: var(--sk-shadow-raised); overflow: hidden; }
+  .appbar { display: flex; align-items: center; gap: var(--sk-space-m); padding: 18px var(--sk-space-l);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .08); position: relative; }
+  .bar-sep { width: 2px; height: 32px; background: var(--pg-ink); flex: none; }
+  .bar-title { font-size: 18px; color: var(--pg-ink); min-width: 0; }
+  .col { max-width: 640px; margin: 0 auto; padding: var(--sk-space-xl) var(--sk-space-m) var(--sk-space-3xl); display: grid; gap: var(--sk-space-l); }
+  .col > * { min-width: 0; }
+  .back { display: flex; }
+  .pgrey { background: var(--pg-card-grey); border-radius: 20px; padding: var(--sk-space-m) var(--sk-space-l) var(--sk-space-l); display: grid; gap: 6px; }
+  .pgrey h3 { margin: 0; font-size: 16px; }
+  .pgrey p { margin: 0; font-size: 14px; }
+  .pgrey .pct { font-weight: 700; margin-top: var(--sk-space-xs); }
+  .pcard { background: var(--pg-surface); border-radius: 20px; box-shadow: 0 2px 14px rgba(0, 0, 0, .07); border: 1px solid #f0f0f0;
+    padding: var(--sk-space-l); display: grid; gap: var(--sk-space-l); }
+  .pcard h2 { margin: 0; }
+  .pcard .cnt { margin: 2px 0 0; font-size: 14px; color: var(--pg-ink); }
+  .head { display: flex; gap: var(--sk-space-m); align-items: center; }
+  .head .ico { flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--pg-card-grey); color: var(--pg-ink); font-size: 22px; }
+  .fields { display: grid; gap: var(--sk-space-m); }
+  .asterisk-note { border: 1px dashed var(--pg-line); border-radius: var(--sk-radius-md); padding: var(--sk-space-s) var(--sk-space-m);
+    color: var(--pg-muted); font-size: 13px; }
+
+  /* Bloques de documento: instrucción, selector (si hay más de una opción) y zona de arrastre */
+  .blk { display: grid; gap: var(--sk-space-m); }
+  .blk + .blk { border-top: 1px solid var(--pg-line); padding-top: var(--sk-space-l); }
+  .ask { margin: 0; font-family: var(--sk-font-title); font-weight: 700; font-size: 17px; line-height: 1.35; }
+  .why { margin: -8px 0 0; font-size: 14px; color: var(--pg-muted); }
+  .hint { margin: -8px 0 0; font-size: 14px; color: var(--pg-muted); }
+
+  .dz { border: 1.5px dashed #c5cbc5; border-radius: 16px; padding: var(--sk-space-l); display: grid; gap: 6px;
+    justify-items: center; text-align: center; transition: border-color .15s, background .15s; }
+  .dz[data-disabled] { background: #f4f5f4; border-color: #dfe3df; opacity: .6; cursor: not-allowed; }
+  .dz[data-disabled] * { pointer-events: none; }
+  .dz.over { border-color: var(--pg-brand); background: var(--pg-brand-soft); }
+  .dz[data-has] { border-style: solid; border-color: var(--pg-brand); padding: var(--sk-space-m); }
+  .dz .dz-empty { display: grid; gap: 6px; justify-items: center; width: 100%; }
+  .dz-ico { font-size: 30px; color: #9aa09a; }
+  .dz-t { margin: var(--sk-space-xs) 0 0; font-weight: 700; }
+  .dz-s { margin: 0; color: #9a9f9a; }
+  .dz-pick { width: 100%; margin-top: var(--sk-space-m); }
+  .dz-m { margin: 2px 0 0; font-size: 14px; }
+  .dz-file { display: flex; align-items: center; gap: var(--sk-space-s); width: 100%; text-align: left; }
+  .dz-file .fi { font-size: 22px; color: var(--pg-brand); flex: none; }
+  .dz-file .nm { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 600; font-size: 14px; }
+  .dz-file .sz { color: var(--pg-muted); font-size: 13px; flex: none; }
+  .dz-err { margin: 0; color: var(--sk-color-error, #c0392b); font-size: 14px; }
+
+  .why-link { text-align: center; }
+  .why-link summary { cursor: pointer; list-style: none; text-decoration: underline; font-size: 15px; }
+  .why-link summary::-webkit-details-marker { display: none; }
+  .why-link summary:focus-visible { outline: 2px solid var(--pg-brand); outline-offset: 3px; border-radius: 4px; }
+  .why-link p { margin: var(--sk-space-s) 0 0; font-size: 14px; color: var(--pg-muted); }
+
+  /* Notas y lógica */
+  .notes { display: grid; gap: var(--sk-space-m); }
+  .notes h2 { margin: 0; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sk-space-m); }
+  .note-card { background: var(--pg-surface); border: 1px solid var(--pg-line); border-radius: var(--sk-radius-lg); padding: var(--sk-space-m) var(--sk-space-l); }
+  .note-card h3 { margin: 0 0 var(--sk-space-xs); }
+  .note-card ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+  .note-card p { margin: 0 0 var(--sk-space-xs); font-size: 14px; color: var(--pg-muted); }
+  .table-wrap { overflow-x: auto; }
+
+  @media (max-width: 767.98px) {
+    .proto-grid, .two { grid-template-columns: 1fr; }
+    .proto sk-select-button .p-selectbutton { flex-wrap: wrap; }
+    .proto sk-select-button .p-togglebutton { flex: 1 1 100%; }
+    .bar-title { font-size: 15px; }
+    .appbar { padding: 14px var(--sk-space-m); }
+    .pcard { padding: var(--sk-space-m); }
+    .dz { padding: var(--sk-space-m); }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main id="app" class="page"></main>
+
+<template id="ui">
+  <header class="intro">
+    <h1>Soporte de ingresos para independientes y personas sin actividad económica</h1>
+    <p>Propuesta sobre el flujo actual de traslado: Información laboral y Documentación. Datos solo agrega una casilla; Documentación muestra solo lo que aplica y mantiene el patrón de selector más zona de arrastre.</p>
+  </header>
+
+  <section class="proto" aria-label="Controles del prototipo">
+    <p class="proto-title">Controles del prototipo</p>
+    <div class="proto-grid">
+      <div>
+        <label id="lbl-esc">Saltar a un escenario</label>
+        <sk-select-button id="escenario" aria-label="Escenario" sk-size="small" allow-empty="false"></sk-select-button>
+      </div>
+    </div>
+  </section>
+
+  <section class="frame" aria-label="Producto">
+    <div class="appbar">
+      <sk-logo sk-style="color" style="height: 30px"></sk-logo>
+      <span class="bar-sep" aria-hidden="true"></span>
+      <span class="bar-title">Traslado digital de tu pensión obligatoria</span>
+    </div>
+
+    <div class="col">
+      <div class="back"><sk-button id="atras" label="Atrás" icon="pi pi-arrow-left" sk-type="tertiary" data-ancho="auto"></sk-button></div>
+
+      <!-- ══ Pantalla 1: Información laboral ══ -->
+      <div id="s-datos" class="col" style="padding: 0; max-width: none;">
+        <div class="pcard">
+          <div class="head">
+            <div class="ico"><i class="pi pi-briefcase" aria-hidden="true"></i></div>
+            <h2>Información laboral</h2>
+          </div>
+
+          <div class="fields">
+            <sk-input-select id="tipo" label="¿Qué tipo de trabajador eres?" required></sk-input-select>
+
+            <div id="w-ciiu" hidden>
+              <sk-input-select id="ciiu" label="Código CIIU de tu actividad" content-search required></sk-input-select>
+            </div>
+
+            <div id="w-sinact" hidden>
+              <sk-checkbox id="sinact" label="Hoy no tengo una actividad económica que me genere ingresos"></sk-checkbox>
+            </div>
+
+            <div id="w-otros" class="asterisk-note" hidden>Aquí siguen los campos actuales de este tipo de trabajador. La propuesta no los cambia.</div>
+            <div class="asterisk-note">El resto de campos del módulo (empresa, ingresos, dirección…) no cambia en esta propuesta.</div>
+          </div>
+        </div>
+
+        <sk-button id="continuar1" label="Continuar"></sk-button>
+      </div>
+
+      <!-- ══ Pantalla 2: Documentación ══ -->
+      <div id="s-anexos" class="col" style="padding: 0; max-width: none;" hidden>
+        <div class="pgrey">
+          <h3>¡Gran decisión!</h3>
+          <p>En solo dos pasos te vincularás a tu complemento.</p>
+          <p class="pct">85%</p>
+          <sk-progress-bar value="85" show-value="false" aria-label="Avance de tu vinculación"></sk-progress-bar>
+        </div>
+
+        <div class="pcard">
+          <div>
+            <h2>Documentación</h2>
+            <p class="cnt" id="cuenta"></p>
+          </div>
+
+          <!-- Con actividad: RUT -->
+          <div class="blk" id="b-rut" data-doc="rut" hidden>
+            <p class="ask">Adjunta tu RUT</p>
+            <p class="why">Porque tienes una actividad económica que genera ingresos.</p>
+            <div class="dz" id="dz-rut">
+              <input type="file" accept=".pdf,image/*" hidden>
+              <div class="dz-empty">
+                <i class="pi pi-upload dz-ico" aria-hidden="true"></i>
+                <p class="dz-t">Arrastra y suelta archivos aquí.</p>
+                <p class="dz-s">Formato: PDF / Image / Scan</p>
+                <sk-button class="dz-pick" label="Selecciona archivo" sk-type="secondary"></sk-button>
+                <p class="dz-m">Tamaño Max: 5MB</p>
+              </div>
+              <div class="dz-file" hidden>
+                <i class="pi pi-file fi" aria-hidden="true"></i><span class="nm"></span><span class="sz"></span>
+                <sk-button class="dz-rm" icon="pi pi-times" sk-type="tertiary" aria-label="Quitar archivo"></sk-button>
+              </div>
+              <p class="dz-err" role="alert" hidden></p>
+            </div>
+          </div>
+
+          <!-- Con actividad: soporte financiero (uno de dos) -->
+          <div class="blk" id="b-fin" data-doc="fin" hidden>
+            <p class="ask">Adjunta uno de estos documentos como soporte financiero</p>
+            <sk-input-select id="sel-fin" label="Seleccionar documento"></sk-input-select>
+            <div class="dz" id="dz-fin">
+              <input type="file" accept=".pdf,image/*" hidden>
+              <div class="dz-empty">
+                <i class="pi pi-upload dz-ico" aria-hidden="true"></i>
+                <p class="dz-t">Arrastra y suelta archivos aquí.</p>
+                <p class="dz-s">Formato: PDF / Image / Scan</p>
+                <sk-button class="dz-pick" label="Selecciona archivo" sk-type="secondary"></sk-button>
+                <p class="dz-m">Tamaño Max: 5MB</p>
+              </div>
+              <div class="dz-file" hidden>
+                <i class="pi pi-file fi" aria-hidden="true"></i><span class="nm"></span><span class="sz"></span>
+                <sk-button class="dz-rm" icon="pi pi-times" sk-type="tertiary" aria-label="Quitar archivo"></sk-button>
+              </div>
+              <p class="dz-err" role="alert" hidden></p>
+            </div>
+          </div>
+
+          <!-- Sin actividad: un solo selector agrupado; elegir el documento declara el origen del dinero -->
+          <div class="blk" id="b-sin" data-doc="sin" hidden>
+            <p class="ask">Adjunta un documento según de dónde venga el dinero que vas a invertir</p>
+            <p class="why">Si el dinero es tuyo, adjunta tu extracto. Si te lo aporta alguien más, como tus papás o tu pareja, adjunta un soporte de esa persona.</p>
+            <sk-input-select id="sel-sin" label="Seleccionar documento" variant="group"></sk-input-select>
+            <p class="hint" id="hint-sin" hidden></p>
+            <div class="dz" id="dz-sin" data-disabled aria-disabled="true">
+              <input type="file" accept=".pdf,image/*" hidden>
+              <div class="dz-empty">
+                <i class="pi pi-upload dz-ico" aria-hidden="true"></i>
+                <p class="dz-t">Arrastra y suelta archivos aquí.</p>
+                <p class="dz-s">Formato: PDF / Image / Scan</p>
+                <sk-button class="dz-pick" label="Selecciona archivo" sk-type="secondary"></sk-button>
+                <p class="dz-m">Tamaño Max: 5MB</p>
+              </div>
+              <div class="dz-file" hidden>
+                <i class="pi pi-file fi" aria-hidden="true"></i><span class="nm"></span><span class="sz"></span>
+                <sk-button class="dz-rm" icon="pi pi-times" sk-type="tertiary" aria-label="Quitar archivo"></sk-button>
+              </div>
+              <p class="dz-err" role="alert" hidden></p>
+            </div>
+          </div>
+        </div>
+
+        <sk-button id="continuar2" label="Continuar" disabled></sk-button>
+
+        <details class="why-link">
+          <summary>¿Por qué te pedimos estos documentos?</summary>
+          <p>Es un requisito legal que aplica a todas las personas que invierten con nosotros. Nos ayuda a proteger tu dinero.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h2>Qué cambia frente a la pantalla actual</h2>
+    <div class="note-card">
+      <ul>
+        <li>Se conserva el patrón actual: pregunta en negrita, selector “Seleccionar documento” y zona de arrastre con “Tamaño Max: 5MB”.</li>
+        <li>Cada documento es un bloque. Con actividad hay dos bloques (RUT, y uno de renta o extractos). Sin actividad hay uno, con el selector agrupado por origen del dinero.</li>
+        <li>El contador pasa de “0/1” a “0/2” cuando hay dos documentos.</li>
+        <li>El selector del bundle solo dibuja una línea entre grupos, no su título. Por eso cada opción lleva el origen en su texto (“Mi dinero ·”, “Quien me aporta el dinero ·”) y una línea explica los dos casos antes de abrirlo.</li>
+        <li>En el caso sin actividad, el selector empieza vacío y la zona de arrastre se ve deshabilitada hasta que se elige el documento. Elegir el documento es lo que declara el origen del dinero.</li>
+        <li>El enlace “¿Quieres realizar este aporte por descuento por nómina?” no aparece: aplica a quien tiene empleador. Se reemplaza por el porqué de los documentos.</li>
+      </ul>
+    </div>
+
+    <h2>Lógica de documentos</h2>
+    <div class="note-card table-wrap"><sk-table id="logica" responsive-layout="stack" paginator="false"></sk-table></div>
+  </section>
+</template>
+
+<script>
+customElements.whenDefined('sk-button').then(() => {
+  const ui = document.importNode(document.getElementById('ui').content, true);
+  let scope = ui; // antes de montar se busca en el fragmento; después, en la página
+  const $ = (s) => scope.querySelector(s);
+  const $$ = (s) => [...scope.querySelectorAll(s)];
+  const val = (e) => (e.detail && typeof e.detail === 'object' && 'value' in e.detail) ? e.detail.value : e.detail;
+
+  // ── Catálogos ──
+  const TIPOS_A = [
+    { label: 'Empleado', value: 'empleado' },
+    { label: 'Independiente', value: 'independiente' },
+    { label: 'Pensionado', value: 'pensionado' },
+  ];
+  const CIIU = [
+    { label: '6201 · Desarrollo de sistemas informáticos', value: '6201' },
+    { label: '7110 · Arquitectura e ingeniería', value: '7110' },
+    { label: '7410 · Diseño especializado', value: '7410' },
+    { label: '8559 · Otros tipos de educación', value: '8559' },
+    { label: '9602 · Peluquería y tratamientos de belleza', value: '9602' },
+    { label: '4711 · Comercio al por menor en tiendas', value: '4711' },
+  ];
+  const DOCS_FIN = [
+    { label: 'Declaración de renta', value: 'renta' },
+    { label: 'Extractos bancarios', value: 'extractos' },
+  ];
+  const GRUPOS_SIN = [
+    // El bundle solo dibuja una línea entre grupos (no pinta el título), así que el origen va dentro de cada opción.
+    { label: 'Mi dinero', items: [
+      { label: 'Mi dinero · Extracto de la entidad donde lo tengo', value: 'propio' },
+    ] },
+    { label: 'Quien me aporta el dinero', items: [
+      { label: 'Quien me aporta el dinero · Certificado de ingresos o laboral', value: 'cert' },
+      { label: 'Quien me aporta el dinero · Declaración de renta', value: 'renta' },
+      { label: 'Quien me aporta el dinero · Extractos bancarios', value: 'extractos' },
+    ] },
+  ];
+
+  // ── Estado ──
+  const state = { tipo: 'independiente', ciiu: '', sinAct: false, pantalla: 'datos',
+    sel: { fin: 'renta', sin: null } };
+
+  const noAct = () => state.tipo === 'independiente' && state.sinAct;
+  const conAct = () => state.tipo === 'independiente' && !noAct();
+  const escenario = () => conAct() ? 'actividad' : noAct() ? 'sinact' : 'ninguno';
+  const listo1 = () => conAct() ? !!state.ciiu : !!state.tipo;
+  const DOCS = { actividad: ['rut', 'fin'], sinact: ['sin'], ninguno: [] };
+
+  // ── Referencias ──
+  const tipo = $('#tipo'), ciiu = $('#ciiu'), sinact = $('#sinact');
+  const esc = $('#escenario');
+  const selFin = $('#sel-fin'), selSin = $('#sel-sin');
+
+  // ── Datos complejos ANTES de montar ──
+  tipo.options = TIPOS_A; tipo.value = state.tipo;
+  ciiu.options = CIIU; // sin valor inicial: la persona elige su actividad
+  selFin.options = DOCS_FIN; selFin.value = state.sel.fin;
+  selSin.optionGroups = GRUPOS_SIN; // sin valor inicial: elegir el documento declara el origen del dinero
+  esc.options = [
+    { label: 'Con actividad económica', value: 'actividad' },
+    { label: 'Sin actividad económica', value: 'sinact' },
+  ];
+  $('#logica').columns = [
+    { field: 'respuesta', header: 'Lo que responde la persona' },
+    { field: 'docs', header: 'Documentos que se piden' },
+    { field: 'extra', header: 'Clics extra en Datos', width: '150px' },
+  ];
+  $('#logica').value = [
+    { respuesta: 'Independiente con CIIU (actividad que genera ingresos)', docs: 'RUT (siempre) + declaración de renta o extractos', extra: '0' },
+    { respuesta: 'Marca “hoy no tengo actividad económica”: el dinero es suyo', docs: 'Extracto de la entidad donde tiene el dinero', extra: '1 (la casilla)' },
+    { respuesta: 'Marca “hoy no tengo actividad económica”: el dinero se lo aporta un tercero', docs: 'Soporte del tercero: certificado de ingresos o laboral (máx. 60 días), declaración de renta o extractos', extra: '1 (la casilla)' },
+  ];
+
+  // ── Zona de arrastre (réplica del patrón actual: arrastrar, “Selecciona archivo”, tamaño máximo) ──
+  const MAX = 5 * 1024 * 1024;
+  const okFormato = (f) => f.type === 'application/pdf' || /^image\//.test(f.type) || /\.(pdf|png|jpe?g|heic|tiff?)$/i.test(f.name);
+  const tam = (n) => n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+  const dzs = {};
+  function initDz(key) {
+    const dz = $('#dz-' + key);
+    const input = dz.querySelector('input'), vacio = dz.querySelector('.dz-empty'), caja = dz.querySelector('.dz-file'), err = dz.querySelector('.dz-err');
+    const mostrarError = (t) => { err.textContent = t; err.hidden = false; };
+    const quitar = () => { input.value = ''; dz.removeAttribute('data-has'); vacio.hidden = false; caja.hidden = true; err.hidden = true; actualizarAnexos(); };
+    const poner = (f) => {
+      if (!f || dz.hasAttribute('data-disabled')) return;
+      if (!okFormato(f)) { mostrarError('Ese formato no es válido. Sube un PDF, una imagen o un escaneo.'); return; }
+      if (f.size > MAX) { mostrarError('El archivo pesa más de 5 MB. Sube uno más liviano.'); return; }
+      err.hidden = true;
+      dz.querySelector('.nm').textContent = f.name; dz.querySelector('.sz').textContent = tam(f.size);
+      dz.setAttribute('data-has', '1'); vacio.hidden = true; caja.hidden = false;
+      actualizarAnexos();
+    };
+    dz.querySelector('.dz-pick').addEventListener('skClick', () => { if (!dz.hasAttribute('data-disabled')) input.click(); });
+    dz.querySelector('.dz-rm').addEventListener('skClick', quitar);
+    input.addEventListener('change', () => poner(input.files[0]));
+    ['dragenter', 'dragover'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('over'); }));
+    ['dragleave', 'drop'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('over'); }));
+    dz.addEventListener('drop', (e) => poner(e.dataTransfer && e.dataTransfer.files[0]));
+    dzs[key] = dz;
+  }
+  ['rut', 'fin', 'sin'].forEach(initDz);
+  const hayArchivo = (k) => dzs[k].hasAttribute('data-has');
+
+  // ── Pantalla 1 ──
+  function actualizarDatos() {
+    $('#w-ciiu').hidden = !conAct();
+    $('#w-sinact').hidden = state.tipo !== 'independiente';
+    $('#w-otros').hidden = !['empleado', 'pensionado'].includes(state.tipo);
+    sinact.checked = state.sinAct;
+    $('#continuar1').toggleAttribute('disabled', !listo1());
+  }
+  tipo.addEventListener('valueChange', (e) => { tipo.value = val(e); state.tipo = val(e); if (state.tipo !== 'independiente') state.sinAct = false; actualizarDatos(); });
+  ciiu.addEventListener('valueChange', (e) => { ciiu.value = val(e); state.ciiu = val(e); actualizarDatos(); });
+  sinact.addEventListener('checkedChange', (e) => { state.sinAct = !!val(e); actualizarDatos(); });
+
+  // ── Pantalla 2 ──
+  const HINT = { cert: 'Debe estar a nombre de quien te aporta el dinero y tener máximo 60 días.', renta: 'Debe estar a nombre de quien te aporta el dinero.', extractos: 'Debe estar a nombre de quien te aporta el dinero.' };
+  function actualizarAnexos() {
+    const visibles = DOCS[escenario()];
+    $$('.blk').forEach((b) => { b.hidden = !visibles.includes(b.dataset.doc); });
+    const s = state.sel.sin;
+    const dzSin = $('#dz-sin');
+    dzSin.toggleAttribute('data-disabled', !s);
+    dzSin.setAttribute('aria-disabled', s ? 'false' : 'true');
+    dzSin.querySelector('.dz-pick').toggleAttribute('disabled', !s);
+    $('#hint-sin').hidden = !(s && s !== 'propio');
+    $('#hint-sin').textContent = HINT[s] || '';
+    let listos = 0;
+    visibles.forEach((k) => {
+      const listo = hayArchivo(k) && (k !== 'sin' || !!state.sel.sin) && (k !== 'fin' || !!state.sel.fin);
+      if (listo) listos++;
+    });
+    $('#cuenta').textContent = listos + '/' + visibles.length + ' campos completados';
+    $('#continuar2').toggleAttribute('disabled', listos < visibles.length);
+  }
+  selFin.addEventListener('valueChange', (e) => { selFin.value = val(e); state.sel.fin = val(e); actualizarAnexos(); });
+  selSin.addEventListener('valueChange', (e) => { selSin.value = val(e); state.sel.sin = val(e); actualizarAnexos(); });
+
+  // ── Navegación ──
+  function ir(pantalla) {
+    state.pantalla = pantalla;
+    $('#s-datos').hidden = pantalla !== 'datos';
+    $('#s-anexos').hidden = pantalla !== 'anexos';
+    if (pantalla === 'anexos') actualizarAnexos(); else actualizarDatos();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  $('#continuar1').addEventListener('skClick', () => {
+    if (!listo1()) return;
+    if (escenario() !== 'ninguno') ir('anexos');
+    else window.skElements.toast.info('Este tipo de trabajador sigue su flujo actual', 'La propuesta no lo modifica.');
+  });
+  $('#atras').addEventListener('skClick', () => {
+    if (state.pantalla === 'anexos') ir('datos');
+    else window.skElements.toast.info('Aquí volvería al paso anterior del traslado');
+  });
+  $('#continuar2').addEventListener('skClick', () => window.skElements.toast.success('Documentos listos', 'Aquí continúa el flujo del traslado.'));
+
+  // ── Controles del prototipo ──
+  function aplicarEscenario(k) {
+    if (k === 'actividad') { state.tipo = 'independiente'; state.ciiu = ''; state.sinAct = false; }
+    else { state.tipo = 'independiente'; state.sinAct = true; }
+    tipo.value = state.tipo; ciiu.value = state.ciiu || null;
+    ir('datos');
+  }
+  esc.addEventListener('skChange', (e) => { if (val(e)) { esc.value = val(e); aplicarEscenario(val(e)); } });
+
+  // ── Montar ──
+  document.getElementById('app').append(ui);
+  scope = document.getElementById('app');
+  setTimeout(() => document.activeElement?.closest?.('sk-input-number') && document.activeElement.blur(), 0);
+  actualizarDatos();
+});
+</script>
+
+</body></html>
