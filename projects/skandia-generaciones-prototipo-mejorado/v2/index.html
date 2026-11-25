@@ -419,15 +419,16 @@ button.nodo:disabled { opacity: 0.55; cursor: not-allowed; }
 .resumen__celda:hover .resumen__v { text-decoration: underline; text-decoration-color: var(--sk-color-primary-active); }
 .resumen__t { color: var(--sk-color-text-muted); font-size: 0.875rem; line-height: 1.3; }
 .resumen__v { font-family: var(--sk-font-title); font-size: 1.25rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; white-space: nowrap; }
+.resumen__d { color: var(--sk-color-text-muted); font-size: 0.8125rem; line-height: 1.3; }
 @media (max-width: 40rem) { .resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); position: static; } .resumen__celda { justify-content: flex-start; padding: var(--sk-space-xs) var(--sk-space-s); } .resumen__ico { width: 2rem; height: 2rem; font-size: 1rem; } .resumen__txt { justify-items: start; text-align: left; } .resumen__v { font-size: 1.125rem; } }
 .resultado { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sk-space-l); align-items: start; }
-.resultado__nav { position: sticky; top: calc(var(--sk-space-5xl) + 5rem); }
+.resultado__nav { position: sticky; top: calc(var(--sk-space-5xl) + 7.25rem); }
 .resultado__corregir { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sk-space-xs); margin-top: var(--sk-space-m); padding-top: var(--sk-space-m); border-top: 1px solid var(--sk-color-border); }
 .resultado__corregir sk-button { flex: 0 0 auto; }
 .corrige-aviso { margin: 0; padding: var(--sk-space-xs) var(--sk-space-s); border: 1px solid var(--stroke-grey-medium); border-radius: var(--bordes-s); background: var(--background-secundaria); }
 /* El foco no queda tapado por las barras fijas (H-71): la barra y, en el resultado, el resumen */
 html { scroll-padding-top: calc(var(--sk-space-5xl) + var(--sk-space-m)); }
-html:has(.resumen) { scroll-padding-top: calc(var(--sk-space-5xl) + 6rem); }
+html:has(.resumen) { scroll-padding-top: calc(var(--sk-space-5xl) + 7.75rem); }
 @media (max-width: 40rem) { html:has(.resumen) { scroll-padding-top: calc(var(--sk-space-5xl) + var(--sk-space-m)); } }
 .resultado__nav ol { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sk-space-xxs); }
 .resultado__nav a { display: flex; gap: var(--sk-space-s); align-items: center; min-height: 44px; padding: var(--sk-space-xs) var(--sk-space-s); border-radius: var(--bordes-m); color: var(--sk-color-text-muted); font-weight: 500; text-decoration: none; }
@@ -918,6 +919,84 @@ body:has(.informe) .pie-legal { display: none; } /* el informe lleva sus propios
   .informe { padding-bottom: var(--sk-space-4xl); }
 }
 
+/* ───── Movimiento: microinteracciones de toda la propuesta ─────
+   Criterio (guía design-motion-principles): un servicio financiero que se usa en una conversación pide movimiento sobrio. Pesa
+   Jakub (pulido que no se nota), después Emil (¿esto debe moverse?) y Jhey solo en el momento raro: completar un reparto.
+   - Solo transform, opacity y filter; nada de ancho, alto ni posición. Curvas propias, sin rebote. Las salidas, más suaves que las entradas.
+   - Lo que se repite a cada instante (teclear, mover una barra) cambia al instante; lo que ocurre de vez en cuando (llegar a una
+     pantalla, abrir un detalle, sumar una persona) se mueve en 150 a 340 ms.
+   - Las pantallas entran solo cuando cambia la ruta (body.ruta-nueva, lo pone enrutar()): volver a dibujar la misma no parpadea.
+   - Con movimiento reducido, base.css deja todo en su estado final; aquí solo se quitan los retrasos para que nada tarde en verse. */
+:root {
+  --mov-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --mov-rapido: 150ms;
+  --mov-medio: 220ms;
+  --mov-lento: 340ms;
+}
+@keyframes mov-entra { from { opacity: 0; transform: translateY(8px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes mov-entra-suave { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes mov-abre { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes mov-cambia { from { opacity: 0.35; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+@keyframes mov-sacude { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 45% { transform: translateX(4px); } 70% { transform: translateX(-2px); } }
+@keyframes mov-pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: none; } }
+@keyframes mov-barra { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes mov-revela { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes mov-destello { from { background-color: var(--sk-color-success-light); } to { background-color: transparent; } }
+@keyframes mov-tip-arriba { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes mov-tip-abajo { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* 1. Llegar a una pantalla: el contenido sube 6 px y aparece; el titular de la portada y su foto entran uno tras otro */
+body.ruta-nueva :is(.paso__principal, .resultado__cuerpo, .informe, .boveda__fila) { animation: mov-entra-suave var(--mov-medio) var(--mov-ease) backwards; }
+body.ruta-nueva .paso__lateral { animation: mov-entra-suave var(--mov-medio) var(--mov-ease) 70ms backwards; }
+body.ruta-nueva .hero__texto > * { animation: mov-entra var(--mov-lento) var(--mov-ease) backwards; }
+body.ruta-nueva .hero__texto > :nth-child(2) { animation-delay: 50ms; }
+body.ruta-nueva .hero__texto > :nth-child(3) { animation-delay: 100ms; }
+body.ruta-nueva .hero__texto > :nth-child(4) { animation-delay: 150ms; }
+body.ruta-nueva .hero__texto > :nth-child(5) { animation-delay: 200ms; }
+body.ruta-nueva .hero__foto { animation: mov-entra-suave 420ms var(--mov-ease) 120ms backwards; }
+
+/* 2. Tocar: una respuesta física al pulsar (escala 0.97) y un cambio de estado de 150 a 220 ms, con la misma curva en todo */
+:root sk-button { transition: transform var(--mov-rapido) var(--mov-ease); }
+:root sk-button:not([disabled]):active { transform: scale(0.97); }
+.opcion { transition: background-color var(--mov-rapido) var(--mov-ease), border-color var(--mov-rapido) var(--mov-ease), box-shadow var(--mov-medio) var(--mov-ease), transform var(--mov-rapido) var(--mov-ease); }
+.opcion:active { transform: scale(0.985); }
+.chip-cifra { transition: background-color var(--mov-rapido) var(--mov-ease), transform var(--mov-rapido) var(--mov-ease); }
+.chip-cifra:active { transform: scale(0.96); }
+.resumen__celda { transition: box-shadow var(--mov-medio) var(--mov-ease), transform var(--mov-rapido) var(--mov-ease); }
+.resumen__celda:active { transform: scale(0.985); }
+button.nodo { transition: transform var(--mov-rapido) var(--mov-ease), box-shadow var(--mov-medio) var(--mov-ease), background-color var(--mov-rapido) var(--mov-ease); }
+.barra__nav a, .boveda__nav a, .resultado__nav a { transition: background-color var(--mov-rapido) var(--mov-ease), color var(--mov-rapido) var(--mov-ease), box-shadow var(--mov-medio) var(--mov-ease); }
+.tt { transition: background-color var(--mov-rapido) var(--mov-ease), color var(--mov-rapido) var(--mov-ease); }
+
+/* 3. Abrir un detalle: el contenido baja desde el título en 220 ms. Al cerrar no hay salida: la persona ya sigue en otra cosa */
+details[open] > :not(summary) { animation: mov-abre var(--mov-medio) var(--mov-ease) backwards; }
+details[open] .ah-fila__barra i { transform-origin: left center; animation: mov-barra var(--mov-lento) var(--mov-ease) 80ms backwards; }
+details[open] .cb__pista { animation: mov-revela var(--mov-lento) var(--mov-ease) 80ms backwards; }
+
+/* 4. Avisos: el tooltip sale de su disparador, la alerta de un campo aparece y, si se insiste sin corregir, se sacude una vez */
+.sk-tip { animation: mov-tip-arriba var(--mov-rapido) var(--mov-ease) backwards; transform-origin: 50% 100%; }
+.sk-tip[data-pos="bottom"] { animation-name: mov-tip-abajo; transform-origin: 50% 0; }
+.alerta-campo:not([hidden]):not(.sacude) { animation: mov-entra-suave var(--mov-medio) var(--mov-ease) backwards; }
+.sacude { animation: mov-sacude 280ms var(--mov-ease); }
+
+/* 5. Lo que cambia sin que la persona lo pida se nota un instante: una persona que llega al árbol o a la lista, el detalle de otra
+   rama, una cifra del libro que se movió */
+.nodo--nuevo, .persona--nueva, .sb__fila--nueva { animation: mov-entra-suave var(--mov-medio) var(--mov-ease) backwards; }
+.reparto__detalle.cambia { animation: mov-cambia var(--mov-rapido) var(--mov-ease) backwards; }
+.libro dd.dato--cambia { border-radius: var(--bordes-s); animation: mov-destello 900ms var(--mov-ease); }
+
+/* 6. Repartir el seguro: las barras y el medidor siguen al número; al llegar a 100 % el visto aparece una sola vez */
+.sb__barra i { transition: transform var(--mov-medio) var(--mov-ease); }
+.sb__medidor > i { transition: flex-grow var(--mov-medio) var(--mov-ease); }
+.sb__medidor { transition: box-shadow var(--mov-rapido) var(--mov-ease); }
+.sb__total { transition: color var(--mov-rapido) var(--mov-ease); }
+.sb__total--ok .pi:not(.sin-animar) { animation: mov-pop var(--mov-medio) var(--mov-ease) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-delay: 0ms !important; }
+  :root sk-button:not([disabled]):active, .opcion:active, .chip-cifra:active, .resumen__celda:active { transform: none; }
+}
+
 
 /* Bloques azules: una línea y cerrados; al abrirlos dicen por qué se pregunta algo y qué tener en cuenta */
 .nota-info { border: 1px solid var(--sk-color-info); border-radius: var(--bordes-s); background: var(--background-info-light); }
@@ -932,6 +1011,116 @@ body:has(.informe) .pie-legal { display: none; } /* el informe lleva sus propios
 .paso__cabeza .nota-info { margin-top: var(--sk-space-xs); }
 .paso:not(:has(.paso__lateral)) { grid-template-columns: minmax(0, 52rem); justify-content: center; }
 
+/* ───── Ajustes acordados con Negocio (2026-11-25) ─────
+   Alerta de campo en rojo, comparativo con su cuenta, desglose del ahorro, porcentaje escrito a mano, beneficiarios del seguro,
+   modelo de fiducia civil y aviso del informe. Solo tokens del sistema. */
+.alerta-campo { display: flex; align-items: flex-start; gap: var(--sk-space-xs); margin: 0; color: var(--sk-color-error); font-size: 0.875rem; font-weight: 600; line-height: 1.5; }
+.alerta-campo[hidden] { display: none; }
+.alerta-campo .pi { margin-top: 0.2em; }
+
+/* Lo que compone el costo, en cada lado del comparativo */
+.partes { list-style: none; margin: var(--sk-space-xs) 0 0; padding: 0; display: grid; gap: var(--sk-space-xs); }
+.partes li { display: flex; justify-content: space-between; gap: var(--sk-space-m); padding-bottom: var(--sk-space-xs); border-bottom: 1px solid var(--sk-color-border); font-size: 0.875rem; }
+.partes b { white-space: nowrap; font-weight: 600; }
+.ahorro__t .tt { vertical-align: middle; margin-left: var(--sk-space-xxs); }
+
+/* «Ver de dónde sale el ahorro»: desplegable en verde suave, como el tablero */
+.desglose { border: 1px solid var(--sk-color-success-medium); border-radius: var(--bordes-m); background: var(--sk-color-success-light); }
+.desglose > summary { display: flex; align-items: center; gap: var(--sk-space-s); min-height: 48px; padding: var(--sk-space-xs) var(--sk-space-m); list-style: none; font-weight: 700; cursor: pointer; border-radius: var(--bordes-m); }
+.desglose > summary::-webkit-details-marker { display: none; }
+.desglose > summary > span { flex: 1; display: grid; }
+.desglose > summary small { color: var(--sk-color-text-muted); font-size: 0.875rem; font-weight: 400; }
+.desglose > summary .pi { transition: transform 0.2s ease-out; }
+.desglose[open] > summary .pi { transform: rotate(180deg); }
+.desglose__cuerpo { display: grid; gap: var(--sk-space-m); padding: var(--sk-space-xs) var(--sk-space-m) var(--sk-space-l); }
+.desglose h3, .informe__desglose h3 { margin: 0; font-size: 1rem; line-height: 1.4; letter-spacing: 0; }
+.desglose h4, .informe__desglose h4 { margin: 0; font-size: 1rem; letter-spacing: 0; }
+.desglose__t { display: flex; align-items: center; gap: var(--sk-space-xs); }
+.cb-grupo { display: grid; gap: var(--sk-space-s); }
+.cb { display: grid; grid-template-columns: minmax(7rem, 11rem) minmax(0, 1fr) 7.5rem; gap: var(--sk-space-m); align-items: center; }
+.cb__l { font-weight: 600; }
+.cb b { text-align: right; white-space: nowrap; }
+.cb__pista { display: flex; height: var(--sk-space-m); border-radius: var(--bordes-s); background: var(--sk-color-surface); border: 1px solid var(--sk-color-border); overflow: hidden; }
+.cb__pista i { display: block; }
+.cb__go { background: var(--charts-c01); } .cb__pr { background: var(--charts-c03); } .cb__tr { background: var(--charts-c08); } .cb__ah { background: var(--sk-color-success); }
+.sim__leyenda i[class^="cb__"] { width: 0.75rem; height: 0.75rem; border-radius: 2px; }
+.ah-lista { display: grid; gap: var(--sk-space-s); }
+.ah-fila { display: grid; grid-template-columns: minmax(0, 1fr) minmax(5rem, 9rem) 9rem; gap: var(--sk-space-m); align-items: center; padding-bottom: var(--sk-space-s); border-bottom: 1px solid var(--sk-color-success-medium); }
+.ah-fila__n { display: grid; gap: var(--sk-space-xxs); }
+.ah-fila__n small, .ah-fila__v small { color: var(--sk-color-text-muted); font-size: 0.875rem; }
+.ah-fila__barra { height: var(--sk-space-xs); border-radius: var(--bordes-s); background: var(--sk-color-surface); overflow: hidden; }
+.ah-fila__barra i { display: block; height: 100%; background: var(--sk-color-success); }
+.ah-fila__v { display: grid; justify-items: end; text-align: right; }
+.ah-fila--otra .ah-fila__barra i { background: var(--sk-color-text-muted); }
+.ah-sub { margin: var(--sk-space-xs) 0 0; color: var(--sk-color-text-muted); font-size: 0.875rem; }
+.ah-porque ul { margin: var(--sk-space-xs) 0 0; padding-left: var(--sk-space-l); display: grid; gap: var(--sk-space-xs); font-size: 0.875rem; }
+.ah-porque .ayuda .pi { margin-right: var(--sk-space-xxs); }
+.informe__desglose { display: grid; gap: var(--sk-space-m); }
+.informe__aviso { margin: 0; padding: var(--sk-space-s) var(--sk-space-m); border: 1px solid var(--sk-color-border); border-radius: var(--bordes-m); font-size: 0.875rem; }
+@media (max-width: 48rem) {
+  .cb { grid-template-columns: minmax(0, 1fr) auto; } .cb__pista { grid-column: 1 / -1; grid-row: 2; }
+  .ah-fila { grid-template-columns: minmax(0, 1fr) auto; } .ah-fila__barra { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* Libre disposición: la barra y el porcentaje escrito a mano */
+.sim__filas { gap: var(--sk-space-s); }
+.sim__filas li { grid-template-columns: minmax(8rem, 14rem) minmax(0, 1fr) 7.5rem; padding: var(--sk-space-s) var(--sk-space-m); border-radius: var(--bordes-m); background: var(--background-secundaria); } /* cada porcentaje en su pozo gris, como las personas beneficiarias del seguro */
+.sim__num { display: block; min-width: 0; }
+.sim__filas input[type="range"] { margin: 0; }
+@media (max-width: 48rem) { .sim__filas li { grid-template-columns: minmax(0, 1fr) 7.5rem; } .sim__num { grid-row: 1; grid-column: 2; } }
+
+/* Personas beneficiarias del seguro de vida: cada persona en su pozo, como las de «Tu familia», con su porcentaje y una barra
+   del mismo color que su tramo en el medidor (el lenguaje de «Quién recibe qué»). El rótulo del porcentaje no se ve: el nombre de
+   la persona ya lo dice y el campo lo conserva para quien usa lector de pantalla. */
+.sb { display: grid; gap: var(--sk-space-m); margin-bottom: var(--sk-space-s); }
+.sb__cab { display: grid; gap: var(--sk-space-xxs); }
+.sb__t { margin: 0; font-family: var(--sk-font-title); font-size: 1rem; font-weight: 700; line-height: 1.4; }
+.sb__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sk-space-s); }
+.sb__fila { --sb-c: var(--charts-c01); display: grid; grid-template-columns: auto minmax(0, 1fr) 7.5rem; grid-template-areas: "av quien valor" "bar bar bar"; align-items: center; gap: var(--sk-space-xs) var(--sk-space-s); padding: var(--sk-space-s) var(--sk-space-m); border-radius: var(--bordes-m); background: var(--background-secundaria); }
+.sb__fila--otra { grid-template-columns: auto minmax(0, 1fr) 7.5rem auto; grid-template-areas: "av quien valor quitar" "bar bar bar bar"; }
+.sb__fila > sk-avatar { grid-area: av; }
+.sb__quien { grid-area: quien; display: grid; min-width: 0; }
+.sb__valor { grid-area: valor; min-width: 0; }
+.sb__fila > sk-button { grid-area: quitar; }
+.sb__barra { grid-area: bar; height: var(--sk-space-xs); border-radius: var(--bordes-s); background: var(--sk-color-surface); overflow: hidden; }
+.sb__barra i { display: block; height: 100%; background: var(--sb-c); transform-origin: left center; transform: scaleX(var(--p, 0)); }
+.sb__n { min-width: 0; font-weight: 700; overflow-wrap: break-word; }
+.sb__rel { color: var(--sk-color-text-muted); font-size: 0.875rem; line-height: 1.4; }
+.sb__valor .sk-input-number__label, .sim__num .sk-input-number__label { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.sb__lista > li:nth-child(7n+2), .sb__medidor > i:nth-child(7n+2) { --sb-c: var(--charts-c03); }
+.sb__lista > li:nth-child(7n+3), .sb__medidor > i:nth-child(7n+3) { --sb-c: var(--charts-c08); }
+.sb__lista > li:nth-child(7n+4), .sb__medidor > i:nth-child(7n+4) { --sb-c: var(--charts-c05); }
+.sb__lista > li:nth-child(7n+5), .sb__medidor > i:nth-child(7n+5) { --sb-c: var(--charts-c04); }
+.sb__lista > li:nth-child(7n+6), .sb__medidor > i:nth-child(7n+6) { --sb-c: var(--charts-c02); }
+.sb__lista > li:nth-child(7n+7), .sb__medidor > i:nth-child(7n+7) { --sb-c: var(--charts-c06); }
+.sb__resumen { display: grid; gap: var(--sk-space-xs); }
+.sb__medidor { display: flex; height: var(--sk-space-s); border-radius: var(--bordes-s); background: var(--sk-color-surface); box-shadow: inset 0 0 0 1px var(--stroke-grey-medium); overflow: hidden; }
+.sb__medidor > i { --sb-c: var(--charts-c01); display: block; min-width: 0; background: var(--sb-c); flex: var(--g, 0) 0 0; }
+.sb__medidor > .sb__resto { background: none; }
+.sb__medidor--mal { box-shadow: inset 0 0 0 2px var(--sk-color-error); }
+.sb__total { min-height: 1lh; margin: 0; display: flex; align-items: center; gap: var(--sk-space-xs); color: var(--sk-color-text-muted); font-size: 0.875rem; line-height: 1.5; }
+.sb__total--ok { color: var(--sk-color-text); font-weight: 600; }
+.sb__total--ok .pi { color: var(--sk-color-success); }
+.sb__total--mal { color: var(--sk-color-error); font-weight: 600; }
+.sb__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sk-space-s); }
+@media (max-width: 40rem) {
+  .sb__fila { grid-template-columns: auto minmax(0, 1fr) 6.5rem; }
+  .sb__fila--otra { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "av quien quien" ". valor quitar" "bar bar bar"; }
+  .sb__fila--otra .sb__valor { max-width: 8rem; }
+}
+
+/* Modelo de fiducia civil: se lee como un documento y se completa en pantalla */
+.minuta__barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sk-space-s); }
+.minuta { display: block; max-height: 55vh; overflow: auto; padding: var(--sk-space-l); border: 1px solid var(--sk-color-border); border-radius: var(--bordes-m); background: var(--sk-color-surface); font-size: 0.9375rem; line-height: 1.65; }
+.minuta h4 { margin: 0 0 var(--sk-space-m); font-size: 1.125rem; text-align: center; letter-spacing: 0; }
+.minuta h5 { margin: var(--sk-space-m) 0 var(--sk-space-xs); font-size: 0.875rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.minuta p, .minuta ul, .minuta ol { margin: 0 0 var(--sk-space-s); max-width: none; }
+.minuta ul, .minuta ol { padding-left: var(--sk-space-l); }
+.minuta__t { width: 100%; margin: var(--sk-space-s) 0; border-collapse: collapse; font-size: 0.875rem; }
+.minuta__t td, .minuta__t th { padding: var(--sk-space-xs) var(--sk-space-s); border: 1px solid var(--sk-color-border); text-align: left; vertical-align: top; }
+.blank { padding: 0 0.25em; border-bottom: 1px dashed var(--sk-color-text-muted); background: var(--background-secundaria); }
+@media print { .desglose { display: none; } .informe__desglose { break-inside: avoid; } }
+
   </style>
 </head>
 <body>
@@ -944,14 +1133,12 @@ body:has(.informe) .pie-legal { display: none; } /* el informe lleva sus propios
   "seq": 2,
   "sesion": {
    "cliente": "Familia Pérez Londoño",
-   "documento": "79123456",
    "edad": 47,
    "asesor": "Asesor de prueba",
    "auth": true,
    "authLog": {
     "fecha": "2026-11-19T17:24:51.717Z",
     "asesor": "Asesor de prueba",
-    "documento": "79123456",
     "texto": "complementaria-fase-prueba"
    }
   },
@@ -1126,7 +1313,6 @@ body:has(.informe) .pie-legal { display: none; } /* el informe lleva sus propios
   "seq": 2,
   "sesion": {
    "cliente": "Familia Restrepo Gómez",
-   "documento": "",
    "edad": 58,
    "asesor": "",
    "auth": true,
@@ -1294,7 +1480,6 @@ body:has(.informe) .pie-legal { display: none; } /* el informe lleva sus propios
   "seq": 20,
   "sesion": {
    "cliente": "Familia Duarte Vélez (caso complejo de prueba)",
-   "documento": "",
    "edad": 62,
    "asesor": "Asesor de prueba",
    "auth": true,
@@ -1605,7 +1790,7 @@ body:has(.informe) .pie-legal { display: none; } /* el informe lleva sus propios
    },
    {
     "t": "p",
-    "x": "Al registrar a otra persona declaras que puedes suministrar sus datos. Solo pedimos nombre, documento, correo y celular. Antes de entregarle información, le pediremos su propia autorización."
+    "x": "Al registrar a otra persona declaras que puedes suministrar sus datos. Solo pedimos nombre, correo y celular. Antes de entregarle información, le pediremos su propia autorización."
    },
    {
     "t": "h",
@@ -2670,11 +2855,45 @@ function cargarCaso(o) {
     S.sesion.cliente = n.cliente;
     if (S.pareja.tiene === 'si') S.pareja.nombre = n.pareja;
     S.personas.forEach((p) => { if (n[p.id]) p.nombre = n[p.id]; if (p.rol === 'otro' && /fundaci/i.test(p.parentesco || '')) p.parentesco = 'Fundación'; });
+    // Los hijos que el caso de Negocio nombra como beneficiarios del seguro pasan a ser los hijos con nombre de este ejemplo
+    const hijos = S.personas.filter((p) => p.rol === 'hijo' && p.nombre);
+    (S.tiene.segBenList || []).filter((b) => b.par === 'Hijo(a)').forEach((b, i) => { if (hijos[i]) b.nombre = hijos[i].nombre; });
   }
   M.S = S;
   app.sucio = true; app.r = null;
 }
-function recalcular() { try { app.r = M.calcular(); app.sucio = false; } catch (e) { console.error('El motor no pudo calcular', e); app.r = null; } return app.r; }
+/* Personas beneficiarias del seguro de vida, en la forma que lee el motor (S.det.polizas[].benefs), o null si no hay un reparto
+   que sume 100: en ese caso el motor reparte el seguro por partes iguales, como en el prototipo de Negocio. */
+function benefsSeguro() {
+  const S = M.S, T = S.tiene;
+  if (!(T.segV > 0) || T.segBen !== 'si') return null;
+  filasSegBen(); guardarSegBen();
+  const con = T.segBenFilas.filter((b) => b.pct > 0);
+  if (!con.length || con.reduce((s, b) => s + b.pct, 0) !== 100) return null;
+  return con.map((b) => (b.ref ? { who: b.ref, pct: b.pct } : { who: 'otro', nombre: (b.nombre || '').trim() || 'Otra persona', pct: b.pct }));
+}
+/* Los mismos bienes que usa el motor sin detalle, uno por inmueble para que el conteo de inmuebles no cambie al activar el detalle */
+function bienesParaCalculo() {
+  const items = M.etapa1Items(), n = Math.max(0, Number(M.S.b.inmuebles && M.S.b.inmuebles.n) || 0), out = [];
+  const inm = items.filter((x) => x.cat === 'inmuebles');
+  items.forEach((x) => {
+    if (x.cat !== 'inmuebles' || n < 2) { out.push({ ...x }); return; }
+    // n inmuebles: el bien «de la sociedad» (o el único) se reparte en partes iguales; el «propio» queda en una sola pieza
+    const partes = inm.length === 2 && x.c === 's' ? n - 1 : inm.length === 2 ? 1 : n;
+    for (let k = 0; k < partes; k++) out.push({ ...x, v: x.v / partes });
+  });
+  return out;
+}
+function recalcular() {
+  const S = M.S, det = S.det, previo = { activo: det.activo, bienes: det.bienes, polizas: det.polizas };
+  try {
+    // El detalle del motor se enciende solo durante el cálculo, para que el seguro se reparta con los porcentajes de la persona
+    const benefs = benefsSeguro();
+    if (benefs) { det.activo = true; det.bienes = bienesParaCalculo(); det.polizas = [{ desc: 'Seguros de vida', v: S.tiene.segV, benefs }]; }
+    app.r = M.calcular(); app.sucio = false;
+  } catch (e) { console.error('El motor no pudo calcular', e); app.r = null; } finally { det.activo = previo.activo; det.bienes = previo.bienes; det.polizas = previo.polizas; }
+  return app.r;
+}
 /* Nombre que ve el cliente: el que se escribió o la etiqueta del motor («Hijo 1») */
 const nombreDe = (p) => (p && p.nombre && p.nombre.trim()) || M.personLabel(p);
 const nombreId = (id) => { if (id === 'pareja') return 'Tu pareja'; if (id === 'icbf') return 'ICBF'; if (String(id).startsWith('otro:')) return String(id).slice(5); const p = M.byId(id); return p ? nombreDe(p) : String(id); };
@@ -2756,6 +2975,8 @@ const navegar = (r) => { if (rutaActual() === r) enrutar(); else location.hash =
 function enrutar(conservar) {
   const r = rutaActual(), d = RUTAS[r] || RUTAS.inicio;
   const y = scrollY;
+  // Las pantallas entran con un movimiento corto solo cuando cambia la ruta: volver a dibujar la misma no parpadea
+  const nueva = r !== app.rutaPrev; app.rutaPrev = r; document.body.classList.toggle('ruta-nueva', nueva);
   // «Corregir un dato» se acaba cuando se vuelve al resultado o se sale de la conversación
   if (app.volverA && (d.exp !== 'c' || r.startsWith('c/resultado') || r === 'c/cierre')) app.volverA = null;
   app.vivos = [];
@@ -2806,7 +3027,7 @@ def('inicio', 'inicio', 'Lo que dejas listo para los tuyos', () => {
   const cuidados = [
     ['pi-chart-bar', 'Cifras con su contexto', 'Una cifra central, su rango y lo que el cálculo no cubre, dicho a la altura del número.'],
     ['pi-comment', 'Palabras de todos los días', 'Un glosario para los términos de la ley y un trato cuidadoso en los momentos que duelen.'],
-    ['pi-users', 'Nadie decide solo', 'El texto se puede compartir antes de firmar, y quien te acompaña te pregunta con quién decides esto.'],
+    ['pi-users', 'Nadie decide solo', 'Puedes compartir el diagnóstico con quien quieras antes de decidir nada.'],
     ['pi-info-circle', 'Alternativas para informarte', 'Cada alternativa dice quién puede implementarla, a tu elección. No es una recomendación de inversión.'],
   ];
   pintar(`
@@ -2816,14 +3037,13 @@ def('inicio', 'inicio', 'Lo que dejas listo para los tuyos', () => {
         <div class="hero__texto">
           <p class="inicio__eyebrow"><i class="pi pi-circle-fill" aria-hidden="true"></i>Skandia Generaciones</p>
           <h1 id="t-inicio">Lo que dejas listo para los tuyos</h1>
-          <p class="inicio__lead">Skandia Generaciones te acompaña a planear la sucesión de tu patrimonio: ves qué pasaría con lo que tienes, decides qué quieres hacer desde ya y dejas todo en orden para tu familia.${why('landing-que-es')}</p>
+          <p class="inicio__lead">Un diagnóstico patrimonial para que veas qué pasaría con lo que tienes, conozcas las alternativas según tu situación y dejes todo en orden para tu familia.${why('landing-que-es')}</p>
           <div class="hero__acciones">
             <sk-button id="ir-conv" label="Empezar la conversación" icon="pi pi-arrow-right" icon-pos="right" data-ancho="auto"></sk-button>
             <sk-button id="ir-como" label="Ver cómo funciona" sk-type="secondary" data-ancho="auto"></sk-button>
           </div>
           <ul class="hero__datos">
-            <li><i class="pi pi-check-circle" aria-hidden="true"></i>Para clientes de Skandia</li>
-            <li><i class="pi pi-check-circle" aria-hidden="true"></i>Con alguien de Skandia a tu lado</li>
+            <li><i class="pi pi-check-circle" aria-hidden="true"></i>Tu información no se guarda</li>
             <li><i class="pi pi-check-circle" aria-hidden="true"></i>A tu ritmo, en tres momentos</li>
           </ul>
         </div>
@@ -2888,7 +3108,7 @@ def('inicio', 'inicio', 'Lo que dejas listo para los tuyos', () => {
       <div class="inicio__in cierre">
         <div class="stack-s">
           <h2 id="t-cierre">¿Empezamos por lo que quieres dejar listo?</h2>
-          <p>Alguien de Skandia te acompaña en la conversación. La bóveda, que hoy es una demostración opcional, y lo que recibiría tu familia vienen después, a tu ritmo.</p>
+          <p>Empieza por la conversación. La bóveda, que hoy es una demostración opcional, y lo que recibiría tu familia vienen después, a tu ritmo.</p>
         </div>
         <div class="cierre__acciones">
           <sk-button id="ir-conv-2" label="Empezar la conversación" icon="pi pi-arrow-right" icon-pos="right"></sk-button>
@@ -2922,12 +3142,13 @@ const PASOS = [['c/apertura', 'Apertura'], ['c/familia', 'Tu familia'], ['c/patr
 function validar(i) {
   const S = M.S, falta = [];
   if (i === 0) {
-    if (!(S.sesion.cliente || '').trim()) falta.push('tu nombre');
+    // El nombre es opcional (la autorización de Legal dice que el suministro es voluntario); la edad la usa el cálculo
     const e = S.sesion.edad;
     if (!e || e < 18 || e > 110) falta.push('tu edad, entre 18 y 110 años');
     if (!S.sesion.auth) falta.push('la autorización');
   }
   if (i === 1 && !S.pareja.tiene) falta.push('si tienes pareja');
+  if (i === 3 && S.tiene.segV > 0 && S.tiene.segBen === 'si') { filasSegBen(); if (totalSegBen() !== 100) falta.push('que los porcentajes de las personas beneficiarias del seguro sumen 100 %'); }
   if (i === 2) { let r = null; try { r = M.compute(); } catch (e) { /* sin datos suficientes */ } if (!r || (!(r.A > 0) && !r.fid)) falta.push('al menos un bien, con un valor aproximado'); }
   return falta;
 }
@@ -2937,7 +3158,7 @@ const textoFalta = (f) => (f.length ? `Falta ${listaY(f)}.` : '');
    y qué tener en cuenta (propuesta de UX, ver «Ver por qué»). La primera frase es la que se lee con el bloque cerrado. */
 const NOTAS = {
   apertura: [['Qué es esto', 'Una conversación para ordenar lo que quieres dejar a tu familia. No es una venta ni un trámite.'], ['Ten en cuenta', 'Es una simulación: no hace falta que los datos sean reales. Si el tema pesa, puedes seguir otro día.']],
-  familia: [['Por qué te lo preguntamos', 'Con tu familia sabemos quién recibiría qué según la ley. El árbol se dibuja mientras avanzas.'], ['Ten en cuenta', 'El nombre es opcional. Si alguien ya falleció, cuéntalo: sus hijos pueden heredar en su lugar.']],
+  familia: [['Por qué te lo preguntamos', 'Con tu familia sabemos quién recibiría qué según la ley. El árbol se dibuja mientras avanzas.'], ['Ten en cuenta', 'Puedes escribir un nombre, un alias o solo el parentesco. Si alguien ya falleció, cuéntalo: sus hijos pueden heredar en su lugar.']],
   patrimonio: [['Por qué te lo preguntamos', 'Con lo que tienes se calcula cuánto pasaría por la sucesión y cuánto costaría.'], ['Ten en cuenta', 'Con valores aproximados basta. Si tienes pareja y no sabes de quién es un bien, déjalo «De la sociedad»: queda anotado como supuesto.']],
   tienes: [['Por qué te lo preguntamos', 'Lo que ya tienes resuelto cambia lo que le llega a tu familia y qué alternativas aplican.'], ['Ten en cuenta', 'Marca solo lo que sea cierto hoy. Un testamento antiguo se revisa con un abogado.']],
   llega: [['De dónde sale esta cifra', 'Lo que dejas, menos el impuesto de los herederos y el costo del trámite. El rango muestra cuánto puede variar.']],
@@ -2971,18 +3192,39 @@ function pasoHTML({ i, titulo, ayuda, cuerpo, lateral = '', nota = '', siguiente
     ${lateral ? `<aside class="paso__lateral" aria-label="Apoyo para este paso">${lateral}</aside>` : ''}
   </div>`;
 }
+/* En la apertura el botón no se apaga (ajuste acordado con Negocio, 2026-11-25): al hacer clic sin la edad o sin la
+   autorización no avanza y sale una alerta roja junto a lo que falta. Antes del clic no se muestra nada. */
+function alertasApertura(enfocar) {
+  const S = M.S, e = Number(S.sesion.edad);
+  const edadMal = !(e >= 18 && e <= 110), authMal = !S.sesion.auth;
+  const edad = $('sk-input-number[data-b="sesion.edad"]'), caja = $('sk-checkbox[data-b="sesion.auth"]'), msg = $('#e-auth');
+  if (edad) { edad.errorMessage = edadMal ? 'Escribe tu edad, entre 18 y 110 años.' : ''; edad.invalid = edadMal; }
+  if (caja) { caja.invalid = authMal; }
+  if (msg) msg.hidden = !authMal;
+  if (enfocar) {
+    const primero = edadMal ? edad : caja; const campo = primero && primero.querySelector('input'); if (campo) campo.focus();
+    // Insistir sin corregir tiene respuesta: lo que falta se sacude una vez (se reinicia la animación en cada intento)
+    [edadMal && edad, authMal && caja, authMal && msg].forEach((el) => { if (!el) return; el.classList.remove('sacude'); void el.offsetWidth; el.classList.add('sacude'); });
+  }
+}
 function pasoListo(frag, i) {
-  const st = $('#pasos', frag);
+  const st = $('#pasos', frag), abierta = i === 0;
+  let intento = false; // ya hizo clic para avanzar sin tener lo necesario
+  const intentar = () => { intento = true; alertasApertura(true); };
   st.steps = PASOS.map(([r, l], k) => ({ id: r, label: l, state: k < i ? 'completed' : k === i ? 'active' : 'pending' }));
   st.activeStep = i;
-  st.canChange = (from, to) => { for (let k = from; k < to; k++) if (validar(k).length) return false; return true; };
+  st.canChange = (from, to) => { for (let k = from; k < to; k++) if (validar(k).length) { if (abierta && k === 0) intentar(); return false; } return true; };
   st.addEventListener('stepChange', (e) => navegar(PASOS[e.detail.to][0]));
   const sigue = $('#sigue', frag), falta = $('#falta', frag), atras = $('#atras', frag);
-  const estado = () => { const f = validar(i); sigue.disabled = f.length > 0; falta.textContent = textoFalta(f); };
+  const estado = () => {
+    const f = validar(i);
+    if (abierta) { falta.textContent = ''; if (intento) alertasApertura(false); return; }
+    sigue.disabled = f.length > 0; falta.textContent = textoFalta(f);
+  };
   estado();
   app.vivos.push(estado);
   sigue.addEventListener('skClick', () => {
-    if (validar(i).length) return;
+    if (validar(i).length) { if (abierta) intentar(); return; }
     if (app.volverA) { const destino = app.volverA; app.volverA = null; navegar(destino); return; }
     navegar(PASOS[i + 1][0]);
   });
@@ -3016,6 +3258,15 @@ function abrirCasos() {
 
 /* ─────────────────────────── Apertura ─────────────────────────── */
 function textoAutorizacion() { return M.AUTH_HTML; }
+/* El aviso de almacenamiento es de Legal, salvo una frase: «Si guardas el caso, se descarga un archivo…». Aquí no se puede
+   guardar el caso, así que se recorta solo esa frase (ajuste acordado con Negocio, 2026-11-25). Si Legal cambia el texto y
+   la frase ya no está, se avisa por consola y se muestra tal cual. */
+const FRASE_GUARDAR = ' Si guardas el caso, se descarga un archivo con sus datos en este equipo.';
+function avisoAlmacenamiento() {
+  const t = DATOS.piloto.almacenamiento;
+  if (!t.includes(FRASE_GUARDAR)) { console.warn('El aviso de almacenamiento cambió: revisar la frase sobre guardar el caso.'); return t; }
+  return t.replace(FRASE_GUARDAR, '');
+}
 def('c/apertura', 'c', 'Apertura de la conversación', () => {
   pintar(pasoHTML({
     i: 0,
@@ -3025,21 +3276,16 @@ def('c/apertura', 'c', 'Apertura de la conversación', () => {
       ${imagen('apertura', 'foto--paso')}
       <fieldset class="bloque"><legend>Quién eres</legend>
         <div class="sk-grid">
-          <div data-col="4">${campoTxt('sesion.cliente', 'Tu nombre completo', { req: true, ayuda: 'Como aparece en tu documento' })}</div>
-          <div data-col="4">${campoTxt('sesion.documento', 'Documento de identidad', { inputmode: 'numeric' })}</div>
-          <div data-col="4">${campoNum('sesion.edad', 'Tu edad', { min: 0, max: 110 })}</div>
+          <div data-col="6">${campoTxt('sesion.cliente', 'Tu nombre', { ayuda: 'Opcional' })}</div>
+          <div data-col="6">${campoNum('sesion.edad', 'Tu edad', { min: 0, max: 110 })}</div>
         </div>
         <div class="fila-enlace"><button type="button" class="enlace" id="ver-casos">Cargar un caso de ejemplo</button>${why('preparar-casos')}</div>
       </fieldset>
       <fieldset class="bloque"><legend>Tus datos, con tu permiso ${why('apertura-autorizacion')}</legend>
-        <ul class="puntos">
-          <li><b>Para qué.</b> Para usar esta herramienta de simulación y generar tu diagnóstico, solo con fines demostrativos.</li>
-          <li><b>Qué datos.</b> Los que registres para la simulación. No hace falta que sean datos reales ni personales, tuyos o de otras personas.</li>
-          <li><b>Tú decides.</b> Si no aceptas, la conversación sigue sin la simulación.</li>
-        </ul>
         <div class="fila-enlace"><button type="button" class="enlace" id="ver-aut">Leer el texto completo de la autorización</button></div>
         ${campoChk('sesion.auth', 'Leí y acepto la autorización para el uso de la herramienta de simulación.')}
-        <p class="ayuda">${esc(DATOS.piloto.almacenamiento)}</p>
+        <p class="alerta-campo" id="e-auth" role="alert" hidden><i class="pi pi-exclamation-circle" aria-hidden="true"></i><span>Sin esta aceptación no se puede continuar.</span></p>
+        <p class="ayuda">${esc(avisoAlmacenamiento())}</p>
       </fieldset>
       <section class="bloque bloque--aviso" aria-label="Aviso legal">
         <p class="legal">${esc(M.LG_T1)}</p>${why('apertura-emisor')}${why('preparar-emisor')}
@@ -3053,7 +3299,7 @@ def('c/apertura', 'c', 'Apertura de la conversación', () => {
   // Al aceptar, queda el registro de la autorización, con su fecha y hora
   app.vivos.push((ruta) => {
     if (ruta !== 'sesion.auth') return;
-    M.S.sesion.authLog = M.S.sesion.auth ? { fecha: new Date().toISOString(), documento: M.S.sesion.documento || '', texto: 'simulacion-piloto' } : null;
+    M.S.sesion.authLog = M.S.sesion.auth ? { fecha: new Date().toISOString(), texto: 'simulacion-piloto' } : null;
   });
 });
 
@@ -3068,6 +3314,13 @@ function rolesDisponibles() {
   if (F.showSob) r.push(['sob', 'Sobrino o sobrina']);
   r.push(['otro', 'Otra persona o una fundación']);
   return r;
+}
+
+/* Campo abierto para nombrar a alguien: un nombre, un alias o el parentesco (ajuste acordado con Negocio, 2026-11-25).
+   Nunca un documento de identidad. El parentesco que usa el cálculo se sigue eligiendo aparte, en la cabecera de la tarjeta. */
+function campoNombre(ruta, label, ejemplo) {
+  const tip = `Escribe lo que prefieras: un nombre, un alias o el parentesco, como «mi esposa» o «hijo mayor». Así aparece en el árbol y en el informe. Si lo dejas vacío, lo mostramos como «${ejemplo}».`;
+  return `<div class="campo-tip">${campoTxt(ruta, label, { ayuda: 'Opcional' })}${ayudaTip(tip, `Para qué sirve: ${label}`)}</div>`;
 }
 
 function tarjetaPersona(p) {
@@ -3087,7 +3340,7 @@ function tarjetaPersona(p) {
   return `<li class="persona${p.padre ? ' persona--sub' : ''}" data-id="${p.id}">
     <div class="persona__cabeza"><span class="persona__rel">${relDe(p)}</span>
       <sk-button data-quitar="${p.id}" label="Quitar" sk-type="tertiary" size="small" icon="pi pi-trash" data-ancho="auto" aria-label="Quitar a ${A(nombreDe(p))}"></sk-button></div>
-    ${campoTxt(b('nombre'), 'Nombre', { ayuda: 'Opcional: puedes dejarlo vacío. Si lo escribes, así aparece en el árbol y en el informe' })}
+    ${campoNombre(b('nombre'), 'Nombre, alias o parentesco', M.personLabel(p))}
     ${campos}
   </li>`;
 }
@@ -3121,6 +3374,9 @@ function enlazarConteos(raiz) {
 function repintarPersonas() {
   const zona = $('#personas-zona'); if (!zona) return;
   const frag = montar(listaPersonasHTML());
+  // Quien llega se nota con un movimiento corto; quien ya estaba no se mueve
+  $$('.persona', frag).forEach((li) => { if (app.personasVistas && !app.personasVistas.has(li.dataset.id)) li.classList.add('persona--nueva'); });
+  app.personasVistas = new Set($$('.persona', frag).map((li) => li.dataset.id));
   enlazar(frag); enlazarConteos(frag); aplicarSi(frag);
   $$('[data-quitar]', frag).forEach((b) => b.addEventListener('skClick', () => {
     const id = b.dataset.quitar; M.S.personas = M.S.personas.filter((p) => p.id !== id && p.padre !== id);
@@ -3132,7 +3388,7 @@ function repintarPersonas() {
 }
 
 def('c/familia', 'c', 'Tu familia', () => {
-  app.nuevoRol = app.nuevoRol || 'hijo';
+  app.nuevoRol = app.nuevoRol || 'hijo'; app.arbolVisto = null; app.personasVistas = null;
   pintar(pasoHTML({
     i: 1,
     titulo: '¿Quién cuenta contigo?',
@@ -3141,7 +3397,7 @@ def('c/familia', 'c', 'Tu familia', () => {
       <fieldset class="bloque"><legend>Tu pareja</legend>
         ${campoSeg('pareja.tiene', '¿Tienes cónyuge o compañero o compañera permanente?', 'sino')}
         <div class="stack-s" data-si="pareja.tiene=si">
-          ${campoTxt('pareja.nombre', 'Nombre de tu pareja', { ayuda: 'Opcional' })}
+          ${campoNombre('pareja.nombre', 'Nombre o alias de tu pareja', 'Tu pareja')}
           ${campoSeg('pareja.tipo', 'Tipo de unión', 'union')}
           ${campoSeg('pareja.sociedad', 'Sociedad conyugal o patrimonial', 'sociedad', { ayuda: 'Si está vigente, lo construido en pareja se parte por mitades antes de repartir la herencia.' })}
           ${campoSeg('pareja.capit', '¿Firmaron capitulaciones?', 'sino', { si: 'pareja.sociedad=si' })}
@@ -3170,6 +3426,7 @@ def('c/familia', 'c', 'Tu familia', () => {
     pasoListo(f, 1);
     const zona = $('#personas-zona', f);
     zona.append(montar(listaPersonasHTML()));
+    app.personasVistas = new Set($$('.persona', zona).map((li) => li.dataset.id));
     enlazar(zona); enlazarConteos(zona); aplicarSi(zona);
     $$('[data-quitar]', zona).forEach((b) => b.addEventListener('skClick', () => { const id = b.dataset.quitar; M.S.personas = M.S.personas.filter((p) => p.id !== id && p.padre !== id); repintarPersonas(); alCambiar('personas'); }));
     const sel = $('#nuevo-rol', f);
@@ -3194,7 +3451,9 @@ def('c/familia', 'c', 'Tu familia', () => {
 
 function pintarArbolFamilia(raiz) {
   const z = $('#arbol-zona', raiz); if (!z) return;
-  z.replaceChildren(montar(arbolHTML({})));
+  const ids = arbolIds(), nuevos = new Set(app.arbolVisto ? ids.filter((id) => !app.arbolVisto.has(id)) : []);
+  app.arbolVisto = new Set(ids);
+  z.replaceChildren(montar(arbolHTML({ nuevos })));
   const F = M.famState(), o = $('#orden-txt', raiz);
   if (!o) return;
   const hay = F.P.length || F.pareja;
@@ -3303,7 +3562,10 @@ def('c/patrimonio', 'c', 'Tu patrimonio', () => {
     clearTimeout(t);
     t = setTimeout(() => {
       const l = $('#libro-zona'), s = $('#suposicion-zona'); if (!l) return;
+      const antes = Object.fromEntries($$('.libro > div', l).map((d) => [d.querySelector('dt').textContent, d.querySelector('dd').textContent]));
       l.replaceChildren(montar(libroPatrimonioHTML()));
+      // La cifra que cambió se marca un instante: se ve qué movió lo que se acaba de escribir
+      $$('.libro > div', l).forEach((d) => { const k = d.querySelector('dt').textContent, dd = d.querySelector('dd'); if (k in antes && antes[k] !== dd.textContent) dd.classList.add('dato--cambia'); });
       if (s) { const h = s.querySelector('.porque'); s.replaceChildren(montar(suposicionHTML())); if (h) s.append(h); }
     }, 120);
   });
@@ -3327,6 +3589,125 @@ function voluntadHTML() {
 }
 ['ley-mas-etapas', 'ley-mas-menos-etapas', 'algo-etapas'].forEach((k) => { OPC['vol-' + k] = k.split('-').map((c) => ({ value: c, label: VOL_OPC[c] })); });
 
+/* ─────────────────────────── Personas beneficiarias del seguro de vida ───────────────────────────
+   Ajuste acordado con Negocio (2026-11-25). Se precargan las personas que ya están en «Tu familia», cada una con su porcentaje
+   (enteros, suman 100), y se pueden agregar otras. El motor reparte el seguro con estos porcentajes cuando suman 100: ver
+   recalcular() en 00-nucleo.js. Las filas de la pantalla viven en S.tiene.segBenFilas; S.tiene.segBenList es la forma que lee
+   el motor (solo las filas con porcentaje), la misma del prototipo de Negocio. */
+const PAR_ROL = { hijo: 'Hijo(a)', nieto: 'Otro familiar', asc: 'Padre o madre', her: 'Hermano(a)', sob: 'Otro familiar', sobRep: 'Otro familiar', otro: 'Otro familiar' };
+const nombreSB = (ref) => (ref === 'pareja' ? ((M.S.pareja.nombre || '').trim() || 'Tu pareja') : nombreId(ref));
+const totalSegBen = () => (M.S.tiene.segBenFilas || []).reduce((s, b) => s + (+b.pct || 0), 0);
+
+/* Pone las filas al día con la familia: quita a quien ya no está, suma a quien llegó y asocia las filas de los casos de ejemplo */
+function filasSegBen() {
+  const S = M.S, T = S.tiene, vivas = S.personas.filter((p) => p.vive !== 'no');
+  if (!Array.isArray(T.segBenFilas)) T.segBenFilas = (T.segBenList || []).map((b) => ({ ref: undefined, nombre: String(b.nombre || ''), par: b.par || '', pct: Math.round(+b.pct || 0) }));
+  const hay = (ref) => (ref === 'pareja' ? S.pareja.tiene === 'si' : vivas.some((p) => p.id === ref));
+  T.segBenFilas.forEach((b) => {
+    if (b.ref !== undefined) return;
+    const nm = b.nombre.trim().toLowerCase();
+    const p = nm && vivas.find((x) => [nombreDe(x), M.personLabel(x)].some((t) => String(t).toLowerCase() === nm));
+    b.ref = b.par === 'Cónyuge o compañero(a)' && S.pareja.tiene === 'si' ? 'pareja' : p ? p.id : null;
+  });
+  const actuales = T.segBenFilas.filter((b) => !b.ref || hay(b.ref));
+  const ligadas = ['pareja', ...S.personas.map((p) => p.id)].filter(hay).map((ref) => actuales.find((b) => b.ref === ref) || { ref, nombre: '', par: '', pct: 0 });
+  T.segBenFilas = [...ligadas, ...actuales.filter((b) => !b.ref)];
+  return T.segBenFilas;
+}
+/* La lista que lee el motor: solo quien tiene porcentaje. Quien ya está en la familia va con su etiqueta («Hijo 1»), que es como lo reconoce */
+function guardarSegBen() {
+  const T = M.S.tiene;
+  T.segBenList = filasSegBen().filter((b) => b.pct > 0).map((b) => ({
+    nombre: b.ref === 'pareja' ? '' : b.ref ? M.personLabel(M.byId(b.ref)) : (b.nombre || '').trim(),
+    par: b.ref === 'pareja' ? 'Cónyuge o compañero(a)' : b.ref ? '' : 'Otro familiar',
+    pct: b.pct,
+  }));
+}
+const claseTotalSB = () => (totalSegBen() === 100 ? ' sb__total--ok' : totalSegBen() > 100 ? ' sb__total--mal' : '');
+/* Lo que dice el total, en una línea: cuánto falta o cuánto sobra */
+function totalSBHTML() {
+  const t = totalSegBen();
+  if (t === 100) return '<i class="pi pi-check-circle" aria-hidden="true"></i><span>Total asignado: <b>100 %</b>. Listo.</span>';
+  if (t === 0) return '<span>Total asignado: <b>0 %</b>. Deben sumar 100 %.</span>';
+  if (t > 100) return `<span>Total asignado: <b>${t} %</b>. Sobran ${t - 100} %.</span>`;
+  return `<span>Total asignado: <b>${t} %</b>. Faltan ${100 - t} %.</span>`;
+}
+/* Quién es cada fila: la persona de «Tu familia» con su nombre o su etiqueta, o la que se agregó aparte */
+function infoSB(b) {
+  if (b.ref === 'pareja') { const n = (M.S.pareja.nombre || '').trim(); return { nombre: n || 'Tu pareja', rel: n ? 'Tu pareja' : '', tiene: !!n }; }
+  const p = M.byId(b.ref);
+  return { nombre: nombreDe(p), rel: relDe(p), tiene: !!(p.nombre && p.nombre.trim()) };
+}
+const resumenSB = (filas) => {
+  const con = filas.filter((b) => b.pct > 0).map((b) => `${b.ref ? infoSB(b).nombre : (b.nombre || '').trim() || 'otra persona'} ${b.pct} %`);
+  return con.length ? `Reparto del seguro: ${con.join(', ')}` : 'El seguro todavía no está repartido';
+};
+
+function segBenHTML() {
+  const filas = filasSegBen(), total = totalSegBen();
+  const fila = (b, i) => {
+    const ligada = !!b.ref, info = ligada ? infoSB(b) : { nombre: (b.nombre || '').trim() || 'otra persona', rel: '', tiene: !!(b.nombre || '').trim() };
+    const avatar = info.tiene ? `<sk-avatar size="small" text="${A(info.nombre)}" aria-hidden="true"></sk-avatar>` : '<sk-avatar size="small" icon="pi pi-user" aria-hidden="true"></sk-avatar>';
+    const quien = ligada
+      ? `<span class="sb__quien"><span class="sb__n">${esc(info.nombre)}</span>${info.rel ? `<span class="sb__rel">${esc(info.rel)}</span>` : ''}</span>`
+      : `<span class="sb__quien"><sk-input-text data-sbn="${i}" label="Nombre, alias o parentesco" size="md"></sk-input-text></span>`;
+    return `<li class="sb__fila${ligada ? '' : ' sb__fila--otra'}">${avatar}${quien}
+      <span class="sb__valor"><sk-input-number data-sbp="${i}" label="Porcentaje para ${A(info.nombre)}" size="md" min="0" max="100" max-fraction-digits="0" suffix=" %"></sk-input-number></span>
+      ${ligada ? '' : `<sk-button data-sbq="${i}" label="Quitar" sk-type="tertiary" size="md" icon="pi pi-trash" data-ancho="auto" aria-label="Quitar a ${A(info.nombre)}"></sk-button>`}
+      <span class="sb__barra" aria-hidden="true"><i style="--p:0"></i></span></li>`;
+  };
+  return `<div class="sb">
+    <div class="sb__cab"><p class="sb__t">¿Cómo está repartido el seguro?</p><p class="ayuda">Escribe el porcentaje de cada persona beneficiaria, en números enteros. Deben sumar 100 %.</p></div>
+    ${filas.length ? `<ul class="sb__lista">${filas.map(fila).join('')}</ul>` : '<p class="vacio">Todavía no hay familiares registrados. Agrega a la persona beneficiaria.</p>'}
+    <div class="sb__resumen">
+      <div class="sb__medidor${total > 100 ? ' sb__medidor--mal' : ''}" id="sb-medidor" role="img" aria-label="${A(resumenSB(filas))}">${filas.map(() => '<i style="--g:0"></i>').join('')}<i class="sb__resto" style="--g:100"></i></div>
+      <p class="sb__total${claseTotalSB()}" id="sb-total" role="status" aria-live="polite">${totalSBHTML()}</p>
+    </div>
+    <div class="sb__acciones"><sk-button id="sb-agregar" label="Agregar otro" sk-type="secondary" size="small" icon="pi pi-plus" data-ancho="auto"></sk-button><sk-button id="sb-igual" label="Repartir en partes iguales" sk-type="tertiary" size="small" data-ancho="auto"></sk-button></div>
+  </div>`;
+}
+function enlazarSegBen(zona) {
+  /* Las barras y el medidor se mueven sin volver a dibujar la lista, para que la transición parta de donde estaban */
+  const actualizar = () => {
+    const filas = M.S.tiene.segBenFilas, total = totalSegBen();
+    $$('.sb__fila', zona).forEach((li, i) => { const b = filas[i], barra = $('.sb__barra i', li); if (b && barra) barra.style.setProperty('--p', Math.min(1, b.pct / 100)); });
+    const m = $('#sb-medidor', zona);
+    if (m) {
+      m.classList.toggle('sb__medidor--mal', total > 100); m.setAttribute('aria-label', resumenSB(filas));
+      $$('i', m).forEach((s, i) => s.style.setProperty('--g', i < filas.length ? filas[i].pct : Math.max(0, 100 - total)));
+    }
+    const t = $('#sb-total', zona);
+    if (t) { const antes = t.className; t.innerHTML = totalSBHTML(); t.className = `sb__total${claseTotalSB()}`; if (antes === t.className) t.querySelector('.pi')?.classList.add('sin-animar'); }
+  };
+  const pintar = ({ nueva = false, entrada = false } = {}) => {
+    const frag = montar(segBenHTML()), filas = M.S.tiene.segBenFilas;
+    $$('[data-sbp]', frag).forEach((el) => { el.value = filas[+el.dataset.sbp].pct; });
+    $$('[data-sbn]', frag).forEach((el) => { el.value = filas[+el.dataset.sbn].nombre; });
+    zona.replaceChildren(frag);
+    if (nueva) { const ultima = $$('.sb__fila', zona).pop(); if (ultima) ultima.classList.add('sb__fila--nueva'); const campos = $$('[data-sbn] input', zona); if (campos.length) campos[campos.length - 1].focus(); }
+    // Al entrar, las barras parten de cero y se llenan; al volver a dibujar por agregar o quitar, ya están donde deben
+    if (entrada) requestAnimationFrame(() => requestAnimationFrame(actualizar)); else actualizar();
+  };
+  const cambio = () => { guardarSegBen(); actualizar(); alCambiar('tiene.segBenList'); };
+  // Los eventos de los sk-* no suben: se escuchan en captura
+  zona.addEventListener('valueChange', (e) => {
+    const p = e.target.closest && e.target.closest('[data-sbp]'), n = e.target.closest && e.target.closest('[data-sbn]'), filas = M.S.tiene.segBenFilas;
+    if (p) { const v = Math.max(0, Math.min(100, Math.round(Number(e.detail) || 0))); if (filas[+p.dataset.sbp].pct === v) return; filas[+p.dataset.sbp].pct = v; cambio(); }
+    else if (n) { filas[+n.dataset.sbn].nombre = e.detail || ''; cambio(); }
+  }, true);
+  zona.addEventListener('skClick', (e) => {
+    const el = e.target, filas = M.S.tiene.segBenFilas;
+    if (el.id === 'sb-agregar') { filas.push({ ref: null, nombre: '', par: 'Otro familiar', pct: 0 }); pintar({ nueva: true }); cambio(); }
+    else if (el.id === 'sb-igual' && filas.length) {
+      const base = Math.floor(100 / filas.length), resto = 100 - base * filas.length;
+      filas.forEach((b, i) => { b.pct = base + (i < resto ? 1 : 0); });
+      $$('[data-sbp]', zona).forEach((c) => { c.value = filas[+c.dataset.sbp].pct; });
+      cambio();
+    } else if (el.dataset && el.dataset.sbq !== undefined) { filas.splice(+el.dataset.sbq, 1); pintar(); cambio(); }
+  }, true);
+  filasSegBen(); guardarSegBen(); pintar({ entrada: true });
+}
+
 def('c/tienes', 'c', 'Lo que ya tienes y lo que te importa', () => {
   pintar(pasoHTML({
     i: 3,
@@ -3340,6 +3721,7 @@ def('c/tienes', 'c', 'Lo que ya tienes y lo que te importa', () => {
           ${campoSeg('tiene.saneados', '¿Los papeles de tus inmuebles están al día?', 'saneados')}
           ${campoDinero('tiene.segV', 'Valor asegurado en tus seguros de vida')}
           ${campoSeg('tiene.segBen', '¿Designaste personas beneficiarias?', 'sino', { si: 'tiene.segV>0' })}
+          <div class="stack-s" data-si="tiene.segV>0&tiene.segBen=si"><div id="sb-zona"></div>${why('tienes-beneficiarios')}</div>
           ${campoDinero('tiene.fidV', 'Fiducias o fideicomisos que ya tienes')}
         </div>
       </fieldset>
@@ -3349,7 +3731,7 @@ def('c/tienes', 'c', 'Lo que ya tienes y lo que te importa', () => {
       </fieldset>
       <fieldset class="bloque"><legend>Qué quieres para cada persona ${why('tienes-voluntad')}</legend><div id="voluntad-zona">${voluntadHTML()}</div></fieldset>`,
     lateral: '', nota: notaHTML('tienes'), siguiente: 'Ver mi diagnóstico',
-  }), (f) => { pasoListo(f, 3); });
+  }), (f) => { pasoListo(f, 3); enlazarSegBen($('#sb-zona', f)); });
 });
 
 /* ══ 25-arbol.js ══ */
@@ -3371,12 +3753,21 @@ function arbolDatos() {
   return { titular, pareja, ramas };
 }
 
+/* Los ids que hay hoy en el árbol, para saber quién llegó desde la última vez que se dibujó */
+function arbolIds() {
+  const d = arbolDatos(), ids = [];
+  if (d.pareja) ids.push('pareja');
+  const rec = (l) => l.forEach((n) => { ids.push(n.id); if (n.hijos) rec(n.hijos); });
+  rec(d.ramas);
+  return ids;
+}
+
 function nodoHTML(n, o) {
   const fila = o.filas && o.filas[n.id];
   const interactivo = o.interactivo && !n.raiz;
   const avatar = n.tiene || n.raiz ? `<sk-avatar size="small" text="${A(n.nombre)}" aria-hidden="true"></sk-avatar>` : '<sk-avatar size="small" icon="pi pi-user" aria-hidden="true"></sk-avatar>';
   const cuerpo = `${avatar}<span class="nodo__texto"><span class="nodo__nombre">${esc(n.nombre)}</span><span class="nodo__rel">${esc(n.rel)}${n.falleció ? ', ya falleció' : ''}</span></span>${fila ? `<span class="nodo__monto num">${fila.neto > 0 ? fmtMc(fila.neto) : '—'}</span>` : ''}`;
-  const cls = `nodo${n.raiz ? ' nodo--raiz' : ''}${n.falleció ? ' nodo--ausente' : ''}${o.sel === n.id ? ' es-sel' : ''}`;
+  const cls = `nodo${n.raiz ? ' nodo--raiz' : ''}${n.falleció ? ' nodo--ausente' : ''}${o.sel === n.id ? ' es-sel' : ''}${o.nuevos && o.nuevos.has(n.id) ? ' nodo--nuevo' : ''}`;
   return interactivo
     ? `<button type="button" class="${cls}" data-nodo="${esc(n.id)}" aria-pressed="${o.sel === n.id}">${cuerpo}</button>`
     : `<div class="${cls}">${cuerpo}</div>`;
@@ -3384,7 +3775,7 @@ function nodoHTML(n, o) {
 function ramasHTML(lista, o) {
   return `<ul class="arbol__ramas">${lista.map((n) => `<li class="rama">${nodoHTML(n, o)}${n.hijos && n.hijos.length ? ramasHTML(n.hijos, o) : ''}</li>`).join('')}</ul>`;
 }
-/* o: { interactivo, sel, filas } */
+/* o: { interactivo, sel, filas, nuevos } */
 function arbolHTML(o = {}) {
   const d = arbolDatos();
   const extra = [];
@@ -3492,14 +3883,16 @@ function avisosFinalesHTML(sec) {
 /* ─────────── Cáscara del resultado ─────────── */
 function pintarCapitulo(sec, cuerpo) {
   const r = app.r, R = r.R, l = R.llega, i = CAPS.findIndex((c) => c[0] === sec);
-  const nota = (t, v, ir, fuerte, ico) => `<li><a class="resumen__celda${fuerte ? ' resumen__celda--f' : ''}" href="#/${ir}"><span class="resumen__ico" aria-hidden="true"><i class="pi ${ico}"></i></span><span class="resumen__txt"><span class="resumen__t">${t}</span><span class="resumen__v num">${v}</span></span></a></li>`;
+  /* Cada tarjeta dice una cosa y la explica en una línea (punto medio acordado con Negocio, 2026-11-25): más que el dato solo, menos que la tarjeta del simulador original */
+  const nota = (t, v, d, ir, fuerte, ico) => `<li><a class="resumen__celda${fuerte ? ' resumen__celda--f' : ''}" href="#/${ir}"><span class="resumen__ico" aria-hidden="true"><i class="pi ${ico}"></i></span><span class="resumen__txt"><span class="resumen__t">${t}</span><span class="resumen__v num">${v}</span><span class="resumen__d">${d}</span></span></a></li>`;
+  const ah = r.AH, altas = gapsDe(r).filter((g) => g.alta).length;
   pintar(`
     <div class="paso-barra"><sk-stepper id="pasos" linear="false" aria-label="Pasos del diagnóstico"></sk-stepper></div>
     <ul class="resumen" aria-label="Resumen del diagnóstico">
-      ${nota('Le llega a tu familia', `${pctf(l.min, 0)} a ${pctf(l.max, 0)}`, 'c/resultado', true, 'pi-heart')}
-      ${nota('Costo estimado', fmtMc(R.cost.cen), 'c/resultado', false, 'pi-receipt')}
-      ${nota('Con las alternativas', fmtMc(r.AH.con.cen), 'c/resultado/planeas', false, 'pi-sparkles')}
-      ${nota('Para revisar', String(r.GAPS.length), 'c/resultado/sigue', false, 'pi-flag')}
+      ${nota('Le llega a tu familia', `${pctf(l.min, 0)} a ${pctf(l.max, 0)}`, 'de tu patrimonio neto', 'c/resultado', true, 'pi-heart')}
+      ${nota('Costo si no planeas', fmtMc(R.cost.cen), `Entre ${fmtMc(R.cost.min)} y ${fmtMc(R.cost.max)}`, 'c/resultado', false, 'pi-receipt')}
+      ${nota('Costo con las alternativas', fmtMc(ah.con.cen), ah.ah.cen > 0 ? `Ahorras ${fmtMc(ah.ah.cen)}: ${pctf(ah.pctCosto, 0)} menos` : 'Sin ahorro en el proceso', 'c/resultado/planeas', false, 'pi-sparkles')}
+      ${nota('Para revisar', String(gapsDe(r).length), altas ? `${altas} de prioridad alta` : 'Ninguno urgente', 'c/resultado/sigue', false, 'pi-flag')}
     </ul>${why('resultado-resumen')}
     <div class="resultado">
       <nav class="resultado__nav" aria-label="Capítulos del diagnóstico"><ol>${CAPS.map(([k, ruta, t], j) => `<li><a href="#/${ruta}"${k === sec ? ' aria-current="step"' : ''}><span class="num">${j + 1}</span>${t}</a></li>`).join('')}</ol>${why('resultado-nav')}
@@ -3607,10 +4000,10 @@ function simHTML(R) {
   const t = simTotales(R);
   return `<section class="sim" aria-labelledby="t-sim">
     <h2 id="t-sim">Prueba cómo repartir la mitad que decides ${why('reparto-simulacion')}</h2>
-    <p class="ayuda">Con un testamento decides esta mitad. Mueve los porcentajes y mira cómo cambia lo que recibe cada uno.</p>
+    <p class="ayuda">Con un testamento decides esta mitad. Mueve las barras o escribe los porcentajes, en números enteros, y mira cómo cambia lo que recibe cada uno.</p>
     <ul class="sim__filas">${rec.map((r) => {
       const nombre = etiquetaSim(r);
-      return `<li><label for="sim-${r.id}">${esc(nombre)}</label><input type="range" id="sim-${r.id}" data-sim="${esc(r.id)}" min="0" max="100" step="5" value="${SIM[r.id] || 0}" aria-valuetext="${SIM[r.id] || 0} por ciento"><output class="num" for="sim-${r.id}" id="out-${r.id}">${SIM[r.id] || 0} %</output></li>`;
+      return `<li><label for="sim-${r.id}">${esc(nombre)}</label><input type="range" id="sim-${r.id}" data-sim="${esc(r.id)}" min="0" max="100" step="1" value="${SIM[r.id] || 0}" aria-valuetext="${SIM[r.id] || 0} por ciento"><span class="sim__num" role="group" aria-label="Porcentaje para ${A(nombre)}"><sk-input-number id="simn-${r.id}" data-simn="${esc(r.id)}" label="Porcentaje" size="md" min="0" max="100" max-fraction-digits="0" suffix=" %"></sk-input-number></span></li>`;
     }).join('')}</ul>
     <p class="sim__resto" id="sim-resto" role="status" aria-live="polite">${t.resto > 0 ? `<b>${t.resto} % sin asignar.</b> Lo que no asignes se suma a la mitad obligatoria de tus herederos.` : ''}</p>
     <div id="sim-res" class="sim__res">${simBarras(t)}</div>
@@ -3664,20 +4057,40 @@ function capReparto() {
     const alSeleccionar = (id) => {
       app.sel = id;
       $$('.nodo', arbol).forEach((n) => { const on = n.dataset.nodo === id; n.classList.toggle('es-sel', on); n.setAttribute('aria-pressed', on); });
-      document.getElementById('persona-det').replaceChildren(montar(detallePersonaHTML(id, filas, R)));
+      const det = document.getElementById('persona-det');
+      det.replaceChildren(montar(detallePersonaHTML(id, filas, R)));
+      det.classList.remove('cambia'); void det.offsetWidth; det.classList.add('cambia'); // el detalle cambia de persona con un fundido corto
     };
     arbol.addEventListener('click', (e) => { const n = e.target.closest('[data-nodo]'); if (n) alSeleccionar(n.dataset.nodo); });
     const sim = $('#sim-zona', f);
     if (sim) {
-      sim.addEventListener('input', (e) => {
-        const k = e.target.dataset && e.target.dataset.sim; if (!k) return;
-        const ids = M.simRec().map((x) => x.id);
-        simFijar(k, Number(e.target.value), ids);
-        ids.forEach((id) => { const r = $(`#sim-${CSS.escape(id)}`, sim), o = $(`#out-${CSS.escape(id)}`, sim); if (r && r !== e.target) { r.value = SIM[id] || 0; r.setAttribute('aria-valuetext', `${SIM[id] || 0} por ciento`); } if (o) o.textContent = `${SIM[id] || 0} %`; });
+      /* Cada porcentaje se puede mover con la barra o escribir a mano (enteros de 0 a 100); los dos se mantienen iguales.
+         Ajuste acordado con Negocio, 2026-11-25. */
+      const ids = () => M.simRec().map((x) => x.id);
+      const mostrar = (origen) => {
+        ids().forEach((id) => {
+          const r = $(`#sim-${CSS.escape(id)}`, sim), n = $(`#simn-${CSS.escape(id)}`, sim), v = SIM[id] || 0;
+          if (r && r !== origen) { r.value = v; r.setAttribute('aria-valuetext', `${v} por ciento`); }
+          if (n && n !== origen) n.value = v;
+        });
         const t = simTotales(R);
         $('#sim-resto', sim).innerHTML = t.resto > 0 ? `<b>${t.resto} % sin asignar.</b> Lo que no asignes se suma a la mitad obligatoria de tus herederos.` : '';
         $('#sim-res', sim).innerHTML = simBarras(t);
+      };
+      $$('[data-simn]', sim).forEach((n) => { n.value = SIM[n.dataset.simn] || 0; });
+      sim.addEventListener('input', (e) => {
+        const k = e.target.dataset && e.target.dataset.sim; if (!k) return;
+        simFijar(k, Number(e.target.value), ids());
+        mostrar(e.target);
       });
+      // Los eventos de los sk-* no suben: se escuchan en captura
+      sim.addEventListener('valueChange', (e) => {
+        const n = e.target.closest && e.target.closest('[data-simn]'); if (!n) return;
+        if (e.detail == null || e.detail === '' || Number(e.detail) === (SIM[n.dataset.simn] || 0)) return;
+        simFijar(n.dataset.simn, Number(e.detail), ids());
+        const r = $(`#sim-${CSS.escape(n.dataset.simn)}`, sim); if (r) { r.value = SIM[n.dataset.simn]; r.setAttribute('aria-valuetext', `${SIM[n.dataset.simn]} por ciento`); }
+        mostrar(n);
+      }, true);
     }
   };
   pintarCapitulo('reparto', `
@@ -3709,20 +4122,38 @@ const acc = (titulo, cuerpo, grupo = 'mas') => `<details name="${grupo}"><summar
 /* Una sola tabla de alternativas (versión piloto de Legal): la figura, para qué sirve, quién puede implementarla
    «de tu elección», el monto de referencia como guía y el ahorro. Sin grupos y sin nombrar compañías. */
 const sinDato = '<span aria-hidden="true">-</span><span class="visually-hidden">Sin dato</span>';
+/* Las alternativas se muestran como figuras genéricas: el seguro no lleva «(con ahorro)», que lo ata a un producto de la
+   compañía (ajuste acordado con Negocio, 2026-11-25). El motor no se toca: el nombre se limpia al pintar. */
+const figGenerica = (fig) => String(fig).replace(/\s*\(con ahorro\)/i, '');
+/* Aviso del seguro de vida por edad: solo de 55 a 60 años, y junto a las alternativas, donde la persona tiene contexto. Antes
+   de los 55 y después de los 60 no se muestra nada (ajuste acordado con Negocio, 2026-11-25). */
+function textoSeguroEdad() {
+  const e = Number(M.S.sesion.edad), tope = M.EDAD_MAX_SEGURO;
+  if (!(e >= 55 && e <= tope)) return '';
+  const q = tope - e;
+  return `El seguro de vida se puede contratar hasta los ${tope} años. ${q === 0 ? 'Este es tu último año para contratarlo.' : `Te ${q === 1 ? 'queda 1 año' : `quedan ${q} años`}.`}`;
+}
+function avisoSeguroEdad() {
+  const t = textoSeguroEdad();
+  return t ? `<sk-alert type="info" closable="false" title="Edad para contratar un seguro de vida" message="${A(t)}"></sk-alert>${why('alternativas-edad')}` : '';
+}
+/* Los avisos «Para revisar» sin los de edad: ese aviso ya vive en las alternativas */
+const esAvisoEdad = (g) => /ventana del seguro de vida|el seguro de vida ya no es una opción/i.test(String(g.html));
+function gapsDe(r) { return r.GAPS.filter((g) => !esAvisoEdad(g)).map(partirGap); }
 function tablaAltsHTML(r, informe = false) {
   const picks = r.MIX.picks, ext = M.EXT_LIST();
   const filas = picks.map((c, i) => {
-    const inf = M.LG_INFO(c.name), ar = r.AH.rows[i], ah = ar && ar.ah && ar.ah.cen > 0 ? fmtM(ar.ah.cen) : null;
+    const inf = M.LG_INFO(c.name), fig = figGenerica(inf.fig), ar = r.AH.rows[i], ah = ar && ar.ah && ar.ah.cen > 0 ? fmtM(ar.ah.cen) : null;
     const para = c.para && c.para.length ? conNombres(c.para.join(', ')) : '';
     const marcas = `${c.have ? '<span class="etiqueta">Ya lo tienes: revisar y ampliar</span>' : ''}${para ? `<span class="etiqueta">Para ${esc(para)}</span>` : ''}`;
-    const monto = c.monto > 0 ? `<b>${fmtM(c.monto)}</b>${informe ? '' : `<button type="button" class="ayuda-monto" data-monto="${i}" aria-label="Cómo se llega al monto de referencia de ${A(inf.fig)}"><i class="pi pi-info-circle" aria-hidden="true"></i></button>`}` : sinDato;
-    return `<tr><th scope="row" data-l="Alternativa"><b>${esc(inf.fig)}</b>${marcas ? `<span class="alt-marcas">${marcas}</span>` : ''}</th>
+    const monto = c.monto > 0 ? `<b>${fmtM(c.monto)}</b>${informe ? '' : `<button type="button" class="ayuda-monto" data-monto="${i}" aria-label="Cómo se llega al monto de referencia de ${A(fig)}"><i class="pi pi-info-circle" aria-hidden="true"></i></button>`}` : sinDato;
+    return `<tr><th scope="row" data-l="Alternativa"><b>${esc(fig)}</b>${marcas ? `<span class="alt-marcas">${marcas}</span>` : ''}</th>
       <td data-l="Para qué te sirve">${esc(c.benef || '')}<small>${c.tiempo === 'variable' ? 'Disponibilidad variable' : `Disponible en ${esc(c.tiempo)}`}</small></td>
       <td data-l="Quién puede implementarla">${esc(M.LG_WHO(c))}</td>
       <td class="r num" data-l="Monto de referencia (guía)">${monto}</td>
       <td class="r num" data-l="Ahorro estimado">${ah || sinDato}</td></tr>`;
   }).join('');
-  const afuera = ext.map((x) => `<tr><th scope="row" data-l="Alternativa"><b>${esc(x.fig)}</b></th><td data-l="Para qué te sirve">${esc(x.help)}</td><td data-l="Quién puede implementarla">${esc(x.who)}</td><td class="r num" data-l="Monto de referencia (guía)">${sinDato}</td><td class="r num" data-l="Ahorro estimado">${sinDato}</td></tr>`).join('');
+  const afuera = ext.map((x) => `<tr><th scope="row" data-l="Alternativa"><b>${esc(x.fig)}</b></th><td data-l="Para qué te sirve">${esc(x.help)}${!informe && /^Fiducia civil/i.test(x.fig) ? `<button type="button" class="enlace" data-fid>Ver el modelo de fiducia civil</button>${why('planeas-fiducia-modelo')}` : ''}</td><td data-l="Quién puede implementarla">${esc(x.who)}</td><td class="r num" data-l="Monto de referencia (guía)">${sinDato}</td><td class="r num" data-l="Ahorro estimado">${sinDato}</td></tr>`).join('');
   return `<div class="tabla-marco"><table class="tabla tabla--alts"><caption class="visually-hidden">Alternativas según tu situación</caption>
     <thead><tr><th scope="col">Alternativa</th><th scope="col">Para qué te sirve</th><th scope="col">Quién puede implementarla</th><th scope="col" class="r">Monto de referencia (guía)</th><th scope="col" class="r">Ahorro estimado</th></tr></thead>
     <tbody>${filas}${afuera}</tbody></table></div>`;
@@ -3735,34 +4166,76 @@ function resumenAltsHTML(r) {
 }
 /* El ⓘ del monto de referencia abre su explicación (texto de Negocio y de Legal, sin tocar) */
 function enlazarMontos(f, r) {
+  $$('[data-fid]', f).forEach((b) => b.addEventListener('click', abrirModeloFiducia));
   $$('.ayuda-monto', f).forEach((b) => b.addEventListener('click', () => {
     const k = b.dataset.monto, txt = k === 'total' ? M.LG_TOTAL_TIP() : M.LG_MONTO_TIP(r.MIX.picks[Number(k)]);
     modal({ titulo: 'Cómo se llega al monto de referencia', cuerpo: `<p>${esc(txt)}</p>`, tamano: 'medium' });
   }));
 }
 
+/* ─────────── Comparativo y desglose del ahorro ───────────
+   Cuentas y estructura de la versión piloto de Negocio («Sin planeación» frente a «Con las alternativas», y «Ver de dónde sale
+   el ahorro»), con la redacción de UX en tuteo y sin la palabra «comisiones» (ajustes acordados con Negocio, 2026-11-25). */
+const CERO = '$ 0';
+const txtRango = (R, x) => (x.max - x.min < 1e6 ? `Solo ganancia ocasional${R.traslado ? ' y traslado' : ''}: en este escenario no queda costo de proceso.` : `Entre ${fmtMc(x.min)} y ${fmtMc(x.max)}.`);
+const costoPartes = (R, proceso) => [['go', 'Impuesto de los herederos (ganancia ocasional)', R.GOher], ['pr', 'Proceso de sucesión', proceso], ['tr', 'Traslado de gananciales', R.traslado]].filter((x) => x[2] > 0);
+/* Es el AH_TIP de Negocio sin la palabra «comisiones»: el resto del texto no cambia */
+const AHORRO_TIP = 'Ahorro bruto, antes de los costos de cada solución: lo que sale de la sucesión (monto de referencia por su factor de liquidez) deja de pagar el costo estimado del proceso (honorarios, derechos notariales y registro), con el mismo rango del escenario sin planeación. La ganancia ocasional no cambia en este estimado. No descuenta las primas, los honorarios ni las escrituras de cada solución.';
+
+/* Qué compone el costo: la misma cuenta, escenario por escenario */
+function ladoComparar(r, titulo, id, escena, proceso, llega, disp, plan) {
+  const R = r.R, partes = costoPartes(R, proceso);
+  return `<div class="comparar__lado${plan ? ' comparar__lado--plan' : ''}"><h2 id="${id}">${titulo}</h2>
+    <dl><div><dt>Costo estimado de la sucesión</dt><dd><span class="cifra-m num">${fmtMc(escena.cen)}</span><span class="rango">${txtRango(R, escena)}</span></dd></div>
+    ${partes.length ? `<div><dt>De qué se compone</dt><dd><ul class="partes">${partes.map(([k, t, v]) => `<li><span>${t}</span><b class="num">${fmtMc(v)}</b></li>`).join('')}</ul></dd></div>` : ''}
+    <div><dt>Le llegaría a tu familia</dt><dd><span class="cifra-m num">${fmtMc(llega)}</span><span class="rango">${pctf(llega / R.PN, 0)} de tu patrimonio</span></dd></div>
+    <div><dt>Disponible sin esperar la sucesión</dt><dd><span class="cifra-m num">${disp > 0 ? fmtMc(disp) : CERO}</span></dd></div></dl></div>`;
+}
+const barraCosto = (rotulo, partes, ahorro) => {
+  const total = partes.reduce((s, x) => s + x[2], 0);
+  return `<div class="cb"><span class="cb__l">${rotulo}</span><div class="cb__pista" role="img" aria-label="${A(`${rotulo}: ${fmtMc(total)}${ahorro > 0 ? `; se ahorran ${fmtMc(ahorro)}` : ''}`)}">${partes.map(([k, , v]) => `<i class="cb__${k}" style="flex:${v} 0 0"></i>`).join('')}${ahorro > 0 ? `<i class="cb__ah" style="flex:${ahorro} 0 0"></i>` : ''}</div><b class="num">${fmtMc(total)}</b></div>`;
+};
+function desgloseAhorroCuerpo(r, informe = false) {
+  const R = r.R, AH = r.AH, picks = r.MIX.picks, maxAh = Math.max(1, ...AH.rows.map((x) => x.ah.cen), ...AH.otras.map((x) => x.ah.cen));
+  const tip = (t, rot) => (informe ? '' : ayudaTip(t, rot));
+  const fila = (nombre, sub, a, otra) => `<div class="ah-fila${otra ? ' ah-fila--otra' : ''}"><div class="ah-fila__n"><b>${esc(nombre)}</b><small>${esc(sub)}</small></div><div class="ah-fila__barra" aria-hidden="true"><i style="width:${(100 * a.cen) / maxAh}%"></i></div><div class="ah-fila__v"><b class="num">${a.cen > 0 ? fmtMc(a.cen) : CERO}</b><small>${a.cen > 0 ? `${fmtMc(a.min)} a ${fmtMc(a.max)}` : 'Sin ahorro en el proceso'}</small></div></div>`;
+  const sinProc = costoPartes(R, R.g8), conProc = costoPartes(R, Math.max(0, R.g8 - AH.ah.cen));
+  return `<div class="desglose__t"><h3>El costo de la sucesión, lado a lado</h3>${tip('Valores centrales. La ganancia ocasional y el traslado de gananciales son iguales en los dos escenarios; cambia el costo del proceso sobre lo que deja de pasar por la sucesión.', 'Cómo leer la comparación')}</div>
+    <div class="cb-grupo">${barraCosto('Sin planeación', sinProc, 0)}${barraCosto('Con las alternativas', conProc, AH.ah.cen)}
+      <div class="sim__leyenda"><span><i class="cb__go"></i>Ganancia ocasional ${fmtMc(R.GOher)}</span><span><i class="cb__pr"></i>Proceso de sucesión</span>${R.traslado ? '<span><i class="cb__tr"></i>Traslado de gananciales</span>' : ''}<span><i class="cb__ah"></i>Lo que te ahorras</span></div></div>
+    <h3>De dónde sale el ahorro, solución por solución</h3>
+    <div class="ah-lista">${AH.rows.map((x, i) => fila(figGenerica(M.LG_INFO(picks[i].name).fig), x.fueraEf > 0 ? 'Una parte del patrimonio dejaría de pasar por la sucesión' : 'Su saldo sigue pasando por la sucesión: no reduce este costo', x.ah)).join('')}
+      ${AH.otras.length ? `<p class="ah-sub"><b>Otras alternativas evaluadas por separado.</b> No se suman al ahorro de las alternativas.</p>${AH.otras.map((o) => fila(o.name, o.how, o.ah, true)).join('')}` : ''}</div>
+    ${AH.capped ? `<p class="ayuda">Limitamos el ahorro al costo del proceso de la parte de tu patrimonio que se tramita en Colombia (${fmtMc(R.Mcol)}).</p>` : ''}
+    <div class="dos ah-porque">
+      <div><h4>Por qué ahorras</h4><ul><li>Lo que queda en alternativas con persona beneficiaria o fuera de la sucesión no paga honorarios, derechos notariales ni registro sobre ese valor.</li><li>Usamos el mismo costo estimado del proceso que en «Sin planeación»: honorarios, derechos notariales y registro.</li><li>La ganancia ocasional se mantiene igual en los dos escenarios (${fmtMc(R.GOher)}): el estimado no supone beneficios tributarios.</li></ul></div>
+      <div><h4>Lo que este estimado no incluye</h4><ul><li>Los costos de cada alternativa: primas, honorarios y escrituras.</li>${AH.fidInv ? '<li>La fiducia de inversión puede cambiar la base de la ganancia ocasional si se donan los derechos en vida. No se suma hasta validarlo con Tributaria.</li>' : ''}<li>Beneficios tributarios que podrían aumentar el ahorro, como la exención de los seguros de vida (3.250 UVT por persona beneficiaria, art. 303-1 E.T.).</li><li>Rendimientos, inflación ni cambios en tu patrimonio o en la norma.</li></ul>
+        <p class="ayuda"><i class="pi pi-info-circle" aria-hidden="true"></i> Es un estimado, no un resultado garantizado: depende de tu situación y de la validación jurídica y tributaria.</p></div>
+    </div>`;
+}
+const desgloseAhorroHTML = (r) => `<details class="desglose" name="ahorro"><summary><span>Ver de dónde sale el ahorro<small>Solución por solución y supuestos</small></span><i class="pi pi-chevron-down" aria-hidden="true"></i></summary><div class="desglose__cuerpo">${desgloseAhorroCuerpo(r)}</div></details>${why('planeas-desglose')}`;
+
 function capPlaneas() {
-  const r = app.r, R = r.R, AH = r.AH, pn = R.PN;
-  const pctLlega = (v) => `${pctf(v / pn, 0)} de tu patrimonio`;
-  const lado = (titulo, id, costo, rango, llega, disp, plan) => `<div class="comparar__lado${plan ? ' comparar__lado--plan' : ''}"><h2 id="${id}">${titulo}</h2>
-    <dl><div><dt>Costo estimado</dt><dd><span class="cifra-m num">${fmtMc(costo)}</span>${millones(rango[0]) !== millones(rango[1]) ? `<span class="rango">entre ${fmtMc(rango[0])} y ${fmtMc(rango[1])}</span>` : ''}</dd></div>
-    <div><dt>Le llega a tu familia</dt><dd><span class="cifra-m num">${fmtMc(llega)}</span><span class="rango">${pctLlega(llega)}</span></dd></div>
-    <div><dt>Disponible por las alternativas, sin esperar la sucesión</dt><dd><span class="cifra-m num">${disp > 0 ? fmtMc(disp) : '$ 0'}</span></dd></div></dl></div>`;
+  const r = app.r, R = r.R, AH = r.AH;
+  const hay = AH.ah.cen > 0;
   app.listoCap = (f) => enlazarMontos(f, r);
   pintarCapitulo('planeas', `
     <section class="hoja" aria-labelledby="t-planeas">
       <h1 id="t-planeas" tabindex="-1">Lo que cambia si planeas</h1>
       <p class="lead">El mismo patrimonio, de dos maneras. ${why('planeas-comparar')}</p>
       <div class="comparar">
-        ${lado('Sin planeación', 'c-sin', AH.sin.cen, [AH.sin.min, AH.sin.max], AH.llegaSin, 0, false)}
-        ${lado('Con las alternativas', 'c-con', AH.con.cen, [AH.con.min, AH.con.max], AH.llegaCon, r.MIX.liq, true)}
+        ${ladoComparar(r, 'Sin planeación', 'c-sin', AH.sin, R.g8, AH.llegaSin, 0, false)}
+        ${ladoComparar(r, 'Con las alternativas', 'c-con', AH.con, Math.max(0, R.g8 - AH.ah.cen), AH.llegaCon, r.MIX.liq, true)}
       </div>
-      <p class="ahorro"><span class="ahorro__t">Ahorro bruto estimado, no garantizado y sin incluir comisiones</span><span class="ahorro__cifra">${cifra(AH.ah.cen)}</span><span class="ahorro__d">${pctf(AH.pctCosto, 0)} menos de costo y ${M.ahPuntos(AH.ptos)} puntos más de patrimonio para tu familia.</span></p>
+      ${hay ? `<p class="ahorro"><span class="ahorro__t">Ahorro bruto estimado, antes de costos de cada solución${ayudaTip(AHORRO_TIP, 'Cómo se calcula el ahorro')}</span><span class="ahorro__cifra">${cifra(AH.ah.cen)}</span><span class="ahorro__d">Entre ${fmtMc(AH.ah.min)} y ${fmtMc(AH.ah.max)}: ${pctf(AH.pctCosto, 0)} menos de costo y ${M.ahPuntos(AH.ptos)} puntos más de patrimonio para tu familia.</span></p>
+      ${desgloseAhorroHTML(r)}`
+      : `<p class="ahorro ahorro--nulo"><span class="ahorro__t">Con lo que registraste, las alternativas no reducen el costo del proceso.</span><span class="ahorro__d">Su valor está en otros frentes, como el orden del reparto, las rentas o la protección de la empresa.</span></p>`}
     </section>
 
     <section class="hoja" aria-labelledby="t-alts">
       <h2 id="t-alts">Alternativas según tu situación ${why('planeas-alternativas')}</h2>
       <sk-alert type="info" closable="false" title="Cómo leer estas alternativas" message="${A(DATOS.piloto.guia_alternativas)}"></sk-alert>
+      ${avisoSeguroEdad()}
       <div class="acordeon acordeon--legal"><details name="t1"><summary><span>Texto legal</span><i class="pi pi-chevron-down" aria-hidden="true"></i></summary><p class="legal">${esc(M.LG_T1)}</p></details></div>
       ${resumenAltsHTML(r)}
       ${tablaAltsHTML(r)}${why('planeas-fuera')}
@@ -3780,7 +4253,7 @@ function partirGap(g) {
 const gapHTML = (g, tag = 'h3') => `<li class="gap${g.alta ? ' gap--alta' : ''}"><span class="gap__ico" aria-hidden="true"><i class="pi ${g.alta ? 'pi-exclamation-triangle' : 'pi-flag'}"></i></span><${tag}>${esc(g.lead)}</${tag}>${g.cuerpo ? `<p>${esc(g.cuerpo)}</p>` : ''}</li>`;
 
 function capSigue() {
-  const r = app.r, gaps = r.GAPS.map(partirGap), primeros = gaps.filter((g) => g.alta), pasos = M.nextSteps();
+  const r = app.r, gaps = gapsDe(r), primeros = gaps.filter((g) => g.alta), pasos = M.nextSteps();
   app.listoCap = (f) => {
     $('#ir-boveda', f).addEventListener('skClick', () => navegar('b/activar'));
     $('#ir-cierre', f).addEventListener('skClick', () => navegar('c/cierre'));
@@ -3818,7 +4291,7 @@ function contrasteHTML(r) {
 }
 function capDetalle() {
   const r = app.r, R = r.R, filas = filasReparto(R);
-  const resto = r.GAPS.map(partirGap).filter((g) => !g.alta);
+  const resto = gapsDe(r).filter((g) => !g.alta);
   app.listoCap = (f) => {
     const t = $('#tabla-personas', f);
     if (t) {
@@ -3846,7 +4319,13 @@ function capDetalle() {
 /* ══ 40-cierre.js ══ */
 /* ═══════════ El cierre de la conversación y el informe ═══════════ */
 
-const DECIDE = ['Solo yo', 'Con mi pareja', 'Con mis hijos o hijas', 'Con mi abogado o abogada', 'Con otra persona'];
+/* Lo que va entre las marcas FUTURO está apagado en esta primera versión (ajuste acordado con Negocio, 2026-11-25): el
+   constructor lo corta de las dos variantes, así que no viaja en el HTML. Queda aquí para una fase futura: el registro de
+   la sesión, la pregunta de con quién decide el cliente, la próxima reunión y la pregunta de si quiere implementar. */
+
+/* Aviso al generar el informe. Legal lo pidió así, por boca de Negocio (2026-11-25): decir que no se guarda y que no se
+   usará después con fines comerciales. La redacción es propuesta de UX, con la guía de comunicación de Skandia. */
+const AVISO_INFORME = 'Esta información no se guarda ni se usará con fines comerciales. Se procesa en esta sesión: descarga o imprime tu informe y, al terminar, toca «Cerrar y borrar».';
 const fechaLarga = (d) => (d instanceof Date && !isNaN(d) ? `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}` : '');
 
 /* Registro de la autorización, con las palabras de la versión piloto de Legal */
@@ -3854,69 +4333,32 @@ function textoRegistroAutorizacion() {
   const S = M.S, l = S.sesion.authLog;
   if (!S.sesion.auth || !l) return 'Sin autorización registrada.';
   const d = new Date(l.fecha);
-  return `Autorización de tratamiento de datos personales (Ley 1581 de 2012) otorgada por ${(S.sesion.cliente || '').trim() || 'el cliente'}${S.sesion.documento ? `, documento ${S.sesion.documento}` : ''}, el ${fechaLarga(d)} a las ${d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}. Autorización para el uso de la herramienta de simulación, otorgada a Skandia Planeación Financiera S.A. – NIT 800066453. La aceptación quedó registrada en esta sesión, con su fecha y hora.`;
+  return `Autorización de tratamiento de datos personales (Ley 1581 de 2012) otorgada por ${(S.sesion.cliente || '').trim() || 'el cliente'}, el ${fechaLarga(d)} a las ${d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}. Autorización para el uso de la herramienta de simulación, otorgada a Skandia Planeación Financiera S.A. – NIT 800066453. La aceptación quedó registrada en esta sesión, con su fecha y hora.`;
 }
 
-/* Lo que quedó de la sesión, para la bitácora (H-10): se puede copiar y pegar donde se registre */
-function registroSesion() {
-  const r = app.r, S = M.S;
-  const mostradas = r ? [...r.MIX.picks.map((c) => M.LG_INFO(c.name).fig), ...M.EXT_LIST().map((x) => x.fig)] : [];
-  const puente = M.LG_PUENTE_TXT();
-  return [
-    ['Fecha', `${hoyTexto()}, ${new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`],
-    ['Cliente', (S.sesion.cliente || '').trim() || 'Sin nombre'],
-    ['Autorización', textoRegistroAutorizacion()],
-    ['Alternativas mostradas', mostradas.length ? mostradas.join('; ') : 'Ninguna'],
-    ['Decisión del cliente', puente],
-    ['Decide con', app.cierre.decide.length ? app.cierre.decide.join(', ') : 'No se preguntó'],
-    ['Próxima reunión', app.cierre.proxima ? fechaLarga(app.cierre.proxima) : 'Sin fecha'],
-  ];
-}
 
-/* En pantalla la lista de alternativas se resume; el texto que se copia a la bitácora las trae todas */
-function registroPantalla() {
-  return registroSesion().map(([t, v]) => {
-    if (t !== 'Alternativas mostradas' || !app.r) return [t, v];
-    const n = [...app.r.MIX.picks, ...M.EXT_LIST()].length;
-    return [t, `${n}: ${app.r.MIX.picks.map((c) => M.LG_INFO(c.name).fig).slice(0, 2).join('; ')}${n > 2 ? ` y ${n - 2} más` : ''}`];
-  });
-}
 
 def('c/cierre', 'c', 'Cierre de la sesión', () => {
   if (!resultadoActual()) { pantallaSinDatos(); return; }
-  const reg = registroPantalla();
+  
   pintar(`
     <div class="paso-barra"><sk-stepper id="pasos" linear="false" aria-label="Pasos del diagnóstico"></sk-stepper></div>
     <div class="paso paso--cierre">
       <section class="hoja paso__principal" aria-labelledby="t-cierre">
-        <header class="paso__cabeza"><h1 id="t-cierre" tabindex="-1">Antes de cerrar</h1><p class="lead">Tres preguntas cortas y el informe para llevarte.</p></header>
+        <header class="paso__cabeza"><h1 id="t-cierre" tabindex="-1">Llévate tu informe</h1><p class="lead">Cuando termines, cierra la sesión: no queda nada guardado.</p></header>
         <div class="stack">
-          <fieldset class="bloque"><legend>¿Con quién decides esto? ${why('cierre-decide')}</legend>
-            <p class="ayuda">Si decides con alguien, la segunda reunión se hace con esa persona.</p>
-            <div class="chips" id="chips-decide" role="group" aria-label="Con quién decides"></div>
-            <sk-date-picker id="proxima" label="Próxima reunión" help-text="Opcional"></sk-date-picker>
-          </fieldset>
-          <fieldset class="bloque"><legend>${esc(DATOS.piloto.puente_titulo)} ${why('cierre-puente')}</legend>
-            <p class="ayuda">${esc(M.LG_PUENTE)}</p>
-            <div class="sk-rg" id="puente" data-dir="row"><span class="sk-rg__label visually-hidden" id="puente-label">Implementar una alternativa</span>
-              <div role="radiogroup" aria-labelledby="puente-label"><sk-radio name="puente" value="si" label="${A(DATOS.piloto.puente_si)}"></sk-radio><sk-radio name="puente" value="no" label="${A(DATOS.piloto.puente_no)}"></sk-radio></div>
-              <p class="sk-rg__error" id="puente-error" role="alert" hidden></p></div>
-            <div class="acordeon acordeon--legal"><details name="t4"><summary><span>Quién recibe qué si implementas una alternativa</span><i class="pi pi-chevron-down" aria-hidden="true"></i></summary><p class="legal">${esc(M.LG_T4)}</p></details></div>
-          </fieldset>
+          
           <fieldset class="bloque"><legend>Tu informe ${why('cierre-informe')}</legend>
             <p class="ayuda">Un documento de texto, con tus cifras, las alternativas y los avisos. Se lee en cualquier lector de pantalla.</p>
-            <p class="ayuda">${esc(DATOS.piloto.informe_nota.replace('Terminar y', 'Cerrar y'))}</p>
+            <sk-alert type="info" closable="false" title="Tu información no se guarda" message="${A(AVISO_INFORME)}"></sk-alert>${why('informe-no-guarda')}
             <div class="actions"><sk-button id="ver-informe" label="Ver el informe" sk-type="secondary" icon="pi pi-file"></sk-button><sk-button id="imprimir" label="Imprimir o guardar en PDF" icon="pi pi-print"></sk-button></div>
           </fieldset>
         </div>
       </section>
-      <aside class="paso__lateral" aria-label="Registro de la sesión">
-        <section class="hoja hoja--libro" aria-labelledby="t-reg"><h2 id="t-reg" class="titulo-lateral">Registro de la sesión ${why('cierre-registro')}</h2>
-          <dl class="registro" id="registro">${reg.map(([t, v]) => `<div><dt>${t}</dt><dd${String(v).length > 70 ? ' class="largo"' : ''}>${esc(v)}</dd></div>`).join('')}</dl>
-          <sk-button id="copiar-reg" label="Copiar el registro" sk-type="secondary" size="small" icon="pi pi-copy" data-ancho="auto"></sk-button>
-        </section>
+      <aside class="paso__lateral" aria-label="Cerrar la sesión">
+        
         <section class="hoja hoja--cerrar" aria-labelledby="t-borrar"><h2 id="t-borrar" class="titulo-lateral">Cerrar y borrar ${why('cierre-borrar')}</h2>
-          <p>Se borra todo lo que escribiste en esta sesión, incluida la bóveda de demostración. El informe y el registro no se guardan: llévatelos antes.</p>
+          <p>Se borra todo lo que escribiste en esta sesión, incluida la bóveda de demostración. El informe no se guarda: llévatelo antes.</p>
           <p class="ayuda">Lo escrito vive solo en esta pestaña. Si la cierras o la recargas, el navegador te pregunta antes. ${why('cierre-salir')}</p>
           <sk-button id="cerrar" label="Cerrar y borrar" sk-type="secondary" size="small" icon="pi pi-times" data-ancho="auto"></sk-button></section>
       </aside>
@@ -3925,33 +4367,17 @@ def('c/cierre', 'c', 'Cierre de la sesión', () => {
     const st = $('#pasos', f);
     st.steps = PASOS.map(([ru, l], k) => ({ id: ru, label: l, state: k < 4 ? 'completed' : 'active' })); st.activeStep = 4; st.canChange = () => true;
     st.addEventListener('stepChange', (e) => navegar(PASOS[e.detail.to][0]));
-    const cont = $('#chips-decide', f);
-    DECIDE.forEach((t) => {
-      const c = document.createElement('sk-chip'); c.setAttribute('label', t); c.setAttribute('sk-style', 'secondary'); c.setAttribute('size', 'large');
-      c.selected = app.cierre.decide.includes(t);
-      c.addEventListener('selectedChange', (e) => { app.cierre.decide = e.detail ? [...new Set([...app.cierre.decide, t])] : app.cierre.decide.filter((x) => x !== t); refrescarRegistro(); });
-      cont.append(c);
-    });
-    const dp = $('#proxima', f); dp.value = app.cierre.proxima; dp.minDate = new Date();
-    dp.addEventListener('valueChange', (e) => { app.cierre.proxima = e.detail || null; refrescarRegistro(); });
-    $$('sk-radio', f).forEach((rd) => { rd.selectedValue = M.LG.puente; rd.addEventListener('selectedValueChange', (e) => { $$('sk-radio[name="puente"]').forEach((o) => { o.selectedValue = e.detail; }); M.LG.puente = e.detail; refrescarRegistro(); }); });
+    
     $('#ver-informe', f).addEventListener('skClick', () => navegar('c/informe'));
     $('#imprimir', f).addEventListener('skClick', () => { navegar('c/informe'); setTimeout(() => window.print(), 600); });
-    const copiar = $('#copiar-reg', f);
-    copiar.addEventListener('skClick', async () => {
-      const texto = registroSesion().map(([t, v]) => `${t}: ${v}`).join('\n');
-      try { await navigator.clipboard.writeText(texto); copiar.setAttribute('label', 'Copiado'); setTimeout(() => copiar.setAttribute('label', 'Copiar el registro'), 2500); } catch (e) { aviso('warning', 'No pude copiar', 'Selecciona el texto y cópialo a mano.'); }
-    });
+    
     $('#cerrar', f).addEventListener('skClick', async () => {
-      const ok = await window.skElements.modal.confirm({ title: 'Cerrar y borrar', message: 'Se borra todo lo que escribiste en esta sesión, incluida la bóveda de demostración. El informe y el registro no se guardan. ¿Quieres seguir?', acceptLabel: 'Cerrar y borrar', cancelLabel: 'Volver', acceptType: 'danger' });
+      const ok = await window.skElements.modal.confirm({ title: 'Cerrar y borrar', message: 'Se borra todo lo que escribiste en esta sesión, incluida la bóveda de demostración. El informe no se guarda. ¿Quieres seguir?', acceptLabel: 'Cerrar y borrar', cancelLabel: 'Volver', acceptType: 'danger' });
       if (ok) borrarSesion();
     });
   });
 });
-function refrescarRegistro() {
-  const z = $('#registro'); if (!z) return;
-  z.replaceChildren(montar(registroPantalla().map(([t, v]) => `<div><dt>${t}</dt><dd${String(v).length > 70 ? ' class="largo"' : ''}>${esc(v)}</dd></div>`).join('')));
-}
+
 /* Una sola acción con un solo nombre, y dice lo que de verdad borra (H-25) */
 function borrarSesion() {
   M.S = M.DEF(); M.LG.puente = ''; Object.keys(SIM).forEach((k) => delete SIM[k]);
@@ -3966,7 +4392,7 @@ def('c/informe', 'c', 'Informe del diagnóstico', () => {
   if (!resultadoActual()) { pantallaSinDatos(); return; }
   const r = app.r, R = r.R, AH = r.AH, S = M.S, filas = filasReparto(R);
   const cen = R.PN - R.cost.cen, l = R.llega;
-  const gaps = r.GAPS.map(partirGap), pasos = M.nextSteps(), ext = M.EXT_LIST();
+  const gaps = gapsDe(r), pasos = M.nextSteps(), ext = M.EXT_LIST();
   const mm = (n) => (n ? (Math.abs(n) < 1e6 ? '<1' : (n < 0 ? '−' : '') + millones(Math.abs(n))) : '—');
   pintar(`
     <div class="informe-barra">
@@ -3977,6 +4403,7 @@ def('c/informe', 'c', 'Informe del diagnóstico', () => {
       <header class="informe__cab"><sk-logo sk-style="color" style="height: 32px"></sk-logo>
         <h1 id="inf-t" tabindex="-1">Diagnóstico Patrimonial</h1>
         <p>${(S.sesion.cliente || '').trim() ? `Preparado para ${esc(S.sesion.cliente.trim())}. ` : ''}${hoyTexto()}.</p></header>
+      <p class="informe__aviso">${esc(AVISO_INFORME)}</p>
       <section><h2>Tu perfil</h2><dl class="registro">${M.perfil().map(([t, v]) => `<div><dt>${t}</dt><dd>${quitaTags(v)}</dd></div>`).join('')}</dl></section>
       <section><h2>Lo que le llegaría a tu familia</h2>
         <p class="informe__cifra">${esc(fmtM(cen))}</p>
@@ -3987,12 +4414,16 @@ def('c/informe', 'c', 'Informe del diagnóstico', () => {
         <div class="tabla-marco"><table class="tabla tabla--num"><thead><tr><th scope="col">Persona</th>${R.sc ? '<th scope="col" class="r">Gananciales</th>' : ''}<th scope="col" class="r">Herencia</th><th scope="col" class="r">Seguros</th><th scope="col" class="r">Impuesto</th><th scope="col" class="r">Gastos</th><th scope="col" class="r">Le queda</th></tr></thead><tbody>${filas.map((x) => `<tr><th scope="row">${esc(x.label)}</th>${R.sc ? `<td class="r num">${mm(x.gan)}</td>` : ''}<td class="r num">${mm(x.asig)}</td><td class="r num">${mm(x.sg)}</td><td class="r num">${mm(x.imp)}</td><td class="r num">${mm(x.gas)}</td><td class="r num">${mm(x.neto)}</td></tr>`).join('')}</tbody></table></div></section>
       <section><h2>Lo que cambia si planeas</h2>
         <div class="tabla-marco"><table class="tabla tabla--num"><thead><tr><th scope="col"><span class="visually-hidden">Concepto</span></th><th scope="col" class="r">Sin planeación</th><th scope="col" class="r">Con las alternativas</th></tr></thead><tbody>
-          <tr><th scope="row">Costo estimado</th><td class="r num">${fmtMc(AH.sin.cen)}</td><td class="r num">${fmtMc(AH.con.cen)}</td></tr>
-          <tr><th scope="row">Le llega a tu familia</th><td class="r num">${fmtMc(AH.llegaSin)}</td><td class="r num">${fmtMc(AH.llegaCon)}</td></tr>
-          <tr><th scope="row">Disponible por las alternativas, sin esperar la sucesión</th><td class="r num">$ 0</td><td class="r num">${fmtMc(r.MIX.liq)}</td></tr></tbody></table></div>
-        <p>Ahorro bruto estimado, no garantizado y sin incluir comisiones: ${fmtM(AH.ah.cen)}.</p></section>
+          ${[['Impuesto de los herederos (ganancia ocasional)', R.GOher, R.GOher], ['Proceso de sucesión', R.g8, Math.max(0, R.g8 - AH.ah.cen)], ['Traslado de gananciales', R.traslado, R.traslado]].filter((x) => x[1] > 0 || x[2] > 0).map(([t, a, b]) => `<tr><th scope="row">${t}</th><td class="r num">${fmtMc(a)}</td><td class="r num">${fmtMc(b)}</td></tr>`).join('')}
+          <tr><th scope="row">Costo estimado de la sucesión</th><td class="r num"><b>${fmtMc(AH.sin.cen)}</b></td><td class="r num"><b>${fmtMc(AH.con.cen)}</b></td></tr>
+          <tr><th scope="row">Le llegaría a tu familia</th><td class="r num">${fmtMc(AH.llegaSin)}</td><td class="r num">${fmtMc(AH.llegaCon)}</td></tr>
+          <tr><th scope="row">Disponible sin esperar la sucesión</th><td class="r num">${CERO}</td><td class="r num">${fmtMc(r.MIX.liq)}</td></tr></tbody></table></div>
+        <p>Ahorro bruto estimado, antes de costos de cada solución: <b>${fmtMc(AH.ah.cen)}</b>${AH.ah.cen > 0 ? ` (entre ${fmtMc(AH.ah.min)} y ${fmtMc(AH.ah.max)})` : ''}.</p>
+        ${AH.ah.cen > 0 ? `<div class="informe__desglose">${desgloseAhorroCuerpo(r, true)}</div>` : ''}</section>
+
       <section><h2>Alternativas según tu situación</h2>
         <p>${esc(DATOS.piloto.guia_alternativas)}</p>
+        ${textoSeguroEdad() ? `<p><b>Edad para contratar un seguro de vida.</b> ${esc(textoSeguroEdad())}</p>` : ''}
         ${tablaAltsHTML(r, true)}
         <p class="informe__recuadro"><b>Cómo se llega al monto de referencia.</b> ${esc(M.LG_TOTAL_TIP())}</p></section>
       <section><h2>Para revisar</h2>${gaps.length ? `<ul class="informe__lista">${gaps.map((g) => `<li><b>${esc(g.lead)}</b> ${esc(g.cuerpo)}</li>`).join('')}</ul>` : '<p>No hay aspectos por revisar con lo que registraste.</p>'}</section>
@@ -4004,12 +4435,120 @@ def('c/informe', 'c', 'Informe del diagnóstico', () => {
       <section><h2>Alcance de este diagnóstico</h2><p>${esc(M.LG_T3())}</p></section>
       <section><h2>Supuestos y definiciones por validar</h2><p>${esc(DATOS.piloto.pendientes_intro)}</p><ol class="informe__lista">${DATOS.piloto.pendientes.map((x) => `<li><b>${esc(x.que)}</b> Aplica a: ${esc(x.aplica)}</li>`).join('')}</ol></section>
       <section><h2>Avisos</h2><p>${esc(M.LG_T4)}</p><p>${esc(M.LG_T1)}</p><p>${esc(M.DISCLAIMER)}</p></section>
-      <section><h2>Registro de la sesión</h2><dl class="registro">${registroSesion().map(([t, v]) => `<div><dt>${t}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
-        <p class="informe__firma">Recibí este informe: ______________________________ &nbsp; Fecha: ______________</p></section>
+      <section><h2>Registro de la autorización</h2><p>${esc(textoRegistroAutorizacion())}</p></section>
       <footer class="informe__pie"><span>Skandia Generaciones · Diagnóstico Patrimonial${(S.sesion.cliente || '').trim() ? ` · ${esc(S.sesion.cliente.trim())}` : ''}</span><span>Skandia Planeación Financiera S.A. · Entidad no vigilada por la Superintendencia Financiera de Colombia.</span></footer>
     </article>`,
   (f) => { $('#inf-vol', f).addEventListener('skClick', () => navegar('c/cierre')); $('#inf-imp', f).addEventListener('skClick', () => window.print()); });
 });
+
+/* ══ 45-fiducia.js ══ */
+/* ═══════════ Modelo de fiducia civil: se ve, se completa y se descarga ═══════════
+   Ajuste acordado con Negocio el 2026-11-25: se quitó el bloque de fiducia civil con productos, costos y honorarios, pero la
+   persona conserva la opción de diligenciar y descargar el modelo. Es un modelo general, el tipo de minuta que usan las
+   notarías (cada notaría tiene la suya): un borrador de referencia que revisa un abogado, no un documento final.
+   El texto es el de la minuta del prototipo de Negocio. Se quitó lo que nombraba un producto de la compañía (la línea de
+   «Producto Skandia» y su notificación) y se generalizó a «inversión o producto financiero»; «asesor externo» pasó a «abogado
+   externo» (Legal restringió «asesor»); la advertencia sigue diciendo que no es un documento final. La minuta no guarda nada:
+   se completa en pantalla y se descarga. */
+
+const FID_AVISO = 'Borrador de referencia. No es un documento final. Debe revisarlo y validarlo un abogado, y ajustarlo el notario, antes de iniciar cualquier trámite. Skandia Planeación Financiera S.A. no actúa como abogado del otorgante.';
+
+function fidMinutaHTML() {
+  const B = '<span class="blank">[……]</span>', S = M.S, nom = esc((S.sesion.cliente || '').trim()) || '[NOMBRE DEL CONSTITUYENTE]';
+  const O = (l, t) => `<li><b>${l}</b> ${t}</li>`;
+  return `<div class="minuta" id="minuta" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" aria-label="Modelo de fiducia civil, editable">
+  <h4>CONSTITUCIÓN DE FIDEICOMISO CIVIL</h4>
+  <h5>Encabezado</h5>
+  <table class="minuta__t"><tbody>
+   <tr><td>Escritura pública número</td><td>${B}</td></tr><tr><td>Fecha de otorgamiento</td><td>${B}</td></tr>
+   <tr><td>Notaría</td><td>${B} del Círculo de ${B}</td></tr><tr><td>Acto</td><td>Constitución de fideicomiso civil (propiedad fiduciaria)</td></tr>
+   <tr><td>Cuantía</td><td>$${B} (suma de los bienes fideicomitidos)</td></tr>
+   <tr><td>Constituyente</td><td>${nom} — C.C. ${B}</td></tr><tr><td>Propietario fiduciario</td><td>[NOMBRE] — C.C. ${B}</td></tr>
+   <tr><td>Fideicomisario(s)</td><td>[NOMBRE] — C.C. o T.I. ${B}</td></tr></tbody></table>
+  <h5>Comparecencia</h5>
+  <p>En la ciudad de ${B}, República de Colombia, a los ${B} días del mes de ${B} del año ${B}, ante mí, ${B}, Notario ${B} del Círculo de ${B}, comparecieron: <b>${nom}</b>, mayor de edad, domiciliado en ${B}, identificado con la cédula de ciudadanía número ${B}, de estado civil [casado / en unión marital de hecho / separado / viudo / soltero], [con sociedad conyugal vigente,] quien obra en nombre propio y en adelante se denominará EL CONSTITUYENTE; [solo si se elige la opción B de la cláusula primera:] y [NOMBRE DEL PROPIETARIO FIDUCIARIO], mayor de edad, identificado con la cédula de ciudadanía número ${B}, [parentesco] del constituyente, quien en adelante se denominará EL PROPIETARIO FIDUCIARIO.</p>
+  <p><b>Solo si se fideicomiten bienes de la sociedad conyugal:</b> y [NOMBRE DEL CÓNYUGE O COMPAÑERO(A) PERMANENTE], identificado(a) con la cédula de ciudadanía número ${B}, cónyuge [o compañero(a) permanente] del constituyente, quien comparece para manifestar su consentimiento respecto de los bienes sociales incluidos en este acto.</p>
+  <p>Y manifestaron que celebran el presente acto, que se regirá por las siguientes consideraciones y cláusulas:</p>
+  <h5>Consideraciones</h5>
+  <ol><li>Que EL CONSTITUYENTE es titular de los bienes que se relacionan en la cláusula segunda de este instrumento.</li>
+  <li>Que es su voluntad constituir sobre dichos bienes un fideicomiso civil en los términos de los artículos 793 y siguientes del Código Civil, con el fin de [propósito de la fiducia; si no se define, «asegurar que lleguen a [FIDEICOMISARIOS] [condición de la cláusula cuarta]»].</li>
+  <li><b>Solo si hay hijos o padres (legitimarios):</b> Que los bienes fideicomitidos se imputan a la porción de libre disposición del constituyente, de modo que el presente acto no afecta las asignaciones forzosas de sus legitimarios (artículo 1250 del Código Civil). Se recomienda que EL CONSTITUYENTE otorgue un testamento que dé cuenta de este fideicomiso como parte de su libre disposición.</li></ol>
+  <h5>Cláusulas</h5>
+  <p><b>PRIMERA. OBJETO.</b> [Elige una opción]:</p>
+  <ul>${O('Opción A, el constituyente conserva la propiedad:', 'EL CONSTITUYENTE constituye un fideicomiso civil sobre los bienes descritos en la cláusula segunda y conserva su propiedad en calidad de propietario fiduciario, con el gravamen de restituirlos a EL(LOS) FIDEICOMISARIO(S) al verificarse la condición prevista en la cláusula cuarta (artículos 794 y 797 del Código Civil).')}${O('Opción B, transfiere a un tercero:', 'EL CONSTITUYENTE transfiere a EL PROPIETARIO FIDUCIARIO, a título de propiedad fiduciaria, los bienes descritos en la cláusula segunda, con el gravamen de restituirlos a EL(LOS) FIDEICOMISARIO(S) al verificarse la condición prevista en la cláusula cuarta (artículos 794 y 797 del Código Civil).')}</ul>
+  <p><b>SEGUNDA. BIENES FIDEICOMITIDOS.</b> Hacen parte del presente fideicomiso los siguientes bienes:</p>
+  <ul>${O('Inversión o producto financiero (si aplica):', `los derechos derivados del contrato número ${B} de ${B} [entidad que lo administra], con un saldo de $${B} con corte al ${B}, junto con sus rendimientos.`)}
+   ${O('Inmueble (si aplica):', `El inmueble denominado ${B}, identificado con folio de matrícula inmobiliaria número ${B} de la Oficina de Registro de Instrumentos Públicos de ${B}, cuyos linderos y demás especificaciones constan en el título de adquisición. Valor: $${B}.`)}
+   ${O('Acciones o cuotas (si aplica):', `${B} [acciones / cuotas sociales], equivalentes al ${B}% del capital de [RAZÓN SOCIAL], NIT ${B}. Valor: $${B}.`)}
+   ${O('Otro bien (si aplica):', `[Descripción del bien][, ubicado en (país), si está en el exterior]. Valor: $${B}.`)}</ul>
+  <p><b>TERCERA. FIDEICOMISARIOS.</b> Son fideicomisarios, en las proporciones que se indican: [NOMBRE], identificado(a) con documento número ${B}, en un ${B}%; [repetir por cada fideicomisario; los porcentajes suman 100%].</p>
+  <p><b>CUARTA. CONDICIÓN Y RESTITUCIÓN.</b> La restitución de los bienes fideicomitidos se hará [elige una opción]:</p>
+  <ul>${O('Opción A, al fallecimiento:', `al fallecimiento de EL CONSTITUYENTE, siempre que a esa fecha se haya cumplido la siguiente condición: [describir la condición; por ejemplo, que EL FIDEICOMISARIO exista y haya cumplido ${B} años de edad].`)}${O('Opción B, edad:', `cuando [NOMBRE] cumpla ${B} años de edad.`)}${O('Opción C, grado:', 'cuando [NOMBRE] obtenga su título profesional universitario.')}${O('Opción D, otra condición:', '[describir la condición].')}</ul>
+  <p><i>Nota para el abogado: una fecha o un plazo por sí solos no bastan; la restitución debe sujetarse a una condición que se verifique, conforme a la posición reciente de la Sala Civil de la Corte Suprema de Justicia citada por el abogado externo (SC2119-2025).</i></p>
+  <p>En todo caso, la condición deberá cumplirse dentro del término máximo previsto en el artículo 800 del Código Civil. Verificada la condición, EL PROPIETARIO FIDUCIARIO entregará los bienes, con sus accesorios, a EL(LOS) FIDEICOMISARIO(S) dentro de los treinta (30) días siguientes.</p>
+  <p><b>QUINTA. SUSTITUTOS.</b> [Elige una opción]:</p>
+  <ul>${O('Opción A, con sustitutos:', `Si EL(LOS) FIDEICOMISARIO(S) faltare(n) antes de verificarse la condición, los bienes se restituirán a [NOMBRE], con documento número ${B}[, y a (NOMBRE), con documento número (…), por partes iguales], en calidad de sustitutos (artículos 801 y siguientes del Código Civil).`)}${O('Opción B, sin sustitutos:', 'EL CONSTITUYENTE no designa sustitutos. Si EL(LOS) FIDEICOMISARIO(S) faltare(n) antes de verificarse la condición, se aplicarán las reglas del Código Civil.')}</ul>
+  <p><b>SEXTA. ADMINISTRACIÓN.</b> EL PROPIETARIO FIDUCIARIO tendrá la administración de los bienes fideicomitidos y deberá conservarlos con la diligencia de un buen padre de familia.</p>
+  <ul><li>Inversiones, <b>Opción A:</b> podrá invertir y reinvertir los recursos financieros en portafolios de riesgo acorde con la finalidad de este acto. <b>Opción B:</b> no podrá cambiar la inversión de los recursos financieros sin autorización escrita de EL(LOS) FIDEICOMISARIO(S) o de su representante.</li>
+  <li>Venta de bienes, <b>Opción A:</b> no podrá enajenar ni gravar los bienes fideicomitidos sin autorización judicial o de EL(LOS) FIDEICOMISARIO(S). <b>Opción B:</b> podrá enajenar los bienes, con la obligación de subrogarlos por otros de igual o mayor valor, que quedarán afectos a este fideicomiso.</li></ul>
+  <p><b>SÉPTIMA. FRUTOS Y RENDIMIENTOS.</b> Mientras pende la condición [elige una opción]:</p>
+  <ul>${O('Opción A, con destino:', 'los frutos y rendimientos se destinarán a [destino, por ejemplo la educación de (NOMBRE)], y el excedente se acumulará al capital fideicomitido.')}${O('Opción B, al capital:', 'los frutos y rendimientos se acumularán al capital fideicomitido y se restituirán junto con él.')}${O('Opción C, para quien administra:', 'los frutos pertenecerán a EL PROPIETARIO FIDUCIARIO, conforme al Código Civil.')}</ul>
+  <p><b>OCTAVA. INVENTARIO Y RENDICIÓN DE CUENTAS.</b> EL PROPIETARIO FIDUCIARIO elaborará inventario de los bienes dentro de los treinta (30) días siguientes al otorgamiento y rendirá cuentas [semestralmente / anualmente] a EL(LOS) FIDEICOMISARIO(S) o a su representante legal.</p>
+  <p><b>NOVENA. REGISTRO Y NOTIFICACIONES.</b> Se incluyen las frases que apliquen:</p>
+  <ul>${O('Solo si hay inmuebles:', 'Este instrumento se inscribirá en la Oficina de Registro de Instrumentos Públicos correspondiente a cada inmueble (artículo 797 del Código Civil y Ley 1579 de 2012).')}${O('Solo si hay inversiones o productos financieros:', 'Se notificará a la entidad que los administra para que registre el fideicomiso sobre los contratos relacionados.')}${O('Solo si hay acciones o cuotas:', 'Se notificará a las sociedades emisoras para la anotación en el libro de registro de accionistas o socios.')}${O('Siempre:', 'Los gastos notariales, de registro e impuestos que se causen serán de cargo de EL CONSTITUYENTE.')}</ul>
+  <p><b>DÉCIMA. ACEPTACIÓN.</b> [Solo en la opción B de la cláusula primera:] Presente EL PROPIETARIO FIDUCIARIO, manifestó que acepta la propiedad fiduciaria que se le transfiere y las obligaciones que de ella se derivan.</p>
+  <h5>Otorgamiento y firmas</h5>
+  <p>Leído el presente instrumento por los comparecientes y advertidos de la formalidad de su registro, lo aprobaron y firman ante mí, el Notario, que de todo lo anterior doy fe.</p>
+  <table class="minuta__t"><thead><tr><th>Firma</th><th>Nombre</th><th>Documento</th></tr></thead><tbody>
+   <tr><td>EL CONSTITUYENTE</td><td>${nom}</td><td>C.C. ${B}</td></tr><tr><td>EL PROPIETARIO FIDUCIARIO</td><td>[NOMBRE]</td><td>C.C. ${B}</td></tr>
+   <tr><td>CÓNYUGE O COMPAÑERO(A) PERMANENTE (solo si hay bienes sociales)</td><td>[NOMBRE]</td><td>C.C. ${B}</td></tr><tr><td>EL NOTARIO</td><td>[NOMBRE]</td><td>—</td></tr></tbody></table>
+  </div>`;
+}
+
+/* Lo que se descarga: el texto tal como esté en la pantalla, con lo que la persona haya completado */
+const xmlE = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const wPara = (t, o = {}) => `<w:p><w:pPr><w:jc w:val="${o.c ? 'center' : 'both'}"/><w:spacing w:after="${o.a == null ? 140 : o.a}" w:line="300" w:lineRule="auto"/>${o.ind ? '<w:ind w:left="360"/>' : ''}</w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>${o.b ? '<w:b/>' : ''}<w:sz w:val="${o.sz || 21}"/></w:rPr><w:t xml:space="preserve">${xmlE(t)}</w:t></w:r></w:p>`;
+/* JSZip se pide solo cuando alguien descarga: no pesa en la carga de la página */
+function cargarJSZip() {
+  if (window.JSZip) return Promise.resolve();
+  return new Promise((ok, mal) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'; s.onload = ok; s.onerror = mal; document.head.append(s); });
+}
+async function fidDescargar() {
+  const raiz = $('#minuta');
+  if (!raiz) return;
+  try { await cargarJSZip(); } catch (e) { aviso('warning', 'No se pudo preparar el archivo', 'Revisa tu conexión e inténtalo de nuevo.'); return; }
+  const out = [wPara(FID_AVISO.toUpperCase().replace('. NO ES', ' · NO ES'), { b: 1, c: 1, sz: 17, a: 240 })];
+  const T = (el) => el.innerText.replace(/\s+/g, ' ').trim();
+  [...raiz.children].forEach((el) => {
+    const tg = el.tagName;
+    if (tg === 'H4') out.push(wPara(T(el), { b: 1, c: 1, sz: 28, a: 240 }));
+    else if (tg === 'H5') out.push(wPara(T(el).toUpperCase(), { b: 1, sz: 22, a: 120 }));
+    else if (tg === 'P') out.push(wPara(T(el)));
+    else if (tg === 'OL' || tg === 'UL') [...el.children].forEach((li, k) => out.push(wPara((tg === 'OL' ? `${k + 1}. ` : '• ') + T(li), { ind: 1 })));
+    else if (tg === 'TABLE') el.querySelectorAll('tr').forEach((tr) => { const c = [...tr.children].map(T); if (c.length) out.push(wPara(c.join(' · '), { a: 60 })); });
+  });
+  const z = new window.JSZip();
+  z.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+  z.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+  z.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${out.join('')}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`);
+  const blob = await z.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  const quien = ((M.S.sesion.cliente || '').replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ ]/g, '').trim().replace(/\s+/g, '_'));
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Modelo_fiducia_civil${quien ? `_${quien}` : ''}.docx`;
+  document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  aviso('info', 'Descargaste el modelo editable', 'No se guardó nada en esta herramienta.');
+}
+
+function abrirModeloFiducia() {
+  modal({
+    titulo: 'Modelo de fiducia civil', tamano: 'large',
+    cuerpo: `<sk-alert type="warning" closable="false" title="Borrador de referencia, no es un documento final" message="${A(FID_AVISO.replace(/^Borrador de referencia\. No es un documento final\. /, ''))}"></sk-alert>
+      <p class="ayuda"><b>¿Para qué sirve?</b> Para que veas cómo se armaría una fiducia civil: los bienes que incluyas llegarían a quien tú decidas sin pasar por el proceso de sucesión, y así se evitan sus costos (notaría, juez y abogados). La ganancia ocasional se sigue pagando. Es un modelo general, como los que usan las notarías: cada una tiene el suyo.</p>
+      <p class="ayuda">Cada <span class="blank">[……]</span> es un dato por completar. Donde hay <b>Opción A, B o C</b>, deja solo la que aplique. Lo marcado <b>«Solo si…»</b> se incluye únicamente en ese caso.</p>
+      <div class="minuta__barra"><span><i class="pi pi-pencil" aria-hidden="true"></i> Haz clic en cualquier parte del texto para escribir.</span><sk-button id="fid-dl" label="Descargar editable (.docx)" icon="pi pi-download" size="small" data-ancho="auto"></sk-button></div>
+      ${fidMinutaHTML()}`,
+    listo: (m) => { const b = $('#fid-dl', m); if (b) b.addEventListener('skClick', fidDescargar); },
+  });
+}
 
 /* ══ 50-boveda.js ══ */
 /* ═══════════ La bóveda: el cliente ordena lo suyo, con quien lo ayude ═══════════ */
@@ -4420,7 +4959,6 @@ function abrirPersona(guardado, editar) {
       <sk-input-text id="p-nombre" label="Nombre completo" size="md" required></sk-input-text>
       <sk-input-select id="p-rel" label="Relación contigo" size="md"></sk-input-select>
       <div class="sk-grid"><div data-col="6"><sk-input-text id="p-correo" label="Correo" type="email" size="md"></sk-input-text></div><div data-col="6"><sk-input-text id="p-cel" label="Celular" type="tel" inputmode="numeric" size="md"></sk-input-text></div></div>
-      <p class="ayuda">Su documento se pide después, cuando ella o él reciba el aviso.</p>
       <fieldset class="bloque"><legend>Qué recibe</legend><p class="ayuda">Elige lo que esta persona puede recibir. Nada viene marcado.</p>${SECCIONES.map(([k, t]) => `<sk-switch data-sec="${k}" label="${A(t)}"></sk-switch>`).join('')}</fieldset>
       <sk-switch id="p-reporta" label="Puede avisar de mi fallecimiento"></sk-switch>
       <sk-switch id="p-alterno" label="Es mi persona alterna"></sk-switch>
@@ -4573,7 +5111,7 @@ def('b/sobre', 'b', 'El sobre para los tuyos', () => {
       <section class="hoja-sobre"><h2>2. Qué hay en Skandia y cómo se reclama</h2>
         ${prods.length ? `<table class="tabla"><thead><tr><th scope="col">Producto</th><th scope="col">Cómo se reclama</th></tr></thead><tbody>${prods.map((p) => `<tr><th scope="row">${esc(p.n)}</th><td>${comoSeReclama(p.n)}</td></tr>`).join('')}${M.S.tiene.segV > 0 ? '<tr><th scope="row">Seguros de vida</th><td>Lo reclaman directamente las personas beneficiarias.</td></tr>' : ''}</tbody></table>` : '<p>No hay productos Skandia cargados.</p>'}</section>
       <section class="hoja-sobre"><h2>3. Quién recibirá la información</h2>${nombres.length ? `<ul>${bov.personas.map((p) => `<li>${esc(p.nombre)}${p.alterno ? ', persona alterna' : ''}</li>`).join('')}</ul>` : '<p>Todavía no hay personas designadas.</p>'}</section>
-      <section class="hoja-sobre"><h2>4. Los primeros pasos</h2><ol><li>Llamen a la persona de Skandia que acompañó este proceso.</li><li>Avisen del fallecimiento por ${fill('canal de reporte por definir')}.</li><li>Tengan a la mano el certificado de defunción y la copia del documento de identidad.</li><li>Esperen la verificación: son 10 días hábiles. No tienen que hacer nada más mientras tanto.</li></ol></section>
+      <section class="hoja-sobre"><h2>4. Los primeros pasos</h2><ol><li>Llamen a la persona de Skandia que acompañó este proceso.</li><li>Avisen del fallecimiento por ${fill('canal de reporte por definir')}.</li><li>Tengan a la mano el certificado de defunción.</li><li>Esperen la verificación: son 10 días hábiles. No tienen que hacer nada más mientras tanto.</li></ol></section>
     </article>`, (f) => { $('#imprimir-sobre', f).addEventListener('skClick', () => window.print()); });
 });
 
@@ -4717,7 +5255,7 @@ def('d/correo', 'd', 'Cómo pedir lo que dejó', () => {
       <p>Lamentamos profundamente el fallecimiento de ${esc(d.titular)}. Recibe un abrazo de todo el equipo de Skandia.</p>
       <p>${esc(d.tp)} te eligió como su persona designada: dejó información y mensajes para ti, y queremos acompañarte para que puedas recibirlos.</p>
       <h2>Lo único que te pedimos</h2>
-      <div class="paso-unico"><p>Pide la entrega en el formulario. Tendrás a la mano el certificado de defunción de ${esc(d.tp)} y una copia de tu documento de identidad.</p><sk-button id="co-pedir" label="Pedir la entrega" icon="pi pi-arrow-right" icon-pos="right" data-ancho="auto"></sk-button></div>
+      <div class="paso-unico"><p>Pide la entrega en el formulario. Ten a la mano el certificado de defunción de ${esc(d.tp)}.</p><sk-button id="co-pedir" label="Pedir la entrega" icon="pi pi-arrow-right" icon-pos="right" data-ancho="auto"></sk-button></div>
       <p>Si prefieres, <b>${esc(d.fp)}</b> te acompaña con el formulario y resuelve tus dudas: ${fill('celular y correo de quien acompañó este proceso')}</p>
       <div class="plazo"><p><b>Tienes 90 días para pedirla.</b> Hasta el ${esc(d.limite)}.</p><p>Sabemos que estos días son difíciles. Tómate el tiempo que necesites dentro de ese plazo: no tienes que resolver nada más. Si no la pides en ese tiempo, eliminaremos la información de forma definitiva.</p></div>
       <h2>Qué pasa después</h2>
@@ -4729,7 +5267,7 @@ def('d/correo', 'd', 'Cómo pedir lo que dejó', () => {
 
 /* ─────────── 4. La solicitud de entrega ─────────── */
 def('d/solicitud', 'd', 'Solicitud de entrega', () => {
-  const d = datosDes(); const est = { nombre: '', doc: '', correo: '', cel: '', f1: false, f2: false, a1: false, a2: false, codigo: '' };
+  const d = datosDes(); const est = { nombre: '', correo: '', cel: '', f1: false, a1: false, a2: false, codigo: '' };
   pintarDes('d/solicitud', `Formulario de Skandia Planeación Financiera al que llega ${esc(d.np)} desde el correo. ${why('solicitud-pasos')}`, `
     <section class="hoja" aria-labelledby="t-so2">
       <h1 id="t-so2" tabindex="-1">Pedir la entrega de lo que ${esc(d.tp)} dejó</h1>
@@ -4737,13 +5275,12 @@ def('d/solicitud', 'd', 'Solicitud de entrega', () => {
       <div id="sol-form" class="stack">
         <fieldset class="bloque"><legend>Tus datos</legend>
           <sk-input-text id="s-nombre" label="Nombre completo" size="md" required></sk-input-text>
-          <div class="sk-grid"><div data-col="6"><sk-input-text id="s-doc" label="Número de documento" inputmode="numeric" size="md" required></sk-input-text></div><div data-col="6"><sk-input-text id="s-correo" label="Correo" type="email" size="md" required help-text="Aquí te enviamos el documento"></sk-input-text></div></div>
+          <sk-input-text id="s-correo" label="Correo" type="email" size="md" required help-text="Aquí te enviamos el documento"></sk-input-text>
           <sk-input-text id="s-cel" label="Celular" type="tel" inputmode="numeric" size="md" required help-text="Aquí llegará la clave para abrir el PDF"></sk-input-text>
           <div><p class="ayuda">Clave dinámica de 6 dígitos. Prototipo: acepta cualquier clave.</p>${codigoHTML('s-cod', 'Clave dinámica')}</div>
         </fieldset>
-        <fieldset class="bloque"><legend>Documentos</legend>
+        <fieldset class="bloque"><legend>Certificado</legend>
           <sk-file-upload id="s-f1" label="Certificado de defunción de ${A(d.tp)}" hint="PDF o imagen, hasta 10 MB" accept=".pdf,image/*" choose-label="Elegir archivo"></sk-file-upload>
-          <sk-file-upload id="s-f2" label="Copia de tu documento de identidad" hint="PDF o imagen, hasta 10 MB" accept=".pdf,image/*" choose-label="Elegir archivo"></sk-file-upload>
           <p class="ayuda">Validamos tu identidad sin reconocimiento facial ni huella.</p>
         </fieldset>
         <fieldset class="bloque"><legend>Antes de enviar, lee estos avisos</legend>
@@ -4761,13 +5298,12 @@ def('d/solicitud', 'd', 'Solicitud de entrega', () => {
         <sk-button id="s-ver" label="Ver cómo llega la entrega" icon="pi pi-arrow-right" icon-pos="right"></sk-button></div>
     </section>`, (f) => {
     const btn = $('#s-enviar', f), falta = $('#falta', f);
-    const evaluar = () => { const m = []; if (est.nombre.trim().split(/\s+/).length < 2) m.push('tu nombre completo'); if (!est.doc) m.push('tu documento'); if (!/^\S+@\S+\.\S+$/.test(est.correo)) m.push('un correo válido'); if (est.cel.length !== 10) m.push('tu celular'); if (est.codigo.length < 6) m.push('la clave de 6 dígitos'); if (!est.f1 || !est.f2) m.push('los dos documentos'); if (!est.a1 || !est.a2) m.push('aceptar los dos avisos'); btn.disabled = m.length > 0; falta.textContent = m.length ? `Falta ${listaY(m)}.` : ''; };
+    const evaluar = () => { const m = []; if (est.nombre.trim().split(/\s+/).length < 2) m.push('tu nombre completo'); if (!/^\S+@\S+\.\S+$/.test(est.correo)) m.push('un correo válido'); if (est.cel.length !== 10) m.push('tu celular'); if (est.codigo.length < 6) m.push('la clave de 6 dígitos'); if (!est.f1) m.push('el certificado de defunción'); if (!est.a1 || !est.a2) m.push('aceptar los dos avisos'); btn.disabled = m.length > 0; falta.textContent = m.length ? `Falta ${listaY(m)}.` : ''; };
     $('#s-nombre', f).addEventListener('valueChange', (e) => { est.nombre = e.detail || ''; evaluar(); });
-    $('#s-doc', f).addEventListener('valueChange', (e) => { est.doc = String(e.detail || '').replace(/\D/g, ''); evaluar(); });
     $('#s-correo', f).addEventListener('valueChange', (e) => { est.correo = e.detail || ''; evaluar(); });
     $('#s-cel', f).addEventListener('valueChange', (e) => { est.cel = String(e.detail || '').replace(/\D/g, ''); evaluar(); });
     enlazarCodigo($('#s-cod', f), (x) => { est.codigo = x; evaluar(); });
-    ['s-f1', 's-f2'].forEach((id, k) => { const u = $('#' + id, f); u.maxFileSize = 10 * 1024 * 1024; u.addEventListener('valueChange', (e) => { est['f' + (k + 1)] = !!(e.detail && e.detail.length); evaluar(); }); });
+    ['s-f1'].forEach((id, k) => { const u = $('#' + id, f); u.maxFileSize = 10 * 1024 * 1024; u.addEventListener('valueChange', (e) => { est['f' + (k + 1)] = !!(e.detail && e.detail.length); evaluar(); }); });
     ['s-a1', 's-a2'].forEach((id, k) => $('#' + id, f).addEventListener('checkedChange', (e) => { est['a' + (k + 1)] = !!e.detail; evaluar(); }));
     evaluar();
     btn.addEventListener('skClick', () => { if (btn.disabled) return; $('#sol-form').hidden = true; const ok = $('#sol-ok'); ok.hidden = false; const h = $('h2', ok); if (h) { h.tabIndex = -1; h.focus(); } });
