@@ -1121,6 +1121,24 @@ details[open] .cb__pista { animation: mov-revela var(--mov-lento) var(--mov-ease
 .blank { padding: 0 0.25em; border-bottom: 1px dashed var(--sk-color-text-muted); background: var(--background-secundaria); }
 @media print { .desglose { display: none; } .informe__desglose { break-inside: avoid; } }
 
+/* En celular dos botones con texto no van enfrentados: la etiqueta se parte en dos líneas y se ve mal. Se apilan a lo ancho y la acción
+   principal queda arriba (la misma regla de .actions en sk-capas.css). Ajuste pedido por Javier el 2026-11-25. */
+@media (max-width: 40rem) {
+  .paso__botones, .resultado__pie { grid-auto-flow: row; }
+  .paso__botones > :last-child, .resultado__pie > :last-child { order: -1; }
+  .hero__acciones, .portada__acciones, .sb__acciones, .informe-barra { flex-direction: column; align-items: stretch; }
+  .informe-barra { flex-direction: column-reverse; }
+  .pie-modal { flex-direction: column-reverse; align-items: stretch; }
+  :is(.hero__acciones, .portada__acciones, .sb__acciones, .informe-barra, .pie-modal) sk-button { display: block; }
+  :is(.hero__acciones, .portada__acciones, .sb__acciones, .informe-barra, .pie-modal) sk-button .p-button { width: 100%; justify-content: center; }
+  .ficha-recorrido__accion { grid-column: 1 / -1; }
+  .ficha-recorrido__accion sk-button { display: block; }
+  .ficha-recorrido__accion sk-button .p-button { width: 100%; justify-content: center; }
+  .boveda__cab { flex-wrap: wrap; }
+  .boveda__cab sk-button { flex: none; }
+  .boveda__cab sk-button .p-button { white-space: nowrap; }
+}
+
   </style>
 </head>
 <body>
@@ -2696,7 +2714,11 @@ function enlazar(raiz) {
     if (el.dataset.o) el.options = OPC[el.dataset.o];
     const v = leerRuta(ruta);
     if (t === 'txt' || t === 'ta') { el.value = v == null ? '' : v; el.addEventListener('valueChange', (e) => guardar(e.detail == null ? '' : e.detail)); }
-    else if (t === 'num') { el.value = v > 0 ? v : null; el.addEventListener('valueChange', (e) => guardar(e.detail == null || e.detail === '' ? 0 : Number(e.detail))); }
+    else if (t === 'num') {
+      el.value = v > 0 ? v : null; el.addEventListener('valueChange', (e) => guardar(e.detail == null || e.detail === '' ? 0 : Number(e.detail)));
+      // El componente solo avisa al salir del campo, y en el celular tocar un botón no lo saca: la cifra se registra también mientras se teclea
+      el.addEventListener('input', (e) => { const n = Number(String(e.target && e.target.value != null ? e.target.value : '').replace(/\D/g, '')) || 0; if (n !== (Number(leerRuta(ruta)) || 0)) guardar(n); });
+    }
     else if (t === 'sel' || t === 'seg') { el.value = v; el.addEventListener('valueChange', (e) => { el.value = e.detail; guardar(e.detail); }); }
     else if (t === 'chk') { el.checked = !!v; el.addEventListener('checkedChange', (e) => guardar(!!e.detail)); }
     else if (t === 'sw') { el.value = !!v; el.addEventListener('valueChange', (e) => guardar(!!e.detail)); }
@@ -3689,6 +3711,12 @@ function enlazarSegBen(zona) {
     if (entrada) requestAnimationFrame(() => requestAnimationFrame(actualizar)); else actualizar();
   };
   const cambio = () => { guardarSegBen(); actualizar(); alCambiar('tiene.segBenList'); };
+  // Mientras se teclea un porcentaje (en el celular el campo no pierde el foco al tocar un botón) el total ya cuenta
+  zona.addEventListener('input', (e) => {
+    const p = e.target.closest && e.target.closest('[data-sbp]'); if (!p) return;
+    const v = Math.max(0, Math.min(100, Number(String(e.target.value || '').replace(/\D/g, '')) || 0)), filas = M.S.tiene.segBenFilas;
+    if (filas[+p.dataset.sbp].pct === v) return; filas[+p.dataset.sbp].pct = v; cambio();
+  });
   // Los eventos de los sk-* no suben: se escuchan en captura
   zona.addEventListener('valueChange', (e) => {
     const p = e.target.closest && e.target.closest('[data-sbp]'), n = e.target.closest && e.target.closest('[data-sbn]'), filas = M.S.tiene.segBenFilas;
@@ -4079,7 +4107,15 @@ function capReparto() {
       };
       $$('[data-simn]', sim).forEach((n) => { n.value = SIM[n.dataset.simn] || 0; });
       sim.addEventListener('input', (e) => {
-        const k = e.target.dataset && e.target.dataset.sim; if (!k) return;
+        const k = e.target.dataset && e.target.dataset.sim;
+        if (!k) {
+          // El porcentaje escrito cuenta mientras se teclea: en el celular el campo no pierde el foco al tocar un botón
+          const n = e.target.closest && e.target.closest('[data-simn]'); if (!n) return;
+          const v = Number(String(e.target.value || '').replace(/\D/g, '')) || 0; if (v === (SIM[n.dataset.simn] || 0)) return;
+          simFijar(n.dataset.simn, v, ids());
+          const r = $(`#sim-${CSS.escape(n.dataset.simn)}`, sim); if (r) { r.value = SIM[n.dataset.simn]; r.setAttribute('aria-valuetext', `${SIM[n.dataset.simn]} por ciento`); }
+          mostrar(n); return;
+        }
         simFijar(k, Number(e.target.value), ids());
         mostrar(e.target);
       });
