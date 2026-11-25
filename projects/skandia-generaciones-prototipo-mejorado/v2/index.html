@@ -2986,7 +2986,7 @@ function abrirGlosario() {
   modal({
     titulo: 'Glosario',
     tamano: 'medium',
-    cuerpo: `<p class="ayuda">Las palabras de la ley, en palabras de todos los días. Redacción propuesta por UX, pendiente de validación de Legal.</p><dl class="glosario">${Object.values(GLOSARIO).map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('')}</dl>`,
+    cuerpo: `<p class="ayuda">Las palabras de la ley, en palabras de todos los días.</p><dl class="glosario">${Object.values(GLOSARIO).map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('')}</dl>`,
   });
 }
 
@@ -3316,7 +3316,7 @@ def('c/apertura', 'c', 'Apertura de la conversación', () => {
   }), (f) => {
     pasoListo(f, 0);
     $('#ver-casos', f).addEventListener('click', abrirCasos);
-    $('#ver-aut', f).addEventListener('click', () => modal({ titulo: 'Autorización para el uso de la herramienta de simulación', tamano: 'large', cuerpo: `<div class="texto-legal">${textoAutorizacion()}</div><p class="ayuda">Texto de Legal (versión piloto), sin cambios.</p>` }));
+    $('#ver-aut', f).addEventListener('click', () => modal({ titulo: 'Autorización para el uso de la herramienta de simulación', tamano: 'large', cuerpo: `<div class="texto-legal">${textoAutorizacion()}</div>` }));
   });
   // Al aceptar, queda el registro de la autorización, con su fecha y hora
   app.vivos.push((ruta) => {
@@ -3893,17 +3893,13 @@ function corregirDato() {
 }
 
 /* ─────────── Avisos de la parte inferior del diagnóstico ───────────
-   Los de la versión piloto de Legal: el alcance (T3), la vinculación al grupo (T4), los supuestos por validar y el descargo
-   con el UVT. Van al final de los capítulos que los necesitan; el descargo, al final de todos. */
+   Los de la versión piloto de Legal: el alcance (T3) y el descargo con el UVT. Van al final de los capítulos que los necesitan; el
+   descargo, al final de todos. Ajuste de Negocio del 2026-11-25: no se muestra la vinculación al grupo (T4) ni la lista de supuestos
+   por validar (ni aquí, ni en el cierre, ni en el informe). */
 function avisosFinalesHTML(sec) {
-  const conAlcance = ['planeas', 'sigue', 'detalle'].includes(sec), pend = DATOS.piloto.pendientes;
-  const filas = pend.map((x, i) => `<tr><th scope="row" data-l="N.º">${i + 1}</th><td data-l="Qué está pendiente"><b>${esc(x.que)}</b></td><td data-l="A qué parte aplica">${esc(x.aplica)}</td><td data-l="Quién valida">${esc(x.valida)}</td></tr>`).join('');
+  const conAlcance = ['planeas', 'sigue', 'detalle'].includes(sec);
   return `<section class="avisos" aria-label="Alcance y avisos legales">
-    ${conAlcance ? `<div class="avisos__caja"><h2>Alcance de este diagnóstico</h2><p>${esc(M.LG_T3())}</p></div>
-    <div class="avisos__caja"><h2>Vinculación al grupo Skandia</h2><p>${esc(M.LG_T4)}</p></div>` : ''}
-    ${sec === 'detalle' ? `<details class="pendientes"><summary><span class="etiqueta etiqueta--pend">Pendiente de validación</span><span>Supuestos y definiciones por validar (${pend.length})</span><i class="pi pi-chevron-down" aria-hidden="true"></i></summary>
-      <div class="pendientes__cuerpo"><p>${esc(DATOS.piloto.pendientes_intro)}</p>
-      <div class="tabla-marco"><table class="tabla tabla--pend"><caption class="visually-hidden">Supuestos y definiciones por validar</caption><thead><tr><th scope="col"><span class="visually-hidden">N.º</span></th><th scope="col">Qué está pendiente</th><th scope="col">A qué parte aplica</th><th scope="col">Quién valida</th></tr></thead><tbody>${filas}</tbody></table></div></div></details>` : ''}
+    ${conAlcance ? `<div class="avisos__caja"><h2>Alcance de este diagnóstico</h2><p>${esc(M.LG_T3())}</p></div>` : ''}
     <p class="legal avisos__disc">${esc(M.DISCLAIMER.replace(M.LG_T2, '').trim())}</p>${why('legal-avisos')}
   </section>`;
 }
@@ -4346,8 +4342,8 @@ function capDetalle() {
         ${acc('Lo que quieres frente a lo que haría la ley', contrasteHTML(r))}
         ${acc('Cómo se llega a estas cifras', `${liquidacionHTML(R)}${costosHTML(R)}`)}
         ${acc('Detalle por persona', `<p class="ayuda">Millones de pesos, con el costo del proceso en su valor central.</p><sk-table id="tabla-personas" data-key="p"></sk-table>`)}
-        ${acc('Palabras de la ley, en palabras llanas', `<dl class="glosario">${Object.values(GLOSARIO).map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('')}</dl><p class="ayuda">Redacción propuesta por UX, pendiente de validación de Legal.</p>`)}
-        ${acc('Fundamento legal', `<p class="ayuda">La norma va por un lado y el criterio del equipo por otro. Su redacción final la valida el área Legal. Parámetros: UVT 2026 ${fmt(M.UVT)}; SMLV 2026 ${fmt(M.SMLV)}.</p><h2 class="subgrupo">La norma</h2><ul class="legal-lista">${M.LEGAL.map(([t, d]) => `<li><b>${esc(t)}.</b> ${esc(d)}</li>`).join('')}</ul><h2 class="subgrupo">Criterio del equipo, pendiente de validación</h2><ul class="legal-lista">${M.LG_SUPUESTOS.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>`)}
+        ${acc('Palabras de la ley, en palabras llanas', `<dl class="glosario">${Object.values(GLOSARIO).map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('')}</dl>`)}
+        ${acc('Fundamento legal', `<p class="ayuda">Parámetros: UVT 2026 ${fmt(M.UVT)}; SMLV 2026 ${fmt(M.SMLV)}.</p><h2 class="subgrupo">La norma</h2><ul class="legal-lista">${M.LEGAL.map(([t, d]) => `<li><b>${esc(t)}.</b> ${esc(d)}</li>`).join('')}</ul>`)}
       </div>
     </section>`);
 }
@@ -4469,8 +4465,7 @@ def('c/informe', 'c', 'Informe del diagnóstico', () => {
         <p>${esc(DATOS.piloto.boveda_informe.nota)}</p></section>
       <section><h2>Próximos pasos</h2><ol class="informe__lista">${pasos.map((p) => `<li>${esc(p)}</li>`).join('')}</ol></section>
       <section><h2>Alcance de este diagnóstico</h2><p>${esc(M.LG_T3())}</p></section>
-      <section><h2>Supuestos y definiciones por validar</h2><p>${esc(DATOS.piloto.pendientes_intro)}</p><ol class="informe__lista">${DATOS.piloto.pendientes.map((x) => `<li><b>${esc(x.que)}</b> Aplica a: ${esc(x.aplica)}</li>`).join('')}</ol></section>
-      <section><h2>Avisos</h2><p>${esc(M.LG_T4)}</p><p>${esc(M.LG_T1)}</p><p>${esc(M.DISCLAIMER)}</p></section>
+      <section><h2>Avisos</h2><p>${esc(M.LG_T1)}</p><p>${esc(M.DISCLAIMER)}</p></section>
       <section><h2>Registro de la autorización</h2><p>${esc(textoRegistroAutorizacion())}</p></section>
       <footer class="informe__pie"><span>Skandia Generaciones · Diagnóstico Patrimonial${(S.sesion.cliente || '').trim() ? ` · ${esc(S.sesion.cliente.trim())}` : ''}</span><span>Skandia Planeación Financiera S.A. · Entidad no vigilada por la Superintendencia Financiera de Colombia.</span></footer>
     </article>`,
@@ -4624,7 +4619,7 @@ function textoLegalHTML(k) {
   const t = DATOS.textos[k]; if (!t) return '';
   const hueco = (s) => esc(s).replace(/\[([^\]]+)\]/g, (_, x) => `<span class="fill">${x}</span>`);
   const cuerpo = t.partes.map((p) => (p.t === 'h' ? `<h3>${esc(p.x)}</h3>` : p.t === 'p' ? `<p>${hueco(p.x)}</p>` : (p.x.every((s) => s.length < 140) ? `<ul>${p.x.map((s) => `<li>${hueco(s)}</li>`).join('')}</ul>` : p.x.map((s) => `<p>${hueco(s)}</p>`).join('')))).join('');
-  return `<div class="texto-legal">${cuerpo}</div><p class="ayuda">Texto de Negocio, sujeto a validación de Legal. Lo que está en recuadro punteado lo define Legal.</p>`;
+  return `<div class="texto-legal">${cuerpo}</div>`;
 }
 const verTexto = (k) => modal({ titulo: DATOS.textos[k].titulo, tamano: 'large', cuerpo: textoLegalHTML(k) });
 
@@ -5170,7 +5165,7 @@ def('b/mas', 'b', 'Más', () => {
     const acciones = {
       ayuda: abrirAyuda,
       aut: () => modal({ titulo: 'Tus autorizaciones', tamano: 'medium', cuerpo: `<ul class="items">${[['datos', 'Tratamiento de datos'], ['naturaleza', 'Alcance de la bóveda'], ['cliente', 'Calidad de cliente'], ['precarga', 'Precarga de productos']].map(([k, t]) => `<li><div><b>${t}</b><span class="ayuda">${bov.auth[k] || bov.ejemplo ? `Aceptada el ${esc(fechaAut)}` : 'No aceptada'}</span></div><button type="button" class="enlace" data-ver="${k}">Leer</button></li>`).join('')}</ul>`, listo: (el, frag) => $$('[data-ver]', frag).forEach((b) => b.addEventListener('click', () => verTexto(b.dataset.ver))) }),
-      vida: () => modal({ titulo: 'Confirmación anual', tamano: 'small', cuerpo: '<p>Una vez al año te escribiremos para confirmar que sigues usando tu bóveda y para que revises los datos de tus personas, por ejemplo su correo y su celular. Redacción propuesta por UX, pendiente de Legal.</p>' }),
+      vida: () => modal({ titulo: 'Confirmación anual', tamano: 'small', cuerpo: '<p>Una vez al año te escribiremos para confirmar que sigues usando tu bóveda y para que revises los datos de tus personas, por ejemplo su correo y su celular.</p>' }),
       datos: () => verTexto('datos'),
       cierre: () => avisoInactividad(15),
       borrar: async () => { const ok = await window.skElements.modal.confirm({ title: 'Eliminar la bóveda', message: 'Se borra todo lo que guardaste: activos, deseos, personas y la entrega firmada. No se puede deshacer.', acceptLabel: 'Eliminar la bóveda', cancelLabel: 'Volver', acceptType: 'danger' }); if (ok) { window.reiniciarBoveda(); navegar('b/activar'); aviso('info', 'Bóveda eliminada', 'Se borró todo lo que habías guardado.'); } },
