@@ -2747,17 +2747,16 @@ function hojaHTML(){const H=S.hoja;if(!H)return'';const F=FL[S.f],u=S.u;
     A('h-si',()=>{u.pAv=true;si();});
     return `<h2 class="k-h2">${F.txP2[0]}</h2><p class="k-ap">${F.txP2[1]}</p>${tog('p-av',`Que ${n} vea mi avance`,PERM_AV,u.pAv,()=>{u.pAv=!u.pAv})}<p class="k-c">Puedes hablar con ${n} sin dar este permiso. Lo apagas cuando quieras.</p>${u.pAv?btn('h-ok','Listo','pri',si):btn('h-no','Ahora no','sec',no)}`;}
   if(H.t==='P1'){const n=F.as.p1,can=F.as.canal,ofP2=!tiene('P2');
-    const si=()=>{perm('P1','otorgado');const con2=ofP2&&u.pAv;
+    const si=()=>{perm('P1','otorgado');const con2=ofP2;
       emit('hablar_con_asesor',`Motivo: ${H.mot} · paso ${S.id}`,F.txP1dec||'Entrega el pedido con el contexto',{x:F.txP1as(S,H),p:'P1'});
       emit('permiso_contacto_respondido',`Otorgado · ${can} · ${F.as.horario(S)}`,'Abre el contacto: nombre, canal, horario y motivo',{x:`Permiso de contacto: ${can} · ${F.as.horario(S)}`,p:'P1'});
-      if(con2){perm('P2','otorgado');emit('permiso_avance_respondido',`Otorgado · a ${F.as.nombre||'la bandeja'}`,'Abre el avance completo',{x:'§ compartió su avance',p:'P2'});}
+      if(con2){perm('P2','otorgado');emit('permiso_avance_respondido',`Otorgado · a ${F.as.nombre||'la bandeja'} · al pedir contacto`,'Abre el avance completo para rescatarla si se traba',{x:'§ compartió su avance al pedir contacto',p:'P2'});}
       S.hoja=null;F.trasP1(S,true,H);};
     const no=()=>{perm('P1','negado');emit('permiso_contacto_respondido','No otorgado','Nadie la contacta; el flujo sigue igual',{x:'No dio permiso de contacto',p:'reg0'});S.hoja=null;F.trasP1(S,false,H);};
     A('h-si',()=>{u.pCo=true;si();});
     return `<h2 class="k-h2">Hablar con ${n}</h2><p class="k-ap">${F.as.plazo(S)}</p>
      ${tog('p-co',`Que ${n} me contacte`,`Solo sobre este plan, por ${can} y en el horario que elijas.`,u.pCo,()=>{u.pCo=!u.pCo})}
-     ${ofP2?tog('p-av',`Que ${n} vea mi avance <em>Opcional</em>`,PERM_AV,u.pAv,()=>{u.pAv=!u.pAv}):''}
-     <p class="k-c">${ofP2?`Puedes hablar con ${n} sin compartir tu avance. `:''}Lo apagas cuando quieras en Mis autorizaciones.</p>
+     <p class="k-c">Al pedir que te contacte, ${n} ve en qué paso vas para ayudarte. Lo apagas cuando quieras en Mis autorizaciones.</p>
      ${u.pCo?btn('h-ok','Listo','pri',si):btn('h-no','Ahora no','sec',no)}`;}
   return '';
 }
@@ -3775,7 +3774,7 @@ Object.assign(PANT,{
    sugs:[{ic:'brujula',t:'Mi retiro',s:'Ver cuánto me faltaría al mes',fn:()=>{u.retiro=true},m:1},{ic:'diana',t:'Un ahorro con destino',s:'Ponerle nombre, monto y fecha',fn:otra,m:1},{rot:'Otra idea'},{ic:'escudo',t:'Mis imprevistos',s:'Calcular cuánto necesitaría',fn:otra,m:1}],
    extra:con?lk('porque',ic('info')+'Por qué veo esto',info('Por qué veo esto','<p>Porque elegiste usar tu resultado. Tus dos áreas con más espacio fueron «Tu futuro» y «Tu ahorro»; por eso esas dos ideas van primero.</p><p>Es información para ordenar tu inicio. No incluye recomendaciones de productos.</p>'),{m:1,cl:'sua'}):'',
    salida:'Solo quiero explorar',alSalir:fuera('Explorar sin elegir','Abre el Lobby completo, con todas las metas y sus cápsulas, sin pedir nada más.'),lob:{mot:'ayuda para empezar'}});},
- notas:[['diseno','Libérate 1 de F3: vive aquí y no en el índice. Pregunta abierta con la estructura de la referencia; el orden de las ideas sale de su resultado solo si dio el permiso, y se puede preguntar por qué.'],['regla','El hijo existe en el flujo solo porque ella lo escribió y lo confirmó («Sumarla» · «No era eso»). Ningún texto dice «sabemos que» ni «vimos que». Aquí no se nombra ningún producto.'],['diseno','La tarjeta de Lucía salió de esta pantalla: el permiso «Que Lucía vea mi avance» se pide cuando Paola toca «Validarlo con Lucía», en la simulación de educación.'],['diseno','Sin permiso de uso del resultado, la etiqueta y el rótulo son los de F1 y el plan arranca por lo que ella elija.'],['provisional','Aviso «Elegiste «Mi retiro»…» después de tocar la primera idea. Las demás ideas abren la hoja de salida del prototipo.']]},
+ notas:[['diseno','Libérate 1 de F3: vive aquí y no en el índice. Pregunta abierta con la estructura de la referencia; el orden de las ideas sale de su resultado solo si dio el permiso, y se puede preguntar por qué.'],['regla','El hijo existe en el flujo solo porque ella lo escribió y lo confirmó («Sumarla» · «No era eso»). Ningún texto dice «sabemos que» ni «vimos que». Aquí no se nombra ningún producto.'],['diseno','La tarjeta de Lucía salió de esta pantalla. «Validarlo con Lucía» abre la hoja de contacto: al pedir que la contacten, Lucía ve su avance (una línea lo dice; sin interruptor aparte, pedido de la revisión del 26-nov).'],['diseno','Sin permiso de uso del resultado, la etiqueta y el rótulo son los de F1 y el plan arranca por lo que ella elija.'],['provisional','Aviso «Elegiste «Mi retiro»…» después de tocar la primera idea. Las demás ideas abren la hoja de salida del prototipo.']]},
 'F3-M3-a':{m:3,tpl:'P06 brecha de retiro',h:'Mié 12:22 p. m.',
  g:S=>{const v=S.v,u=S.u;if(S.est==='res'){if(v.metaRet==null){v.metaRet=Math.round(.7*v.ingreso);u.simN3=(u.simN3||0)+1;return true;}return 'seguirE';}v.edad=33;u.edadTx='33';v.ingreso=11e6;u.iOtro=false;return 'calc';},
  r:S=>{const v=S.v,u=S.u,b=f3brecha(v),cam=()=>{u.simN3=(u.simN3||0)+1};
@@ -3794,7 +3793,7 @@ Object.assign(PANT,{
    <div data-out="acts" class="k-fin">${btn('calc','Ver mi brecha','pri',()=>{emit('dato_declarado','Edad e ingreso declarados por ella, en rangos','Estima la pensión; no se toman del índice');est('res')},{no:ok?'':'Escribe tu edad y elige tu ingreso para calcularlo.'})+btn('saltar','Saltar','ter',()=>ir('F3-M4-b'))}</div>`);},
  notas:[['diseno','Tramo Simula. Primero dos datos (edad e ingreso, que el índice real no pregunta) y después la brecha en dos barras, con la cifra de lo que falta escrita encima. Ninguna opción viene elegida.'],['diseno','Una acción cercana: «¿Con cuánto quieres vivir?», con la consecuencia de cada opción a la vista. Al tocar, la gráfica se redibuja.'],['producto','Fórmula ilustrativa de la pensión estimada: ingreso × una tasa de ejemplo (16% más 1 punto por cada año que falta para los 57, entre 20% y 60%). El cálculo real usa el parámetro de la SFC (CE 015 de 2023).'],['legal','No se puede decir que trasladar la pensión mejora su pensión. Tip: Legal confirma la vigencia de la cita a la Ley 100.'],['provisional','Botón «Ver mi brecha» y motivos del botón deshabilitado.']]},
 'F3-M3-b':{m:3,tpl:'P06 educación',h:'Mié 12:24 p. m.',
- g:S=>{if(S.v.aporte==null){S.v.aporte=5e5;S.u.aOtro=false;S.u.simN4=(S.u.simN4||0)+1;return true;}if(S.p.P2.e==='sin')return 'validar';return 'armar';},
+ g:S=>{if(S.v.aporte==null){S.v.aporte=5e5;S.u.aOtro=false;S.u.simN4=(S.u.simN4||0)+1;return true;}return 'armar';},
  r:S=>{const v=S.v,u=S.u,e=f3educ(v),cam=()=>{u.simN4=(u.simN4||0)+1},sem=x=>{const s=f3educ(v,x).sem;return s>=10?'los 10':`${s} de 10 semestres`};
   return lobby(`<h1 class="k-h1">¿Cuánto costaría su educación?</h1>
    <div class="k-card gris"><div class="monto-fila"><span class="k-s">Una carrera hoy: <b class="k-b">${$(v.carrera)}</b></span>${lk('cambiarC','Cambiar',()=>{u.edC=!u.edC})}</div>${u.edC?campo('carTx','Valor de una carrera hoy',{pre:'$',pesos:1,modo:'numeric',oculto:1,ph:'120.000.000',fn:x=>{v.carrera=num(x)||0;cam()}}):''}</div>
@@ -3804,9 +3803,9 @@ Object.assign(PANT,{
    <p class="k-c">Montos de ejemplo. Elige el que puedas sostener.</p>
    <div data-out="res" style="display:grid;gap:12px">${v.aporte&&v.carrera?`<span class="k-et">${ic('destello')}Así empiezas a liberarte de las cuentas a mano</span><div class="k-card g"><p class="g-fr">Con <b>${$(v.aporte)}</b> al mes cubres <b>${e.sem>=10?'los 10':e.sem+' de 10'}</b> semestres.</p>${bloques(e.sem,10)}${notaCifra()}${como(`${$(v.aporte)} por 216 meses frente a una carrera de ${$(v.carrera)}, en pesos de hoy. No contamos rendimientos, costos de ningún producto ni alzas de matrícula.`)}</div>`:'<div class="k-card g"><p class="k-ap">Elige un monto y aquí ves cuántos semestres cubres.</p></div>'}</div>
    ${tipPildora('f3edu','¿Sube la educación cada año?')}
-   <p class="k-sal">${lk('validar','Validarlo con Lucía',()=>{S.hoja={t:'P2'}},{m:1,cl:'sal'})}</p>
+   <p class="k-sal">${lk('validar','Validarlo con Lucía',pedirP1('validar su plan','validar'),{m:1,cl:'sal'})}</p>
    <div data-out="acts" class="k-fin">${btn('armar','Armar mi plan','pri',()=>{emit('simulacion_completada',`Educación: ${$(e.junta)} en 18 años · ${e.sem} de 10 semestres · ${pl(u.simN4||0,'cambio','cambios')}`,'Lleva los montos al plan',p2(`Simuló: educación con ${$(v.aporte)} al mes`));emit('monto_elegido',`${$(v.aporte)} al mes · origen: simulador`,'El monto viaja a la prima');ir('F3-M4-i')},{no:v.aporte?'':'Elige cuánto puedes apartar al mes.'})+btn('guardar','Seguir después','ter',guardar,{m:1})}</div>`,{mot:'validar el plan'});},
- notas:[['diseno','Libérate 2, como etiqueta sobre el resultado. Un supuesto a la vista (una carrera hoy) con «Cambiar», fichas de aporte con su consecuencia y diez bloques que responden ¿cuánto de la carrera cubro?'],['diseno','«Validarlo con Lucía» abre el permiso «Que Lucía vea mi avance»: interruptor apagado, con su para qué. Es el primer lugar donde aparece Lucía, y desde aquí ve el avance si Paola lo permite.'],['producto','Lo simulado viaja a la prima, pero parte de la prima paga protección: la cuenta de semestres lo ignora. Pregunta abierta para Producto.'],['medicion','Palanca: monto con su consecuencia («9 de 10 semestres»). Control: los mismos montos sin consecuencia. Dato del DANE para el tip: por verificar.'],['legal','P-2 provisional. Qué ve la asesora de una colaboradora y con qué autorización: por confirmar.']]},
+ notas:[['diseno','Libérate 2, como etiqueta sobre el resultado. Un supuesto a la vista (una carrera hoy) con «Cambiar», fichas de aporte con su consecuencia y diez bloques que responden ¿cuánto de la carrera cubro?'],['diseno','«Validarlo con Lucía» abre la hoja de contacto. Pedir que la contacten comparte su avance con Lucía, y una línea sobre el botón lo dice: sin interruptor aparte, porque el avance se sigue para rescatarla si se traba (revisión del 26-nov).'],['producto','Lo simulado viaja a la prima, pero parte de la prima paga protección: la cuenta de semestres lo ignora. Pregunta abierta para Producto.'],['medicion','Palanca: monto con su consecuencia («9 de 10 semestres»). Control: los mismos montos sin consecuencia. Dato del DANE para el tip: por verificar.'],['legal','P-2 provisional. Qué ve la asesora de una colaboradora y con qué autorización: por confirmar.']]},
 'F3-M4-a':{m:4,tpl:'P05 perfil · preguntas, espera y resultado',h:'Mié 12:26 p. m.',ctl:perfilCtl,g:S=>perfilG(S,'pf3',F3Q,[1,1,2,1,1]),
  r:S=>perfilPant(S,{k:'pf3',qs:F3Q,tips:['f3edu','f3ret'],pie:'Sirve para las dos metas.',ap:'Sirven para las dos metas y las respondes una sola vez. No hay respuestas buenas ni malas.',
   alVer:pf=>{S.v.perfil=pf;emit('perfil_respuesta',`Perfil: ${PF[pf].n.toLowerCase()} · nuevo · una vez para las dos metas`,'Muestra opciones acordes');ir('F3-M4-b')}}),
@@ -5612,6 +5611,25 @@ FL.F1.sigPaso='El segundo aporte, con aviso la víspera. A los 90 días, Money P
   ['legal','Valentina no dio permiso de contacto (P-1): solo autorizó guardar su plan y recibir avisos. Por eso la presentación llega por la app y no por WhatsApp ni por llamada. Confirmar con Legal si la autorización de avisos la cubre (Ley 1581 y Ley 2300).'],
   ['medicion','Se mide cuántas personas responden a la presentación, cuántas piden no ser contactadas y si quienes la reciben abren un segundo producto antes que quienes no.']]);
 })();
+
+/* ═════════ v2.9m · Comentario de la revisión del 26-nov: si la persona pide contacto, la vista del asesor no puede decir «Esperar · no tienes permiso».
+   Pedir contacto (hablar_con_asesor con P-1) abre una acción: contactarla en el canal y horario que eligió, con su avance a la mano.
+   Vale en los tres caminos mientras siga en el mismo momento y nadie la haya contactado todavía. ═════════ */
+(()=>{['F1','F2','F3'].forEach(f=>{const F=FL[f],d0=F.dec;
+  F.dec=S=>{const d=d0(S);if(!tiene('P1')||d.a==='int')return d;
+    let ip=-1,ic_=-1;S.reg.forEach((r,i)=>{if(r.s==='hablar_con_asesor')ip=i;if(r.s==='contacto_realizado')ic_=i;});
+    const ped=ip>=0?S.reg[ip]:null,mismo=ped&&PANT[ped.pa]&&PANT[S.id]&&PANT[ped.pa].m===PANT[S.id].m;
+    if(ped&&ip>ic_&&mismo){const mot=((ped.l||'').match(/Motivo: (.*?) · paso/)||[,'ayuda'])[1],as=F.as,cli=F.persona.nombre;
+      return Object.assign({},d,{a:'int',t:'Intervenir · pidió contacto',
+        r:`Te pidió contacto (motivo: ${mot}). Escríbele o llámale por ${as.canal}, ${as.horario(S)}.`,v:'Hoy, en el horario que eligió',
+        q:`«Hola, ${cli}. ${as.nombre?`Soy ${as.nombre}`:'Te escribo de Skandia'}: me pediste que te contactara. Ya tengo tu avance, así que no repites nada. Cuéntame en qué te ayudo.»`,
+        nq:['Ofrecer otro producto','Pedirle datos que ya están en su avance','Insistir si no responde'],
+        o:`Tocó «Hablar con ${as.p1}» y dio permiso de contacto.`,i:'Quiere resolver algo con una persona antes de seguir.',ns:'La duda exacta: pregúntasela.',
+        actor:as.nombre||as.quien,ctx:'Pedido de contacto · P-1 otorgado',vis:'',
+        regla:'Si hay <code>hablar_con_asesor</code> con P-1 → contacto en el canal y el horario que eligió, con su avance a la mano. Si se traba después, el objetivo es rescatarla.'});}
+    // Ya dio el permiso de contacto: el panel no puede decir que falta
+    if(/no tienes permiso de contacto/i.test(d.r||''))return Object.assign({},d,{r:d.r.replace(/,? ?pero no tienes permiso de contacto\.|No tienes permiso de contacto\./i,m=>/pero/.test(m)?' y te dio permiso de contacto: escríbele solo si lo pide o se traba.':'Te dio permiso de contacto: escríbele solo si lo pide o se traba.')});
+    return d;};});})();
 
 /* ═════════ Arranque ═════════ */
 Object.keys(PANT).forEach(id=>{if(!PANT[id].f)PANT[id].f=id.slice(0,2);TEXTOS[id]=PANT[id].tpl;});
