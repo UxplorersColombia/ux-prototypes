@@ -2364,6 +2364,37 @@ button.visor.bio{border:0;width:100%;cursor:pointer;font:inherit}
 .sel-res ul{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
 .sel-res li{padding:4px 11px;border-radius:100px;background:var(--marca-suave);color:var(--marca-tx);font:600 12.5px/18px var(--tit)}
 .sel-res>span{flex-basis:100%;font-size:12.5px;color:var(--fg2)}
+
+/* v2.9m · Cargando con el ícono de Skandia: en las pantallas de espera la flecha despega en ciclo.
+   La estela se dibuja, la flecha entra desde abajo a la izquierda, toma impulso y sale por arriba a la derecha (la recorta el cuadro). */
+.marca-anim.esp{animation:ma-respira 2.2s ease-in-out infinite}
+.marca-anim.esp .ma-l{animation:ma-traza 2.2s cubic-bezier(.45,0,.2,1) infinite!important}
+.marca-anim.esp .ma-f{animation:ma-despega 2.2s cubic-bezier(.45,0,.2,1) infinite!important}
+.marca-anim.esp::after{content:'';position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.22) 50%,transparent 58%);animation:ma-brillo 2.2s ease-in-out infinite;pointer-events:none}
+@keyframes ma-despega{
+  0%{transform:translate(-30px,30px);opacity:0}
+  9%{opacity:1}
+  28%{transform:translate(0,0);opacity:1}
+  44%{transform:translate(-3px,3px);opacity:1}
+  58%{transform:translate(0,0);opacity:1}
+  80%,100%{transform:translate(34px,-34px);opacity:0}}
+@keyframes ma-traza{
+  0%{stroke-dashoffset:120;opacity:.5}
+  32%{stroke-dashoffset:0;opacity:1}
+  58%{stroke-dashoffset:0;opacity:1}
+  84%{stroke-dashoffset:-110;opacity:.3}
+  86%,100%{stroke-dashoffset:-120;opacity:0}}
+@keyframes ma-respira{0%,100%{transform:scale(1)}58%{transform:scale(1.04)}}
+@keyframes ma-brillo{0%,50%{transform:translateX(-60%)}85%,100%{transform:translateX(60%)}}
+@media (prefers-reduced-motion:reduce){
+  .marca-anim.esp,.marca-anim.esp::after{animation:none}
+  .marca-anim.esp .ma-l{animation:none!important}
+  .marca-anim.esp .ma-f{animation:ma-late 1.6s ease-in-out infinite!important}}
+/* v2.9m · Paola desde Colpensiones: tarjeta de Lucía con foto y mensaje de contacto */
+.f3-colp{display:grid;gap:12px}
+.f3-colp .f3-msj{margin:0;padding:12px 14px;border-radius:4px 16px 16px 16px;background:var(--sk-ok-bg);color:var(--sk-tinta);font-size:15px;line-height:22px}
+.f3-colp .f3-cont{margin:0;display:flex;gap:8px;align-items:center;font-size:13px;line-height:18px;color:var(--sk-tx2)}
+.f3-colp .f3-cont svg{width:18px;height:18px;flex:none;color:var(--sk-verde-tx)}
 </style>
 
 <div id="app">
@@ -5336,7 +5367,7 @@ Object.assign(PANT['F3-M4-b'],{tpl:'P07 plan · pensión obligatoria + pensión 
 PANT['F3-M4-h']={m:4,f:'F3',tpl:'P10 dónde está hoy su pensión',h:'Mié 12:33 p. m.',g:S=>S.est==='colp'?null:'fondo-0',
  r:S=>{const u=S.u,L=c=>lobby(c,{av:0,pie:F3ENT1,mot:'ayuda con mi traslado'});
   const pon=k=>()=>{u.fondo=k;emit('fondo_actual_declarado',k===0?'Fondo actual: privado':'Fondo actual: no sabe · consulta autorizada',k===0?'Abre el traslado dentro del mismo régimen':'Consulta el fondo actual con su autorización',p2(k===0?'Fondo actual: privado (traslado dentro del mismo régimen)':'Fondo actual: por consultar'));ir('F3-M4-f')};
-  if(S.est==='colp')return L(`<h1 class="k-h1">Desde Colpensiones, el paso que sigue es con Lucía</h1><p class="k-ap">Cambiar de régimen tiene reglas propias y una asesoría obligatoria. Lucía te acompaña.</p>${fin(btn('colp','Hablar con Lucía','pri',pedirP1('cambio de régimen: asesoría obligatoria','barra'),{m:1})+btn('otraR','Cambiar mi respuesta','sec',()=>{u.fondo=null;est('')}))}`);
+  if(S.est==='colp')return L(`<h1 class="k-h1">Desde Colpensiones, el paso que sigue es con Lucía</h1><p class="k-ap">Cambiar de régimen tiene reglas propias y una asesoría obligatoria. Lucía te acompaña.</p><div class="k-card f3-colp"><div class="f3-cita">${ft('lucia','LG','Lucía, asesora del plan','av')}<b>Lucía</b><small>Asesora del plan de ${EMP}</small></div><p class="f3-msj">«Hola, soy Lucía. Para traer tu pensión desde Colpensiones, la ley pide una doble asesoría: una con Colpensiones y otra conmigo. Te acompaño en las dos y te explico qué cambia en tu pensión antes de que decidas.»</p><p class="f3-cont">${ic('chat')}<span>Te escribe por WhatsApp o te llama, como prefieras</span></p></div>${fin(btn('colp','Hablar con Lucía','pri',pedirP1('cambio de régimen: asesoría obligatoria','barra'),{m:1})+btn('otraR','Cambiar mi respuesta','sec',()=>{u.fondo=null;est('')}))}`);
   return L(`<h1 class="k-h1">¿Dónde está hoy tu pensión obligatoria?</h1><p class="k-ap">Es lo único que falta para firmar.</p>
    <div class="k-ops" role="group" aria-label="Fondo actual">${op('fondo-0','En un fondo privado',u.fondo===0,pon(0),{paso:1})}${op('fondo-1','En Colpensiones',u.fondo===1,()=>{u.fondo=1;est('colp')},{paso:1})}${op('fondo-2','No sé; consúltenlo',u.fondo===2,pon(2),{paso:1,sub:'Al elegirla autorizas a Skandia a consultarlo en {fuente}, solo para tu vinculación.'})}</div>`);},
  notas:[['diseno','Una decisión por pantalla: es lo único propio de este traslado. Al elegir, pasa a la firma.'],['legal','«Colpensiones»: cambiar de régimen exige asesoría obligatoria y sale del prototipo.']]};
